@@ -1,0 +1,28 @@
+name: GitHub to Notion Sync
+on:
+  issues:
+    types: [opened, edited, closed, reopened]
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Notion SDK
+        run: npm install @notionhq/client@2.2.15
+      - name: Run Sync Script
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_API_KEY }}
+          NOTION_ISSUE_DB_ID: ${{ secrets.NOTION_ISSUE_DB_ID }}
+          NOTION_PR_DB_ID: ${{ secrets.NOTION_PR_DB_ID }}
+          NOTION_USER: ${{ secrets.NOTION_USER }}
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_EVENT_DATA: ${{ toJson(github.event) }}
+        run: node .github/scripts/notion-sync.js
+
+        # @latest 대신 안정적인 2.2.15 버전을 설치합니다.

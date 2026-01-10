@@ -1,0 +1,33 @@
+paginatePath: pullRequests.edges.node
+
+name-template: '🔖 Nier_Automata v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '✨ 추가된 기능'
+    labels:
+      - 'enhancement'
+  - title: '🐛 버그 픽스'
+    labels:
+      - 'bug'
+      - 'fix'
+  - title: '🔧 코드 개선'
+    label:
+      - 'chore'
+      - 'refactor'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  ## No Lable Changes
+
+  $CHANGES

@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="99. Headers">
+      <UniqueIdentifier>{d313c04d-6d61-4aab-a446-1457b9a59c1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System">
+      <UniqueIdentifier>{53798066-eaec-445e-aa8e-258a50bd01d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\00. GraphicDevice">
+      <UniqueIdentifier>{3e8ce880-4ebd-486e-a5ba-0b91d7366e9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SystemFiles">
+      <UniqueIdentifier>{731bc2de-25a5-4c3a-920c-c7a0d1601f4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility">
+      <UniqueIdentifier>{f816cadb-c4ff-4717-97f7-dd49af70a446}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\01. Time">
+      <UniqueIdentifier>{668bf2b4-766d-4d3d-82ed-fc95f75eff67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\01. Time\Manager">
+      <UniqueIdentifier>{916d9826-c804-4bc5-ad7e-16d4f5d7d5ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\01. Time\Timer">
+      <UniqueIdentifier>{2aac22b5-8683-40e1-90e2-914d0c9cf8f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\99. BasicObject">
+      <UniqueIdentifier>{11f78164-ce5d-4d47-a5c1-063ef65035c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\00. GameInstance">
+      <UniqueIdentifier>{8a3d234d-4747-4708-92b4-238afc44f020}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\99. Helper">
+      <UniqueIdentifier>{46461e0e-1874-4db3-b539-ddafc0d22b34}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\public\Engine_Define.h">
+      <Filter>99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_Enum.h">
+      <Filter>99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_Function.h">
+      <Filter>99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_Macro.h">
+      <Filter>99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_Struct.h">
+      <Filter>99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_Typedef.h">
+      <Filter>99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GraphicDevice.h">
+      <Filter>00. System\00. GraphicDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Game.h">
+      <Filter>01. Utility\00. GameInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TimeManager.h">
+      <Filter>00. System\01. Time\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Object.h">
+      <Filter>00. System\99. BasicObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ID_Helper.h">
+      <Filter>01. Utility\99. Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Timer.h">
+      <Filter>00. System\01. Time\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\String_Helper.h">
+      <Filter>01. Utility\99. Helper</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Private\GraphicDevice.cpp">
+      <Filter>00. System\00. GraphicDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Game.cpp">
+      <Filter>01. Utility\00. GameInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TimeManager.cpp">
+      <Filter>00. System\01. Time\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Object.cpp">
+      <Filter>00. System\99. BasicObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Timer.cpp">
+      <Filter>00. System\01. Time\Timer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ExportBuildArtifacts.bat">
+      <Filter>SystemFiles</Filter>
+    </None>
+    <None Include="..\vcpkg.json">
+      <Filter>SystemFiles</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,20 @@
+{
+  "name": "dx11-game-project",
+  "version": "1.0.0",
+  "dependencies": [
+    "directxtk",
+    "directxtex",
+    "assimp",
+    "magic-enum",
+    "spdlog",
+    "rttr",
+    {
+      "name": "imgui",
+      "features": [
+        "dx11-binding",
+        "win32-binding",
+        "docking-experimental"
+      ]
+    }
+  ]
+}

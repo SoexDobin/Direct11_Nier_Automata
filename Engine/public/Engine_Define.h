@@ -19,11 +19,13 @@ using namespace Microsoft::WRL;
 #include <ctime>
 #include <functional>
 #include <list>
+#include <set>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "Engine_Enum.h"
@@ -43,9 +45,9 @@ using namespace Microsoft::WRL;
 
 #ifdef _DEBUG
 
-#define _CRTDBG_MAP_ALLOC
+#define CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifndef DBG_NEW
 

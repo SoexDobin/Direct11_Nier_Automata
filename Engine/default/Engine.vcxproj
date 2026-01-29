@@ -128,7 +128,7 @@
       <PreprocessorDefinitions>_DEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;..\..\EngineSDK\lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Projectdir)..\public\;$(Solutiondir)Engine\external\FMOD\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -136,7 +136,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
@@ -154,7 +155,7 @@
       <PreprocessorDefinitions>NDEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;..\..\EngineSDK\lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Projectdir)..\public\;$(Solutiondir)Engine\external\FMOD\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -162,7 +163,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
@@ -177,10 +179,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Engine_Define.h" />
+    <ClInclude Include="..\public\Engine_Enum.h" />
+    <ClInclude Include="..\public\Engine_Function.h" />
+    <ClInclude Include="..\public\Engine_Macro.h" />
+    <ClInclude Include="..\public\Engine_Struct.h" />
+    <ClInclude Include="..\public\Engine_Typedef.h" />
+    <ClInclude Include="..\public\Game.h" />
     <ClInclude Include="..\public\GraphicDevice.h" />
+    <ClInclude Include="..\public\ID_Helper.h" />
+    <ClInclude Include="..\public\Object.h" />
+    <ClInclude Include="..\public\TimeManager.h" />
+    <ClInclude Include="..\public\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GraphicDevice.cpp" />
+    <ClCompile Include="..\private\Object.cpp" />
+    <ClCompile Include="..\private\TimeManager.cpp" />
+    <ClCompile Include="..\private\Timer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

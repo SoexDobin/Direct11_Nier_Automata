@@ -1,0 +1,21 @@
+{
+  "name": "dx11-framework",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "magic-enum",
+    "directxtk",
+    "nlohmann-json",
+    "assimp",
+    "spdlog",
+    "rttr",
+    {
+      "name": "imgui",
+      "features": [
+        "dx11-binding",
+        "win32-binding",
+        "docking-experimental"
+      ]
+    },
+    "imguizmo"
+  ]
+}

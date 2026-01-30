@@ -10,7 +10,7 @@ HRESULT TimeManager::Initialize()
 
 Float TimeManager::Update_Timers()
 {
-	for (auto& timer : m_Timers)
+	for (const auto& timer : m_Timers)
 	{
 		if (timer.second->IsActive())
 			timer.second->Update_Timer();

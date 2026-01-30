@@ -10,8 +10,8 @@ Object::Object()
 Object::~Object()
 {
 	// ReSharper disable once CppVirtualFunctionCallInsideCtor
-	OnDestroy();
-    Object::OnDestroy();
+	On_Destroy();
+    Object::On_Destroy();
 }
 
 void Object::Destroy(Shared<Object> object)
@@ -25,9 +25,9 @@ void Object::Set_Active(Bool isActive)
     if (m_IsActive == isActive) return;
 
     if (isActive)
-        OnEnable();
+        On_Enable();
     else
-        OnDisable();
+        On_Disable();
 
     m_IsActive = isActive;
 }

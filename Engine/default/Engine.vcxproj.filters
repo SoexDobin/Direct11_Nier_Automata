@@ -13,9 +13,6 @@
     <Filter Include="01. Utility">
       <UniqueIdentifier>{5603e6ed-0b0e-48b7-b29b-775ddf69d9e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="99. SystemFiles\vcpkg">
-      <UniqueIdentifier>{a6209e49-bcb7-4a18-aac6-d1c683fc64ac}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. System\00. GraphicDevice">
       <UniqueIdentifier>{1235952a-10e7-4fb1-96a6-cd1bc759b699}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,21 @@
     </Filter>
     <Filter Include="01. Utility\05. Component">
       <UniqueIdentifier>{654d0826-3c73-4a92-bb3b-e992abc3342d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\00. Object\Abstract">
+      <UniqueIdentifier>{1e20fd20-96d7-4d1e-a749-69006df8df2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Prototype\Manager">
+      <UniqueIdentifier>{018a6506-ef62-440e-ab7c-56435ec34b18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. SystemFiles\vcpkg">
+      <UniqueIdentifier>{a6209e49-bcb7-4a18-aac6-d1c683fc64ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Transform">
+      <UniqueIdentifier>{ed2d446a-82cf-4a10-a19a-9288916b2645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. GameObject\Manager">
+      <UniqueIdentifier>{21019bc6-af5e-4141-8ccd-e6de98413f55}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +110,27 @@
     <ClInclude Include="..\public\Timer.h">
       <Filter>00. System\01. Time</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Manager.h">
+      <Filter>01. Utility\00. Object\Abstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>01. Utility\02. Level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LevelManager.h">
+      <Filter>01. Utility\02. Level\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PrototypeManager.h">
+      <Filter>01. Utility\03. Prototype\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GameObject.h">
+      <Filter>01. Utility\04. GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Component.h">
+      <Filter>01. Utility\05. Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ObjectManager.h">
+      <Filter>01. Utility\04. GameObject\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -114,6 +147,27 @@
     </ClCompile>
     <ClCompile Include="..\private\Timer.cpp">
       <Filter>00. System\01. Time</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Manager.cpp">
+      <Filter>01. Utility\00. Object\Abstract</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LevelManager.cpp">
+      <Filter>01. Utility\02. Level\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level.cpp">
+      <Filter>01. Utility\02. Level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PrototypeManager.cpp">
+      <Filter>01. Utility\03. Prototype\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GameObject.cpp">
+      <Filter>01. Utility\04. GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Component.cpp">
+      <Filter>01. Utility\05. Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ObjectManager.cpp">
+      <Filter>01. Utility\04. GameObject\Manager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

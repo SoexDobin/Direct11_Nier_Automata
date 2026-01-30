@@ -10,13 +10,10 @@
 
 #include "spdlog/spdlog.h"
 #include "magic_enum/magic_enum.hpp"
-#include "rttr/registration"
-#include "rttr/type"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace Microsoft::WRL;
-using namespace rttr;
 
 #include <algorithm>
 #include <ctime>

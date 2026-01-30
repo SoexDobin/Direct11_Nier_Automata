@@ -148,6 +148,10 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <PostBuildEvent>
       <Message>Exporting build artifacts (DLLs, headers, libs) to Client and EngineSDK...</Message>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
+      <Message>Reflection Class Naming</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -176,10 +180,15 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <PostBuildEvent>
       <Message>Exporting build artifacts (DLLs, headers, libs) to Client and EngineSDK...</Message>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
+      <Message>Reflection Class Naming</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\external\vcpkg.json" />
+    <None Include="..\vcpkg.json" />
     <None Include="ExportBuildArtifacts.bat" />
+    <None Include="GenerateRTTR.bat" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Component.h" />

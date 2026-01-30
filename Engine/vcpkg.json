@@ -7,7 +7,7 @@
     "nlohmann-json",
     "assimp",
     "spdlog",
-    "rttr",
+    "rttr", 
     {
       "name": "imgui",
       "features": [

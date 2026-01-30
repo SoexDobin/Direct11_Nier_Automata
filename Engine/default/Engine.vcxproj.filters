@@ -66,11 +66,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\external\vcpkg.json">
-      <Filter>99. SystemFiles\vcpkg</Filter>
-    </None>
     <None Include="ExportBuildArtifacts.bat">
       <Filter>99. SystemFiles\Batch</Filter>
+    </None>
+    <None Include="GenerateRTTR.bat">
+      <Filter>99. SystemFiles\Batch</Filter>
+    </None>
+    <None Include="..\vcpkg.json">
+      <Filter>99. SystemFiles\vcpkg</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

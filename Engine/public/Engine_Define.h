@@ -1,6 +1,10 @@
 #ifndef Engine_Define_h__
 #define Engine_Define_h__
 
+#include "rttr/registration"
+#include "rttr/type"
+using namespace rttr;
+
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "directxtk/SimpleMath.h"
@@ -10,13 +14,11 @@
 
 #include "spdlog/spdlog.h"
 #include "magic_enum/magic_enum.hpp"
-#include "rttr/registration"
-#include "rttr/type"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace Microsoft::WRL;
-using namespace rttr;
+
 
 #include <algorithm>
 #include <ctime>

@@ -4,7 +4,7 @@
 Object::Object()
 {
     Helper::CreateID(Helper::OBJECT_ID_TYPE, m_ObjectID);
-    
+	
 }
 
 Object::~Object()

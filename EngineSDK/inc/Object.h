@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine_Define.h"
+#define RTTR_ENABLED 
 
 NS_BEGIN(Engine)
 

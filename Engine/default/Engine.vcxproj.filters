@@ -134,6 +134,12 @@
     <ClInclude Include="..\public\ObjectManager.h">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Type_Helper.h">
+      <Filter>97. Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\String_Helper.h">
+      <Filter>97. Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">

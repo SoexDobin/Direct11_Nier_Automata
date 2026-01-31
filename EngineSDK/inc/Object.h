@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine_Define.h"
-#define RTTR_ENABLED 
 
 NS_BEGIN(Engine)
 
@@ -15,7 +14,7 @@ public:
 	const wstring& Get_Name() const		{ return m_ObjectName; }
 
 public:
-	virtual HRESULT Initialize(Shared<void> arg) { return S_OK; }
+	virtual HRESULT Initialize(Shared<void> arg);
 	virtual void On_Destroy() { return; }
 	virtual void On_Disable() { return; }
 	virtual void On_Enable() { return; }

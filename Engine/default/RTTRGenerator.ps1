@@ -11,8 +11,8 @@ Write-Host "RTTR Registration Code Generator" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "========== [RTTR] Scanning directory: $InputDir ==========" -ForegroundColor Yellow
-Write-Host "========== [RTTR] Output directory: $OutputDir ==========" -ForegroundColor Yellow
+Write-Host "========== [RTTR] Scanning directory: $InputDir" -ForegroundColor Yellow
+Write-Host "========== [RTTR] Output directory: $OutputDir" -ForegroundColor Yellow
 Write-Host ""
 
 if (-not (Test-Path $InputDir)) {
@@ -26,42 +26,68 @@ if (-not (Test-Path $OutputDir)) {
 }
 
 $count = 0
+$processedClasses = @{}  # ⭐ 중복 방지용 해시테이블
 
 # 모든 .h 파일 처리
 Get-ChildItem -Path $InputDir -Filter "*.h" | ForEach-Object {
     $headerFile = $_
     $content = Get-Content $headerFile.FullName -Raw -Encoding UTF8
     
-    # 클래스 이름 추출
-if ($content -match 'class\s+(?:ENGINE_DLL\s+)?(\w+)\s*(?::\s*public\s+(\w+))?') {
-    $className = $Matches[1]
-    $parentClass = if ($Matches[2]) { $Matches[2] } else { "" }  # ← 없으면 빈 문자열
-    
-    # RTTR 등록 코드 생성 (wstring 사용)
-    $rttrCode = @"
-#include "$className.h"
-#include <rttr/registration>
-using namespace rttr;
-using namespace Engine;
-RTTR_REGISTRATION
-{
-    registration::class_<$className>(L"$className")
-        (
-            rttr::metadata("parent", L"$parentClass")
-        )
-        .constructor<>()
-    ;
-}
+
+    # ⭐ enum이나 struct가 있으면 건너뛰기
+    if ($content -match '\benum\s+' -or $content -match '\bstruct\s+') 
+    {
+        # Write-Host "==========      [SKIP] $($headerFile.Name) (enum or struct)" -ForegroundColor Gray
+        return  # 다음 파일로
+    }
+    if ($content -notmatch '\bclass\s+') 
+    {
+        return
+    }
+
+    # 클래스 이름 추출 - : 또는 { 필수
+    if ($content -match '\bclass\s+(?:ENGINE_DLL\s+)?(\w+)(?:\s+(?:final|abstract))?\s*[:{]')
+    {
+        $className = $Matches[1]
+        
+        # ⭐ 중복 체크
+        if ($processedClasses.ContainsKey($className)) 
+        {
+            # Write-Host "==========      [SKIP] $($headerFile.Name) - $className already processed" -ForegroundColor Gray
+            return
+        }
+        
+        $processedClasses[$className] = $true
+        # $parentClass = if ($Matches[2]) { $Matches[2] } else { "" }  # ← 없으면 빈 문자열
+        
+        # RTTR 등록 코드 생성 (wstring 사용)
+        $rttrCode = @"
+        #include "$className.h"
+        #include <rttr/registration>
+        using namespace rttr;
+        using namespace Engine;
+        RTTR_REGISTRATION
+        {
+            registration::class_<$className>(L"$className")
+            // (
+            //     rttr::metadata("parent", L"$parentClass")
+            // )
+            .constructor<>()
+        }
+
 "@
-    
-    # 파일 저장
-    $outputFile = Join-Path $OutputDir "${className}_rttr.cpp"
-    $rttrCode | Out-File -FilePath $outputFile -Encoding UTF8
-    
-    Write-Host "==========      [OK] ${className}_rttr.cpp (parent: $parentClass)" -ForegroundColor Green
-    $count++
-}
-    else {
+
+        # 파일 저장
+        $outputFile = Join-Path $OutputDir "${className}_rttr.cpp"
+        $rttrCode | Out-File -FilePath $outputFile -Encoding UTF8
+        
+        Write-Host "==========      [OK] ${className}_rttr.cpp" -ForegroundColor Green
+        $count++
+
+        return
+    }
+    else 
+    {
         Write-Host "==========      [!WARN] $($headerFile.Name) (class not found)" -ForegroundColor Yellow
     }
 }

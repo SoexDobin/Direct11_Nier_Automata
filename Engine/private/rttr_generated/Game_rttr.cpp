@@ -1,10 +1,10 @@
-﻿        #include "GraphicDevice.h"
+﻿        #include "Game.h"
         #include <rttr/registration>
         using namespace rttr;
         using namespace Engine;
         RTTR_REGISTRATION
         {
-            registration::class_<GraphicDevice>(L"GraphicDevice")
+            registration::class_<Game>(L"Game")
             // (
             //     rttr::metadata("parent", L"")
             // )

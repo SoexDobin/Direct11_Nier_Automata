@@ -13,7 +13,7 @@ public:
 	HRESULT Initialize(HWND hWnd, WINMODE isWindowed, uint32 winSizeX, uint32 iWinSizeY,
 		_Inout_ ComPtr<ID3D11Device>& device,
 		_Inout_ ComPtr<ID3D11DeviceContext>& context);
-	HRESULT Clear_BackBufferView(const Float4* clearColor) const;
+	HRESULT Clear_BackBufferView(const Shared<Float4>& clearColor) const;
 	HRESULT Clear_DepthStencilView() const;
 	HRESULT Present() const;
 

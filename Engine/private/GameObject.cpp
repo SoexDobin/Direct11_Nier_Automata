@@ -2,6 +2,7 @@
 #include "ID_Helper.h"
 #include "Type_Helper.h"
 #include "String_Helper.h"
+#include "Game.h"
 
 GameObject::GameObject(const ComPtr<ID3D11Device>& pDevice, const ComPtr<ID3D11DeviceContext>& context)
 	: m_Device(pDevice), m_Context(context)
@@ -51,5 +52,7 @@ void GameObject::Priority_Update(Float timeDelta) {}
 void GameObject::Update(Float timeDelta) {}
 
 void GameObject::Late_Update(Float timeDelta) {}
+
+void GameObject::Fixed_Update(Float fixedDelta) {}
 
 HRESULT GameObject::Render() { return S_OK; }

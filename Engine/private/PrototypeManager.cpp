@@ -36,7 +36,7 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex)
 	return S_OK;
 }
 
-Shared<Object> PrototypeManager::Find_Prototype(uint32 levIndex, const wstring& name)
+Shared<Object> PrototypeManager::Find_Prototype(uint32 levIndex, const wstring& typeTag)
 {
 	return nullptr;
 }

@@ -49,6 +49,7 @@ namespace Engine
 		LAYER30 = 1 << 29,
 		LAYER31 = 1 << 30,
 
+		END = 32,
 		ALL_LAYER = 0xFFFFFFFF,
 	};
 	using CUSTOM_LAYER = LAYER;
@@ -93,6 +94,7 @@ namespace Engine
 		TAG_30 = 1 << 29,
 		TAG_31 = 1 << 30,
 
+		END = 32,
 		ALL_TAG = 0xFFFFFFFF,
 	};
 	using CUSTOM_TAG = TAG;

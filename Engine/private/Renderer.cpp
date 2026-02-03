@@ -1,7 +1,23 @@
 #include "Renderer.h"
 
+#include "GameObject.h"
+
 Renderer::Renderer(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+	: m_Device(device), m_Context(context)
 {
+}
+
+void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject>& gameObject)
+{
+	m_RenderGroup[ETOI(renderGroup)].push_back(gameObject);
+}
+
+void Renderer::Draw()
+{
+	for (size_t i = 0; i < renderGroupSize; ++i)
+	{
+		Render_Group(i);
+	}
 }
 
 HRESULT Renderer::Initialize(Shared<void> arg)
@@ -11,7 +27,9 @@ HRESULT Renderer::Initialize(Shared<void> arg)
 
 void Renderer::On_Destroy()
 {
-	
+	for (auto group : m_RenderGroup)
+		group.clear();
+
 }
 
 void Renderer::On_Disable()
@@ -27,6 +45,21 @@ void Renderer::On_Enable()
 void Renderer::Set_Active(Bool isActive)
 {
 	EngineManager::Set_Active(isActive);
+}
+
+void Renderer::Render_Group(uint32 groupIndex)
+{
+	for (auto& object : m_RenderGroup[groupIndex])
+	{
+		uint32 objLayer = object->Get_Layer();
+
+		// Layer 필터링
+		if ((m_EnabledLayerMask & objLayer) == 0) continue;
+
+		object->Render();
+	}
+
+	m_RenderGroup[groupIndex].clear();
 }
 
 Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

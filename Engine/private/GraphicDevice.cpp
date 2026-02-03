@@ -51,13 +51,13 @@ HRESULT GraphicDevice::Initialize(HWND hWnd, WINMODE isWindowed, uint32 winSizeX
 	return S_OK;
 }
 
-HRESULT GraphicDevice::Clear_BackBufferView(const Float4* clearColor) const
+HRESULT GraphicDevice::Clear_BackBufferView(const Shared<Float4>& clearColor) const
 {
 	if (nullptr == m_Device)
 		return E_FAIL;
 
 	m_Context->ClearRenderTargetView(m_RTV.Get(),
-		reinterpret_cast<const Float*>(clearColor));
+		reinterpret_cast<const Float*>(clearColor.get()));
 
 	return S_OK;
 }

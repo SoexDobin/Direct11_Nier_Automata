@@ -8,7 +8,7 @@ HRESULT TimeManager::Initialize()
 	return S_OK;
 }
 
-Float TimeManager::Update_Timers()
+Float TimeManager::Update_Timers() const
 {
 	for (const auto& timer : m_Timers)
 	{
@@ -17,6 +17,11 @@ Float TimeManager::Update_Timers()
 	}
 
 	return m_MainTimer->Update_Timer();
+}
+
+Float TimeManager::Is_FixedUpdate() const
+{
+	return m_MainTimer->IsFixedUpdate();
 }
 
 Shared<Timer> TimeManager::Get_MainTimer() const

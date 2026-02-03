@@ -16,8 +16,8 @@ NS_BEGIN(Helper)
 	constexpr uint32 OBJECT_ID_NONE		= 0x00000003;
 	
 
-	static std::atomic<uint32> g_TypeIDCounter = { 1 };		// 프로토타입 개수 카운터
-	static std::atomic<uint32> g_UniqueIDCounter = { 1 }; // 고유 아이디 카운터
+	static std::atomic<uint32> g_TypeIDCounter = { 1 };	// 프로토타입 개수 카운터
+	static std::atomic<uint32> g_UniqueIDCounter = { 1 };  // 고유 아이디 카운터
 
     static uint32 Hash_GUID(const GUID& guid)
     {

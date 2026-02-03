@@ -21,8 +21,10 @@ public:
 	HRESULT			Clear_Prototypes(uint32 levIndex);
 
 private:
-	Shared<Object>	Find_Prototype(uint32 levIndex, const wstring& name);
-	
+	Shared<Object>	Find_Prototype(uint32 levIndex, const wstring& typeTag);
+	template <typename T>
+	uint32			Find_TypeID();
+	uint32			Find_TypeID(const wstring& typeTag);
 
 private:
 	

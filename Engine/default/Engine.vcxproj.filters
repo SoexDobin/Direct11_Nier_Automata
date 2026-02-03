@@ -67,6 +67,12 @@
     <Filter Include="01. Utility\06. Renderer">
       <UniqueIdentifier>{d18791d9-b40e-4b89-95b7-85da985aa256}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\Texture">
+      <UniqueIdentifier>{82f89165-0584-42b3-bbe1-e2261eaab34d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. GameObject\Layer">
+      <UniqueIdentifier>{26eea91c-6b58-45de-baf3-24d53e64a704}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -146,7 +152,12 @@
     <ClInclude Include="..\public\Level.h">
       <Filter>01. Utility\02. Level</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Renderer.h" />
+    <ClInclude Include="..\public\Renderer.h">
+      <Filter>01. Utility\06. Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LayerRegistry.h">
+      <Filter>01. Utility\04. GameObject\Layer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -188,6 +199,11 @@
     <ClCompile Include="..\private\Level.cpp">
       <Filter>01. Utility\02. Level</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Renderer.cpp" />
+    <ClCompile Include="..\private\Renderer.cpp">
+      <Filter>01. Utility\06. Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerRegistry.cpp">
+      <Filter>01. Utility\04. GameObject\Layer</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

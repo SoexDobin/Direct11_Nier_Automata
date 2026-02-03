@@ -11,8 +11,8 @@ public:
 	~Timer() = default;
 
 public:
-	Bool IsActive() const { return m_isActive; }
-	void SetActive(Bool isActive) { m_isActive = isActive; }
+	Bool IsActive() const { return m_IsActive; }
+	void SetActive(Bool isActive) { m_IsActive = isActive; }
 
 	Float	GetDeltaTime()	const { return m_DeltaTime; }
 	Float	GetTotalTime()	const { return m_DeltaAcc; }
@@ -51,7 +51,7 @@ private:
 	uint32 m_TempFPS = {};
 	Float m_FPSTimeElapsed = {};
 
-	Bool m_isActive = { true };
+	Bool m_IsActive = { true };
 
 public:
 	static Shared<Timer> Create();

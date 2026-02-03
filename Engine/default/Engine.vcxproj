@@ -74,11 +74,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\bin\</OutDir>
-    <ExternalIncludePath>$(ProjectDir)..\external\vcpkg_installed\x64-windows-static\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(ProjectDir)..\external\vcpkg_installed\x64-windows\include\;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\bin\</OutDir>
-    <ExternalIncludePath>$(ProjectDir)..\external\vcpkg_installed\x64-windows-static\include\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(ProjectDir)..\external\vcpkg_installed\x64-windows\include\;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -150,7 +150,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
-      <Message>Reflection Class Naming</Message>
+      <Message>Reflection Engine Class</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -182,7 +182,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
-      <Message>Reflection Class Naming</Message>
+      <Message>Reflection Engine Class</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -202,16 +202,18 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GraphicDevice.h" />
     <ClInclude Include="..\public\ID_Helper.h" />
+    <ClInclude Include="..\public\Level.h" />
     <ClInclude Include="..\public\LevelManager.h" />
-    <ClInclude Include="..\public\Manager.h" />
+    <ClInclude Include="..\public\EngineManager.h" />
     <ClInclude Include="..\public\Object.h" />
     <ClInclude Include="..\public\ObjectManager.h" />
     <ClInclude Include="..\public\PrototypeManager.h" />
+    <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\String_Helper.h" />
     <ClInclude Include="..\public\TimeManager.h" />
     <ClInclude Include="..\public\Timer.h" />
+    <ClInclude Include="..\public\Transform.h" />
     <ClInclude Include="..\public\Type_Helper.h" />
-    <ClInclude Include="Level.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Component.cpp" />
@@ -220,12 +222,14 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\GraphicDevice.cpp" />
     <ClCompile Include="..\private\Level.cpp" />
     <ClCompile Include="..\private\LevelManager.cpp" />
-    <ClCompile Include="..\private\Manager.cpp" />
+    <ClCompile Include="..\private\EngineManager.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
     <ClCompile Include="..\private\ObjectManager.cpp" />
     <ClCompile Include="..\private\PrototypeManager.cpp" />
+    <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\TimeManager.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />
+    <ClCompile Include="..\private\Transform.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

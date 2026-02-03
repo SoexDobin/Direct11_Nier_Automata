@@ -1,4 +1,5 @@
 #include "GraphicDevice.h"
+#include "Game.h"
 
 HRESULT GraphicDevice::Initialize(HWND hWnd, WINMODE isWindowed, uint32 winSizeX, uint32 winSizeY,
 	_Inout_ ComPtr<ID3D11Device>& device,

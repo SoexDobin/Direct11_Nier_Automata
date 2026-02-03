@@ -6,7 +6,6 @@
 
 namespace Engine
 {
-
 	using Bool = bool;
 
 	using Byte = signed char;

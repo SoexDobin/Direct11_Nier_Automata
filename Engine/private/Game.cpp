@@ -1,7 +1,10 @@
 #include "Game.h"
 #include "GraphicDevice.h"
 #include "TimeManager.h"
+#include "LevelManager.h"
 #include "PrototypeManager.h"
+#include "ObjectManager.h"
+
 
 IMPLEMENT_SINGLETON(Game)
 
@@ -21,8 +24,16 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC& engineDesc,
 		device, 
 		context
 	);
-	m_TimeManager = TimeManager::Create();
-	m_PrototypeManager = PrototypeManager::Create(1);
+	
+	if (nullptr == (m_TimeManager = TimeManager::Create()))
+		return E_FAIL;
+
+	if (nullptr == (m_PrototypeManager = PrototypeManager::Create(engineDesc.levCount)))
+		return E_FAIL;
+
+	if (nullptr == (m_ObjectManager = ObjectManager::Create(engineDesc.levCount)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -30,6 +41,8 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC& engineDesc,
 void Game::Update_Engine()
 {
 	Float delta = m_TimeManager->Update_Timers();
+
+	
 }
 
 HRESULT Game::Draw()

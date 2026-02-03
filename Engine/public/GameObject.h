@@ -11,9 +11,12 @@ public:
 	virtual ~GameObject() override = default;
 
 public:
-	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(Shared<void> arg) override;
+	constexpr static PROTOTYPE Get_Prototype() { return PROTOTYPE::GAMEOBJECT; }
 
+public:
+	virtual HRESULT Initialize_Prototype() override;
+	virtual HRESULT Initialize(Shared<void> arg) override;
+	
 public:
 	virtual void Priority_Update(Float timeDelta);
 	virtual void Update(Float timeDelta);
@@ -29,6 +32,9 @@ protected:
 
 public:
 	virtual Shared<GameObject> Clone(Shared<void> arg) PURE;
+
+private:
+	using Object::m_ObjectDesc;
 };
 
 NS_END

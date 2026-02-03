@@ -1,4 +1,6 @@
 @echo off
+
+
 echo ========================================
 echo RTTR Registration Code Generator
 echo ========================================
@@ -11,7 +13,8 @@ echo ========== [INFO] Input: %INPUT_DIR%
 echo ========== [INFO] Output: %OUTPUT_DIR%
 echo.
 
-powershell -ExecutionPolicy Bypass -File "%SCRIPT_PATH%" -InputDir "%INPUT_DIR%" -OutputDir "%OUTPUT_DIR%"
+python RTTRGenerator.py "..\public" "..\private\rttr_generated" :: || powershell -ExecutionPolicy Bypass -File "%~dp0RTTRGenerator.ps1" -InputDir "..\public" -OutputDir "..\private\rttr_generated"
+
 if %ERRORLEVEL% EQU 0 (
     echo.
     echo ========== [SUCCESS] RTTR generation completed!

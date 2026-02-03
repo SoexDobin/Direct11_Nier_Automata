@@ -4,7 +4,7 @@
 
 HRESULT LevelManager::Initialize(Shared<void> arg)
 {
-	return Manager::Initialize(arg);
+	return EngineManager::Initialize(arg);
 }
 
 void LevelManager::On_Destroy()

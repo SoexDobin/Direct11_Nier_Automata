@@ -64,6 +64,9 @@
     <Filter Include="01. Utility\04. GameObject\Manager">
       <UniqueIdentifier>{21019bc6-af5e-4141-8ccd-e6de98413f55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\06. Renderer">
+      <UniqueIdentifier>{d18791d9-b40e-4b89-95b7-85da985aa256}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -113,11 +116,8 @@
     <ClInclude Include="..\public\Timer.h">
       <Filter>00. System\01. Time</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Manager.h">
+    <ClInclude Include="..\public\EngineManager.h">
       <Filter>01. Utility\00. Object\Abstract</Filter>
-    </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>01. Utility\02. Level</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LevelManager.h">
       <Filter>01. Utility\02. Level\Manager</Filter>
@@ -140,6 +140,13 @@
     <ClInclude Include="..\public\String_Helper.h">
       <Filter>97. Helper</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Transform.h">
+      <Filter>01. Utility\05. Component\Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level.h">
+      <Filter>01. Utility\02. Level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -157,14 +164,11 @@
     <ClCompile Include="..\private\Timer.cpp">
       <Filter>00. System\01. Time</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Manager.cpp">
+    <ClCompile Include="..\private\EngineManager.cpp">
       <Filter>01. Utility\00. Object\Abstract</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LevelManager.cpp">
       <Filter>01. Utility\02. Level\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Level.cpp">
-      <Filter>01. Utility\02. Level</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PrototypeManager.cpp">
       <Filter>01. Utility\03. Prototype\Manager</Filter>
@@ -178,5 +182,12 @@
     <ClCompile Include="..\private\ObjectManager.cpp">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Transform.cpp">
+      <Filter>01. Utility\05. Component\Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level.cpp">
+      <Filter>01. Utility\02. Level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Renderer.cpp" />
   </ItemGroup>
 </Project>

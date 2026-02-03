@@ -1,11 +1,11 @@
 #pragma once
-#include "Manager.h"
+#include "EngineManager.h"
 
 NS_BEGIN(Engine)
 
 class Level;
 
-class LevelManager final : public Manager
+class LevelManager final : public EngineManager
 {
 	NO_COPY(LevelManager)
 public:

@@ -10,12 +10,6 @@ public:
 	virtual ~Level() override = default;
 
 public:
-	virtual HRESULT Initialize(Shared<void> arg) override;
-	virtual void On_Destroy() override;
-	virtual void On_Disable() override;
-	virtual void On_Enable() override;
-
-public:
 	virtual void Update_Level(Float timeDelta);
 	virtual HRESULT Render_Level();
 

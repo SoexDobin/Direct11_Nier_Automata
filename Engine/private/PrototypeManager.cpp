@@ -1,13 +1,14 @@
 #include "PrototypeManager.h"
 #include "GameObject.h"
 #include "Component.h"
+#include "Type_Helper.h"
+#include "String_Helper.h"
 
 HRESULT PrototypeManager::Initialize(Shared<void> arg)
 {
 	m_LevelCount = *static_pointer_cast<uint32>(arg);
 	m_Prototypes.shrink_to_fit();
 	m_Prototypes.resize(m_LevelCount);
-
 	return S_OK;
 }
 
@@ -19,66 +20,64 @@ void PrototypeManager::On_Destroy()
 	}
 }
 
-HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const wstring& key, const Shared<Object>& prototype)
+HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& prototype)
 {
-	if (levIndex >= m_LevelCount || prototype == nullptr)
-		return E_FAIL;
-
-	// TODO : Add 할때 리플렉션으로 클래스 이름 가져와서 이름으로 키 사용
-
 	return S_OK;
 }
 
-Shared<Object> PrototypeManager::Clone_Prototype(PROTOTYPE prototype, 
-												 uint32 levIndex, 
-												 const wstring& key,
-												 Shared<void> arg)
+Shared<Object> PrototypeManager::Clone_Prototype(uint32 levIndex, Shared<void> arg)
 {
-	Shared<Object> searchedPrototype = Find_Prototype(levIndex, key);
-	if (searchedPrototype == nullptr)
-		return nullptr;
 
-	Shared<Object> instance = { nullptr };
-
-	if (PROTOTYPE::GAMEOBJECT == prototype)
-	{
-		instance = static_pointer_cast<GameObject>(searchedPrototype)->Clone(arg);
-	}
-	else if (PROTOTYPE::COMPONENT == prototype)
-	{
-		instance = static_pointer_cast<Component>(searchedPrototype)->Clone(arg);
-	}
-
-	if (instance == nullptr)
-	{
-		MSG_BOX("Failed To Clone Prototype");
-		return nullptr;
-	}
-
-	return instance;
-}	
+	return nullptr;
+}
 
 HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex)
 {
-	if (levIndex >= m_LevelCount)
-		return E_FAIL;
-
-	m_Prototypes[levIndex].clear();
-
 	return S_OK;
 }
 
-Shared<Object> PrototypeManager::Find_Prototype(uint32 levIndex, const wstring& key)
+Shared<Object> PrototypeManager::Find_Prototype(uint32 levIndex, const wstring& name)
 {
-	if (levIndex >= m_LevelCount)
-		return nullptr;
-
-	auto it = m_Prototypes[levIndex].find(key);
-	if (it == m_Prototypes[levIndex].end())
-		return nullptr;
-
-	return it->second;
+	return nullptr;
 }
+
+HRESULT PrototypeManager::Create_Reflection(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+{
+	type type_GameObject = Helper::Get_Type<GameObject>();
+	type type_Component = Helper::Get_Type<Component>();
+
+	for (auto& type : type::get_types())
+	{
+		Bool isDerivedObj = type.is_derived_from(type_GameObject);
+		Bool isDerivedCom = type.is_derived_from(type_Component);
+
+		if (!isDerivedObj && !isDerivedCom)
+			continue;
+
+		method createMethod = type.get_method("Create");
+		if (createMethod.is_valid() == false)
+			continue;
+
+		variant result = createMethod.invoke({}, device, context);
+		if (result.is_valid() == false)
+			continue;
+
+		Shared<Object> prototype = result.get_value<Shared<Object>>();
+		if (prototype == nullptr) 
+			continue;
+
+		std::wstring typeName = Helper::To_wString(type.get_name().to_string());
+
+		for (size_t i = 0; i < m_LevelCount; ++i)
+		{
+			m_Prototypes[i].emplace(prototype->Get_TypeID(), prototype);
+			m_Types[i].emplace(typeName, prototype->Get_TypeID());
+		}
+
+	}
+	return S_OK;
+}
+
 
 Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount)
 {

@@ -10,11 +10,13 @@ public:
 	virtual ~Object();
 
 public:
-	ObjectID Get_ObjectID() const		{ return m_ObjectID; }
+	uint32 Get_TypeID() const			{ return m_ObjectDesc.typeID; }
+	uint32 Get_ObjectID() const			{ return m_ObjectDesc.uniqueID; }
 	const wstring& Get_Name() const		{ return m_ObjectName; }
 
 public:
-	virtual HRESULT Initialize(Shared<void> arg);
+	virtual HRESULT Initialize_Prototype() { return S_OK; }
+	virtual HRESULT Initialize(Shared<void> arg) { return S_OK; }
 	virtual void On_Destroy() { return; }
 	virtual void On_Disable() { return; }
 	virtual void On_Enable() { return; }
@@ -28,7 +30,7 @@ public:
 protected:
 	Bool m_IsDestroy		= { false }; 
 	Bool m_IsActive			= { true };
-	uint32 m_ObjectID		= {};
+	ID_DESC m_ObjectDesc	= {};
 	wstring m_ObjectName	= {};
 
 };

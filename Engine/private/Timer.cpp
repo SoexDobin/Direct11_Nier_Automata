@@ -11,7 +11,7 @@ HRESULT Timer::Initialize()
     m_DeltaTime = 0.0f;
     m_DeltaAcc = 0.0f;
     
-    m_FixedDeltaTime = 0.016f; // 60Hz
+    m_FixedDeltaTime = 0.016667f; // 60Hz
     m_FixedAcc = 0.0f;
 
     m_FPS = 0;
@@ -27,10 +27,10 @@ Float Timer::Update_Timer()
 	QueryPerformanceCounter(&m_CurrentTime);
 	m_DeltaTime = 
         static_cast<Float>(m_CurrentTime.QuadPart - m_PrevTime.QuadPart) / 
-        static_cast<Float>(m_Frequency.QuadPart);
+        static_cast<Float>(m_Frequency.QuadPart) * m_TimeScale;
 	m_DeltaAcc += m_DeltaTime;
 
-	m_FixedAcc += m_DeltaTime * m_TimeScale;
+	m_FixedAcc += m_DeltaTime;
 
     ++m_FrameAcc;
     ++m_TempFPS;

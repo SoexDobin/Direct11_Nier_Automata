@@ -68,7 +68,7 @@ NS_BEGIN(Helper)
 	{
         // 1. 일반 string으로 포맷팅 후 2. wstring으로 변환
 		// format_w("Assets/Shaders/{}_{}.hlsl", "Effect", 1);
-        return To_wString(std::format(fmt, std::forward<Args>(args)...));
+        return Helper::To_wString(std::format(fmt, std::forward<Args>(args)...));
     }
     
     // --- 3. C++20 format 기반 가변 인자 변환 (String) ---

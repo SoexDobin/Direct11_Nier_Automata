@@ -1,7 +1,4 @@
 #include "Object.h"
-#include "ID_Helper.h"
-#include "Type_Helper.h"
-#include "String_Helper.h"
 
 Object::Object()
 {
@@ -14,14 +11,6 @@ Object::~Object()
 	// ReSharper disable once CppVirtualFunctionCallInsideCtor
 	On_Destroy();
     Object::On_Destroy();
-}
-
-HRESULT Object::Initialize(Shared<void> arg)
-{
-    Helper::CreateID(Helper::OBJECT_ID_TYPE, m_ObjectID);
-    m_ObjectName = Helper::To_wString(Helper::Get_Type(this).get_name().to_string());
-
-	return S_OK;
 }
 
 void Object::Destroy(Shared<Object> object)

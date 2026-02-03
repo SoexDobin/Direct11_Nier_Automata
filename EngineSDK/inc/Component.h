@@ -11,7 +11,7 @@ public:
 	virtual ~Component() override = default;
 	
 public:
-	virtual HRESULT Initialize_Prototype();
+	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(Shared<void> arg) override;
 
 protected:
@@ -20,6 +20,8 @@ protected:
 
 public:
 	virtual Shared<Component> Clone(Shared<void> arg) PURE;
+private:
+	using Object::m_ObjectDesc;
 };
 
 NS_END

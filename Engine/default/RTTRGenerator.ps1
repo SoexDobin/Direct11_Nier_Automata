@@ -49,6 +49,7 @@ Get-ChildItem -Path $InputDir -Filter "*.h" | ForEach-Object {
     if ($content -match '\bclass\s+(?:ENGINE_DLL\s+)?(\w+)(?:\s+(?:final|abstract))?\s*[:{]')
     {
         $className = $Matches[1]
+
         
         # ⭐ 중복 체크
         if ($processedClasses.ContainsKey($className)) 
@@ -58,22 +59,37 @@ Get-ChildItem -Path $InputDir -Filter "*.h" | ForEach-Object {
         }
         
         $processedClasses[$className] = $true
-        # $parentClass = if ($Matches[2]) { $Matches[2] } else { "" }  # ← 없으면 빈 문자열
         
-        # RTTR 등록 코드 생성 (wstring 사용)
-        $rttrCode = @"
-        #include "$className.h"
-        #include <rttr/registration>
-        using namespace rttr;
-        using namespace Engine;
-        RTTR_REGISTRATION
-        {
-            registration::class_<$className>(L"$className")
-            // (
-            //     rttr::metadata("parent", L"$parentClass")
-            // )
-            .constructor<>()
+        # ⭐ Clone 메서드 존재 여부 확인
+        $hasClone = $content -match '\bClone\s*\('
+        
+        # ⭐ static Create 메서드 존재 여부 확인
+        $hasCreate = $content -match '\bstatic\s+.*\bCreate\s*\('
+        
+        # ⭐ RTTR 메서드 등록 코드 구성 (RTTR이 자동으로 타입 추론)
+        $methodRegistrations = ""
+        
+        if ($hasClone) {
+            $methodRegistrations += "`n        .method(`"Clone`", &${className}::Clone)"
         }
+        
+        if ($hasCreate) {
+            $methodRegistrations += "`n        .method(`"Create`", &${className}::Create)"
+        }
+        
+        # RTTR 등록 코드 생성
+        $rttrCode = @"
+#include "$className.h"
+#include <rttr/registration>
+using namespace rttr;
+using namespace Engine;
+
+RTTR_REGISTRATION
+{
+    registration::class_<$className>(L"$className")
+        .constructor<>()$methodRegistrations
+        ;
+}
 
 "@
 

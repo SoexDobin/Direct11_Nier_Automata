@@ -22,7 +22,6 @@ private:
 		uint32 winSizeY);
 	HRESULT Ready_BackBufferRenderTargetView();
 	HRESULT Ready_DepthStencilView(uint32 winSizeX, uint32 winSizeY);
-	// HRESULT Ready_ShaderResourceView();
 
 private:
 	ComPtr<ID3D11Device> m_Device = { nullptr };

@@ -158,6 +158,9 @@
     <ClInclude Include="..\public\LayerRegistry.h">
       <Filter>01. Utility\04. GameObject\Layer</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ScriptComponent.h">
+      <Filter>01. Utility\05. Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -202,8 +205,14 @@
     <ClCompile Include="..\private\Renderer.cpp">
       <Filter>01. Utility\06. Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="LayerRegistry.cpp">
+    <ClCompile Include="..\private\ScriptComponent.cpp">
+      <Filter>01. Utility\05. Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LayerRegistry.cpp">
       <Filter>01. Utility\04. GameObject\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GameUtility.cpp">
+      <Filter>01. Utility\01. GameInstance</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

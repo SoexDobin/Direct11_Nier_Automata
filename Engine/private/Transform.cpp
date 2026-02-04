@@ -15,7 +15,7 @@ HRESULT Transform::Initialize_Prototype()
 	return Component::Initialize_Prototype();
 }
 
-HRESULT Transform::Initialize(Shared<void> arg)
+HRESULT Transform::Initialize(const Shared<void>& arg)
 {
 	Shared<TRANSFORM_DESC> desc = static_pointer_cast<TRANSFORM_DESC>(arg);
 
@@ -37,7 +37,7 @@ Shared<Transform> Transform::Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11De
 	return transform;
 }
 
-Shared<Component> Transform::Clone(Shared<void> arg)
+Shared<Component> Transform::Clone(const Shared<void>& arg)
 {
 	return nullptr;
 }

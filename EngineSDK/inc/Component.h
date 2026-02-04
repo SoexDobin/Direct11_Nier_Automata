@@ -11,15 +11,20 @@ public:
 	virtual ~Component() override = default;
 	
 public:
+	virtual COMPONENT_TYPE Get_ComponentType() const PURE;
+	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::COMPONENT; }
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(Shared<void> arg) override;
+	virtual HRESULT Initialize(const Shared<void>& arg) override;
 
 protected:
 	ComPtr<ID3D11Device>		m_Device = { nullptr };
 	ComPtr<ID3D11DeviceContext> m_Context = { nullptr };
 
 public:
-	virtual Shared<Component> Clone(Shared<void> arg) PURE;
+	constexpr virtual Shared<Component> Clone(const Shared<void>& arg) PURE;
+
 private:
 	using Object::m_ObjectDesc;
 };

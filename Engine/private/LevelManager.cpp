@@ -2,7 +2,7 @@
 #include "Level.h"
 #include "Game.h"
 
-HRESULT LevelManager::Initialize(Shared<void> arg)
+HRESULT LevelManager::Initialize(const Shared<void>& arg)
 {
 	return EngineManager::Initialize(arg);
 }

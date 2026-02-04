@@ -4,8 +4,15 @@
 namespace Engine
 {
 	enum class WINMODE { FULL, WIN };
-	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
+	enum class PROTOTYPE { GAMEOBJECT, COMPONENT, ENGINE_MANAGER };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
+	enum class COMPONENT_TYPE
+	{
+		SCRIPT,
+		TRANSFORM,
+		TEXTURE,
+
+	};
 
 }
 

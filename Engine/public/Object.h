@@ -16,7 +16,7 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype() { return S_OK; }
-	virtual HRESULT Initialize(Shared<void> arg) { return S_OK; }
+	virtual HRESULT Initialize(const Shared<void>& arg) { return S_OK; }
 	virtual void On_Destroy() { return; }
 	virtual void On_Disable() { return; }
 	virtual void On_Enable() { return; }
@@ -25,6 +25,7 @@ public:
 	Bool Is_Active() const;
 
 public:
+	virtual PROTOTYPE Get_Prototype() const PURE;
 	static void Destroy(Shared<Object> object);
 
 protected:

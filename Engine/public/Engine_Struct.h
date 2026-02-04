@@ -1,8 +1,6 @@
 #ifndef Engine_Struct_h__
 #define Engine_Struct_h__
 
-#include "Engine_Define.h"
-
 namespace Engine
 {
 	typedef struct tagEngineDesc
@@ -14,21 +12,6 @@ namespace Engine
 		unsigned int	levCount = {};
 	} ENGINE_DESC;
 
-	typedef struct tagLayerMask
-	{
-		std::wstring layerName = {};
-		Engine::LAYER layer;
-		Engine::COMPARE_LAYER compareLayer;
-
-	} LAYER_MASK;
-
-	typedef struct tagTagMask
-	{
-		std::wstring tagName = {};
-		Engine::TAG tag;
-		Engine::COMPARE_TAG compareTag;
-	} TAG_MASK;
-
 	typedef struct tagGuidDesc
 	{
 		uint32 typeID = {};
@@ -39,7 +22,7 @@ namespace Engine
 
 namespace Engine
 {
-	struct ENGINE_DLL LayerMask final
+	typedef struct ENGINE_DLL LayerMask final
 	{
 		using Mask = uint32;
 		LayerMask() = default;
@@ -59,7 +42,15 @@ namespace Engine
 	private:
 		Mask m_layer = { 0x00000000 };
 		Mask m_mask = { 0xFFFFFFFF };
-	};
+	} LAYER_MASK;
+
+	typedef struct ENGINE_DLL TagMask final
+	{
+		
+	private:
+		
+
+	} TAG_MASK;
 }
 
 #endif // Engine_Struct_h__

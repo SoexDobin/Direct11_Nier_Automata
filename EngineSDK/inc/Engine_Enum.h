@@ -4,8 +4,15 @@
 namespace Engine
 {
 	enum class WINMODE { FULL, WIN };
-	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
+	enum class PROTOTYPE { GAMEOBJECT, COMPONENT, ENGINE_MANAGER };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
+	enum class COMPONENT_TYPE
+	{
+		SCRIPT,
+		TRANSFORM,
+		TEXTURE,
+
+	};
 
 }
 
@@ -49,6 +56,7 @@ namespace Engine
 		LAYER30 = 1 << 29,
 		LAYER31 = 1 << 30,
 
+		END = 32,
 		ALL_LAYER = 0xFFFFFFFF,
 	};
 	using CUSTOM_LAYER = LAYER;
@@ -93,6 +101,7 @@ namespace Engine
 		TAG_30 = 1 << 29,
 		TAG_31 = 1 << 30,
 
+		END = 32,
 		ALL_TAG = 0xFFFFFFFF,
 	};
 	using CUSTOM_TAG = TAG;

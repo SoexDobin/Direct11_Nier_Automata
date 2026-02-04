@@ -14,7 +14,8 @@ public:
 
 public:
 	HRESULT Initialize();
-	Float Update_Timers();
+	Float Update_Timers() const;
+	Float Is_FixedUpdate() const;
 
 	Shared<Timer> Get_MainTimer() const;
 	Shared<Timer> Get_Timer(const wstring& key) const;

@@ -13,7 +13,7 @@ public:
 	~ObjectManager() override = default;
 
 public:
-	HRESULT Initialize(Shared<void> arg) override;
+	HRESULT Initialize(const Shared<void>& arg) override;
 	void On_Destroy() override;
 
 public:

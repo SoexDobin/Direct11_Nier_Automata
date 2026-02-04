@@ -35,7 +35,7 @@ HRESULT GameObject::Initialize_Prototype()
 	return __super::Initialize_Prototype();
 }
 
-HRESULT GameObject::Initialize(Shared<void> arg)
+HRESULT GameObject::Initialize(const Shared<void>& arg)
 {
 	Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_ObjectDesc);
 	if (m_ObjectDesc.uniqueID == 0)

@@ -1,9 +1,10 @@
 #pragma once
 #include "EngineManager.h"
+#include "Level.h"
 
 NS_BEGIN(Engine)
 
-class Level;
+
 
 class LevelManager final : public EngineManager
 {
@@ -13,7 +14,10 @@ public:
 	~LevelManager() override = default;
 
 public:
-	HRESULT Initialize(Shared<void> arg) override;
+	uint32 Get_CurrentLevelIndex() const { return m_CurrentLevelIndex; }
+
+public:
+	HRESULT Initialize(const Shared<void>& arg) override;
 	void On_Destroy() override;
 
 public:

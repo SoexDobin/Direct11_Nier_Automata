@@ -4,7 +4,7 @@
 
 IMPLEMENT_SINGLETON(LayerRegistry)
 
-const wstring& LayerRegistry::Get_LayerName(LAYER layer) const
+wstring LayerRegistry::Get_LayerName(LAYER layer) const
 {
 	const auto iter = m_LayerToName.find(layer);
 
@@ -13,7 +13,7 @@ const wstring& LayerRegistry::Get_LayerName(LAYER layer) const
 
 	return Helper::To_wString(magic_enum::enum_name(layer));
 }
-const wstring& LayerRegistry::Get_LayerName(uint32 layerBit) const
+wstring LayerRegistry::Get_LayerName(uint32 layerBit) const
 {
 	return Get_LayerName(static_cast<LAYER>(layerBit));
 }

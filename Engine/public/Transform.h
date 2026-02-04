@@ -18,14 +18,16 @@ public:
 
 public:
 	HRESULT Initialize_Prototype() override;
-	HRESULT Initialize(Shared<void> arg) override;
+	HRESULT Initialize(const Shared<void>& arg) override;
+	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::TRANSFORM; }
+	
 
 private:
 	Matrix		m_WorldMatrix = {};
 
 public:
 	static Shared<Transform> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
-	Shared<Component> Clone(Shared<void> arg) override;
+	Shared<Component> Clone(const Shared<void>& arg) override;
 
 };
 

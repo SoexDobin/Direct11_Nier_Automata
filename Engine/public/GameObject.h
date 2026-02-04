@@ -15,11 +15,9 @@ public:
 	virtual ~GameObject() override = default;
 
 public:
-	constexpr static PROTOTYPE Get_Prototype() { return PROTOTYPE::GAMEOBJECT; }
-
-public:
 	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(Shared<void> arg) override;
+	virtual HRESULT Initialize(const Shared<void>& arg) override;
+	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
 	
 public:
 	virtual void Priority_Update(Float timeDelta);
@@ -39,7 +37,7 @@ protected:
 	// TODO : Child GameObjects
 
 public:
-	virtual Shared<GameObject> Clone(Shared<void> arg) PURE;
+	constexpr virtual Shared<GameObject> Clone(const Shared<void>& arg) PURE;
 
 private:
 	using Object::m_ObjectDesc;

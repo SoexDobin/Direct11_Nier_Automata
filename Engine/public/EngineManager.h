@@ -10,6 +10,9 @@ public:
 	EngineManager() = default;
 	virtual ~EngineManager() override = default;
 
+public:
+	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::ENGINE_MANAGER; }
+
 private:
 	using Object::m_ObjectDesc;
 };

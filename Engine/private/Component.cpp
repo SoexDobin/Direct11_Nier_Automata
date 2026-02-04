@@ -32,7 +32,7 @@ HRESULT Component::Initialize_Prototype()
 	return __super::Initialize_Prototype();
 }
 
-HRESULT Component::Initialize(Shared<void> arg)
+HRESULT Component::Initialize(const Shared<void>& arg)
 {
 	Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_ObjectDesc);
 	if (m_ObjectDesc.uniqueID == 0)

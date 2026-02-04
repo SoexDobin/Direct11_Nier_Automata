@@ -1,11 +1,11 @@
 #pragma once
 #include "Object.h"
+#include "LayerRegistry.h"
+#include "TagRegistry.h"
 
 NS_BEGIN(Engine)
 
 class Transform;
-class LayerRegistry;
-struct LayerMask;
 
 class ENGINE_DLL GameObject abstract : public Object, enable_shared_from_this<GameObject>
 {
@@ -13,6 +13,10 @@ public:
 	explicit GameObject(const ComPtr<ID3D11Device>& pDevice, const ComPtr<ID3D11DeviceContext>& context);
 	explicit GameObject(const Shared<GameObject>& prototype);
 	virtual ~GameObject() override = default;
+
+public:
+	LAYER_MASK& Get_LayerMask() { return m_LayerMask; }
+	TAG_MASK& Get_TagMask() { return m_TagMask; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -31,7 +35,7 @@ protected:
 	ComPtr<ID3D11DeviceContext> m_Context = { nullptr };
 	Shared<Transform>			m_Transform = { nullptr };
 	LayerMask					m_LayerMask = {};
-
+	TagMask						m_TagMask = {};
 	
 	// TODO : Parent GameObject
 	// TODO : Child GameObjects

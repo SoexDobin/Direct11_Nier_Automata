@@ -13,6 +13,9 @@ public:
 	~Renderer() override = default;
 
 public:
+	uint32 Get_LayerBits() const { return m_LayerMask; }
+
+public:
 	void Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject>& gameObject);
 	void Draw();
 
@@ -25,13 +28,12 @@ public:
 
 private:
 	void Render_Group(uint32 groupIndex);
-	
 
 private:
 	ComPtr<ID3D11Device>										m_Device = { nullptr };
 	ComPtr<ID3D11DeviceContext>									m_Context = { nullptr };
 	array<vector<Shared<GameObject>>, ETOI(RENDERGROUP::END)>	m_RenderGroup;
-	array<Bool, ETOI(LAYER::END)>								m_LayerEnable = { true, };
+	uint32														m_LayerMask = { ETOI(LAYER::ALL_LAYER) };
 
 public:
 	static Unique<Renderer> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

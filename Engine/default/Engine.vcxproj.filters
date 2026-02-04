@@ -73,6 +73,9 @@
     <Filter Include="01. Utility\04. GameObject\Layer">
       <UniqueIdentifier>{26eea91c-6b58-45de-baf3-24d53e64a704}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. GameObject\Tag">
+      <UniqueIdentifier>{0eba92fd-2cc4-4241-ab59-f595c94ae580}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -161,6 +164,9 @@
     <ClInclude Include="..\public\ScriptComponent.h">
       <Filter>01. Utility\05. Component</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\TagRegistry.h">
+      <Filter>01. Utility\04. GameObject\Tag</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -213,6 +219,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GameUtility.cpp">
       <Filter>01. Utility\01. GameInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TagRegistry.cpp">
+      <Filter>01. Utility\04. GameObject\Tag</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

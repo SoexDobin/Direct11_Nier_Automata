@@ -22,6 +22,8 @@ void Renderer::Draw()
 
 HRESULT Renderer::Initialize(const Shared<void>& arg)
 {
+	m_LayerMask = ETOI(LAYER::ALL_LAYER);
+
 	return EngineManager::Initialize(arg);
 }
 
@@ -51,12 +53,11 @@ void Renderer::Render_Group(uint32 groupIndex)
 {
 	for (auto& object : m_RenderGroup[groupIndex])
 	{
-		//uint32 objLayer = object->Get_Layer();
-		//
-		//// Layer 필터링
-		//if ((m_EnabledLayerMask & objLayer) == 0) continue;
-		//
-		//object->Render();
+		uint32 objLayer = object->Get_LayerMask().Get_Layer();
+		
+		if ((m_LayerMask & objLayer) == 0) continue;
+		
+		object->Render();
 	}
 
 	m_RenderGroup[groupIndex].clear();

@@ -13,6 +13,9 @@ public:
 	~ObjectManager() override = default;
 
 public:
+	uint32 Get_LayerBits() const { return m_LayerMask; }
+
+public:
 	HRESULT Initialize(const Shared<void>& arg) override;
 	void On_Destroy() override;
 
@@ -26,14 +29,12 @@ public:
 	HRESULT Clear_GameObjects();
 	Shared<GameObject> Find_GameObjectByType(uint32 typeID);
 	Shared<GameObject> Find_GameObjectByUnique(uint32 objectID);
-	template <typename T>
-	constexpr Shared<GameObject> Find_GameObject();
 
 private:
-	map<uint32, list<Shared<GameObject>>>				m_ObjectByLayer;
-	unordered_map<uint32, list<Shared<GameObject>>>		m_ObjectsByType;
-	unordered_map<uint32, Shared<GameObject>>			m_ObjectsByUnique;
-	array<Bool, ETOI(LAYER::END)>						m_LayerEnable = { true, };
+	map<uint32, list<Shared<GameObject>>>					m_ObjectByLayer;
+	unordered_map<uint32, list<Shared<GameObject>>>			m_ObjectByType;
+	unordered_map<uint32, Shared<GameObject>>				m_ObjectByUnique;
+	uint32													m_LayerMask = { ETOI(LAYER::ALL_LAYER) };
 
 public:
 	static Unique<ObjectManager> Create();

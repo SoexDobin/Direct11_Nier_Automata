@@ -212,6 +212,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
     <ClInclude Include="..\public\String_Helper.h" />
+    <ClInclude Include="..\public\TagRegistry.h" />
     <ClInclude Include="..\public\TimeManager.h" />
     <ClInclude Include="..\public\Timer.h" />
     <ClInclude Include="..\public\Transform.h" />
@@ -232,6 +233,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
+    <ClCompile Include="..\private\TagRegistry.cpp" />
     <ClCompile Include="..\private\TimeManager.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />

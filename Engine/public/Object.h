@@ -17,7 +17,10 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype() { return S_OK; }
 	virtual HRESULT Initialize(const Shared<void>& arg) { return S_OK; }
+
+	Bool Is_Destroy() const { return m_IsDestroy; }
 	virtual void On_Destroy() { return; }
+
 	virtual void On_Disable() { return; }
 	virtual void On_Enable() { return; }
 

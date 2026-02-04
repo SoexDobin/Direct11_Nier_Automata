@@ -3,6 +3,27 @@
 
 NS_BEGIN(Engine)
 
+typedef struct ENGINE_DLL LayerMask final
+{
+	LayerMask() = default;
+
+	uint32 Get_Layer() const { return m_Layer; }
+	void Set_Layer(const LAYER layer) { m_Layer = ETOI(layer); }
+	uint32 Get_Mask() const { return m_Mask; }
+	void Set_Mask(const LAYER mask) { m_Mask = ETOI(mask); }
+
+	void Add(LAYER layer) { m_Mask |= ETOI(layer); }
+	void Add(uint32 layer) { m_Mask |= layer; }
+	void Remove(LAYER layer) { m_Mask &= ~ETOI(layer); }
+	void Remove(uint32 layer) { m_Mask &= ~layer; }
+	Bool Has(LAYER layer) const { return (m_Mask & ETOI(layer)) != 0; }
+	Bool Has(uint32 layer) const { return (m_Mask & layer) != 0; }
+
+private:
+	uint32 m_Layer = { 0x00000000 };
+	uint32 m_Mask = { 0xFFFFFFFF };
+} LAYER_MASK;
+
 class ENGINE_DLL LayerRegistry
 {
 	DECLARE_SINGLETON(LayerRegistry)

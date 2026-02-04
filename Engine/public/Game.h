@@ -72,8 +72,3 @@ private:
 };
 
 NS_END
-
-layer, tag를 툴과 클라이언트 연동을 위한 Regist 클래스
-Reflection 을 통해 자동으로 Client의 스크립트를 읽어오는 rttr을
-감싸는 wrapper 클래스는 어떻게 구성하는게 좋고 사용엔진 처럼 엔진은 무조건 적으로 독립적이어야해
-Engine의 모든 헤더를 읽고 판단해줘 필요하다면 cpp나 다른 파일도

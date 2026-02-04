@@ -59,8 +59,6 @@ namespace Engine
 		END = 32,
 		ALL_LAYER = 0xFFFFFFFF,
 	};
-	using CUSTOM_LAYER = LAYER;
-	using COMPARE_LAYER = LAYER;
 
 
 	enum class TAG : unsigned __int32
@@ -104,8 +102,7 @@ namespace Engine
 		END = 32,
 		ALL_TAG = 0xFFFFFFFF,
 	};
-	using CUSTOM_TAG = TAG;
-	using COMPARE_TAG = TAG;
+
 }
 
 

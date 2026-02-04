@@ -20,37 +20,4 @@ namespace Engine
 
 }
 
-namespace Engine
-{
-	typedef struct ENGINE_DLL LayerMask final
-	{
-		using Mask = uint32;
-		LayerMask() = default;
-
-		uint32 Get_Layer() const { return m_layer; }
-		void Set_Layer(const uint32 layer) { m_layer = layer; }
-		uint32 Get_Mask() const { return m_mask; }
-		void Set_Mask(const uint32 mask) { m_mask = mask; }
-
-		void Add(LAYER layer) { m_mask |= ETOI(layer); }
-		void Add(uint32 layer) { m_mask |= layer; }
-		void Remove(LAYER layer) { m_mask &= ~ETOI(layer); }
-		void Remove(uint32 layer) { m_mask &= ~layer; }
-		Bool Has(LAYER layer) const { return (m_mask & ETOI(layer)) != 0; }
-		Bool Has(uint32 layer) const { return (m_mask & layer) != 0; }
-
-	private:
-		Mask m_layer = { 0x00000000 };
-		Mask m_mask = { 0xFFFFFFFF };
-	} LAYER_MASK;
-
-	typedef struct ENGINE_DLL TagMask final
-	{
-		
-	private:
-		
-
-	} TAG_MASK;
-}
-
 #endif // Engine_Struct_h__

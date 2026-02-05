@@ -76,6 +76,9 @@
     <Filter Include="01. Utility\04. GameObject\Tag">
       <UniqueIdentifier>{0eba92fd-2cc4-4241-ab59-f595c94ae580}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97. Helper\SpdLogger">
+      <UniqueIdentifier>{187d8e7d-3bf5-458e-85eb-d3faa4627e5a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -167,6 +170,9 @@
     <ClInclude Include="..\public\TagRegistry.h">
       <Filter>01. Utility\04. GameObject\Tag</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SpdLogger.h">
+      <Filter>97. Helper\SpdLogger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -222,6 +228,12 @@
     </ClCompile>
     <ClCompile Include="..\private\TagRegistry.cpp">
       <Filter>01. Utility\04. GameObject\Tag</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SpdLogger.cpp">
+      <Filter>97. Helper\SpdLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SimpleMath.cpp">
+      <Filter>98. Headers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

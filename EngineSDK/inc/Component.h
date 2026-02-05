@@ -3,7 +3,7 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Component abstract : public Object, enable_shared_from_this<Component>
+class ENGINE_DLL Component abstract : public Object, public enable_shared_from_this<Component>
 {
 public:
 	explicit Component(const ComPtr<ID3D11Device>& pDevice, const ComPtr<ID3D11DeviceContext>& context);

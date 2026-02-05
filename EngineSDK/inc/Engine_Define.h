@@ -8,11 +8,13 @@ using namespace rttr;
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "directxtk/SimpleMath.h"
+#include <directxtk/DDSTextureLoader.h>
+#include <directxtk/WICTextureLoader.h>
+
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <wrl.h>
 
-#include "spdlog/spdlog.h"
 #include "magic_enum/magic_enum.hpp"
 
 using namespace DirectX;
@@ -32,6 +34,7 @@ using namespace Microsoft::WRL;
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <format>
 
 #include "Engine_Enum.h"
 #include "Engine_Function.h"

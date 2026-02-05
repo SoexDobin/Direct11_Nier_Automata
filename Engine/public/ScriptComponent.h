@@ -6,7 +6,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL ScriptComponent abstract : public Component
 {
 public:
-	ScriptComponent() = default;
+	ScriptComponent();
 	virtual ~ScriptComponent() override = default;
 
 public:

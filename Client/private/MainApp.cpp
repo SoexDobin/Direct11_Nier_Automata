@@ -37,8 +37,7 @@ void MainApp::Update() const
 
 HRESULT MainApp::Render() const
 {
-
-	return S_OK;
+	return m_Game->Draw();
 }
 
 HRESULT MainApp::Ready_StartLevel(LEVEL startLevel)
@@ -47,8 +46,8 @@ HRESULT MainApp::Ready_StartLevel(LEVEL startLevel)
 		return E_FAIL;
 
 
-	if (FAILED(m_Game->Change_Level(ETOI(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eStartLevelID))))
-		return E_FAIL;
+	/*if (FAILED(m_Game->Change_Level(ETOI(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eStartLevelID))))
+		return E_FAIL;*/
 
 	return S_OK;
 }

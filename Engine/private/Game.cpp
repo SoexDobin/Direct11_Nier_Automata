@@ -8,12 +8,21 @@
 
 
 #include "Level.h"
+#include "SpdLogger.h"
 #include "Timer.h"
-
+#include "SpdLogger.h"
 
 #include "String_Helper.h"
 
 
+Game::~Game()
+{
+
+#ifdef _DEBUG
+	LOG_SHUTDOWN(); /* Debug Helper SpdLogger */
+#endif
+
+}
 
 HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc,
                                 _Out_ ComPtr<ID3D11Device> &device,
@@ -43,10 +52,16 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc,
 	if (nullptr == (m_Renderer = Renderer::Create(device, context)))
 		return E_FAIL;
 	
+#ifdef _DEBUG
+	LOG_INIT(); /* Debug Helper SpdLogger */ 
+#endif
+
+
 	return S_OK;
 }
 
-void Game::Update_Engine() {
+void Game::Update_Engine() 
+{
 	const Float delta = m_TimeManager->Update_Timers();
 
 	m_ObjectManager->PriorityUpdate(delta);
@@ -59,14 +74,15 @@ void Game::Update_Engine() {
 	{
 		Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
 		m_ObjectManager->FixedUpdate(fixedDelta);
-
 		m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
+		m_TimeManager->Has_FixedUpdate();
 	}
 }
 
 HRESULT Game::Draw() 
 {
-	m_Renderer->Draw();
+	if (m_TimeManager->Is_FixedUpdate())
+		m_Renderer->Draw();
 
 	return S_OK;
 }

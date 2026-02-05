@@ -16,7 +16,7 @@ class ENGINE_DLL Game
 
 protected:
 	explicit Game() = default;
-	~Game() = default;
+	~Game();
 
 public:
 	HRESULT Initialize_Engine(const ENGINE_DESC& engineDesc,

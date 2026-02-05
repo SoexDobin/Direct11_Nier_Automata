@@ -4,6 +4,7 @@
 HRESULT TimeManager::Initialize()
 {
 	m_MainTimer = Timer::Create();
+	m_HasFixedUpdate = true;
 
 	return S_OK;
 }
@@ -19,8 +20,9 @@ Float TimeManager::Update_Timers() const
 	return m_MainTimer->Update_Timer();
 }
 
-Float TimeManager::Is_FixedUpdate() const
+Float TimeManager::Is_FixedUpdate()
 {
+	m_HasFixedUpdate = false;
 	return m_MainTimer->IsFixedUpdate();
 }
 

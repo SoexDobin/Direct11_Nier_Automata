@@ -3,27 +3,92 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Transform final : public Component
+class ENGINE_DLL Transform final : public Component, public enable_shared_from_this<Transform>
 {
-public:
-	typedef struct tagTransformDesc
-	{
-		// _float		fSpeedPerSec = {};
-		// _float		fRotationPerSec = {};
-	} TRANSFORM_DESC;
 public:
 	Transform(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
 	Transform(const Shared<Transform>& prototype);
 	~Transform() override = default;
 
+public: /* Local Getter */
+	Vector3			Get_LocalScale() const;
+	Vector3			Get_LocalPosition() const;
+	Quaternion		Get_LocalRotation() const;
+	Vector3			Get_LocalEulerAngles() const;
+	Matrix			Get_LocalMatrix() const;
+
+public: /* Local Setter */
+	void			Set_LocalScale(const Vector3& scale);
+	void			Set_LocalScale(Float x, Float y, Float z);
+
+	void			Set_LocalRotation(const Quaternion& rotation);
+	void			Set_LocalRotation(const Vector3& eulerAngles);
+	void			Set_LocalRotation(Float pitch, Float yaw, Float roll);
+
+	void			Set_LocalPosition(const Vector3& position);
+	void			Set_LocalPosition(Float x, Float y, Float z);
+
+public: /* World Getter */
+	Vector3			Get_Scale() const;
+	Vector3			Get_Rotation() const;
+	Quaternion		Get_RotationQuaternion() const;
+	Vector3			Get_Position() const;
+	Matrix			Get_WorldMatrix() const;
+
+public: /* World Setter */
+	void			Set_Scale(Float scaleX, Float scaleY, Float scaleZ);
+	void			Set_Scale(Vector3 scaleVec);
+
+	void			Set_Rotation(Vector3 eulerAngles);
+	void			Set_Rotation(Float pitch, Float yaw, Float roll);
+	void			Set_Rotation(Quaternion rotation);
+
+	void			Set_Position(Float scaleX, Float scaleY, Float scaleZ);
+	void			Set_Position(Vector3 positionVec);
+
+public: /* Util Method */
+	void Move_Forward(Float delta, Float amount);
+	void Move_Backward(Float delta, Float amount);
+	void Move_Right(Float delta, Float amount);
+	void Move_Left(Float delta, Float amount);
+	void LookAt(Vector3 atVec, Vector3 upVector = Vector3::UnitY);
+
+public: /* Parent, Child Method */
+	void				Set_Parent(const Shared<Transform>& parent);
+	Shared<Transform>	Get_Parent() const;
+	void				Remove_Parent();
+	Bool				Has_Parent() const;
+
+	void				Add_Children(const Shared<Transform>& child);
+	void				Remove_Child(const Shared<Transform>& child);
+	void				Remove_Child(uint32 objectID);
+	Bool				Has_Children();
+
 public:
+	Bool Is_Dirty() const { return m_IsDirty; }
+
+public: /* override */
+	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::TRANSFORM; }
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(const Shared<void>& arg) override;
-	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::TRANSFORM; }
-	
+	void On_Destroy() override;
+	void On_Disable() override;
+	void On_Enable() override;
 
-private:
-	Matrix		m_WorldMatrix = {};
+public:
+	void Update_WorldMatrix();
+
+private: 
+	Vector3				m_LocalScale		= { Vector3::One };
+	Quaternion			m_LocalRotation		= { Quaternion::Identity };
+	Vector3				m_LocalPosition		= { Vector3::One };
+
+	Matrix				m_WorldMatrix		= { Matrix::Identity };
+
+	Weak<Transform>				m_Parent	= { };
+	vector<Weak<Transform>>		m_Children;
+
+	Bool				m_IsDirty = { true };
 
 public:
 	static Shared<Transform> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);

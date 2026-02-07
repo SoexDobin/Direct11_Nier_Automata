@@ -122,7 +122,7 @@ Shared<GameObject> ObjectManager::Find_GameObjectByType(uint32 typeID)
 	return m_ObjectByType[typeID].front();
 }
 
-Shared<GameObject> ObjectManager::Find_GameObjectByUnique(uint32 objectID)
+Shared<GameObject> ObjectManager::Find_GameObjectByID(uint32 objectID)
 {
 	if (!m_ObjectByUnique.contains(objectID))
 	{

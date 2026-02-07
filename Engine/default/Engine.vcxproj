@@ -225,6 +225,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
+    <ClCompile Include="..\private\GameObjectUtil.cpp" />
     <ClCompile Include="..\private\GameUtility.cpp" />
     <ClCompile Include="..\private\GraphicDevice.cpp" />
     <ClCompile Include="..\private\LayerRegistry.cpp" />

@@ -235,5 +235,8 @@
     <ClCompile Include="..\private\SimpleMath.cpp">
       <Filter>98. Headers</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\GameObjectUtil.cpp">
+      <Filter>01. Utility\04. GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

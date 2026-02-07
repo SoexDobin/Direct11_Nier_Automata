@@ -5,6 +5,11 @@ NS_BEGIN(Engine)
 typedef struct ENGINE_DLL TagMask final
 {
 	TagMask() = default;
+	TagMask(const TagMask& tagMask)
+		: m_Tag(tagMask.m_Tag)
+	{
+		
+	}
 
 public:
 	uint32 Get_Tags() const { return m_Tag; }

@@ -16,6 +16,10 @@ public:
 	~PrototypeManager() override = default;
 
 public:
+	uint32 Get_TypeByName(const wstring& name);
+	const wstring& Get_NameByType(uint32 typeID);
+
+public:
 	HRESULT Initialize(const Shared<void>& arg) override;
 	void On_Destroy() override;
 
@@ -24,17 +28,12 @@ public:
 	HRESULT					Add_Prototype(uint32 levIndex, const Shared<Object>& object, const Shared<void>& arg = nullptr);
 	HRESULT					Clear_Prototypes(uint32 levIndex);
 
-	template <typename T>
-	constexpr Shared<T>		Clone_Prototype(PROTOTYPE prototype, uint32 levIndex, uint32 typeID, const Shared<void>& arg = nullptr);
-	Shared<Object>			Clone_Prototype(PROTOTYPE prototype, uint32 levIndex, uint32 typeID, const Shared<void>& arg = nullptr);
-	Shared<Object>			Clone_Prototype(PROTOTYPE prototype, uint32 levIndex, const wstring& typeName, const Shared<void>& arg = nullptr);
-
 public:
 	Shared<Object>	Find_Prototype(PROTOTYPE prototype, uint32 levIndex, uint32 typeID) const;
 	Shared<Object>	Find_Prototype(PROTOTYPE prototype, uint32 levIndex, const wstring& typeName) const;
 
 private:
-	vector<unordered_set<uint32>>								m_Types;
+	vector<unordered_map<uint32, wstring>>						m_NameByTypes;
 	vector<unordered_map<wstring, uint32>>						m_TypesByName;
 	vector<unordered_map<uint32, Shared<GameObject>>>			m_GameObjects;
 	vector<unordered_map<uint32, Shared<Component>>>			m_Components;
@@ -42,6 +41,9 @@ private:
 
 public:
 	static Unique<PrototypeManager> Create(uint32 levCount);
+
+private: /* validation method*/
+	Bool Validate_Level(uint32 levIndex) const;
 };
 
 NS_END

@@ -23,7 +23,7 @@ HRESULT MainApp::Initialize()
 	if (FAILED(m_Game->Initialize_Engine(EngineDesc, m_Device, m_Context)))
 		return E_FAIL;
 
-	/* 내 게임의 시작을 위해 시작이되는 레벨 할당과 동작을 시킨다. */
+
 	if (FAILED(Ready_StartLevel(LEVEL::LOGO)))
 		return E_FAIL;
 
@@ -37,7 +37,18 @@ void MainApp::Update() const
 
 HRESULT MainApp::Render() const
 {
-	return m_Game->Draw();
+	Shared<Float4>		vClearColor = make_shared<Float4>(0.f, 0.f, 1.f, 1.f);
+
+	if (FAILED(m_Game->Clear_BackBufferView(vClearColor)))
+		return E_FAIL;
+
+	if (FAILED(m_Game->Draw()))
+		return E_FAIL;
+
+	if (FAILED(m_Game->Present()))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT MainApp::Ready_StartLevel(LEVEL startLevel)
@@ -54,5 +65,13 @@ HRESULT MainApp::Ready_StartLevel(LEVEL startLevel)
 
 Unique<MainApp> MainApp::Create()
 {
-	return make_unique<MainApp>();
+	Unique<MainApp> mainApp = make_unique<MainApp>();
+
+	if (FAILED(mainApp->Initialize()))
+	{
+		
+		MSG_BOX("Failed to Created : MainApp");
+		return nullptr;
+	}
+	return mainApp;
 }

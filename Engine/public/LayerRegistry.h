@@ -6,6 +6,11 @@ NS_BEGIN(Engine)
 typedef struct ENGINE_DLL LayerMask final
 {
 	LayerMask() = default;
+	LayerMask(const LayerMask& layerMask)
+		: m_Layer(layerMask.m_Layer), m_Mask(layerMask.m_Mask)
+	{
+		
+	}
 
 	uint32 Get_Layer() const { return m_Layer; }
 	void Set_Layer(const LAYER layer) { m_Layer = ETOI(layer); }

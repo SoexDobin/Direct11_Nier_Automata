@@ -42,6 +42,9 @@ private:
 
 public:
 	static Unique<PrototypeManager> Create(uint32 levCount);
+
+private: /* validation method*/
+	Bool Validate_Level(uint32 levIndex) const;
 };
 
 NS_END

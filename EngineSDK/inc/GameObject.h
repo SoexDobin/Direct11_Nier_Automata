@@ -5,6 +5,7 @@
 
 NS_BEGIN(Engine)
 
+class Component;
 class Transform;
 
 class ENGINE_DLL GameObject abstract : public Object, enable_shared_from_this<GameObject>
@@ -36,9 +37,17 @@ protected:
 	Shared<Transform>			m_Transform = { nullptr };
 	LayerMask					m_LayerMask = {};
 	TagMask						m_TagMask = {};
-	
+
+protected:
+	unordered_map<uint32, Shared<Component>>	m_Components;
+
 	// TODO : Parent GameObject
 	// TODO : Child GameObjects
+protected:
+	//HRESULT Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,
+	//	const _wstring& strComponentTag, CComponent** ppOut, const Shared<void>& arg = nullptr);
+
+
 
 public:
 	constexpr virtual Shared<GameObject> Clone(const Shared<void>& arg) PURE;

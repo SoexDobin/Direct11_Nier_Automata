@@ -41,18 +41,19 @@ public: /* For PrototypeManager */
 	HRESULT Add_Prototype(uint32 levIndex, const Shared<class Object>& prototype) const;
 	
 public: /* For ObjectManager */
-	HRESULT Add_GameObject(const Shared<void>& arg = nullptr) const;
+private:
+	HRESULT Add_GameObject(const Shared<GameObject>& GameObject) const;
 
 public: /* For Renderer */
 	void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject>& gameObject) const;
 
-public: /* Util */
-	template<typename T>
+public: /* Util At GameUtil.cpp*/
+	template<typename T> /* Find Read only Prototype */
 	constexpr Shared<const T> Find_Prototype(uint32 levIndex = MAXINT32) const;
-	inline Shared<const GameObject> Find_Prototype(uint32 typeID, uint32 levIndex = MAXINT32) const;
-	inline Shared<const GameObject> Find_Prototype(const wstring& className, uint32 levIndex = MAXINT32) const;
+	inline Shared<const Object> Find_Prototype(uint32 typeID, uint32 levIndex = MAXINT32) const;
+	inline Shared<const Object> Find_Prototype(const wstring& className, uint32 levIndex = MAXINT32) const;
 	
-	template<typename T>
+	template<typename T> /* Instance GameObject */
 	constexpr Shared<T> Instantiated(const Shared<void>& arg) const;
 	inline Shared<GameObject> Instantiated(uint32 typeID, const Shared<void>& arg) const;
 	inline Shared<GameObject> Instantiated(const wstring& className, const Shared<void>& arg) const;

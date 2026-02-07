@@ -1,8 +1,11 @@
 #include "GameObject.h"
+#include "Game.h"
+
 #include "ID_Helper.h"
 #include "Type_Helper.h"
 #include "String_Helper.h"
-#include "Game.h"
+#include "SpdLogger.h"
+
 
 GameObject::GameObject(const ComPtr<ID3D11Device>& pDevice, const ComPtr<ID3D11DeviceContext>& context)
 	: m_Device(pDevice), m_Context(context)
@@ -11,16 +14,20 @@ GameObject::GameObject(const ComPtr<ID3D11Device>& pDevice, const ComPtr<ID3D11D
 }
 
 GameObject::GameObject(const Shared<GameObject>& prototype)
-	: GameObject(prototype->m_Device, prototype->m_Context)
+	: m_Device(prototype->m_Device), m_Context(prototype->m_Context),
+	m_LayerMask(prototype->m_LayerMask), 
+	m_TagMask(prototype->m_TagMask)
 {
-
+	
+	
 }
 
 HRESULT GameObject::Initialize_Prototype()
 {
 	Helper::CreateID(Helper::OBJECT_ID_TYPE, m_ObjectDesc);
-	if (m_ObjectDesc.typeID == 0)
+	if (m_ObjectDesc.m_typeID == 0)
 	{
+		LOG_ERROR(L"GameObject Initialize Failed By Set TypeID");
 		MSG_BOX("GameObject Initialize Failed By Set TypeID");
 		return E_FAIL;
 	}
@@ -28,7 +35,8 @@ HRESULT GameObject::Initialize_Prototype()
 	m_ObjectName = Helper::To_wString(Helper::Get_Type(this).get_name().to_string());
 	if (m_ObjectName.empty())
 	{
-		MSG_BOX("GameObject Initialize Failed By Set Class Name");
+		LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
+		MSG_BOX("GameObject Initialize Failed By Set Object Name");
 		return E_FAIL;
 	}
 
@@ -38,9 +46,10 @@ HRESULT GameObject::Initialize_Prototype()
 HRESULT GameObject::Initialize(const Shared<void>& arg)
 {
 	Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_ObjectDesc);
-	if (m_ObjectDesc.uniqueID == 0)
+	if (m_ObjectDesc.m_objectID == 0)
 	{
-		MSG_BOX("Component Initialize Failed By UniqueID");
+		LOG_ERROR(L"GameObject {} Initialize Failed By ObjectID", m_ObjectName);
+		MSG_BOX("GameObject Initialize Failed By ObjectID");
 		return E_FAIL;
 	}
 

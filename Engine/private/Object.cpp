@@ -13,10 +13,9 @@ Object::~Object()
     Object::On_Destroy();
 }
 
-void Object::Destroy(Shared<Object> object)
+void Object::Destroy(const Shared<Object>& object)
 {
 	object->m_IsDestroy = true;
-    object.reset();
 }
 
 void Object::Set_Active(Bool isActive)

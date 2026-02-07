@@ -3,118 +3,180 @@
 #include "LevelManager.h"
 #include "ObjectManager.h"
 #include "PrototypeManager.h"
-#include "Renderer.h"
-#include "TimeManager.h"
+#include "SpdLogger.h"
 
-#include "Level.h"
-#include "Timer.h"
+#include "GameObject.h"
+#include "Component.h"
 
 IMPLEMENT_SINGLETON(Game);
 
 template <typename T>
-constexpr Shared<const T> Game::Find_Prototype(uint32 levIndex) const 
+constexpr Shared<const T> Game::Find_Prototype(PROTOTYPE prototype, uint32 levIndex) const
 {
 	uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
     rttr::type type = rttr::type::get<T>();
     if (type.is_valid() == false) {
-		// TODO : Warn
-    	MSG_BOX("Failed To Find GameObject Prototype \n I Think Reflection Failed");
+        LOG_ERROR(L"Failed To Find Prototype {} At Level{}", Helper::To_wString(typeid(T).name()), level);
+    	MSG_BOX("Failed To Find Prototype \n Check Reflection");
 		return nullptr;
     }
 
-    wstring className = Helper::To_wString(type.get_name().to_string());
+    const wstring& className = Helper::To_wString(type.get_name().to_string());
 
     if (Shared<Object> object 
-        = m_PrototypeManager->Find_Prototype(PROTOTYPE::GAMEOBJECT, level, className)) 
+        = m_PrototypeManager->Find_Prototype(prototype, level, className))
     {
-      return static_pointer_cast<T>(object);
+		return static_pointer_cast<T>(object);
     }
 
-	// TODO : Warn
+    LOG_WARN(L"Failed To Find Prototype {} At Level{}", className, level);
 	MSG_BOX("Failed To Find GameObject Prototype");
 	return nullptr;
 }
 
-inline Shared<const GameObject> Game::Find_Prototype(uint32 typeID, uint32 levIndex) const
+inline Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID, uint32 levIndex) const
 {
 	uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
 	if (Shared<Object> object 
-        = m_PrototypeManager->Find_Prototype(PROTOTYPE::GAMEOBJECT, level, typeID)) 
+        = m_PrototypeManager->Find_Prototype(prototype, level, typeID))
     {
-		return static_pointer_cast<GameObject>(object);
+		return object;
 	}
 
-    // TODO : critical
-    MSG_BOX("Failed To Find GameObject Prototype");
+    LOG_WARN(L"Failed To Find Prototype TypeID : {} At Level{}", typeID, level);
+    MSG_BOX("Failed To Find Prototype");
     return nullptr;
 }
 
-inline Shared<const GameObject> Game::Find_Prototype(const wstring &className, uint32 levIndex) const 
+inline Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, const wstring &className, uint32 levIndex) const
 {
 	uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
 	if (Shared<Object> object 
-        = m_PrototypeManager->Find_Prototype(PROTOTYPE::GAMEOBJECT, level, className)) 
+        = m_PrototypeManager->Find_Prototype(prototype, level, className))
     {
-		return static_pointer_cast<GameObject>(object);
+		return object;
 	}
 
-    // TODO : critical
-    MSG_BOX("Failed To Find GameObject Prototype");
+    LOG_WARN(L"Failed To Find Prototype {} At Level{}", className, level);
+    MSG_BOX("Failed To Find Prototype");
     return nullptr;
 }
 
 template <typename T>
-constexpr Shared<T> Game::Instantiated(const Shared<void> &arg) const 
+constexpr Shared<T> Game::Instantiate(const Shared<void> &arg) const
 {
 	uint32 level = m_LevelManager->Get_CurrentLevelIndex();
 
 	rttr::type type = rttr::type::get<T>();
 	if (type.is_valid() == false) {
-        // TODO : Warn
+        LOG_ERROR(L"Failed To Find Prototype {} At Level{}", Helper::To_wString(typeid(T).name()), level);
         MSG_BOX("Failed To Find GameObject Prototype \n I Think Reflection Failed");
         return nullptr;
 	}
 
-    wstring className = Helper::To_wString(type.get_name().to_string());
+    PROTOTYPE typeTag = {};
+    if constexpr (is_base_of_v<GameObject, T>)
+        typeTag = PROTOTYPE::GAMEOBJECT;
+    else
+        typeTag = PROTOTYPE::COMPONENT;
 
-    if (Shared<Object> object 
-        = m_PrototypeManager->Clone_Prototype(PROTOTYPE::GAMEOBJECT, level, className)) 
+    const wstring& className = Helper::To_wString(type.get_name().to_string());
+
+    if (auto instance = Instantiate_Internal(typeTag, level, className))
     {
-		return static_pointer_cast<T>(object);
+		return static_pointer_cast<T>(instance);
     }
 
-    // TODO : Warn
-    MSG_BOX("Failed To Find GameObject Prototype");
+    LOG_WARN(L"Failed To Clone GameObject {} At Level{}", className, level);
+    MSG_BOX("Failed To Clone GameObject");
     return nullptr;
 }
 
-inline Shared<GameObject> Game::Instantiated(uint32 typeID, const Shared<void> &arg) const 
+template <typename T>
+constexpr Shared<T> Game::Instantiate(uint32 typeID, const Shared<void> &arg) const
 {
     uint32 level = m_LevelManager->Get_CurrentLevelIndex();
 
-    if (auto instance 
-        = m_PrototypeManager->Clone_Prototype(PROTOTYPE::GAMEOBJECT, level, typeID, arg)) 
+    PROTOTYPE typeTag = {};
+    if constexpr (is_base_of_v<GameObject, T>)
+        typeTag = PROTOTYPE::GAMEOBJECT;
+    else
+        typeTag = PROTOTYPE::COMPONENT;
+
+    if (auto instance = Instantiate_Internal(typeTag, level, typeID, arg))
     {
-		return static_pointer_cast<GameObject>(instance);
+		return static_pointer_cast<T>(instance);
     }
 
-    MSG_BOX("Failed To Create GameObject");
+    LOG_WARN(L"Failed To Clone Object TypeID : {} At Level{}", typeID, level);
+    MSG_BOX("Failed To Clone Object");
     return nullptr;
 }
 
-inline Shared<GameObject> Game::Instantiated(const wstring &className, const Shared<void> &arg) const 
+template <typename T>
+constexpr Shared<T> Game::Instantiate(const wstring &className, const Shared<void> &arg) const
 {
     uint32 level = m_LevelManager->Get_CurrentLevelIndex();
 
-    if (auto instance 
-        = m_PrototypeManager->Clone_Prototype(PROTOTYPE::GAMEOBJECT, level, className, arg)) 
+    PROTOTYPE typeTag = {};
+    if constexpr (is_base_of_v<GameObject, T>)
+        typeTag = PROTOTYPE::GAMEOBJECT;
+    else
+        typeTag = PROTOTYPE::COMPONENT;
+
+    if (auto instance = Instantiate_Internal(typeTag, level, className, arg))
     {
-		return static_pointer_cast<GameObject>(instance);
+        return static_pointer_cast<T>(instance);
     }
 
-    MSG_BOX("Failed To Create GameObject");
+    LOG_WARN(L"Failed To Clone Object {} At Level{}", className, level);
+    MSG_BOX("Failed To Create Object");
+    return nullptr;
+}
+
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, uint32 typeID, const Shared<void>& arg) const
+{
+    auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, typeID);
+    if (!prototypeInstance) return nullptr;
+
+    if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT)
+    {
+        auto gameObject = static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
+        m_ObjectManager->Add_GameObject(gameObject);
+
+        return gameObject;
+    }
+    else if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT)
+    {
+        return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
+    }
+
+    LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
+    MSG_BOX("Prototype Miss Match In Instantiate Internal");
+    return nullptr;
+}
+
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, const wstring& className, const Shared<void>& arg) const
+{
+    auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
+    if (!prototypeInstance) return nullptr;
+
+    if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT)
+    {
+        auto gameObject = static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
+        m_ObjectManager->Add_GameObject(gameObject);
+
+        return gameObject;
+    }
+    else if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT)
+    {
+        return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
+    }
+
+    LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
+    MSG_BOX("Prototype Miss Match In Instantiate Internal");
     return nullptr;
 }

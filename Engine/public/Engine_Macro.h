@@ -3,8 +3,8 @@
 
 namespace Engine
 {
-#define ETOI(ENUM) static_cast<unsigned int>(ENUM)
-
+#define ETOI(ENUM)              static_cast<unsigned int>(ENUM)
+#define GAME                    Game::GetInstance()
 
 #ifndef MSG_BOX
 #define MSG_BOX(_message)                                                      \

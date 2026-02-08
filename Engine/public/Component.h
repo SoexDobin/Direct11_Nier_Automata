@@ -3,6 +3,8 @@
 
 NS_BEGIN(Engine)
 
+class GameObject;
+
 class ENGINE_DLL Component abstract : public Object
 {
 public:
@@ -10,6 +12,9 @@ public:
 	explicit Component(const Shared<Component>& prototype);
 	virtual ~Component() override = default;
 	
+public:
+	Shared<GameObject> Get_Owner() const { return m_Owner; }
+
 public:
 	virtual COMPONENT_TYPE Get_ComponentType() const PURE;
 	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::COMPONENT; }
@@ -21,6 +26,7 @@ public:
 protected:
 	ComPtr<ID3D11Device>		m_Device = { nullptr };
 	ComPtr<ID3D11DeviceContext> m_Context = { nullptr };
+	Shared<GameObject>			m_Owner = { nullptr };
 
 public:
 	constexpr virtual Shared<Component> Clone(const Shared<void>& arg) PURE;

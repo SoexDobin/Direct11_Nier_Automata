@@ -28,7 +28,7 @@ public:
 	HRESULT Add_GameObject(const Shared<GameObject>& object);
 	HRESULT Clear_GameObjects();
 	Shared<GameObject> Find_GameObjectByType(uint32 typeID);
-	Shared<GameObject> Find_GameObjectByUnique(uint32 objectID);
+	Shared<GameObject> Find_GameObjectByID(uint32 objectID);
 
 private:
 	map<uint32, list<Shared<GameObject>>>					m_ObjectByLayer;

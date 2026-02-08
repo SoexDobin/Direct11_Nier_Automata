@@ -6,7 +6,6 @@
 NS_BEGIN(Engine)
 
 class Component;
-class ScriptComponent;
 class Transform;
 
 class ENGINE_DLL GameObject abstract : public Object, enable_shared_from_this<GameObject>
@@ -23,6 +22,9 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(const Shared<void>& arg) override;
+	void On_Destroy() override;
+	void On_Enable() override;
+	void On_Disable() override;
 	// TODO : Disable child
 	// TODO : Destroy child
 	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
@@ -41,28 +43,35 @@ protected:
 	LayerMask					m_LayerMask = {};
 	TagMask						m_TagMask = {};
 
-protected:
-	unordered_map<uint32, list<Shared<Component>>>			m_Components;
-	unordered_map<uint32, list<Shared<ScriptComponent>>>	m_Scripts;
-
+protected: /* Parent Child */
 	// TODO : Parent GameObject 
+	Weak<GameObject>				m_Parent = {};
 	// TODO : Child GameObjects ?????
+	vector<Shared<GameObject>>		m_Children;
+
+public: 
+	HRESULT Set_Parent(const Shared<GameObject>& parent);
+	HRESULT Remove_Parent();
+	HRESULT Add_Child(const Shared<GameObject>& child);
+	HRESULT Remove_Child(const Shared<GameObject>& child);
+	Shared<GameObject> Get_Parent() const;
+	const vector<Shared<GameObject>>& Get_Children() const;
+
+protected: /* Component */
+	unordered_map<uint32, Shared<Component>>	m_Components;
+	unordered_map<uint32, Shared<Component>>	m_Scripts;
 
 public: /* GameObject Util At GameObjectUtil.cpp */
 	template<typename T>
-	constexpr Shared<T> Get_Component() const;
-	inline Shared<Component> Get_Component(uint32 id, Bool Is_ObjectID) const;
-	template<typename T>
-	constexpr Shared<T> Get_Components() const;
-	inline Shared<Component> Get_Components(uint32 id) const;
+	constexpr Shared<T> Get_Component();
+	inline Shared<Component> Get_Component(uint32 objectID);
 
 protected: /* GameObject Util At GameObjectUtil.cpp */
 	template<typename T>
 	constexpr Shared<T> Add_Component(const Shared<void>& arg = nullptr);
-	inline Shared<Component> Add_Component(uint32 typeID, const Shared<void>& arg = nullptr);
 
 public:
-	constexpr virtual Shared<GameObject> Clone(const Shared<void>& arg) PURE;
+	virtual Shared<GameObject> Clone(const Shared<void>& arg) PURE;
 
 private:
 	using Object::m_ObjectDesc;

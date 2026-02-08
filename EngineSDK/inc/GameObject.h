@@ -22,6 +22,11 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(const Shared<void>& arg) override;
+	void On_Destroy() override;
+	void On_Enable() override;
+	void On_Disable() override;
+	// TODO : Disable child
+	// TODO : Destroy child
 	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
 	
 public:
@@ -38,19 +43,35 @@ protected:
 	LayerMask					m_LayerMask = {};
 	TagMask						m_TagMask = {};
 
-protected:
+protected: /* Parent Child */
+	// TODO : Parent GameObject 
+	Weak<GameObject>				m_Parent = {};
+	// TODO : Child GameObjects ?????
+	vector<Shared<GameObject>>		m_Children;
+
+public: 
+	HRESULT Set_Parent(const Shared<GameObject>& parent);
+	HRESULT Remove_Parent();
+	HRESULT Add_Child(const Shared<GameObject>& child);
+	HRESULT Remove_Child(const Shared<GameObject>& child);
+	Shared<GameObject> Get_Parent() const;
+	const vector<Shared<GameObject>>& Get_Children() const;
+
+protected: /* Component */
 	unordered_map<uint32, Shared<Component>>	m_Components;
+	unordered_map<uint32, Shared<Component>>	m_Scripts;
 
-	// TODO : Parent GameObject
-	// TODO : Child GameObjects
-protected:
-	//HRESULT Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,
-	//	const _wstring& strComponentTag, CComponent** ppOut, const Shared<void>& arg = nullptr);
+public: /* GameObject Util At GameObjectUtil.cpp */
+	template<typename T>
+	constexpr Shared<T> Get_Component();
+	inline Shared<Component> Get_Component(uint32 objectID);
 
-
+protected: /* GameObject Util At GameObjectUtil.cpp */
+	template<typename T>
+	constexpr Shared<T> Add_Component(const Shared<void>& arg = nullptr);
 
 public:
-	constexpr virtual Shared<GameObject> Clone(const Shared<void>& arg) PURE;
+	virtual Shared<GameObject> Clone(const Shared<void>& arg) PURE;
 
 private:
 	using Object::m_ObjectDesc;

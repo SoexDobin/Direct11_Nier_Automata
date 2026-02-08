@@ -50,9 +50,4 @@ namespace Engine
 	using Color			= DirectX::SimpleMath::Color;
 }
 
-namespace Engine
-{
-	using ObjectID = uint32;
-}
-
 #endif // Engine_Typedef_h__

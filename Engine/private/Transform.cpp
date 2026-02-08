@@ -13,6 +13,10 @@ Transform::Transform(const Shared<Transform>& prototype)
 	, m_WorldMatrix(prototype->m_WorldMatrix)
 	, m_IsDirty(true)
 {
+	m_LocalScale = { Vector3::One };
+	m_LocalRotation = { Quaternion::Identity };
+	m_LocalPosition = { Vector3::One };
+	m_WorldMatrix = { Matrix::Identity };
 }
 
 Vector3			Transform::Get_LocalScale() const { return m_LocalScale; }

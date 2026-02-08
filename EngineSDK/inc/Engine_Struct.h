@@ -12,11 +12,11 @@ namespace Engine
 		unsigned int	levCount = {};
 	} ENGINE_DESC;
 
-	typedef struct tagGuidDesc
+	typedef struct tagVertexTexcoord
 	{
-		uint32 typeID = {};
-		uint32 uniqueID = {};
-	} ID_DESC;
+		Vector3			position;
+		Vector2			texCoord;
+	} VTXTEX;
 
 }
 

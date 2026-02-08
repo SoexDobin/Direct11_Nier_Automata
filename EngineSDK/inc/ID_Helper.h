@@ -16,8 +16,8 @@ NS_BEGIN(Helper)
 	constexpr uint32 OBJECT_ID_NONE		= 0x00000003;
 	
 
-	static std::atomic<uint32> g_TypeIDCounter = { 1 };		// 프로토타입 개수 카운터
-	static std::atomic<uint32> g_UniqueIDCounter = { 1 }; // 고유 아이디 카운터
+	static std::atomic<uint32> g_TypeIDCounter = { 1 };	// 프로토타입 개수 카운터
+	static std::atomic<uint32> g_UniqueIDCounter = { 1 };  // 고유 아이디 카운터
 
     static uint32 Hash_GUID(const GUID& guid)
     {
@@ -41,7 +41,7 @@ NS_BEGIN(Helper)
 		return 0;
     }
 
-    static void CreateID(OBJECT_ID_FLAG requestFlag, ID_DESC& idDesc)
+    static void CreateID(OBJECT_ID_FLAG requestFlag, Object::ID_DESC& idDesc)
     {
         GUID guid = {};
 
@@ -50,15 +50,14 @@ NS_BEGIN(Helper)
             MSG_BOX("Out Of ID_FLAG");
             return;
         }
-			
 
         switch (requestFlag)
         {
             case OBJECT_ID_TYPE:
                 if (SUCCEEDED(CoCreateGuid(&guid)))
                 {
-                    idDesc.typeID = Hash_GUID(guid);
-                    idDesc.uniqueID = 0;
+                    idDesc.m_typeID = Hash_GUID(guid);
+                    idDesc.m_objectID = 0;
                     g_TypeIDCounter.fetch_add(1);  // 카운터는 로깅용
                 }
                 break;
@@ -66,7 +65,7 @@ NS_BEGIN(Helper)
             case OBJECT_ID_UNIQUE:
                 if (SUCCEEDED(CoCreateGuid(&guid)))
                 {
-                    idDesc.uniqueID = Hash_GUID(guid);
+                    idDesc.m_objectID = Hash_GUID(guid);
                     g_UniqueIDCounter.fetch_add(1);  // 카운터는 로깅용
                 }
                 break;
@@ -74,14 +73,14 @@ NS_BEGIN(Helper)
             case OBJECT_ID_FULL:
                 if (SUCCEEDED(CoCreateGuid(&guid)))
                 {
-                    idDesc.typeID = Hash_GUID(guid);
+                    idDesc.m_typeID = Hash_GUID(guid);
                     g_TypeIDCounter.fetch_add(1);
                 }
 
                 // uniqueID는 새로운 GUID
                 if (SUCCEEDED(CoCreateGuid(&guid)))
                 {
-                    idDesc.uniqueID = Hash_GUID(guid);
+                    idDesc.m_objectID = Hash_GUID(guid);
                     g_UniqueIDCounter.fetch_add(1);
                 }
                 break;

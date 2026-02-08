@@ -3,15 +3,22 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Object abstract : public enable_shared_from_this<Object>
+class ENGINE_DLL Object abstract
 {
+public:
+	typedef struct tagGuidDesc
+	{
+		uint32 m_typeID = {};
+		uint32 m_objectID = {};
+	} ID_DESC, ObjectID;
+
 public:
 	Object();
 	virtual ~Object();
 
 public:
-	uint32 Get_TypeID() const			{ return m_ObjectDesc.typeID; }
-	uint32 Get_ObjectID() const			{ return m_ObjectDesc.uniqueID; }
+	uint32 Get_TypeID() const			{ return m_ObjectDesc.m_typeID; }
+	uint32 Get_ObjectID() const			{ return m_ObjectDesc.m_objectID; }
 	const wstring& Get_Name() const		{ return m_ObjectName; }
 
 public:
@@ -29,7 +36,7 @@ public:
 
 public:
 	virtual PROTOTYPE Get_Prototype() const PURE;
-	static void Destroy(Shared<Object> object);
+	static void Destroy(const Shared<Object>& object);
 
 protected:
 	Bool m_IsDestroy		= { false }; 

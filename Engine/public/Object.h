@@ -3,7 +3,7 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Object abstract : public enable_shared_from_this<Object>
+class ENGINE_DLL Object abstract
 {
 public:
 	typedef struct tagGuidDesc

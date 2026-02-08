@@ -6,7 +6,7 @@
 #include "SpdLogger.h"
 
 template <typename T>
-constexpr Shared<T> GameObject::Get_Component() const
+constexpr Shared<T> GameObject::Get_Component()
 {
 	uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
 
@@ -18,11 +18,18 @@ constexpr Shared<T> GameObject::Get_Component() const
 		return nullptr;
 	}
 
-	if (Shared<T> prototype = Game::GetInstance()->Find_Prototype<T>(level))
+	if (Shared<const Component> prototype = static_pointer_cast<Component>
+		(Game::GetInstance()->Find_Prototype<T>(level)))
 	{
-		uint32 typeID = prototype->Get_TypeID();
-		if (m_Components.contains(typeID)) {
-			return static_pointer_cast<T>(m_Components.at(typeID));
+		if (prototype->Get_ComponentType() == COMPONENT_TYPE::SCRIPT
+			&& m_Scripts.contains(prototype->Get_ObjectID()))
+		{
+			return static_pointer_cast<T>(m_Scripts[prototype->Get_ObjectID()]);
+		}
+
+		if (m_Components.contains(ETOI(prototype->Get_ComponentType())))
+		{
+			return static_pointer_cast<T>(m_Components[ETOI(prototype->Get_ComponentType())]);
 		}
 	}
 
@@ -31,26 +38,19 @@ constexpr Shared<T> GameObject::Get_Component() const
 	return nullptr;
 }
 
-inline Shared<Component> GameObject::Get_Component(ObjectID typeID) const
+Shared<Component> GameObject::Get_Component(uint32 objectID) 
 {
-	if (m_Components.contains(typeID)) {
-		return m_Components.at(typeID);
+	if (m_Scripts.contains(objectID))
+	{
+		return m_Scripts[objectID];
 	}
 
-	const wstring& className = Game::GetInstance()->Get_PrototypeName(typeID);
-	LOG_WARN(L"Component {} Not Found In GameObject {}", className, m_ObjectName);
-	return nullptr;
-}
-
-inline Shared<Component> GameObject::Get_Component(const wstring& className) const
-{
-	uint32 typeID = Game::GetInstance()->Get_PrototypeID(className);
-
-	if (m_Components.contains(typeID)) {
-		return m_Components.at(typeID);
+	for (const auto& component : m_Components)
+	{
+		if (component.second->Get_ObjectID() == objectID)
+			return component.second;
 	}
 
-	LOG_WARN(L"Component {} Not Found In GameObject {}", className, m_ObjectName);
 	return nullptr;
 }
 
@@ -67,54 +67,23 @@ constexpr Shared<T> GameObject::Add_Component(const Shared<void>& arg)
 		return nullptr;
 	}
 
-	Game::GetInstance()->
-
-	if (Shared<T> prototype = Game::GetInstance()->Find_Prototype<T>(level))
+	if (Shared<Component> instance = Game::GetInstance()->Instantiate<T>(arg))
 	{
-		uint32 typeID = prototype->Get_TypeID();
-		if (m_Components.contains(typeID)) {
-			return static_pointer_cast<T>(m_Components.at(typeID));
+		if (instance->Get_ComponentType() == COMPONENT_TYPE::SCRIPT
+			&& !m_Scripts.contains(instance->Get_ObjectID()))
+		{
+			m_Scripts.emplace(instance->Get_ObjectID(), instance);
 		}
+		else if (!m_Components.contains(ETOI(instance->Get_ComponentType())))
+		{
+			m_Components.emplace(ETOI(instance->Get_ComponentType()), instance);
+		}
+
+		return instance;
 	}
-
-	
-
-	// 컴포넌트 등록
-	m_Components.emplace(typeID, newComponent);
 
 	wstring className = Helper::To_wString(type.get_name().to_string());
-	LOG_INFO(L"Component {} Added Successfully", className);
-
-	return newComponent;
-}
-
-Shared<Component> GameObject::Get_Component(uint32 id, Bool Is_ObjectID) const
-{
-}
-
-inline Shared<Component> GameObject::Add_Component(uint32 typeID, const Shared<void>& arg)
-{
-	if (m_Components.contains(typeID)) {
-		LOG_ERROR(L"Component ID:{} Already Exists In GameObject", typeID);
-		MSG_BOX("Component Already Exists");
-		return nullptr;
-	}
-
-	// TypeID로 컴포넌트 생성 (Factory 패턴 필요)
-	// 현재는 구현 불가 - Prototype Manager를 통해야 함
-	LOG_ERROR(L"Add_Component By TypeID Not Implemented Yet");
-	MSG_BOX("Use Template Version Or PrototypeManager");
+	LOG_ERROR(L"Failed To Add Component {} In GameObject {}", className, m_ObjectName);
+	MSG_BOX("Failed To Add Component\nCheck Reflection Registration");
 	return nullptr;
-}
-
-inline Shared<Component> GameObject::Add_Component(const wstring& className, const Shared<void>& arg)
-{
-	uint32 typeID = ID_Helper::Get_TypeID(className);
-	if (typeID == 0) {
-		LOG_ERROR(L"Component {} - Invalid TypeID", className);
-		MSG_BOX("Invalid Component ClassName");
-		return nullptr;
-	}
-
-	return Add_Component(typeID, arg);
 }

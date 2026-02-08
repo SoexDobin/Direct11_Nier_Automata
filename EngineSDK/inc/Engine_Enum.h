@@ -12,7 +12,7 @@ namespace Engine
 		SCRIPT,
 		TRANSFORM,
 		TEXTURE,
-
+		VI_RECT_BUFFER,
 	};
 
 }

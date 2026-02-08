@@ -79,11 +79,10 @@ public:
 	void Update_WorldMatrix();
 
 private: 
-	Vector3				m_LocalScale		= { Vector3::One };
-	Quaternion			m_LocalRotation		= { Quaternion::Identity };
-	Vector3				m_LocalPosition		= { Vector3::One };
-
-	Matrix				m_WorldMatrix		= { Matrix::Identity };
+	Vector3				m_LocalScale		= {};
+	Quaternion			m_LocalRotation		= {};
+	Vector3				m_LocalPosition		= {};
+	Matrix				m_WorldMatrix		= {};
 
 	Weak<Transform>				m_Parent	= { };
 	vector<Weak<Transform>>		m_Children;

@@ -79,6 +79,12 @@
     <Filter Include="97. Helper\SpdLogger">
       <UniqueIdentifier>{187d8e7d-3bf5-458e-85eb-d3faa4627e5a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer">
+      <UniqueIdentifier>{26140ced-99ba-4eea-8d7d-f2ef94f55f71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer\Rect">
+      <UniqueIdentifier>{71dd066e-1a0a-4853-992c-49d4de9f56ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -173,6 +179,12 @@
     <ClInclude Include="..\public\SpdLogger.h">
       <Filter>97. Helper\SpdLogger</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\VIBuffer.h">
+      <Filter>01. Utility\05. Component\VIBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Rect.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Rect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -237,6 +249,12 @@
     </ClCompile>
     <ClCompile Include="..\private\GameObjectUtil.cpp">
       <Filter>01. Utility\04. GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Rect.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Rect</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

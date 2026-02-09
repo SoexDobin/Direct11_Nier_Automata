@@ -6,7 +6,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL Transform final : public Component, public enable_shared_from_this<Transform>
 {
 public:
-	Transform(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
+	Transform(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Transform(const Shared<Transform>& prototype);
 	~Transform() override = default;
 
@@ -53,19 +53,12 @@ public: /* Util Method */
 	void Move_Left(Float delta, Float amount);
 	void LookAt(Vector3 atVec, Vector3 upVector = Vector3::UnitY);
 
-public: /* Parent, Child Method */
-	void				Set_Parent(const Shared<Transform>& parent);
-	Shared<Transform>	Get_Parent() const;
-	void				Remove_Parent();
-	Bool				Has_Parent() const;
-
-	void				Add_Children(const Shared<Transform>& child);
-	void				Remove_Child(const Shared<Transform>& child);
-	void				Remove_Child(uint32 objectID);
-	Bool				Has_Children();
+private:
+	Shared<Transform> Get_Parent() const;
 
 public:
 	Bool Is_Dirty() const { return m_IsDirty; }
+	void Set_Dirty() { m_IsDirty = true; }
 
 public: /* override */
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::TRANSFORM; }
@@ -79,15 +72,11 @@ public:
 	void Update_WorldMatrix();
 
 private: 
-	Vector3				m_LocalScale		= {};
-	Quaternion			m_LocalRotation		= {};
-	Vector3				m_LocalPosition		= {};
-	Matrix				m_WorldMatrix		= {};
-
-	Weak<Transform>				m_Parent	= { };
-	vector<Weak<Transform>>		m_Children;
-
-	Bool				m_IsDirty = { true };
+	Vector3				m_LocalScale		= { Vector3::One };
+	Quaternion			m_LocalRotation		= { Quaternion::Identity };
+	Vector3				m_LocalPosition		= { Vector3::Zero };
+	Matrix				m_WorldMatrix		= { Matrix::Identity };
+	Bool				m_IsDirty			= { true };
 
 public:
 	static Shared<Transform> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);

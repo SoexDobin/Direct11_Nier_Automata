@@ -13,6 +13,7 @@ Component::Component(const ComPtr<ID3D11Device>& pDevice, const ComPtr<ID3D11Dev
 Component::Component(const Shared<Component>& prototype)
 	: Component(prototype->m_Device, prototype->m_Context)
 {
+
 }
 
 HRESULT Component::Initialize_Prototype()

@@ -140,7 +140,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>d3d11.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;$(ProjectDir)..\external\vcpkg_installed\x64-windows\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)
@@ -173,7 +173,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>d3d11.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;$(ProjectDir)..\external\vcpkg_installed\x64-windows\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)
@@ -216,6 +216,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\SpdLogger.h" />
     <ClInclude Include="..\public\String_Helper.h" />
     <ClInclude Include="..\public\TagRegistry.h" />
+    <ClInclude Include="..\public\Texture.h" />
     <ClInclude Include="..\public\TimeManager.h" />
     <ClInclude Include="..\public\Timer.h" />
     <ClInclude Include="..\public\Transform.h" />
@@ -227,8 +228,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
-    <ClCompile Include="..\private\GameObjectUtil.cpp" />
-    <ClCompile Include="..\private\GameUtility.cpp" />
+    <ClCompile Include="..\private\GameObject.inl" />
+    <ClCompile Include="..\private\Game.inl" />
     <ClCompile Include="..\private\GraphicDevice.cpp" />
     <ClCompile Include="..\private\LayerRegistry.cpp" />
     <ClCompile Include="..\private\Level.cpp" />
@@ -239,9 +240,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
-    <ClCompile Include="..\private\SimpleMath.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />
     <ClCompile Include="..\private\TagRegistry.cpp" />
+    <ClCompile Include="..\private\Texture.cpp" />
     <ClCompile Include="..\private\TimeManager.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />

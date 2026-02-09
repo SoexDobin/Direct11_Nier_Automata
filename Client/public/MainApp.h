@@ -7,11 +7,11 @@ NS_END
 
 NS_BEGIN(Client)
 
-class MainApp final : public Object
+class MainApp final
 {
 public:
 	explicit MainApp();
-	virtual ~MainApp() override = default;
+	~MainApp() = default;
 
 public:
 	HRESULT		Initialize();

@@ -15,6 +15,9 @@ public:
 	explicit GameObject(const Shared<GameObject>& prototype);
 	virtual ~GameObject() override = default;
 
+
+	operator Shared<Transform>() const { return m_Transform; }
+	Shared<Transform> Get_Transform() const { return m_Transform; }
 public:
 	LAYER_MASK& Get_LayerMask() { return m_LayerMask; }
 	TAG_MASK& Get_TagMask() { return m_TagMask; }
@@ -25,8 +28,6 @@ public:
 	void On_Destroy() override;
 	void On_Enable() override;
 	void On_Disable() override;
-	// TODO : Disable child
-	// TODO : Destroy child
 	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
 	
 public:
@@ -36,6 +37,9 @@ public:
 	virtual void Fixed_Update(Float fixedDelta);
 	virtual HRESULT Render();
 
+public: // 충돌 함수
+	
+
 protected:
 	ComPtr<ID3D11Device>		m_Device = { nullptr };
 	ComPtr<ID3D11DeviceContext> m_Context = { nullptr };
@@ -44,12 +48,11 @@ protected:
 	TagMask						m_TagMask = {};
 
 protected: /* Parent Child */
-	// TODO : Parent GameObject 
 	Weak<GameObject>				m_Parent = {};
-	// TODO : Child GameObjects ?????
 	vector<Shared<GameObject>>		m_Children;
 
 public: 
+	Bool Has_Parent() const { return !m_Parent.expired(); }
 	HRESULT Set_Parent(const Shared<GameObject>& parent);
 	HRESULT Remove_Parent();
 	HRESULT Add_Child(const Shared<GameObject>& child);
@@ -58,7 +61,7 @@ public:
 	const vector<Shared<GameObject>>& Get_Children() const;
 
 protected: /* Component */
-	unordered_map<uint32, Shared<Component>>	m_Components;
+	map<uint32, Shared<Component>>				m_Components;
 	unordered_map<uint32, Shared<Component>>	m_Scripts;
 
 public: /* GameObject Util At GameObjectUtil.cpp */

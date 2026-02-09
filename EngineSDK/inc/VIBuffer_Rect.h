@@ -6,7 +6,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL VIBuffer_Rect final : public VIBuffer
 {
 public:
-	VIBuffer_Rect(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
+	VIBuffer_Rect(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	VIBuffer_Rect(const VIBuffer_Rect& rhs);
 	~VIBuffer_Rect() override = default;
 
@@ -20,7 +20,7 @@ public:
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::VI_RECT_BUFFER; };
 
 public:
-	static Shared<VIBuffer_Rect> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
+	static Shared<VIBuffer_Rect> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<Component> Clone(const Shared<void>& arg) override;
 };
 

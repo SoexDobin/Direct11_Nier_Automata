@@ -7,6 +7,7 @@ RTTR_REGISTRATION
 {
     registration::class_<ScriptComponent>(L"ScriptComponent")
         .constructor<>()
+        .method("Clone", &ScriptComponent::Clone)
         ;
 }
 

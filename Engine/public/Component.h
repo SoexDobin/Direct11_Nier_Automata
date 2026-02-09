@@ -13,7 +13,10 @@ public:
 	virtual ~Component() override = default;
 	
 public:
-	Shared<GameObject> Get_Owner() const { return m_Owner; }
+	Shared<GameObject> Get_Owner() const { return m_Owner.lock(); }
+private:
+	friend GameObject;
+	void Set_Owner(const Shared<GameObject>& owner) { m_Owner = owner; }
 
 public:
 	virtual COMPONENT_TYPE Get_ComponentType() const PURE;
@@ -26,7 +29,7 @@ public:
 protected:
 	ComPtr<ID3D11Device>		m_Device = { nullptr };
 	ComPtr<ID3D11DeviceContext> m_Context = { nullptr };
-	Shared<GameObject>			m_Owner = { nullptr };
+	Weak<GameObject>			m_Owner = {};
 
 public:
 	constexpr virtual Shared<Component> Clone(const Shared<void>& arg) PURE;

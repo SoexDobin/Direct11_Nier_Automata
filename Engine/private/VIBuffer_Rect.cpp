@@ -1,6 +1,6 @@
 #include "VIBuffer_Rect.h"
 
-VIBuffer_Rect::VIBuffer_Rect(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
+VIBuffer_Rect::VIBuffer_Rect(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: VIBuffer{ device, context }
 {
 }
@@ -80,25 +80,25 @@ HRESULT VIBuffer_Rect::Initialize(const Shared<void>& arg)
 	return VIBuffer::Initialize(arg);
 }
 
-Shared<VIBuffer_Rect> VIBuffer_Rect::Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
+Shared<VIBuffer_Rect> VIBuffer_Rect::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
-	auto viBufferRect = make_shared<VIBuffer_Rect>(device, context);
+	auto bufferRect = make_shared<VIBuffer_Rect>(device, context);
 
-	if (FAILED(viBufferRect->Initialize_Prototype()))
+	if (FAILED(bufferRect->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Rect");
 	}
-	return viBufferRect;
+	return bufferRect;
 }
 
 Shared<Component> VIBuffer_Rect::Clone(const Shared<void>& arg)
 {
-	auto viBufferRect = make_shared<VIBuffer_Rect>(*this);
+	auto bufferRect = make_shared<VIBuffer_Rect>(*this);
 
-	if (FAILED(viBufferRect->Initialize(arg)))
+	if (FAILED(bufferRect->Initialize(arg)))
 	{
 		MSG_BOX("Failed to Cloned : CVIBuffer_Rect");
 	}
 
-	return viBufferRect;
+	return bufferRect;
 }

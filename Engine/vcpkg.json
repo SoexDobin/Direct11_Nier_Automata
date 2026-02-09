@@ -8,7 +8,8 @@
     "assimp",
     "spdlog",
     "python3",
-    "rttr", 
+    "rttr",
+    "effects11",
     {
       "name": "imgui",
       "features": [

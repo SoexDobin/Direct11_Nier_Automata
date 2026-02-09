@@ -1,5 +1,6 @@
+#pragma once
+
 #include "Game.h"
-#include "GraphicDevice.h"
 #include "LevelManager.h"
 #include "ObjectManager.h"
 #include "PrototypeManager.h"
@@ -8,7 +9,10 @@
 #include "GameObject.h"
 #include "Component.h"
 
-IMPLEMENT_SINGLETON(Game);
+
+NS_BEGIN(Engine)
+
+//IMPLEMENT_SINGLETON(Game);
 
 template <typename T>
 constexpr Shared<const T> Game::Find_Prototype(PROTOTYPE prototype, uint32 levIndex) const
@@ -180,3 +184,6 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, 
     MSG_BOX("Prototype Miss Match In Instantiate Internal");
     return nullptr;
 }
+
+NS_END
+

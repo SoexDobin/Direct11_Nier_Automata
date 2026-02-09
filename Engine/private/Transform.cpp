@@ -1,8 +1,13 @@
 #include "Transform.h"
+#include "GameObject.h"
 
-Transform::Transform(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)
+Transform::Transform(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Component(device, context)	
 {
+	m_LocalScale = { Vector3::One };
+	m_LocalRotation = { Quaternion::Identity };
+	m_LocalPosition = { Vector3::Zero };
+	m_WorldMatrix = { Matrix::Identity };
 }
 
 Transform::Transform(const Shared<Transform>& prototype)
@@ -13,10 +18,7 @@ Transform::Transform(const Shared<Transform>& prototype)
 	, m_WorldMatrix(prototype->m_WorldMatrix)
 	, m_IsDirty(true)
 {
-	m_LocalScale = { Vector3::One };
-	m_LocalRotation = { Quaternion::Identity };
-	m_LocalPosition = { Vector3::One };
-	m_WorldMatrix = { Matrix::Identity };
+
 }
 
 Vector3			Transform::Get_LocalScale() const { return m_LocalScale; }
@@ -101,11 +103,11 @@ void Transform::Set_Scale(Float scaleX, Float scaleY, Float scaleZ)
 
 void Transform::Set_Scale(Vector3 scaleVec)
 {
-	if (!Has_Parent())
+	if (!m_Owner.lock()->Has_Parent())
 		Set_LocalScale(scaleVec);
 	else
 	{
-		auto parent = m_Parent.lock();
+		auto parent = Get_Parent();
 		Vector3 parentScale = parent->Get_Scale();
 		m_LocalScale = Vector3 {
 			scaleVec.x / parentScale.x,
@@ -118,11 +120,11 @@ void Transform::Set_Scale(Vector3 scaleVec)
 
 void Transform::Set_Rotation(Vector3 eulerAngles)
 {
-	if (!Has_Parent())
+	if (!m_Owner.lock()->Has_Parent())
 		Set_LocalRotation(eulerAngles);
 	else
 	{
-		auto parent = m_Parent.lock();
+		auto parent = Get_Parent();
 		Quaternion worldQuat = Quaternion::CreateFromYawPitchRoll(
 			XMConvertToRadians(eulerAngles.y),
 			XMConvertToRadians(eulerAngles.x),
@@ -139,11 +141,11 @@ void Transform::Set_Rotation(Float pitch, Float yaw, Float roll)
 { Set_Rotation(Vector3{ pitch, yaw, roll }); }
 void Transform::Set_Rotation(Quaternion rotation)
 {
-	if (!Has_Parent())
+	if (!m_Owner.lock()->Has_Parent())
 		Set_LocalRotation(rotation);
 	else
 	{
-		auto parent = m_Parent.lock();
+		auto parent = Get_Parent();
 		Quaternion parentQuat = parent->Get_RotationQuaternion();
 		parentQuat.Inverse(parentQuat);
 		m_LocalRotation = rotation * parentQuat;
@@ -155,11 +157,11 @@ void Transform::Set_Position(Float x, Float y, Float z)
 { Set_Position(Vector3{ x, y, z }); }
 void Transform::Set_Position(Vector3 positionVec)
 {
-	if (!Has_Parent())
+	if (!m_Owner.lock()->Has_Parent())
 		Set_LocalPosition(positionVec);
 	else
 	{
-		auto parent = m_Parent.lock();
+		auto parent = Get_Parent();
 		Matrix parentWorldInv = parent->Get_WorldMatrix().Invert();
 		m_LocalPosition = Vector3::Transform(positionVec, parentWorldInv);
 		m_IsDirty = true;
@@ -211,9 +213,9 @@ void Transform::LookAt(Vector3 atVec, Vector3 upVector)
 
 	m_LocalRotation = Quaternion::CreateFromRotationMatrix(rotationMat);
 
-	if (Has_Parent())
+	if (m_Owner.lock()->Has_Parent())
 	{
-		auto parent = m_Parent.lock();
+		auto parent = Get_Parent();
 		Quaternion parentQuat = parent->Get_RotationQuaternion();
 		parentQuat.Inverse(parentQuat);
 		m_LocalRotation = m_LocalRotation * parentQuat;
@@ -222,95 +224,8 @@ void Transform::LookAt(Vector3 atVec, Vector3 upVector)
 	m_IsDirty = true;
 }
 
-void Transform::Set_Parent(const Shared<Transform>& parent)
-{
-	if (parent && parent.get() == this) return;
-	
-	if (auto oldParent = m_Parent.lock())
-		oldParent->Remove_Child(enable_shared_from_this<Transform>::shared_from_this());
-
-	m_Parent = parent;
-
-	if (parent)
-		parent->Add_Children(enable_shared_from_this<Transform>::shared_from_this());
-
-	m_IsDirty = true;
-}
-
 Shared<Transform> Transform::Get_Parent() const
-{
-	return m_Parent.lock();
-}
-
-void Transform::Remove_Parent()
-{
-	if (auto parent = m_Parent.lock())
-		parent->Remove_Child(enable_shared_from_this<Transform>::shared_from_this());
-	
-	m_Parent.reset();
-	m_IsDirty = true;
-}
-
-Bool Transform::Has_Parent() const
-{
-	return !m_Parent.expired();
-}
-
-void Transform::Add_Children(const Shared<Transform>& child)
-{
-	if (child == nullptr) return;
-
-	for (auto& registChild : m_Children)
-	{
-		if (registChild.expired() == false
-			&& registChild.lock() == child)
-			return;
-	}
-
-	m_Children.push_back(child);
-}
-
-void Transform::Remove_Child(const Shared<Transform>& child)
-{
-	if (child == nullptr) return;
-
-	for (size_t i = 0; i < m_Children.size(); ++i)
-		if (!m_Children[i].expired() && m_Children[i].lock() == child)
-		{
-			m_Children[i] = m_Children.back();
-			m_Children.pop_back();
-			return;
-		}
-}
-
-void Transform::Remove_Child(uint32 objectID)
-{
-	for (size_t i = 0; i < m_Children.size(); ++i)
-		if (auto child = m_Children[i].lock())
-		{
-			if (child->Get_ObjectID() == objectID)
-			{
-				m_Children[i] = m_Children.back();
-				m_Children.pop_back();
-				return;
-			}
-		}
-}
-
-Bool Transform::Has_Children()
-{
-	for (size_t i = 0; i < m_Children.size(); )
-	{
-		if (m_Children[i].expired())
-		{
-			m_Children[i] = m_Children.back();
-			m_Children.pop_back();
-			continue;
-		}
-		++i;
-	}
-	return !m_Children.empty();
-}
+{ return m_Owner.lock()->Get_Parent()->Get_Transform(); }
 
 HRESULT Transform::Initialize_Prototype()
 {
@@ -323,46 +238,15 @@ HRESULT Transform::Initialize(const Shared<void>& arg)
 	return Component::Initialize(arg);
 }
 
-
 void Transform::On_Destroy()
 {
-	if (auto parent = m_Parent.lock())
-		parent->Remove_Child(enable_shared_from_this<Transform>::shared_from_this());
-	
-	m_Parent.reset();
-
-	for (auto& weakChild : m_Children)
-	{
-		if (auto child = weakChild.lock())
-		{
-			child->m_Parent.reset();
-			child->m_IsDirty = true;
-		}
-	}
-	m_Children.clear();
+	m_Owner.reset();
 
 	Component::On_Destroy();
 }
 
 void Transform::On_Disable()
 {
-	for (size_t i = 0; i < m_Children.size(); )
-	{
-		if (m_Children[i].expired())
-		{
-			m_Children[i] = m_Children.back();
-			m_Children.pop_back();
-			continue;
-		}
-
-		if (auto child = m_Children[i].lock())
-		{
-			if (child->Is_Active())
-				child->Set_Active(false);
-		}
-		++i;
-	}
-
 	Component::On_Disable();
 }
 
@@ -376,16 +260,17 @@ void Transform::On_Enable()
 
 void Transform::Update_WorldMatrix()
 {
+	if (m_IsDestroy == false) return;
 	if (m_IsActive == false) return;
 	if (m_IsDirty == false)  return;
 
 	Matrix localMatrix = Get_LocalMatrix();
 
-	if (!Has_Parent())
+	if (!m_Owner.lock()->Has_Parent())
 		m_WorldMatrix = localMatrix;
 	else  
 	{
-		auto parent = m_Parent.lock();
+		auto parent = Get_Parent();
 		if (parent)
 			m_WorldMatrix = localMatrix * parent->Get_WorldMatrix();
 		else
@@ -393,19 +278,6 @@ void Transform::Update_WorldMatrix()
 	}
 
 	m_IsDirty = false;  // dirty 플래그 리셋
-
-	// 자식 업데이트
-	for (auto& registChild : m_Children)
-	{
-		if (auto child = registChild.lock())
-		{
-			if (child->Is_Active())
-			{
-				child->m_IsDirty = true;
-				child->Update_WorldMatrix();
-			}
-		}
-	}
 }
 
 Shared<Transform> Transform::Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context)

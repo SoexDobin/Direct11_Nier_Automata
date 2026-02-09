@@ -7,12 +7,14 @@ echo =================================================
 echo.
 
 echo ===== [1/4] Copying Engine.lib to EngineSDK\lib =====
-xcopy /Y /I "..\bin\Engine.lib"            "..\..\EngineSDK\lib\"
+xcopy /Y /I "..\bin\Engine.lib"				"..\..\EngineSDK\lib\"
 echo =================================================
 echo.
 
 echo ===== [2/4] Copying Engine headers to EngineSDK\inc ===== 
-xcopy /Y /I "..\public\*.h*"			   "..\..\EngineSDK\inc\"
+xcopy /Y /I		"..\public\*.h*"			"..\..\EngineSDK\inc\"
+xcopy /Y /I /E "..\external\FMOD"			"..\..\EngineSDK\inc\"
+xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\include" "..\..\EngineSDK\inc\"
 echo =================================================
 echo.
 

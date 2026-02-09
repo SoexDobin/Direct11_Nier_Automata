@@ -1,9 +1,13 @@
+#pragma once
 #include "Game.h"
 #include "GameObject.h"
 #include "Component.h"
 #include "ID_Helper.h"
 #include "String_Helper.h"
 #include "SpdLogger.h"
+
+
+NS_BEGIN(Engine)
 
 template <typename T>
 constexpr Shared<T> GameObject::Get_Component()
@@ -18,8 +22,8 @@ constexpr Shared<T> GameObject::Get_Component()
 		return nullptr;
 	}
 
-	if (Shared<const Component> prototype = static_pointer_cast<Component>
-		(Game::GetInstance()->Find_Prototype<T>(level)))
+	if (Shared<const Component> prototype = static_pointer_cast<const Component>
+		(Game::GetInstance()->Find_Prototype<T>(PROTOTYPE::COMPONENT, level)))
 	{
 		if (prototype->Get_ComponentType() == COMPONENT_TYPE::SCRIPT
 			&& m_Scripts.contains(prototype->Get_ObjectID()))
@@ -79,6 +83,7 @@ constexpr Shared<T> GameObject::Add_Component(const Shared<void>& arg)
 			m_Components.emplace(ETOI(instance->Get_ComponentType()), instance);
 		}
 
+		instance->Set_Owner(shared_from_this());
 		return instance;
 	}
 
@@ -87,3 +92,5 @@ constexpr Shared<T> GameObject::Add_Component(const Shared<void>& arg)
 	MSG_BOX("Failed To Add Component\nCheck Reflection Registration");
 	return nullptr;
 }
+
+NS_END

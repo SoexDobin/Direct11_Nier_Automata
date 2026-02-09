@@ -14,9 +14,8 @@ public:
 	virtual HRESULT Render_Level();
 
 protected:
-	ComPtr<ID3D11Device> m_Device = { nullptr };
-	ComPtr<ID3D11DeviceContext> m_Context = { nullptr };
-
+	ComPtr<ID3D11Device> m_Device{ nullptr };
+	ComPtr<ID3D11DeviceContext> m_Context{ nullptr };
 };
 
 NS_END

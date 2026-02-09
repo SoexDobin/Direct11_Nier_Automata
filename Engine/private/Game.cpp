@@ -6,14 +6,14 @@
 #include "Renderer.h"
 #include "TimeManager.h"
 
-
 #include "Level.h"
 #include "SpdLogger.h"
 #include "Timer.h"
 #include "SpdLogger.h"
 
+NS_BEGIN(Engine)
 
-
+IMPLEMENT_SINGLETON(Game);
 
 Game::~Game()
 {
@@ -170,3 +170,8 @@ void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObje
 {
 	m_Renderer->Add_RenderGroup(group, gameObject);
 }
+
+NS_END
+
+
+#include "Game.inl"

@@ -85,6 +85,9 @@
     <Filter Include="01. Utility\05. Component\VIBuffer\Rect">
       <UniqueIdentifier>{71dd066e-1a0a-4853-992c-49d4de9f56ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\Shader">
+      <UniqueIdentifier>{06c5d012-3586-41e6-b69e-c0d09aed9cbc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -185,6 +188,9 @@
     <ClInclude Include="..\public\VIBuffer_Rect.h">
       <Filter>01. Utility\05. Component\VIBuffer\Rect</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Texture.h">
+      <Filter>01. Utility\05. Component\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -235,7 +241,7 @@
     <ClCompile Include="..\private\LayerRegistry.cpp">
       <Filter>01. Utility\04. GameObject\Layer</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\GameUtility.cpp">
+    <ClCompile Include="..\private\Game.inl">
       <Filter>01. Utility\01. GameInstance</Filter>
     </ClCompile>
     <ClCompile Include="..\private\TagRegistry.cpp">
@@ -244,10 +250,7 @@
     <ClCompile Include="..\private\SpdLogger.cpp">
       <Filter>97. Helper\SpdLogger</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\SimpleMath.cpp">
-      <Filter>98. Headers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\GameObjectUtil.cpp">
+    <ClCompile Include="..\private\GameObject.inl">
       <Filter>01. Utility\04. GameObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer.cpp">
@@ -255,6 +258,9 @@
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer_Rect.cpp">
       <Filter>01. Utility\05. Component\VIBuffer\Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Texture.cpp">
+      <Filter>01. Utility\05. Component\Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -17,10 +17,12 @@
 #include <limits>
 
 #include <d3d11.h>
+#define DIRECTX_TOOLKIT_IMPORT
 #include <DirectXMath.h>
-#include "directxtk/SimpleMath.h"
+#include <directxtk/SimpleMath.h>
 #include <directxtk/DDSTextureLoader.h>
 #include <directxtk/WICTextureLoader.h>
+#include <Effects11/d3dx11effect.h>
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <wrl.h>
@@ -40,8 +42,13 @@
 #endif
 
 #include "magic_enum/magic_enum.hpp"
-#include "rttr/registration"
-#include "rttr/type"
+#pragma warning(push)
+#pragma warning(disable : 26495) // Code Analysis: Variable is uninitialized
+#pragma warning(disable : 26439) // Code Analysis: Function may not throw
+#pragma warning(disable : 26819) // Code Analysis: Unannotated fallthrough
+#include <rttr/registration>
+#include <rttr/type>
+#pragma warning(pop)
 
 #include "Engine_Enum.h"
 #include "Engine_Function.h"

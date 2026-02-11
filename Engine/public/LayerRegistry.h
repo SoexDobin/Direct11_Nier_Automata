@@ -31,8 +31,7 @@ private:
 
 class ENGINE_DLL LayerRegistry
 {
-	DECLARE_SINGLETON(LayerRegistry)
-private:
+public:
 	LayerRegistry() = default;
 	~LayerRegistry() = default;
 

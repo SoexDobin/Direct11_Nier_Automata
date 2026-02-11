@@ -12,8 +12,6 @@
 
 NS_BEGIN(Engine)
 
-//IMPLEMENT_SINGLETON(Game);
-
 template <typename T>
 constexpr Shared<const T> Game::Find_Prototype(PROTOTYPE prototype, uint32 levIndex) const
 {

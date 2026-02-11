@@ -2,8 +2,6 @@
 #include "Engine_Define.h"
 #include "String_Helper.h"
 
-IMPLEMENT_SINGLETON(TagRegistry)
-
 wstring TagRegistry::Get_TagName(TAG tag) const
 {
 	const auto iter = m_TagToName.find(tag);

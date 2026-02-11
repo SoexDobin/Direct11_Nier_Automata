@@ -23,8 +23,6 @@
 #include <directxtk/DDSTextureLoader.h>
 #include <directxtk/WICTextureLoader.h>
 #include <Effects11/d3dx11effect.h>
-#include <imgui.h>
-#include <imgui_impl_dx11.h>
 #include <wrl.h>
 
 #define DIRECTINPUT_VERSION 0x0800

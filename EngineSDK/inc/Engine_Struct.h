@@ -7,9 +7,12 @@ namespace Engine
 	{
 		HWND 			hWnd = {};
 		WINMODE			winMode = {};
+		std::wstring	windowTitle = {};
 		unsigned int	viewportWidth = {};
 		unsigned int	viewportHeight = {};
 		unsigned int	levCount = {};
+		bool            useOffscreenRendering {};
+		uint32          renderTargetCount = {};
 	} ENGINE_DESC;
 
 	typedef struct tagVertexTexcoord

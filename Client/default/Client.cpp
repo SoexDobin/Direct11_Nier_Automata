@@ -2,12 +2,13 @@
 #include "framework.h"
 #include "MainApp.h"
 #include "Client.h"
+#include "Client_Define.h"
 
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
-HWND g_hWnd = {};
-HINSTANCE g_hInst = {};
+HWND g_hWnd = { nullptr };
+HINSTANCE g_hInst = { nullptr };
 WCHAR szTitle[MAX_LOADSTRING];              
 WCHAR szWindowClass[MAX_LOADSTRING];
 
@@ -27,22 +28,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CLIENT, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-    // 애플리케이션 초기화를 수행합니다:
+    // Load Project Settings (Client-managed)
+    g_projectSettings = LoadProjectSettings();
+
     if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CLIENT));
-
     MSG msg = {};
 
-	Unique<MainApp> MAINAPP = MainApp::Create();
+	Unique<MainApp> mainApp = MainApp::Create();
 
     while (true)
     {
@@ -58,8 +59,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             }
         }
 
-        MAINAPP->Update();
-        HRESULT hr = MAINAPP->Render();
+        mainApp->Update();
+        HRESULT hr = mainApp->Render();
     }
 
     return static_cast<int>(msg.wParam);
@@ -88,10 +89,13 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   g_hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+   g_hInst = hInstance; 
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+   RECT rc = { 0, 0, (LONG)g_projectSettings.screenWidth, (LONG)g_projectSettings.screenHeight };
+   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+
+   HWND hWnd = CreateWindowW(szWindowClass, g_projectSettings.windowTitle.c_str(), WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT, 0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {

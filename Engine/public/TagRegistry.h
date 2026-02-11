@@ -32,9 +32,7 @@ private:
 
 class ENGINE_DLL TagRegistry
 {
-	DECLARE_SINGLETON(TagRegistry)
-
-private:
+public:
 	TagRegistry() = default;
 	~TagRegistry() = default;
 

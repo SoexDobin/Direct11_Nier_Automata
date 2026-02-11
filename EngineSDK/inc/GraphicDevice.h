@@ -5,23 +5,39 @@ NS_BEGIN(Engine)
 
 class GraphicDevice final
 {
-public:
-	GraphicDevice() = default;
-	~GraphicDevice() = default;
+private:
+	struct OffscreenRenderTarget
+	{
+		ComPtr<ID3D11Texture2D>				texture;
+		ComPtr<ID3D11RenderTargetView>		RTV;
+		ComPtr<ID3D11ShaderResourceView>	SRV;
+		D3D11_VIEWPORT						viewport;
+	};
 
 public:
-	HRESULT Initialize(HWND hWnd, WINMODE isWindowed, uint32 winSizeX, uint32 iWinSizeY,
-		_Inout_ ComPtr<ID3D11Device>& device,
-		_Inout_ ComPtr<ID3D11DeviceContext>& context);
+	GraphicDevice() = default;
+	~GraphicDevice();
+
+public:
+	ComPtr<ID3D11Device>			Get_Device() const { return m_Device; }
+	ComPtr<ID3D11DeviceContext>		Get_Context() const { return m_Context; }
+
+public:
+	HRESULT Initialize(const ENGINE_DESC& engineDesc);
 	HRESULT Clear_BackBufferView(const Shared<Float4>& clearColor) const;
 	HRESULT Clear_DepthStencilView() const;
 	HRESULT Present() const;
 
+public:
+	HRESULT Begin_RenderOffScreen(const wstring& offScreenTag);
+	HRESULT End_RenderOffScreen();
+	ComPtr<ID3D11ShaderResourceView> Get_OffscreenSRV(const wstring& rtTag);
+
 private:
-	HRESULT Ready_SwapChain(HWND hWnd, WINMODE isWindowed, uint32 winSizeX,
-		uint32 winSizeY);
+	HRESULT Ready_SwapChain(HWND hWnd, WINMODE isWindowed, uint32 winSizeX, uint32 winSizeY);
 	HRESULT Ready_BackBufferRenderTargetView();
 	HRESULT Ready_DepthStencilView(uint32 winSizeX, uint32 winSizeY);
+	HRESULT Create_OffScreenTarget(const wstring& tag, uint32 width, uint32 height);
 
 private:
 	ComPtr<ID3D11Device> m_Device = { nullptr };
@@ -30,11 +46,13 @@ private:
 
 	ComPtr<ID3D11RenderTargetView> m_RTV = { nullptr };
 	ComPtr<ID3D11DepthStencilView> m_DSV = { nullptr };
+	D3D11_VIEWPORT m_ViewPort = {};
+
+	map<wstring, OffscreenRenderTarget> m_Offscreens;
 
 public:
-	static Unique<GraphicDevice> Create(_In_  HWND hWnd, WINMODE isWindowed, uint32 winSizeX, uint32 winSizeY,
-										_Out_ ComPtr<ID3D11Device>& device,
-										_Out_ ComPtr<ID3D11DeviceContext>& context);
+	static Unique<GraphicDevice> Create(_In_ const ENGINE_DESC& engineDesc);
+	
 };
 
 NS_END

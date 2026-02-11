@@ -35,7 +35,7 @@ const wstring& PrototypeManager::Get_NameByType(uint32 typeID)
 
 HRESULT PrototypeManager::Initialize(const Shared<void> &arg) 
 {
-    m_LevelCount = *static_pointer_cast<uint32>(arg);
+    m_LevelCount = arg == nullptr ? 0 : *static_pointer_cast<uint32>(arg);
 
     m_NameByTypes.shrink_to_fit();
     m_TypesByName.shrink_to_fit();

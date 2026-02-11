@@ -3,7 +3,7 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Texture final : public Component
+class ENGINE_DLL Texture final : public Component, enable_shared_from_this<Texture>
 {
 public:
 	Texture(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -11,6 +11,7 @@ public:
 	~Texture() override = default;
 
 public:
+	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::TEXTURE; }
 	HRESULT Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs);
 	HRESULT Initialize(const Shared<void>& arg) override;
 	void On_Destroy() override;
@@ -20,8 +21,8 @@ private:
 	vector<ComPtr<ID3D11ShaderResourceView>>	m_SRVs;
 
 public:
-	static Shared<Texture> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	Shared<Component> Clone(const Shared<void>& arg) override;
+	static Shared<Texture> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const tChar* textureFilePath, uint32 numSRVs);
+	Shared<Component> Clone(const Shared<void>& arg = nullptr) override;
 };
 
 NS_END

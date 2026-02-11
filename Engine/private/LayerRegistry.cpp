@@ -2,8 +2,6 @@
 #include "Engine_Define.h"
 #include "String_Helper.h"
 
-IMPLEMENT_SINGLETON(LayerRegistry)
-
 wstring LayerRegistry::Get_LayerName(LAYER layer) const
 {
 	const auto iter = m_LayerToName.find(layer);

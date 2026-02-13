@@ -191,6 +191,9 @@
     <ClInclude Include="..\public\Texture.h">
       <Filter>01. Utility\05. Component\Texture</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Shader.h">
+      <Filter>01. Utility\05. Component\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -261,6 +264,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Texture.cpp">
       <Filter>01. Utility\05. Component\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Shader.cpp">
+      <Filter>01. Utility\05. Component\Shader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

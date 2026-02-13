@@ -1,6 +1,13 @@
 #include "TimeManager.h"
 #include "Timer.h"
 
+
+TimeManager::~TimeManager()
+{
+	m_Timers.clear();
+}
+
+
 HRESULT TimeManager::Initialize()
 {
 	m_MainTimer = Timer::Create();

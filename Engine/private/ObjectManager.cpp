@@ -1,7 +1,7 @@
 #include "ObjectManager.h"
 #include "GameObject.h"
 
-HRESULT ObjectManager::Initialize(const Shared<void> &arg)
+HRESULT ObjectManager::Initialize(const Shared<void>& arg)
 {
 	m_LayerMask = ETOI(LAYER::ALL_LAYER);
 
@@ -109,7 +109,7 @@ void ObjectManager::Cleanup_GameObjects()
 	}
 }
 
-HRESULT ObjectManager::Add_GameObject(const Shared<GameObject> &object)
+HRESULT ObjectManager::Add_GameObject(const Shared<GameObject>& object)
 {
 	m_ObjectByLayer[object->Get_LayerMask().Get_Layer()].push_back(object);
 	m_ObjectByType[object->Get_TypeID()].push_back(object);

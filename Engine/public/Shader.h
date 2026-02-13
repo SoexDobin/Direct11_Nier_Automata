@@ -1,0 +1,38 @@
+#pragma once
+#include "Component.h"
+
+NS_BEGIN(Engine)
+
+class ENGINE_DLL Shader final : public Component, enable_shared_from_this<Shader>
+{
+public:
+	Shader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	Shader(const Shared<Shader>& rhs);
+	~Shader() override = default;
+	
+public:
+	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::SHADER; };
+	HRESULT Initialize_Prototype(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements);
+	HRESULT Initialize(const Shared<void>& arg) override;
+	void On_Destroy() override;
+
+public:
+	HRESULT Begin(uint32 passIndex);
+	HRESULT Bind_SRV(const Char* constantName, const ComPtr<ID3D11ShaderResourceView>& srv);
+	HRESULT Bind_Matrix(const Char* constantName, const Float4x4* matrix);
+
+private:
+	ComPtr<ID3DX11Effect>				m_Effect = { nullptr };
+	uint32								m_NumPasses = {};
+	vector<ComPtr<ID3D11InputLayout>>	m_InputLayouts;
+
+public:
+	static Shared<Shader> Create(const ComPtr<ID3D11Device>& device, 
+		const ComPtr<ID3D11DeviceContext>& context, 
+		const tChar* shaderFilePath, 
+		const D3D11_INPUT_ELEMENT_DESC* elements, 
+		uint32 numElements);
+	Shared<Component> Clone(const Shared<void>& arg) override;
+};
+
+NS_END

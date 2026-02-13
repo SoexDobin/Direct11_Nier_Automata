@@ -22,6 +22,12 @@
     <ClInclude Include="..\public\Client_Define.h">
       <Filter>98. Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LevelLoading.h">
+      <Filter>01. Level\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Loader.h">
+      <Filter>01. Level\Loading\Loader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -32,6 +38,12 @@
     </ClCompile>
     <ClCompile Include="..\private\MainApp.cpp">
       <Filter>00. MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LevelLoading.cpp">
+      <Filter>01. Level\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Loader.cpp">
+      <Filter>01. Level\Loading\Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +66,15 @@
     </Filter>
     <Filter Include="98. Headers">
       <UniqueIdentifier>{e9c11d15-75c2-4be7-9e61-ae543485c521}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level">
+      <UniqueIdentifier>{38bf182f-550e-4086-a73e-841c9607d4b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\Loading">
+      <UniqueIdentifier>{7a33b79a-7ac6-4cf8-9720-7373ff68f935}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\Loading\Loader">
+      <UniqueIdentifier>{03fcc313-3304-4541-a9eb-eee23cc2756e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

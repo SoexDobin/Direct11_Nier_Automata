@@ -1,31 +1,34 @@
 #pragma once
 
-#include "Engine_Define.h"
-
 NS_BEGIN(Engine)
 class Game;
 NS_END
 
 NS_BEGIN(Editor)
 
+class EditorManager;
+
 class EditorApp final {
 public:
-  explicit EditorApp();
-  ~EditorApp();
+	EditorApp();
+	~EditorApp();
 
 public:
-  HRESULT Initialize();
-  void Update();
-  HRESULT Render();
+	HRESULT Initialize();
+	void Update();
+	HRESULT Render();
 
 private:
-  void RenderDualView();
+	HRESULT Initialize_IMGUI();
+	HRESULT Destruct_IMGUI();
 
-  Shared<Engine::Game> m_Game = {nullptr};
-  Bool m_PlayMode = {false};
+private:
+	Shared<Game> m_Game = {nullptr};
+	Shared<EditorManager> m_Editor = {nullptr};
 
 public:
-  static Unique<EditorApp> Create();
+	static Unique<EditorApp> Create();
+
 };
 
 NS_END

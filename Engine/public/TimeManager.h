@@ -10,7 +10,7 @@ class TimeManager final
 	NO_COPY(TimeManager)
 public:
 	explicit TimeManager() = default;
-	~TimeManager() = default;
+	~TimeManager();
 
 public:
 	HRESULT Initialize();

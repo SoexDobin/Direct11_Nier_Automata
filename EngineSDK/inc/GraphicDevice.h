@@ -1,9 +1,9 @@
 #pragma once
+#include "Object.h"
 #include "Engine_Define.h"
 
 NS_BEGIN(Engine)
-
-class GraphicDevice final
+	class GraphicDevice final : public Object
 {
 private:
 	struct OffscreenRenderTarget
@@ -16,14 +16,16 @@ private:
 
 public:
 	GraphicDevice() = default;
-	~GraphicDevice();
+	~GraphicDevice() override;
 
 public:
 	ComPtr<ID3D11Device>			Get_Device() const { return m_Device; }
 	ComPtr<ID3D11DeviceContext>		Get_Context() const { return m_Context; }
 
 public:
+	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
 	HRESULT Initialize(const ENGINE_DESC& engineDesc);
+	void On_Destroy() override;
 	HRESULT Clear_BackBufferView(const Shared<Float4>& clearColor) const;
 	HRESULT Clear_DepthStencilView() const;
 	HRESULT Present() const;

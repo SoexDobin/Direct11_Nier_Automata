@@ -33,6 +33,7 @@
 
 #include "ID_Helper.h"
 #include "String_Helper.h"
+#include "SpdLogger.h"
 
 using namespace Engine;
 using namespace Helper;

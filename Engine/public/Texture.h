@@ -3,6 +3,8 @@
 
 NS_BEGIN(Engine)
 
+class Shader;
+
 class ENGINE_DLL Texture final : public Component, enable_shared_from_this<Texture>
 {
 public:
@@ -15,6 +17,9 @@ public:
 	HRESULT Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs);
 	HRESULT Initialize(const Shared<void>& arg) override;
 	void On_Destroy() override;
+	
+public:
+	HRESULT Bind_ShaderResourceView(const Shared<Shader>& shader, const Char* constantName, uint32 index);
 
 private:
 	uint32										m_NumSRVs = {};

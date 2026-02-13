@@ -213,6 +213,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\PrototypeManager.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
+    <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
     <ClInclude Include="..\public\String_Helper.h" />
     <ClInclude Include="..\public\TagRegistry.h" />
@@ -240,6 +241,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
+    <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />
     <ClCompile Include="..\private\TagRegistry.cpp" />
     <ClCompile Include="..\private\Texture.cpp" />

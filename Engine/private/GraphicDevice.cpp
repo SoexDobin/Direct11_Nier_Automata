@@ -66,6 +66,13 @@ HRESULT GraphicDevice::Initialize(const ENGINE_DESC& engineDesc)
 	return S_OK;
 }
 
+void GraphicDevice::On_Destroy()
+{
+	m_Offscreens.clear();
+
+	Object::On_Destroy();
+}
+
 HRESULT GraphicDevice::Clear_BackBufferView(const Shared<Float4>& clearColor) const
 {
 	if (nullptr == m_Device)

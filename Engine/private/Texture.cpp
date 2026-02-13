@@ -80,6 +80,13 @@ void Texture::On_Destroy()
 	Component::On_Destroy();
 }
 
+HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader>& shader, const Char* constantName, uint32 index)
+{
+
+
+	return S_OK;
+}
+
 Shared<Texture> Texture::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const tChar* textureFilePath, uint32 numSRVs)
 {
 	auto texture = make_shared<Texture>(device, context);

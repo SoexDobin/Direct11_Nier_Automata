@@ -176,9 +176,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\vcpkg.json" />
+    <ClInclude Include="..\public\EditorManager.h" />
+    <ClInclude Include="..\public\EditorObject.h" />
+    <ClInclude Include="..\public\EditorView.h" />
     <ClInclude Include="..\public\Editor_Define.h" />
     <ClInclude Include="..\public\EditorApp.h" />
-    <ClInclude Include="..\public\Editor_Function.h" />
+    <ClInclude Include="..\public\Inspector.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -188,7 +191,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp" />
-    <ClCompile Include="..\private\Editor_Function.cpp" />
+    <ClCompile Include="..\private\EditorManager.cpp" />
+    <ClCompile Include="..\private\EditorView.cpp" />
+    <ClCompile Include="..\private\Inspector.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

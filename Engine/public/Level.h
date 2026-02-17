@@ -3,19 +3,32 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Level abstract : public Object
-{
+class ENGINE_DLL Level abstract : public Object {
 public:
-	explicit Level(const ComPtr<ID3D11Device>&device, const ComPtr<ID3D11DeviceContext>&context);
-	virtual ~Level() override = default;
+  explicit Level(const ComPtr<ID3D11Device> &device,
+                 const ComPtr<ID3D11DeviceContext> &context);
+  virtual ~Level() override = default;
 
 public:
-	virtual void Update_Level(Float timeDelta);
-	virtual HRESULT Render_Level();
+  HRESULT Initialize_Prototype() override {
+    return Object::Initialize_Prototype();
+  }
+  HRESULT Initialize(void *arg = nullptr) override {
+    return Object::Initialize(arg);
+  }
+  void On_Destroy() override { Object::On_Destroy(); }
+  void On_Disable() override { Object::On_Disable(); }
+  void On_Enable() override { Object::On_Enable(); }
+  void Set_Active(Bool isActive) override { Object::Set_Active(isActive); }
+  PROTOTYPE Get_Prototype() const final { return PROTOTYPE::LEVEL; }
+
+public:
+  virtual void Update_Level(Float timeDelta);
+  virtual HRESULT Render_Level();
 
 protected:
-	ComPtr<ID3D11Device> m_Device{ nullptr };
-	ComPtr<ID3D11DeviceContext> m_Context{ nullptr };
+  ComPtr<ID3D11Device> m_Device{nullptr};
+  ComPtr<ID3D11DeviceContext> m_Context{nullptr};
 };
 
 NS_END

@@ -4,9 +4,10 @@
 namespace Engine
 {
 	enum class WINMODE { FULL, WIN };
-	enum class PROTOTYPE { OBJECT, GAMEOBJECT, COMPONENT, ENGINE_MANAGER };
+	enum class PROTOTYPE { OBJECT, GAMEOBJECT, COMPONENT, LEVEL, ENGINE_MANAGER };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
 	enum class WORLD_STATE { RIGHT, UP, LOOK, POSITION, END};
+	enum class D3DTS { VIEW, PROJ, END };
 	enum class COMPONENT_TYPE
 	{
 		SCRIPT,
@@ -15,11 +16,14 @@ namespace Engine
 		VI_RECT_BUFFER,
 		SHADER
 	};
+	
 
 }
 
+
 namespace Engine
 {
+
 	enum class LAYER : unsigned __int32
 	{
 		LAYER0 = 0 << 0,
@@ -59,6 +63,41 @@ namespace Engine
 		LAYER31 = 1 << 30,
 
 		END = 32,
+
+		L0 = 0,
+		L1 = 1,
+		L2 = 2,
+		L3 = 3,
+		L4 = 4,
+		L5 = 5,
+		L6 = 6,
+		L7 = 7,
+		L8 = 8,
+		L9 = 9,
+		L10 = 10,
+		L11 = 11,
+		L12 = 12,
+		L13 = 13,
+		L14 = 14,
+		L15 = 15,
+		L16 = 16,
+		L17 = 17,
+		L18 = 18,
+		L19 = 19,
+		L20 = 20,
+		L21 = 21,
+		L22 = 22,
+		L23 = 23,
+		L24 = 24,
+		L25 = 25,
+		L26 = 26,
+		L27 = 27,
+		L28 = 28,
+		L29 = 29,
+		L30 = 30,
+		L31 = 31,
+
+	
 		ALL_LAYER = 0xFFFFFFFF,
 	};
 
@@ -104,7 +143,6 @@ namespace Engine
 		END = 32,
 		ALL_TAG = 0xFFFFFFFF,
 	};
-
 }
 
 

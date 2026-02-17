@@ -59,7 +59,7 @@ Shared<Component> GameObject::Get_Component(uint32 objectID)
 }
 
 template <typename T>
-constexpr Shared<T> GameObject::Add_Component(const Shared<void>& arg)
+constexpr Shared<T> GameObject::Add_Component(void* arg)
 {
 	uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
 

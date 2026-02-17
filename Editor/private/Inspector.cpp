@@ -1,13 +1,14 @@
 #include "pch.h"
 #include "Inspector.h"
+#include "PathManager.h"
 
 Inspector::Inspector() {}
 Inspector::~Inspector() {}
 
 HRESULT Inspector::Initialize()
 {
-	m_layerJsonPath = L"../Data/LayerSettings.json";
-	m_tagJsonPath = L"../Data/TagSettings.json";
+	m_layerJsonPath = PATH.GetLayerSettingsPath();
+    m_tagJsonPath = PATH.GetTagSettingsPath();
 
 	auto layerRegistry = GAME->Get_LayerRegister();
 	auto tagRegistry = GAME->Get_TagRegister();
@@ -27,51 +28,91 @@ void Inspector::Render()
 {
 	ImGui::Begin("Inspector");
 	{
-		ImGui::Text("Inspector Panel");
+		Inspector::LayerTagGUI();
 		ImGui::Separator();
 		ImGui::TextDisabled("Select a GameObject to view properties");
 	}
 	ImGui::End();
-	Inspector::LayerTagGUI();
 }
 
 void Inspector::LayerTagGUI()
 {
-	ImGui::Begin("Layer & Tag Settings");
-	{
-		auto layerRegistry = GAME->Get_LayerRegister();
-		auto tagRegistry = GAME->Get_TagRegister();
+    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(8.0f, 4.0f));
 
-		if (ImGui::CollapsingHeader("Layers", ImGuiTreeNodeFlags_DefaultOpen)) {
-			const auto& layers = layerRegistry->Get_AllLayers();
+    if (ImGui::BeginTable("InspectorHeader", 2, ImGuiTableFlags_Resizable)) {
+        ImGui::TableSetupColumn("Layers", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Tags", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableNextRow();
 
-			for (const auto& [layer, name] : layers) {
-				Char buffer[256] = {};
-				wcstombs_s(nullptr, buffer, name.c_str(), sizeof(buffer));
+        // ================= [ 왼쪽: Layers ] =================
+        ImGui::TableSetColumnIndex(0);
+        if (ImGui::CollapsingHeader("Layers", ImGuiTreeNodeFlags_OpenOnArrow)) {
+            ImGui::BeginChild("LayerScroll", ImVec2(0, 200), true);
 
-				if (ImGui::InputText(std::to_string(ETOI(layer)).c_str(), buffer, sizeof(buffer))) {
-					tChar wBuffer[256] = {};
-					mbstowcs_s(nullptr, wBuffer, buffer, sizeof(wBuffer));
-					layerRegistry->Set_LayerName(layer, wBuffer);
-				}
-			}
-		}
+            auto layerRegistry = GAME->Get_LayerRegister();
 
-		if (ImGui::CollapsingHeader("Tags", ImGuiTreeNodeFlags_DefaultOpen)) {
-			const auto& tags = tagRegistry->Get_AllTags();
-			for (const auto& [tag, name] : tags) {
-				Char buffer[256] = {};
-				wcstombs_s(nullptr, buffer, name.c_str(), sizeof(buffer));
+            // 맵을 도는게 아니라 0~31 인덱스로 직접 접근합니다.
+            for (int i = 0; i < 32; ++i) {
+                Engine::LAYER currentLayer;
+                if (i == 0) currentLayer = Engine::LAYER::LAYER0;
+                else currentLayer = static_cast<Engine::LAYER>(1 << (i - 1));
 
-				if (ImGui::InputText(std::to_string(ETOI(tag)).c_str(), buffer, sizeof(buffer))) {
-					tChar wBuffer[256] = {};
-					mbstowcs_s(nullptr, wBuffer, buffer, sizeof(wBuffer));
-					tagRegistry->Set_TagName(tag, wBuffer);
-				}
-			}
-		}
-	}
-	ImGui::End();
+                // 레지스트리에서 이름 가져오기 (없으면 빈 문자열)
+                std::wstring wName = layerRegistry->Get_LayerName(currentLayer);
+
+                Char buffer[256] = {};
+                wcstombs_s(nullptr, buffer, wName.c_str(), sizeof(buffer));
+
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 35.f);
+                std::string labelId = "##layer_" + std::to_string(i);
+
+                if (ImGui::InputText(labelId.c_str(), buffer, sizeof(buffer))) {
+                    tChar wBuffer[256] = {};
+                    mbstowcs_s(nullptr, wBuffer, buffer, sizeof(wBuffer));
+                    layerRegistry->Set_LayerName(currentLayer, wBuffer);
+                }
+
+                ImGui::SameLine();
+                ImGui::TextDisabled("%2d", i);
+            }
+            ImGui::EndChild();
+        }
+
+        // ================= [ 오른쪽: Tags ] =================
+        ImGui::TableSetColumnIndex(1);
+        if (ImGui::CollapsingHeader("Tags", ImGuiTreeNodeFlags_OpenOnArrow)) {
+            ImGui::BeginChild("TagScroll", ImVec2(0, 200), true);
+
+            auto tagRegistry = GAME->Get_TagRegister();
+
+            // 태그도 동일하게 0~31 혹은 정해진 개수만큼 반복
+            for (int i = 0; i < 32; ++i) {
+                Engine::TAG currentTag = static_cast<Engine::TAG>(i);
+                if (i == 0) currentTag = Engine::TAG::TAG_0;
+                else currentTag = static_cast<Engine::TAG>(1 << (i - 1));
+
+                std::wstring wName = tagRegistry->Get_TagName(currentTag);
+
+                Char buffer[256] = {};
+                wcstombs_s(nullptr, buffer, wName.c_str(), sizeof(buffer));
+
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 35.f);
+                std::string labelId = "##tag_" + std::to_string(i);
+
+                if (ImGui::InputText(labelId.c_str(), buffer, sizeof(buffer))) {
+                    tChar wBuffer[256] = {};
+                    mbstowcs_s(nullptr, wBuffer, buffer, sizeof(wBuffer));
+                    tagRegistry->Set_TagName(currentTag, wBuffer);
+                }
+
+                ImGui::SameLine();
+                ImGui::TextDisabled("%2d", i);
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndTable();
+    }
+    ImGui::PopStyleVar();
 }
 
 Shared<Inspector> Inspector::Create()

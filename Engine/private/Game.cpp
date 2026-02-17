@@ -88,8 +88,7 @@ void Game::Update_Engine() {
 }
 
 HRESULT Game::Draw() {
-	if (m_TimeManager->Is_FixedUpdate())
-		m_Renderer->Draw();
+	m_Renderer->Draw();
 
 	return S_OK;
 }
@@ -105,9 +104,6 @@ void Game::Clear_Resource(uint32 levIndex) {
 }
 
 HRESULT Game::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
-    if (m_TimeManager->Is_FixedUpdate())
-		return S_OK;
-
     if (FAILED(m_GraphicDevice->Clear_BackBufferView(clearColor)))
 		return E_FAIL;
     if (FAILED(m_GraphicDevice->Clear_DepthStencilView()))
@@ -117,10 +113,7 @@ HRESULT Game::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
 }
 
 HRESULT Game::Present() const {
-	if (m_TimeManager->Is_FixedUpdate())
-		return m_GraphicDevice->Present();
-
-	return S_OK;
+	return m_GraphicDevice->Present();
 }
 
 HRESULT Game::Begin_RenderOffScreen(const wstring &rtTag) const {

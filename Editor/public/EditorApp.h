@@ -22,10 +22,6 @@ private:
 	HRESULT Initialize_IMGUI();
 	HRESULT Destruct_IMGUI();
 
-private:
-	Shared<Game> m_Game = {nullptr};
-	Shared<EditorManager> m_Editor = {nullptr};
-
 public:
 	static Unique<EditorApp> Create();
 

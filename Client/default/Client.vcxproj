@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Client_Define.h" />
+    <ClInclude Include="..\public\Client_Function.h" />
     <ClInclude Include="..\public\LevelLoading.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />

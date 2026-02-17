@@ -4,6 +4,7 @@ NS_BEGIN(Editor)
 
 class Inspector;
 class EditorView;
+class MenuBar;
 
 class EditorManager
 {
@@ -23,6 +24,7 @@ private:
 private:
 	Shared<Inspector> m_Inspector = { nullptr };
 	Shared<EditorView> m_EditorView = { nullptr };
+	Shared<MenuBar> m_MenuBar = { nullptr };
 	
 };
 

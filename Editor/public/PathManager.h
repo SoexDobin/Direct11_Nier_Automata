@@ -1,0 +1,61 @@
+#pragma once
+#include "Engine_Define.h"
+#include <filesystem>
+
+namespace Editor {
+class PathManager {
+  NO_COPY(PathManager)
+
+public:
+    static PathManager& GetInstance() {
+        static PathManager instance;
+        return instance;
+    }
+
+    void Initialize(const wstring &projectRoot = L"../../") {
+        m_ProjectRoot = projectRoot;
+        m_ProjectSettingDir = m_ProjectRoot + L"ProjectSetting/";
+
+        m_LayerSettingsPath = m_ProjectSettingDir + L"LayerSettings.json";
+        m_TagSettingsPath = m_ProjectSettingDir + L"TagSettings.json";
+        m_EngineDescSettingsPath = m_ProjectSettingDir + L"EngineDesc.json";
+
+        m_AssetsDir = m_ProjectRoot + L"Assets/";
+        m_ShadersDir = m_AssetsDir + L"Shaders/";
+        m_TexturesDir = m_AssetsDir + L"Textures/";
+        m_ModelsDir = m_AssetsDir + L"Models/";
+    }
+
+	const wstring& GetProjectRoot() const { return m_ProjectRoot; }
+	const wstring& GetProjectSettingDir() const { return m_ProjectSettingDir; }
+
+	const wstring& GetLayerSettingsPath() const { return m_LayerSettingsPath; }
+	const wstring& GetTagSettingsPath() const { return m_TagSettingsPath; }
+	const wstring& GetRenderSettingsPath() const { return m_EngineDescSettingsPath; }
+	
+	const wstring& GetAssetsDir() const { return m_AssetsDir; }
+	const wstring& GetShadersDir() const { return m_ShadersDir; }
+	const wstring& GetTexturesDir() const { return m_TexturesDir; }
+	const wstring& GetModelsDir() const { return m_ModelsDir; }
+
+  void SetProjectRoot(const wstring &root) { Initialize(root); }
+
+private:
+    PathManager() = default;
+    ~PathManager() = default;
+
+    wstring m_ProjectRoot = L"../";
+    wstring m_ProjectSettingDir = L"../ProjectSetting/";
+
+    wstring m_LayerSettingsPath = L"../../ProjectSetting/LayerSettings.json";
+    wstring m_TagSettingsPath = L"../../ProjectSetting/TagSettings.json";
+    wstring m_EngineDescSettingsPath = L"../../ProjectSetting/EngineDesc.json";
+
+    wstring m_AssetsDir = L"../../Assets/";
+    wstring m_ShadersDir = L"../../Assets/Shaders/";
+    wstring m_TexturesDir = L"../../Assets/Textures/";
+    wstring m_ModelsDir = L"../../Assets/Models/";
+};
+
+#define PATH Editor::PathManager::GetInstance()
+} // namespace Editor

@@ -2,38 +2,43 @@
 
 #include "targetver.h"
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
+#include <stdlib.h>
 #include <tchar.h>
+#include <windows.h>
 
-#include <vector>
+
+#include <algorithm>
 #include <list>
 #include <map>
-#include <string>
 #include <memory>
-#include <algorithm>
+#include <string>
+#include <vector>
+
 
 // Engine Headers
 #include "Engine_Define.h"
 #include "Game.h"
 
-#include <nlohmann/json.hpp>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
+#include <nlohmann/json.hpp>
+
 
 // ImGui Headers
 #include "imgui.h"
-#include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
+#include "imgui_impl_win32.h"
+
 
 // Editor Headers
 #include "Editor_Define.h"
 
 #include "ID_Helper.h"
-#include "String_Helper.h"
 #include "SpdLogger.h"
+#include "String_Helper.h"
+
 
 using namespace Engine;
 using namespace Helper;

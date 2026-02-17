@@ -5,7 +5,8 @@ NS_BEGIN(Engine)
 
 class GameObject;
 
-class ObjectManager final : public EngineManager {
+class ObjectManager final : public EngineManager 
+{
 	NO_COPY(ObjectManager)
 public:
 	ObjectManager() = default;
@@ -15,7 +16,7 @@ public:
 	uint32 Get_LayerBits() const { return m_LayerMask; }
 
 public:
-	HRESULT Initialize(const Shared<void> &arg) override;
+	HRESULT Initialize(void *arg) override;
 	void On_Destroy() override;
 
 public:

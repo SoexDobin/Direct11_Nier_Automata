@@ -68,7 +68,7 @@ inline Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, const wstr
 }
 
 template <typename T>
-constexpr Shared<T> Game::Instantiate(const Shared<void> &arg) const
+constexpr Shared<T> Game::Instantiate(void* arg) const
 {
 	uint32 level = m_LevelManager->Get_CurrentLevelIndex();
 
@@ -98,7 +98,7 @@ constexpr Shared<T> Game::Instantiate(const Shared<void> &arg) const
 }
 
 template <typename T>
-constexpr Shared<T> Game::Instantiate(uint32 typeID, const Shared<void> &arg) const
+constexpr Shared<T> Game::Instantiate(uint32 typeID, void* arg) const
 {
     uint32 level = m_LevelManager->Get_CurrentLevelIndex();
 
@@ -119,7 +119,7 @@ constexpr Shared<T> Game::Instantiate(uint32 typeID, const Shared<void> &arg) co
 }
 
 template <typename T>
-constexpr Shared<T> Game::Instantiate(const wstring &className, const Shared<void> &arg) const
+constexpr Shared<T> Game::Instantiate(const wstring &className, void* arg) const
 {
     uint32 level = m_LevelManager->Get_CurrentLevelIndex();
 
@@ -139,7 +139,7 @@ constexpr Shared<T> Game::Instantiate(const wstring &className, const Shared<voi
     return nullptr;
 }
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, uint32 typeID, const Shared<void>& arg) const
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, uint32 typeID, void* arg) const
 {
     auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, typeID);
     if (!prototypeInstance) return nullptr;
@@ -161,7 +161,7 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, 
     return nullptr;
 }
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, const wstring& className, const Shared<void>& arg) const
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex, const wstring& className, void* arg) const
 {
     auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
     if (!prototypeInstance) return nullptr;

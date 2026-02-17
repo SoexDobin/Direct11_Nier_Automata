@@ -2,7 +2,6 @@
 #include "Game.h"
 #include "GameObject.h"
 
-
 Renderer::Renderer(const ComPtr<ID3D11Device> &device,
                    const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(device), m_Context(context) {}
@@ -18,7 +17,7 @@ void Renderer::Draw() {
   }
 }
 
-HRESULT Renderer::Initialize(const Shared<void> &arg) {
+HRESULT Renderer::Initialize(void *arg) {
   m_LayerMask = ETOI(LAYER::ALL_LAYER);
 
   return EngineManager::Initialize(arg);

@@ -6,31 +6,34 @@
 
 MainApp::MainApp() : m_Game(Game::GetInstance()) {}
 
-HRESULT MainApp::Initialize() {
-  ENGINE_DESC EngineDesc = {};
-  {
-    EngineDesc.hWnd = g_hWnd;
-    EngineDesc.winMode = WINMODE::WIN;
-    EngineDesc.levCount = ETOI(LEVEL::END);
+HRESULT MainApp::Initialize() 
+{
+    m_Game->
 
-    // Use loaded project settings
-    EngineDesc.viewportWidth = g_projectSettings.screenWidth;
-    EngineDesc.viewportHeight = g_projectSettings.screenHeight;
-    EngineDesc.windowTitle = g_projectSettings.windowTitle;
-  }
+    ENGINE_DESC EngineDesc = {};
+    {
+      EngineDesc.hWnd = g_hWnd;
+      EngineDesc.winMode = WINMODE::WIN;
+      EngineDesc.levCount = ETOI(LEVEL::LOADING);
 
-  if (FAILED(m_Game->Initialize_Engine(EngineDesc)))
-    return E_FAIL;
+      // Use loaded project settings
+      EngineDesc.viewportWidth = g_projectSettings.screenWidth;
+      EngineDesc.viewportHeight = g_projectSettings.screenHeight;
+      EngineDesc.windowTitle = g_projectSettings.windowTitle;
+    }
 
-  // Load Layer & Tag Settings
-  m_Game->Get_LayerRegistry()->LoadFromFile(
-      L"../Data/Settings/LayerSettings.json");
-  m_Game->Get_TagRegistry()->LoadFromFile(L"../Data/Settings/TagSettings.json");
+    if (FAILED(m_Game->Initialize_Engine(EngineDesc)))
+      return E_FAIL;
 
-  if (FAILED(Ready_StartLevel(LEVEL::LOGO)))
-    return E_FAIL;
+    // Load Layer & Tag Settings
+    m_Game->Get_LayerRegistry()->LoadFromFile(
+        L"../Data/Settings/LayerSettings.json");
+    m_Game->Get_TagRegistry()->LoadFromFile(L"../Data/Settings/TagSettings.json");
 
-  return S_OK;
+    if (FAILED(Ready_StartLevel(LEVEL::LOGO)))
+      return E_FAIL;
+
+    return S_OK;
 }
 
 void MainApp::Update() const { m_Game->Update_Engine(); }

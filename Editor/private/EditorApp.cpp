@@ -3,9 +3,9 @@
 
 #include "Game.h"
 #include "EditorManager.h"
+#include "PathManager.h"
 
-
-EditorApp::EditorApp() : m_Game(GAME), m_Editor(EDITOR) {}
+EditorApp::EditorApp() {}
 EditorApp::~EditorApp() 
 {
     Destruct_IMGUI();
@@ -82,11 +82,8 @@ HRESULT EditorApp::Initialize_IMGUI()
 
 HRESULT EditorApp::Destruct_IMGUI()
 {
-    auto layerRegistry = GAME->Get_LayerRegister();
-    auto tagRegistry = GAME->Get_TagRegister();
-
-    layerRegistry->SaveToFile(L"../Data/LayerSettings.json");
-    tagRegistry->SaveToFile(L"../Data/TagSettings.json");
+    GAME->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
+    GAME->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
 
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();

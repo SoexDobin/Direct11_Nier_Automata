@@ -66,13 +66,52 @@ GameObject *ptr = nullptr;
 - RAII 원칙 준수
 - 리소스 해제 순서: 생성 역순
 
-## 리서치 & 디버깅
+## 활성 스킬 & 사용 가이드
 
-- 자료 리서치, 코드 래퍼런스, 디버깅 시 **NotebookLM 스킬** 활용
-- C++ 코드 작성 시 **cpp-pro 스킬** 참조
-- 게임 시스템 설계 시 **game-development 스킬** 참조
-- 아키텍처 결정 시 **architecture 스킬** 참조
-- 디버깅 시 **debugger 스킬** 참조
+### 자동 트리거 스킬 (항상 활성)
+
+이 스킬들은 관련 키워드나 작업 시 자동으로 활성화됩니다:
+
+#### 리서치 & 문서
+- **notebooklm**: 자료 리서치, 코드 래퍼런스, 기술 질문 시
+  - 트리거: NotebookLM URL 언급, `/research` 워크플로우
+
+#### C++ & 게임 개발
+- **cpp-pro**: C++ 코드 작성/리팩토링 시
+  - 트리거: Modern C++, RAII, 스마트 포인터 관련 작업
+- **game-development**: 게임 시스템 설계 시
+  - 트리거: 게임 루프, FSM, ECS, 컴포넌트 시스템 작업
+
+#### 디버깅 & 아키텍처
+- **debugger**: 에러/버그 발생 시
+  - 트리거: `/debug` 워크플로우, 에러 메시지 분석
+- **architecture**: 아키텍처 결정 시
+  - 트리거: 시스템 설계, 의존성 분석, ADR 작성
+
+#### 코드 품질 & 메모리 안전성 (신규 추가)
+- **code-review-checklist**: 코드 리뷰 시 체계적 체크리스트 제공
+  - 트리거: 코드 리뷰 요청, PR 검토, 품질 검증
+  - 용도: 기능, 보안, 성능, 가독성, 테스트 커버리지 검증
+- **memory-safety-patterns**: C++ 메모리 안전성 패턴 가이드
+  - 트리거: 메모리 관리, DirectX 리소스, ComPtr, Live Object 경고
+  - 용도: RAII, 스마트 포인터, 리소스 누수 방지
+- **context-window-management**: 대화 컨텍스트 최적화
+  - 트리거: 대규모 코드베이스 분석, 긴 에러 로그 처리
+  - 용도: 토큰 절약, 중요 정보 우선순위화
+
+### 명시적 호출 방법
+
+필요 시 명시적으로 특정 스킬 호출 가능:
+```
+Use @[스킬명] [작업 내용]
+```
+
+**예시:**
+```
+Use @code-review-checklist to review Engine/private/RenderSystem.cpp
+Use @memory-safety-patterns to analyze memory management in Engine/private/TextureManager.cpp
+```
+
 
 ## 활성 NotebookLM 노트북
 

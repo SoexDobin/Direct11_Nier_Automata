@@ -182,6 +182,8 @@
     <ClInclude Include="..\public\Editor_Define.h" />
     <ClInclude Include="..\public\EditorApp.h" />
     <ClInclude Include="..\public\Inspector.h" />
+    <ClInclude Include="..\public\MenuBar.h" />
+    <ClInclude Include="..\public\PathManager.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -194,6 +196,7 @@
     <ClCompile Include="..\private\EditorManager.cpp" />
     <ClCompile Include="..\private\EditorView.cpp" />
     <ClCompile Include="..\private\Inspector.cpp" />
+    <ClCompile Include="..\private\MenuBar.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

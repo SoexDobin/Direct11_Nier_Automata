@@ -9,16 +9,19 @@ extern inline ENGINE_DESC g_projectSettings = {
 	nullptr, 
 	WINMODE::WIN, 
 	L"Editor", 
-	1280, 
-	720, 
+	1920, 
+	1080, 
 	0, 
 	true, 
 	2
 };
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 
 namespace Editor
 {
-	#define EDITOR		EditorManager::GetInstance()
+	#define EDITOR		Editor::EditorManager::GetInstance()
 }
+
 using namespace Editor;

@@ -28,6 +28,9 @@
     <ClInclude Include="..\public\Loader.h">
       <Filter>01. Level\Loading\Loader</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Client_Function.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -75,6 +78,9 @@
     </Filter>
     <Filter Include="01. Level\Loading\Loader">
       <UniqueIdentifier>{03fcc313-3304-4541-a9eb-eee23cc2756e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject">
+      <UniqueIdentifier>{a4ca53d2-1ab1-4372-ad1b-faaaadec0d0b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

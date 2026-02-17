@@ -22,6 +22,9 @@
     <Filter Include="01. EditorObject\EditorView">
       <UniqueIdentifier>{bc786b98-8079-4617-9de9-003941d4c51f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. EditorObject\MenuBar">
+      <UniqueIdentifier>{13c3f82c-e2ff-4242-8230-a81a32584fa0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\EditorApp.h">
@@ -57,6 +60,12 @@
     <ClInclude Include="..\public\EditorView.h">
       <Filter>01. EditorObject\EditorView</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MenuBar.h">
+      <Filter>01. EditorObject\MenuBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PathManager.h">
+      <Filter>00. System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -76,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="..\private\EditorView.cpp">
       <Filter>01. EditorObject\EditorView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MenuBar.cpp">
+      <Filter>01. EditorObject\MenuBar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

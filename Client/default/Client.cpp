@@ -9,6 +9,8 @@
 // 전역 변수:
 HWND g_hWnd = { nullptr };
 HINSTANCE g_hInst = { nullptr };
+ENGINE_DESC g_projectSettings = {};
+
 WCHAR szTitle[MAX_LOADSTRING];              
 WCHAR szWindowClass[MAX_LOADSTRING];
 
@@ -31,9 +33,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CLIENT, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
-
-    // Load Project Settings (Client-managed)
-    g_projectSettings = LoadProjectSettings();
 
     if (!InitInstance (hInstance, nCmdShow))
     {
@@ -89,25 +88,30 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   g_hInst = hInstance; 
+	g_hInst = hInstance; 
 
-   RECT rc = { 0, 0, (LONG)g_projectSettings.screenWidth, (LONG)g_projectSettings.screenHeight };
-   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+    RECT rc = {
+	    0, 
+    	0, 
+    	static_cast<LONG>(g_projectSettings.viewportWidth), 
+        static_cast<LONG>(g_projectSettings.viewportHeight)
+    };
+    AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-   HWND hWnd = CreateWindowW(szWindowClass, g_projectSettings.windowTitle.c_str(), WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW(szWindowClass, g_projectSettings.windowTitle.c_str(), WS_OVERLAPPEDWINDOW,
+       CW_USEDEFAULT, 0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    if (!hWnd)
+    {
+       return FALSE;
+    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
 
-   g_hWnd = hWnd;
+    g_hWnd = hWnd;
 
-   return TRUE;
+    return TRUE;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -130,6 +134,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
+        break;
+    case WM_KEYDOWN:
+	    {
+		    if (wParam == VK_ESCAPE)
+                PostQuitMessage(0);
+	    }
         break;
     case WM_PAINT:
         break;

@@ -88,6 +88,9 @@
     <Filter Include="01. Utility\05. Component\Shader">
       <UniqueIdentifier>{06c5d012-3586-41e6-b69e-c0d09aed9cbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. GameObject\UIObject">
+      <UniqueIdentifier>{04f9478e-a545-45b9-b830-717ad7b3d1ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -194,6 +197,9 @@
     <ClInclude Include="..\public\Shader.h">
       <Filter>01. Utility\05. Component\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UIObject.h">
+      <Filter>01. Utility\04. GameObject\UIObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -267,6 +273,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Shader.cpp">
       <Filter>01. Utility\05. Component\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIObject.cpp">
+      <Filter>01. Utility\04. GameObject\UIObject</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

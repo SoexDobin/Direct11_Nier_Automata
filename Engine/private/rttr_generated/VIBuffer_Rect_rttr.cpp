@@ -8,7 +8,6 @@ RTTR_REGISTRATION
     registration::class_<VIBuffer_Rect>(L"VIBuffer_Rect")
         .constructor<>()
         .method("Clone", &VIBuffer_Rect::Clone)
-        .method("Create", &VIBuffer_Rect::Create)
         ;
 }
 

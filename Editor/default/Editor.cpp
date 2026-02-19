@@ -1,7 +1,8 @@
+#include "pch.h"
 #include "Editor.h"
 #include "EditorApp.h"
 #include "framework.h"
-#include "pch.h"
+
 
 #define MAX_LOADSTRING 100
 
@@ -18,19 +19,23 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd,
                                                              UINT msg,
                                                              WPARAM wParam,
                                                              LPARAM lParam);
+static bool  g_ResizePending = { false };
+static uint32 g_PendingWidth = { 0 };
+static uint32 g_PendingHeight = { 0 };
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine,
-                      _In_ int nCmdShow) {
-  if constexpr (_DEBUG)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+                      _In_ int nCmdShow) 
+{
+	if constexpr (_DEBUG)
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-  UNREFERENCED_PARAMETER(hPrevInstance);
-  UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
-  // Initialize Global Variables
-  wcscpy_s(szTitle, g_projectSettings.windowTitle.c_str());
-  wcscpy_s(szWindowClass, L"EDITOR_WND_CLASS");
+    // Initialize Global Variables
+    wcscpy_s(szTitle, g_projectSettings.windowTitle.c_str());
+    wcscpy_s(szWindowClass, L"EDITOR_WND_CLASS");
 
   MyRegisterClass(hInstance);
 
@@ -55,6 +60,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         TranslateMessage(&msg);
         DispatchMessage(&msg);
       }
+    }
+
+    if (g_ResizePending && GAME)
+    {
+        GAME->OnResize(g_PendingWidth, g_PendingHeight);
+        g_ResizePending = false;
     }
 
     pEditorApp->Update();
@@ -93,8 +104,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
              static_cast<int32>(g_projectSettings.viewportHeight)};
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-  HWND hWnd =
-      CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+  HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
                     0, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr,
                     hInstance, nullptr);
 
@@ -129,7 +139,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
   case WM_KEYDOWN: {
     if (wParam == VK_ESCAPE)
       PostQuitMessage(0);
-  }
+  } break;
+  case WM_SIZE: {
+      if (wParam != SIZE_MINIMIZED)
+      {
+          RECT rc{};
+          GetClientRect(g_hWnd, &rc);
+          g_PendingWidth = rc.right - rc.left;
+          g_PendingHeight = rc.bottom - rc.top;
+          g_ResizePending = true;
+      }
+  } break; 
   case WM_DESTROY:
     PostQuitMessage(0);
     break;

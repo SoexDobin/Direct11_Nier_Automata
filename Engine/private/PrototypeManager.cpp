@@ -5,7 +5,6 @@
 #include "ScriptComponent.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
-#include "Type_Helper.h"
 
 uint32 PrototypeManager::Get_TypeByName(const wstring &name) {
   uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
@@ -127,7 +126,6 @@ Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
     auto it = m_GameObjects[levIndex].find(typeID);
     if (it != m_GameObjects[levIndex].end())
       return it->second;
-
   } else if (prototype == PROTOTYPE::COMPONENT) {
     auto it = m_Components[levIndex].find(typeID);
     if (it != m_Components[levIndex].end())
@@ -155,40 +153,73 @@ Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
 HRESULT PrototypeManager::Create_Reflection(
     const ComPtr<ID3D11Device> &device,
     const ComPtr<ID3D11DeviceContext> &context) {
-  type type_GameObject = Helper::Get_Type<GameObject>();
-  type type_Component = Helper::Get_Type<Component>();
+    type type_GameObject = type::get<GameObject>();
+	type type_Component = type::get<Component>();
 
-  for (auto &type : type::get_types()) {
-    Bool isDerivedObj = type.is_derived_from(type_GameObject);
-    Bool isDerivedCom = type.is_derived_from(type_Component);
+  auto allTypes = type::get_types();
 
-    if (!isDerivedObj && !isDerivedCom)
-      continue;
-
-    method createMethod = type.get_method("Create");
-    if (createMethod.is_valid() == false)
-      continue;
-
-    variant result = createMethod.invoke({}, device, context);
-    if (result.is_valid() == false) {
-      // TODO : 리플랙션한 클래스 출력
-      continue;
-    } else {
-      // TODO : 리플랙션 못한 클래스 출력
-    }
-
-    Shared<Object> prototype = result.get_value<Shared<Object>>();
-    if (prototype == nullptr)
-      continue;
-
-    std::wstring typeName = Helper::To_wString(type.get_name().to_string());
-
-    // for (size_t i = 0; i < m_LevelCount; ++i)
-    //{
-    //	m_Prototypes[i].emplace(prototype->Get_TypeID(), prototype);
-    //	m_TypeNames[i].emplace(typeName, prototype->Get_TypeID());
-    // }
+  /* [Pass 1] Component 먼저 등록 (의존성 해결) */
+  for (auto &t : allTypes) {
+    if (t.is_derived_from(type_Component) &&
+        !t.is_derived_from(type_GameObject))
+      Register_Type(t, PROTOTYPE::COMPONENT, device, context);
   }
+
+  /* [Pass 2] GameObject 등록 (Component가 이미 등록됨) */
+  for (auto &t : allTypes) {
+    if (t.is_derived_from(type_GameObject))
+      Register_Type(t, PROTOTYPE::GAMEOBJECT, device, context);
+  }
+
+  return S_OK;
+}
+
+void PrototypeManager::Register_Type(
+    rttr::type type, PROTOTYPE protoType, const ComPtr<ID3D11Device> &device,
+    const ComPtr<ID3D11DeviceContext> &context) {
+  if (type.get_name().empty())
+    return;
+
+  method createMethod = type.get_method("Create");
+  if (!createMethod.is_valid())
+    return;
+
+  variant result = createMethod.invoke({}, device, context);
+  if (!result.is_valid()) {
+    LOG_WARN(L"[RTTR] Failed to invoke Create for: {}",
+             Helper::To_wString(type.get_name().to_string()));
+    return;
+  }
+
+  Shared<Object> prototype = result.get_value<Shared<Object>>();
+  if (!prototype)
+    return;
+
+  wstring typeName = Helper::To_wString(type.get_name().to_string());
+  uint32 typeID = prototype->Get_TypeID();
+
+  for (size_t i = 0; i < m_LevelCount; ++i) {
+    m_NameByTypes[i].emplace(typeID, typeName);
+    m_TypesByName[i].emplace(typeName, typeID);
+
+    if (protoType == PROTOTYPE::GAMEOBJECT)
+      m_GameObjects[i].emplace(typeID,
+                               static_pointer_cast<GameObject>(prototype));
+    else if (protoType == PROTOTYPE::COMPONENT)
+      m_Components[i].emplace(typeID,
+                              static_pointer_cast<Component>(prototype));
+  }
+
+  LOG_INFO(L"[RTTR] Registered: {}", typeName);
+}
+
+HRESULT PrototypeManager::Export_Prefabs(const wstring &path) {
+  /* TODO: JSON 직렬화 구현 */
+  return S_OK;
+}
+
+HRESULT PrototypeManager::Import_Prefabs(const wstring &path) {
+  /* TODO: JSON 역직렬화 구현 */
   return S_OK;
 }
 

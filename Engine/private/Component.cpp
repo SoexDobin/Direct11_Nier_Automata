@@ -6,6 +6,10 @@
 #include "Type_Helper.h"
 
 
+Component::Component()
+{
+}
+
 Component::Component(const ComPtr<ID3D11Device> &pDevice,
                      const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(pDevice), m_Context(context) {}

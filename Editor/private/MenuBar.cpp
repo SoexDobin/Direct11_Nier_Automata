@@ -3,6 +3,7 @@
 #include "PathManager.h"
 
 MenuBar::MenuBar() {}
+
 HRESULT MenuBar::Initialize() {
     m_Enable = false;
     if (FAILED(Load_EngineDesc()))
@@ -28,13 +29,17 @@ void MenuBar::Render() {
 void MenuBar::ViewEngineDesc() {
     if (ImGui::Begin("Viewport Configuration", &m_Enable,
         ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("Client Settings (Unsigned Int)");
+        ImGui::Text("Client Settings");
         ImGui::Separator();
+
+        ImGui::InputText("Window Title", m_Title, MAXCHAR);
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
         // Use InputScalar for unsigned int types
-        ImGui::InputScalar("Viewport Width", ImGuiDataType_U32,
-            &m_EngineDesc.viewportWidth, nullptr, nullptr, "%u");
-        ImGui::InputScalar("Viewport Height", ImGuiDataType_U32,
-            &m_EngineDesc.viewportHeight, nullptr, nullptr, "%u");
+        ImGui::InputScalar("Viewport Width", ImGuiDataType_U32, &m_EngineDesc.viewportWidth, nullptr, nullptr, "%u");
+        ImGui::InputScalar("Viewport Height", ImGuiDataType_U32, &m_EngineDesc.viewportHeight, nullptr, nullptr, "%u");
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
@@ -63,6 +68,7 @@ HRESULT MenuBar::Load_EngineDesc() {
         }
         nlohmann::json json;
         file >> json;
+        m_EngineDesc.windowTitle = Helper::To_wString(json.value("windowTitle", "client"));
         m_EngineDesc.viewportWidth = json.value("viewportWidth", 1280u);
         m_EngineDesc.viewportHeight = json.value("viewportHeight", 720u);
         m_EngineDesc.levCount = json.value("levCount", 0u);
@@ -89,6 +95,7 @@ HRESULT MenuBar::Save_EngineDesc() {
             return E_FAIL;
         }
         nlohmann::json json;
+        json["windowTitle"] = Helper::To_wString(m_Title);
         json["viewportWidth"] = m_EngineDesc.viewportWidth;
         json["viewportHeight"] = m_EngineDesc.viewportHeight;
         json["levCount"] = m_EngineDesc.levCount;
@@ -102,9 +109,12 @@ HRESULT MenuBar::Save_EngineDesc() {
 }
 Shared<MenuBar> MenuBar::Create() {
     auto menuBar = make_shared<MenuBar>();
-    if (FAILED(menuBar->Initialize())) {
+
+    if (FAILED(menuBar->Initialize())) 
+    {
         MSG_BOX("Failed To Create MenuBar");
         return nullptr;
     }
+
     return menuBar;
 }

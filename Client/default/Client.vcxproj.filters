@@ -31,6 +31,9 @@
     <ClInclude Include="..\public\Client_Function.h">
       <Filter>98. Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LoadingBackground.h">
+      <Filter>02. GameObject\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -47,6 +50,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Loader.cpp">
       <Filter>01. Level\Loading\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingBackground.cpp">
+      <Filter>02. GameObject\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +87,9 @@
     </Filter>
     <Filter Include="02. GameObject">
       <UniqueIdentifier>{a4ca53d2-1ab1-4372-ad1b-faaaadec0d0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI">
+      <UniqueIdentifier>{50aa4288-41b6-4aa9-a91e-9ceed7f591f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -145,6 +145,10 @@
       <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>call "$(ProjectDir)GenerateRTTR.bat"</Command>
+      <Message>Parsing Client Headers for Prefab Metadata</Message>
+    </PreBuildEvent>
     <PostBuildEvent>
       <Command>call "$(ProjectDir)ProjectSetting.bat" "$(SolutionDir)" "$(OutDir)"</Command>
     </PostBuildEvent>
@@ -170,6 +174,10 @@
       <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>call "$(ProjectDir)GenerateRTTR.bat"</Command>
+      <Message>Parsing Client Headers for Prefab Metadata</Message>
+    </PreBuildEvent>
     <PostBuildEvent>
       <Command>call "$(ProjectDir)ProjectSetting.bat" "$(SolutionDir)" "$(OutDir)"</Command>
     </PostBuildEvent>
@@ -182,13 +190,18 @@
     <ClInclude Include="..\public\Editor_Define.h" />
     <ClInclude Include="..\public\EditorApp.h" />
     <ClInclude Include="..\public\Inspector.h" />
+    <ClInclude Include="..\public\LogConsole.h" />
     <ClInclude Include="..\public\MenuBar.h" />
+    <ClInclude Include="..\public\MetadataManager.h" />
     <ClInclude Include="..\public\PathManager.h" />
+    <ClInclude Include="..\public\PrefabRegistry.h" />
+    <ClInclude Include="..\public\PrefabTab.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <None Include="GenerateRTTR.bat" />
     <None Include="ProjectSetting.bat" />
   </ItemGroup>
   <ItemGroup>
@@ -196,7 +209,11 @@
     <ClCompile Include="..\private\EditorManager.cpp" />
     <ClCompile Include="..\private\EditorView.cpp" />
     <ClCompile Include="..\private\Inspector.cpp" />
+    <ClCompile Include="..\private\LogConsole.cpp" />
     <ClCompile Include="..\private\MenuBar.cpp" />
+    <ClCompile Include="..\private\MetadataManager.cpp" />
+    <ClCompile Include="..\private\PrefabRegistry.cpp" />
+    <ClCompile Include="..\private\PrefabTab.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

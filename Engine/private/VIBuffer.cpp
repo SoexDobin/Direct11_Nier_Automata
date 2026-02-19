@@ -1,5 +1,10 @@
 #include "VIBuffer.h"
 
+VIBuffer::VIBuffer()
+	: Component{}
+{
+}
+
 VIBuffer::VIBuffer(ComPtr<ID3D11Device> device,
                    ComPtr<ID3D11DeviceContext> context)
     : Component(device, context) {}

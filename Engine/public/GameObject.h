@@ -8,11 +8,11 @@ NS_BEGIN(Engine)
 class Component;
 class Transform;
 
-class ENGINE_DLL GameObject abstract : public Object,
-                                       enable_shared_from_this<GameObject> {
+class ENGINE_DLL GameObject abstract : public Object, enable_shared_from_this<GameObject> 
+{
 public:
-  explicit GameObject(const ComPtr<ID3D11Device> &pDevice,
-                      const ComPtr<ID3D11DeviceContext> &context);
+	explicit GameObject();
+  explicit GameObject(const ComPtr<ID3D11Device> &pDevice, const ComPtr<ID3D11DeviceContext> &context);
   explicit GameObject(const Shared<GameObject> &prototype);
   virtual ~GameObject() override = default;
 

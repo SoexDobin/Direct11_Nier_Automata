@@ -1,29 +1,38 @@
 #pragma once
 #include "EditorObject.h"
+#include "MetadataManager.h"
 
 NS_BEGIN(Editor)
 
-class Inspector final : public EditorObject
-{
+class PrefabRegistry;
+
+class Inspector final : public EditorObject {
+  NO_COPY(Inspector)
 public:
-	Inspector();
-	~Inspector() override;
+  Inspector();
+  ~Inspector() override;
 
 public:
-	HRESULT Initialize() override;
-	void Update() override;
-	void Render() override;
+  HRESULT Initialize() override;
+  void Update() override {}
+  void Render() override;
+
+public:
+  void Set_SelectedClass(const string &className) {
+    m_SelectedClass = className;
+  }
 
 private:
-	void LayerTagGUI();
+    void LayerTagGUI();
+  void RenderMemberList(const vector<MetadataManager::MemberInfo> &members,
+                        const Shared<PrefabRegistry> &registry,
+                        const char *sectionId);
 
 private:
-	wstring m_layerJsonPath = {};
-	wstring m_tagJsonPath = {};
+  string m_SelectedClass;
 
 public:
-	static Shared<Inspector> Create();
-	
+  static Shared<Inspector> Create();
 };
 
 NS_END

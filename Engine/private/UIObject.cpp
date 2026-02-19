@@ -3,14 +3,21 @@
 #include "Shader.h"
 #include "Transform.h"
 
+UIObject::UIObject()
+	: GameObject()
+{
+}
+
 UIObject::UIObject(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: GameObject { device, context }
 {
 }
 
-UIObject::UIObject(const UIObject& rhs)
-	: GameObject { rhs }
+UIObject::UIObject(const Shared<UIObject>& rhs)
+	: GameObject { rhs }, m_TransformationMatrices {  }
 {
+	m_TransformationMatrices[ETOI(D3DTS::VIEW)] = rhs->m_TransformationMatrices[ETOI(D3DTS::VIEW)];
+	m_TransformationMatrices[ETOI(D3DTS::PROJ)] = rhs->m_TransformationMatrices[ETOI(D3DTS::PROJ)];
 }
 
 HRESULT UIObject::Initialize_Prototype()

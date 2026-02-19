@@ -91,6 +91,9 @@
     <Filter Include="01. Utility\04. GameObject\UIObject">
       <UniqueIdentifier>{04f9478e-a545-45b9-b830-717ad7b3d1ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer\Terrain">
+      <UniqueIdentifier>{07761988-e5c3-4843-9ef1-403cb017494d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -158,9 +161,6 @@
     <ClInclude Include="..\public\ObjectManager.h">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Type_Helper.h">
-      <Filter>97. Helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\String_Helper.h">
       <Filter>97. Helper</Filter>
     </ClInclude>
@@ -199,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="..\public\UIObject.h">
       <Filter>01. Utility\04. GameObject\UIObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Terrain.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -276,6 +279,9 @@
     </ClCompile>
     <ClCompile Include="..\private\UIObject.cpp">
       <Filter>01. Utility\04. GameObject\UIObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Terrain.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

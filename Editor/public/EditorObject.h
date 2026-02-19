@@ -1,4 +1,7 @@
 #pragma once
+#include "Editor_Define.h"
+
+NS_BEGIN(Editor)
 
 class EditorObject abstract
 {
@@ -23,3 +26,5 @@ protected:
 	Bool m_IsDirty = { true };
 
 };
+
+NS_END

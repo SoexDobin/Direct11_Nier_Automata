@@ -7,6 +7,7 @@ class GameObject;
 
 class ENGINE_DLL Component abstract : public Object {
 public:
+    Component();
   explicit Component(const ComPtr<ID3D11Device> &pDevice,
                      const ComPtr<ID3D11DeviceContext> &context);
   explicit Component(const Shared<Component> &prototype);

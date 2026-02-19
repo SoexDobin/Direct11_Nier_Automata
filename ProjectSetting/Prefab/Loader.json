@@ -1,0 +1,13 @@
+{
+  "base_class": "Level",
+  "class": "Loader",
+  "namespace": "Client",
+  "overrides": [
+    {
+      "name": "m_isFinished",
+      "type": "BOOL",
+      "value": "false"
+    }
+  ],
+  "version": "1.0"
+}

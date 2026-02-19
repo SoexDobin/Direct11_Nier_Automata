@@ -34,103 +34,103 @@
     },
     {
       "bit": 128,
-      "name": "TAG_7"
+      "name": "TAG7"
     },
     {
       "bit": 256,
-      "name": "TAG_8"
+      "name": "TAG8"
     },
     {
       "bit": 512,
-      "name": "TAG_9"
+      "name": "TAG9"
     },
     {
       "bit": 1024,
-      "name": "TAG_10"
+      "name": "TAG10"
     },
     {
       "bit": 2048,
-      "name": "TAG_11"
+      "name": "TAG11"
     },
     {
       "bit": 4096,
-      "name": "TAG_12"
+      "name": "TAG12"
     },
     {
       "bit": 8192,
-      "name": "TAG_13"
+      "name": "TAG13"
     },
     {
       "bit": 16384,
-      "name": "TAG_14"
+      "name": "TAG14"
     },
     {
       "bit": 32768,
-      "name": "TAG_15"
+      "name": "TAG15"
     },
     {
       "bit": 65536,
-      "name": "TAG_16"
+      "name": "TAG16"
     },
     {
       "bit": 131072,
-      "name": "TAG_17"
+      "name": "TAG17"
     },
     {
       "bit": 262144,
-      "name": "TAG_18"
+      "name": "TAG18"
     },
     {
       "bit": 524288,
-      "name": "TAG_19"
+      "name": "TAG19"
     },
     {
       "bit": 1048576,
-      "name": "TAG_20"
+      "name": "TAG20"
     },
     {
       "bit": 2097152,
-      "name": "TAG_21"
+      "name": "TAG21"
     },
     {
       "bit": 4194304,
-      "name": "TAG_22"
+      "name": "TAG22"
     },
     {
       "bit": 8388608,
-      "name": "TAG_23"
+      "name": "TAG23"
     },
     {
       "bit": 16777216,
-      "name": "TAG_24"
+      "name": "TAG24"
     },
     {
       "bit": 33554432,
-      "name": "TAG_25"
+      "name": "TAG25"
     },
     {
       "bit": 67108864,
-      "name": "TAG_26"
+      "name": "TAG26"
     },
     {
       "bit": 134217728,
-      "name": "TAG_27"
+      "name": "TAG27"
     },
     {
       "bit": 268435456,
-      "name": "TAG_28"
+      "name": "TAG28"
     },
     {
       "bit": 536870912,
-      "name": "TAG_29"
+      "name": "TAG29"
     },
     {
       "bit": 1073741824,
-      "name": "TAG_30"
+      "name": "TAG30"
     },
     {
       "bit": 2147483648,
-      "name": "TAG_31"
+      "name": "TAG31"
     }
   ],
   "version": "1.0"

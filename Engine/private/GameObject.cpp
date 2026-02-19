@@ -9,11 +9,13 @@
 #include "String_Helper.h"
 #include "Type_Helper.h"
 
-GameObject::GameObject(const ComPtr<ID3D11Device> &pDevice,
-                       const ComPtr<ID3D11DeviceContext> &context)
-    : m_Device(pDevice), m_Context(context) {}
+GameObject::GameObject()
+{
+}
 
-GameObject::GameObject(const Shared<GameObject> &prototype)
+GameObject::GameObject(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+    : m_Device(device), m_Context(context) {}
+GameObject::GameObject(const Shared<GameObject>& prototype)
     : m_Device(prototype->m_Device), m_Context(prototype->m_Context),
       m_LayerMask(prototype->m_LayerMask), m_TagMask(prototype->m_TagMask) {}
 

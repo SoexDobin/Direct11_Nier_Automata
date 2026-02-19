@@ -14,6 +14,7 @@ namespace Engine
 		TRANSFORM,
 		TEXTURE,
 		VI_RECT_BUFFER,
+		VI_TERRAIN_BUFFER,
 		SHADER
 	};
 	

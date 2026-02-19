@@ -14,8 +14,9 @@ public:
 	} UI_DESC;
 
 public:
+	UIObject();
 	UIObject(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	UIObject(const UIObject& rhs);
+	UIObject(const Shared<UIObject>& rhs);
 	virtual ~UIObject() override = default; 
 
 public:
@@ -40,7 +41,7 @@ protected:
 private:
 	Float		m_X{}, m_Y{}, m_SizeX{}, m_SizeY{};
 	Float		m_ViewportWidth{}, m_ViewportHeight{};
-	Float4x4	m_TransformationMatrices[ETOI(D3DTS::END)];
+	Matrix		m_TransformationMatrices[ETOI(D3DTS::END)];
 
 public:
 	Shared<GameObject> Clone(void* arg) override PURE;

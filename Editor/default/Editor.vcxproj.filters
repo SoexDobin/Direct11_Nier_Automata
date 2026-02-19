@@ -25,6 +25,18 @@
     <Filter Include="01. EditorObject\MenuBar">
       <UniqueIdentifier>{13c3f82c-e2ff-4242-8230-a81a32584fa0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="99. SystemFiles\Batch">
+      <UniqueIdentifier>{403f5c6c-fe1b-452c-8631-7fe621c3fbd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. SystemFiles\vcpkg">
+      <UniqueIdentifier>{e04e437b-f073-4e3b-aa81-de0fd0a2744b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. EditorObject\PrefabTab">
+      <UniqueIdentifier>{1da03235-36bf-40f2-be95-b2512b5da2c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. EditorObject\LogConsole">
+      <UniqueIdentifier>{c980370b-bdbe-473e-a971-be0699b816b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\EditorApp.h">
@@ -66,6 +78,18 @@
     <ClInclude Include="..\public\PathManager.h">
       <Filter>00. System</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\PrefabTab.h">
+      <Filter>01. EditorObject\PrefabTab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MetadataManager.h">
+      <Filter>01. EditorObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PrefabRegistry.h">
+      <Filter>01. EditorObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LogConsole.h">
+      <Filter>01. EditorObject\LogConsole</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -89,6 +113,18 @@
     <ClCompile Include="..\private\MenuBar.cpp">
       <Filter>01. EditorObject\MenuBar</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\PrefabTab.cpp">
+      <Filter>01. EditorObject\PrefabTab</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MetadataManager.cpp">
+      <Filter>01. EditorObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PrefabRegistry.cpp">
+      <Filter>01. EditorObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LogConsole.cpp">
+      <Filter>01. EditorObject\LogConsole</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Editor.ico">
@@ -99,11 +135,14 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\vcpkg.json">
-      <Filter>99. SystemFiles</Filter>
-    </None>
     <None Include="ProjectSetting.bat">
-      <Filter>99. SystemFiles</Filter>
+      <Filter>99. SystemFiles\Batch</Filter>
+    </None>
+    <None Include="..\vcpkg.json">
+      <Filter>99. SystemFiles\vcpkg</Filter>
+    </None>
+    <None Include="GenerateRTTR.bat">
+      <Filter>99. SystemFiles\Batch</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

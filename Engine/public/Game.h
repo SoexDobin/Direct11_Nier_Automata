@@ -39,6 +39,7 @@ public: /* For Editor / Tool */
 public: /* For GraphicDevice */
   HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
   HRESULT Present() const;
+  HRESULT OnResize(uint32 width, uint32 height);
   HRESULT Begin_RenderOffScreen(const wstring &rtTag) const;
   HRESULT End_RenderOffScreen() const;
   ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(const wstring &rtTag) const;
@@ -62,6 +63,23 @@ public: /* For PrototypeManager */
   }
   HRESULT Add_Prototype(uint32 levIndex,
                         const Shared<class Object> &prototype) const;
+
+public: /* For PrototypeManager - Prefab/Editor 래핑 */
+  const auto &Get_Prototype_GameObjects() const {
+    return m_PrototypeManager->Get_GameObjects();
+  }
+  const auto &Get_Prototype_Components() const {
+    return m_PrototypeManager->Get_Components();
+  }
+  const auto &Get_Prototype_NameMap() const {
+    return m_PrototypeManager->Get_NameByTypes();
+  }
+  HRESULT Export_Prefabs(const wstring &path) const {
+    return m_PrototypeManager->Export_Prefabs(path);
+  }
+  HRESULT Import_Prefabs(const wstring &path) const {
+    return m_PrototypeManager->Import_Prefabs(path);
+  }
 
 private: /* For ObjectManager */
   HRESULT Add_GameObject(const Shared<GameObject> &GameObject) const;

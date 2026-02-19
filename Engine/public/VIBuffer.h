@@ -5,9 +5,10 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL VIBuffer abstract : public Component {
 public:
+    VIBuffer();
   VIBuffer(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
   VIBuffer(const Shared<VIBuffer> &rhs);
-  virtual ~VIBuffer() = default;
+  virtual ~VIBuffer() override = default;
 
 public:
   virtual HRESULT Initialize_Prototype() override;

@@ -108,12 +108,6 @@
     <None Include="RTTRGenerator.py">
       <Filter>99. SystemFiles</Filter>
     </None>
-    <None Include="..\private\Game.inl">
-      <Filter>01. Utility\01. GameInstance</Filter>
-    </None>
-    <None Include="..\private\GameObject.inl">
-      <Filter>01. Utility\04. GameObject</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GraphicDevice.h">
@@ -212,6 +206,7 @@
     <ClInclude Include="..\public\VIBuffer_Terrain.h">
       <Filter>01. Utility\05. Component\VIBuffer\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -286,5 +281,6 @@
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp">
       <Filter>01. Utility\05. Component\VIBuffer\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Pipeline.cpp" />
   </ItemGroup>
 </Project>

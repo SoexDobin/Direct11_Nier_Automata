@@ -53,6 +53,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   if (nullptr == (m_TimeManager = TimeManager::Create()))
     return E_FAIL;
 
+  if (nullptr == (m_Pipeline = Pipeline::Create()))
+	  return E_FAIL;
+
   if (nullptr == (m_LevelManager = LevelManager::Create()))
     return E_FAIL;
 
@@ -62,8 +65,8 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   }
 
   // RTTR 리플렉션을 통한 프로토타입 자동 등록
-  if (FAILED(m_PrototypeManager->Create_Reflection(
-          m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context()))) {
+  if (FAILED(m_PrototypeManager->Create_Reflection(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context()))) 
+  {
     LOG_ERROR(L"Failed to Create RTTR Reflection in PrototypeManager");
   }
 
@@ -71,18 +74,19 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     return E_FAIL;
   }
 
-  if (nullptr ==
-      (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),
-                                     m_GraphicDevice->Get_Context())))
+  if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
     return E_FAIL;
 
   return S_OK;
 }
 
-void Game::Update_Engine() {
+void Game::Update_Engine() 
+{
   const Float delta = m_TimeManager->Update_Timers();
 
   m_ObjectManager->PriorityUpdate(delta);
+
+  m_Pipeline->Update_Pipeline();
 
   m_ObjectManager->Update(delta);
 
@@ -188,6 +192,55 @@ HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
 void Game::Add_RenderGroup(RENDERGROUP group,
                            const Shared<GameObject> &gameObject) const {
   m_Renderer->Add_RenderGroup(group, gameObject);
+}
+
+HRESULT Game::Bind_TransformMatrix(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState)
+{
+	return m_Pipeline->Bind_TransformMatrix(shader, constantName, transformState);
+}
+
+HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState)
+{
+	return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName, transformState);
+}
+
+const Matrix& Game::Get_Transform(D3DTS transformState) const
+{
+	return m_Pipeline->Get_Transform(transformState);
+}
+
+const Vector3& Game::Get_CamTransform() const
+{
+	return m_Pipeline->Get_CamTransform();
+}
+
+void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix)
+{
+	m_Pipeline->Set_Transform(transformState, transformStateMatrix);
+}
+
+Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID, uint32 levIndex) const
+{
+    uint32 level = levIndex == MAXINT32
+        ? m_LevelManager->Get_CurrentLevelIndex()
+        : levIndex;
+
+    if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, typeID)) {
+        return static_pointer_cast<Object>(object);
+    }
+    return nullptr;
+}
+
+Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, const wstring& className, uint32 levIndex) const
+{
+    uint32 level = levIndex == MAXINT32
+        ? m_LevelManager->Get_CurrentLevelIndex()
+        : levIndex;
+
+    if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, className)) {
+        return static_pointer_cast<Object>(object);
+    }
+    return nullptr;
 }
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,

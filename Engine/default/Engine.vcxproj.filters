@@ -105,6 +105,15 @@
     <None Include="..\vcpkg.json">
       <Filter>99. SystemFiles\vcpkg</Filter>
     </None>
+    <None Include="RTTRGenerator.py">
+      <Filter>99. SystemFiles</Filter>
+    </None>
+    <None Include="..\private\Game.inl">
+      <Filter>01. Utility\01. GameInstance</Filter>
+    </None>
+    <None Include="..\private\GameObject.inl">
+      <Filter>01. Utility\04. GameObject</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GraphicDevice.h">
@@ -253,17 +262,11 @@
     <ClCompile Include="..\private\LayerRegistry.cpp">
       <Filter>01. Utility\04. GameObject\Layer</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Game.inl">
-      <Filter>01. Utility\01. GameInstance</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\TagRegistry.cpp">
       <Filter>01. Utility\04. GameObject\Tag</Filter>
     </ClCompile>
     <ClCompile Include="..\private\SpdLogger.cpp">
       <Filter>97. Helper\SpdLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\GameObject.inl">
-      <Filter>01. Utility\04. GameObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\VIBuffer.cpp">
       <Filter>01. Utility\05. Component\VIBuffer</Filter>

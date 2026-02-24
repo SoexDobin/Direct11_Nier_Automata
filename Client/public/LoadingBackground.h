@@ -9,17 +9,17 @@ NS_END
 
 NS_BEGIN(Client)
 
-class LoadingBackground final : public UIObject, public enable_shared_from_this<LoadingBackground>
+class LoadingBackground final : public UIObject, public enable_shared_from_this<LoadingBackground> 
 {
 public:
     LoadingBackground();
-    LoadingBackground(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-    LoadingBackground(const Shared<LoadingBackground>& rhs);
+    LoadingBackground(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
+    LoadingBackground(const Shared<LoadingBackground> &rhs);
     ~LoadingBackground() override = default;
 
 public:
     HRESULT Initialize_Prototype() override;
-    HRESULT Initialize(void* arg) override;
+    HRESULT Initialize(void *arg) override;
     void On_Destroy() override;
 
     void Priority_Update(Float timeDelta) override;
@@ -29,13 +29,13 @@ public:
     HRESULT Render() override;
 
 private:
-    Shared<VIBuffer> m_VIBuffer = { nullptr };
-    Shared<Texture> m_Texture = { nullptr };
-	Shared<Shader> m_Shader = { nullptr };
+    HRESULT Ready_Components();
 
 public:
     static Shared<LoadingBackground> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-    Shared<GameObject> Clone(void* arg) override;
+    Shared<GameObject> Clone(void *arg) override;
+
+    RTTR_ENABLE()
 };
 
 NS_END

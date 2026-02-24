@@ -6,7 +6,9 @@
 #include "ObjectManager.h"
 #include "PrototypeManager.h"
 #include "Renderer.h"
+#include "String_Helper.h"
 #include "TimeManager.h"
+#include <concepts>
 
 NS_BEGIN(Engine)
 
@@ -64,21 +66,11 @@ public: /* For PrototypeManager */
   HRESULT Add_Prototype(uint32 levIndex,
                         const Shared<class Object> &prototype) const;
 
-public: /* For PrototypeManager - Prefab/Editor 래핑 */
-  const auto &Get_Prototype_GameObjects() const {
-    return m_PrototypeManager->Get_GameObjects();
-  }
   const auto &Get_Prototype_Components() const {
     return m_PrototypeManager->Get_Components();
   }
   const auto &Get_Prototype_NameMap() const {
     return m_PrototypeManager->Get_NameByTypes();
-  }
-  HRESULT Export_Prefabs(const wstring &path) const {
-    return m_PrototypeManager->Export_Prefabs(path);
-  }
-  HRESULT Import_Prefabs(const wstring &path) const {
-    return m_PrototypeManager->Import_Prefabs(path);
   }
 
 private: /* For ObjectManager */
@@ -88,23 +80,62 @@ public: /* For Renderer */
   void Add_RenderGroup(RENDERGROUP group,
                        const Shared<class GameObject> &gameObject) const;
 
-public:                 /* Util At GameUtil.cpp*/
-  template <typename T> /* Find Read only Prototype */
-  constexpr Shared<const T> Find_Prototype(PROTOTYPE prototype,
-                                           uint32 levIndex = MAXINT32) const;
+public:
+  template <typename T>
+  Shared<const T> Find_Prototype(PROTOTYPE prototype,
+                                 uint32 levIndex = MAXINT32) const {
+    uint32 level = levIndex == MAXINT32
+                       ? m_LevelManager->Get_CurrentLevelIndex()
+                       : levIndex;
+    const wstring &className = Helper::To_wString(typeid(T).name());
+    if (Shared<Object> object =
+            m_PrototypeManager->Find_Prototype(prototype, level, className)) {
+      return static_pointer_cast<const T>(object);
+    }
+    return nullptr;
+  }
+
   inline Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 typeID,
                                              uint32 levIndex = MAXINT32) const;
   inline Shared<const Object> Find_Prototype(PROTOTYPE prototype,
                                              const wstring &className,
                                              uint32 levIndex = MAXINT32) const;
 
-  template <typename T> /* Instance Object */
-  constexpr Shared<T> Instantiate(void *arg = nullptr) const;
+  template <typename T> Shared<T> Instantiate(void *arg = nullptr) const {
+    uint32 level = m_LevelManager->Get_CurrentLevelIndex();
+    PROTOTYPE typeTag = std::is_base_of_v<class GameObject, T>
+                            ? PROTOTYPE::GAMEOBJECT
+                            : PROTOTYPE::COMPONENT;
+    const wstring &className = Helper::To_wString(typeid(T).name());
+    if (auto instance = Instantiate_Internal(typeTag, level, className, arg)) {
+      return static_pointer_cast<T>(instance);
+    }
+    return nullptr;
+  }
+
   template <typename T>
-  constexpr Shared<T> Instantiate(uint32 typeID, void *arg = nullptr) const;
+  Shared<T> Instantiate(uint32 typeID, void *arg = nullptr) const {
+    uint32 level = m_LevelManager->Get_CurrentLevelIndex();
+    PROTOTYPE typeTag = std::is_base_of_v<class GameObject, T>
+                            ? PROTOTYPE::GAMEOBJECT
+                            : PROTOTYPE::COMPONENT;
+    if (auto instance = Instantiate_Internal(typeTag, level, typeID, arg)) {
+      return static_pointer_cast<T>(instance);
+    }
+    return nullptr;
+  }
+
   template <typename T>
-  constexpr Shared<T> Instantiate(const wstring &className,
-                                  void *arg = nullptr) const;
+  Shared<T> Instantiate(const wstring &className, void *arg = nullptr) const {
+    uint32 level = m_LevelManager->Get_CurrentLevelIndex();
+    PROTOTYPE typeTag = std::is_base_of_v<class GameObject, T>
+                            ? PROTOTYPE::GAMEOBJECT
+                            : PROTOTYPE::COMPONENT;
+    if (auto instance = Instantiate_Internal(typeTag, level, className, arg)) {
+      return static_pointer_cast<T>(instance);
+    }
+    return nullptr;
+  }
 
 private:
   inline Shared<Object> Instantiate_Internal(PROTOTYPE protoType,

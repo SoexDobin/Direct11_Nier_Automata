@@ -13,7 +13,7 @@ public:
 
 public:
 	HRESULT Initialize_Prototype() override;
-	HRESULT Initialize(const Shared<void>& arg) override;
+	HRESULT Initialize(void* arg) override;
 	void On_Destroy() override;
 
 public:
@@ -29,7 +29,7 @@ private:
 	Shared<Loader>	m_Loader = { nullptr };
 
 public:
-	static Shared<LevelLoading> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);
+	static Unique<LevelLoading> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);
 	
 };
 

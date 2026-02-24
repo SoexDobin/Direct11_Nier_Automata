@@ -1,6 +1,6 @@
 #pragma once
+#include "Client_Define.h"
 #include "Engine_Define.h"
-#include "Object.h"
 
 
 NS_BEGIN(Engine)
@@ -12,7 +12,7 @@ NS_BEGIN(Client)
 class MainApp final {
 public:
   explicit MainApp();
-  ~MainApp() = default;
+  ~MainApp();
 
 public:
   HRESULT Initialize();

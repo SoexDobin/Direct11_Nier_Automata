@@ -55,7 +55,7 @@ public: /* Util Method */
     void Move_Left(Float delta, Float amount);
     void LookAt(Vector3 atVec, Vector3 upVector = Vector3::UnitY);
 
-    HRESULT Bind_Resource(const Shared<Shader>& shader, const Char* constantName) const;
+    HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const;
 
 private:
 	Shared<Transform> Get_Parent() const;

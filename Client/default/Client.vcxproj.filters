@@ -19,6 +19,9 @@
     <ClInclude Include="..\public\MainApp.h">
       <Filter>00. MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ClientSettingManager.h">
+      <Filter>00. MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Client_Define.h">
       <Filter>98. Headers</Filter>
     </ClInclude>
@@ -32,7 +35,10 @@
       <Filter>98. Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LoadingBackground.h">
-      <Filter>02. GameObject\UI</Filter>
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadingLogo.h">
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +51,9 @@
     <ClCompile Include="..\private\MainApp.cpp">
       <Filter>00. MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\ClientSettingManager.cpp">
+      <Filter>00. MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\LevelLoading.cpp">
       <Filter>01. Level\Loading</Filter>
     </ClCompile>
@@ -52,7 +61,10 @@
       <Filter>01. Level\Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingBackground.cpp">
-      <Filter>02. GameObject\UI</Filter>
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingLogo.cpp">
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,10 +103,24 @@
     <Filter Include="02. GameObject\UI">
       <UniqueIdentifier>{50aa4288-41b6-4aa9-a91e-9ceed7f591f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\UI\LoadingUI">
+      <UniqueIdentifier>{6bfbce2f-aaca-4c17-8e1a-06f526d5a91e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. Shader">
+      <UniqueIdentifier>{f8f6556e-0ec0-47f4-9b97-3f4d9a6fe77f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
       <Filter>99. Default\00. API_File</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\shaders\Shader_VtxNormTex.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -1,53 +1,53 @@
 #include "Shader.h"
 
-Shader::Shader(const ComPtr<ID3D11Device> &device,
-               const ComPtr<ID3D11DeviceContext> &context)
+Shader::Shader() : Component{} {}
+Shader::Shader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
     : Component(device, context) {}
 
 Shader::Shader(const Shared<Shader> &rhs)
     : Component(rhs), m_Effect{rhs->m_Effect}, m_NumPasses{rhs->m_NumPasses},
       m_InputLayouts{rhs->m_InputLayouts} {}
 
-HRESULT Shader::Initialize_Prototype(const tChar *shaderFilePath,
-                                     const D3D11_INPUT_ELEMENT_DESC *elements,
-                                     uint32 numElements) {
-  uint32 hlslFlag = {};
+HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC *elements, uint32 numElements) 
+{
+    uint32 hlslFlag = {};
 
-  if constexpr (_DEBUG)
-    hlslFlag |= D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG;
-  else
-    hlslFlag |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
+    if constexpr (_DEBUG)
+        hlslFlag |= D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG;
+    else
+		hlslFlag |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
 
-  if (FAILED(D3DX11CompileEffectFromFile(
-          shaderFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, hlslFlag,
-          0, m_Device.Get(), m_Effect.GetAddressOf(), nullptr)))
-    return E_FAIL;
+	if (FAILED(D3DX11CompileEffectFromFile(
+        shaderFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, hlslFlag,
+        0, m_Device.Get(), m_Effect.GetAddressOf(), nullptr)))
+		return E_FAIL;
 
-  if (ComPtr<ID3DX11EffectTechnique> technique =
-          m_Effect->GetTechniqueByIndex(0)) {
-    D3DX11_TECHNIQUE_DESC techniqueDesc = {};
+    if (ComPtr<ID3DX11EffectTechnique> technique = m_Effect->GetTechniqueByIndex(0)) 
+    {
+    	D3DX11_TECHNIQUE_DESC techniqueDesc = {};
+    	
+    	technique->GetDesc(&techniqueDesc);
+        m_NumPasses = techniqueDesc.Passes;
+        m_InputLayouts.reserve(m_NumPasses);
 
-    technique->GetDesc(&techniqueDesc);
-    m_NumPasses = techniqueDesc.Passes;
-    m_InputLayouts.reserve(m_NumPasses);
+        for (uint32 i = 0; i < m_NumPasses; ++i) 
+        {
+            ComPtr<ID3D11InputLayout> inputLayout = {nullptr};
+            ComPtr<ID3DX11EffectPass> pass = technique->GetPassByIndex(i);
+            if (nullptr == pass)
+				return E_FAIL;
 
-    for (uint32 i = 0; i < m_NumPasses; ++i) {
-      ComPtr<ID3D11InputLayout> inputLayout = {nullptr};
-      ComPtr<ID3DX11EffectPass> pass = technique->GetPassByIndex(i);
-      if (nullptr == pass)
-        return E_FAIL;
+            D3DX11_PASS_DESC passDesc = {};
+            pass->GetDesc(&passDesc);
 
-      D3DX11_PASS_DESC passDesc = {};
-      pass->GetDesc(&passDesc);
+            if (FAILED(m_Device->CreateInputLayout(
+            elements, numElements, passDesc.pIAInputSignature,
+            passDesc.IAInputSignatureSize, inputLayout.GetAddressOf())))
+              return E_FAIL;
 
-      if (FAILED(m_Device->CreateInputLayout(
-              elements, numElements, passDesc.pIAInputSignature,
-              passDesc.IAInputSignatureSize, inputLayout.GetAddressOf())))
-        return E_FAIL;
-
-      m_InputLayouts.push_back(inputLayout);
-    }
-  } else
+            m_InputLayouts.push_back(inputLayout);
+        }
+    } else
     return E_FAIL;
 
   return Component::Initialize_Prototype();
@@ -73,22 +73,21 @@ HRESULT Shader::Begin(uint32 passIndex) {
 }
 
 HRESULT Shader::Bind_SRV(const Char *constantName,
-                         const ComPtr<ID3D11ShaderResourceView> &srv) {
-  ComPtr<ID3DX11EffectVariable> variable =
-      m_Effect->GetVariableByName(constantName);
-  if (nullptr == variable) {
-    MSG_BOX("Failed To Throw Value To Shader");
-    return E_FAIL;
-  }
+                         const ComPtr<ID3D11ShaderResourceView> &srv) 
+{
+	ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
+	if (nullptr == variable) {
+		MSG_BOX("Failed To Throw Value To Shader");
+		return E_FAIL;
+	}
 
-  ComPtr<ID3DX11EffectShaderResourceVariable> srvVariable =
-      variable->AsShaderResource();
-  if (nullptr == srvVariable) {
-    MSG_BOX("Shader Types Do Not Match");
-    return E_FAIL;
-  }
+	ComPtr<ID3DX11EffectShaderResourceVariable> srvVariable = variable->AsShaderResource();
+    if (nullptr == srvVariable) {
+		MSG_BOX("Shader Types Do Not Match");
+		return E_FAIL;
+    }
 
-  return srvVariable->SetResource(srv.Get());
+    return srvVariable->SetResource(srv.Get());
 }
 
 HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix) 

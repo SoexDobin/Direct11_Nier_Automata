@@ -1,10 +1,14 @@
 #include "PrototypeManager.h"
-
 #include "Game.h"
 #include "GameObject.h"
-#include "ScriptComponent.h"
 #include "SpdLogger.h"
+#include "ScriptComponent.h"
 #include "String_Helper.h"
+#include "LayerRegistry.h"
+#include "TagRegistry.h"
+#include "SpdLogger.h"
+
+#include "Engine_Define.h"
 
 uint32 PrototypeManager::Get_TypeByName(const wstring &name) {
   uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
@@ -29,52 +33,37 @@ const wstring &PrototypeManager::Get_NameByType(uint32 typeID) {
   return m_NameByTypes[level][typeID];
 }
 
-HRESULT PrototypeManager::Initialize(void *arg) {
-  m_LevelCount = arg == nullptr ? 0 : *static_cast<uint32 *>(arg);
-
-  m_NameByTypes.shrink_to_fit();
-  m_TypesByName.shrink_to_fit();
-  m_GameObjects.shrink_to_fit();
-  m_Components.shrink_to_fit();
+HRESULT PrototypeManager::Initialize(void* arg) {
+  m_LevelCount = arg == nullptr ? 0 : reinterpret_cast<uintptr_t>(arg);
 
   m_NameByTypes.resize(m_LevelCount);
   m_TypesByName.resize(m_LevelCount);
   m_GameObjects.resize(m_LevelCount);
   m_Components.resize(m_LevelCount);
 
-  for (auto &prototype : m_NameByTypes)
-    prototype.clear();
-  for (auto &prototype : m_TypesByName)
-    prototype.clear();
-  for (auto &prototype : m_GameObjects)
-    prototype.clear();
-  for (auto &prototype : m_Components)
-    prototype.clear();
-
   return S_OK;
 }
 
 void PrototypeManager::On_Destroy() {
-  for (auto &prototype : m_NameByTypes)
-    prototype.clear();
-  for (auto &prototype : m_TypesByName)
-    prototype.clear();
-  for (auto &prototype : m_GameObjects)
-    prototype.clear();
-  for (auto &prototype : m_Components)
-    prototype.clear();
+  for (uint32 i = 0; i < m_LevelCount; ++i) {
+    m_NameByTypes[i].clear();
+    m_TypesByName[i].clear();
+    m_GameObjects[i].clear();
+    m_Components[i].clear();
+  }
 
-  m_NameByTypes.shrink_to_fit();
-  m_TypesByName.shrink_to_fit();
-  m_GameObjects.shrink_to_fit();
-  m_Components.shrink_to_fit();
+  m_NameByTypes.clear();
+  m_TypesByName.clear();
+  m_GameObjects.clear();
+  m_Components.clear();
 }
 
 HRESULT PrototypeManager::Add_Prototype(uint32 levIndex,
                                         const Shared<Object> &object,
                                         void *arg) {
-  if (!Validate_Level(levIndex))
+  if (!Validate_Level(levIndex)) {
     return E_FAIL;
+  }
 
   PROTOTYPE prototype = object->Get_Prototype();
   if (Find_Prototype(prototype, levIndex, object->Get_TypeID()) != nullptr) {
@@ -83,25 +72,26 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex,
     return E_FAIL;
   }
 
-  if (object->Get_Name() != L"") {
-    LOG_WARN(L"Object No Name TypeID:{}", object->Get_TypeID());
+  if (!object->Get_Name().empty()) {
     m_NameByTypes[levIndex].emplace(object->Get_TypeID(), object->Get_Name());
     m_TypesByName[levIndex].emplace(object->Get_Name(), object->Get_TypeID());
   }
 
-  if (prototype == PROTOTYPE::GAMEOBJECT)
+  if (prototype == PROTOTYPE::GAMEOBJECT) {
     m_GameObjects[levIndex].emplace(object->Get_TypeID(),
                                     static_pointer_cast<GameObject>(object));
-  else if (prototype == PROTOTYPE::COMPONENT)
+  } else if (prototype == PROTOTYPE::COMPONENT) {
     m_Components[levIndex].emplace(object->Get_TypeID(),
                                    static_pointer_cast<Component>(object));
+  }
 
   return S_OK;
 }
 
 HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
-  if (!Validate_Level(levIndex))
+  if (!Validate_Level(levIndex)) {
     return E_FAIL;
+  }
 
   m_NameByTypes[levIndex].clear();
   m_TypesByName[levIndex].clear();
@@ -114,22 +104,20 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
 Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
                                                 uint32 levIndex,
                                                 uint32 typeID) const {
-  if (!Validate_Level(levIndex))
-    return nullptr;
-  if (!m_NameByTypes[levIndex].contains(typeID)) {
-    LOG_ERROR(L"{}: Failed To Find TypeID", m_ObjectName);
-    MSG_BOX("Failed To Find TypeID");
+  if (!Validate_Level(levIndex)) {
     return nullptr;
   }
 
   if (prototype == PROTOTYPE::GAMEOBJECT) {
     auto it = m_GameObjects[levIndex].find(typeID);
-    if (it != m_GameObjects[levIndex].end())
+    if (it != m_GameObjects[levIndex].end()) {
       return it->second;
+    }
   } else if (prototype == PROTOTYPE::COMPONENT) {
     auto it = m_Components[levIndex].find(typeID);
-    if (it != m_Components[levIndex].end())
+    if (it != m_Components[levIndex].end()) {
       return it->second;
+    }
   }
 
   return nullptr;
@@ -138,23 +126,23 @@ Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
 Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
                                                 uint32 levIndex,
                                                 const wstring &typeName) const {
-  if (!Validate_Level(levIndex))
-    return nullptr;
-  if (m_TypesByName[levIndex].contains(typeName) == false) {
-    LOG_ERROR(L"{}: No Class Name At Prototype", m_ObjectName);
-    MSG_BOX("No Class Name At Prototype \n Check Reflection or ObjectName");
+  if (!Validate_Level(levIndex)) {
     return nullptr;
   }
 
-  return Find_Prototype(prototype, levIndex,
-                        m_TypesByName[levIndex].at(typeName));
+  if (m_TypesByName[levIndex].contains(typeName)) {
+    return Find_Prototype(prototype, levIndex,
+                          m_TypesByName[levIndex].at(typeName));
+  }
+
+  return nullptr;
 }
 
 HRESULT PrototypeManager::Create_Reflection(
     const ComPtr<ID3D11Device> &device,
     const ComPtr<ID3D11DeviceContext> &context) {
-    type type_GameObject = type::get<GameObject>();
-	type type_Component = type::get<Component>();
+  type type_GameObject = type::get<GameObject>();
+  type type_Component = type::get<Component>();
 
   auto allTypes = type::get_types();
 
@@ -180,15 +168,16 @@ void PrototypeManager::Register_Type(
   if (type.get_name().empty())
     return;
 
-  method createMethod = type.get_method("Create");
-  if (!createMethod.is_valid())
-    return;
-
-  variant result = createMethod.invoke({}, device, context);
+  // 1. RTTR 생성자를 통해 객체 생성 시도
+  variant result = type.create({device, context});
   if (!result.is_valid()) {
-    LOG_WARN(L"[RTTR] Failed to invoke Create for: {}",
-             Helper::To_wString(type.get_name().to_string()));
-    return;
+    // 인자 없는 생성자 시도 (의존성은 나중에 주입)
+    result = type.create();
+    if (!result.is_valid()) {
+      LOG_WARN(L"[RTTR] No valid constructor found for: {}",
+               Helper::To_wString(type.get_name().to_string()));
+      return;
+    }
   }
 
   Shared<Object> prototype = result.get_value<Shared<Object>>();
@@ -198,38 +187,25 @@ void PrototypeManager::Register_Type(
   wstring typeName = Helper::To_wString(type.get_name().to_string());
   uint32 typeID = prototype->Get_TypeID();
 
-  for (size_t i = 0; i < m_LevelCount; ++i) {
-    m_NameByTypes[i].emplace(typeID, typeName);
-    m_TypesByName[i].emplace(typeName, typeID);
+  for (size_t i = 0; i < m_LevelCount; ++i)
+  {
+      m_NameByTypes[i].emplace(typeID, typeName);
+      m_TypesByName[i].emplace(typeName, typeID);
 
-    if (protoType == PROTOTYPE::GAMEOBJECT)
-      m_GameObjects[i].emplace(typeID,
-                               static_pointer_cast<GameObject>(prototype));
-    else if (protoType == PROTOTYPE::COMPONENT)
-      m_Components[i].emplace(typeID,
-                              static_pointer_cast<Component>(prototype));
+      if (protoType == PROTOTYPE::GAMEOBJECT)
+          m_GameObjects[i].emplace(typeID, static_pointer_cast<GameObject>(prototype));
+      else if (protoType == PROTOTYPE::COMPONENT)
+          m_Components[i].emplace(typeID, static_pointer_cast<Component>(prototype));
   }
-
-  LOG_INFO(L"[RTTR] Registered: {}", typeName);
-}
-
-HRESULT PrototypeManager::Export_Prefabs(const wstring &path) {
-  /* TODO: JSON 직렬화 구현 */
-  return S_OK;
-}
-
-HRESULT PrototypeManager::Import_Prefabs(const wstring &path) {
-  /* TODO: JSON 역직렬화 구현 */
-  return S_OK;
+    
 }
 
 Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {
   auto prototypeManager = make_unique<PrototypeManager>();
 
-  if (FAILED(
-          prototypeManager->Initialize(reinterpret_cast<void *>(levCount)))) {
-    MSG_BOX("Failed To Create PrototypeManager");
-    return nullptr;
+  if (FAILED(prototypeManager->Initialize(reinterpret_cast<void *>(levCount)))) {
+        MSG_BOX("Failed To Create PrototypeManager");
+        return nullptr;
   }
 
   return prototypeManager;

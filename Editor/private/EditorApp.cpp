@@ -70,7 +70,7 @@ HRESULT EditorApp::Initialize_IMGUI()
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;           // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 
-  io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/malgun.ttf", 18.0f, nullptr,
+  io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/malgun.ttf", 16.0f, nullptr,
                                io.Fonts->GetGlyphRangesKorean());
 
   ImGui::StyleColorsDark();

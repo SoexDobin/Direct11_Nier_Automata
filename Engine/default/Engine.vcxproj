@@ -188,9 +188,11 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\private\Game.inl" />
     <None Include="..\vcpkg.json" />
     <None Include="ExportBuildArtifacts.bat" />
     <None Include="GenerateRTTR.bat" />
+    <None Include="RTTRGenerator.py" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Component.h" />
@@ -230,8 +232,6 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
-    <ClCompile Include="..\private\GameObject.inl" />
-    <ClCompile Include="..\private\Game.inl" />
     <ClCompile Include="..\private\GraphicDevice.cpp" />
     <ClCompile Include="..\private\LayerRegistry.cpp" />
     <ClCompile Include="..\private\Level.cpp" />

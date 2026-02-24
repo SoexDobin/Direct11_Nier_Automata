@@ -196,7 +196,7 @@ void Transform::LookAt(Vector3 atVec, Vector3 upVector) {
     m_IsDirty = true;
 }
 
-HRESULT Transform::Bind_Resource(const Shared<Shader>& shader, const Char* constantName) const
+HRESULT Transform::Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const
 {
     return shader->Bind_Matrix(constantName, &m_WorldMatrix);
 }

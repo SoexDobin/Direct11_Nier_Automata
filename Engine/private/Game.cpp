@@ -13,7 +13,8 @@
 #include "SpdLogger.h"
 #include "Timer.h"
 
-NS_BEGIN(Engine)
+#include "Component.h"
+#include "GameObject.h"
 
 IMPLEMENT_SINGLETON(Game);
 
@@ -41,6 +42,8 @@ Game::~Game() {
 }
 
 HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
+  LOG_INIT(); /* Debug Helper SpdLogger - 먼저 초기화 */
+
   m_LayerRegistry = make_shared<LayerRegistry>();
   m_TagRegistry = make_shared<TagRegistry>();
 
@@ -54,18 +57,24 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     return E_FAIL;
 
   if (nullptr ==
-      (m_PrototypeManager = PrototypeManager::Create(engineDesc.levCount)))
+      (m_PrototypeManager = PrototypeManager::Create(engineDesc.levCount))) {
     return E_FAIL;
+  }
 
-  if (nullptr == (m_ObjectManager = ObjectManager::Create()))
+  // RTTR 리플렉션을 통한 프로토타입 자동 등록
+  if (FAILED(m_PrototypeManager->Create_Reflection(
+          m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context()))) {
+    LOG_ERROR(L"Failed to Create RTTR Reflection in PrototypeManager");
+  }
+
+  if (nullptr == (m_ObjectManager = ObjectManager::Create())) {
     return E_FAIL;
+  }
 
   if (nullptr ==
       (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),
                                      m_GraphicDevice->Get_Context())))
     return E_FAIL;
-
-  LOG_INIT(); /* Debug Helper SpdLogger */
 
   return S_OK;
 }
@@ -116,12 +125,11 @@ HRESULT Game::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
 
 HRESULT Game::Present() const { return m_GraphicDevice->Present(); }
 
-HRESULT Game::OnResize(uint32 width, uint32 height)
-{
-    if (nullptr == m_GraphicDevice)
-        return S_OK;
+HRESULT Game::OnResize(uint32 width, uint32 height) {
+  if (nullptr == m_GraphicDevice)
+    return S_OK;
 
-    return m_GraphicDevice->OnResize(width, height);
+  return m_GraphicDevice->OnResize(width, height);
 }
 
 HRESULT Game::Begin_RenderOffScreen(const wstring &rtTag) const {
@@ -182,6 +190,48 @@ void Game::Add_RenderGroup(RENDERGROUP group,
   m_Renderer->Add_RenderGroup(group, gameObject);
 }
 
-NS_END
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
+                                          uint32 typeID, void *arg) const {
+  auto prototypeInstance =
+      m_PrototypeManager->Find_Prototype(prototype, levIndex, typeID);
+  if (!prototypeInstance)
+    return nullptr;
 
-#include "Game.inl"
+  if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
+    auto gameObject = static_pointer_cast<GameObject>(prototypeInstance);
+    m_ObjectManager->Add_GameObject(gameObject->Clone(arg));
+
+    return gameObject;
+  } else if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
+    return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
+  }
+
+  LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
+  MSG_BOX("Prototype Miss Match In Instantiate Internal");
+  return nullptr;
+}
+
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
+                                          const wstring &className,
+                                          void *arg) const {
+  auto prototypeInstance =
+      m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
+
+  if (!prototypeInstance) {
+    return nullptr;
+  }
+
+  if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
+    auto gameObject =
+        static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
+    m_ObjectManager->Add_GameObject(gameObject);
+
+    return gameObject;
+  } else if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
+    return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
+  }
+
+  LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
+  MSG_BOX("Prototype Miss Match In Instantiate Internal");
+  return nullptr;
+}

@@ -21,7 +21,7 @@ def print_header():
     print()
 
 
-def generate_rttr_code(class_name: str, has_clone: bool, has_create: bool) -> str:
+def generate_rttr_code(class_name: str, has_clone: bool, has_create: bool, namespace: str = "Engine") -> str:
     """RTTR 등록 코드 생성"""
     method_registrations = ""
     
@@ -47,7 +47,7 @@ RTTR_REGISTRATION
     return rttr_code
 
 
-def process_header_file(header_path: Path, output_dir: Path, processed_classes: Set[str]) -> bool:
+def process_header_file(header_path: Path, output_dir: Path, processed_classes: Set[str], namespace: str = "Engine") -> bool:
     """헤더 파일 처리"""
     try:
         content = header_path.read_text(encoding='utf-8')
@@ -84,7 +84,7 @@ def process_header_file(header_path: Path, output_dir: Path, processed_classes: 
     has_create = bool(re.search(r'\bstatic\s+.*\bCreate\s*\(', content))
     
     # RTTR 등록 코드 생성
-    rttr_code = generate_rttr_code(class_name, has_clone, has_create)
+    rttr_code = generate_rttr_code(class_name, has_clone, has_create, namespace)
     
     # 파일 저장
     output_file = output_dir / f"{class_name}_rttr.cpp"
@@ -102,6 +102,7 @@ def main():
     parser = argparse.ArgumentParser(description='RTTR Registration Code Generator')
     parser.add_argument('input_dir', help='Input directory containing header files')
     parser.add_argument('output_dir', help='Output directory for generated RTTR files')
+    parser.add_argument('--namespace', default='Engine', help='Namespace for types (default: Engine)')
     
     args = parser.parse_args()
     
@@ -111,6 +112,7 @@ def main():
     print_header()
     print(f"==========      [RTTR] Scanning directory: {input_dir}")
     print(f"==========      [RTTR] Output directory: {output_dir}")
+    print(f"==========      [RTTR] Namespace: {args.namespace}")
     print()
     
     # 입력 디렉터리 확인
@@ -127,7 +129,7 @@ def main():
     
     # 모든 .h 파일 처리
     for header_file in sorted(input_dir.glob("*.h")):
-        if process_header_file(header_file, output_dir, processed_classes):
+        if process_header_file(header_file, output_dir, processed_classes, args.namespace):
             count += 1
     
     print()

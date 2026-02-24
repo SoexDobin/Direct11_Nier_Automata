@@ -1,23 +1,28 @@
 #include "GameObject.h"
-
 #include "Game.h"
-#include "Transform.h"
-
-
 #include "ID_Helper.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
-#include "Type_Helper.h"
+#include "Transform.h"
 
-GameObject::GameObject()
-{
-}
+GameObject::GameObject() {}
 
-GameObject::GameObject(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+GameObject::GameObject(const ComPtr<ID3D11Device> &device,
+                       const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(device), m_Context(context) {}
-GameObject::GameObject(const Shared<GameObject>& prototype)
+GameObject::GameObject(const Shared<GameObject> &prototype)
     : m_Device(prototype->m_Device), m_Context(prototype->m_Context),
-      m_LayerMask(prototype->m_LayerMask), m_TagMask(prototype->m_TagMask) {}
+      m_LayerMask(prototype->m_LayerMask), m_TagMask(prototype->m_TagMask) {
+  for (auto &pair : prototype->m_Components) {
+    m_Components.emplace(pair.first, pair.second->Clone(nullptr));
+  }
+
+  for (auto &pair : prototype->m_Scripts) {
+    m_Scripts.emplace(pair.first, pair.second->Clone(nullptr));
+  }
+
+  m_Transform = Get_Component<Transform>();
+}
 
 HRESULT GameObject::Initialize_Prototype() {
   Helper::CreateID(Helper::OBJECT_ID_TYPE, m_ObjectDesc);
@@ -27,8 +32,8 @@ HRESULT GameObject::Initialize_Prototype() {
     return E_FAIL;
   }
 
-  m_ObjectName =
-      Helper::To_wString(Helper::Get_Type(this).get_name().to_string());
+  m_ObjectName = Helper::To_wString(
+      rttr::detail::get_type_from_instance(this).get_name().to_string());
   if (m_ObjectName.empty()) {
     LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
     MSG_BOX("GameObject Initialize Failed By Set Object Name");
@@ -196,4 +201,15 @@ const vector<Shared<GameObject>> &GameObject::Get_Children() const {
   return m_Children;
 }
 
-#include "GameObject.inl"
+Shared<Component> GameObject::Get_Component(uint32 objectID) {
+  if (m_Scripts.contains(objectID)) {
+    return m_Scripts[objectID];
+  }
+
+  for (const auto &component : m_Components) {
+    if (component.second->Get_ObjectID() == objectID)
+      return component.second;
+  }
+
+  return nullptr;
+}

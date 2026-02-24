@@ -21,31 +21,29 @@ public:
     };
 
 public:
-  PrefabRegistry();
-  ~PrefabRegistry() override;
+    PrefabRegistry();
+    ~PrefabRegistry() override;
 
 public:
-  HRESULT Initialize() override;
-  void Update() override {}
+    HRESULT Initialize() override;
+    void Update() override {}
   void Render() override {}
 
 public:
-  void Set_Override(const string &className, const string &memberName,
-                    const string &type, const string &value);
-  string Get_Override(const string &className, const string &memberName) const;
-  const PrefabData *Get_Prefab(const string &className) const;
-  PrefabData &GetOrCreate_Prefab(const string &className, const string &ns,
-                                 const string &base);
+    void Set_Override(const string &className, const string &memberName, const string &type, const string &value);
+    string Get_Override(const string &className, const string &memberName) const;
+    const PrefabData *Get_Prefab(const string &className) const;
+    PrefabData &GetOrCreate_Prefab(const string& className, const string &ns, const string &base);
 
 public:
   void LoadFromDir(const wstring &dirPath);
   void SaveToDir(const wstring &dirPath) const;
 
+private:
+    map<string, PrefabData> m_Prefabs;
+
 public:
   static Shared<PrefabRegistry> Create();
-
-private:
-  map<string, PrefabData> m_Prefabs;
 };
 
 NS_END

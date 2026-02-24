@@ -22,25 +22,22 @@ public:
     m_ModelsDir = m_AssetsDir + L"Models/";
     m_ClientProjectDir = m_ProjectRoot + L"Client/";
     m_ClientPublicDir = m_ClientProjectDir + L"public/";
-    m_ClientMetadataPath =
-        m_ProjectRoot + L"Editor/private/client_metadata.json";
+    m_ClientMetadataPath = m_ProjectRoot + L"client_metadata.json";
   }
-  const wstring &GetProjectRoot() const { return m_ProjectRoot; }
-  const wstring &GetProjectSettingDir() const { return m_ProjectSettingDir; }
-  const wstring &GetLayerSettingsPath() const { return m_LayerSettingsPath; }
-  const wstring &GetTagSettingsPath() const { return m_TagSettingsPath; }
-  const wstring &GetRenderSettingsPath() const {
-    return m_EngineDescSettingsPath;
-  }
+  const wstring& GetProjectRoot() const { return m_ProjectRoot; }
+  const wstring& GetProjectSettingDir() const { return m_ProjectSettingDir; }
+  const wstring& GetLayerSettingsPath() const { return m_LayerSettingsPath; }
+  const wstring& GetTagSettingsPath() const { return m_TagSettingsPath; }
+  const wstring& GetRenderSettingsPath() const { return m_EngineDescSettingsPath; }
 
-  const wstring &GetAssetsDir() const { return m_AssetsDir; }
-  const wstring &GetShadersDir() const { return m_ShadersDir; }
-  const wstring &GetTexturesDir() const { return m_TexturesDir; }
-  const wstring &GetModelsDir() const { return m_ModelsDir; }
-  const wstring &GetPrefabSettingsDir() const { return m_PrefabSettingsDir; }
-  const wstring &GetClientProjectDir() const { return m_ClientProjectDir; }
-  const wstring &GetClientPublicDir() const { return m_ClientPublicDir; }
-  const wstring &GetClientMetadataPath() const { return m_ClientMetadataPath; }
+  const wstring& GetAssetsDir() const { return m_AssetsDir; }
+  const wstring& GetShadersDir() const { return m_ShadersDir; }
+  const wstring& GetTexturesDir() const { return m_TexturesDir; }
+  const wstring& GetModelsDir() const { return m_ModelsDir; }
+  const wstring& GetPrefabSettingsDir() const { return m_PrefabSettingsDir; }
+  const wstring& GetClientProjectDir() const { return m_ClientProjectDir; }
+  const wstring& GetClientPublicDir() const { return m_ClientPublicDir; }
+  const wstring& GetClientMetadataPath() const { return m_ClientMetadataPath; }
   void SetProjectRoot(const wstring &root) { Initialize(root); }
 
 private:
@@ -48,6 +45,7 @@ private:
   ~PathManager() = default;
   wstring m_ProjectRoot = L"../";
   wstring m_ProjectSettingDir = L"../ProjectSetting/";
+
   wstring m_LayerSettingsPath = L"../../ProjectSetting/LayerSettings.json";
   wstring m_TagSettingsPath = L"../../ProjectSetting/TagSettings.json";
   wstring m_EngineDescSettingsPath = L"../../ProjectSetting/EngineDesc.json";
@@ -58,7 +56,7 @@ private:
   wstring m_PrefabSettingsDir = L"../../ProjectSetting/Prefab/";
   wstring m_ClientProjectDir = L"../../Client/";
   wstring m_ClientPublicDir = L"../../Client/public/";
-  wstring m_ClientMetadataPath = L"../../Editor/private/client_metadata.json";
+  wstring m_ClientMetadataPath = L"../../ProjectSetting/client_metadata.json";
 };
 #define PATH Editor::PathManager::GetInstance()
 

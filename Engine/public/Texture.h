@@ -5,13 +5,14 @@ NS_BEGIN(Engine)
 
 class Shader;
 
-class ENGINE_DLL Texture final : public Component,
-                                 enable_shared_from_this<Texture> {
+class ENGINE_DLL Texture final : public Component, enable_shared_from_this<Texture> 
+{
+
 public:
-  Texture(const ComPtr<ID3D11Device> &device,
-          const ComPtr<ID3D11DeviceContext> &context);
-  Texture(const Shared<Texture> &rhs);
-  ~Texture() override = default;
+	Texture();
+	Texture(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	Texture(const Shared<Texture> &rhs);
+	~Texture() override = default;
 
 public:
   COMPONENT_TYPE Get_ComponentType() const override {
@@ -22,6 +23,7 @@ public:
   void On_Destroy() override;
 
 public:
+  uint32 Get_NumSRVs() const { return m_NumSRVs; }
   HRESULT Bind_ShaderResourceView(const Shared<Shader> &shader,
                                   const Char *constantName, uint32 index);
 
@@ -30,8 +32,8 @@ private:
   vector<ComPtr<ID3D11ShaderResourceView>> m_SRVs;
 
 public:
-  static Shared<Texture> Create(const ComPtr<ID3D11Device> &device,
-                                const ComPtr<ID3D11DeviceContext> &context,
+  static Shared<Texture> Create(const ComPtr<ID3D11Device>& device,
+                                const ComPtr<ID3D11DeviceContext>& context,
                                 const tChar *textureFilePath, uint32 numSRVs);
   Shared<Component> Clone(void *arg = nullptr) override;
 };

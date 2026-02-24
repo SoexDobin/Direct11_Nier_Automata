@@ -13,7 +13,8 @@ HRESULT GraphicDevice::Initialize(const ENGINE_DESC &engineDesc) {
   if (FAILED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flag,
                                nullptr, 0, D3D11_SDK_VERSION,
                                m_Device.GetAddressOf(), &feature_Level,
-                               m_Context.GetAddressOf()))) {
+                               m_Context.GetAddressOf()))) 
+  {
     return E_FAIL;
   }
 
@@ -43,23 +44,23 @@ HRESULT GraphicDevice::Initialize(const ENGINE_DESC &engineDesc) {
     m_Context->RSSetViewports(1, &m_ViewPort);
   }
 
-  if (engineDesc.useOffscreenRendering && engineDesc.renderTargetCount > 0) {
-    for (uint32 i = 0; i < engineDesc.renderTargetCount; ++i) {
-      wstring frontTag = L"OffScreenRT_" + to_wstring(i);
+	if (engineDesc.useOffscreenRendering && engineDesc.renderTargetCount > 0) {
+        for (uint32 i = 0; i < engineDesc.renderTargetCount; ++i) {
+          wstring frontTag = L"OffScreenRT_" + to_wstring(i);
 
-      if (FAILED(Create_OffScreenTarget(frontTag, engineDesc.viewportWidth,
-                                        engineDesc.viewportHeight)))
-        return E_FAIL;
-    }
-  }
+          if (FAILED(Create_OffScreenTarget(frontTag, engineDesc.viewportWidth,
+                                            engineDesc.viewportHeight)))
+            return E_FAIL;
+        }
+	}
 
   return S_OK;
 }
 
-void GraphicDevice::On_Destroy() {
-  m_Offscreens.clear();
-
-  Object::On_Destroy();
+void GraphicDevice::On_Destroy() 
+{
+    m_Offscreens.clear();
+    Object::On_Destroy();
 }
 
 HRESULT

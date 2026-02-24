@@ -1,6 +1,6 @@
 #pragma once
 #include "EngineManager.h"
-#include "GameObject.h"
+#include "Object.h"
 #include "String_Helper.h"
 
 NS_BEGIN(Engine)
@@ -29,10 +29,6 @@ public:
                         void *arg = nullptr);
   HRESULT Clear_Prototypes(uint32 levIndex);
 
-public: /* Prefab 직렬화 */
-  HRESULT Export_Prefabs(const wstring &path);
-  HRESULT Import_Prefabs(const wstring &path);
-
 public: /* 읽기 전용 Getter (Game 래핑용) */
   const vector<unordered_map<uint32, Shared<GameObject>>> &
   Get_GameObjects() const {
@@ -57,6 +53,7 @@ private:
   vector<unordered_map<wstring, uint32>> m_TypesByName;
   vector<unordered_map<uint32, Shared<GameObject>>> m_GameObjects;
   vector<unordered_map<uint32, Shared<Component>>> m_Components;
+
   uint32 m_LevelCount = {};
 
 private:

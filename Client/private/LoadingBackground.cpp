@@ -1,75 +1,79 @@
-#include "pch.h"
 #include "LoadingBackground.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "VIBuffer_Rect.h"
+#include "pch.h"
 
 #include "SpdLogger.h"
 
 LoadingBackground::LoadingBackground() : UIObject() {}
 
-LoadingBackground::LoadingBackground(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: UIObject { device, context }
-{
+LoadingBackground::LoadingBackground(const ComPtr<ID3D11Device> &device,
+                                     const ComPtr<ID3D11DeviceContext> &context)
+    : UIObject{device, context} {}
+
+LoadingBackground::LoadingBackground(const Shared<LoadingBackground> &rhs)
+    : UIObject{rhs} {}
+
+HRESULT LoadingBackground::Initialize_Prototype() {
+
+  return UIObject::Initialize_Prototype();
 }
 
-LoadingBackground::LoadingBackground(const Shared<LoadingBackground>& rhs)
-	: UIObject{ rhs }
-{
+HRESULT LoadingBackground::Initialize(void *arg) {
+
+  return UIObject::Initialize(arg);
 }
 
-HRESULT LoadingBackground::Initialize_Prototype()
-{
-	return UIObject::Initialize_Prototype();
+void LoadingBackground::On_Destroy() { UIObject::On_Destroy(); }
+
+void LoadingBackground::Priority_Update(Float timeDelta) {
+  UIObject::Priority_Update(timeDelta);
 }
 
-HRESULT LoadingBackground::Initialize(void* arg)
-{
-	return UIObject::Initialize(arg);
+void LoadingBackground::Update(Float timeDelta) { UIObject::Update(timeDelta); }
+
+void LoadingBackground::Late_Update(Float timeDelta) {
+  UIObject::Late_Update(timeDelta);
 }
 
-void LoadingBackground::On_Destroy()
-{
-	UIObject::On_Destroy();
+void LoadingBackground::Fixed_Update(Float fixedDelta) {
+  UIObject::Fixed_Update(fixedDelta);
 }
 
-void LoadingBackground::Priority_Update(Float timeDelta)
-{
-	UIObject::Priority_Update(timeDelta);
+HRESULT LoadingBackground::Render() {
+  if (nullptr == m_Shader || nullptr == m_Texture || nullptr == m_BufferRect) {
+    return E_FAIL;
+  }
+
+  return UIObject::Render();
 }
 
-void LoadingBackground::Update(Float timeDelta)
+HRESULT LoadingBackground::Ready_Components()
 {
-	UIObject::Update(timeDelta);
+    return S_OK;
 }
 
-void LoadingBackground::Late_Update(Float timeDelta)
-{
-	UIObject::Late_Update(timeDelta);
+Shared<LoadingBackground>
+LoadingBackground::Create(const ComPtr<ID3D11Device> &device,
+                          const ComPtr<ID3D11DeviceContext> &context) {
+  auto bg = make_shared<LoadingBackground>();
+
+  if (FAILED(bg->Initialize_Prototype())) {
+    LOG_ERROR(L"Failed To Create LoadingBackground");
+    return nullptr;
+  }
+
+  return bg;
 }
 
-void LoadingBackground::Fixed_Update(Float fixedDelta)
-{
-	UIObject::Fixed_Update(fixedDelta);
-}
+Shared<GameObject> LoadingBackground::Clone(void *arg) {
+  auto bg = make_shared<LoadingBackground>(*this);
 
-HRESULT LoadingBackground::Render()
-{
-	return UIObject::Render();
-}
+  if (FAILED(bg->Initialize(arg))) {
+    LOG_ERROR(L"Failed To Clone LoadingBackground");
+    return nullptr;
+  }
 
-Shared<LoadingBackground> LoadingBackground::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-{
-	auto bg = make_shared<LoadingBackground>();
-
-	if (FAILED(bg->Initialize_Prototype()))
-	{
-		LOG_ERROR(L"Failed To Create LoadingBackground");
-		return nullptr;
-	}
-
-	return bg;
-}
-
-Shared<GameObject> LoadingBackground::Clone(void* arg)
-{
-	auto self = ;
-	return make_shared<LoadingBackground>(enable_shared_from_this<LoadingBackground>::shared_from_this());
+  return bg;
 }

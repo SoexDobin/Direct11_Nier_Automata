@@ -1,16 +1,19 @@
 #include "Texture.h"
 
+#include "Shader.h"
 #include <tchar.h>
 
-Texture::Texture(const ComPtr<ID3D11Device> &device,
-                 const ComPtr<ID3D11DeviceContext> &context)
-    : Component(device, context) {}
+Texture::Texture() 
+	: Component {} {}
+
+Texture::Texture(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
+    : Component{ device, context } {}
 
 Texture::Texture(const Shared<Texture> &rhs)
-    : Component(rhs), m_NumSRVs(rhs->m_NumSRVs), m_SRVs(rhs->m_SRVs) {}
+    : Component{ rhs }, m_NumSRVs{ rhs->m_NumSRVs }, m_SRVs{ rhs->m_SRVs } {
+}
 
-HRESULT Texture::Initialize_Prototype(const tChar *textureFilePath,
-                                      uint32 numSRVs) {
+HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs) {
   m_NumSRVs = numSRVs;
 
   for (uint32 i = 0; i < m_NumSRVs; ++i) {
@@ -29,26 +32,22 @@ HRESULT Texture::Initialize_Prototype(const tChar *textureFilePath,
     ComPtr<ID3D11Resource> texture{nullptr};
     ComPtr<ID3D11ShaderResourceView> srv{nullptr};
 
-    try {
-      if (!lstrcmp(szExt, TEXT(".dds"))) {
+    if (!lstrcmp(szExt, TEXT(".dds"))) {
         hr = CreateDDSTextureFromFile(m_Device.Get(), szFullPath,
-                                      texture.GetAddressOf(),
-                                      srv.GetAddressOf());
-      } else if (!lstrcmp(szExt, TEXT(".tga"))) {
+            texture.GetAddressOf(),
+            srv.GetAddressOf());
+    }
+    else if (!lstrcmp(szExt, TEXT(".tga"))) {
         MSG_BOX("TGA Texture Loading Not Supported Yet");
         return E_FAIL;
-      } else {
+    }
+    else {
         hr = CreateWICTextureFromFile(m_Device.Get(), szFullPath,
-                                      texture.GetAddressOf(),
-                                      srv.GetAddressOf());
-      }
-      if (FAILED(hr)) {
-        // TODO : 로딩 실패 시 크래시 대신 실패 처리
+            texture.GetAddressOf(),
+            srv.GetAddressOf());
+    }
+    if (FAILED(hr)) {
         return E_FAIL;
-      }
-    } catch (...) {
-      // TODO : DirectXTK 등의 내부 예외 발생 시 안전하게 처리
-      return E_FAIL;
     }
     m_SRVs.push_back(srv);
   }
@@ -63,31 +62,37 @@ void Texture::On_Destroy() {
   Component::On_Destroy();
 }
 
-HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader> &shader,
-                                         const Char *constantName,
+HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader>& shader,
+                                         const Char* constantName,
                                          uint32 index) {
+	if (index >= m_NumSRVs) {
+		return E_INVALIDARG;
+	}
 
-  return S_OK;
+	return shader->Bind_SRV(constantName, m_SRVs[index]);
 }
 
 Shared<Texture> Texture::Create(const ComPtr<ID3D11Device> &device,
                                 const ComPtr<ID3D11DeviceContext> &context,
-                                const tChar *textureFilePath, uint32 numSRVs) {
-  auto texture = make_shared<Texture>(device, context);
+                                const tChar* textureFilePath, uint32 numSRVs) 
+{
+	auto texture = make_shared<Texture>(device, context);
 
-  if (FAILED(texture->Initialize_Prototype(textureFilePath, numSRVs))) {
-    MSG_BOX("Failed to Created : Texture");
-  }
+	if (FAILED(texture->Initialize_Prototype(textureFilePath, numSRVs))) {
+		MSG_BOX("Failed to Created : Texture");
+	}
 
-  return texture;
+	return texture;
 }
 
-Shared<Component> Texture::Clone(void *arg) {
-  auto texture = make_shared<Texture>(shared_from_this());
+Shared<Component> Texture::Clone(void *arg) 
+{
+    auto texture = make_shared<Texture>(shared_from_this());
 
-  if (FAILED(texture->Initialize(arg))) {
-    MSG_BOX("Failed to Created : Texture");
-  }
+    if (FAILED(texture->Initialize(arg))) 
+    {
+    	MSG_BOX("Failed to Created : Texture");
+    }
 
-  return texture;
+    return texture;
 }

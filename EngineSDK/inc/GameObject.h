@@ -1,18 +1,23 @@
 #pragma once
+#include "Component.h"
+#include "Game.h"
 #include "LayerRegistry.h"
 #include "Object.h"
 #include "TagRegistry.h"
+#include <concepts>
 
 NS_BEGIN(Engine)
 
 class Component;
 class Transform;
 
-class ENGINE_DLL GameObject abstract : public Object, enable_shared_from_this<GameObject> 
-{
+class ENGINE_DLL GameObject abstract
+    : public Object,
+      public enable_shared_from_this<GameObject> {
 public:
-	explicit GameObject();
-  explicit GameObject(const ComPtr<ID3D11Device> &pDevice, const ComPtr<ID3D11DeviceContext> &context);
+  explicit GameObject();
+  explicit GameObject(const ComPtr<ID3D11Device> &pDevice,
+                      const ComPtr<ID3D11DeviceContext> &context);
   explicit GameObject(const Shared<GameObject> &prototype);
   virtual ~GameObject() override = default;
 
@@ -63,12 +68,43 @@ protected: /* Component */
   map<uint32, Shared<Component>> m_Components;
   unordered_map<uint32, Shared<Component>> m_Scripts;
 
-public: /* GameObject Util At GameObjectUtil.cpp */
-  template <typename T> constexpr Shared<T> Get_Component();
+public:
+  template <typename T> Shared<T> Get_Component() {
+    static_assert(std::is_base_of_v<Component, T>,
+                  "T must derive from Component");
+    uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
+    if (Shared<const T> prototype = Game::GetInstance()->Find_Prototype<T>(
+            PROTOTYPE::COMPONENT, level)) {
+      if (prototype->Get_ComponentType() == COMPONENT_TYPE::SCRIPT &&
+          m_Scripts.contains(prototype->Get_ObjectID())) {
+        return static_pointer_cast<T>(m_Scripts[prototype->Get_ObjectID()]);
+      }
+      if (m_Components.contains(ETOI(prototype->Get_ComponentType()))) {
+        return static_pointer_cast<T>(
+            m_Components[ETOI(prototype->Get_ComponentType())]);
+      }
+    }
+    return nullptr;
+  }
+
   inline Shared<Component> Get_Component(uint32 objectID);
 
-protected: /* GameObject Util At GameObjectUtil.cpp */
-  template <typename T> constexpr Shared<T> Add_Component(void *arg = nullptr);
+protected:
+  template <typename T> Shared<T> Add_Component(void *arg = nullptr) {
+    static_assert(std::is_base_of_v<Component, T>,
+                  "T must derive from Component");
+    if (Shared<T> instance = Game::GetInstance()->Instantiate<T>(arg)) {
+      if (instance->Get_ComponentType() == COMPONENT_TYPE::SCRIPT &&
+          !m_Scripts.contains(instance->Get_ObjectID())) {
+        m_Scripts.emplace(instance->Get_ObjectID(), instance);
+      } else if (!m_Components.contains(ETOI(instance->Get_ComponentType()))) {
+        m_Components.emplace(ETOI(instance->Get_ComponentType()), instance);
+      }
+      instance->Set_Owner(shared_from_this());
+      return instance;
+    }
+    return nullptr;
+  }
 
 public:
   virtual Shared<GameObject> Clone(void *arg) PURE;

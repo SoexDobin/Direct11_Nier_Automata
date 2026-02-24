@@ -21,16 +21,19 @@
 #include <d3d11.h>
 #define DIRECTX_TOOLKIT_IMPORT
 #include <DirectXMath.h>
-#include <Effects11/d3dx11effect.h>
 #include <d3dcompiler.h>
+#include <DirectXCollision.h>
+
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
 #include <directxtk/DDSTextureLoader.h>
 #include <directxtk/SimpleMath.h>
 #include <directxtk/WICTextureLoader.h>
 #include <wrl.h>
 
+#include <Effects11/d3dx11effect.h>
 
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
 
 #include "fmod.hpp"
 #include "fmod_common.h"

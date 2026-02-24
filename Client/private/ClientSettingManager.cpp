@@ -173,7 +173,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 			if (entry.path().extension() == L".hlsl")
 			{
 				std::replace(filePath.begin(), filePath.end(), L'\\', L'/');
-				std::wstring tagName = entry.path().stem().wstring();
+				std::wstring tagName = entry.path().stem().wstring() + entry.path().extension().wstring();
 
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
@@ -195,8 +195,8 @@ HRESULT ClientSettingManager::Load_Shader() const
 				{
 					GAME->Add_Prototype(ETOI(LEVEL::STATIC),
 						Shader::Create(GAME->Get_Device(), GAME->Get_Context(),
-							(m_ShaderPath + tagName).c_str(), 
-							VTXTEX::Elements, VTXNORMTEX::numElements)
+							(m_ShaderPath + tagName).c_str(),
+							VTXTEX::Elements, VTXTEX::numElements)
 					);
 				}
 				else if (itNormTex != tagName.end())

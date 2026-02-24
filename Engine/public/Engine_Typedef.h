@@ -19,11 +19,15 @@ namespace Engine
 	using uint8 = unsigned __int8;
 	using uint16 = unsigned __int16;
 	using uint32 = unsigned __int32;
+	using uint32 = uint32_t;
 
 	using int8 = signed __int8;
 	using int16 = signed __int16;
 	using int32 = signed __int32;
+	using int32 = int32_t;
 
+	using Long = signed long;
+	using uLong = unsigned long;
 
 	using Float = float;
 	using Double = double;

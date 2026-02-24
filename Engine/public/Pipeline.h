@@ -20,9 +20,11 @@ public:
 	{
 		m_TransformStateMatrices[ETOI(transformState)] = transformStateMatrix;
 	}
-	Vector3 Get_CamTransform() const
+	Vector4 Get_CamTransform() const
 	{
-		return m_TransformStateMatrices[ETOI(D3DTS::VIEW)].Translation();
+		Vector4 v4 = Vector4(m_TransformStateMatrices[ETOI(D3DTS::VIEW)].Translation());
+		v4.w = 1.f;
+		return v4;
 	}
 
 public:

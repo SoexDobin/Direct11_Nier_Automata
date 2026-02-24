@@ -8,6 +8,8 @@ namespace Engine
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
 	enum class WORLD_STATE { RIGHT, UP, LOOK, POSITION, END};
 	enum class D3DTS { VIEW, PROJ, END };
+	enum class DIMB { LBUTTON, RBUTTON, WHEEL, END };
+	enum class DIMM { X, Y, WHEEL, END };
 	enum class COMPONENT_TYPE
 	{
 		SCRIPT,

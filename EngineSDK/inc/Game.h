@@ -2,13 +2,14 @@
 #include "Engine_Define.h"
 
 #include "GraphicDevice.h"
+#include "InputDevice.h"
 #include "LevelManager.h"
 #include "ObjectManager.h"
 #include "PrototypeManager.h"
 #include "Renderer.h"
 #include "String_Helper.h"
 #include "TimeManager.h"
-#include <concepts>
+#include "Pipeline.h"
 
 NS_BEGIN(Engine)
 
@@ -77,13 +78,19 @@ private: /* For ObjectManager */
   HRESULT Add_GameObject(const Shared<GameObject> &GameObject) const;
 
 public: /* For Renderer */
-  void Add_RenderGroup(RENDERGROUP group,
-                       const Shared<class GameObject> &gameObject) const;
+  void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
+
+public: /* For Pipeline */
+    HRESULT Bind_TransformMatrix(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
+    HRESULT Bind_TransformMatrix_Inverse(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
+	Matrix Get_Transform(D3DTS transformState) const;
+	Vector4 Get_CamTransform() const;
+	void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
 
 public:
   template <typename T>
-  Shared<const T> Find_Prototype(PROTOTYPE prototype,
-                                 uint32 levIndex = MAXINT32) const {
+  Shared<const T> Find_Prototype(PROTOTYPE prototype, uint32 levIndex = MAXINT32) const 
+	{
     uint32 level = levIndex == MAXINT32
                        ? m_LevelManager->Get_CurrentLevelIndex()
                        : levIndex;
@@ -147,15 +154,17 @@ private:
                                              void *arg = nullptr) const;
 
 private:
-  Shared<LayerRegistry> m_LayerRegistry = {nullptr};
-  Shared<TagRegistry> m_TagRegistry = {nullptr};
+	Shared<LayerRegistry> m_LayerRegistry = {nullptr};
+	Shared<TagRegistry> m_TagRegistry = {nullptr};
 
-  Unique<GraphicDevice> m_GraphicDevice = {nullptr};
-  Unique<TimeManager> m_TimeManager = {nullptr};
-  Unique<LevelManager> m_LevelManager = {nullptr};
-  Unique<PrototypeManager> m_PrototypeManager = {nullptr};
-  Unique<ObjectManager> m_ObjectManager = {nullptr};
-  Unique<Renderer> m_Renderer = {nullptr};
+	Unique<GraphicDevice> m_GraphicDevice = {nullptr};
+	Unique<TimeManager> m_TimeManager = {nullptr};
+    Unique<InputDevice> m_InputDevice = {nullptr};
+	Unique<Pipeline> m_Pipeline = { nullptr };
+	Unique<LevelManager> m_LevelManager = {nullptr};
+	Unique<PrototypeManager> m_PrototypeManager = {nullptr};
+	Unique<ObjectManager> m_ObjectManager = {nullptr};
+	Unique<Renderer> m_Renderer = {nullptr};
 };
 
 NS_END

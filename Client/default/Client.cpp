@@ -12,6 +12,7 @@ HWND g_hWnd = {nullptr};
 HINSTANCE g_hInst = {nullptr};
 ENGINE_DESC g_projectSettings = {
     nullptr,
+    nullptr,
     WINMODE::WIN,
     L"NieRAutomata",
     1920,

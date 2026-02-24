@@ -20,6 +20,7 @@ IMPLEMENT_SINGLETON(Game);
 
 Game::~Game() {
   m_GraphicDevice.reset();
+  m_InputDevice.reset();
 
   m_LevelManager->On_Destroy();
   m_LevelManager.reset();
@@ -53,6 +54,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   if (nullptr == (m_TimeManager = TimeManager::Create()))
     return E_FAIL;
 
+  if (nullptr == (m_InputDevice = InputDevice::Create(engineDesc.hWnd, engineDesc.hInst)))
+	  return E_FAIL;
+
   if (nullptr == (m_Pipeline = Pipeline::Create()))
 	  return E_FAIL;
 
@@ -84,6 +88,8 @@ void Game::Update_Engine()
 {
   const Float delta = m_TimeManager->Update_Timers();
 
+  m_InputDevice->Update();
+
   m_ObjectManager->PriorityUpdate(delta);
 
   m_Pipeline->Update_Pipeline();
@@ -93,10 +99,10 @@ void Game::Update_Engine()
   m_ObjectManager->LateUpdate(delta);
 
   while (m_TimeManager->Is_FixedUpdate()) {
-    Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
-    m_ObjectManager->FixedUpdate(fixedDelta);
-    m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
-    m_TimeManager->Has_FixedUpdate();
+        Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
+        m_ObjectManager->FixedUpdate(fixedDelta);
+        m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
+        m_TimeManager->Has_FixedUpdate();
   }
 
   m_ObjectManager->Cleanup_GameObjects();
@@ -204,12 +210,12 @@ HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<class Shader>& shader, c
 	return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName, transformState);
 }
 
-const Matrix& Game::Get_Transform(D3DTS transformState) const
+Matrix Game::Get_Transform(D3DTS transformState) const
 {
 	return m_Pipeline->Get_Transform(transformState);
 }
 
-const Vector3& Game::Get_CamTransform() const
+Vector4 Game::Get_CamTransform() const
 {
 	return m_Pipeline->Get_CamTransform();
 }
@@ -222,8 +228,7 @@ void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix)
 Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID, uint32 levIndex) const
 {
     uint32 level = levIndex == MAXINT32
-        ? m_LevelManager->Get_CurrentLevelIndex()
-        : levIndex;
+        ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
     if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, typeID)) {
         return static_pointer_cast<Object>(object);
@@ -234,8 +239,7 @@ Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID, ui
 Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, const wstring& className, uint32 levIndex) const
 {
     uint32 level = levIndex == MAXINT32
-        ? m_LevelManager->Get_CurrentLevelIndex()
-        : levIndex;
+        ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
     if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, className)) {
         return static_pointer_cast<Object>(object);

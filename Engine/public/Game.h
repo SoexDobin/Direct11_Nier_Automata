@@ -2,6 +2,7 @@
 #include "Engine_Define.h"
 
 #include "GraphicDevice.h"
+#include "InputDevice.h"
 #include "LevelManager.h"
 #include "ObjectManager.h"
 #include "PrototypeManager.h"
@@ -79,11 +80,11 @@ private: /* For ObjectManager */
 public: /* For Renderer */
   void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
 
-public:
+public: /* For Pipeline */
     HRESULT Bind_TransformMatrix(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
     HRESULT Bind_TransformMatrix_Inverse(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
-	const Matrix& Get_Transform(D3DTS transformState) const;
-	const Vector3& Get_CamTransform() const;
+	Matrix Get_Transform(D3DTS transformState) const;
+	Vector4 Get_CamTransform() const;
 	void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
 
 public:
@@ -158,6 +159,7 @@ private:
 
 	Unique<GraphicDevice> m_GraphicDevice = {nullptr};
 	Unique<TimeManager> m_TimeManager = {nullptr};
+    Unique<InputDevice> m_InputDevice = {nullptr};
 	Unique<Pipeline> m_Pipeline = { nullptr };
 	Unique<LevelManager> m_LevelManager = {nullptr};
 	Unique<PrototypeManager> m_PrototypeManager = {nullptr};

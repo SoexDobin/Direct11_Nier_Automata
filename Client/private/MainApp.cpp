@@ -18,6 +18,7 @@ HRESULT MainApp::Initialize() {
   ENGINE_DESC EngineDesc = {};
   {
     EngineDesc.hWnd = g_hWnd;
+	EngineDesc.hInst = g_hInst;
     EngineDesc.winMode = WINMODE::WIN;
     EngineDesc.levCount = ETOI(LEVEL::LOADING);
 

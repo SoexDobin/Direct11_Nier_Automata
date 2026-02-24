@@ -6,6 +6,7 @@ namespace Engine
 	typedef struct tagEngineDesc
 	{
 		HWND 			hWnd = {};
+		HINSTANCE 		hInst = {};
 		WINMODE			winMode = {};
 		std::wstring	windowTitle = {};
 		unsigned int	viewportWidth = {};

@@ -22,8 +22,9 @@ public:
 
 public:
   HRESULT Begin(uint32 passIndex);
-  HRESULT Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderResourceView> &srv);
-  HRESULT Bind_Matrix(const Char *constantName, const Float4x4 *matrix);
+  HRESULT Bind_SRV(const Char* constantName, const ComPtr<ID3D11ShaderResourceView> &srv);
+  HRESULT Bind_Matrix(const Char* constantName, const Float4x4 *matrix);
+  HRESULT Bind_RawValue(const Char* constantName, const void* data, uint32 length);
 
 private:
   ComPtr<ID3DX11Effect> m_Effect = { nullptr };

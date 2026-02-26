@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "ClientSettingManager.h"
+
+#include <fstream>
 #include <SpdLogger.h>
 #include "Client_Define.h"
 #include "Game.h"
@@ -7,6 +9,7 @@
 #include "LayerRegistry.h"
 #include "Texture.h"
 #include "Shader.h"
+#include <regex>
 
 IMPLEMENT_SINGLETON(ClientSettingManager)
 
@@ -14,7 +17,7 @@ HRESULT ClientSettingManager::Load_EngineDesc() const
 {
 	std::wstring path = m_ProjectSettingPath + L"EngineDesc.json";
 
-	if (!exists(path)) {
+	if (!filesystem::exists(path)) {
 		SpdLogger::Warn(L"Failed To Find Path " + path);
 		return E_FAIL;
 	}

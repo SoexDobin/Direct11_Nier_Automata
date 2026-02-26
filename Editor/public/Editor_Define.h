@@ -1,6 +1,5 @@
 #pragma once
 
-#include <imgui.h>
 #include <windows.h>
 #include "Engine_Define.h"
 
@@ -8,6 +7,7 @@ extern inline HWND g_hWnd = { nullptr };
 extern inline HINSTANCE g_hInst = { nullptr };
 extern inline ENGINE_DESC g_projectSettings = {
 	nullptr, 
+	nullptr,
 	WINMODE::WIN, 
 	L"Editor", 
 	1920, 

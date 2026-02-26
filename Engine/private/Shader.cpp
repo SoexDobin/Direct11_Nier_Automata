@@ -107,6 +107,17 @@ HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix)
     return matrixVariable->SetMatrix(reinterpret_cast<const Float*>(matrix));
 }
 
+HRESULT Shader::Bind_RawValue(const Char* constantName, const void* data, uint32 length)
+{
+    ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
+    if (nullptr == variable) {
+        MSG_BOX("Failed To Throw Value To Shader");
+        return E_FAIL;
+    }
+
+	return variable->SetRawValue(data, 0, length);
+}
+
 Shared<Shader> Shader::Create(const ComPtr<ID3D11Device> &device,
                               const ComPtr<ID3D11DeviceContext> &context,
                               const tChar *shaderFilePath,

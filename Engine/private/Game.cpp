@@ -20,6 +20,7 @@ IMPLEMENT_SINGLETON(Game);
 
 Game::~Game() {
   m_GraphicDevice.reset();
+  m_TimeManager.reset();
   m_InputDevice.reset();
 
   m_LevelManager->On_Destroy();
@@ -34,8 +35,6 @@ Game::~Game() {
   m_PrototypeManager->On_Destroy();
   m_PrototypeManager.reset();
 
-  m_TimeManager.reset();
-  m_GraphicDevice.reset();
   m_LayerRegistry.reset();
   m_TagRegistry.reset();
 

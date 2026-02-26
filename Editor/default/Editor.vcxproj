@@ -135,15 +135,15 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;..\..\Client\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Engine.lib;Client.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;$(SolutionDir)Editor\bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>call "$(ProjectDir)GenerateRTTR.bat"</Command>
@@ -164,15 +164,15 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;..\..\Client\public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Engine.lib;Client.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;$(SolutionDir)Editor\bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>call "$(ProjectDir)GenerateRTTR.bat"</Command>
@@ -192,9 +192,7 @@
     <ClInclude Include="..\public\Inspector.h" />
     <ClInclude Include="..\public\LogConsole.h" />
     <ClInclude Include="..\public\MenuBar.h" />
-    <ClInclude Include="..\public\MetadataManager.h" />
     <ClInclude Include="..\public\PathManager.h" />
-    <ClInclude Include="..\public\PrefabRegistry.h" />
     <ClInclude Include="..\public\PrefabTab.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="framework.h" />
@@ -211,8 +209,6 @@
     <ClCompile Include="..\private\Inspector.cpp" />
     <ClCompile Include="..\private\LogConsole.cpp" />
     <ClCompile Include="..\private\MenuBar.cpp" />
-    <ClCompile Include="..\private\MetadataManager.cpp" />
-    <ClCompile Include="..\private\PrefabRegistry.cpp" />
     <ClCompile Include="..\private\PrefabTab.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">

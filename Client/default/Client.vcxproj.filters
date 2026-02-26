@@ -4,19 +4,7 @@
     <ClInclude Include="pch.h">
       <Filter>99. Default</Filter>
     </ClInclude>
-    <ClInclude Include="Client.h">
-      <Filter>99. Default\00. API_File</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>99. Default\00. API_File</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>99. Default\00. API_File</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>99. Default\00. API_File</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\MainApp.h">
+    <ClInclude Include="..\public\ClientApp.h">
       <Filter>00. MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\public\ClientSettingManager.h">
@@ -42,13 +30,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Client.cpp">
-      <Filter>99. Default</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>99. Default\00. API_File</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\MainApp.cpp">
+    <ClCompile Include="..\private\ClientApp.cpp">
       <Filter>00. MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\ClientSettingManager.cpp">
@@ -66,21 +48,13 @@
     <ClCompile Include="..\private\LoadingLogo.cpp">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Client.ico">
-      <Filter>99. Default\00. API_File</Filter>
-    </Image>
-    <Image Include="small.ico">
-      <Filter>99. Default\00. API_File</Filter>
-    </Image>
+    <ClCompile Include="pch.cpp">
+      <Filter>99. Default</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="99. Default">
       <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="99. Default\00. API_File">
-      <UniqueIdentifier>{a80c2ef9-9c94-4519-a73a-f021bc065c5e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. MainApp">
       <UniqueIdentifier>{f01147ca-57a3-4889-b167-1759cfd39a21}</UniqueIdentifier>
@@ -111,16 +85,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Client.rc">
-      <Filter>99. Default\00. API_File</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl">
       <Filter>97. Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\shaders\Shader_VtxNormTex.hlsl">
       <Filter>97. Shader</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostBuildCopy.bat">
+      <Filter>99. Default</Filter>
+    </None>
   </ItemGroup>
 </Project>

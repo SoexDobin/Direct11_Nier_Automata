@@ -37,12 +37,12 @@
     <Filter Include="01. EditorObject\LogConsole">
       <UniqueIdentifier>{c980370b-bdbe-473e-a971-be0699b816b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. System\Manager">
+      <UniqueIdentifier>{58448432-806e-434f-98f0-59b3b783555d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\EditorApp.h">
-      <Filter>00. System</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\EditorManager.h">
       <Filter>00. System</Filter>
     </ClInclude>
     <ClInclude Include="Editor.h">
@@ -75,27 +75,21 @@
     <ClInclude Include="..\public\MenuBar.h">
       <Filter>01. EditorObject\MenuBar</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\PathManager.h">
-      <Filter>00. System</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\PrefabTab.h">
       <Filter>01. EditorObject\PrefabTab</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\MetadataManager.h">
-      <Filter>01. EditorObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\PrefabRegistry.h">
-      <Filter>01. EditorObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LogConsole.h">
       <Filter>01. EditorObject\LogConsole</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\EditorManager.h">
+      <Filter>00. System\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PathManager.h">
+      <Filter>00. System\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
-      <Filter>00. System</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\EditorManager.cpp">
       <Filter>00. System</Filter>
     </ClCompile>
     <ClCompile Include="Editor.cpp">
@@ -116,14 +110,11 @@
     <ClCompile Include="..\private\PrefabTab.cpp">
       <Filter>01. EditorObject\PrefabTab</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\MetadataManager.cpp">
-      <Filter>01. EditorObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\PrefabRegistry.cpp">
-      <Filter>01. EditorObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\LogConsole.cpp">
       <Filter>01. EditorObject\LogConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EditorManager.cpp">
+      <Filter>00. System\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

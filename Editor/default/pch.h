@@ -8,7 +8,6 @@
 #include <tchar.h>
 #include <windows.h>
 
-
 #include <algorithm>
 #include <list>
 #include <map>
@@ -16,10 +15,9 @@
 #include <string>
 #include <vector>
 
-
 // Engine Headers
 #include "Engine_Define.h"
-#include "Game.h"
+#include "Client_Define.h"
 
 #include <filesystem>
 #include <fstream>
@@ -35,11 +33,13 @@
 // Editor Headers
 #include "Editor_Define.h"
 
+#include "Game.h"
 #include "ID_Helper.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
 
 
 using namespace Engine;
+using namespace Client;
 using namespace Helper;
 using namespace std;

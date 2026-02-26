@@ -28,6 +28,7 @@ public:
 	}
 
 public:
+	HRESULT Bind_CameraPosition(const Shared<Shader>& shader, const Char* constantName);
 	HRESULT Bind_TransformMatrix(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState);
 	HRESULT Bind_TransformMatrix_Inverse(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState);
 	void Update_Pipeline();

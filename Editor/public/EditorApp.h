@@ -19,12 +19,8 @@ public:
 	HRESULT Render();
 
 private:
-	HRESULT Initialize_IMGUI();
+	HRESULT Initialize_IMGUI(const ENGINE_DESC& desc);
 	HRESULT Destruct_IMGUI();
-
-private:
-	Shared<Game> m_Game = { nullptr };
-	Shared<EditorManager> m_Editor = { nullptr };
 
 public:
 	static Unique<EditorApp> Create();

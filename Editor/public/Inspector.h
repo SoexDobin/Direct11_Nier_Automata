@@ -1,6 +1,5 @@
 #pragma once
 #include "EditorObject.h"
-#include "MetadataManager.h"
 
 NS_BEGIN(Editor)
 
@@ -24,9 +23,6 @@ public:
 
 private:
     void LayerTagGUI();
-  void RenderMemberList(const vector<MetadataManager::MemberInfo> &members,
-                        const Shared<PrefabRegistry> &registry,
-                        const char *sectionId);
 
 private:
   string m_SelectedClass;

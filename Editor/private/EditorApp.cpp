@@ -1,12 +1,15 @@
-#include "EditorApp.h"
 #include "pch.h"
+#include "EditorApp.h"
+#include "ClientApp.h"
 
 #include "EditorManager.h"
-#include "Game.h"
+
 #include "PathManager.h"
 #include "PrefabRegistry.h"
+#include "LayerRegistry.h"
+#include "TagRegistry.h"
 
-EditorApp::EditorApp() : m_Game{GAME}, m_Editor{EDITOR} {}
+EditorApp::EditorApp() {}
 EditorApp::~EditorApp() {
   Destruct_IMGUI();
 
@@ -15,86 +18,91 @@ EditorApp::~EditorApp() {
 }
 
 HRESULT EditorApp::Initialize() {
-  ENGINE_DESC engineDesc = {};
+  ENGINE_DESC desc = {};
   {
-    engineDesc.hWnd = g_hWnd;
-    engineDesc.winMode = WINMODE::WIN;
-    engineDesc.viewportWidth = g_projectSettings.viewportWidth;
-    engineDesc.viewportHeight = g_projectSettings.viewportHeight;
-    engineDesc.windowTitle = g_projectSettings.windowTitle;
-    engineDesc.useOffscreenRendering = true;
-    engineDesc.renderTargetCount = 2;
+    desc.hWnd = g_hWnd;
+	desc.hInst = g_hInst;
+    desc.winMode = WINMODE::WIN;
+    desc.viewportWidth = g_projectSettings.viewportWidth;
+    desc.viewportHeight = g_projectSettings.viewportHeight;
+    desc.windowTitle = g_projectSettings.windowTitle;
+    desc.useOffscreenRendering = true;
+    desc.renderTargetCount = 2;
   }
 
-  if (FAILED(GAME->Initialize_Engine(engineDesc)))
+  if (FAILED(GAME->Initialize_Engine(desc)))
     return E_FAIL;
   if (FAILED(EDITOR->Initialize()))
     return E_FAIL;
 
-  if (FAILED(Initialize_IMGUI()))
+  if (FAILED(Initialize_IMGUI(desc)))
     return E_FAIL;
 
   return S_OK;
 }
 
-void EditorApp::Update() {
-  GAME->Update_Engine();
-  EDITOR->Update();
+void EditorApp::Update() 
+{
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
+	GAME->Update_Engine();
+	EDITOR->Update();
 }
 
-HRESULT EditorApp::Render() {
-  EDITOR->Render();
-
-  return S_OK;
+HRESULT EditorApp::Render() 
+{
+	EDITOR->Render();
+	return S_OK;
 }
 
 Unique<EditorApp> EditorApp::Create() {
-  Unique<EditorApp> editorApp = make_unique<EditorApp>();
+	Unique<EditorApp> editorApp = make_unique<EditorApp>();
 
-  if (FAILED(editorApp->Initialize())) {
-    MSG_BOX("Failed to Create : EditorApp");
-    return nullptr;
-  }
+    if (FAILED(editorApp->Initialize())) {
+        MSG_BOX("Failed to Create : EditorApp");
+        return nullptr;
+    }
 
   return editorApp;
 }
 
-HRESULT EditorApp::Initialize_IMGUI() 
+HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC& desc) 
 {
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
-  (void)io;
+    IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
 
-  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;           // Enable Keyboard Controls
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
+    ImGuiIO io = ImGui::GetIO(); (void)io;
 
-  io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/malgun.ttf", 16.0f, nullptr,
-                               io.Fonts->GetGlyphRangesKorean());
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
 
-  ImGui::StyleColorsDark();
-  ImGuiStyle &style = ImGui::GetStyle();
+    ImGui::StyleColorsDark();
+	ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding = 0.f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 
-  ImGui_ImplWin32_Init(g_hWnd);
-  ImGui_ImplDX11_Init(GAME->Get_Device().Get(), GAME->Get_Context().Get());
+    ImGui_ImplWin32_Init(desc.hWnd);
+    ImGui_ImplDX11_Init(GAME->Get_Device().Get(), GAME->Get_Context().Get());
 
-  RECT rc{};
-  GetClientRect(g_hWnd, &rc);
-  uint32 width = rc.right - rc.left;
-  uint32 height = rc.bottom - rc.top;
-  GAME->OnResize(width, height);
-  //io.ConfigWindowsResizeFromEdges();
-
-  return S_OK;
+    {
+        RECT rc{};
+        GetClientRect(g_hWnd, &rc);
+        uint32 width = rc.right - rc.left;
+        uint32 height = rc.bottom - rc.top;
+        GAME->OnResize(width, height);
+    }
+	return S_OK;
 }
 
 HRESULT EditorApp::Destruct_IMGUI() {
   GAME->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
   GAME->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
-
-  /* Prefab 오버라이드 저장 */
-  EDITOR->Get_PrefabRegistry()->SaveToDir(PATH.GetPrefabSettingsDir());
 
   ImGui_ImplDX11_Shutdown();
   ImGui_ImplWin32_Shutdown();

@@ -184,24 +184,6 @@
                                                                     ],
                                               "has_clone":  true
                                           },
-                    "MainApp":  {
-                                    "members":  [
-                                                    {
-                                                        "access":  "private",
-                                                        "default":  "nullptr",
-                                                        "name":  "m_Game",
-                                                        "type":  "Shared\u003cEngine::Game\u003e"
-                                                    }
-                                                ],
-                                    "base_class":  "",
-                                    "inherited_members":  {
-
-                                                          },
-                                    "namespace":  "Engine",
-                                    "has_create":  true,
-                                    "has_clone":  false,
-                                    "category":  "other"
-                                },
                     "LevelLoading":  {
                                          "members":  [
                                                          {
@@ -236,6 +218,24 @@
                                          "has_create":  true,
                                          "has_clone":  false,
                                          "category":  "level"
-                                     }
+                                     },
+                    "ClientApp":  {
+                                      "members":  [
+                                                      {
+                                                          "access":  "private",
+                                                          "default":  "nullptr",
+                                                          "name":  "m_Game",
+                                                          "type":  "Shared\u003cEngine::Game\u003e"
+                                                      }
+                                                  ],
+                                      "base_class":  "",
+                                      "inherited_members":  {
+
+                                                            },
+                                      "namespace":  "Engine",
+                                      "has_create":  true,
+                                      "has_clone":  false,
+                                      "category":  "other"
+                                  }
                 }
 }

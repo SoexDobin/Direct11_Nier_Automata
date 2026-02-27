@@ -1,0 +1,33 @@
+#pragma once
+#include "Object.h"
+
+NS_BEGIN(Engine)
+
+class Light final : public Object
+{
+	NO_COPY(Light)
+public:
+	Light();
+	~Light() override = default;
+
+public:
+	const LIGHT_DESC& Get_LightDesc() const { return m_LightDesc; }
+
+public:
+	HRESULT Initialize_Prototype(const LIGHT_DESC& desc);
+	HRESULT Initialize(void* arg) override;
+
+	void On_Destroy() override { Object::On_Destroy(); }
+	void On_Disable() override { Object::On_Disable(); }
+	void On_Enable() override { Object::On_Enable(); }
+	void Set_Active(Bool isActive) override { Object::Set_Active(isActive); }
+	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
+
+private:
+	LIGHT_DESC m_LightDesc = {};
+
+public:
+	static Shared<Light> Create(const LIGHT_DESC& desc);
+};
+
+NS_END

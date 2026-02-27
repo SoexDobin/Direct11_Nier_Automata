@@ -10,6 +10,7 @@ namespace Engine
 	enum class D3DTS { VIEW, PROJ, END };
 	enum class DIMB { LBUTTON, RBUTTON, WHEEL, END };
 	enum class DIMM { X, Y, WHEEL, END };
+	enum class LIGHT { DIRECTIONAL, POINT, END };
 	enum class COMPONENT_TYPE
 	{
 		SCRIPT,
@@ -17,7 +18,9 @@ namespace Engine
 		TEXTURE,
 		VI_RECT_BUFFER,
 		VI_TERRAIN_BUFFER,
-		SHADER
+		SHADER,
+		MESH,
+		MODEL
 	};
 	
 

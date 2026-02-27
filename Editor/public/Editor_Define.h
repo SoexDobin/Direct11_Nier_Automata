@@ -13,6 +13,7 @@ extern inline ENGINE_DESC g_projectSettings = {
 	1920, 
 	1080, 
 	0, 
+	0,
 	true, 
 	2
 };

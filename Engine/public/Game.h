@@ -10,6 +10,7 @@
 #include "String_Helper.h"
 #include "TimeManager.h"
 #include "Pipeline.h"
+#include "LightManager.h"
 
 NS_BEGIN(Engine)
 
@@ -88,6 +89,11 @@ public: /* For Pipeline */
 	Vector4 Get_CamTransform() const;
 	void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
 
+public: /* For.Light_Manager */
+    const LIGHT_DESC* Get_LightDesc(uint32 index) const;
+    HRESULT Add_Light(const LIGHT_DESC& lightDesc) const;
+	HRESULT Remove_Light(uint32 index) const;
+
 public:
   template <typename T>
   Shared<const T> Find_Prototype(PROTOTYPE prototype, uint32 levIndex = MAXINT32) const 
@@ -157,7 +163,7 @@ private:
 private:
 	Shared<LayerRegistry> m_LayerRegistry = {nullptr};
 	Shared<TagRegistry> m_TagRegistry = {nullptr};
-
+    
 	Unique<GraphicDevice> m_GraphicDevice = {nullptr};
 	Unique<TimeManager> m_TimeManager = {nullptr};
     Unique<InputDevice> m_InputDevice = {nullptr};
@@ -166,6 +172,7 @@ private:
 	Unique<PrototypeManager> m_PrototypeManager = {nullptr};
 	Unique<ObjectManager> m_ObjectManager = {nullptr};
 	Unique<Renderer> m_Renderer = {nullptr};
+	Unique<LightManager> m_LightManager = { nullptr };
 };
 
 NS_END

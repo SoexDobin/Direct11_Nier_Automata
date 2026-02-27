@@ -41,7 +41,7 @@ NS_BEGIN(Helper)
 		return 0;
     }
 
-    static void CreateID(OBJECT_ID_FLAG requestFlag, Object::ID_DESC& idDesc)
+    static void CreateID(OBJECT_ID_FLAG requestFlag, ID_DESC& idDesc)
     {
         GUID guid = {};
 

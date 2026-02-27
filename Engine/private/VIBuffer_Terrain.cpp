@@ -70,7 +70,7 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 				static_cast<Float>(pixels[index] & 0x000000FF) / 15.f, static_cast<Float>(i) 
 			};
 			vertices[index].normal = Vector3::Up;
-			vertices[index].texCoord = Vector2{ 
+			vertices[index].texcoord = Vector2{
 				static_cast<Float>(j) / (m_NumVerticesX - 1), 
 				static_cast<Float>(i) / (m_NumVerticesZ - 1) 
 			};

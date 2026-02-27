@@ -28,19 +28,19 @@ HRESULT ClientApp::Initialize(const ENGINE_DESC& desc)
 
 HRESULT ClientApp::Ready_StartLevel(LEVEL startLevel) 
 {
-  if (LEVEL::LOADING == startLevel)
-    return E_FAIL;
+	if (LEVEL::LOADING == startLevel)
+		return E_FAIL;
 
-  if (nullptr == Loader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), LEVEL::STATIC))
-      return E_FAIL;
+	if (nullptr == Loader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), LEVEL::STATIC))
+		return E_FAIL;
 
-  if (FAILED(GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING),
-      LevelLoading::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), startLevel))))
-  {
-      return E_FAIL;
-  }
+	if (FAILED(GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING),
+		LevelLoading::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), startLevel))))
+	{
+		return E_FAIL;
+	}
 
-  return S_OK;
+	return S_OK;
 }
 
 Unique<ClientApp> ClientApp::Create(const ENGINE_DESC& desc) {

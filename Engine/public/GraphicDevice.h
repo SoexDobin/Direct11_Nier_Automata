@@ -31,17 +31,15 @@ public:
   HRESULT OnResize(uint32 width, uint32 height);
 
 public:
-  HRESULT Begin_RenderOffScreen(const wstring &offScreenTag);
+  HRESULT Begin_RenderOffScreen(uint32 screenIndex);
   HRESULT End_RenderOffScreen();
-  ComPtr<ID3D11ShaderResourceView> Get_OffscreenSRV(const wstring &rtTag);
+  ComPtr<ID3D11ShaderResourceView> Get_OffscreenSRV(uint32 screenIndex);
 
 private:
-  HRESULT Ready_SwapChain(HWND hWnd, WINMODE isWindowed, uint32 winSizeX,
-                          uint32 winSizeY);
+  HRESULT Ready_SwapChain(HWND hWnd, WINMODE isWindowed, uint32 winSizeX, uint32 winSizeY);
   HRESULT Ready_BackBufferRenderTargetView();
   HRESULT Ready_DepthStencilView(uint32 winSizeX, uint32 winSizeY);
-  HRESULT Create_OffScreenTarget(const wstring &tag, uint32 width,
-                                 uint32 height);
+  HRESULT Create_OffScreenTarget(uint32 width, uint32 height);
 
 private:
   ComPtr<ID3D11Device> m_Device = {nullptr};
@@ -52,7 +50,7 @@ private:
   ComPtr<ID3D11DepthStencilView> m_DSV = {nullptr};
   D3D11_VIEWPORT m_ViewPort = {};
 
-  map<wstring, OffscreenRenderTarget> m_Offscreens;
+  vector<OffscreenRenderTarget> m_Offscreens;
 
 public:
   static Unique<GraphicDevice> Create(_In_ const ENGINE_DESC &engineDesc);

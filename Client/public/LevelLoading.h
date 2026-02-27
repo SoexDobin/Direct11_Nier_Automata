@@ -11,8 +11,8 @@ public:
 	LevelLoading(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	~LevelLoading() override = default;
 
-public:
-	HRESULT Initialize_Prototype() override;
+private:
+	HRESULT Initialize_Prototype() override { return S_OK; }
 	HRESULT Initialize(void* arg) override;
 	void On_Destroy() override;
 

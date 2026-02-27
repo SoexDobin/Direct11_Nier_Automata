@@ -6,8 +6,6 @@ EditorView::~EditorView() {}
 
 HRESULT EditorView::Initialize()
 {
-	editorViewTag = L"OffScreenRT_0";
-	gameViewTag = L"OffScreenRT_1";
 
 	return EditorObject::Initialize();
 }
@@ -22,25 +20,25 @@ void EditorView::Render()
 	if (!m_IsDirty)
 		return;
 
-	HRESULT hr = {};
-	hr = GAME->Begin_RenderOffScreen(editorViewTag);
-	hr = GAME->Draw();
-	hr = GAME->End_RenderOffScreen();
-	if (FAILED(hr)) {
-		LOG_CRITICAL(L"Failed {} Rendering ", editorViewTag);
-		return;
-	}
-
-	if (m_PlayMode)
-	{
-		hr = GAME->Begin_RenderOffScreen(gameViewTag);
-		hr = GAME->Draw();
-		hr = GAME->End_RenderOffScreen();
-	}
-	if (FAILED(hr)) {
-		LOG_CRITICAL(L"Failed {} Rendering ", gameViewTag);
-		return;
-	}
+	//HRESULT hr = {};
+	//hr = GAME_INSTANCE->Begin_RenderOffScreen(0);
+	//hr = GAME_INSTANCE->Draw();
+	//hr = GAME_INSTANCE->End_RenderOffScreen();
+	//if (FAILED(hr)) {
+	//	LOG_CRITICAL(L"Failed {} Rendering ", editorViewTag);
+	//	return;
+	//}
+	//
+	//if (m_PlayMode)
+	//{
+	//	hr = GAME_INSTANCE->Begin_RenderOffScreen(gameViewTag);
+	//	hr = GAME_INSTANCE->Draw();
+	//	hr = GAME_INSTANCE->End_RenderOffScreen();
+	//}
+	//if (FAILED(hr)) {
+	//	LOG_CRITICAL(L"Failed {} Rendering ", gameViewTag);
+	//	return;
+	//}
 
 	EditorView::RenderView();
 }
@@ -49,7 +47,7 @@ void EditorView::RenderView()
 {
     ImGui::Begin("Scene View");
     {
-        auto srv = GAME->Get_OffScreenSRV(L"OffScreenRT_0");
+        auto srv = GAME_INSTANCE->Get_OffScreenSRV(0);
         if (srv) {
             ImVec2 viewportSize = ImGui::GetContentRegionAvail();
             ImGui::Image(reinterpret_cast<ImTextureID>(srv.Get()), viewportSize);
@@ -69,7 +67,7 @@ void EditorView::RenderView()
 
         ImGui::Separator();
 
-        auto srv = GAME->Get_OffScreenSRV(L"OffScreenRT_1");
+        auto srv = GAME_INSTANCE->Get_OffScreenSRV(0);
         if (srv) {
             ImVec2 viewportSize = ImGui::GetContentRegionAvail();
             ImGui::Image(reinterpret_cast<ImTextureID>(srv.Get()), viewportSize);

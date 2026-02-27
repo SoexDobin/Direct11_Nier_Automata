@@ -3,7 +3,6 @@
 #include "ID_Helper.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
-#include "Type_Helper.h"
 
 
 Component::Component()
@@ -25,8 +24,7 @@ HRESULT Component::Initialize_Prototype() {
     return E_FAIL;
   }
 
-  m_ObjectName =
-      Helper::To_wString(Helper::Get_Type(this).get_name().to_string());
+  m_ObjectName = Helper::To_wString(rttr::type::get(this).get_name().to_string());
   if (m_ObjectName.empty()) {
     LOG_ERROR(L"Component Initialize Failed By Set Object Name");
     MSG_BOX("Component Initialize Failed By Set Object Name");

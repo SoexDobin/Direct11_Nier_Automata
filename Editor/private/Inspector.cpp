@@ -15,8 +15,8 @@ Inspector::~Inspector()
 
 HRESULT Inspector::Initialize()
 {
-    auto layerRegistry = GAME->Get_LayerRegister();
-    auto tagRegistry = GAME->Get_TagRegister();
+    auto layerRegistry = GAME_INSTANCE->Get_LayerRegister();
+    auto tagRegistry = GAME_INSTANCE->Get_TagRegister();
 
     layerRegistry->LoadFromFile(PATH.GetLayerSettingsPath());
     tagRegistry->LoadFromFile(PATH.GetTagSettingsPath());
@@ -51,7 +51,7 @@ void Inspector::LayerTagGUI()
         if (ImGui::CollapsingHeader("Layers", ImGuiTreeNodeFlags_OpenOnArrow)) {
             ImGui::BeginChild("LayerScroll", ImVec2(0, 200), true);
 
-            auto layerRegistry = GAME->Get_LayerRegister();
+            auto layerRegistry = GAME_INSTANCE->Get_LayerRegister();
 
             // 맵을 도는게 아니라 0~31 인덱스로 직접 접근합니다.
             for (int i = 0; i < 32; ++i) {
@@ -84,7 +84,7 @@ void Inspector::LayerTagGUI()
         if (ImGui::CollapsingHeader("Tags", ImGuiTreeNodeFlags_OpenOnArrow)) {
             ImGui::BeginChild("TagScroll", ImVec2(0, 200), true);
 
-            auto tagRegistry = GAME->Get_TagRegister();
+            auto tagRegistry = GAME_INSTANCE->Get_TagRegister();
 
             // 태그도 동일하게 0~31 혹은 정해진 개수만큼 반복
             for (int i = 0; i < 32; ++i) {

@@ -28,6 +28,9 @@
     <ClInclude Include="..\public\LoadingLogo.h">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Terrain.h">
+      <Filter>02. GameObject\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -50,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>99. Default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Terrain.cpp">
+      <Filter>02. GameObject\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +88,9 @@
     </Filter>
     <Filter Include="97. Shader">
       <UniqueIdentifier>{f8f6556e-0ec0-47f4-9b97-3f4d9a6fe77f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Terrain">
+      <UniqueIdentifier>{9d488e4b-716c-4500-a17f-75dd1911dc79}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -30,12 +30,13 @@ public:
   virtual ~UIObject() override = default;
 
 public:
-  virtual HRESULT Initialize_Prototype() override;
-  virtual HRESULT Initialize(void *arg) override;
-  virtual void On_Destroy() override;
-  virtual void On_Enable() override;
-  virtual void On_Disable() override;
-  virtual void Set_Active(Bool isActive) override;
+    void Set_Active(Bool isActive) final;
+    virtual HRESULT Initialize_Prototype() override;
+    virtual HRESULT Initialize(void *arg) override;
+    virtual void On_Destroy() override;
+    virtual void On_Enable() override;
+    virtual void On_Disable() override;
+
 
 public:
   virtual void Priority_Update(Float timeDelta) override;

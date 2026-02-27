@@ -41,8 +41,8 @@ HRESULT ClientSettingManager::Load_EngineDesc() const
 
 HRESULT ClientSettingManager::Apply_LayerAndTagSettings() const
 {
-  auto layerRegistry = GAME->Get_LayerRegister();
-  auto tagRegistry = GAME->Get_TagRegister();
+  auto layerRegistry = GAME_INSTANCE->Get_LayerRegister();
+  auto tagRegistry = GAME_INSTANCE->Get_TagRegister();
 
   if (layerRegistry) {
     layerRegistry->LoadFromFile(m_ProjectSettingPath + L"LayerSettings.json");
@@ -113,16 +113,16 @@ HRESULT ClientSettingManager::Load_Texture(LEVEL level) const
 				{
 					for (uint32 i = 0; i < ETOI(LEVEL::LEVEL_END); ++i)
 					{
-						GAME->Add_Prototype(i,
-							Texture::Create(GAME->Get_Device(), GAME->Get_Context(),
+						GAME_INSTANCE->Add_Prototype(i,
+							Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
 								formatPath.c_str(), sequenceCount)
 						);
 					}
 				}
 				else
 				{
-					GAME->Add_Prototype(levIndex,
-						Texture::Create(GAME->Get_Device(), GAME->Get_Context(),
+					GAME_INSTANCE->Add_Prototype(levIndex,
+						Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
 							formatPath.c_str(), sequenceCount)
 					);
 				}
@@ -135,16 +135,16 @@ HRESULT ClientSettingManager::Load_Texture(LEVEL level) const
 				{
 					for (uint32 i = 0; i < ETOI(LEVEL::LEVEL_END); ++i)
 					{
-						GAME->Add_Prototype(i,
-							Texture::Create(GAME->Get_Device(), GAME->Get_Context(),
+						GAME_INSTANCE->Add_Prototype(i,
+							Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
 								formatPath.c_str(), 1)
 						);
 					}
 				}
 				else
 				{
-					GAME->Add_Prototype(levIndex,
-						Texture::Create(GAME->Get_Device(), GAME->Get_Context(), 
+					GAME_INSTANCE->Add_Prototype(levIndex,
+						Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), 
 							formatPath.c_str(), 1)
 					);
 				}
@@ -196,16 +196,16 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				if (itTex != tagName.end())
 				{
-					GAME->Add_Prototype(ETOI(LEVEL::STATIC),
-						Shader::Create(GAME->Get_Device(), GAME->Get_Context(),
+					GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
 							(m_ShaderPath + tagName).c_str(),
 							VTXTEX::Elements, VTXTEX::numElements)
 					);
 				}
 				else if (itNormTex != tagName.end())
 				{
-					GAME->Add_Prototype(ETOI(LEVEL::STATIC),
-						Shader::Create(GAME->Get_Device(), GAME->Get_Context(),
+					GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
 							(m_ShaderPath + tagName).c_str(), 
 							VTXNORMTEX::Elemnets, VTXNORMTEX::numElements)
 					);

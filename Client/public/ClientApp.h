@@ -17,8 +17,6 @@ public:
 
 public:
 	HRESULT Initialize(const ENGINE_DESC& desc);
-	void Update() const;
-	HRESULT Render() const;
 
 private:
 	HRESULT Ready_StartLevel(LEVEL startLevel);

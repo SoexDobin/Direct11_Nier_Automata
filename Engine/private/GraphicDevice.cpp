@@ -1,5 +1,6 @@
 #include "GraphicDevice.h"
 #include "Game.h"
+#include "SpdLogger.h"
 
 GraphicDevice::~GraphicDevice() {}
 
@@ -30,27 +31,28 @@ HRESULT GraphicDevice::Initialize(const ENGINE_DESC &engineDesc) {
                                     engineDesc.viewportHeight)))
     return E_FAIL;
 
-  { // Set Viewport
-    ComPtr<ID3D11RenderTargetView> RTVs[1] = {m_RTV};
-    m_Context->OMSetRenderTargets(1, RTVs[0].GetAddressOf(), m_DSV.Get());
+    { // Set Viewport
+        ComPtr<ID3D11RenderTargetView> RTVs[1] = {m_RTV};
+        m_Context->OMSetRenderTargets(1, RTVs[0].GetAddressOf(), m_DSV.Get());
 
-    m_ViewPort.TopLeftX = 0.f;
-    m_ViewPort.TopLeftY = 0.f;
-    m_ViewPort.Width = static_cast<Float>(engineDesc.viewportWidth);
-    m_ViewPort.Height = static_cast<Float>(engineDesc.viewportHeight);
-    m_ViewPort.MinDepth = 0.f;
-    m_ViewPort.MaxDepth = 1.f;
+        m_ViewPort.TopLeftX = 0.f;
+        m_ViewPort.TopLeftY = 0.f;
+        m_ViewPort.Width = static_cast<Float>(engineDesc.viewportWidth);
+        m_ViewPort.Height = static_cast<Float>(engineDesc.viewportHeight);
+        m_ViewPort.MinDepth = 0.f;
+        m_ViewPort.MaxDepth = 1.f;
 
-    m_Context->RSSetViewports(1, &m_ViewPort);
-  }
+        m_Context->RSSetViewports(1, &m_ViewPort);
+    }
 
 	if (engineDesc.useOffscreenRendering && engineDesc.renderTargetCount > 0) {
         for (uint32 i = 0; i < engineDesc.renderTargetCount; ++i) {
-          wstring frontTag = L"OffScreenRT_" + to_wstring(i);
 
-          if (FAILED(Create_OffScreenTarget(frontTag, engineDesc.viewportWidth,
-                                            engineDesc.viewportHeight)))
-            return E_FAIL;
+        	if (FAILED(Create_OffScreenTarget(
+				engineDesc.viewportWidth,
+				engineDesc.viewportHeight))
+				)
+          		return E_FAIL;
         }
 	}
 
@@ -65,7 +67,7 @@ void GraphicDevice::On_Destroy()
 
 HRESULT
 GraphicDevice::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
-  if (nullptr == m_Device)
+  if (nullptr == m_Context)
     return E_FAIL;
 
   m_Context->ClearRenderTargetView(
@@ -75,7 +77,7 @@ GraphicDevice::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
 }
 
 HRESULT GraphicDevice::Clear_DepthStencilView() const {
-  if (nullptr == m_Device)
+  if (nullptr == m_Context)
     return E_FAIL;
 
   m_Context->ClearDepthStencilView(
@@ -122,16 +124,12 @@ HRESULT GraphicDevice::OnResize(uint32 width, uint32 height)
     m_ViewPort.Width = static_cast<Float>(width);
     m_ViewPort.Height = static_cast<Float>(height);
 
-    vector<wstring> tags;
-    tags.reserve(m_Offscreens.size());
-    for (const auto& [tag, _] : m_Offscreens)
-        tags.push_back(tag);
-
+    uint32 size = m_Offscreens.size();
     m_Offscreens.clear();
 
-    for (const auto& tag : tags)
+    for (uint32 i = 0; i < size; ++i)
     {
-        if (FAILED(Create_OffScreenTarget(tag, width, height)))
+        if (FAILED(Create_OffScreenTarget(width, height)))
             return E_FAIL;
     }
 
@@ -142,37 +140,44 @@ HRESULT GraphicDevice::OnResize(uint32 width, uint32 height)
     return S_OK;
 }
 
-HRESULT GraphicDevice::Begin_RenderOffScreen(const wstring &offScreenTag) {
-  if (!m_Offscreens.contains(offScreenTag))
-    return E_FAIL;
+HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {
+    if (screenIndex >= m_Offscreens.size())
+    {
+        LOG_CRITICAL(L"Invalid Offscreen Index: {}", screenIndex);
+        return E_FAIL;
+    }
 
-  auto &rt = m_Offscreens[offScreenTag];
+	auto& rt = m_Offscreens[screenIndex];
 
-  Float clearColor[4] = {0.2f, 0.2f, 0.2f, 1.f};
-  m_Context->ClearRenderTargetView(rt.RTV.Get(), clearColor);
-  m_Context->ClearDepthStencilView(
-      m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0.f);
+    Float clearColor[4] = {0.2f, 0.2f, 0.2f, 1.f};
+    m_Context->ClearRenderTargetView(rt.RTV.Get(), clearColor);
+    m_Context->ClearDepthStencilView(
+        m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0.f);
 
-  ID3D11RenderTargetView *RTVs[] = {rt.RTV.Get()};
-  m_Context->OMSetRenderTargets(1, RTVs, m_DSV.Get());
-  m_Context->RSSetViewports(1, &rt.viewport);
+    ID3D11RenderTargetView *RTVs[] = {rt.RTV.Get()};
+    m_Context->OMSetRenderTargets(1, RTVs, m_DSV.Get());
+    m_Context->RSSetViewports(1, &rt.viewport);
 
-  return S_OK;
+    return S_OK;
 }
 
 HRESULT GraphicDevice::End_RenderOffScreen() {
-  ID3D11RenderTargetView *RTVs[] = {m_RTV.Get()};
-  m_Context->OMSetRenderTargets(1, RTVs, m_DSV.Get());
-  m_Context->RSSetViewports(1, &m_ViewPort);
+    ID3D11RenderTargetView *RTVs[] = {m_RTV.Get()};
+    m_Context->OMSetRenderTargets(1, RTVs, m_DSV.Get());
+    m_Context->RSSetViewports(1, &m_ViewPort);
 
-  return S_OK;
+    return S_OK;
 }
 
 ComPtr<ID3D11ShaderResourceView>
-GraphicDevice::Get_OffscreenSRV(const wstring &rtTag) {
-  if (!m_Offscreens.contains(rtTag))
-    return nullptr;
-  return m_Offscreens[rtTag].SRV;
+GraphicDevice::Get_OffscreenSRV(uint32 screenIndex) {
+    if (screenIndex >= m_Offscreens.size())
+    {
+		LOG_CRITICAL(L"Invalid Offscreen Index: {}", screenIndex);
+        return nullptr;
+    }
+    
+  return m_Offscreens[screenIndex].SRV;
 }
 
 HRESULT GraphicDevice::Ready_SwapChain(HWND hWnd, WINMODE isWindowed,
@@ -216,29 +221,32 @@ HRESULT GraphicDevice::Ready_SwapChain(HWND hWnd, WINMODE isWindowed,
       hWnd,
       &swapChain,
       &fullScreenSwapChain,
-      nullptr,                           /* pRestrictToOutput */
+      nullptr,
       m_SwapChain.ReleaseAndGetAddressOf());
 }
 
 HRESULT GraphicDevice::Ready_BackBufferRenderTargetView() {
-  if (nullptr == m_Device)
-    return E_FAIL;
+    if (nullptr == m_Device)
+        return E_FAIL;
 
-  ComPtr<ID3D11Texture2D> backBufferTexture = {nullptr};
+    ComPtr<ID3D11Texture2D> backBufferTexture = {nullptr};
 
-  if (FAILED(m_SwapChain->GetBuffer(
-          0, __uuidof(ID3D11Texture2D),
-          reinterpret_cast<void **>(backBufferTexture.GetAddressOf()))))
-    return E_FAIL;
-  if (FAILED(m_Device->CreateRenderTargetView(backBufferTexture.Get(), nullptr,
-                                              m_RTV.GetAddressOf())))
-    return E_FAIL;
+    if (FAILED(m_SwapChain->GetBuffer(
+        0, __uuidof(ID3D11Texture2D),
+        reinterpret_cast<void **>(backBufferTexture.GetAddressOf())))
+        )
+		return E_FAIL;
+    if (FAILED(m_Device->CreateRenderTargetView(
+        backBufferTexture.Get(), 
+        nullptr,
+        m_RTV.GetAddressOf()))
+        )
+		return E_FAIL;
 
-  return S_OK;
+    return S_OK;
 }
 
-HRESULT GraphicDevice::Ready_DepthStencilView(uint32 winSizeX,
-                                              uint32 winSizeY) {
+HRESULT GraphicDevice::Ready_DepthStencilView(uint32 winSizeX, uint32 winSizeY) {
   if (nullptr == m_Device)
     return E_FAIL;
 
@@ -260,54 +268,70 @@ HRESULT GraphicDevice::Ready_DepthStencilView(uint32 winSizeX,
     textureDesc.MiscFlags = 0;
   }
 
-  if (FAILED(m_Device->CreateTexture2D(&textureDesc, nullptr,
-                                       depthStencilTexture.GetAddressOf())))
-    return E_FAIL;
-  if (FAILED(m_Device->CreateDepthStencilView(depthStencilTexture.Get(),
-                                              nullptr, m_DSV.GetAddressOf())))
+  if (FAILED(m_Device->CreateTexture2D(
+      &textureDesc, 
+      nullptr, 
+      depthStencilTexture.GetAddressOf()))
+      )
     return E_FAIL;
 
-  return S_OK;
+  if (FAILED(m_Device->CreateDepthStencilView(
+      depthStencilTexture.Get(),
+      nullptr, 
+      m_DSV.GetAddressOf()))
+      )
+    return E_FAIL;
+
+	return S_OK;
 }
 
-HRESULT GraphicDevice::Create_OffScreenTarget(const wstring &tag, uint32 width,
-                                              uint32 height) {
-  OffscreenRenderTarget rt = {};
+HRESULT GraphicDevice::Create_OffScreenTarget(uint32 width, uint32 height) {
+    OffscreenRenderTarget rt = {};
+    D3D11_TEXTURE2D_DESC textureDesc = {};
+    {
+        textureDesc.Width = width;
+        textureDesc.Height = height;
+        textureDesc.MipLevels = 1;
+        textureDesc.ArraySize = 1;
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.SampleDesc.Quality = 0;
+        textureDesc.Usage = D3D11_USAGE_DEFAULT;
+        textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        textureDesc.CPUAccessFlags = 0;
+    }
 
-  D3D11_TEXTURE2D_DESC textureDesc = {};
-  textureDesc.Width = width;
-  textureDesc.Height = height;
-  textureDesc.MipLevels = 1;
-  textureDesc.ArraySize = 1;
-  textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  textureDesc.SampleDesc.Count = 1;
-  textureDesc.SampleDesc.Quality = 0;
-  textureDesc.Usage = D3D11_USAGE_DEFAULT;
-  textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-  textureDesc.CPUAccessFlags = 0;
+	if (FAILED(m_Device->CreateTexture2D(
+		&textureDesc, 
+        nullptr,
+		rt.texture.GetAddressOf()))
+        )
+		return E_FAIL;
 
-  if (FAILED(m_Device->CreateTexture2D(&textureDesc, nullptr,
-                                       rt.texture.GetAddressOf())))
-    return E_FAIL;
+	if (FAILED(m_Device->CreateRenderTargetView(
+        rt.texture.Get(), 
+		nullptr,
+		rt.RTV.GetAddressOf()))
+        )
+		return E_FAIL;
 
-  if (FAILED(m_Device->CreateRenderTargetView(rt.texture.Get(), nullptr,
-                                              rt.RTV.GetAddressOf())))
-    return E_FAIL;
+	if (FAILED(m_Device->CreateShaderResourceView(
+		rt.texture.Get(), 
+        nullptr,
+		rt.SRV.GetAddressOf()))
+		)
+      return E_FAIL;
 
-  if (FAILED(m_Device->CreateShaderResourceView(rt.texture.Get(), nullptr,
-                                                rt.SRV.GetAddressOf())))
-    return E_FAIL;
+    rt.viewport.TopLeftX = 0.f;
+    rt.viewport.TopLeftY = 0.f;
+    rt.viewport.Width = static_cast<Float>(width);
+    rt.viewport.Height = static_cast<Float>(height);
+    rt.viewport.MinDepth = 0.f;
+    rt.viewport.MaxDepth = 1.f;
 
-  rt.viewport.TopLeftX = 0.f;
-  rt.viewport.TopLeftY = 0.f;
-  rt.viewport.Width = static_cast<Float>(width);
-  rt.viewport.Height = static_cast<Float>(height);
-  rt.viewport.MinDepth = 0.f;
-  rt.viewport.MaxDepth = 1.f;
+	m_Offscreens.push_back(rt);
 
-  m_Offscreens.emplace(tag, rt);
-
-  return S_OK;
+	return S_OK;
 }
 
 Unique<GraphicDevice> GraphicDevice::Create(_In_ const ENGINE_DESC &engineDesc) {

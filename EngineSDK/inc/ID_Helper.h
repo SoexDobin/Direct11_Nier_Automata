@@ -1,5 +1,4 @@
 #pragma once
-#include "Object.h"
 #include "Engine_Define.h"
 #include <atomic>
 #include <combaseapi.h> // CoCreateGuid

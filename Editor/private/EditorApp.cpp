@@ -10,51 +10,89 @@
 #include "TagRegistry.h"
 
 EditorApp::EditorApp() {}
-EditorApp::~EditorApp() {
-  Destruct_IMGUI();
+EditorApp::~EditorApp() { Destruct_IMGUI(); }
 
-  GAME->DestroyInstance();
-  EDITOR->DestroyInstance();
-}
+HRESULT EditorApp::Initialize()
+{
+    ENGINE_DESC desc = {};
+    {
+        desc.hWnd = g_hWnd;
+        desc.hInst = g_hInst;
+        desc.winMode = WINMODE::WIN;
+        desc.viewportWidth = g_projectSettings.viewportWidth;
+        desc.viewportHeight = g_projectSettings.viewportHeight;
+        desc.windowTitle = g_projectSettings.windowTitle;
+        desc.useOffscreenRendering = true;
+        desc.renderTargetCount = 2;
+    }
+    /* 엔진 Core 설정 1순위 그래야만 하고 그래야하게 만들어야 함*/
+    if (FAILED(GAME_INSTANCE->Initialize_Engine(desc)))
+        return E_FAIL;
 
-HRESULT EditorApp::Initialize() {
-  ENGINE_DESC desc = {};
-  {
-    desc.hWnd = g_hWnd;
-	desc.hInst = g_hInst;
-    desc.winMode = WINMODE::WIN;
-    desc.viewportWidth = g_projectSettings.viewportWidth;
-    desc.viewportHeight = g_projectSettings.viewportHeight;
-    desc.windowTitle = g_projectSettings.windowTitle;
-    desc.useOffscreenRendering = true;
-    desc.renderTargetCount = 2;
-  }
+    if ((m_ClientApp = ClientApp::Create(desc)))
+    {
+        
+    }
+	else 
+		{
+            MSG_BOX("Failed To Create : ClientApp");
+            return E_FAIL;
+	}
+		
+	if (FAILED(EDITOR->Initialize()))
+		return E_FAIL;
+	if (FAILED(Initialize_IMGUI(desc)))
+		return E_FAIL;
 
-  if (FAILED(GAME->Initialize_Engine(desc)))
-    return E_FAIL;
-  if (FAILED(EDITOR->Initialize()))
-    return E_FAIL;
-
-  if (FAILED(Initialize_IMGUI(desc)))
-    return E_FAIL;
-
-  return S_OK;
+	return S_OK;
 }
 
 void EditorApp::Update() 
 {
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-
-	GAME->Update_Engine();
+	GAME_INSTANCE->Update_Engine();
 	EDITOR->Update();
 }
 
 HRESULT EditorApp::Render() 
 {
-	EDITOR->Render();
-	return S_OK;
+    Shared<Float4> vClearColor = make_shared<Float4>(0.f, 0.f, 1.f, 1.f);
+    if (FAILED(Game::GetInstance()->Clear_BackBufferView(vClearColor)))
+        return E_FAIL;
+
+    // TODO : 게임 카메라 세팅
+
+    if (FAILED(GAME_INSTANCE->Draw()))
+        return E_FAIL;
+
+    
+    if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0)))
+		return E_FAIL;
+
+    // TODO : 에디터 카메라 세팅
+
+    if (FAILED(GAME_INSTANCE->Draw()))
+        return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->End_RenderOffScreen()))
+        return E_FAIL;
+
+	/* For ImGui Rendering*/
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
+    EDITOR->Render();
+
+    ImGui::Render();
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+    }
+
+    return GAME_INSTANCE->Present();
 }
 
 Unique<EditorApp> EditorApp::Create() {
@@ -73,7 +111,7 @@ HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC& desc)
     IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
-    ImGuiIO io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
 
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
@@ -88,25 +126,27 @@ HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC& desc)
     }
 
     ImGui_ImplWin32_Init(desc.hWnd);
-    ImGui_ImplDX11_Init(GAME->Get_Device().Get(), GAME->Get_Context().Get());
+    ImGui_ImplDX11_Init(GAME_INSTANCE->Get_Device().Get(), GAME_INSTANCE->Get_Context().Get());
 
     {
         RECT rc{};
         GetClientRect(g_hWnd, &rc);
         uint32 width = rc.right - rc.left;
         uint32 height = rc.bottom - rc.top;
-        GAME->OnResize(width, height);
+        GAME_INSTANCE->OnResize(width, height);
     }
 	return S_OK;
 }
 
 HRESULT EditorApp::Destruct_IMGUI() {
-  GAME->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
-  GAME->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
+    GAME_INSTANCE->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
+    GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
 
-  ImGui_ImplDX11_Shutdown();
-  ImGui_ImplWin32_Shutdown();
-  ImGui::DestroyContext();
+    GAME_INSTANCE->DestroyInstance();
 
-  return S_OK;
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
+    return S_OK;
 }

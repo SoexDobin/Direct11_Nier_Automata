@@ -34,7 +34,7 @@ const wstring &PrototypeManager::Get_NameByType(uint32 typeID) {
 }
 
 HRESULT PrototypeManager::Initialize(void* arg) {
-  m_LevelCount = arg == nullptr ? 0 : reinterpret_cast<uintptr_t>(arg);
+  m_LevelCount = arg == nullptr ? 0 : *static_cast<uintptr_t*>(arg);
 
   m_NameByTypes.resize(m_LevelCount);
   m_TypesByName.resize(m_LevelCount);
@@ -203,7 +203,7 @@ void PrototypeManager::Register_Type(
 Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {
   auto prototypeManager = make_unique<PrototypeManager>();
 
-  if (FAILED(prototypeManager->Initialize(reinterpret_cast<void *>(levCount)))) {
+  if (FAILED(prototypeManager->Initialize(&levCount))) {
         MSG_BOX("Failed To Create PrototypeManager");
         return nullptr;
   }
@@ -212,11 +212,11 @@ Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {
 }
 
 Bool PrototypeManager::Validate_Level(uint32 levIndex) const {
-  if (levIndex >= m_LevelCount) {
-    LOG_ERROR(L"{}: Out Of Level", m_ObjectName);
-    MSG_BOX("Out Of Level Count");
-    return false;
-  }
+  //if (levIndex >= m_LevelCount) {
+  //  LOG_ERROR(L"{}: Out Of Level", m_ObjectName);
+  //  MSG_BOX("Out Of Level Count");
+  //  return false;
+  //}
 
   return true;
 }

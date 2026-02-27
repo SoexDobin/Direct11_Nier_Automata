@@ -43,9 +43,9 @@ public: /* For GraphicDevice */
   HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
   HRESULT Present() const;
   HRESULT OnResize(uint32 width, uint32 height);
-  HRESULT Begin_RenderOffScreen(const wstring &rtTag) const;
+  HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
   HRESULT End_RenderOffScreen() const;
-  ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(const wstring &rtTag) const;
+  ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
 
 public: /* For TimeManager */
   HRESULT Add_Timer(const wstring &timerTag) const;
@@ -81,6 +81,7 @@ public: /* For Renderer */
   void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
 
 public: /* For Pipeline */
+	HRESULT Bind_CameraPosition(const Shared<class Shader>& shader, const Char* constantName) const;
     HRESULT Bind_TransformMatrix(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
     HRESULT Bind_TransformMatrix_Inverse(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
 	Matrix Get_Transform(D3DTS transformState) const;
@@ -113,8 +114,8 @@ public:
     PROTOTYPE typeTag = std::is_base_of_v<class GameObject, T>
                             ? PROTOTYPE::GAMEOBJECT
                             : PROTOTYPE::COMPONENT;
-    const wstring &className = Helper::To_wString(typeid(T).name());
-    if (auto instance = Instantiate_Internal(typeTag, level, className, arg)) {
+	auto typeInfo = Helper::To_wString(rttr::type::get<T>().get_name().to_string());
+    if (auto instance = Instantiate_Internal(typeTag, level, typeInfo, arg)) {
       return static_pointer_cast<T>(instance);
     }
     return nullptr;

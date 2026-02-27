@@ -19,8 +19,6 @@ private:
 
 private:
 	Bool m_PlayMode = { false };
-	wstring editorViewTag = {};
-	wstring gameViewTag = {};
 
 public:
 	static Shared<EditorView> Create();

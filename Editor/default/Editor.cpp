@@ -62,9 +62,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
       }
     }
 
-    if (g_ResizePending && GAME)
+    if (g_ResizePending && GAME_INSTANCE)
     {
-        GAME->OnResize(g_PendingWidth, g_PendingHeight);
+        GAME_INSTANCE->OnResize(g_PendingWidth, g_PendingHeight);
         g_ResizePending = false;
     }
 

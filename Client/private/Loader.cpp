@@ -3,6 +3,12 @@
 #include "SpdLogger.h"
 
 #include "ClientSettingManager.h"
+#include "Game.h"
+
+#include "Texture.h"
+#include "Shader.h"
+#include "Terrain.h"
+#include "VIBuffer_Terrain.h"
 
 
 Loader::Loader(const ComPtr<ID3D11Device> &device,
@@ -28,20 +34,20 @@ uint32 APIENTRY ThreadMain(void* arg)
 }
 HRESULT Loader::Initialize(void *arg) 
 {
-    m_NextLevelID = static_cast<LEVEL>(reinterpret_cast<size_t>(arg));
+    m_NextLevelID = *static_cast<LEVEL*>(arg);
     InitializeCriticalSection(&m_CriticalSection);
 
 	auto pSharedPtrToPass = new Shared<Loader>(shared_from_this());
 
-  m_Thread = reinterpret_cast<HANDLE>(
+	m_Thread = reinterpret_cast<HANDLE>(
       _beginthreadex(nullptr, 0, ThreadMain, pSharedPtrToPass, 0, nullptr));
 
-  if (m_Thread == nullptr) {
-      delete pSharedPtrToPass; // 실패 시 메모리 해제
-      return E_FAIL;
-  }
+    if (m_Thread == nullptr) {
+        delete pSharedPtrToPass; // 실패 시 메모리 해제
+        return E_FAIL;
+    }
   
-  return Level::Initialize(arg);
+	return Level::Initialize(arg);
 }
 
 void Loader::On_Destroy() {
@@ -52,7 +58,10 @@ void Loader::On_Destroy() {
   Level::On_Destroy();
 }
 
-void Loader::Update_Level(Float timeDelta) { Level::Update_Level(timeDelta); }
+void Loader::Update_Level(Float timeDelta)
+{
+	Level::Update_Level(timeDelta);
+}
 
 HRESULT Loader::Loading() {
   HRESULT hr = {};
@@ -94,8 +103,30 @@ HRESULT Loader::Loading_For_LogoLevel() {
     if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::LOGO)))
     {
         LOG_ERROR(L"Failed To Load Level Texture");
+        m_isFinished = true;
         return E_FAIL;
     }
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+        Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+            L"C:\Users\a9018\Desktop\Direct11_Nier_Automata\Client\bin\resources\lev0_static\texture\Terrain\Tile0.dds", 1))))
+        return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+        Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+            L"C:\Users\a9018\Desktop\Direct11_Nier_Automata\Client\bin\shaders\Shader_VtxNormTex.hlsl",
+            VTXNORMTEX::Elemnets, VTXNORMTEX::numElements))))
+        return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+        VIBuffer_Terrain::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+            L"C:\Users\a9018\Desktop\Direct11_Nier_Automata\Client\bin\resources\lev0_static\texture\Terrain\Height.bmp"))))
+        return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+        Terrain::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()))))
+        return E_FAIL;
+
 
 	m_isFinished = true;
 	return S_OK;
@@ -120,16 +151,40 @@ HRESULT Loader::Loading_Global_Prototype()
     m_isFinished = false;
 
     lstrcpy(m_LoadingText, TEXT("Loading Static Level... "));
+    lstrcpy(m_LoadingText, TEXT("Loading Static Level Texture... "));
     if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::STATIC)))
     {
         LOG_ERROR(L"Failed To Load Global Texture");
         return E_FAIL;
     }
+    lstrcpy(m_LoadingText, TEXT("Loading Static Level Shader... "));
     if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
     {
         LOG_ERROR(L"Failed To Load Shader");
         return E_FAIL;
     }
+
+    lstrcpy(m_LoadingText, TEXT("Loading Static Level Shader... "));
+ 
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+        Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), 
+            L"C:\Users\a9018\Desktop\Direct11_Nier_Automata\Client\bin\resources\lev0_static\texture\Terrain\Tile0.dds", 1))))
+		return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+        Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), 
+            L"C:\Users\a9018\Desktop\Direct11_Nier_Automata\Client\bin\shaders\Shader_VtxNormTex.hlsl", 
+            VTXNORMTEX::Elemnets, VTXNORMTEX::numElements))))
+        return E_FAIL;
+
+	if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+	VIBuffer_Terrain::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), 
+        L"C:\Users\a9018\Desktop\Direct11_Nier_Automata\Client\bin\resources\lev0_static\texture\Terrain\Height.bmp"))))
+		return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+        Terrain::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()))))
+        return E_FAIL;
 
     m_isFinished = true;
     return S_OK;
@@ -139,7 +194,7 @@ Shared<Loader> Loader::Create(const ComPtr<ID3D11Device> &device, const ComPtr<I
 {
     Shared<Loader> loader = make_shared<Loader>(device, context);
 
-    if (FAILED(loader->Initialize(reinterpret_cast<void*>(nextLevelID)))) {
+    if (FAILED(loader->Initialize(&nextLevelID))) {
 		MSG_BOX("Failed to Created : Loader");
     }
 

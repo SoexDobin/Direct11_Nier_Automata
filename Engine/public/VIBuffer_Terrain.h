@@ -3,16 +3,16 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL VIBuffer_Terrain final : public VIBuffer
+class ENGINE_DLL VIBuffer_Terrain final : public VIBuffer, public enable_shared_from_this<VIBuffer_Terrain>
 {
 public:
 	VIBuffer_Terrain();
 	VIBuffer_Terrain(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	VIBuffer_Terrain(const Shared<VIBuffer_Terrain>& rhs);
-	~VIBuffer_Terrain() override;
+	~VIBuffer_Terrain() override = default;
 
 public:
-	HRESULT Initialize_Prototype() override;
+	HRESULT Initialize_Prototype(const tChar* pHeightMapFilePath);
 	HRESULT Initialize(void* arg = nullptr) override;
 
 public:
@@ -27,7 +27,7 @@ private:
 	uint32 m_NumVerticesZ = {};
 
 public:
-	static Shared<VIBuffer_Terrain> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	static Shared<VIBuffer_Terrain> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const tChar* heightMapFilePath = L"");
 	Shared<Component> Clone(void* arg = nullptr) override;
 };
 

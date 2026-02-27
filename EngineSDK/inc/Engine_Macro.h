@@ -4,7 +4,7 @@
 namespace Engine
 {
 #define ETOI(ENUM)              static_cast<unsigned int>(ENUM)
-#define GAME                    Engine::Game::GetInstance()
+#define GAME_INSTANCE                    Engine::Game::GetInstance()
 
 #ifndef MSG_BOX
 #define MSG_BOX(_message)                                                      \

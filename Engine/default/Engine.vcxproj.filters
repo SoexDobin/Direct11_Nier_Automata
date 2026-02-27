@@ -100,6 +100,9 @@
     <Filter Include="00. System\02. Input">
       <UniqueIdentifier>{d605d215-6d7c-4cae-99d5-1628d70cdcaa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. GameObject\Camera">
+      <UniqueIdentifier>{2ecade7c-1d29-4f16-aa17-9e8ee7142afb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -218,6 +221,9 @@
     <ClInclude Include="..\public\InputDevice.h">
       <Filter>00. System\02. Input</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera.h">
+      <Filter>01. Utility\04. GameObject\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -297,6 +303,9 @@
     </ClCompile>
     <ClCompile Include="..\private\InputDevice.cpp">
       <Filter>00. System\02. Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera.cpp">
+      <Filter>01. Utility\04. GameObject\Camera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

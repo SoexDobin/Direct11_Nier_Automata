@@ -26,9 +26,9 @@ public:
 
 public:
 	HRESULT Loading();
+	HRESULT Print_LoadingText();
 
 private:
-	HRESULT Print_LoadingText();
 	HRESULT Loading_For_LogoLevel();
 	HRESULT Loading_For_GamePlayLevel();
 	HRESULT Loading_Global_Prototype();
@@ -38,7 +38,7 @@ private:
 	LEVEL				m_NextLevelID = {LEVEL::LEVEL_END};
 	CRITICAL_SECTION	m_CriticalSection = {};
 	tChar				m_LoadingText[MAX_PATH] = {};
-	BOOL				m_isFinished = { false };
+	atomic<BOOL>		m_isFinished = { false };
 
 public:
 	static Shared<Loader> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);

@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <concepts>
 
 
 #include <d3d11.h>
@@ -47,7 +48,12 @@
 #endif
 
 #include "magic_enum/magic_enum.hpp"
+
+#pragma warning(push)
+#pragma warning(disable: 26819) 
 #include <nlohmann/json.hpp>
+#pragma warning(pop)
+
 #pragma warning(push)
 #pragma warning(disable : 26495) // Code Analysis: Variable is uninitialized
 #pragma warning(disable : 26439) // Code Analysis: Function may not throw

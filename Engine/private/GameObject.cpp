@@ -20,7 +20,7 @@ GameObject::GameObject(const Shared<GameObject> &prototype)
   for (auto &pair : prototype->m_Scripts) {
     m_Scripts.emplace(pair.first, pair.second->Clone(nullptr));
   }
-
+  
   m_Transform = Get_Component<Transform>();
 }
 

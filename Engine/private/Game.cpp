@@ -105,6 +105,8 @@ void Game::Update_Engine()
   }
 
   m_ObjectManager->Cleanup_GameObjects();
+
+  m_LevelManager->Update(delta);
 }
 
 HRESULT Game::Draw() {
@@ -141,17 +143,15 @@ HRESULT Game::OnResize(uint32 width, uint32 height) {
   return m_GraphicDevice->OnResize(width, height);
 }
 
-HRESULT Game::Begin_RenderOffScreen(const wstring &rtTag) const {
-  return m_GraphicDevice->Begin_RenderOffScreen(rtTag);
+HRESULT Game::Begin_RenderOffScreen(uint32 screenIndex) const {
+  return m_GraphicDevice->Begin_RenderOffScreen(screenIndex);
 }
-
 HRESULT Game::End_RenderOffScreen() const {
   return m_GraphicDevice->End_RenderOffScreen();
 }
-
 ComPtr<ID3D11ShaderResourceView>
-Game::Get_OffScreenSRV(const wstring &rtTag) const {
-  return m_GraphicDevice->Get_OffscreenSRV(rtTag);
+Game::Get_OffScreenSRV(uint32 screenIndex) const {
+  return m_GraphicDevice->Get_OffscreenSRV(screenIndex);
 }
 
 HRESULT Game::Add_Timer(const wstring &timerTag) const {
@@ -176,8 +176,7 @@ HRESULT Game::Change_Level(uint32 levIndex, Unique<Level> newLevel) {
   return S_OK;
 }
 
-HRESULT Game::Add_Prototype(uint32 levIndex,
-                            const Shared<Object> &prototype) const {
+HRESULT Game::Add_Prototype(uint32 levIndex, const Shared<Object> &prototype) const {
   if (FAILED(m_PrototypeManager->Add_Prototype(levIndex, prototype))) {
     return E_FAIL;
   }
@@ -197,6 +196,11 @@ HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
 void Game::Add_RenderGroup(RENDERGROUP group,
                            const Shared<GameObject> &gameObject) const {
   m_Renderer->Add_RenderGroup(group, gameObject);
+}
+
+HRESULT Game::Bind_CameraPosition(const Shared<class Shader>& shader, const Char* constantName) const
+{
+	return m_Pipeline->Bind_CameraPosition(shader, constantName);
 }
 
 HRESULT Game::Bind_TransformMatrix(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState)

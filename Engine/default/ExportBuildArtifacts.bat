@@ -8,11 +8,14 @@ echo.
 
 echo ===== [1/4] Copying Engine.lib to EngineSDK\lib =====
 xcopy /Y /I "..\bin\Engine.lib"				"..\..\EngineSDK\lib\"
+xcopy /Y /I "..\external\vcpkg_installed\x64-windows\debug\lib\*.lib*"  "..\..\EngineSDK\lib\"
+xcopy /Y /I "..\external\vcpkg_installed\x64-windows\lib\*.lib*"        "..\..\EngineSDK\lib\"
 echo =================================================
 echo.
 
 echo ===== [2/4] Copying Engine headers to EngineSDK\inc ===== 
 xcopy /Y /I		"..\public\*.h*"			"..\..\EngineSDK\inc\"
+xcopy /Y /I		"..\private\*.inl"			"..\..\EngineSDK\inc\"
 xcopy /Y /I /E "..\external\FMOD"			"..\..\EngineSDK\inc\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\include" "..\..\EngineSDK\inc\"
 echo =================================================
@@ -20,11 +23,19 @@ echo.
 
 echo ===== [3/4] Copying Engine.dll to Client\bin ===== 
 xcopy /Y /I "..\bin\Engine.dll"            "..\..\Client\bin\"
+xcopy /Y /I "..\bin\Engine.dll"            "..\..\Editor\bin\"
+xcopy /Y /I /E "..\external\FMOD\*.dll*"  "..\..\Client\bin\"
+xcopy /Y /I /E "..\external\FMOD\*.dll*"  "..\..\Editor\bin\"
+xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Client\bin\"
+xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Editor\bin\"
+xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\bin\*.dll*"  "..\..\Client\bin\"
+xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\bin\*.dll*"  "..\..\Editor\bin\"
 echo =================================================
 echo.
 
 echo ===== [4/4] Copying Engine.pdb to Client\bin =====
 xcopy /Y /I "..\bin\Engine.pdb"            "..\..\Client\bin\"
+xcopy /Y /I "..\bin\Engine.pdb"            "..\..\Editor\bin\"
 echo =================================================
 echo.
 

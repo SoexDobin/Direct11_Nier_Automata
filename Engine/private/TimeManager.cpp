@@ -1,6 +1,13 @@
 #include "TimeManager.h"
 #include "Timer.h"
 
+
+TimeManager::~TimeManager()
+{
+	m_Timers.clear();
+}
+
+
 HRESULT TimeManager::Initialize()
 {
 	m_MainTimer = Timer::Create();
@@ -18,12 +25,6 @@ Float TimeManager::Update_Timers() const
 	}
 
 	return m_MainTimer->Update_Timer();
-}
-
-Float TimeManager::Is_FixedUpdate()
-{
-	m_HasFixedUpdate = false;
-	return m_MainTimer->IsFixedUpdate();
 }
 
 Shared<Timer> TimeManager::Get_MainTimer() const
@@ -71,6 +72,13 @@ HRESULT TimeManager::Remove_Timer(const wstring& key)
 
 	m_Timers.erase(key);
 	return S_OK;
+}
+
+Bool TimeManager::Has_FixedUpdate()
+{
+	Bool hasFixedUpdate = m_MainTimer->IsFixedUpdate();
+	m_HasFixedUpdate = hasFixedUpdate;
+	return hasFixedUpdate;
 }
 
 Unique<TimeManager> TimeManager::Create()

@@ -1,0 +1,16 @@
+{
+    "name": "dx11-editor",
+    "version-string": "1.0.0",
+    "dependencies": [
+        {
+            "name": "imgui",
+            "features": [
+                "dx11-binding",
+                "win32-binding",
+                "docking-experimental"
+            ]
+        },
+        "imguizmo",
+        "rttr"
+    ]
+}

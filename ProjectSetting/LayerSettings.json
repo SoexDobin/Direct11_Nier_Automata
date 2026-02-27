@@ -1,0 +1,137 @@
+{
+  "layers": [
+    {
+      "bit": 0,
+      "name": "Static"
+    },
+    {
+      "bit": 1,
+      "name": "LAYER1"
+    },
+    {
+      "bit": 2,
+      "name": "LAYER2"
+    },
+    {
+      "bit": 4,
+      "name": "LAYER3"
+    },
+    {
+      "bit": 8,
+      "name": "LAYER4"
+    },
+    {
+      "bit": 16,
+      "name": "LAYER5"
+    },
+    {
+      "bit": 32,
+      "name": "LAYER6"
+    },
+    {
+      "bit": 64,
+      "name": "LAYER7"
+    },
+    {
+      "bit": 128,
+      "name": "LAYER7"
+    },
+    {
+      "bit": 256,
+      "name": "LAYER8"
+    },
+    {
+      "bit": 512,
+      "name": "LAYER9"
+    },
+    {
+      "bit": 1024,
+      "name": "LAYER10"
+    },
+    {
+      "bit": 2048,
+      "name": "LAYER11"
+    },
+    {
+      "bit": 4096,
+      "name": "LAYER12"
+    },
+    {
+      "bit": 8192,
+      "name": "LAYER13"
+    },
+    {
+      "bit": 16384,
+      "name": "LAYER14"
+    },
+    {
+      "bit": 32768,
+      "name": "LAYER15"
+    },
+    {
+      "bit": 65536,
+      "name": "LAYER16"
+    },
+    {
+      "bit": 131072,
+      "name": "LAYER17"
+    },
+    {
+      "bit": 262144,
+      "name": "LAYER18"
+    },
+    {
+      "bit": 524288,
+      "name": "LAYER19"
+    },
+    {
+      "bit": 1048576,
+      "name": "LAYER20"
+    },
+    {
+      "bit": 2097152,
+      "name": "LAYER21"
+    },
+    {
+      "bit": 4194304,
+      "name": "LAYER22"
+    },
+    {
+      "bit": 8388608,
+      "name": "LAYER23"
+    },
+    {
+      "bit": 16777216,
+      "name": "LAYER24"
+    },
+    {
+      "bit": 33554432,
+      "name": "LAYER25"
+    },
+    {
+      "bit": 67108864,
+      "name": "LAYER26"
+    },
+    {
+      "bit": 134217728,
+      "name": "LAYER27"
+    },
+    {
+      "bit": 268435456,
+      "name": "LAYER28"
+    },
+    {
+      "bit": 536870912,
+      "name": "LAYER29"
+    },
+    {
+      "bit": 1073741824,
+      "name": "LAYER30"
+    },
+    {
+      "bit": 2147483648,
+      "name": "LAYER31"
+    }
+  ],
+  "version": "1.0"
+}

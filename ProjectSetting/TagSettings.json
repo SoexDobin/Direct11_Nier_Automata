@@ -1,0 +1,137 @@
+{
+  "tags": [
+    {
+      "bit": 0,
+      "name": "TAG_0"
+    },
+    {
+      "bit": 1,
+      "name": "TAG_1"
+    },
+    {
+      "bit": 2,
+      "name": "TAG_2"
+    },
+    {
+      "bit": 4,
+      "name": "TAG_3"
+    },
+    {
+      "bit": 8,
+      "name": "TAG_4"
+    },
+    {
+      "bit": 16,
+      "name": "TAG_5"
+    },
+    {
+      "bit": 32,
+      "name": "TAG_6"
+    },
+    {
+      "bit": 64,
+      "name": "TAG_7"
+    },
+    {
+      "bit": 128,
+      "name": "TAG7"
+    },
+    {
+      "bit": 256,
+      "name": "TAG8"
+    },
+    {
+      "bit": 512,
+      "name": "TAG9"
+    },
+    {
+      "bit": 1024,
+      "name": "TAG10"
+    },
+    {
+      "bit": 2048,
+      "name": "TAG11"
+    },
+    {
+      "bit": 4096,
+      "name": "TAG12"
+    },
+    {
+      "bit": 8192,
+      "name": "TAG13"
+    },
+    {
+      "bit": 16384,
+      "name": "TAG14"
+    },
+    {
+      "bit": 32768,
+      "name": "TAG15"
+    },
+    {
+      "bit": 65536,
+      "name": "TAG16"
+    },
+    {
+      "bit": 131072,
+      "name": "TAG17"
+    },
+    {
+      "bit": 262144,
+      "name": "TAG18"
+    },
+    {
+      "bit": 524288,
+      "name": "TAG19"
+    },
+    {
+      "bit": 1048576,
+      "name": "TAG20"
+    },
+    {
+      "bit": 2097152,
+      "name": "TAG21"
+    },
+    {
+      "bit": 4194304,
+      "name": "TAG22"
+    },
+    {
+      "bit": 8388608,
+      "name": "TAG23"
+    },
+    {
+      "bit": 16777216,
+      "name": "TAG24"
+    },
+    {
+      "bit": 33554432,
+      "name": "TAG25"
+    },
+    {
+      "bit": 67108864,
+      "name": "TAG26"
+    },
+    {
+      "bit": 134217728,
+      "name": "TAG27"
+    },
+    {
+      "bit": 268435456,
+      "name": "TAG28"
+    },
+    {
+      "bit": 536870912,
+      "name": "TAG29"
+    },
+    {
+      "bit": 1073741824,
+      "name": "TAG30"
+    },
+    {
+      "bit": 2147483648,
+      "name": "TAG31"
+    }
+  ],
+  "version": "1.0"
+}

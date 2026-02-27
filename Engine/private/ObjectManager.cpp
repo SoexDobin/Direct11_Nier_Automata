@@ -1,147 +1,142 @@
 #include "ObjectManager.h"
 #include "GameObject.h"
 
-HRESULT ObjectManager::Initialize(const Shared<void>& arg)
-{
-	m_LayerMask = ETOI(LAYER::ALL_LAYER);
+HRESULT ObjectManager::Initialize(void *arg) {
+  m_LayerMask = ETOI(LAYER::ALL_LAYER);
 
-	return EngineManager::Initialize(arg);
+  return EngineManager::Initialize(arg);
 }
 
-void ObjectManager::On_Destroy()
-{
-	Clear_GameObjects();
+void ObjectManager::On_Destroy() {
+  Clear_GameObjects();
 
-	EngineManager::On_Destroy();
+  EngineManager::On_Destroy();
 }
 
-void ObjectManager::PriorityUpdate(Float timeDelta)
-{
-	for (auto& [layerBit, objects] : m_ObjectByLayer)
-	{
-		if ((m_LayerMask & layerBit) == 0)
-			continue;
+void ObjectManager::PriorityUpdate(Float timeDelta) {
+  for (auto &[layerBit, objects] : m_ObjectByLayer) {
+    if ((m_LayerMask & layerBit) == 0)
+      continue;
 
-		for (auto it = objects.begin(); it != objects.end(); )
-		{
-			auto& obj = *it;
-			
-			if (obj->Is_Destroy())
-			{
-				m_ObjectByType[obj->Get_TypeID()].remove(obj);
-				m_ObjectByUnique.erase(obj->Get_ObjectID());
-				it = objects.erase(it);
-				continue;
-			}
+    for (auto &obj : objects) {
+      if (obj->Is_Destroy())
+        continue;
 
-			if (obj->Is_Active())
-				obj->Priority_Update(timeDelta);
-
-			++it;
-		}
-	}
+      if (obj->Is_Active())
+        obj->Priority_Update(timeDelta);
+    }
+  }
 }
 
-void ObjectManager::Update(Float timeDelta)
-{
-	for (auto& [layerBit, objects] : m_ObjectByLayer)
-	{
-		if ((m_LayerMask & layerBit) == 0)
-			continue;
+void ObjectManager::Update(Float timeDelta) {
+  for (auto &[layerBit, objects] : m_ObjectByLayer) {
+    if ((m_LayerMask & layerBit) == 0)
+      continue;
 
-		for (auto& obj : objects)
-		{
-			if (obj->Is_Active())
-				obj->Update(timeDelta);
-		}
-	}
+    for (auto &obj : objects) {
+      if (obj->Is_Destroy())
+        continue;
+
+      if (obj->Is_Active())
+        obj->Update(timeDelta);
+    }
+  }
 }
 
-void ObjectManager::LateUpdate(Float timeDelta)
-{
-	for (auto& [layerBit, objects] : m_ObjectByLayer)
-	{
-		if ((m_LayerMask & layerBit) == 0)
-			continue;
+void ObjectManager::LateUpdate(Float timeDelta) {
+  for (auto &[layerBit, objects] : m_ObjectByLayer) {
+    if ((m_LayerMask & layerBit) == 0)
+      continue;
 
-		for (auto& obj : objects)
-		{
-			if (obj->Is_Active())
-				obj->Late_Update(timeDelta);
-		}
-	}
+    for (auto &obj : objects) {
+      if (obj->Is_Destroy())
+        continue;
+
+      if (obj->Is_Active())
+        obj->Late_Update(timeDelta);
+    }
+  }
 }
 
-void ObjectManager::FixedUpdate(Float fixedDelta)
-{
-	for (auto& [layerBit, objects] : m_ObjectByLayer)
-	{
-		if ((m_LayerMask & layerBit) == 0)
-			continue;
+void ObjectManager::FixedUpdate(Float fixedDelta) {
+  for (auto &[layerBit, objects] : m_ObjectByLayer) {
+    if ((m_LayerMask & layerBit) == 0)
+      continue;
 
-		for (auto& obj : objects)
-		{
-			if (obj->Is_Active())
-				obj->Fixed_Update(fixedDelta);
-		}
-	}
+    for (auto &obj : objects) {
+      if (obj->Is_Destroy())
+        continue;
+
+      if (obj->Is_Active())
+        obj->Fixed_Update(fixedDelta);
+    }
+  }
 }
 
-HRESULT ObjectManager::Add_GameObject(const Shared<GameObject>& object)
-{
-	m_ObjectByLayer[object->Get_LayerMask().Get_Layer()].push_back(object);
-	m_ObjectByType[object->Get_TypeID()].push_back(object);
-	m_ObjectByUnique.emplace(object->Get_ObjectID(), object);
-
-	return S_OK;
+void ObjectManager::Cleanup_GameObjects() {
+  for (auto &[layerBit, objects] : m_ObjectByLayer) {
+    std::erase_if(objects, [this](const Shared<GameObject> &object) {
+      if (object->Is_Destroy()) // 삭제 대상 처리
+      {
+        m_ObjectByUnique.erase(object->Get_ObjectID());
+        if (m_ObjectByType.contains(object->Get_TypeID())) {
+          auto &typeVec = m_ObjectByType[object->Get_TypeID()];
+          std::erase(typeVec, object);
+        }
+        object->On_Destroy();
+        return true;
+      }
+      return false;
+    });
+  }
 }
 
-HRESULT ObjectManager::Clear_GameObjects()
-{
-	for (auto& layer : m_ObjectByLayer)
-		layer.second.clear();
-	m_ObjectByType.clear();
+HRESULT ObjectManager::Add_GameObject(const Shared<GameObject> &object) {
+  m_ObjectByLayer[object->Get_LayerMask().Get_Layer()].push_back(object);
+  m_ObjectByType[object->Get_TypeID()].push_back(object);
+  m_ObjectByUnique.emplace(object->Get_ObjectID(), object);
 
-	for (auto& type : m_ObjectByType)
-		type.second.clear();
-	m_ObjectByUnique.clear();
-
-	m_LayerMask = ETOI(LAYER::ALL_LAYER);
-	return S_OK;
+  return S_OK;
 }
 
-Shared<GameObject> ObjectManager::Find_GameObjectByType(uint32 typeID)
-{
-	if (!m_ObjectByType.contains(typeID)
-		|| m_ObjectByType[typeID].empty())
-	{
-		MSG_BOX("Failed To Find GameObject By ObjectID");
-		return nullptr;
-	}
+HRESULT ObjectManager::Clear_GameObjects() {
+  for (auto &layer : m_ObjectByLayer)
+    layer.second.clear();
+  m_ObjectByType.clear();
 
-	return m_ObjectByType[typeID].front();
+  for (auto &type : m_ObjectByType)
+    type.second.clear();
+  m_ObjectByUnique.clear();
+
+  m_LayerMask = ETOI(LAYER::ALL_LAYER);
+  return S_OK;
 }
 
-Shared<GameObject> ObjectManager::Find_GameObjectByID(uint32 objectID)
-{
-	if (!m_ObjectByUnique.contains(objectID))
-	{
-		MSG_BOX("Failed To Find GameObject By ObjectID");
-		return nullptr;
-	}
+Shared<GameObject> ObjectManager::Find_GameObjectByType(uint32 typeID) {
+  if (!m_ObjectByType.contains(typeID) || m_ObjectByType[typeID].empty()) {
+    MSG_BOX("Failed To Find GameObject By ObjectID");
+    return nullptr;
+  }
 
-	return m_ObjectByUnique[objectID];
+  return m_ObjectByType[typeID].front();
 }
 
-Unique<ObjectManager> ObjectManager::Create()
-{
-	auto objectManager = make_unique<ObjectManager>();
+Shared<GameObject> ObjectManager::Find_GameObjectByID(uint32 objectID) {
+  if (!m_ObjectByUnique.contains(objectID)) {
+    MSG_BOX("Failed To Find GameObject By ObjectID");
+    return nullptr;
+  }
 
-	if (FAILED(objectManager->Initialize(nullptr)))
-	{
-		MSG_BOX("Failed To Create ObjectManager");
-		return nullptr;
-	}
+  return m_ObjectByUnique[objectID];
+}
 
-	return objectManager;
+Unique<ObjectManager> ObjectManager::Create() {
+  auto objectManager = make_unique<ObjectManager>();
+
+  if (FAILED(objectManager->Initialize(nullptr))) {
+    MSG_BOX("Failed To Create ObjectManager");
+    return nullptr;
+  }
+
+  return objectManager;
 }

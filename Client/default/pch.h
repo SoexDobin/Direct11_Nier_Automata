@@ -1,7 +1,7 @@
 #ifndef PCH_H
 #define PCH_H
 
-#include "framework.h"
+#include "Engine_Define.h"
 #include "Client_Define.h"
 
 #endif //PCH_H

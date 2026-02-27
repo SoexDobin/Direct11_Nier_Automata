@@ -139,7 +139,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;fmod_vc.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;$(ProjectDir)..\external\vcpkg_installed\x64-windows\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -172,7 +172,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;fmod_vc.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;$(ProjectDir)..\external\vcpkg_installed\x64-windows\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -191,8 +191,10 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <None Include="..\vcpkg.json" />
     <None Include="ExportBuildArtifacts.bat" />
     <None Include="GenerateRTTR.bat" />
+    <None Include="RTTRGenerator.py" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\Engine_Define.h" />
     <ClInclude Include="..\public\Engine_Enum.h" />
@@ -204,15 +206,18 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GraphicDevice.h" />
     <ClInclude Include="..\public\ID_Helper.h" />
+    <ClInclude Include="..\public\InputDevice.h" />
     <ClInclude Include="..\public\LayerRegistry.h" />
     <ClInclude Include="..\public\Level.h" />
     <ClInclude Include="..\public\LevelManager.h" />
     <ClInclude Include="..\public\EngineManager.h" />
     <ClInclude Include="..\public\Object.h" />
     <ClInclude Include="..\public\ObjectManager.h" />
+    <ClInclude Include="..\public\Pipeline.h" />
     <ClInclude Include="..\public\PrototypeManager.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
+    <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
     <ClInclude Include="..\public\String_Helper.h" />
     <ClInclude Include="..\public\TagRegistry.h" />
@@ -220,34 +225,39 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\TimeManager.h" />
     <ClInclude Include="..\public\Timer.h" />
     <ClInclude Include="..\public\Transform.h" />
-    <ClInclude Include="..\public\Type_Helper.h" />
+    <ClInclude Include="..\public\UIObject.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
     <ClInclude Include="..\public\VIBuffer_Rect.h" />
+    <ClInclude Include="..\public\VIBuffer_Terrain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
-    <ClCompile Include="..\private\GameObject.inl" />
-    <ClCompile Include="..\private\Game.inl" />
     <ClCompile Include="..\private\GraphicDevice.cpp" />
+    <ClCompile Include="..\private\InputDevice.cpp" />
     <ClCompile Include="..\private\LayerRegistry.cpp" />
     <ClCompile Include="..\private\Level.cpp" />
     <ClCompile Include="..\private\LevelManager.cpp" />
     <ClCompile Include="..\private\EngineManager.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
     <ClCompile Include="..\private\ObjectManager.cpp" />
+    <ClCompile Include="..\private\Pipeline.cpp" />
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
+    <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />
     <ClCompile Include="..\private\TagRegistry.cpp" />
     <ClCompile Include="..\private\Texture.cpp" />
     <ClCompile Include="..\private\TimeManager.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />
+    <ClCompile Include="..\private\UIObject.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

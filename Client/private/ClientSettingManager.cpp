@@ -31,7 +31,8 @@ HRESULT ClientSettingManager::Load_EngineDesc() const
 	file >> json;
 	file.close();
 
-	g_projectSettings.levCount = json.value("levCount", ETOI(LEVEL::LOGO));
+	g_projectSettings.levelCount = ETOI(LEVEL::LEVEL_END);
+	g_projectSettings.startLevel = json.value("startLevel", ETOI(LEVEL::LOGO));
 	g_projectSettings.viewportWidth = json.value("viewportWidth", 1920);
 	g_projectSettings.viewportHeight = json.value("viewportHeight", 1080);
 	g_projectSettings.windowTitle = Helper::To_wString(json.value("windowTitle", "NieRAutomata"));

@@ -211,6 +211,10 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Level.h" />
     <ClInclude Include="..\public\LevelManager.h" />
     <ClInclude Include="..\public\EngineManager.h" />
+    <ClInclude Include="..\public\Light.h" />
+    <ClInclude Include="..\public\LightManager.h" />
+    <ClInclude Include="..\public\Mesh.h" />
+    <ClInclude Include="..\public\Model.h" />
     <ClInclude Include="..\public\Object.h" />
     <ClInclude Include="..\public\ObjectManager.h" />
     <ClInclude Include="..\public\Pipeline.h" />
@@ -241,6 +245,10 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Level.cpp" />
     <ClCompile Include="..\private\LevelManager.cpp" />
     <ClCompile Include="..\private\EngineManager.cpp" />
+    <ClCompile Include="..\private\Light.cpp" />
+    <ClCompile Include="..\private\LightManager.cpp" />
+    <ClCompile Include="..\private\Mesh.cpp" />
+    <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
     <ClCompile Include="..\private\ObjectManager.cpp" />
     <ClCompile Include="..\private\Pipeline.cpp" />

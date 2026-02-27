@@ -63,8 +63,8 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     return E_FAIL;
 
   if (nullptr ==
-      (m_PrototypeManager = PrototypeManager::Create(engineDesc.levCount))) {
-    return E_FAIL;
+      (m_PrototypeManager = PrototypeManager::Create(engineDesc.startLevel))) {
+  	return E_FAIL;
   }
 
   // RTTR 리플렉션을 통한 프로토타입 자동 등록
@@ -79,6 +79,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
 
   if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
     return E_FAIL;
+
+    if (nullptr == (m_LightManager = LightManager::Create()))
+		return E_FAIL;
 
   return S_OK;
 }
@@ -228,6 +231,19 @@ void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix)
 	m_Pipeline->Set_Transform(transformState, transformStateMatrix);
 }
 
+const LIGHT_DESC* Game::Get_LightDesc(uint32 index) const
+{
+	return m_LightManager->Get_LightDesc(index);
+}
+HRESULT Game::Add_Light(const LIGHT_DESC& lightDesc) const
+{
+    return m_LightManager->Add_Light(lightDesc);
+}
+HRESULT Game::Remove_Light(uint32 index) const
+{
+	return m_LightManager->Remove_Light(index);
+}
+
 Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID, uint32 levIndex) const
 {
     uint32 level = levIndex == MAXINT32
@@ -273,23 +289,25 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
                                           const wstring &className,
-                                          void *arg) const {
-  auto prototypeInstance =
-      m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
+                                          void *arg) const 
+{
+	auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
 
-  if (!prototypeInstance) {
-    return nullptr;
-  }
+	if (!prototypeInstance) 
+    {
+		return nullptr;
+	}
 
-  if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
-    auto gameObject =
-        static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
-    m_ObjectManager->Add_GameObject(gameObject);
+    if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
+		auto gameObject = static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
+		m_ObjectManager->Add_GameObject(gameObject);
 
-    return gameObject;
-  } else if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
-    return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
-  }
+		return gameObject;
+    } 
+
+    if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
+		return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
+    }
 
   LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
   MSG_BOX("Prototype Miss Match In Instantiate Internal");

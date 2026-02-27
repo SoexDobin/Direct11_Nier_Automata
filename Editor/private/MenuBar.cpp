@@ -46,7 +46,7 @@ void MenuBar::ViewEngineDesc() {
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Spacing();
-    ImGui::InputScalar("Start Level", ImGuiDataType_U32, &m_EngineDesc.levCount,
+    ImGui::InputScalar("Start Level", ImGuiDataType_U32, &m_EngineDesc.startLevel,
                        nullptr, nullptr, "%u");
     ImGui::Spacing();
     // Save Button
@@ -67,7 +67,7 @@ HRESULT MenuBar::Load_EngineDesc() {
       m_EngineDesc.windowTitle = L"client";
       m_EngineDesc.viewportWidth = 1280;
       m_EngineDesc.viewportHeight = 720;
-      m_EngineDesc.levCount = 0;
+      m_EngineDesc.startLevel = 0;
       strcpy_s(m_Title, "client");
       return Save_EngineDesc();
     }
@@ -77,7 +77,7 @@ HRESULT MenuBar::Load_EngineDesc() {
     m_EngineDesc.windowTitle = Helper::To_wString(title);
     m_EngineDesc.viewportWidth = json.value("viewportWidth", 1280u);
     m_EngineDesc.viewportHeight = json.value("viewportHeight", 720u);
-    m_EngineDesc.levCount = json.value("levCount", 0u);
+    m_EngineDesc.startLevel = json.value("startLevel", 0u);
 
     // Sync m_Title buffer from loaded windowTitle
     strcpy_s(m_Title, title.c_str());
@@ -86,7 +86,7 @@ HRESULT MenuBar::Load_EngineDesc() {
     m_EngineDesc.windowTitle = L"client";
     m_EngineDesc.viewportWidth = 1280;
     m_EngineDesc.viewportHeight = 720;
-    m_EngineDesc.levCount = 0;
+    m_EngineDesc.startLevel = 0;
     strcpy_s(m_Title, "client");
     return Save_EngineDesc();
   }
@@ -111,7 +111,7 @@ HRESULT MenuBar::Save_EngineDesc() {
     json["windowTitle"] = string(m_Title);
     json["viewportWidth"] = m_EngineDesc.viewportWidth;
     json["viewportHeight"] = m_EngineDesc.viewportHeight;
-    json["levCount"] = m_EngineDesc.levCount;
+    json["startLevel"] = m_EngineDesc.startLevel;
     file << json.dump(4);
   } catch (const std::exception &e) {
     LOG_CRITICAL(L"Save Failed: {}", Helper::To_wString(e.what()));

@@ -103,6 +103,18 @@
     <Filter Include="01. Utility\04. GameObject\Camera">
       <UniqueIdentifier>{2ecade7c-1d29-4f16-aa17-9e8ee7142afb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\08. Light">
+      <UniqueIdentifier>{28d87559-8c01-48c7-82b3-dbf6007d678d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\08. Light\Manager">
+      <UniqueIdentifier>{d160b7ab-e9f1-4358-8edc-c9dad4309111}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Model">
+      <UniqueIdentifier>{651fcdc6-a7ce-4e46-ac6e-8c8272c4bfdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer\Mesh">
+      <UniqueIdentifier>{aca5f482-fe70-44c1-8cf7-0f225b986a41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -224,6 +236,16 @@
     <ClInclude Include="..\public\Camera.h">
       <Filter>01. Utility\04. GameObject\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Light.h">
+      <Filter>01. Utility\08. Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LightManager.h">
+      <Filter>01. Utility\08. Light\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Mesh.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Model.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -307,5 +329,15 @@
     <ClCompile Include="..\private\Camera.cpp">
       <Filter>01. Utility\04. GameObject\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Light.cpp">
+      <Filter>01. Utility\08. Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LightManager.cpp">
+      <Filter>01. Utility\08. Light\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Mesh.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Model.cpp" />
   </ItemGroup>
 </Project>

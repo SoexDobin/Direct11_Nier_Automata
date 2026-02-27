@@ -26,16 +26,16 @@ HRESULT VIBuffer_Rect::Initialize_Prototype() {
 
   VTXTEX *vertices = new VTXTEX[m_NumVertices];
   vertices[0].position = Float3(-0.5f, 0.5f, 0.f);
-  vertices[0].texCoord = Float2(0.f, 0.f);
+  vertices[0].texcoord = Float2(0.f, 0.f);
 
   vertices[1].position = Float3(0.5f, 0.5f, 0.f);
-  vertices[1].texCoord = Float2(1.f, 0.f);
+  vertices[1].texcoord = Float2(1.f, 0.f);
 
   vertices[2].position = Float3(0.5f, -0.5f, 0.f);
-  vertices[2].texCoord = Float2(1.f, 1.f);
+  vertices[2].texcoord = Float2(1.f, 1.f);
 
   vertices[3].position = Float3(-0.5f, -0.5f, 0.f);
-  vertices[3].texCoord = Float2(0.f, 1.f);
+  vertices[3].texcoord = Float2(0.f, 1.f);
 
   D3D11_SUBRESOURCE_DATA vtxInitialData = {};
   vtxInitialData.pSysMem = vertices;

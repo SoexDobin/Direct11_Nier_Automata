@@ -1,14 +1,15 @@
-#pragma once
+﻿#pragma once
 #include "VIBuffer.h"
 
 NS_BEGIN(Engine)
 
 class ENGINE_DLL Mesh final : public VIBuffer, public enable_shared_from_this<Mesh>
 {
+	RTTR_ENABLE(VIBuffer)
 public:
 	Mesh();
 	Mesh(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	Mesh(const Shared<Mesh>& rhs);
+	Mesh(const Mesh& rhs);
 	~Mesh() override = default;
 
 public:

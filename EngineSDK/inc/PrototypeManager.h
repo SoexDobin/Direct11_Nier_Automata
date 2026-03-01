@@ -27,7 +27,9 @@ public:
                             const ComPtr<ID3D11DeviceContext> &context);
   HRESULT Add_Prototype(uint32 levIndex, const Shared<Object> &object,
                         void *arg = nullptr);
+  HRESULT Clear_Prototypes();
   HRESULT Clear_Prototypes(uint32 levIndex);
+  
 
 public: /* 읽기 전용 Getter (Game 래핑용) */
   const vector<unordered_map<uint32, Shared<GameObject>>> &
@@ -49,12 +51,13 @@ public:
                                 const wstring &typeName) const;
 
 private:
-  vector<unordered_map<uint32, wstring>> m_NameByTypes;
-  vector<unordered_map<wstring, uint32>> m_TypesByName;
-  vector<unordered_map<uint32, Shared<GameObject>>> m_GameObjects;
-  vector<unordered_map<uint32, Shared<Component>>> m_Components;
+    vector<unordered_map<uint32, wstring>> m_NameByTypes;
+    vector<unordered_map<wstring, uint32>> m_TypesByName;
+    vector<unordered_map<uint32, Shared<GameObject>>> m_GameObjects;
+    vector<unordered_map<uint32, Shared<Component>>> m_Components;
 
-  uint32 m_LevelCount = {};
+    uint32 m_LevelCount = {};
+    mutable std::recursive_mutex m_PrototypeMutex;
 
 private:
   void Register_Type(rttr::type type, PROTOTYPE protoType,

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Component.h"
 
 NS_BEGIN(Engine)
@@ -9,7 +9,7 @@ class ENGINE_DLL Model final : public Component, public enable_shared_from_this<
 public:
 	explicit Model();
 	explicit Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	explicit Model(const Shared<Model>& rhs);
+	explicit Model(const Model& rhs);
 	~Model() override = default;
 
 public:

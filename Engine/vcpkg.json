@@ -1,5 +1,5 @@
 {
-  "name": "dx11-framework",
+  "name": "dx11-engine",
   "version-string": "1.0.0",
   "dependencies": [
     "magic-enum",

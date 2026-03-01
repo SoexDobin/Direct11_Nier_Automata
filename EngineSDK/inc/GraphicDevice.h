@@ -22,18 +22,18 @@ public:
   ComPtr<ID3D11DeviceContext> Get_Context() const { return m_Context; }
 
 public:
-  PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
-  HRESULT Initialize(const ENGINE_DESC &engineDesc);
-  void On_Destroy() override;
-  HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
-  HRESULT Clear_DepthStencilView() const;
-  HRESULT Present() const;
-  HRESULT OnResize(uint32 width, uint32 height);
+    PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
+    HRESULT Initialize(const ENGINE_DESC &engineDesc);
+    void On_Destroy() override;
+    HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
+    HRESULT Clear_DepthStencilView() const;
+    HRESULT Present() const;
+    HRESULT OnResize(uint32 width, uint32 height);
 
 public:
-  HRESULT Begin_RenderOffScreen(uint32 screenIndex);
-  HRESULT End_RenderOffScreen();
-  ComPtr<ID3D11ShaderResourceView> Get_OffscreenSRV(uint32 screenIndex);
+    HRESULT Begin_RenderOffScreen(uint32 screenIndex);
+    HRESULT End_RenderOffScreen();
+    ComPtr<ID3D11ShaderResourceView> Get_OffscreenSRV(uint32 screenIndex);
 
 private:
   HRESULT Ready_SwapChain(HWND hWnd, WINMODE isWindowed, uint32 winSizeX, uint32 winSizeY);

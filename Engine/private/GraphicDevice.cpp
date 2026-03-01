@@ -87,10 +87,12 @@ HRESULT GraphicDevice::Clear_DepthStencilView() const {
 }
 
 HRESULT GraphicDevice::Present() const {
-  if (nullptr == m_SwapChain)
-    return E_FAIL;
+    if (nullptr == m_SwapChain)
+		return E_FAIL;
 
-  return m_SwapChain->Present(0, 0);
+    m_Context->OMSetRenderTargets(0, nullptr, nullptr);
+
+    return m_SwapChain->Present(0, 0);
 }
 
 HRESULT GraphicDevice::OnResize(uint32 width, uint32 height)
@@ -147,6 +149,9 @@ HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {
         return E_FAIL;
     }
 
+    ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+    m_Context->PSSetShaderResources(0, 1, nullSRV);
+
 	auto& rt = m_Offscreens[screenIndex];
 
     Float clearColor[4] = {0.2f, 0.2f, 0.2f, 1.f};
@@ -154,7 +159,7 @@ HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {
     m_Context->ClearDepthStencilView(
         m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0.f);
 
-    ID3D11RenderTargetView *RTVs[] = {rt.RTV.Get()};
+    ID3D11RenderTargetView* RTVs[] = {rt.RTV.Get()};
     m_Context->OMSetRenderTargets(1, RTVs, m_DSV.Get());
     m_Context->RSSetViewports(1, &rt.viewport);
 

@@ -1,12 +1,12 @@
-#include "Model.h"
+﻿#include "Model.h"
 #include "Mesh.h"
 
 Model::Model() : Component{} {}
 Model::Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Component{device, context} {}
 
-Model::Model(const Shared<Model>& rhs)
-	: Component{ rhs }, m_NumMeshes{ rhs->m_NumMeshes }, m_Meshes{ rhs->m_Meshes } {}
+Model::Model(const Model& rhs)
+	: Component{ rhs }, m_NumMeshes{ rhs.m_NumMeshes }, m_Meshes{ rhs.m_Meshes } {}
 
 HRESULT Model::Initialize_Prototype(const wstring& path)
 {
@@ -66,7 +66,7 @@ Shared<Model> Model::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3
 
 Shared<Component> Model::Clone(void* arg)
 {
-	auto model = make_shared<Model>(shared_from_this());
+	auto model = make_shared<Model>(*this);
 
 	if (FAILED(model->Initialize(arg)))
 	{

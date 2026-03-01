@@ -1,9 +1,7 @@
-#include "Component.h"
-
+﻿#include "Component.h"
 #include "ID_Helper.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
-
 
 Component::Component()
 {
@@ -13,8 +11,12 @@ Component::Component(const ComPtr<ID3D11Device> &pDevice,
                      const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(pDevice), m_Context(context) {}
 
-Component::Component(const Shared<Component> &prototype)
-    : Component(prototype->m_Device, prototype->m_Context) {}
+Component::Component(const Component& prototype)
+    : Component{prototype.m_Device, prototype.m_Context}
+{
+	m_ObjectName = prototype.m_ObjectName;
+	m_ObjectDesc.m_typeID = prototype.m_ObjectDesc.m_typeID;
+}
 
 HRESULT Component::Initialize_Prototype() {
   Helper::CreateID(Helper::OBJECT_ID_TYPE, m_ObjectDesc);
@@ -24,7 +26,7 @@ HRESULT Component::Initialize_Prototype() {
     return E_FAIL;
   }
 
-  m_ObjectName = Helper::To_wString(rttr::type::get(this).get_name().to_string());
+  m_ObjectName = Helper::To_wString(rttr::type::get(*this).get_name().to_string());
   if (m_ObjectName.empty()) {
     LOG_ERROR(L"Component Initialize Failed By Set Object Name");
     MSG_BOX("Component Initialize Failed By Set Object Name");

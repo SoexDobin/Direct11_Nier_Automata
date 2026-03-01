@@ -1,13 +1,14 @@
-#pragma once
+﻿#pragma once
 #include "VIBuffer.h"
 
 NS_BEGIN(Engine)
 
 class ENGINE_DLL VIBuffer_Rect final : public VIBuffer {
+    RTTR_ENABLE(VIBuffer)
 public:
     VIBuffer_Rect();
   VIBuffer_Rect(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-  VIBuffer_Rect(const Shared<VIBuffer_Rect>& rhs);
+  VIBuffer_Rect(const VIBuffer_Rect& rhs);
   ~VIBuffer_Rect() override = default;
 
 public:

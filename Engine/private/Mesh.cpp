@@ -1,9 +1,9 @@
-#include "Mesh.h"
+﻿#include "Mesh.h"
 
 Mesh::Mesh() : VIBuffer{} {}
 Mesh::Mesh(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: VIBuffer{ device, context } {}
-Mesh::Mesh(const Shared<Mesh>& rhs)
+Mesh::Mesh(const Mesh& rhs)
 	: VIBuffer{ rhs } {}
 
 HRESULT Mesh::Initialize_Prototype(void* aiMesh)
@@ -38,7 +38,7 @@ Shared<Mesh> Mesh::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D1
 
 Shared<Component> Mesh::Clone(void* arg)
 {
-	auto  mesh = make_shared<Mesh>(enable_shared_from_this<Mesh>::shared_from_this());
+	auto  mesh = make_shared<Mesh>(*this);
 
 	if (FAILED(mesh->Initialize(arg)))
 	{

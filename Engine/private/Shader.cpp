@@ -1,12 +1,12 @@
-#include "Shader.h"
+﻿#include "Shader.h"
 
 Shader::Shader() : Component{} {}
 Shader::Shader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
     : Component(device, context) {}
 
-Shader::Shader(const Shared<Shader> &rhs)
-    : Component(rhs), m_Effect{rhs->m_Effect}, m_NumPasses{rhs->m_NumPasses},
-      m_InputLayouts{rhs->m_InputLayouts} {}
+Shader::Shader(const Shader& rhs)
+    : Component(rhs), m_Effect{rhs.m_Effect}, m_NumPasses{rhs.m_NumPasses},
+      m_InputLayouts{rhs.m_InputLayouts} {}
 
 HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC *elements, uint32 numElements) 
 {
@@ -133,7 +133,7 @@ Shared<Shader> Shader::Create(const ComPtr<ID3D11Device> &device,
 }
 
 Shared<Component> Shader::Clone(void *arg) {
-	auto shader = make_shared<Shader>(shared_from_this());
+	auto shader = make_shared<Shader>(*this);
 
     if (FAILED(shader->Initialize(arg))) {
     	MSG_BOX("Failed To Cloned : Shader");

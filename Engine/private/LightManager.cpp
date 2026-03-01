@@ -38,6 +38,12 @@ HRESULT LightManager::Remove_Light(uint32 index)
 	return S_OK;
 }
 
+HRESULT LightManager::Clear_Lights()
+{
+	m_Lights.shrink_to_fit(); 
+	return S_OK; 
+}
+
 HRESULT LightManager::Initialize_Prototype() { return EngineManager::Initialize_Prototype(); }
 HRESULT LightManager::Initialize(void* arg) { return EngineManager::Initialize(arg); }
 void LightManager::On_Destroy()

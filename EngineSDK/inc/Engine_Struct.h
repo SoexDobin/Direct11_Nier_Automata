@@ -30,7 +30,7 @@ namespace Engine
 		float range = {};
 
 		Vector4 diffuse = {};
-		Vector4 Ambient = {};
+		Vector4 ambient = {};
 		Vector4 specular = {};
 	} LIGHT_DESC;
 

@@ -1,4 +1,4 @@
-#include "GameObject.h"
+﻿#include "GameObject.h"
 #include "Game.h"
 #include "ID_Helper.h"
 #include "SpdLogger.h"
@@ -10,18 +10,25 @@ GameObject::GameObject() {}
 GameObject::GameObject(const ComPtr<ID3D11Device> &device,
                        const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(device), m_Context(context) {}
-GameObject::GameObject(const Shared<GameObject> &prototype)
-    : m_Device(prototype->m_Device), m_Context(prototype->m_Context),
-      m_LayerMask(prototype->m_LayerMask), m_TagMask(prototype->m_TagMask) {
-  for (auto &pair : prototype->m_Components) {
-    m_Components.emplace(pair.first, pair.second->Clone(nullptr));
-  }
+GameObject::GameObject(const GameObject& prototype)
+    : m_Device(prototype.m_Device), m_Context(prototype.m_Context),
+      m_LayerMask(prototype.m_LayerMask), m_TagMask(prototype.m_TagMask) 
+{
+	m_ObjectName = prototype.m_ObjectName;
+	m_ObjectDesc.m_typeID = prototype.m_ObjectDesc.m_typeID;
 
-  for (auto &pair : prototype->m_Scripts) {
-    m_Scripts.emplace(pair.first, pair.second->Clone(nullptr));
-  }
-  
-  m_Transform = Get_Component<Transform>();
+	// TODO : Clone 시점에 부모 자식 관계는 어떻게 할 것인지 고민 필요
+	// TODO : Prototype의 자식들은 어떻게 할 것인지 고민 필요
+	// TODO : 이전 속성, 상태들은 어떻게 할거인지 고민 필요
+
+    for (auto &pair : prototype.m_Components) {
+		m_Components.emplace(pair.first, pair.second->Clone(nullptr));
+    }
+    for (auto &pair : prototype.m_Scripts) {
+		m_Scripts.emplace(pair.first, pair.second->Clone(nullptr));
+    }
+    
+    m_Transform = Get_Component<Transform>();
 }
 
 HRESULT GameObject::Initialize_Prototype() {
@@ -32,8 +39,7 @@ HRESULT GameObject::Initialize_Prototype() {
     return E_FAIL;
   }
 
-  m_ObjectName = Helper::To_wString(
-      rttr::detail::get_type_from_instance(this).get_name().to_string());
+  m_ObjectName = Helper::To_wString(rttr::type::get(*this).get_name().to_string());
   if (m_ObjectName.empty()) {
     LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
     MSG_BOX("GameObject Initialize Failed By Set Object Name");

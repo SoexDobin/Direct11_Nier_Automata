@@ -31,6 +31,9 @@
     <ClInclude Include="..\public\Terrain.h">
       <Filter>02. GameObject\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\FreeCamera.h">
+      <Filter>02. GameObject\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -56,6 +59,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Terrain.cpp">
       <Filter>02. GameObject\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Client_RTTR.cpp">
+      <Filter>00. MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FreeCamera.cpp">
+      <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +101,9 @@
     <Filter Include="02. GameObject\Terrain">
       <UniqueIdentifier>{9d488e4b-716c-4500-a17f-75dd1911dc79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Camera">
+      <UniqueIdentifier>{3dd8255e-639e-40e9-a996-130834996b2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl">
@@ -103,6 +115,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostBuildCopy.bat">
+      <Filter>99. Default</Filter>
+    </None>
+    <None Include="ClientRTTRGenerator.py">
+      <Filter>99. Default</Filter>
+    </None>
+    <None Include="GenerateRTTR_Client.bat">
       <Filter>99. Default</Filter>
     </None>
   </ItemGroup>

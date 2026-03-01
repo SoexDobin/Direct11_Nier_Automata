@@ -1,4 +1,4 @@
-#include "VIBuffer_Rect.h"
+﻿#include "VIBuffer_Rect.h"
 
 VIBuffer_Rect::VIBuffer_Rect()
 	: VIBuffer{} {}
@@ -6,7 +6,7 @@ VIBuffer_Rect::VIBuffer_Rect()
 VIBuffer_Rect::VIBuffer_Rect(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
     : VIBuffer{device, context} {}
 
-VIBuffer_Rect::VIBuffer_Rect(const Shared<VIBuffer_Rect>& rhs) : VIBuffer{rhs} {}
+VIBuffer_Rect::VIBuffer_Rect(const VIBuffer_Rect& rhs) : VIBuffer{rhs} {}
 
 HRESULT VIBuffer_Rect::Initialize_Prototype() {
   m_NumVtxBuffers = 1;

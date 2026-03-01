@@ -6,8 +6,7 @@ Renderer::Renderer(const ComPtr<ID3D11Device> &device,
                    const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(device), m_Context(context) {}
 
-void Renderer::Add_RenderGroup(RENDERGROUP renderGroup,
-                               const Shared<GameObject> &gameObject) {
+void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject> &gameObject) {
   m_RenderGroup[ETOI(renderGroup)].push_back(gameObject);
 }
 
@@ -15,6 +14,17 @@ void Renderer::Draw() {
   for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
     Render_Group(i);
   }
+}
+
+// TODO : draw call check clear group all frame
+HRESULT Renderer::Clear_RenderGroup()
+{
+    m_LayerMask = ETOI(LAYER::ALL_LAYER);
+
+    for (auto& group : m_RenderGroup)
+        group.shrink_to_fit();
+
+    return S_OK;
 }
 
 HRESULT Renderer::Initialize(void *arg) {
@@ -40,8 +50,8 @@ void Renderer::Render_Group(uint32 groupIndex) {
   for (auto &object : m_RenderGroup[groupIndex]) {
     uint32 objLayer = object->Get_LayerMask().Get_Layer();
 
-    if ((m_LayerMask & objLayer) == 0)
-      continue;
+    if ((m_LayerMask & objLayer) == 1)
+        continue;
 
     object->Render();
   }

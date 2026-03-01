@@ -69,6 +69,19 @@
                                                               ],
                                         "has_clone":  true
                                     },
+                    "FreeCamera":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "Camera",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Client",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "Loader":  {
                                    "members":  [
                                                    {
@@ -93,7 +106,7 @@
                                                        "access":  "private",
                                                        "default":  "false",
                                                        "name":  "m_isFinished",
-                                                       "type":  "atomic\u003cBOOL\u003e"
+                                                       "type":  "Bool"
                                                    }
                                                ],
                                    "base_class":  "Level",

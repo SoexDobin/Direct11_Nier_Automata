@@ -1,4 +1,4 @@
-#include "LoadingLogo.h"
+﻿#include "LoadingLogo.h"
 #include "pch.h"
 
 
@@ -10,7 +10,7 @@ LoadingLogo::LoadingLogo(const ComPtr<ID3D11Device> &device,
                          const ComPtr<ID3D11DeviceContext> &context)
     : UIObject(device, context) {}
 
-LoadingLogo::LoadingLogo(const Shared<LoadingLogo> &rhs) : UIObject(rhs) {}
+LoadingLogo::LoadingLogo(const LoadingLogo& rhs) : UIObject(rhs) {}
 
 HRESULT LoadingLogo::Initialize_Prototype() {
   return UIObject::Initialize_Prototype();

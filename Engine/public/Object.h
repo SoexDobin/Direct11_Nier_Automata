@@ -4,6 +4,7 @@
 NS_BEGIN(Engine)
 
 class ENGINE_DLL Object abstract {
+	RTTR_ENABLE()
 public:
 	Object();
 	virtual ~Object();

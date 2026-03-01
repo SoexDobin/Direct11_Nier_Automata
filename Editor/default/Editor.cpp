@@ -51,28 +51,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   if (nullptr == pEditorApp)
     return FALSE;
 
-  while (true) {
-    if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-      if (WM_QUIT == msg.message)
-        break;
+	while (true) {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+	    	if (WM_QUIT == msg.message)
+	    		break;
 
-      if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-      }
-    }
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
 
-    if (g_ResizePending && GAME_INSTANCE)
-    {
-        GAME_INSTANCE->OnResize(g_PendingWidth, g_PendingHeight);
-        g_ResizePending = false;
-    }
+        if (g_ResizePending && GAME_INSTANCE)
+        {
+            GAME_INSTANCE->OnResize(g_PendingWidth, g_PendingHeight);
+            g_ResizePending = false;
+        }
 
-    pEditorApp->Update();
-    pEditorApp->Render();
-  }
+        pEditorApp->Update();
+        pEditorApp->Render();
+	}
 
-  pEditorApp.reset();
+	pEditorApp.reset();
 
   return static_cast<int32>(msg.wParam);
 }

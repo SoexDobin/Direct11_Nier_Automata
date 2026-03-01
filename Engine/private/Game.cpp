@@ -53,23 +53,24 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   if (nullptr == (m_TimeManager = TimeManager::Create()))
     return E_FAIL;
 
-  if (nullptr == (m_InputDevice = InputDevice::Create(engineDesc.hWnd, engineDesc.hInst)))
-	  return E_FAIL;
+  if (nullptr ==
+      (m_InputDevice = InputDevice::Create(engineDesc.hWnd, engineDesc.hInst)))
+    return E_FAIL;
 
   if (nullptr == (m_Pipeline = Pipeline::Create()))
-	  return E_FAIL;
+    return E_FAIL;
 
   if (nullptr == (m_LevelManager = LevelManager::Create()))
     return E_FAIL;
 
   if (nullptr ==
-      (m_PrototypeManager = PrototypeManager::Create(engineDesc.startLevel))) {
-  	return E_FAIL;
+      (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount))) {
+    return E_FAIL;
   }
 
   // RTTR 리플렉션을 통한 프로토타입 자동 등록
-  if (FAILED(m_PrototypeManager->Create_Reflection(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context()))) 
-  {
+  if (FAILED(m_PrototypeManager->Create_Reflection(
+          m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context()))) {
     LOG_ERROR(L"Failed to Create RTTR Reflection in PrototypeManager");
   }
 
@@ -77,17 +78,18 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     return E_FAIL;
   }
 
-  if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
+  if (nullptr ==
+      (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),
+                                     m_GraphicDevice->Get_Context())))
     return E_FAIL;
 
-    if (nullptr == (m_LightManager = LightManager::Create()))
-		return E_FAIL;
+  if (nullptr == (m_LightManager = LightManager::Create()))
+    return E_FAIL;
 
   return S_OK;
 }
 
-void Game::Update_Engine() 
-{
+void Game::Update_Engine() {
   const Float delta = m_TimeManager->Update_Timers();
 
   m_InputDevice->Update();
@@ -101,21 +103,36 @@ void Game::Update_Engine()
   m_ObjectManager->LateUpdate(delta);
 
   while (m_TimeManager->Is_FixedUpdate()) {
-        Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
-        m_ObjectManager->FixedUpdate(fixedDelta);
-        m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
-        m_TimeManager->Has_FixedUpdate();
+    Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
+    m_ObjectManager->FixedUpdate(fixedDelta);
+    m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
+    m_TimeManager->Has_FixedUpdate();
   }
 
   m_ObjectManager->Cleanup_GameObjects();
 
   m_LevelManager->Update(delta);
+
 }
 
 HRESULT Game::Draw() {
   m_Renderer->Draw();
-
+  //m_Renderer->Clear_RenderGroup();
   return S_OK;
+}
+
+HRESULT Game::Draw_NanRefresh()
+{
+    m_Renderer->Draw();
+    return S_OK;
+}
+
+void Game::Clear_AllResource()
+{
+    m_PrototypeManager->Clear_Prototypes();
+    m_ObjectManager->Clear_GameObjects();
+    m_LightManager->Clear_Lights();
+    m_Renderer->Clear_RenderGroup();
 }
 
 void Game::Clear_Resource(uint32 levIndex) {
@@ -157,6 +174,21 @@ Game::Get_OffScreenSRV(uint32 screenIndex) const {
   return m_GraphicDevice->Get_OffscreenSRV(screenIndex);
 }
 
+Byte Game::Get_DIKeyState(uByte byKeyID) const
+{
+    return m_InputDevice->Get_DIKeyState(byKeyID);
+}
+
+Byte Game::Get_DIMouseState(DIMB mouseInput) const
+{
+    return m_InputDevice->Get_DIMouseState(mouseInput);
+}
+
+Long Game::Get_DIMouseMove(DIMM mouseState) const
+{
+    return m_InputDevice->Get_DIMouseMove(mouseState);
+}
+
 HRESULT Game::Add_Timer(const wstring &timerTag) const {
   if (FAILED(m_TimeManager->Add_Timer(timerTag))) {
     MSG_BOX("Failed To Add Timer");
@@ -179,7 +211,8 @@ HRESULT Game::Change_Level(uint32 levIndex, Unique<Level> newLevel) {
   return S_OK;
 }
 
-HRESULT Game::Add_Prototype(uint32 levIndex, const Shared<Object> &prototype) const {
+HRESULT Game::Add_Prototype(uint32 levIndex,
+                            const Shared<Object> &prototype) const {
   if (FAILED(m_PrototypeManager->Add_Prototype(levIndex, prototype))) {
     return E_FAIL;
   }
@@ -201,69 +234,69 @@ void Game::Add_RenderGroup(RENDERGROUP group,
   m_Renderer->Add_RenderGroup(group, gameObject);
 }
 
-HRESULT Game::Bind_CameraPosition(const Shared<class Shader>& shader, const Char* constantName) const
-{
-	return m_Pipeline->Bind_CameraPosition(shader, constantName);
+HRESULT Game::Bind_CameraPosition(const Shared<class Shader> &shader,
+                                  const Char *constantName) const {
+  return m_Pipeline->Bind_CameraPosition(shader, constantName);
 }
 
-HRESULT Game::Bind_TransformMatrix(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState)
-{
-	return m_Pipeline->Bind_TransformMatrix(shader, constantName, transformState);
+HRESULT Game::Bind_TransformMatrix(const Shared<class Shader> &shader,
+                                   const Char *constantName,
+                                   D3DTS transformState) {
+  return m_Pipeline->Bind_TransformMatrix(shader, constantName, transformState);
 }
 
-HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState)
-{
-	return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName, transformState);
+HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<class Shader> &shader,
+                                           const Char *constantName,
+                                           D3DTS transformState) {
+  return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName,
+                                                  transformState);
 }
 
-Matrix Game::Get_Transform(D3DTS transformState) const
-{
-	return m_Pipeline->Get_Transform(transformState);
+Matrix Game::Get_Transform(D3DTS transformState) const {
+  return m_Pipeline->Get_Transform(transformState);
 }
 
-Vector4 Game::Get_CamTransform() const
-{
-	return m_Pipeline->Get_CamTransform();
+Vector4 Game::Get_CamTransform() const {
+  return m_Pipeline->Get_CamTransform();
 }
 
-void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix)
-{
-	m_Pipeline->Set_Transform(transformState, transformStateMatrix);
+void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix) {
+  m_Pipeline->Set_Transform(transformState, transformStateMatrix);
 }
 
-const LIGHT_DESC* Game::Get_LightDesc(uint32 index) const
-{
-	return m_LightManager->Get_LightDesc(index);
+const LIGHT_DESC *Game::Get_LightDesc(uint32 index) const {
+  return m_LightManager->Get_LightDesc(index);
 }
-HRESULT Game::Add_Light(const LIGHT_DESC& lightDesc) const
-{
-    return m_LightManager->Add_Light(lightDesc);
+HRESULT Game::Add_Light(const LIGHT_DESC &lightDesc) const {
+  return m_LightManager->Add_Light(lightDesc);
 }
-HRESULT Game::Remove_Light(uint32 index) const
-{
-	return m_LightManager->Remove_Light(index);
+HRESULT Game::Remove_Light(uint32 index) const {
+  return m_LightManager->Remove_Light(index);
 }
 
-Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID, uint32 levIndex) const
-{
-    uint32 level = levIndex == MAXINT32
-        ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
+Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID,
+                                          uint32 levIndex) const {
+  uint32 level =
+      levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
-    if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, typeID)) {
-        return static_pointer_cast<Object>(object);
-    }
-    return nullptr;
+  if (Shared<Object> object =
+          m_PrototypeManager->Find_Prototype(prototype, level, typeID)) {
+    return static_pointer_cast<Object>(object);
+  }
+  return nullptr;
 }
 
-Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, const wstring& className, uint32 levIndex) const
-{
-    uint32 level = levIndex == MAXINT32
-        ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
+Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype,
+                                          const wstring &className,
+                                          uint32 levIndex) const {
+  uint32 level =
+      levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
-    if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, className)) {
-        return static_pointer_cast<Object>(object);
-    }
-    return nullptr;
+  if (Shared<Object> object =
+          m_PrototypeManager->Find_Prototype(prototype, level, className)) {
+    return static_pointer_cast<Object>(object);
+  }
+  return nullptr;
 }
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
@@ -289,25 +322,25 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
                                           const wstring &className,
-                                          void *arg) const 
-{
-	auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
+                                          void *arg) const {
+  auto prototypeInstance =
+      m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
 
-	if (!prototypeInstance) 
-    {
-		return nullptr;
-	}
+  if (!prototypeInstance) {
+    return nullptr;
+  }
 
-    if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
-		auto gameObject = static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
-		m_ObjectManager->Add_GameObject(gameObject);
+  if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
+    auto gameObject =
+        static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
+    m_ObjectManager->Add_GameObject(gameObject);
 
-		return gameObject;
-    } 
+    return gameObject;
+  }
 
-    if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
-		return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
-    }
+  if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
+    return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
+  }
 
   LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
   MSG_BOX("Prototype Miss Match In Instantiate Internal");

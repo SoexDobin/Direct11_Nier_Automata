@@ -1,6 +1,6 @@
 #include "VIBuffer_Terrain.h"
 
-#include "../../EngineSDK/inc/SpdLogger.h"
+#include "SpdLogger.h"
 
 VIBuffer_Terrain::VIBuffer_Terrain()
 	: VIBuffer{} {}
@@ -8,8 +8,8 @@ VIBuffer_Terrain::VIBuffer_Terrain()
 VIBuffer_Terrain::VIBuffer_Terrain(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: VIBuffer{ device, context }, m_NumVerticesX{ 0 }, m_NumVerticesZ{ 0 } {}
 
-VIBuffer_Terrain::VIBuffer_Terrain(const Shared<VIBuffer_Terrain>& rhs)
-	: VIBuffer { rhs }, m_NumVerticesX{rhs->m_NumVerticesX}, m_NumVerticesZ{rhs->m_NumVerticesZ} {}
+VIBuffer_Terrain::VIBuffer_Terrain(const VIBuffer_Terrain& rhs)
+	: VIBuffer { rhs }, m_NumVerticesX{rhs.m_NumVerticesX}, m_NumVerticesZ{rhs.m_NumVerticesZ} {}
 
 HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 {
@@ -33,15 +33,32 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 		}
 	}
 	BITMAPFILEHEADER fh{};
-	ReadFile(fileHandle, &fh, sizeof(uint32), &byte, nullptr);
+	ReadFile(fileHandle, &fh, sizeof(BITMAPFILEHEADER), &byte, nullptr);
+	if (fileHandle == INVALID_HANDLE_VALUE)
+	{
+		MSG_BOX("Failed To Read Header Height Map File");
+		return E_FAIL;
+	}
+
 	BITMAPINFOHEADER ih{};
-	ReadFile(fileHandle, &ih, sizeof(uint32), &byte, nullptr);
+	ReadFile(fileHandle, &ih, sizeof(BITMAPINFOHEADER), &byte, nullptr);
+	if (fileHandle == INVALID_HANDLE_VALUE)
+	{
+		MSG_BOX("Failed To Read Info Height Map File");
+		return E_FAIL;
+	}
+
 	m_NumVerticesX = ih.biWidth;
 	m_NumVerticesZ = ih.biHeight;
 	m_NumVertices = m_NumVerticesX * m_NumVerticesZ;
 
 	uint32* pixels = new uint32[m_NumVertices];
 	ReadFile(fileHandle, pixels, sizeof(uint32) * m_NumVertices, &byte, nullptr);
+	if (fileHandle == INVALID_HANDLE_VALUE)
+	{
+		MSG_BOX("Failed To Read Data Height Map File");
+		return E_FAIL;
+	}
 
 	m_NumVtxBuffers = 1;
 	m_VtxStride = sizeof(VTXNORMTEX);
@@ -155,7 +172,7 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 		return E_FAIL;
 	}
 
-	delete[] pixels;
+	delete[] indices;
 	delete[] vertices;
 	delete[] pixels;
 
@@ -184,7 +201,7 @@ Shared<VIBuffer_Terrain> VIBuffer_Terrain::Create(const ComPtr<ID3D11Device>& de
 
 Shared<Component> VIBuffer_Terrain::Clone(void* arg)
 {
-	auto bufferTerrain = make_shared<VIBuffer_Terrain>(shared_from_this());
+	auto bufferTerrain = make_shared<VIBuffer_Terrain>(*this);
 
 	if (FAILED(bufferTerrain->Initialize(arg)))
 	{

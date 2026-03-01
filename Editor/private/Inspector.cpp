@@ -2,7 +2,6 @@
 #include "Inspector.h"
 #include "EditorManager.h"
 
-#include "PrefabRegistry.h"
 #include "LayerRegistry.h"
 #include "TagRegistry.h"
 #include "PathManager.h"

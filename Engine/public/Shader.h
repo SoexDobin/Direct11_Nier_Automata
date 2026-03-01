@@ -1,13 +1,14 @@
-#pragma once
+﻿#pragma once
 #include "Component.h"
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Shader final : public Component, enable_shared_from_this<Shader> {
+class ENGINE_DLL Shader final : public Component, public enable_shared_from_this<Shader> {
+    RTTR_ENABLE(Component)
 public:
     Shader();
     Shader(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
-    Shader(const Shared<Shader> &rhs);
+    Shader(const Shader& rhs);
     ~Shader() override = default;
 
 public:

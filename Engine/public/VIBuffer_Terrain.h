@@ -1,14 +1,15 @@
-#pragma once
+﻿#pragma once
 #include "VIBuffer.h"
 
 NS_BEGIN(Engine)
 
 class ENGINE_DLL VIBuffer_Terrain final : public VIBuffer, public enable_shared_from_this<VIBuffer_Terrain>
 {
+	RTTR_ENABLE(VIBuffer)
 public:
 	VIBuffer_Terrain();
 	VIBuffer_Terrain(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	VIBuffer_Terrain(const Shared<VIBuffer_Terrain>& rhs);
+	VIBuffer_Terrain(const VIBuffer_Terrain& rhs);
 	~VIBuffer_Terrain() override = default;
 
 public:

@@ -43,8 +43,8 @@ public:
 private:
   PathManager() = default;
   ~PathManager() = default;
-  wstring m_ProjectRoot = L"../";
-  wstring m_ProjectSettingDir = L"../ProjectSetting/";
+  wstring m_ProjectRoot = L"../../";
+  wstring m_ProjectSettingDir = L"../../ProjectSetting/";
 
   wstring m_LayerSettingsPath = L"../../ProjectSetting/LayerSettings.json";
   wstring m_TagSettingsPath = L"../../ProjectSetting/TagSettings.json";

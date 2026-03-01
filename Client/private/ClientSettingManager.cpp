@@ -13,7 +13,7 @@
 
 IMPLEMENT_SINGLETON(ClientSettingManager)
 
-HRESULT ClientSettingManager::Load_EngineDesc() const 
+HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const 
 {
 	std::wstring path = m_ProjectSettingPath + L"EngineDesc.json";
 
@@ -31,11 +31,11 @@ HRESULT ClientSettingManager::Load_EngineDesc() const
 	file >> json;
 	file.close();
 
-	g_projectSettings.levelCount = ETOI(LEVEL::LEVEL_END);
-	g_projectSettings.startLevel = json.value("startLevel", ETOI(LEVEL::LOGO));
-	g_projectSettings.viewportWidth = json.value("viewportWidth", 1920);
-	g_projectSettings.viewportHeight = json.value("viewportHeight", 1080);
-	g_projectSettings.windowTitle = Helper::To_wString(json.value("windowTitle", "NieRAutomata"));
+	outDesc.levelCount = ETOI(LEVEL::LEVEL_END);
+	outDesc.startLevel = json.value("startLevel", ETOI(LEVEL::LOGO));
+	outDesc.viewportWidth = json.value("viewportWidth", 1920);
+	outDesc.viewportHeight = json.value("viewportHeight", 1080);
+	outDesc.windowTitle = Helper::To_wString(json.value("windowTitle", "NieRAutomata"));
 
 	return S_OK;
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "GameObject.h"
 
 NS_BEGIN(Engine)
@@ -26,7 +26,7 @@ public:
   UIObject();
   UIObject(const ComPtr<ID3D11Device> &device,
            const ComPtr<ID3D11DeviceContext> &context);
-  UIObject(const Shared<UIObject> &rhs);
+  UIObject(const UIObject& rhs);
   virtual ~UIObject() override = default;
 
 public:

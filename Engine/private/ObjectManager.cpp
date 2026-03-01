@@ -15,7 +15,7 @@ void ObjectManager::On_Destroy() {
 
 void ObjectManager::PriorityUpdate(Float timeDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
+    if ((m_LayerMask & layerBit) == 1)
       continue;
 
     for (auto &obj : objects) {
@@ -30,8 +30,8 @@ void ObjectManager::PriorityUpdate(Float timeDelta) {
 
 void ObjectManager::Update(Float timeDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
-      continue;
+      if ((m_LayerMask & layerBit) == 1)
+          continue;
 
     for (auto &obj : objects) {
       if (obj->Is_Destroy())
@@ -45,8 +45,8 @@ void ObjectManager::Update(Float timeDelta) {
 
 void ObjectManager::LateUpdate(Float timeDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
-      continue;
+      if ((m_LayerMask & layerBit) == 1)
+          continue;
 
     for (auto &obj : objects) {
       if (obj->Is_Destroy())
@@ -60,8 +60,8 @@ void ObjectManager::LateUpdate(Float timeDelta) {
 
 void ObjectManager::FixedUpdate(Float fixedDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
-      continue;
+      if ((m_LayerMask & layerBit) == 1)
+          continue;
 
     for (auto &obj : objects) {
       if (obj->Is_Destroy())

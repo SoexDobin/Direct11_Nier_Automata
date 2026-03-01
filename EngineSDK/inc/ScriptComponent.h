@@ -4,6 +4,7 @@
 NS_BEGIN(Engine)
 
 class ENGINE_DLL ScriptComponent abstract : public Component {
+    RTTR_ENABLE(Component)
 public:
     explicit ScriptComponent();
 	explicit ScriptComponent(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);

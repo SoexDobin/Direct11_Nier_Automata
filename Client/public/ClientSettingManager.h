@@ -9,8 +9,12 @@ class ClientSettingManager
 	DECLARE_SINGLETON(ClientSettingManager)
 	ClientSettingManager() = default;
 	~ClientSettingManager() = default;
+
 public:
-	HRESULT Load_EngineDesc() const;
+	uint32 Get_LevelCount() const { return ETOI(LEVEL::LEVEL_END); }
+
+public:
+	HRESULT Load_EngineDesc(ENGINE_DESC& outDesc) const;
 	HRESULT Apply_LayerAndTagSettings() const;
 	HRESULT Load_Texture(LEVEL level) const;
 	HRESULT Load_Shader() const;

@@ -1,4 +1,4 @@
-#include "Texture.h"
+﻿#include "Texture.h"
 
 #include "Shader.h"
 #include <tchar.h>
@@ -9,8 +9,8 @@ Texture::Texture()
 Texture::Texture(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
     : Component{ device, context } {}
 
-Texture::Texture(const Shared<Texture> &rhs)
-    : Component{ rhs }, m_NumSRVs{ rhs->m_NumSRVs }, m_SRVs{ rhs->m_SRVs } {
+Texture::Texture(const Texture& rhs)
+    : Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs } {
 }
 
 HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs) {
@@ -51,7 +51,7 @@ HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSR
     }
     m_SRVs.push_back(srv);
   }
-  return S_OK;
+  return Component::Initialize_Prototype();
 }
 
 HRESULT Texture::Initialize(void *arg) { return Component::Initialize(arg); }
@@ -87,7 +87,7 @@ Shared<Texture> Texture::Create(const ComPtr<ID3D11Device> &device,
 
 Shared<Component> Texture::Clone(void *arg) 
 {
-    auto texture = make_shared<Texture>(shared_from_this());
+    auto texture = make_shared<Texture>(*this);
 
     if (FAILED(texture->Initialize(arg))) 
     {

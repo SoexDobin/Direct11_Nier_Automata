@@ -2,7 +2,6 @@
 #include "Client_Define.h"
 #include "Engine_Define.h"
 
-
 NS_BEGIN(Engine)
 class Game;
 NS_END
@@ -14,6 +13,9 @@ class ClientApp final
 public:
 	ClientApp();
 	~ClientApp();
+
+public:
+	uint32 Get_LevelCount() const { return ETOI(LEVEL::LEVEL_END); }
 
 public:
 	HRESULT Initialize(const ENGINE_DESC& desc);

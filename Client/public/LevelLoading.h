@@ -21,10 +21,12 @@ public:
 	HRESULT Render_Level() override;
 
 private:
-	HRESULT Ready_BackGround();
-	HRESULT Ready_UI();
 
-private:
+#ifdef _DEBUG
+	bool idididi = false;
+#endif
+
+
 	LEVEL			m_NextLevel = {};
 	Shared<Loader>	m_Loader = { nullptr };
 

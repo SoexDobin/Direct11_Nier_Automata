@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Component.h"
 
 NS_BEGIN(Engine)
@@ -7,11 +7,11 @@ class Shader;
 
 class ENGINE_DLL Texture final : public Component, enable_shared_from_this<Texture> 
 {
-
+	RTTR_ENABLE(Component)
 public:
 	Texture();
 	Texture(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	Texture(const Shared<Texture> &rhs);
+	Texture(const Texture& rhs);
 	~Texture() override = default;
 
 public:

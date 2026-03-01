@@ -1,10 +1,9 @@
-#pragma once
-#include "Component.h"
+﻿#pragma once
 #include "Game.h"
-#include "LayerRegistry.h"
 #include "Object.h"
+#include "Component.h"
+#include "LayerRegistry.h"
 #include "TagRegistry.h"
-#include <concepts>
 
 NS_BEGIN(Engine)
 
@@ -13,18 +12,19 @@ class Transform;
 
 class ENGINE_DLL GameObject abstract : public Object, public enable_shared_from_this<GameObject> 
 {
+	RTTR_ENABLE(Object)
 public:
 	explicit GameObject();
 	explicit GameObject(const ComPtr<ID3D11Device> &pDevice, const ComPtr<ID3D11DeviceContext> &context);
-	explicit GameObject(const Shared<GameObject> &prototype);
+	explicit GameObject(const GameObject& prototype);
 	virtual ~GameObject() override = default;
 
 	operator Shared<Transform>() const { return m_Transform; }
 	Shared<Transform> Get_Transform() const { return m_Transform; }
 
 public:
-	LAYER_MASK &Get_LayerMask() { return m_LayerMask; }
-	TAG_MASK &Get_TagMask() { return m_TagMask; }
+	LAYER_MASK& Get_LayerMask() { return m_LayerMask; }
+	TAG_MASK& Get_TagMask() { return m_TagMask; }
 
 public:
   virtual HRESULT Initialize_Prototype() override;

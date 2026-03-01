@@ -9,7 +9,7 @@ class ENGINE_DLL Transform final : public Component, public enable_shared_from_t
 {
 public:
     Transform(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
-    Transform(const Shared<Transform> &prototype);
+    Transform(const Transform& prototype);
     ~Transform() override = default;
 
 public: /* Local Getter */
@@ -20,11 +20,11 @@ public: /* Local Getter */
     Matrix Get_LocalMatrix() const;
 
 public: /* Local Setter */
-    void Set_LocalScale(const Vector3 &scale);
+    void Set_LocalScale(const Vector3& scale);
     void Set_LocalScale(Float x, Float y, Float z);
 
-    void Set_LocalRotation(const Quaternion &rotation);
-    void Set_LocalRotation(const Vector3 &eulerAngles);
+    void Set_LocalRotation(const Quaternion& rotation);
+    void Set_LocalRotation(const Vector3& eulerAngles);
     void Set_LocalRotation(Float pitch, Float yaw, Float roll);
 
     void Set_LocalPosition(const Vector3 &position);
@@ -49,11 +49,12 @@ public: /* World Setter */
     void Set_Position(Vector3 positionVec);
 
 public: /* Util Method */
-    void Move_Forward(Float delta, Float amount);
-    void Move_Backward(Float delta, Float amount);
-    void Move_Right(Float delta, Float amount);
-    void Move_Left(Float delta, Float amount);
+    void Move_Forward(Float delta, Float amount = 1.f);
+    void Move_Backward(Float delta, Float amount = 1.f);
+    void Move_Right(Float delta, Float amount = 1.f);
+    void Move_Left(Float delta, Float amount = 1.f);
     void LookAt(Vector3 atVec, Vector3 upVector = Vector3::UnitY);
+    void Rotate(Vector3 axis, Float timeDelta, Float amount = 1.f);
 
     HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const;
 

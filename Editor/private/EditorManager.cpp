@@ -29,7 +29,9 @@ HRESULT EditorManager::Initialize()
     if (nullptr == (m_LogConsole = LogConsole::Create()))
 		return E_FAIL;
 
-  return S_OK;
+    
+
+	return S_OK;
 }
 
 void EditorManager::Update() {

@@ -4,13 +4,11 @@
 #include "SpdLogger.h"
 #include "ScriptComponent.h"
 #include "String_Helper.h"
-#include "LayerRegistry.h"
-#include "TagRegistry.h"
-#include "SpdLogger.h"
 
 #include "Engine_Define.h"
 
 uint32 PrototypeManager::Get_TypeByName(const wstring &name) {
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
   uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
 
   if (!m_TypesByName[level].contains(name)) {
@@ -22,6 +20,7 @@ uint32 PrototypeManager::Get_TypeByName(const wstring &name) {
 }
 
 const wstring &PrototypeManager::Get_NameByType(uint32 typeID) {
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
   uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
 
   if (!m_NameByTypes[level].contains(typeID) ||
@@ -34,14 +33,14 @@ const wstring &PrototypeManager::Get_NameByType(uint32 typeID) {
 }
 
 HRESULT PrototypeManager::Initialize(void* arg) {
-  m_LevelCount = arg == nullptr ? 0 : *static_cast<uintptr_t*>(arg);
+    m_LevelCount = arg == nullptr ? 0 : *static_cast<uintptr_t*>(arg);
 
-  m_NameByTypes.resize(m_LevelCount);
-  m_TypesByName.resize(m_LevelCount);
-  m_GameObjects.resize(m_LevelCount);
-  m_Components.resize(m_LevelCount);
+    m_NameByTypes.resize(m_LevelCount);
+    m_TypesByName.resize(m_LevelCount);
+    m_GameObjects.resize(m_LevelCount);
+    m_Components.resize(m_LevelCount);
 
-  return S_OK;
+    return S_OK;
 }
 
 void PrototypeManager::On_Destroy() {
@@ -60,82 +59,104 @@ void PrototypeManager::On_Destroy() {
 
 HRESULT PrototypeManager::Add_Prototype(uint32 levIndex,
                                         const Shared<Object> &object,
-                                        void *arg) {
-  if (!Validate_Level(levIndex)) {
-    return E_FAIL;
-  }
+                                        void *arg) 
+{
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+	if (!Validate_Level(levIndex)) {
+		return E_FAIL;
+	}
 
-  PROTOTYPE prototype = object->Get_Prototype();
-  if (Find_Prototype(prototype, levIndex, object->Get_TypeID()) != nullptr) {
-    LOG_ERROR(L"{}: Already Added Prototype", m_ObjectName);
-    MSG_BOX("Already Added Prototype");
-    return E_FAIL;
-  }
+    PROTOTYPE prototype = object->Get_Prototype();
+    if (Find_Prototype(prototype, levIndex, object->Get_TypeID()) != nullptr) {
+        LOG_ERROR(L"{}: Already Added Prototype", m_ObjectName);
+        MSG_BOX("Already Added Prototype");
+        return E_FAIL;
+    }
 
-  if (!object->Get_Name().empty()) {
-    m_NameByTypes[levIndex].emplace(object->Get_TypeID(), object->Get_Name());
-    m_TypesByName[levIndex].emplace(object->Get_Name(), object->Get_TypeID());
-  }
+    if (!object->Get_Name().empty()) {
+        m_NameByTypes[levIndex].emplace(object->Get_TypeID(), object->Get_Name());
+        m_TypesByName[levIndex].emplace(object->Get_Name(), object->Get_TypeID());
+    } else MSG_BOX("Miss Type Name");
 
-  if (prototype == PROTOTYPE::GAMEOBJECT) {
-    m_GameObjects[levIndex].emplace(object->Get_TypeID(),
-                                    static_pointer_cast<GameObject>(object));
-  } else if (prototype == PROTOTYPE::COMPONENT) {
-    m_Components[levIndex].emplace(object->Get_TypeID(),
-                                   static_pointer_cast<Component>(object));
-  }
+    if (prototype == PROTOTYPE::GAMEOBJECT) {
+		m_GameObjects[levIndex].emplace(object->Get_TypeID(), static_pointer_cast<GameObject>(object));
+    } else if (prototype == PROTOTYPE::COMPONENT) {
+		m_Components[levIndex].emplace(object->Get_TypeID(), static_pointer_cast<Component>(object));
+    }
 
-  return S_OK;
+    return S_OK;
+}
+
+HRESULT PrototypeManager::Clear_Prototypes()
+{
+    m_NameByTypes.clear();
+    m_TypesByName.clear();
+    m_GameObjects.clear();
+    m_Components.clear();
+
+    m_NameByTypes.resize(m_LevelCount);
+    m_TypesByName.resize(m_LevelCount);
+    m_GameObjects.resize(m_LevelCount);
+    m_Components.resize(m_LevelCount);
+
+    return S_OK;
 }
 
 HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
-  if (!Validate_Level(levIndex)) {
-    return E_FAIL;
-  }
+    if (!Validate_Level(levIndex)) {
+      return E_FAIL;
+    }
 
-  m_NameByTypes[levIndex].clear();
-  m_TypesByName[levIndex].clear();
-  m_GameObjects[levIndex].clear();
-  m_Components[levIndex].clear();
+    m_NameByTypes[levIndex].clear();
+    m_TypesByName[levIndex].clear();
+    m_GameObjects[levIndex].clear();
+    m_Components[levIndex].clear();
 
-  return S_OK;
+    return S_OK;
 }
 
 Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
                                                 uint32 levIndex,
-                                                uint32 typeID) const {
-  if (!Validate_Level(levIndex)) {
+                                                uint32 typeID) const 
+{
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+
+	if (!Validate_Level(levIndex)) {
+		return nullptr;
+	}
+
+	if (prototype == PROTOTYPE::GAMEOBJECT) {
+		if (m_GameObjects[levIndex].contains(typeID))
+		{
+			return m_GameObjects[levIndex].at(typeID);
+		}
+        return nullptr;
+	} 
+	if (prototype == PROTOTYPE::COMPONENT) {
+		if (m_Components[levIndex].contains(typeID))
+		{
+			return m_Components[levIndex].at(typeID);
+		}
+        return nullptr;
+	}
+
     return nullptr;
-  }
-
-  if (prototype == PROTOTYPE::GAMEOBJECT) {
-    auto it = m_GameObjects[levIndex].find(typeID);
-    if (it != m_GameObjects[levIndex].end()) {
-      return it->second;
-    }
-  } else if (prototype == PROTOTYPE::COMPONENT) {
-    auto it = m_Components[levIndex].find(typeID);
-    if (it != m_Components[levIndex].end()) {
-      return it->second;
-    }
-  }
-
-  return nullptr;
 }
 
 Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
                                                 uint32 levIndex,
-                                                const wstring &typeName) const {
-  if (!Validate_Level(levIndex)) {
-    return nullptr;
-  }
+                                                const wstring &typeName) const 
+{
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+    if (!Validate_Level(levIndex)) {
+		return nullptr;
+    }
 
-  if (m_TypesByName[levIndex].contains(typeName)) {
-    return Find_Prototype(prototype, levIndex,
-                          m_TypesByName[levIndex].at(typeName));
-  }
+	if (m_TypesByName[levIndex].contains(typeName)) {
+		return Find_Prototype(prototype, levIndex, m_TypesByName[levIndex].at(typeName));
+	}
 
-  return nullptr;
+	return nullptr;
 }
 
 HRESULT PrototypeManager::Create_Reflection(
@@ -212,11 +233,11 @@ Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {
 }
 
 Bool PrototypeManager::Validate_Level(uint32 levIndex) const {
-  //if (levIndex >= m_LevelCount) {
-  //  LOG_ERROR(L"{}: Out Of Level", m_ObjectName);
-  //  MSG_BOX("Out Of Level Count");
-  //  return false;
-  //}
+  if (levIndex >= m_LevelCount) {
+    LOG_ERROR(L"{}: Out Of Level", m_ObjectName);
+    MSG_BOX("Out Of Level Count");
+    return false;
+  }
 
   return true;
 }

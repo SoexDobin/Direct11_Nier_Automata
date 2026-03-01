@@ -1,13 +1,14 @@
-#pragma once
+﻿#pragma once
 #include "Component.h"
 
 NS_BEGIN(Engine)
 
 class ENGINE_DLL VIBuffer abstract : public Component {
+    RTTR_ENABLE(Component)
 public:
     VIBuffer();
   VIBuffer(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
-  VIBuffer(const Shared<VIBuffer> &rhs);
+  VIBuffer(const VIBuffer& rhs);
   virtual ~VIBuffer() override = default;
 
 public:

@@ -6,19 +6,19 @@ NS_BEGIN(Engine)
 class GameObject;
 
 class ENGINE_DLL Component abstract : public Object {
+    RTTR_ENABLE(Object)
 public:
     Component();
-  explicit Component(const ComPtr<ID3D11Device> &pDevice,
-                     const ComPtr<ID3D11DeviceContext> &context);
-  explicit Component(const Shared<Component> &prototype);
-  virtual ~Component() override = default;
+	explicit Component(const ComPtr<ID3D11Device> &pDevice, const ComPtr<ID3D11DeviceContext> &context);
+	explicit Component(const Component& prototype);
+	virtual ~Component() override = default;
 
 public:
   Shared<GameObject> Get_Owner() const { return m_Owner.lock(); }
 
 private:
   friend GameObject;
-  void Set_Owner(const Shared<GameObject> &owner) { m_Owner = owner; }
+  void Set_Owner(const Shared<GameObject>& owner) { m_Owner = owner; }
 
 public:
   virtual COMPONENT_TYPE Get_ComponentType() const PURE;

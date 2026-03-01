@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "UIObject.h"
 
 NS_BEGIN(Engine)
@@ -14,7 +14,7 @@ class LoadingLogo : public UIObject
 public:
     LoadingLogo();
     LoadingLogo(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-    LoadingLogo(const Shared<LoadingLogo>& rhs);
+    LoadingLogo(const LoadingLogo& rhs);
     ~LoadingLogo() override = default;
 
 public:

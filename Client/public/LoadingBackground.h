@@ -9,12 +9,18 @@ NS_END
 
 NS_BEGIN(Client)
 
-class LoadingBackground final : public UIObject, public enable_shared_from_this<LoadingBackground> 
+class LoadingBackground final : public UIObject
 {
+private:
+    typedef struct tagLoadingBackgroundUI final : public UIObject::UI_DESC
+    {
+	    
+    } LOADING_BG_UI;
+
 public:
     LoadingBackground();
     LoadingBackground(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
-    LoadingBackground(const Shared<LoadingBackground> &rhs);
+    LoadingBackground(const LoadingBackground& rhs);
     ~LoadingBackground() override = default;
 
 public:

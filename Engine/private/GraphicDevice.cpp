@@ -27,8 +27,7 @@ HRESULT GraphicDevice::Initialize(const ENGINE_DESC &engineDesc) {
   if (FAILED(Ready_BackBufferRenderTargetView()))
     return E_FAIL;
 
-  if (FAILED(Ready_DepthStencilView(engineDesc.viewportWidth,
-                                    engineDesc.viewportHeight)))
+  if (FAILED(Ready_DepthStencilView(engineDesc.viewportWidth, engineDesc.viewportHeight)))
     return E_FAIL;
 
     { // Set Viewport
@@ -143,8 +142,7 @@ HRESULT GraphicDevice::OnResize(uint32 width, uint32 height)
 }
 
 HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {
-    if (screenIndex >= m_Offscreens.size())
-    {
+    if (screenIndex >= m_Offscreens.size()) {
         LOG_CRITICAL(L"Invalid Offscreen Index: {}", screenIndex);
         return E_FAIL;
     }

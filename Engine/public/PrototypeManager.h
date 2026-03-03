@@ -23,8 +23,6 @@ public:
   void On_Destroy() override;
 
 public:
-  HRESULT Create_Reflection(const ComPtr<ID3D11Device> &device,
-                            const ComPtr<ID3D11DeviceContext> &context);
   HRESULT Add_Prototype(uint32 levIndex, const Shared<Object> &object,
                         void *arg = nullptr);
   HRESULT Clear_Prototypes();
@@ -58,11 +56,6 @@ private:
 
     uint32 m_LevelCount = {};
     mutable std::recursive_mutex m_PrototypeMutex;
-
-private:
-  void Register_Type(rttr::type type, PROTOTYPE protoType,
-                     const ComPtr<ID3D11Device> &device,
-                     const ComPtr<ID3D11DeviceContext> &context);
 
 public:
   static Unique<PrototypeManager> Create(uint32 levCount);

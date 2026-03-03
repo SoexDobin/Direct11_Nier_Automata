@@ -30,32 +30,10 @@ void LevelLoading::Update_Level(Float timeDelta) {
 
     if (idididi) return;
 
-    if (true == m_Loader->Is_Finished() && GetKeyState(VK_RETURN) & 0x8000) {
+    if (true == m_Loader->Is_Finished()) {
 
         idididi = true;
 
-        LIGHT_DESC			LightDesc{};
-        LightDesc.type = LIGHT::DIRECTIONAL;
-        LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
-        LightDesc.diffuse = Vector4(1.f, 1.f, 1.f, 1.f);
-        LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
-        LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
-
-        if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
-            return;
-
-        FreeCamera::FREE_CAMERA_DESC desc{};
-        desc.mouseSensitive = 1.f;
-        desc.eye = Vector4{ 0.f, 10.f, -10.f, 1.f };
-        desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
-        desc.up = Vector4{ 0.f, 1.f, 0.f, 1.f };
-        desc.fovY = XMConvertToRadians(60.f);
-        desc.nearPlane = 0.1f;
-        desc.farPlane = 500.f;
-      
-        GAME_INSTANCE->Instantiate<Terrain>();
-    	GAME_INSTANCE->Instantiate<FreeCamera>(&desc);
-//        GAME_INSTANCE->Instantiate<LoadingBackground>();
 
         if (4 <= ETOI(m_NextLevel)) {
         		MSG_BOX("Failed to Created : NextLevel");

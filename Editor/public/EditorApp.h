@@ -27,9 +27,8 @@ private:
   void Reset_ClientApp();
 
 private:
-  Unique<ClientApp> m_ClientApp = {nullptr};
-  ENGINE_DESC m_EngineDesc = {};
-  Bool m_WasPlaying = {false};
+	Unique<ClientApp> m_ClientApp = {nullptr};
+	ENGINE_DESC m_EngineDesc = {};
 
 public:
   static Unique<EditorApp> Create();

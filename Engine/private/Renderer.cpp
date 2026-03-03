@@ -11,9 +11,16 @@ void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject>
 }
 
 void Renderer::Draw() {
-  for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
-    Render_Group(i);
-  }
+	for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
+		Render_Group(i);
+        m_RenderGroup[i].clear();
+	}
+}
+
+void Renderer::Draw_NoClearing() {
+    for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
+        Render_Group(i);
+    }
 }
 
 // TODO : draw call check clear group all frame
@@ -55,8 +62,6 @@ void Renderer::Render_Group(uint32 groupIndex) {
 
     object->Render();
   }
-
-  m_RenderGroup[groupIndex].clear();
 }
 
 Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device> &device,

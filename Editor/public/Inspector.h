@@ -1,6 +1,11 @@
 #pragma once
 #include "EditorObject.h"
 
+NS_BEGIN(Engine)
+class GameObject;
+class Component;
+NS_END
+
 NS_BEGIN(Editor)
 
 class PrefabRegistry;
@@ -16,16 +21,11 @@ public:
   void Update() override {}
   void Render() override;
 
-public:
-  void Set_SelectedClass(const string &className) {
-    m_SelectedClass = className;
-  }
-
 private:
-    void LayerTagGUI();
-
-private:
-  string m_SelectedClass;
+  void LayerTagGUI();
+  void GameObjectGUI(const Shared<Engine::GameObject> &pObj);
+  void ComponentGUI(const string &label,
+                    const Shared<Engine::Component> &pComp);
 
 public:
   static Shared<Inspector> Create();

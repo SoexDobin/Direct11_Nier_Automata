@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Loader.h"
 
+#include <Transform.h>
+
 #include "ClientApp.h"
 #include "SpdLogger.h"
 
@@ -102,7 +104,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
     //    m_isFinished = true;
     //    return E_FAIL;
     //}
-    //
+    
     if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::LOADING),
         Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
             L"C:/Users/a9018/Desktop/Direct11_Nier_Automata/Client/bin/resources/lev0_static/texture/Terrain/Tile0.dds", 1))))
@@ -129,6 +131,37 @@ HRESULT Loader::Loading_For_LogoLevel() {
 
 
 	m_isFinished = true;
+
+
+    LIGHT_DESC			LightDesc{};
+    LightDesc.type = LIGHT::DIRECTIONAL;
+    LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
+    LightDesc.diffuse = Vector4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
+
+    if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
+        return E_FAIL;
+
+    FreeCamera::FREE_CAMERA_DESC desc{};
+    desc.mouseSensitive = 5.f;
+    desc.eye = Vector4{ 0.f, 10.f, -10.f, 1.f };
+    desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
+    desc.up = Vector4{ 0.f, 1.f, 0.f, 1.f };
+    desc.fovY = XMConvertToRadians(60.f);
+    desc.nearPlane = 0.1f;
+    desc.farPlane = 500.f;
+
+    auto one = GAME_INSTANCE->Instantiate<Terrain>();
+    auto two = GAME_INSTANCE->Instantiate<Terrain>();
+    auto three = GAME_INSTANCE->Instantiate<Terrain>();
+    one->Set_Parent(two);
+    two->Add_Child(three);
+    one->Get_Transform()->Set_Position(10.f, 10.f, 10.f);
+
+    auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(&desc);
+    GAME_INSTANCE->Set_MainCamera(cam);
+
 	return S_OK;
 }
 

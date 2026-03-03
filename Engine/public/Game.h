@@ -1,16 +1,18 @@
 #pragma once
 #include "Engine_Define.h"
 
+#include "CameraManager.h"
 #include "GraphicDevice.h"
 #include "InputDevice.h"
 #include "LevelManager.h"
+#include "LightManager.h"
 #include "ObjectManager.h"
+#include "Pipeline.h"
 #include "PrototypeManager.h"
 #include "Renderer.h"
 #include "String_Helper.h"
 #include "TimeManager.h"
-#include "Pipeline.h"
-#include "LightManager.h"
+
 
 NS_BEGIN(Engine)
 
@@ -25,71 +27,101 @@ protected:
   ~Game();
 
 public:
-    HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
-    void Update_Engine();
-    HRESULT Draw();
-    HRESULT Draw_NanRefresh();
-    void Clear_Resource(uint32 levIndex);
-    void Clear_AllResource();
+  HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
+  void Update_Engine();
+  HRESULT Draw() const;
+  HRESULT Draw_NoClearing() const;
+  void Clear_Resource(uint32 levIndex) const;
+  void Clear_AllResource() const;
 
 public: /* For Editor / Tool */
-    ComPtr<ID3D11Device> Get_Device() const { return m_GraphicDevice->Get_Device(); }
-    ComPtr<ID3D11DeviceContext> Get_Context() const { return m_GraphicDevice->Get_Context();}
+  ComPtr<ID3D11Device> Get_Device() const { return m_GraphicDevice->Get_Device(); }
+  ComPtr<ID3D11DeviceContext> Get_Context() const { return m_GraphicDevice->Get_Context(); }
 
-    Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
-    Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
+  Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
+  Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
 
 public: /* For GraphicDevice */
-    HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
-    HRESULT Present() const;
-    HRESULT OnResize(uint32 width, uint32 height);
-    HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
-    HRESULT End_RenderOffScreen() const;
-    ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
+  HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
+  HRESULT Present() const;
+  HRESULT OnResize(uint32 width, uint32 height);
+  HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
+  HRESULT End_RenderOffScreen() const;
+  ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
 
 public:
-    Byte	Get_DIKeyState(uByte byKeyID) const;
-    Byte	Get_DIMouseState(DIMB mouseInput) const;
-    Long	Get_DIMouseMove(DIMM mouseState) const;
+  Byte Get_DIKeyState(uByte byKeyID) const;
+  Byte Get_DIMouseState(DIMB mouseInput) const;
+  Long Get_DIMouseMove(DIMM mouseState) const;
 
 public: /* For TimeManager */
-    HRESULT Add_Timer(const wstring &timerTag) const;
-    Float Compute_TimeDelta(const wstring &timerTag) const;
+  HRESULT Add_Timer(const wstring &timerTag) const;
+  void Set_TimeScale(Float timeScale) const;
+  Float Get_FPS() const;
+  Float Compute_TimeDelta() const;
+  Float Compute_UnscaledTimeDelta() const;
+  Float Compute_TimeDelta(const wstring &timerTag) const;
 
 public: /* For LevelManager */
-	uint32 Get_CurrentLevelIndex() const { return m_LevelManager->Get_CurrentLevelIndex(); }
-	HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
+  uint32 Get_CurrentLevelIndex() const {
+    return m_LevelManager->Get_CurrentLevelIndex();
+  }
+  HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
 
 public: /* For PrototypeManager */
-    uint32 Get_PrototypeID(const wstring &name) const { return m_PrototypeManager->Get_TypeByName(name); }
-    const wstring& Get_PrototypeName(uint32 typeID) const { return m_PrototypeManager->Get_NameByType(typeID); }
-    HRESULT Add_Prototype(uint32 levIndex, const Shared<class Object> &prototype) const;
-    const auto& Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
-    const auto& Get_Prototype_NameMap() const { return m_PrototypeManager->Get_NameByTypes(); }
+  uint32 Get_PrototypeID(const wstring &name) const {
+    return m_PrototypeManager->Get_TypeByName(name);
+  }
+  const wstring &Get_PrototypeName(uint32 typeID) const {
+    return m_PrototypeManager->Get_NameByType(typeID);
+  }
+  HRESULT Add_Prototype(uint32 levIndex,
+                        const Shared<class Object> &prototype) const;
+  const auto &Get_Prototype_Components() const {
+    return m_PrototypeManager->Get_Components();
+  }
+  const auto &Get_Prototype_NameMap() const {
+    return m_PrototypeManager->Get_NameByTypes();
+  }
 
 private: /* For ObjectManager */
-	HRESULT Add_GameObject(const Shared<GameObject> &GameObject) const;
+  HRESULT Add_GameObject(const Shared<GameObject> &GameObject) const;
+
+public: /* For ObjectManager */
+	void Submit_RenderGroup() const;
+    unordered_map<uint32, Shared<GameObject>>& Get_GameObjects() const;
+
+public: /* For CameraManager */
+  HRESULT Add_Camera(const Shared<class Camera> &camera) const;
+  HRESULT Set_MainCamera(const Shared<class Camera> &camera) const;
+  Shared<class Camera> Get_MainCamera() const;
 
 public: /* For Renderer */
-	void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
+  void Add_RenderGroup(RENDERGROUP group,
+                       const Shared<class GameObject> &gameObject) const;
 
 public: /* For Pipeline */
-	HRESULT Bind_CameraPosition(const Shared<class Shader>& shader, const Char* constantName) const;
-    HRESULT Bind_TransformMatrix(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
-    HRESULT Bind_TransformMatrix_Inverse(const Shared<class Shader>& shader, const Char* constantName, D3DTS transformState);
-	Matrix Get_Transform(D3DTS transformState) const;
-	Vector4 Get_CamTransform() const;
-	void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
+  HRESULT Bind_CameraPosition(const Shared<class Shader> &shader,
+                              const Char *constantName) const;
+  HRESULT Bind_TransformMatrix(const Shared<class Shader> &shader,
+                               const Char *constantName, D3DTS transformState);
+  HRESULT Bind_TransformMatrix_Inverse(const Shared<class Shader> &shader,
+                                       const Char *constantName,
+                                       D3DTS transformState);
+  Matrix Get_Transform(D3DTS transformState) const;
+  Vector4 Get_CamTransform() const;
+  void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
+  void Update_Pipeline() const;
 
 public: /* For.Light_Manager */
-    const LIGHT_DESC* Get_LightDesc(uint32 index) const;
-    HRESULT Add_Light(const LIGHT_DESC& lightDesc) const;
-	HRESULT Remove_Light(uint32 index) const;
+  const LIGHT_DESC *Get_LightDesc(uint32 index) const;
+  HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
+  HRESULT Remove_Light(uint32 index) const;
 
 public:
   template <typename T>
-  Shared<const T> Find_Prototype(PROTOTYPE prototype, uint32 levIndex = MAXINT32) const 
-	{
+  Shared<const T> Find_Prototype(PROTOTYPE prototype,
+                                 uint32 levIndex = MAXINT32) const {
     uint32 level = levIndex == MAXINT32
                        ? m_LevelManager->Get_CurrentLevelIndex()
                        : levIndex;
@@ -112,7 +144,8 @@ public:
     PROTOTYPE typeTag = std::is_base_of_v<class GameObject, T>
                             ? PROTOTYPE::GAMEOBJECT
                             : PROTOTYPE::COMPONENT;
-	auto typeInfo = Helper::To_wString(rttr::type::get<T>().get_name().to_string());
+    auto typeInfo =
+        Helper::To_wString(rttr::type::get<T>().get_name().to_string());
     if (auto instance = Instantiate_Internal(typeTag, level, typeInfo, arg)) {
       return static_pointer_cast<T>(instance);
     }
@@ -153,18 +186,19 @@ private:
                                              void *arg = nullptr) const;
 
 private:
-	Shared<LayerRegistry> m_LayerRegistry = {nullptr};
-	Shared<TagRegistry> m_TagRegistry = {nullptr};
-    
-	Unique<GraphicDevice> m_GraphicDevice = {nullptr};
-	Unique<TimeManager> m_TimeManager = {nullptr};
-    Unique<InputDevice> m_InputDevice = {nullptr};
-	Unique<Pipeline> m_Pipeline = { nullptr };
-	Unique<LevelManager> m_LevelManager = {nullptr};
-	Unique<PrototypeManager> m_PrototypeManager = {nullptr};
-	Unique<ObjectManager> m_ObjectManager = {nullptr};
-	Unique<Renderer> m_Renderer = {nullptr};
-	Unique<LightManager> m_LightManager = { nullptr };
+  Shared<LayerRegistry> m_LayerRegistry = {nullptr};
+  Shared<TagRegistry> m_TagRegistry = {nullptr};
+
+  Unique<GraphicDevice> m_GraphicDevice = {nullptr};
+  Unique<TimeManager> m_TimeManager = {nullptr};
+  Unique<InputDevice> m_InputDevice = {nullptr};
+  Unique<Pipeline> m_Pipeline = {nullptr};
+  Unique<LevelManager> m_LevelManager = {nullptr};
+  Unique<PrototypeManager> m_PrototypeManager = {nullptr};
+  Unique<ObjectManager> m_ObjectManager = {nullptr};
+  Unique<CameraManager> m_CameraManager = {nullptr};
+  Unique<Renderer> m_Renderer = {nullptr};
+  Unique<LightManager> m_LightManager = {nullptr};
 };
 
 NS_END

@@ -84,12 +84,13 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 
 			vertices[index].position = Vector3{ 
 				static_cast<Float>(j), 
-				static_cast<Float>(pixels[index] & 0x000000FF) / 15.f, static_cast<Float>(i) 
+				static_cast<Float>(pixels[index] & 0x000000ff) / 10.f, 
+				static_cast<Float>(i) 
 			};
-			vertices[index].normal = Vector3::Up;
+			vertices[index].normal = Vector3::Zero;
 			vertices[index].texcoord = Vector2{
-				static_cast<Float>(j) / (m_NumVerticesX - 1), 
-				static_cast<Float>(i) / (m_NumVerticesZ - 1) 
+				static_cast<Float>(j) / (m_NumVerticesX - 1.f), 
+				static_cast<Float>(i) / (m_NumVerticesZ - 1.f) 
 			};
 		}
 	}

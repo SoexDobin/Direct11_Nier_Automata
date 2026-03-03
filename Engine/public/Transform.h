@@ -54,7 +54,7 @@ public: /* Util Method */
     void Move_Right(Float delta, Float amount = 1.f);
     void Move_Left(Float delta, Float amount = 1.f);
     void LookAt(Vector3 atVec, Vector3 upVector = Vector3::UnitY);
-    void Rotate(Vector3 axis, Float timeDelta, Float amount = 1.f);
+    void Turn(Vector3 eulerAmount, Float timeDelta, Float amount = 1.f);
 
     HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const;
 

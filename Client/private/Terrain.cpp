@@ -34,14 +34,13 @@ void Terrain::On_Enable() { GameObject::On_Enable(); }
 void Terrain::On_Disable() { GameObject::On_Disable(); }
 
 void Terrain::Priority_Update(Float timeDelta) {}
-
 void Terrain::Update(Float timeDelta) {}
-
-void Terrain::Late_Update(Float timeDelta) {
-  GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
-}
-
+void Terrain::Late_Update(Float timeDelta) {}
 void Terrain::Fixed_Update(Float fixedDelta) {}
+void Terrain::Submit_RenderGroup()
+{
+    GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+}
 
 HRESULT Terrain::Render() {
   if (FAILED(Bind_ShaderResources()))

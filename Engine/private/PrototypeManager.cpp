@@ -89,10 +89,21 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex,
 
 HRESULT PrototypeManager::Clear_Prototypes()
 {
-    m_NameByTypes.clear();
-    m_TypesByName.clear();
-    m_GameObjects.clear();
-    m_Components.clear();
+    for (auto container : m_NameByTypes)
+        container.clear();
+    m_NameByTypes.shrink_to_fit();
+
+    for (auto container : m_TypesByName)
+        container.clear();
+    m_TypesByName.shrink_to_fit();
+
+    for (auto container : m_GameObjects)
+        container.clear();
+    m_GameObjects.shrink_to_fit();
+
+    for (auto container : m_Components)
+        container.clear();
+    m_Components.shrink_to_fit();
 
     m_NameByTypes.resize(m_LevelCount);
     m_TypesByName.resize(m_LevelCount);
@@ -157,68 +168,6 @@ Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
 	}
 
 	return nullptr;
-}
-
-HRESULT PrototypeManager::Create_Reflection(
-    const ComPtr<ID3D11Device> &device,
-    const ComPtr<ID3D11DeviceContext> &context) {
-  type type_GameObject = type::get<GameObject>();
-  type type_Component = type::get<Component>();
-
-  auto allTypes = type::get_types();
-
-  /* [Pass 1] Component 먼저 등록 (의존성 해결) */
-  for (auto &t : allTypes) {
-    if (t.is_derived_from(type_Component) &&
-        !t.is_derived_from(type_GameObject))
-      Register_Type(t, PROTOTYPE::COMPONENT, device, context);
-  }
-
-  /* [Pass 2] GameObject 등록 (Component가 이미 등록됨) */
-  for (auto &t : allTypes) {
-    if (t.is_derived_from(type_GameObject))
-      Register_Type(t, PROTOTYPE::GAMEOBJECT, device, context);
-  }
-
-  return S_OK;
-}
-
-void PrototypeManager::Register_Type(
-    rttr::type type, PROTOTYPE protoType, const ComPtr<ID3D11Device> &device,
-    const ComPtr<ID3D11DeviceContext> &context) {
-  if (type.get_name().empty())
-    return;
-
-  // 1. RTTR 생성자를 통해 객체 생성 시도
-  variant result = type.create({device, context});
-  if (!result.is_valid()) {
-    // 인자 없는 생성자 시도 (의존성은 나중에 주입)
-    result = type.create();
-    if (!result.is_valid()) {
-      LOG_WARN(L"[RTTR] No valid constructor found for: {}",
-               Helper::To_wString(type.get_name().to_string()));
-      return;
-    }
-  }
-
-  Shared<Object> prototype = result.get_value<Shared<Object>>();
-  if (!prototype)
-    return;
-
-  wstring typeName = Helper::To_wString(type.get_name().to_string());
-  uint32 typeID = prototype->Get_TypeID();
-
-  for (size_t i = 0; i < m_LevelCount; ++i)
-  {
-      m_NameByTypes[i].emplace(typeID, typeName);
-      m_TypesByName[i].emplace(typeName, typeID);
-
-      if (protoType == PROTOTYPE::GAMEOBJECT)
-          m_GameObjects[i].emplace(typeID, static_pointer_cast<GameObject>(prototype));
-      else if (protoType == PROTOTYPE::COMPONENT)
-          m_Components[i].emplace(typeID, static_pointer_cast<Component>(prototype));
-  }
-    
 }
 
 Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {

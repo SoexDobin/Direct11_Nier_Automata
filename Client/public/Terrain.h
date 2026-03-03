@@ -27,6 +27,7 @@ public:
 	void Update(Float timeDelta) override;
 	void Late_Update(Float timeDelta) override;
 	void Fixed_Update(Float fixedDelta) override;
+	void Submit_RenderGroup() override;
 	HRESULT Render() override;
 	
 protected:

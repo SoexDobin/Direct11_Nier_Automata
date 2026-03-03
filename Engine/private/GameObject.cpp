@@ -1,4 +1,4 @@
-﻿#include "GameObject.h"
+#include "GameObject.h"
 #include "Game.h"
 #include "ID_Helper.h"
 #include "SpdLogger.h"
@@ -139,6 +139,8 @@ void GameObject::Late_Update(Float timeDelta) {}
 void GameObject::Fixed_Update(Float fixedDelta) {}
 
 HRESULT GameObject::Render() { return S_OK; }
+
+void GameObject::Submit_RenderGroup() {}
 
 HRESULT GameObject::Set_Parent(const Shared<GameObject> &parent) {
 

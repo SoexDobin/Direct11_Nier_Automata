@@ -24,12 +24,14 @@ public:
 	void Update(Float timeDelta);
 	void LateUpdate(Float timeDelta);
 	void FixedUpdate(Float fixedDelta);
+	void Submit_RenderGroup();
 	void Cleanup_GameObjects();
 
 	HRESULT Add_GameObject(const Shared<GameObject> &object);
 	HRESULT Clear_GameObjects();
 	Shared<GameObject> Find_GameObjectByType(uint32 typeID);
 	Shared<GameObject> Find_GameObjectByID(uint32 objectID);
+	unordered_map<uint32, Shared<GameObject>>& Get_GameObjects();
 
 private:
 	map<uint32, vector<Shared<GameObject>>> m_ObjectByLayer;

@@ -246,6 +246,9 @@
       <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Model.h" />
+    <ClInclude Include="..\public\CameraManager.h">
+      <Filter>01. Utility\04. GameObject\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -339,5 +342,8 @@
       <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Model.cpp" />
+    <ClCompile Include="..\private\CameraManager.cpp">
+      <Filter>01. Utility\04. GameObject\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

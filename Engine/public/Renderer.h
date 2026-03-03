@@ -16,9 +16,10 @@ public:
   uint32 Get_LayerBits() const { return m_LayerMask; }
 
 public:
-  void Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject> &gameObject);
-  void Draw();
-  HRESULT Clear_RenderGroup();
+	void Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject> &gameObject);
+	void Draw();
+	void Draw_NoClearing();
+	HRESULT Clear_RenderGroup();
 
 public:
   HRESULT Initialize(void *arg) override;

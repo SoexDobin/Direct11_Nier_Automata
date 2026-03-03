@@ -35,6 +35,9 @@ Game::~Game() {
   m_PrototypeManager->On_Destroy();
   m_PrototypeManager.reset();
 
+  m_CameraManager->On_Destroy();
+  m_CameraManager.reset();
+
   m_LayerRegistry.reset();
   m_TagRegistry.reset();
 
@@ -64,19 +67,14 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     return E_FAIL;
 
   if (nullptr ==
-      (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount))) {
+      (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount)))
     return E_FAIL;
-  }
 
-  // RTTR 리플렉션을 통한 프로토타입 자동 등록
-  if (FAILED(m_PrototypeManager->Create_Reflection(
-          m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context()))) {
-    LOG_ERROR(L"Failed to Create RTTR Reflection in PrototypeManager");
-  }
-
-  if (nullptr == (m_ObjectManager = ObjectManager::Create())) {
+  if (nullptr == (m_ObjectManager = ObjectManager::Create()))
     return E_FAIL;
-  }
+
+  if (nullptr == (m_CameraManager = CameraManager::Create()))
+    return E_FAIL;
 
   if (nullptr ==
       (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),
@@ -96,8 +94,6 @@ void Game::Update_Engine() {
 
   m_ObjectManager->PriorityUpdate(delta);
 
-  m_Pipeline->Update_Pipeline();
-
   m_ObjectManager->Update(delta);
 
   m_ObjectManager->LateUpdate(delta);
@@ -109,39 +105,51 @@ void Game::Update_Engine() {
     m_TimeManager->Has_FixedUpdate();
   }
 
+  m_ObjectManager->Submit_RenderGroup();
+
   m_ObjectManager->Cleanup_GameObjects();
+  m_CameraManager->Bind_MainCamera_Transform();
+  m_Pipeline->Update_Pipeline();
 
   m_LevelManager->Update(delta);
-
 }
 
-HRESULT Game::Draw() {
-  m_Renderer->Draw();
-  //m_Renderer->Clear_RenderGroup();
-  return S_OK;
-}
-
-HRESULT Game::Draw_NanRefresh()
-{
+HRESULT Game::Draw() const {
     m_Renderer->Draw();
     return S_OK;
 }
-
-void Game::Clear_AllResource()
-{
-    m_PrototypeManager->Clear_Prototypes();
-    m_ObjectManager->Clear_GameObjects();
-    m_LightManager->Clear_Lights();
-    m_Renderer->Clear_RenderGroup();
+HRESULT Game::Draw_NoClearing() const {
+    m_Renderer->Draw_NoClearing();
+    return S_OK;
 }
 
-void Game::Clear_Resource(uint32 levIndex) {
+void Game::Clear_AllResource() const {
+    m_PrototypeManager->Clear_Prototypes();
+    m_ObjectManager->Clear_GameObjects();
+    m_Renderer->Clear_RenderGroup();
+    m_CameraManager->Clear_Cameras();
+    m_LightManager->Clear_Lights();
+}
+
+void Game::Clear_Resource(uint32 levIndex) const {
   if (FAILED(m_PrototypeManager->Clear_Prototypes(levIndex))) {
     LOG_CRITICAL(L"Failed To Clear Level{} Prototypes", levIndex);
   }
 
   if (FAILED(m_ObjectManager->Clear_GameObjects())) {
     LOG_CRITICAL(L"Failed To Clear GameObjects");
+  }
+
+  if (FAILED(m_Renderer->Clear_RenderGroup())) {
+    LOG_CRITICAL(L"Failed To Clear RenderGroup");
+  }
+
+  if (FAILED(m_CameraManager->Clear_Cameras())) {
+    LOG_CRITICAL(L"Failed To Clear Cameras");
+  }
+
+  if (FAILED(m_LightManager->Clear_Lights())) {
+    LOG_CRITICAL(L"Failed To Clear Lights");
   }
 }
 
@@ -174,19 +182,16 @@ Game::Get_OffScreenSRV(uint32 screenIndex) const {
   return m_GraphicDevice->Get_OffscreenSRV(screenIndex);
 }
 
-Byte Game::Get_DIKeyState(uByte byKeyID) const
-{
-    return m_InputDevice->Get_DIKeyState(byKeyID);
+Byte Game::Get_DIKeyState(uByte byKeyID) const {
+  return m_InputDevice->Get_DIKeyState(byKeyID);
 }
 
-Byte Game::Get_DIMouseState(DIMB mouseInput) const
-{
-    return m_InputDevice->Get_DIMouseState(mouseInput);
+Byte Game::Get_DIMouseState(DIMB mouseInput) const {
+  return m_InputDevice->Get_DIMouseState(mouseInput);
 }
 
-Long Game::Get_DIMouseMove(DIMM mouseState) const
-{
-    return m_InputDevice->Get_DIMouseMove(mouseState);
+Long Game::Get_DIMouseMove(DIMM mouseState) const {
+  return m_InputDevice->Get_DIMouseMove(mouseState);
 }
 
 HRESULT Game::Add_Timer(const wstring &timerTag) const {
@@ -198,6 +203,17 @@ HRESULT Game::Add_Timer(const wstring &timerTag) const {
   return S_OK;
 }
 
+void Game::Set_TimeScale(Float timeScale) const {
+  return m_TimeManager->Get_MainTimer()->SetTimeScale(timeScale);
+}
+
+Float Game::Get_FPS() const { return m_TimeManager->Get_MainTimer()->GetFPS(); }
+Float Game::Compute_TimeDelta() const {
+  return m_TimeManager->Get_MainTimer()->GetDeltaTime();
+}
+Float Game::Compute_UnscaledTimeDelta() const {
+  return m_TimeManager->Get_MainTimer()->GetUnscaledDeltaTime();
+}
 Float Game::Compute_TimeDelta(const wstring &timerTag) const {
   return m_TimeManager->Get_Timer(timerTag)->GetDeltaTime();
 }
@@ -229,23 +245,39 @@ HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
   return S_OK;
 }
 
+void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
+
+unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects() const {
+    return m_ObjectManager->Get_GameObjects();
+}
+
+HRESULT Game::Add_Camera(const Shared<Camera> &camera) const {
+  return m_CameraManager->Add_Camera(camera);
+}
+HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const {
+  return m_CameraManager->Set_MainCamera(camera);
+}
+Shared<Camera> Game::Get_MainCamera() const {
+  return m_CameraManager->Get_MainCamera();
+}
+
 void Game::Add_RenderGroup(RENDERGROUP group,
                            const Shared<GameObject> &gameObject) const {
   m_Renderer->Add_RenderGroup(group, gameObject);
 }
 
-HRESULT Game::Bind_CameraPosition(const Shared<class Shader> &shader,
+HRESULT Game::Bind_CameraPosition(const Shared<Shader> &shader,
                                   const Char *constantName) const {
   return m_Pipeline->Bind_CameraPosition(shader, constantName);
 }
 
-HRESULT Game::Bind_TransformMatrix(const Shared<class Shader> &shader,
+HRESULT Game::Bind_TransformMatrix(const Shared<Shader> &shader,
                                    const Char *constantName,
                                    D3DTS transformState) {
   return m_Pipeline->Bind_TransformMatrix(shader, constantName, transformState);
 }
 
-HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<class Shader> &shader,
+HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<Shader> &shader,
                                            const Char *constantName,
                                            D3DTS transformState) {
   return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName,
@@ -263,6 +295,8 @@ Vector4 Game::Get_CamTransform() const {
 void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix) {
   m_Pipeline->Set_Transform(transformState, transformStateMatrix);
 }
+
+void Game::Update_Pipeline() const { m_Pipeline->Update_Pipeline(); }
 
 const LIGHT_DESC *Game::Get_LightDesc(uint32 index) const {
   return m_LightManager->Get_LightDesc(index);

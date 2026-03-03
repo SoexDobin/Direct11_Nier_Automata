@@ -195,6 +195,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Camera.h" />
+    <ClInclude Include="..\public\CameraManager.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\Engine_Define.h" />
     <ClInclude Include="..\public\Engine_Enum.h" />
@@ -236,6 +237,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera.cpp" />
+    <ClCompile Include="..\private\CameraManager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />

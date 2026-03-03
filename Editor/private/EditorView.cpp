@@ -6,81 +6,70 @@
 EditorView::EditorView() {}
 EditorView::~EditorView() {}
 
-HRESULT EditorView::Initialize() { return EditorObject::Initialize(); }
+HRESULT EditorView::Initialize()
+{
+	return EditorObject::Initialize();
+}
 
 void EditorView::Update() {}
 
 void EditorView::Render() {
-  if (!m_IsDirty)
-    return;
+	if (!m_IsDirty)
+		return;
 
-  // HRESULT hr = {};
-  // hr = GAME_INSTANCE->Begin_RenderOffScreen(0);
-  // hr = GAME_INSTANCE->Draw();
-  // hr = GAME_INSTANCE->End_RenderOffScreen();
-  // if (FAILED(hr)) {
-  //	LOG_CRITICAL(L"Failed {} Rendering ", editorViewTag);
-  //	return;
-  // }
-  //
-  // if (m_PlayMode)
-  //{
-  //	hr = GAME_INSTANCE->Begin_RenderOffScreen(gameViewTag);
-  //	hr = GAME_INSTANCE->Draw();
-  //	hr = GAME_INSTANCE->End_RenderOffScreen();
-  // }
-  // if (FAILED(hr)) {
-  //	LOG_CRITICAL(L"Failed {} Rendering ", gameViewTag);
-  //	return;
-  // }
-
-  EditorView::RenderView();
+	EditorView::RenderView();
 }
 
 void EditorView::RenderView() {
-  ImGui::Begin("Scene View");
-  {
-    auto srv = GAME_INSTANCE->Get_OffScreenSRV(0);
-    if (srv) {
-      ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-      ImGui::Image(reinterpret_cast<ImTextureID>(srv.Get()), viewportSize);
-    } else
-      ImGui::Text("Scene View: RenderTarget not available");
-  }
-  ImGui::End();
+	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
+	auto srvScene = GAME_INSTANCE->Get_OffScreenSRV(1);
 
-  ImGui::Begin("Game View");
-  {
-    if (ImGui::Button("Play")) {
-      EDITOR->Set_PlayMode(true);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Stop")) {
-      EDITOR->Set_PlayMode(false);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Quit")) {
-      PostQuitMessage(0);
-    }
+	ImGui::Begin("Scene View");
+	if (srvScene)
+	{
+		ImGui::Text("FPS : %3f", GAME_INSTANCE->Get_FPS());
 
-    ImGui::Separator();
+		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+		ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), viewportSize);
 
-    auto srv = GAME_INSTANCE->Get_OffScreenSRV(0);
-    if (srv) {
-      ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-      ImGui::Image(reinterpret_cast<ImTextureID>(srv.Get()), viewportSize);
-    } else
-      ImGui::Text("Game View: RenderTarget not available");
-  }
-  ImGui::End();
+	}
+	ImGui::End();
+
+	ImGui::Begin("Game View");
+	if (ImGui::Button("Play")) {
+		if (EDITOR->Get_State() == EDITOR_STATE::PLAY) return;
+		EDITOR->Set_State(EDITOR_STATE::PLAY);
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Pause")) {
+		EDITOR->Set_State(EDITOR_STATE::PAUSE);
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Stop")) {
+		if (EDITOR->Get_State() == EDITOR_STATE::STOP) return;
+		EDITOR->Set_State(EDITOR_STATE::STOP);
+	}
+	ImGui::Separator();
+
+	if (srvGame) {
+		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+		ImGui::Image(reinterpret_cast<ImTextureID>(srvGame.Get()), viewportSize);
+		
+	}
+
+	ImGui::End();
 }
 
-Shared<EditorView> EditorView::Create() {
-  auto view = make_shared<EditorView>();
+Shared<EditorView> EditorView::Create()
+{
+	auto editorView = make_shared<EditorView>();
 
-  if (FAILED(view->Initialize())) {
-    MSG_BOX("Failed To Create EditorView");
-  }
+	if (FAILED(editorView->Initialize()))
+	{
+		MSG_BOX("Failed to Create EditorView");
+		return nullptr;
+	}
 
-  return view;
+	return editorView;
 }
+

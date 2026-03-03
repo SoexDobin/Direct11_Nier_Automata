@@ -21,6 +21,7 @@ extern inline ENGINE_DESC g_projectSettings = {
 namespace Editor
 {
 	#define EDITOR		Editor::EditorManager::GetInstance()
+	enum class EDITOR_STATE { PLAY, PAUSE, STOP };
 }
 
 using namespace Editor;

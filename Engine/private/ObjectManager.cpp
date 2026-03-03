@@ -14,33 +14,33 @@ void ObjectManager::On_Destroy() {
 }
 
 void ObjectManager::PriorityUpdate(Float timeDelta) {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 1)
-      continue;
+    for (auto &[layerBit, objects] : m_ObjectByLayer) {
+        if ((m_LayerMask & layerBit) == 1)
+			continue;
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+        for (auto &obj : objects) {
+			if (obj->Is_Destroy())
+				continue;
 
-      if (obj->Is_Active())
-        obj->Priority_Update(timeDelta);
+			if (obj->Is_Active())
+				obj->Priority_Update(timeDelta);
+        }
     }
-  }
 }
 
 void ObjectManager::Update(Float timeDelta) {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-      if ((m_LayerMask & layerBit) == 1)
-          continue;
+    for (auto &[layerBit, objects] : m_ObjectByLayer) {
+        if ((m_LayerMask & layerBit) == 1)
+            continue;
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+        for (auto &obj : objects) {
+            if (obj->Is_Destroy())
+				continue;
 
-      if (obj->Is_Active())
-        obj->Update(timeDelta);
+            if (obj->Is_Active())
+				obj->Update(timeDelta);
+        }
     }
-  }
 }
 
 void ObjectManager::LateUpdate(Float timeDelta) {
@@ -59,18 +59,34 @@ void ObjectManager::LateUpdate(Float timeDelta) {
 }
 
 void ObjectManager::FixedUpdate(Float fixedDelta) {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-      if ((m_LayerMask & layerBit) == 1)
-          continue;
+    for (auto &[layerBit, objects] : m_ObjectByLayer) {
+        if ((m_LayerMask & layerBit) == 1)
+            continue;
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+        for (auto &obj : objects) {
+            if (obj->Is_Destroy())
+                continue;
 
-      if (obj->Is_Active())
-        obj->Fixed_Update(fixedDelta);
+            if (obj->Is_Active())
+                obj->Fixed_Update(fixedDelta);
+        }
     }
-  }
+}
+
+void ObjectManager::Submit_RenderGroup()
+{
+    for (auto& [layerBit, objects] : m_ObjectByLayer) {
+        if ((m_LayerMask & layerBit) == 1)
+            continue;
+
+        for (auto& obj : objects) {
+            if (obj->Is_Destroy())
+                continue;
+
+            if (obj->Is_Active())
+                obj->Submit_RenderGroup();
+        }
+    }
 }
 
 void ObjectManager::Cleanup_GameObjects() {
@@ -128,6 +144,11 @@ Shared<GameObject> ObjectManager::Find_GameObjectByID(uint32 objectID) {
   }
 
   return m_ObjectByUnique[objectID];
+}
+
+unordered_map<uint32, Shared<GameObject>>& ObjectManager::Get_GameObjects()
+{
+    return m_ObjectByUnique;
 }
 
 Unique<ObjectManager> ObjectManager::Create() {

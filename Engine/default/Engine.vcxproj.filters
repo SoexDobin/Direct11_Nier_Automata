@@ -115,6 +115,9 @@
     <Filter Include="01. Utility\05. Component\VIBuffer\Mesh">
       <UniqueIdentifier>{aca5f482-fe70-44c1-8cf7-0f225b986a41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96. RTTR">
+      <UniqueIdentifier>{761f8863-5b6b-4ef2-bd71-87a411a4e533}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -344,6 +347,15 @@
     <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\CameraManager.cpp">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\GameObject_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
+      <Filter>96. RTTR</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,7 +28,6 @@ public:
 
 public:
 	HRESULT Bind_EditorMatrix() const;
-	Vector3 RaycastEditorView(Vector2 mousePos, Vector2 viewSize, _Out_ Shared<class GameOject>* outObjectAddress);
 	
 private:
 	Float m_CameraSpeed{};

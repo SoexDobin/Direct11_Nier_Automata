@@ -22,8 +22,8 @@ public:
   void Render() override;
 
 private:
-  void LayerTagGUI();
   void GameObjectGUI(const Shared<Engine::GameObject> &pObj);
+  void GameObjectPropertiesGUI(const Shared<Engine::GameObject> &pObj);
   void ComponentGUI(const string &label,
                     const Shared<Engine::Component> &pComp);
 

@@ -10,25 +10,24 @@ GameObject::GameObject() {}
 GameObject::GameObject(const ComPtr<ID3D11Device> &device,
                        const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(device), m_Context(context) {}
-GameObject::GameObject(const GameObject& prototype)
+GameObject::GameObject(const GameObject &prototype)
     : m_Device(prototype.m_Device), m_Context(prototype.m_Context),
-      m_LayerMask(prototype.m_LayerMask), m_TagMask(prototype.m_TagMask) 
-{
-	m_ObjectName = prototype.m_ObjectName;
-	m_ObjectDesc.m_typeID = prototype.m_ObjectDesc.m_typeID;
+      m_LayerMask(prototype.m_LayerMask), m_TagMask(prototype.m_TagMask) {
+  m_ObjectName = prototype.m_ObjectName;
+  m_ObjectDesc.m_typeID = prototype.m_ObjectDesc.m_typeID;
 
-	// TODO : Clone 시점에 부모 자식 관계는 어떻게 할 것인지 고민 필요
-	// TODO : Prototype의 자식들은 어떻게 할 것인지 고민 필요
-	// TODO : 이전 속성, 상태들은 어떻게 할거인지 고민 필요
+  // TODO : Clone 시점에 부모 자식 관계는 어떻게 할 것인지 고민 필요
+  // TODO : Prototype의 자식들은 어떻게 할 것인지 고민 필요
+  // TODO : 이전 속성, 상태들은 어떻게 할거인지 고민 필요
 
-    for (auto &pair : prototype.m_Components) {
-		m_Components.emplace(pair.first, pair.second->Clone(nullptr));
-    }
-    for (auto &pair : prototype.m_Scripts) {
-		m_Scripts.emplace(pair.first, pair.second->Clone(nullptr));
-    }
-    
-    m_Transform = Get_Component<Transform>();
+  for (auto &pair : prototype.m_Components) {
+    m_Components.emplace(pair.first, pair.second->Clone(nullptr));
+  }
+  for (auto &pair : prototype.m_Scripts) {
+    m_Scripts.emplace(pair.first, pair.second->Clone(nullptr));
+  }
+
+  m_Transform = Get_Component<Transform>();
 }
 
 HRESULT GameObject::Initialize_Prototype() {
@@ -39,7 +38,8 @@ HRESULT GameObject::Initialize_Prototype() {
     return E_FAIL;
   }
 
-  m_ObjectName = Helper::To_wString(rttr::type::get(*this).get_name().to_string());
+  m_ObjectName =
+      Helper::To_wString(rttr::type::get(*this).get_name().to_string());
   if (m_ObjectName.empty()) {
     LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
     MSG_BOX("GameObject Initialize Failed By Set Object Name");
@@ -73,6 +73,8 @@ HRESULT GameObject::Initialize(void *arg) {
 }
 
 void GameObject::On_Destroy() {
+  m_IsDestroy = true;
+
   for (auto &component : m_Components)
     Destroy(component.second);
   m_Components.clear();
@@ -151,8 +153,8 @@ HRESULT GameObject::Set_Parent(const Shared<GameObject> &parent) {
       return S_OK;
     }
 
-    oldParent.reset();
     oldParent->Remove_Child(shared_from_this());
+    oldParent.reset();
   }
 
   m_Parent = parent;
@@ -189,22 +191,23 @@ HRESULT GameObject::Add_Child(const Shared<GameObject> &child) {
 }
 
 HRESULT GameObject::Remove_Child(const Shared<GameObject> &child) {
-  auto iter = std::find(m_Children.begin(), m_Children.end(), child);
-  if (iter == m_Children.end()) {
-    LOG_ERROR(L"Failed To Find Child {}", child->Get_Name());
-    return E_FAIL;
-  }
-  m_Children.erase(iter);
-  m_Transform->Set_Dirty();
+  if (m_IsDestroy)
+    return S_OK;
 
-  if (child->Get_Parent() == shared_from_this()) {
-    child->Set_Parent(nullptr);
-  }
+  auto it = std::find(m_Children.begin(), m_Children.end(), child);
+  if (it == m_Children.end())
+    return E_FAIL;
+
+  m_Children.erase(it);
   return S_OK;
-  ;
 }
 
-Shared<GameObject> GameObject::Get_Parent() const { return m_Parent.lock(); }
+Shared<GameObject> GameObject::Get_Parent() const {
+  if (m_Parent.expired())
+    return nullptr;
+  return m_Parent.lock();
+}
+
 const vector<Shared<GameObject>> &GameObject::Get_Children() const {
   return m_Children;
 }

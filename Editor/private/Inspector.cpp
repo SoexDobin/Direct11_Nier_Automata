@@ -2,14 +2,12 @@
 #include "EditorManager.h"
 #include "pch.h"
 
-
 #include "Component.h"
 #include "GameObject.h"
 #include "LayerRegistry.h"
 #include "PathManager.h"
 #include "TagRegistry.h"
 #include "Transform.h"
-
 
 using namespace Engine;
 
@@ -29,9 +27,6 @@ HRESULT Inspector::Initialize() {
 void Inspector::Render() {
   ImGui::Begin("Inspector");
 
-  LayerTagGUI();
-  ImGui::Separator();
-
   Shared<GameObject> selected = EDITOR->Get_SelectedObject();
   if (!selected) {
     ImGui::TextDisabled("No object selected.");
@@ -45,64 +40,39 @@ void Inspector::Render() {
 }
 
 // ====================================================
-// wstring -> UTF-8 string 변환 헬퍼
-// ====================================================
-static string WStr_To_UTF8(const wstring &wStr) {
-  if (wStr.empty())
-    return {};
-  int len = WideCharToMultiByte(CP_UTF8, 0, wStr.c_str(), -1, nullptr, 0,
-                                nullptr, nullptr);
-  string result(len, '\0');
-  WideCharToMultiByte(CP_UTF8, 0, wStr.c_str(), -1, result.data(), len, nullptr,
-                      nullptr);
-  return result;
-}
-
-// ====================================================
-// GameObjectGUI: 선택 오브젝트의 이름・Transform・컴포넌트 표시
+// GameObjectGUI: 선택 오브젝트의 이름・Layer/Tag・Transform・컴포넌트 표시
 // ====================================================
 void Inspector::GameObjectGUI(const Shared<GameObject> &pObj) {
-  // ── 오브젝트 이름
-  string name = WStr_To_UTF8(pObj->Get_Name());
-  ImGui::Text("Name : %s", name.c_str());
-  ImGui::Text("ID   : %u", pObj->Get_ObjectID());
+	// ── 오브젝트 이름
+	string name = Helper::To_String(Clean_RTTR_Name(pObj->Get_Name()));
+	ImGui::Text("Name : %s", name.c_str());
+	ImGui::Text("ID   : %u", pObj->Get_ObjectID());
+	ImGui::Separator();
+
+  // ── RTTR GameObject 프로퍼티 (LayerNames, TagNames 등)
+  GameObjectPropertiesGUI(pObj);
   ImGui::Separator();
 
   // ── Transform 섹션
   Shared<Transform> pTransform = pObj->Get_Transform();
   if (pTransform) {
-    if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-      // Position
-      Vector3 pos = pTransform->Get_LocalPosition();
-      float fPos[3] = {pos.x, pos.y, pos.z};
-      if (ImGui::DragFloat3("Position", fPos, 0.1f)) {
-        pTransform->Set_LocalPosition(fPos[0], fPos[1], fPos[2]);
-      }
-
-      // Rotation (Euler)
-      Vector3 rot = pTransform->Get_LocalEulerAngles();
-      float fRot[3] = {rot.x, rot.y, rot.z};
-      if (ImGui::DragFloat3("Rotation", fRot, 0.5f)) {
-        pTransform->Set_LocalRotation(fRot[0], fRot[1], fRot[2]);
-      }
-
-      // Scale
-      Vector3 scl = pTransform->Get_LocalScale();
-      float fScl[3] = {scl.x, scl.y, scl.z};
-      if (ImGui::DragFloat3("Scale", fScl, 0.01f)) {
-        pTransform->Set_LocalScale(fScl[0], fScl[1], fScl[2]);
-      }
-    }
+    string typeName = rttr::type::get(*pTransform).get_name().to_string();
+    ComponentGUI(typeName, pTransform);
   }
-
   ImGui::Separator();
 
   // ── Components 섹션 (Transform 제외)
   const auto &components = pObj->Get_Components();
   if (!components.empty()) {
-    ImGui::Text("Components (%zu)", components.size());
+    // Transform 은 위에서 이미 그렸으니 카운트 제외
+    size_t count = 0;
     for (auto &[id, pComp] : components) {
-      // Transform은 이미 위에서 표시했으므로 중복 제외
+      if (pComp->Get_ComponentType() != COMPONENT_TYPE::TRANSFORM)
+        ++count;
+    }
+    ImGui::Text("Components (%zu)", count);
+
+    for (auto &[id, pComp] : components) {
       if (pComp->Get_ComponentType() == COMPONENT_TYPE::TRANSFORM)
         continue;
 
@@ -125,40 +95,78 @@ void Inspector::GameObjectGUI(const Shared<GameObject> &pObj) {
 }
 
 // ====================================================
-// ComponentGUI: 개별 컴포넌트 헤더 + RTTR 프로퍼티 표시
+// GameObjectPropertiesGUI: GameObject RTTR 프로퍼티 직접 열거
+//   - LayerNames / TagNames 등 vector<wstring> 다중 선택 드롭다운
 // ====================================================
-void Inspector::ComponentGUI(const string &label,
-                             const Shared<Component> &pComp) {
-  // RTTR 기반으로 등록된 프로퍼티를 자동 열거
-  ImGui::PushID(static_cast<int>(pComp->Get_ObjectID()));
+void Inspector::GameObjectPropertiesGUI(const Shared<GameObject> &pObj) {
+  if (!pObj)
+    return;
 
-  if (ImGui::CollapsingHeader(label.c_str())) {
-    auto rttrType = rttr::type::get(*pComp);
-    for (auto &prop : rttrType.get_properties()) {
-      string propName = prop.get_name().to_string();
-      rttr::variant value = prop.get_value(*pComp);
+  if (!ImGui::CollapsingHeader("GameObject Properties",
+                               ImGuiTreeNodeFlags_DefaultOpen))
+    return;
 
-      // 타입별 ImGui 위젯 분기 (기본 타입 한정)
-      if (value.is_type<float>()) {
-        float v = value.get_value<float>();
-        if (ImGui::DragFloat(propName.c_str(), &v, 0.01f)) {
-          prop.set_value(*pComp, v);
+  ImGui::PushID(static_cast<int>(pObj->Get_ObjectID()));
+
+  auto rttrType = rttr::type::get(*pObj);
+  for (auto &prop : rttrType.get_properties()) {
+    string propName = prop.get_name().to_string();
+    rttr::variant val = prop.get_value(*pObj);
+
+    if (!val.is_type<std::vector<std::wstring>>())
+      continue; // LayerNames / TagNames만 처리
+
+    std::vector<std::wstring> currentNames =
+        val.get_value<std::vector<std::wstring>>();
+
+    // Combo 미리보기 텍스트
+    string comboPreview = "Multiple...";
+    if (currentNames.empty()) {
+      comboPreview = "None";
+    } else if (currentNames.size() == 1) {
+      char buf[256] = {};
+      wcstombs_s(nullptr, buf, currentNames[0].c_str(), sizeof(buf));
+      comboPreview = buf;
+    }
+
+    if (ImGui::BeginCombo(propName.c_str(), comboPreview.c_str())) {
+      // Registry 에서 전체 이름 목록 가져오기
+      vector<wstring> allNames;
+      if (propName == "LayerNames") {
+        for (const auto &pair :
+             GAME_INSTANCE->Get_LayerRegister()->Get_AllLayers()) {
+          if (!pair.second.empty())
+            allNames.push_back(pair.second);
         }
-      } else if (value.is_type<int>() || value.is_type<int32_t>()) {
-        int v = value.get_value<int>();
-        if (ImGui::DragInt(propName.c_str(), &v)) {
-          prop.set_value(*pComp, v);
+      } else if (propName == "TagNames") {
+        for (const auto &pair :
+             GAME_INSTANCE->Get_TagRegister()->Get_AllTags()) {
+          if (!pair.second.empty())
+            allNames.push_back(pair.second);
         }
-      } else if (value.is_type<bool>()) {
-        bool v = value.get_value<bool>();
-        if (ImGui::Checkbox(propName.c_str(), &v)) {
-          prop.set_value(*pComp, v);
-        }
-      } else {
-        // 지원하지 않는 타입은 타입 이름만 표시
-        ImGui::TextDisabled("  %s : <%s>", propName.c_str(),
-                            value.get_type().get_name().to_string().c_str());
       }
+
+      for (const auto &regName : allNames) {
+        auto it = std::find(currentNames.begin(), currentNames.end(), regName);
+        bool isSelected = (it != currentNames.end());
+
+        char labelBuf[256] = {};
+        wcstombs_s(nullptr, labelBuf, regName.c_str(), sizeof(labelBuf));
+
+        // DontClosePopups → 다중 체크 지원
+        if (ImGui::Selectable(labelBuf, isSelected,
+                              ImGuiSelectableFlags_DontClosePopups)) {
+          if (isSelected)
+            currentNames.erase(
+                std::find(currentNames.begin(), currentNames.end(), regName));
+          else
+            currentNames.push_back(regName);
+
+          prop.set_value(*pObj, currentNames);
+        }
+      }
+
+      ImGui::EndCombo();
     }
   }
 
@@ -166,85 +174,53 @@ void Inspector::ComponentGUI(const string &label,
 }
 
 // ====================================================
-// LayerTagGUI: 기존 Layer / Tag 편집 UI (변경 없음)
+// ComponentGUI: 개별 컴포넌트 헤더 + RTTR 프로퍼티 표시
 // ====================================================
-void Inspector::LayerTagGUI() {
-  ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(8.0f, 4.0f));
+void Inspector::ComponentGUI(const string &label,
+                             const Shared<Component> &pComp) {
+  if (!pComp)
+    return;
 
-  if (ImGui::BeginTable("InspectorHeader", 2, ImGuiTableFlags_Resizable)) {
-    ImGui::TableSetupColumn("Layers", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn("Tags", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableNextRow();
+  ImGui::PushID(static_cast<int>(pComp->Get_ObjectID()));
 
-    // ── Layers
-    ImGui::TableSetColumnIndex(0);
-    if (ImGui::CollapsingHeader("Layers", ImGuiTreeNodeFlags_OpenOnArrow)) {
-      ImGui::BeginChild("LayerScroll", ImVec2(0, 200), true);
+  if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+    auto rttrType = rttr::type::get(*pComp);
+    for (auto &prop : rttrType.get_properties()) {
+      string propName = prop.get_name().to_string();
+      rttr::variant value = prop.get_value(*pComp);
 
-      auto layerRegistry = GAME_INSTANCE->Get_LayerRegister();
+      if (value.is_type<float>()) {
+        float v = value.get_value<float>();
+        if (ImGui::DragFloat(propName.c_str(), &v, 0.01f))
+          prop.set_value(*pComp, v);
+      } else if (value.is_type<Vector3>()) {
+        Vector3 v = value.get_value<Vector3>();
+        float arr[3] = {v.x, v.y, v.z};
+        if (ImGui::DragFloat3(propName.c_str(), arr, 0.1f)) {
+          v = Vector3(arr[0], arr[1], arr[2]);
+          prop.set_value(*pComp, v);
 
-      for (int i = 0; i < 32; ++i) {
-        Engine::LAYER currentLayer;
-        if (i == 0)
-          currentLayer = Engine::LAYER::LAYER0;
-        else
-          currentLayer = static_cast<Engine::LAYER>(1 << (i - 1));
-
-        wstring wName = layerRegistry->Get_LayerName(currentLayer);
-        Char buffer[256] = {};
-        wcstombs_s(nullptr, buffer, wName.c_str(), sizeof(buffer));
-
-        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 35.f);
-        string labelId = "##layer_" + to_string(i);
-
-        if (ImGui::InputText(labelId.c_str(), buffer, sizeof(buffer))) {
-          tChar wBuffer[256] = {};
-          mbstowcs_s(nullptr, wBuffer, buffer, sizeof(wBuffer));
-          layerRegistry->Set_LayerName(currentLayer, wBuffer);
+          // Transform 이면 월드 행렬 갱신
+          if (rttrType.is_derived_from<Transform>())
+            static_pointer_cast<Transform>(pComp)->Update_WorldMatrix();
         }
-
-        ImGui::SameLine();
-        ImGui::TextDisabled("%2d", i);
+      } else if (value.is_type<int>() || value.is_type<int32_t>()) {
+        int v = value.get_value<int>();
+        if (ImGui::DragInt(propName.c_str(), &v))
+          prop.set_value(*pComp, v);
+      } else if (value.is_type<bool>()) {
+        bool v = value.get_value<bool>();
+        if (ImGui::Checkbox(propName.c_str(), &v))
+          prop.set_value(*pComp, v);
+      } else {
+        // 지원하지 않는 타입은 타입명만 표시
+        ImGui::TextDisabled("  %s : <%s>", propName.c_str(),
+                            value.get_type().get_name().to_string().c_str());
       }
-      ImGui::EndChild();
     }
-
-    // ── Tags
-    ImGui::TableSetColumnIndex(1);
-    if (ImGui::CollapsingHeader("Tags", ImGuiTreeNodeFlags_OpenOnArrow)) {
-      ImGui::BeginChild("TagScroll", ImVec2(0, 200), true);
-
-      auto tagRegistry = GAME_INSTANCE->Get_TagRegister();
-
-      for (int i = 0; i < 32; ++i) {
-        Engine::TAG currentTag;
-        if (i == 0)
-          currentTag = Engine::TAG::TAG_0;
-        else
-          currentTag = static_cast<Engine::TAG>(1 << (i - 1));
-
-        wstring wName = tagRegistry->Get_TagName(currentTag);
-        Char buffer[256] = {};
-        wcstombs_s(nullptr, buffer, wName.c_str(), sizeof(buffer));
-
-        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 35.f);
-        string labelId = "##tag_" + to_string(i);
-
-        if (ImGui::InputText(labelId.c_str(), buffer, sizeof(buffer))) {
-          tChar wBuffer[256] = {};
-          mbstowcs_s(nullptr, wBuffer, buffer, sizeof(wBuffer));
-          tagRegistry->Set_TagName(currentTag, wBuffer);
-        }
-
-        ImGui::SameLine();
-        ImGui::TextDisabled("%2d", i);
-      }
-      ImGui::EndChild();
-    }
-
-    ImGui::EndTable();
   }
-  ImGui::PopStyleVar();
+
+  ImGui::PopID();
 }
 
 Shared<Inspector> Inspector::Create() {

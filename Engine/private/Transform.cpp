@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Shader.h"
 
+Transform::Transform() : Component{} {}
 Transform::Transform(const ComPtr<ID3D11Device> &device,
                      const ComPtr<ID3D11DeviceContext> &context)
     : Component(device, context) {
@@ -10,7 +11,6 @@ Transform::Transform(const ComPtr<ID3D11Device> &device,
   m_LocalPosition = {Vector3::Zero};
   m_WorldMatrix = {Matrix::Identity};
 }
-
 Transform::Transform(const Transform &prototype)
     : Component(prototype), m_LocalScale(prototype.m_LocalScale),
       m_LocalRotation(prototype.m_LocalRotation),
@@ -31,7 +31,7 @@ Matrix Transform::Get_LocalMatrix() const {
   return scale * rotation * position;
 }
 
-void Transform::Set_LocalScale(const Vector3 &scale) {
+void Transform::Set_LocalScale(Vector3 scale) {
   m_LocalScale = scale;
   m_IsDirty = true;
 }

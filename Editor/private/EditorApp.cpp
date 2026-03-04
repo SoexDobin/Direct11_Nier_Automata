@@ -13,6 +13,8 @@ EditorApp::EditorApp() {}
 EditorApp::~EditorApp() { Destruct_IMGUI(); }
 
 HRESULT EditorApp::Initialize() {
+  m_Game = GAME_INSTANCE;
+
   ENGINE_DESC desc = {};
   {
     desc.hWnd = g_hWnd;
@@ -27,8 +29,10 @@ HRESULT EditorApp::Initialize() {
     desc.renderTargetCount = 2;
   }
 
-  ClientSettingManager::GetInstance()->Set_ResourcePath(L"../../Client/bin/resources/");
-  ClientSettingManager::GetInstance()->Set_ShaderPath(L"../../Client/bin/shaders/");
+  ClientSettingManager::GetInstance()->Set_ResourcePath(
+      L"../../Client/bin/resources/");
+  ClientSettingManager::GetInstance()->Set_ShaderPath(
+      L"../../Client/bin/shaders/");
 
   /* 엔진 Core 설정 1순위 그래야만 하고 그래야하게 만들어야 함. 여기서
    * PrototypeManager가 호출됩니다. */
@@ -53,35 +57,44 @@ HRESULT EditorApp::Initialize() {
 }
 
 void EditorApp::Update() {
-    static EDITOR_STATE prevState = EDITOR_STATE::STOP;
-    EDITOR_STATE curState = EDITOR->Get_State();
-    if (curState == EDITOR_STATE::STOP && prevState != EDITOR_STATE::STOP) {
-        
-        Reset_ClientApp();
-    }
-    prevState = curState; // 다음 프레임을 위해 상태 갱신
 
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
+  static EDITOR_STATE prevState = EDITOR_STATE::STOP;
+  EDITOR_STATE curState = EDITOR->Get_State();
+  if (curState == EDITOR_STATE::STOP && prevState != EDITOR_STATE::STOP) {
+    Reset_ClientApp();
+    m_IsReset = true;
+  }
+  prevState = curState; // 다음 프레임을 위해 상태 갱신
 
-    EDITOR->Update();
+  if (m_IsReset) {
+    return;
+  }
+
+  ImGui_ImplDX11_NewFrame();
+  ImGui_ImplWin32_NewFrame();
+  ImGui::NewFrame();
+
+  EDITOR->Update();
 }
 
 HRESULT EditorApp::Render() {
+  if (m_IsReset) {
+    m_IsReset = false;
+    return S_OK;
+  }
 
-	EDITOR->Render();
+  EDITOR->Render();
 
-    ImGui::Render();
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+  ImGui::Render();
+  ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-    ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-    }
+  ImGuiIO &io = ImGui::GetIO();
+  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+  }
 
-    return GAME_INSTANCE->Present();
+  return GAME_INSTANCE->Present();
 }
 
 Unique<EditorApp> EditorApp::Create() {
@@ -142,6 +155,7 @@ HRESULT EditorApp::Destruct_IMGUI() {
   GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
 
   GAME_INSTANCE->DestroyInstance();
+  m_Game.reset();
 
   ImGui_ImplDX11_Shutdown();
   ImGui_ImplWin32_Shutdown();
@@ -154,8 +168,7 @@ void EditorApp::Reset_ClientApp() {
   m_ClientApp.reset();
   GAME_INSTANCE->Clear_AllResource();
   m_ClientApp = ClientApp::Create(m_EngineDesc);
-  if (FAILED(GAME_INSTANCE->Add_Camera(EDITOR->Get_EditorCamera())))
-  {
-      MSG_BOX("Reset ClientApp : Failed to Add Editor Camera");
+  if (FAILED(GAME_INSTANCE->Add_Camera(EDITOR->Get_EditorCamera()))) {
+    MSG_BOX("Reset ClientApp : Failed to Add Editor Camera");
   }
 }

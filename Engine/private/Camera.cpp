@@ -28,13 +28,8 @@ HRESULT Camera::Initialize(void* arg)
 	m_Transform->Set_Position(Vector3{ desc.eye });
 	m_Transform->LookAt(Vector3{ desc.at });
 
-	uint32 numViewports = { 1 };
-	D3D11_VIEWPORT viewportDesc{};
-
-	m_Context->RSGetViewports(&numViewports, &viewportDesc);
-
 	m_FovY = desc.fovY;
-	m_Aspect = viewportDesc.Width / viewportDesc.Height;
+	m_Aspect = desc.aspect;
 	m_Near = desc.nearPlane;
 	m_Far = desc.farPlane;
 

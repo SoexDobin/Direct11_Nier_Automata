@@ -7,10 +7,6 @@ Object::Object()
 
 Object::~Object()
 {
-	// 소멸시 자식의 On_Destroy 호출
-	// ReSharper disable once CppVirtualFunctionCallInsideCtor
-	On_Destroy();
-    Object::On_Destroy();
 }
 
 void Object::Destroy(const Shared<Object>& object)

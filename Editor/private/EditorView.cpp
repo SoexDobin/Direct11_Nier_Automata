@@ -31,7 +31,7 @@ void EditorView::RenderView() {
 
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 		ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), viewportSize);
-
+		
 	}
 	ImGui::End();
 

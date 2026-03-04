@@ -14,10 +14,11 @@ ClientApp::~ClientApp() {}
 HRESULT ClientApp::Initialize(const ENGINE_DESC &desc) {
   Client::Register_Client_Reflection();
 
-  if (FAILED(
-          ClientSettingManager::GetInstance()->Apply_LayerAndTagSettings())) {
+  if (FAILED(ClientSettingManager::GetInstance()->Apply_LayerAndTagSettings())) {
     return E_FAIL;
   }
+  if (FAILED(ClientSettingManager::GetInstance()->Load_EngineDesc(ClientSettingManager::g_EngineDesc)))
+      return E_FAIL;
 
   if (FAILED(Ready_StartLevel(LEVEL::LOGO)))
     return E_FAIL;

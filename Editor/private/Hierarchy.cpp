@@ -49,7 +49,7 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
     flags |= ImGuiTreeNodeFlags_Selected;
 
   // wstring → UTF-8 string 변환 (ImGui는 UTF-8 기준)
-  const wstring &wName = pObj->Get_Name();
+  const wstring &wName = Clean_RTTR_Name(pObj->Get_Name());
   int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wName.c_str(), -1, nullptr, 0,
                                     nullptr, nullptr);
   string name(utf8Len, '\0');

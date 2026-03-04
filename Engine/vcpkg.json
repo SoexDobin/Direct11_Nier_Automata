@@ -5,19 +5,9 @@
     "magic-enum",
     "directxtk",
     "nlohmann-json",
-    "assimp",
     "spdlog",
     "python3",
     "rttr",
-    "effects11",
-    {
-      "name": "imgui",
-      "features": [
-        "dx11-binding",
-        "win32-binding",
-        "docking-experimental"
-      ]
-    },
-    "imguizmo"
+    "effects11"
   ]
 }

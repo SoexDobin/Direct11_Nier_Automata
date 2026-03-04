@@ -1,4 +1,4 @@
-﻿#include "Component.h"
+#include "Component.h"
 #include "ID_Helper.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"

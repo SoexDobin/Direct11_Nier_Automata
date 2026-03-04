@@ -31,6 +31,7 @@ HRESULT EditorManager::Initialize()
         desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
         desc.up = Vector4{ 0.f, 1.f, 0.f, 1.f };
         desc.fovY = XMConvertToRadians(60.f);
+        desc.aspect = g_projectSettings.viewportWidth / g_projectSettings.viewportHeight;
         desc.nearPlane = 0.1f;
         desc.farPlane = 500.f;
     }
@@ -62,6 +63,7 @@ void EditorManager::Update() {
     }
     else {
         if (m_EditorCamera) {
+            GAME_INSTANCE->Update_Input();
             m_EditorCamera->Update(timeDelta);
             GAME_INSTANCE->Submit_RenderGroup();
         }

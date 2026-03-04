@@ -13,6 +13,8 @@
 
 IMPLEMENT_SINGLETON(ClientSettingManager)
 
+ENGINE_DESC ClientSettingManager::g_EngineDesc{};
+
 HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const 
 {
 	std::wstring path = m_ProjectSettingPath + L"EngineDesc.json";
@@ -36,6 +38,8 @@ HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const
 	outDesc.viewportWidth = json.value("viewportWidth", 1920);
 	outDesc.viewportHeight = json.value("viewportHeight", 1080);
 	outDesc.windowTitle = Helper::To_wString(json.value("windowTitle", "NieRAutomata"));
+
+	g_EngineDesc = outDesc;
 
 	return S_OK;
 }

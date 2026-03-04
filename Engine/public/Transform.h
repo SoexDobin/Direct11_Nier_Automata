@@ -1,5 +1,7 @@
 #pragma once
 #include "Component.h"
+#include "rttr/registration.h"
+#include "rttr/registration_friend.h"
 
 NS_BEGIN(Engine)
 
@@ -7,9 +9,12 @@ class Shader;
 
 class ENGINE_DLL Transform final : public Component, public enable_shared_from_this<Transform> 
 {
+    RTTR_ENABLE(Component)
+	RTTR_REGISTRATION_FRIEND
 public:
-    Transform(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
-    Transform(const Transform& prototype);
+    explicit Transform();
+    explicit Transform(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
+    explicit Transform(const Transform& prototype);
     ~Transform() override = default;
 
 public: /* Local Getter */
@@ -20,7 +25,7 @@ public: /* Local Getter */
     Matrix Get_LocalMatrix() const;
 
 public: /* Local Setter */
-    void Set_LocalScale(const Vector3& scale);
+    void Set_LocalScale(Vector3 scale);
     void Set_LocalScale(Float x, Float y, Float z);
 
     void Set_LocalRotation(const Quaternion& rotation);
@@ -86,6 +91,11 @@ private:
 public:
     static Shared<Transform> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
     Shared<Component> Clone(void *arg) override;
+
+private: /* For Reflection */
+    void Set_LocalPositionByValue(Vector3 position) { Set_LocalPosition(position); }
+    void Set_LocalRotationByValue(Quaternion quaternion) { Set_LocalRotation(quaternion); }
+    void Set_LocalScaleByValue(Vector3 scale) { Set_LocalScale(scale); }
 };
 
 NS_END

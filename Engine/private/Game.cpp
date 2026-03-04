@@ -153,6 +153,8 @@ void Game::Clear_Resource(uint32 levIndex) const {
   }
 }
 
+void Game::Update_Input() const { m_InputDevice->Update(); }
+
 HRESULT Game::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
   if (FAILED(m_GraphicDevice->Clear_BackBufferView(clearColor)))
     return E_FAIL;

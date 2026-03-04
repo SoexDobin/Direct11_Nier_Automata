@@ -35,6 +35,9 @@ void EditorCamera::Priority_Update(Float timeDelta) {
 
 void EditorCamera::Update(Float timeDelta) {
 
+    if (timeDelta <= 0)
+        timeDelta = 0.016667f;
+
     Float speed = m_CameraSpeed * timeDelta;
     // 1. WASD (XZ 평면 이동)
     Vector3 look = m_Transform->Get_WorldMatrix().Backward();
@@ -44,36 +47,44 @@ void EditorCamera::Update(Float timeDelta) {
     look.y = 0.f;  look.Normalize();
     right.y = 0.f; right.Normalize();
     Vector3 currentPos = m_Transform->Get_Position();
-    if (ImGui::IsKeyDown(ImGuiKey_W)) currentPos += look * speed;
-    if (ImGui::IsKeyDown(ImGuiKey_S)) currentPos -= look * speed;
-    if (ImGui::IsKeyDown(ImGuiKey_A)) currentPos -= right * speed;
-    if (ImGui::IsKeyDown(ImGuiKey_D)) currentPos += right * speed;
+    if (GAME_INSTANCE->Get_DIKeyState(DIK_W) & 0x80) currentPos += look * speed;
+    if (GAME_INSTANCE->Get_DIKeyState(DIK_S) & 0x80) currentPos -= look * speed;
+    if (GAME_INSTANCE->Get_DIKeyState(DIK_A) & 0x80) currentPos -= right * speed;
+    if (GAME_INSTANCE->Get_DIKeyState(DIK_D) & 0x80) currentPos += right * speed;
     m_Transform->Set_Position(currentPos);
     // 2. 마우스 휠 (줌 인/아웃)
-    Float wheel = ImGui::GetIO().MouseWheel;
-    if (wheel != 0.f)
-    {
-        Vector3 zoomDir = m_Transform->Get_WorldMatrix().Backward();
-        zoomDir.Normalize();
-        // 휠 1틱당 이동할 거리 지정 (배율 곱하기)
-        m_Transform->Set_Position(m_Transform->Get_Position() + zoomDir * wheel * 5.f);
-    }
-    // 3. 우클릭 드래그 시 회전 (Turn)
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        ImVec2 mouseDelta = ImGui::GetIO().MouseDelta;
-
-        if (mouseDelta.x != 0.f || mouseDelta.y != 0.f)
-        {
-            m_Transform->Turn(Vector3{
-                mouseDelta.y,
-                mouseDelta.x,
-                0.f
-            },
-                timeDelta,
-                m_MouseSensitive
-            );
-        }
-    }
+	Long mouseWheel = GAME_INSTANCE->Get_DIMouseMove(DIMM::WHEEL);
+	if (mouseWheel != 0)
+	{
+		// 휠은 Y축 제약 없이 부드럽게 시선 방향으로 빨려 들어가야 줌 효과가 납니다.
+		Vector3 zoomDir = m_Transform->Get_WorldMatrix().Backward();
+		zoomDir.Normalize();
+		m_Transform->Set_Position(m_Transform->Get_Position() + zoomDir * static_cast<Float>(mouseWheel) * timeDelta * 0.5f);
+	}
+	// 3. 우클릭 드래그 시 회전 (Turn)
+	if (GAME_INSTANCE->Get_DIMouseState(DIMB::RBUTTON) & 0x80)
+	{
+		Long mouseMoveX = GAME_INSTANCE->Get_DIMouseMove(DIMM::X);
+		Long mouseMoveY = GAME_INSTANCE->Get_DIMouseMove(DIMM::Y);
+		if (mouseMoveX != 0)
+		{
+			m_Transform->Turn(Vector3{
+				0.f,
+				static_cast<Float>(mouseMoveX),
+				0.f },
+				timeDelta,
+				m_MouseSensitive);
+		}
+		if (mouseMoveY != 0)
+		{
+			m_Transform->Turn(Vector3{
+				static_cast<Float>(mouseMoveY),
+				0.f,
+				0.f },
+				timeDelta,
+				m_MouseSensitive);
+		}
+	}
 }
 
 void EditorCamera::Late_Update(Float timeDelta) {}
@@ -89,12 +100,6 @@ HRESULT EditorCamera::Bind_EditorMatrix() const {
   GAME_INSTANCE->Set_Transform(D3DTS::PROJ, projMatrix);
 
   return S_OK;
-}
-
-Vector3
-EditorCamera::RaycastEditorView(Vector2 mousePos, Vector2 viewSize,
-                                Shared<class GameOject> *outObjectAddress) {
-  return Vector3::One;
 }
 
 Shared<EditorCamera>

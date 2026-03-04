@@ -78,5 +78,32 @@ NS_BEGIN(Helper)
 	{
         return std::format(fmt, std::forward<Args>(args)...);
     }
+
+    static std::string Clean_RTTR_Name(const std::string& rawName) {
+        size_t pos = rawName.rfind("::"); // 가장 마지막에 있는 :: 찾기
+        if (pos != std::string::npos) {
+            return rawName.substr(pos + 2); // :: 다음 글자부터 끝까지 반환!
+        }
+
+        // 만약 "class Terrain" 처럼 남았다면 "class " 지우기
+        size_t classPos = rawName.find("class ");
+        if (classPos != std::string::npos) {
+            return rawName.substr(classPos + 6);
+        }
+        return rawName;
+    }
+    static std::wstring Clean_RTTR_Name(const std::wstring& rawName) {
+        size_t pos = rawName.rfind(L"::"); // 가장 마지막에 있는 :: 찾기
+        if (pos != std::string::npos) {
+            return rawName.substr(pos + 2); // :: 다음 글자부터 끝까지 반환!
+        }
+
+        // 만약 "class Terrain" 처럼 남았다면 "class " 지우기
+        size_t classPos = rawName.find(L"class ");
+        if (classPos != std::string::npos) {
+            return rawName.substr(classPos + 6);
+        }
+        return rawName;
+    }
 NS_END
 NS_END

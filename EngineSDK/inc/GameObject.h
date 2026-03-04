@@ -5,13 +5,14 @@
 #include "Object.h"
 #include "TagRegistry.h"
 
-
 NS_BEGIN(Engine)
 
 class Component;
 class Transform;
 
-class ENGINE_DLL GameObject abstract : public Object, public enable_shared_from_this<GameObject> {
+class ENGINE_DLL GameObject abstract
+    : public Object,
+      public enable_shared_from_this<GameObject> {
   RTTR_ENABLE(Object)
 public:
   explicit GameObject();
@@ -70,7 +71,7 @@ protected: /* Component */
 
 public:
   inline Shared<Component> Get_Component(uint32 objectID);
-  const map<uint32, Shared<Component>>& Get_Components() const {
+  const map<uint32, Shared<Component>> &Get_Components() const {
     return m_Components;
   }
   const unordered_map<uint32, Shared<Component>> &Get_Scripts() const {

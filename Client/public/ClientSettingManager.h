@@ -26,6 +26,9 @@ private:
 	wstring m_ResourcePath = L"../bin/resources/";
 	wstring m_ShaderPath = L"../bin/shaders/";
 	wstring m_ProjectSettingPath = L"../../ProjectSetting/";
+
+public:
+	static ENGINE_DESC g_EngineDesc;
 };
 
 NS_END

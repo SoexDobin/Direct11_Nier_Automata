@@ -20,53 +20,52 @@ class LayerRegistry;
 class TagRegistry;
 
 class ENGINE_DLL Game {
-  DECLARE_SINGLETON(Game)
-
+	DECLARE_SINGLETON(Game)
 protected:
-  explicit Game() = default;
-  ~Game();
+    explicit Game() = default;
+    ~Game();
 
 public:
-  HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
-  void Update_Engine();
-  HRESULT Draw() const;
-  HRESULT Draw_NoClearing() const;
-  void Clear_Resource(uint32 levIndex) const;
-  void Clear_AllResource() const;
+    HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
+    void Update_Engine();
+    HRESULT Draw() const;
+    HRESULT Draw_NoClearing() const;
+    void Clear_Resource(uint32 levIndex) const;
+    void Clear_AllResource() const;
 
 public: /* For Editor / Tool */
-  ComPtr<ID3D11Device> Get_Device() const { return m_GraphicDevice->Get_Device(); }
-  ComPtr<ID3D11DeviceContext> Get_Context() const { return m_GraphicDevice->Get_Context(); }
-
-  Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
-  Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
-
-public: /* For GraphicDevice */
-  HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
-  HRESULT Present() const;
-  HRESULT OnResize(uint32 width, uint32 height);
-  HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
-  HRESULT End_RenderOffScreen() const;
-  ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
+    ComPtr<ID3D11Device> Get_Device() const { return m_GraphicDevice->Get_Device(); }
+    ComPtr<ID3D11DeviceContext> Get_Context() const { return m_GraphicDevice->Get_Context(); }
+    Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
+    Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
 
 public:
-  Byte Get_DIKeyState(uByte byKeyID) const;
-  Byte Get_DIMouseState(DIMB mouseInput) const;
-  Long Get_DIMouseMove(DIMM mouseState) const;
+    void Update_Input() const;
+
+public: /* For GraphicDevice */
+    HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
+    HRESULT Present() const;
+    HRESULT OnResize(uint32 width, uint32 height);
+    HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
+    HRESULT End_RenderOffScreen() const;
+    ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
+
+public:
+    Byte Get_DIKeyState(uByte byKeyID) const;
+    Byte Get_DIMouseState(DIMB mouseInput) const;
+    Long Get_DIMouseMove(DIMM mouseState) const;
 
 public: /* For TimeManager */
-  HRESULT Add_Timer(const wstring &timerTag) const;
-  void Set_TimeScale(Float timeScale) const;
-  Float Get_FPS() const;
-  Float Compute_TimeDelta() const;
-  Float Compute_UnscaledTimeDelta() const;
-  Float Compute_TimeDelta(const wstring &timerTag) const;
+    HRESULT Add_Timer(const wstring &timerTag) const;
+    void Set_TimeScale(Float timeScale) const;
+    Float Get_FPS() const;
+    Float Compute_TimeDelta() const;
+    Float Compute_UnscaledTimeDelta() const;
+    Float Compute_TimeDelta(const wstring &timerTag) const;
 
 public: /* For LevelManager */
-  uint32 Get_CurrentLevelIndex() const {
-    return m_LevelManager->Get_CurrentLevelIndex();
-  }
-  HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
+    uint32 Get_CurrentLevelIndex() const { return m_LevelManager->Get_CurrentLevelIndex(); }
+    HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
 
 public: /* For PrototypeManager */
   uint32 Get_PrototypeID(const wstring &name) const {

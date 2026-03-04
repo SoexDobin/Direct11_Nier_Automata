@@ -27,6 +27,8 @@ private:
   void Reset_ClientApp();
 
 private:
+	Bool m_IsReset = { false };
+	Shared<Game> m_Game = { nullptr };
 	Unique<ClientApp> m_ClientApp = {nullptr};
 	ENGINE_DESC m_EngineDesc = {};
 

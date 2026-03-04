@@ -60,8 +60,9 @@ def process_header_file(header_path: Path, processed_classes: Set[str]) -> tuple
         method_registrations += '\n        .method("Clone", &{}::Clone)'.format(class_name)
     if has_create:
         method_registrations += '\n        .method("Create", &{}::Create)'.format(class_name)
-        
-    rttr_block = f'''    rttr::registration::class_<{class_name}>(L"{class_name}")
+
+    # ⭐ RTTR 문자열 칸에만 clean_name을 적용!
+    rttr_block = f'''    rttr::registration::class_<{class_name}>(L"{clean_name}")
         .constructor<>()''' + method_registrations + ''';\n\n'''
     return class_name, rttr_block
 

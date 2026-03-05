@@ -15,7 +15,7 @@ public:
 	const wstring &Get_Name() const { return m_ObjectName; }
 
 public:
-	virtual HRESULT Initialize_Prototype() { return S_OK; }
+	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void *arg) { return S_OK; }
 
 	Bool Is_Destroy() const { return m_IsDestroy; }

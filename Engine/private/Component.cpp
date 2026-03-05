@@ -19,7 +19,7 @@ Component::Component(const Component& prototype)
 }
 
 HRESULT Component::Initialize_Prototype() {
-  Helper::CreateID(Helper::OBJECT_ID_TYPE, m_ObjectDesc);
+    m_ObjectDesc.m_typeID = rttr::type::get(*this).get_id();
   if (m_ObjectDesc.m_typeID == 0) {
     LOG_ERROR(L"Component Initialize Failed By Set TypeID");
     MSG_BOX("Component Initialize Failed By Set TypeID");

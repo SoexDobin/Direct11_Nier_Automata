@@ -114,45 +114,19 @@ HRESULT ClientSettingManager::Load_Texture(LEVEL level) const
 					}
 				}
 
-				if (level == LEVEL::STATIC)
-				{
-					for (uint32 i = 0; i < ETOI(LEVEL::LEVEL_END); ++i)
-					{
-						GAME_INSTANCE->Add_Prototype(i,
-							Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-								formatPath.c_str(), sequenceCount)
-						);
-					}
-				}
-				else
-				{
-					GAME_INSTANCE->Add_Prototype(levIndex,
-						Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-							formatPath.c_str(), sequenceCount)
-					);
-				}
+				GAME_INSTANCE->Add_Prototype(levIndex,
+					Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+						formatPath.c_str(), sequenceCount)
+				);
 			}
 			else
 			{
 				std::wstring formatPath = FilePath;
 				std::wstring tagName = entry.path().stem().wstring();
-				if (level == LEVEL::STATIC)
-				{
-					for (uint32 i = 0; i < ETOI(LEVEL::LEVEL_END); ++i)
-					{
-						GAME_INSTANCE->Add_Prototype(i,
-							Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-								formatPath.c_str(), 1)
-						);
-					}
-				}
-				else
-				{
-					GAME_INSTANCE->Add_Prototype(levIndex,
-						Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), 
-							formatPath.c_str(), 1)
-					);
-				}
+				GAME_INSTANCE->Add_Prototype(levIndex,
+					Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+						formatPath.c_str(), 1)
+				);
 			}
 		}
 	}
@@ -185,6 +159,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
+				std::wstring meshTex = L"meshtex";
 				
 				auto itTex = 
 					std::search(
@@ -196,6 +171,12 @@ HRESULT ClientSettingManager::Load_Shader() const
 					std::search(
 						tagName.begin(), tagName.end(), 
 						normTex.begin(), normTex.end(),
+						CaseInsensitiveCompare
+					);
+				auto itMeshTex =
+					std::search(
+						tagName.begin(), tagName.end(),
+						meshTex.begin(), meshTex.end(),
 						CaseInsensitiveCompare
 					);
 
@@ -213,6 +194,14 @@ HRESULT ClientSettingManager::Load_Shader() const
 						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
 							(m_ShaderPath + tagName).c_str(), 
 							VTXNORMTEX::Elemnets, VTXNORMTEX::numElements)
+					);
+				}
+				else if (itMeshTex != tagName.end())
+				{
+					GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
+						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+							(m_ShaderPath + tagName).c_str(),
+							VTXMESH::Elemnets, VTXMESH::numElements) // TODO: mesh 셰이더
 					);
 				}
 				else

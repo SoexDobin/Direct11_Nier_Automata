@@ -66,18 +66,19 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   if (nullptr == (m_LevelManager = LevelManager::Create()))
     return E_FAIL;
 
-  if (nullptr ==
-      (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount)))
+  if (nullptr == (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount)))
     return E_FAIL;
 
   if (nullptr == (m_ObjectManager = ObjectManager::Create()))
     return E_FAIL;
 
+  if (nullptr == (m_ResourceManager = ResourceManager::Create()))
+      return E_FAIL;
+
   if (nullptr == (m_CameraManager = CameraManager::Create()))
     return E_FAIL;
 
-  if (nullptr ==
-      (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),
+  if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),
                                      m_GraphicDevice->Get_Context())))
     return E_FAIL;
 
@@ -129,6 +130,7 @@ void Game::Clear_AllResource() const {
     m_Renderer->Clear_RenderGroup();
     m_CameraManager->Clear_Cameras();
     m_LightManager->Clear_Lights();
+    m_ResourceManager->Clear_Resources();
 }
 
 void Game::Clear_Resource(uint32 levIndex) const {
@@ -138,6 +140,10 @@ void Game::Clear_Resource(uint32 levIndex) const {
 
   if (FAILED(m_ObjectManager->Clear_GameObjects())) {
     LOG_CRITICAL(L"Failed To Clear GameObjects");
+  }
+
+  if (FAILED(m_ResourceManager->Clear_Resources())) {
+      LOG_CRITICAL(L"Failed To Clear Resources");
   }
 
   if (FAILED(m_Renderer->Clear_RenderGroup())) {
@@ -263,8 +269,17 @@ Shared<Camera> Game::Get_MainCamera() const {
   return m_CameraManager->Get_MainCamera();
 }
 
-void Game::Add_RenderGroup(RENDERGROUP group,
-                           const Shared<GameObject> &gameObject) const {
+uint32 Game::Get_ResourceTypeID(const wstring& resourcePath) const
+{
+    return m_ResourceManager->Get_ResourceTypeID(resourcePath);
+}
+
+HRESULT Game::Add_ResourceTypeID(const wstring& resourcePath, uint32 typeID) const
+{
+    return m_ResourceManager->Add_ResourceTypeID(resourcePath, typeID);
+}
+
+void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObject) const {
   m_Renderer->Add_RenderGroup(group, gameObject);
 }
 
@@ -282,8 +297,7 @@ HRESULT Game::Bind_TransformMatrix(const Shared<Shader> &shader,
 HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<Shader> &shader,
                                            const Char *constantName,
                                            D3DTS transformState) {
-  return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName,
-                                                  transformState);
+  return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName, transformState);
 }
 
 Matrix Game::Get_Transform(D3DTS transformState) const {
@@ -322,19 +336,6 @@ Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID,
   return nullptr;
 }
 
-Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype,
-                                          const wstring &className,
-                                          uint32 levIndex) const {
-  uint32 level =
-      levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
-
-  if (Shared<Object> object =
-          m_PrototypeManager->Find_Prototype(prototype, level, className)) {
-    return static_pointer_cast<Object>(object);
-  }
-  return nullptr;
-}
-
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
                                           uint32 typeID, void *arg) const {
   auto prototypeInstance =
@@ -356,29 +357,27 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
   return nullptr;
 }
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
-                                          const wstring &className,
-                                          void *arg) const {
-  auto prototypeInstance =
-      m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
-
-  if (!prototypeInstance) {
-    return nullptr;
-  }
-
-  if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
-    auto gameObject =
-        static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
-    m_ObjectManager->Add_GameObject(gameObject);
-
-    return gameObject;
-  }
-
-  if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
-    return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
-  }
-
-  LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
-  MSG_BOX("Prototype Miss Match In Instantiate Internal");
-  return nullptr;
-}
+//Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
+//                                          const wstring &className,
+//                                          void *arg) const {
+//  auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
+//
+//    if (!prototypeInstance) {
+//		return nullptr;
+//    }
+//
+//    if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
+//		auto gameObject = static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
+//		m_ObjectManager->Add_GameObject(gameObject);
+//
+//		return gameObject;
+//    }
+//
+//    if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
+//		return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
+//    }
+//
+//    LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
+//    MSG_BOX("Prototype Miss Match In Instantiate Internal");
+//    return nullptr;
+//}

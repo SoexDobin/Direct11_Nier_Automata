@@ -22,9 +22,12 @@ public:
   void Render() override;
 
 private:
-  void GameObjectGUI(const Shared<Engine::GameObject> &pObj);
-  void GameObjectPropertiesGUI(const Shared<Engine::GameObject> &pObj);
-  void ComponentGUI(const string &label,
+	void Render_Properties(rttr::property prop, const Shared<Component>& component);
+
+private:
+	void GameObjectGUI(const Shared<Engine::GameObject> &pObj);
+	void GameObjectPropertiesGUI(const Shared<GameObject> &pObj);
+	void ComponentGUI(const string &label,
                     const Shared<Engine::Component> &pComp);
 
 public:

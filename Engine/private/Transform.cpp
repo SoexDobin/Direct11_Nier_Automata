@@ -21,7 +21,12 @@ Vector3 Transform::Get_LocalScale() const { return m_LocalScale; }
 Vector3 Transform::Get_LocalPosition() const { return m_LocalPosition; }
 Quaternion Transform::Get_LocalRotation() const { return m_LocalRotation; }
 Vector3 Transform::Get_LocalEulerAngles() const {
-  return m_LocalRotation.ToEuler();
+    Vector3 rad = m_LocalRotation.ToEuler();
+    return Vector3{
+        XMConvertToDegrees(rad.x),
+        XMConvertToDegrees(rad.y),
+        XMConvertToDegrees(rad.z)
+    };
 }
 Matrix Transform::Get_LocalMatrix() const {
   Matrix scale = Matrix::CreateScale(m_LocalScale);
@@ -31,12 +36,30 @@ Matrix Transform::Get_LocalMatrix() const {
   return scale * rotation * position;
 }
 
-void Transform::Set_LocalScale(Vector3 scale) {
-  m_LocalScale = scale;
-  m_IsDirty = true;
+void Transform::Set_LocalScale(const Vector3& scale) {
+    m_LocalScale = scale;
+    m_IsDirty = true;
 }
+
 void Transform::Set_LocalScale(Float x, Float y, Float z) {
   Set_LocalScale(Vector3{x, y, z});
+}
+
+void Transform::Set_LocalScaleByValue(Vector3 scale) {
+    m_LocalScale = scale;
+    m_IsDirty = true;
+    Update_WorldMatrix();
+}
+
+void Transform::Set_LocalEulerAngleByValue(Vector3 rotation) {
+    Set_LocalRotation(rotation);
+    Update_WorldMatrix();
+}
+
+void Transform::Set_LocalPositionByValue(Vector3 position) {
+    m_LocalPosition = position;
+    m_IsDirty = true;
+    Update_WorldMatrix();
 }
 
 void Transform::Set_LocalRotation(const Quaternion &rotation) {
@@ -84,6 +107,21 @@ Quaternion Transform::Get_RotationQuaternion() const {
 
 Vector3 Transform::Get_Position() const { return m_WorldMatrix.Translation(); }
 Matrix Transform::Get_WorldMatrix() const { return m_WorldMatrix; }
+
+Vector3 Transform::Get_Right() const
+{
+    return m_WorldMatrix.Right();
+}
+
+Vector3 Transform::Get_Up() const
+{
+    return m_WorldMatrix.Up();
+}
+
+Vector3 Transform::Get_Look() const
+{
+    return m_WorldMatrix.Backward();
+}
 
 void Transform::Set_Scale(Float scaleX, Float scaleY, Float scaleZ) {
   Set_Scale(Vector3{scaleX, scaleY, scaleZ});

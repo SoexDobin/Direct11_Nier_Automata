@@ -3,40 +3,12 @@
 #include "GameObject.h"
 #include "SpdLogger.h"
 #include "ScriptComponent.h"
-#include "String_Helper.h"
 
 #include "Engine_Define.h"
-
-uint32 PrototypeManager::Get_TypeByName(const wstring &name) {
-    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
-  uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
-
-  if (!m_TypesByName[level].contains(name)) {
-    LOG_WARN(L"{} : Failed To Get {} To typeID", name, m_ObjectName);
-    MSG_BOX("Failed To Get TypeID");
-  }
-
-  return m_TypesByName[level][name];
-}
-
-const wstring &PrototypeManager::Get_NameByType(uint32 typeID) {
-    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
-  uint32 level = Game::GetInstance()->Get_CurrentLevelIndex();
-
-  if (!m_NameByTypes[level].contains(typeID) ||
-      m_NameByTypes[level][typeID].empty()) {
-    LOG_WARN(L"{} : Failed To Get TypeID:{} To Name", typeID, m_ObjectName);
-    MSG_BOX("Failed To Get TypeName");
-  }
-
-  return m_NameByTypes[level][typeID];
-}
 
 HRESULT PrototypeManager::Initialize(void* arg) {
     m_LevelCount = arg == nullptr ? 0 : *static_cast<uintptr_t*>(arg);
 
-    m_NameByTypes.resize(m_LevelCount);
-    m_TypesByName.resize(m_LevelCount);
     m_GameObjects.resize(m_LevelCount);
     m_Components.resize(m_LevelCount);
 
@@ -45,21 +17,15 @@ HRESULT PrototypeManager::Initialize(void* arg) {
 
 void PrototypeManager::On_Destroy() {
   for (uint32 i = 0; i < m_LevelCount; ++i) {
-    m_NameByTypes[i].clear();
-    m_TypesByName[i].clear();
     m_GameObjects[i].clear();
     m_Components[i].clear();
   }
 
-  m_NameByTypes.clear();
-  m_TypesByName.clear();
   m_GameObjects.clear();
   m_Components.clear();
 }
 
-HRESULT PrototypeManager::Add_Prototype(uint32 levIndex,
-                                        const Shared<Object> &object,
-                                        void *arg) 
+HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object> &object) 
 {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
 	if (!Validate_Level(levIndex)) {
@@ -73,15 +39,12 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex,
         return E_FAIL;
     }
 
-    if (!object->Get_Name().empty()) {
-        m_NameByTypes[levIndex].emplace(object->Get_TypeID(), object->Get_Name());
-        m_TypesByName[levIndex].emplace(object->Get_Name(), object->Get_TypeID());
-    } else MSG_BOX("Miss Type Name");
-
     if (prototype == PROTOTYPE::GAMEOBJECT) {
 		m_GameObjects[levIndex].emplace(object->Get_TypeID(), static_pointer_cast<GameObject>(object));
+        m_TypeObjects[levIndex][object->Get_TypeID()].push_back(object);
     } else if (prototype == PROTOTYPE::COMPONENT) {
 		m_Components[levIndex].emplace(object->Get_TypeID(), static_pointer_cast<Component>(object));
+        m_TypeObjects[levIndex][object->Get_TypeID()].push_back(object);
     }
 
     return S_OK;
@@ -89,24 +52,13 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex,
 
 HRESULT PrototypeManager::Clear_Prototypes()
 {
-    for (auto container : m_NameByTypes)
-        container.clear();
-    m_NameByTypes.shrink_to_fit();
-
-    for (auto container : m_TypesByName)
-        container.clear();
-    m_TypesByName.shrink_to_fit();
-
     for (auto container : m_GameObjects)
         container.clear();
     m_GameObjects.shrink_to_fit();
-
     for (auto container : m_Components)
         container.clear();
     m_Components.shrink_to_fit();
 
-    m_NameByTypes.resize(m_LevelCount);
-    m_TypesByName.resize(m_LevelCount);
     m_GameObjects.resize(m_LevelCount);
     m_Components.resize(m_LevelCount);
 
@@ -118,8 +70,6 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
       return E_FAIL;
     }
 
-    m_NameByTypes[levIndex].clear();
-    m_TypesByName[levIndex].clear();
     m_GameObjects[levIndex].clear();
     m_Components[levIndex].clear();
 
@@ -128,10 +78,9 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
 
 Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
                                                 uint32 levIndex,
-                                                uint32 typeID) const 
+                                                uint32 typeID) const
 {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
-
 	if (!Validate_Level(levIndex)) {
 		return nullptr;
 	}
@@ -154,20 +103,20 @@ Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
     return nullptr;
 }
 
-Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
-                                                uint32 levIndex,
-                                                const wstring &typeName) const 
+const vector<Shared<Object>>& PrototypeManager::Find_Prototypes(uint32 levIndex, uint32 typeID)
 {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+    static const vector<Shared<Object>> empty_object;
     if (!Validate_Level(levIndex)) {
-		return nullptr;
+        return empty_object;
     }
 
-	if (m_TypesByName[levIndex].contains(typeName)) {
-		return Find_Prototype(prototype, levIndex, m_TypesByName[levIndex].at(typeName));
-	}
+    if (m_TypeObjects[levIndex].contains(typeID))
+    {
+        return m_TypeObjects[levIndex][typeID];
+    }
 
-	return nullptr;
+    return empty_object;
 }
 
 Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {

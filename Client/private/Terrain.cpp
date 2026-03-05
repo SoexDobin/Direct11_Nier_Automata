@@ -1,5 +1,5 @@
-#include "Terrain.h"
 #include "pch.h"
+#include "Terrain.h"
 
 #include "Shader.h"
 #include "Texture.h"
@@ -8,9 +8,7 @@
 #include <SpdLogger.h>
 
 Terrain::Terrain() : GameObject{} {}
-
-Terrain::Terrain(const ComPtr<ID3D11Device> &device,
-                 const ComPtr<ID3D11DeviceContext> &context)
+Terrain::Terrain(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
     : GameObject{device, context} {}
 
 Terrain::Terrain(const Terrain &rhs) : GameObject{rhs} {}

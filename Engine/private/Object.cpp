@@ -1,12 +1,37 @@
 #include "Object.h"
+#include "ID_Helper.h"
+#include "SpdLogger.h"
+#include "String_Helper.h"
 
-Object::Object()
+Object::Object() {}
+
+Object::~Object() {}
+
+HRESULT Object::Initialize_Prototype()
 {
+    m_ObjectDesc.m_typeID = rttr::type::get(*this).get_id();
+    if (m_ObjectDesc.m_typeID == 0) {
+        LOG_ERROR(L"GameObject Initialize Failed By Set TypeID");
+        MSG_BOX("GameObject Initialize Failed By Set TypeID");
+        return E_FAIL;
+    }
 
-}
+    m_ObjectName =
+        Helper::To_wString(rttr::type::get(*this).get_name().to_string());
+    if (m_ObjectName.empty()) {
+        LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
+        MSG_BOX("GameObject Initialize Failed By Set Object Name");
+        return E_FAIL;
+    }
+	
+    Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_ObjectDesc);
+    if (m_ObjectDesc.m_objectID == 0) {
+        LOG_ERROR(L"GameObject {} Initialize Failed By ObjectID", m_ObjectName);
+        MSG_BOX("GameObject Initialize Failed By ObjectID");
+        return E_FAIL;
+    }
 
-Object::~Object()
-{
+    return S_OK;
 }
 
 void Object::Destroy(const Shared<Object>& object)

@@ -98,12 +98,12 @@ HRESULT Loader::Loading_For_LogoLevel() {
 	m_isFinished = false;
 
     lstrcpy(m_LoadingText, TEXT("Loading Logo Level Texture... "));
-    //if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::LOGO)))
-    //{
-    //    LOG_ERROR(L"Failed To Load Level Texture");
-    //    m_isFinished = true;
-    //    return E_FAIL;
-    //}
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::LOGO)))
+    {
+        LOG_ERROR(L"Failed To Load Level Texture");
+        m_isFinished = true;
+        return E_FAIL;
+    }
     
     if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::LOADING),
         Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),

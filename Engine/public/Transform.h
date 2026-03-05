@@ -10,7 +10,6 @@ class Shader;
 class ENGINE_DLL Transform final : public Component, public enable_shared_from_this<Transform> 
 {
     RTTR_ENABLE(Component)
-	RTTR_REGISTRATION_FRIEND
 public:
     explicit Transform();
     explicit Transform(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
@@ -25,15 +24,18 @@ public: /* Local Getter */
     Matrix Get_LocalMatrix() const;
 
 public: /* Local Setter */
-    void Set_LocalScale(Vector3 scale);
+    void Set_LocalScale(const Vector3 &scale);
     void Set_LocalScale(Float x, Float y, Float z);
+    void Set_LocalScaleByValue(Vector3 scale);
 
     void Set_LocalRotation(const Quaternion& rotation);
     void Set_LocalRotation(const Vector3& eulerAngles);
     void Set_LocalRotation(Float pitch, Float yaw, Float roll);
+    void Set_LocalEulerAngleByValue(Vector3 rotation);
 
     void Set_LocalPosition(const Vector3 &position);
     void Set_LocalPosition(Float x, Float y, Float z);
+    void Set_LocalPositionByValue(Vector3 position);
 
 public: /* World Getter */
     Vector3 Get_Scale() const;
@@ -41,6 +43,9 @@ public: /* World Getter */
     Quaternion Get_RotationQuaternion() const;
     Vector3 Get_Position() const;
     Matrix Get_WorldMatrix() const;
+    Vector3 Get_Right() const;
+    Vector3 Get_Up() const;
+    Vector3 Get_Look() const;
 
 public: /* World Setter */
     void Set_Scale(Float scaleX, Float scaleY, Float scaleZ);
@@ -92,10 +97,6 @@ public:
     static Shared<Transform> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
     Shared<Component> Clone(void *arg) override;
 
-private: /* For Reflection */
-    void Set_LocalPositionByValue(Vector3 position) { Set_LocalPosition(position); }
-    void Set_LocalRotationByValue(Quaternion quaternion) { Set_LocalRotation(quaternion); }
-    void Set_LocalScaleByValue(Vector3 scale) { Set_LocalScale(scale); }
 };
 
 NS_END

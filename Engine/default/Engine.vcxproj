@@ -221,6 +221,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Pipeline.h" />
     <ClInclude Include="..\public\PrototypeManager.h" />
     <ClInclude Include="..\public\Renderer.h" />
+    <ClInclude Include="..\public\ResourceManager.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
@@ -256,6 +257,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Pipeline.cpp" />
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
+    <ClCompile Include="..\private\ResourceManager.cpp" />
     <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>

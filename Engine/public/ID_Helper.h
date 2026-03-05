@@ -11,9 +11,8 @@ NS_BEGIN(Helper)
 	using	ObjectUnique = unsigned __int32;
 	using	OBJECT_ID_FLAG	=	unsigned __int32;
 	constexpr uint32 OBJECT_ID_FULL		= 0x00000000;
-	constexpr uint32 OBJECT_ID_TYPE		= 0x00000001;
-	constexpr uint32 OBJECT_ID_UNIQUE	= 0x00000002; 
-	constexpr uint32 OBJECT_ID_NONE		= 0x00000003;
+	constexpr uint32 OBJECT_ID_UNIQUE	= 0x00000001; 
+	constexpr uint32 OBJECT_ID_NONE		= 0x00000002;
 	
 
 	static std::atomic<uint32> g_TypeIDCounter = { 1 };	// 프로토타입 개수 카운터
@@ -32,7 +31,7 @@ NS_BEGIN(Helper)
         return hash;
     }
     
-	static uint32 CreateID()
+	static uint32 CreateInstanceID()
     {
         GUID guid = {};
         if (SUCCEEDED(CoCreateGuid(&guid)))
@@ -53,15 +52,6 @@ NS_BEGIN(Helper)
 
         switch (requestFlag)
         {
-            case OBJECT_ID_TYPE:
-                if (SUCCEEDED(CoCreateGuid(&guid)))
-                {
-                    idDesc.m_typeID = Hash_GUID(guid);
-                    idDesc.m_objectID = 0;
-                    g_TypeIDCounter.fetch_add(1);  // 카운터는 로깅용
-                }
-                break;
-
             case OBJECT_ID_UNIQUE:
                 if (SUCCEEDED(CoCreateGuid(&guid)))
                 {

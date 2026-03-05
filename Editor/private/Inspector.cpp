@@ -43,23 +43,23 @@ void Inspector::Render() {
 // GameObjectGUI: 선택 오브젝트의 이름・Layer/Tag・Transform・컴포넌트 표시
 // ====================================================
 void Inspector::GameObjectGUI(const Shared<GameObject> &pObj) {
-	// ── 오브젝트 이름
+	
 	string name = Helper::To_String(Clean_RTTR_Name(pObj->Get_Name()));
 	ImGui::Text("Name : %s", name.c_str());
 	ImGui::Text("ID   : %u", pObj->Get_ObjectID());
 	ImGui::Separator();
 
-  // ── RTTR GameObject 프로퍼티 (LayerNames, TagNames 등)
-  GameObjectPropertiesGUI(pObj);
-  ImGui::Separator();
+	/*GameObject*/
+	GameObjectPropertiesGUI(pObj);
+	ImGui::Separator();
 
-  // ── Transform 섹션
-  Shared<Transform> pTransform = pObj->Get_Transform();
-  if (pTransform) {
-    string typeName = rttr::type::get(*pTransform).get_name().to_string();
-    ComponentGUI(typeName, pTransform);
-  }
-  ImGui::Separator();
+	/*Transform*/
+	Shared<Transform> transform = pObj->Get_Transform();
+    if (transform) {
+      string typeName = rttr::type::get(*transform).get_name().to_string();
+      ComponentGUI(typeName, transform);
+    }
+    ImGui::Separator();
 
   // ── Components 섹션 (Transform 제외)
   const auto &components = pObj->Get_Components();
@@ -173,55 +173,117 @@ void Inspector::GameObjectPropertiesGUI(const Shared<GameObject> &pObj) {
   ImGui::PopID();
 }
 
-// ====================================================
-// ComponentGUI: 개별 컴포넌트 헤더 + RTTR 프로퍼티 표시
-// ====================================================
-void Inspector::ComponentGUI(const string &label,
-                             const Shared<Component> &pComp) {
-  if (!pComp)
-    return;
-
-  ImGui::PushID(static_cast<int>(pComp->Get_ObjectID()));
-
-  if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-    auto rttrType = rttr::type::get(*pComp);
-    for (auto &prop : rttrType.get_properties()) {
-      string propName = prop.get_name().to_string();
-      rttr::variant value = prop.get_value(*pComp);
-
-      if (value.is_type<float>()) {
-        float v = value.get_value<float>();
-        if (ImGui::DragFloat(propName.c_str(), &v, 0.01f))
-          prop.set_value(*pComp, v);
-      } else if (value.is_type<Vector3>()) {
-        Vector3 v = value.get_value<Vector3>();
-        float arr[3] = {v.x, v.y, v.z};
-        if (ImGui::DragFloat3(propName.c_str(), arr, 0.1f)) {
-          v = Vector3(arr[0], arr[1], arr[2]);
-          prop.set_value(*pComp, v);
-
-          // Transform 이면 월드 행렬 갱신
-          if (rttrType.is_derived_from<Transform>())
-            static_pointer_cast<Transform>(pComp)->Update_WorldMatrix();
+void Inspector::ComponentGUI(const string& label, const Shared<Component>& component) {
+    if (!component) return;
+    ImGui::PushID(component->Get_ObjectID());
+    if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+        auto componentType = rttr::type::get(*component);
+        for (auto& prop : componentType.get_properties()) {
+            // prop와 컴포넌트 실체를 함께 넘김
+            Render_Properties(prop, component);
         }
-      } else if (value.is_type<int>() || value.is_type<int32_t>()) {
-        int v = value.get_value<int>();
-        if (ImGui::DragInt(propName.c_str(), &v))
-          prop.set_value(*pComp, v);
-      } else if (value.is_type<bool>()) {
-        bool v = value.get_value<bool>();
-        if (ImGui::Checkbox(propName.c_str(), &v))
-          prop.set_value(*pComp, v);
-      } else {
-        // 지원하지 않는 타입은 타입명만 표시
-        ImGui::TextDisabled("  %s : <%s>", propName.c_str(),
-                            value.get_type().get_name().to_string().c_str());
-      }
     }
-  }
-
-  ImGui::PopID();
+    ImGui::PopID();
 }
+
+void Inspector::Render_Properties(rttr::property prop, const Shared<Component>& component)
+{
+    std::string propName = prop.get_name().to_string();
+    rttr::variant varValue = prop.get_value(*component);
+    if (!varValue.is_valid())
+        return;
+
+    /* 메타데이터 파싱 (Widget 형태) */
+    std::string widgetStr{};
+    rttr::variant metaWidget = prop.get_metadata("Widget");
+    if (metaWidget.is_valid() && metaWidget.can_convert<std::string>())
+    {
+        widgetStr = metaWidget.to_string();
+    }
+
+    Bool isReadOnly = prop.is_readonly();
+    if (isReadOnly) ImGui::BeginDisabled();
+    
+    if (varValue.is_type<Engine::Vector3>())
+    {
+        Vector3 vec = varValue.get_value<Engine::Vector3>();
+
+        Float speed = 0.1f;
+        auto metaSpeed = prop.get_metadata("Speed");
+        if (metaSpeed.is_valid() && metaSpeed.can_convert<Float>()) speed = metaSpeed.to_float();
+
+        if (ImGui::DragFloat3(propName.c_str(), reinterpret_cast<Float*>(&vec), speed))
+        {
+            if (!prop.set_value(*component, vec))
+                LOG_WARN("Failed to Set : {}", propName);
+        }
+    }
+    else if (widgetStr == "ColorPicker" || varValue.is_type<Color>())
+    {
+        Color col = varValue.get_value<Color>();
+        if (ImGui::ColorEdit4(propName.c_str(), reinterpret_cast<float*>(&col)))
+        {
+            if (!prop.set_value(*component, col))
+                LOG_WARN("Failed to Set : {}", propName);
+        }
+    }
+    else if (widgetStr == "SliderFloat" && varValue.is_type<Float>())
+    {
+        Float val = varValue.get_value<Float>();
+        Float minVal = 0.f, maxVal = 100.f;
+
+        auto metaMin = prop.get_metadata("Min");
+        auto metaMax = prop.get_metadata("Max");
+        if (metaMin.is_valid() && metaMin.can_convert<Float>()) minVal = metaMin.to_float();
+        if (metaMax.is_valid() && metaMax.can_convert<Float>()) maxVal = metaMax.to_float();
+
+        if (ImGui::SliderFloat(propName.c_str(), &val, minVal, maxVal))
+        {
+            if (!prop.set_value(*component, val))
+                LOG_WARN("Failed to Set : {}", propName);
+        }
+    }
+    else if (widgetStr == "SliderInt" && varValue.is_type<int32>())
+    {
+        int32 val = varValue.get_value<int32>();
+        int32 minVal = 0, maxVal = 100;
+
+        auto metaMin = prop.get_metadata("Min");
+        auto metaMax = prop.get_metadata("Max");
+        if (metaMin.is_valid() && metaMin.can_convert<int32>()) minVal = metaMin.to_int();
+        if (metaMax.is_valid() && metaMax.can_convert<int32>()) maxVal = metaMax.to_int();
+
+        if (ImGui::SliderInt(propName.c_str(), &val, minVal, maxVal))
+        {
+            if (!prop.set_value(*component, val))
+                LOG_WARN("Failed to Set : {}", propName);
+        }
+    }
+    else if (varValue.is_type<int>())
+    {
+        int val = varValue.get_value<int>();
+        if (ImGui::DragInt(propName.c_str(), &val)) prop.set_value(*component, val);
+    }
+    else if (varValue.is_type<float>())
+    {
+        float val = varValue.get_value<float>();
+        if (ImGui::DragFloat(propName.c_str(), &val, 0.1f)) prop.set_value(*component, val);
+    }
+    else if (varValue.is_type<bool>())
+    {
+        bool val = varValue.get_value<bool>();
+        if (ImGui::Checkbox(propName.c_str(), &val)) prop.set_value(*component, val);
+    }
+    else if (varValue.is_type<std::string>())
+    {
+        std::string valStr = varValue.get_value<std::string>();
+        ImGui::LabelText(propName.c_str(), "%s", valStr.c_str());
+    }
+
+    // --- 읽기 전용 해제 ---
+    if (isReadOnly) ImGui::EndDisabled();
+}
+
 
 Shared<Inspector> Inspector::Create() {
   auto instance = make_shared<Inspector>();

@@ -1,4 +1,4 @@
-﻿#include "Shader.h"
+#include "Shader.h"
 
 Shader::Shader() : Component{} {}
 Shader::Shader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -72,8 +72,7 @@ HRESULT Shader::Begin(uint32 passIndex) {
   return S_OK;
 }
 
-HRESULT Shader::Bind_SRV(const Char *constantName,
-                         const ComPtr<ID3D11ShaderResourceView> &srv) 
+HRESULT Shader::Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderResourceView> &srv) 
 {
 	ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
 	if (nullptr == variable) {

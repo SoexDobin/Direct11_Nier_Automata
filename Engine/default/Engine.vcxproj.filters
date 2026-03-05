@@ -118,6 +118,9 @@
     <Filter Include="96. RTTR">
       <UniqueIdentifier>{761f8863-5b6b-4ef2-bd71-87a411a4e533}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\Manager">
+      <UniqueIdentifier>{9d6db1e0-3bf5-4ff2-b23e-e1e9a2f0f4a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -248,9 +251,14 @@
     <ClInclude Include="..\public\Mesh.h">
       <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Model.h" />
     <ClInclude Include="..\public\CameraManager.h">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ResourceManager.h">
+      <Filter>01. Utility\05. Component\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Model.h">
+      <Filter>01. Utility\05. Component\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -344,7 +352,6 @@
     <ClCompile Include="..\private\Mesh.cpp">
       <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\CameraManager.cpp">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
     </ClCompile>
@@ -356,6 +363,12 @@
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
       <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ResourceManager.cpp">
+      <Filter>01. Utility\05. Component\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Model.cpp">
+      <Filter>01. Utility\05. Component\Model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

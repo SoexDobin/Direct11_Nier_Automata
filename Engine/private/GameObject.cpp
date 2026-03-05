@@ -30,70 +30,47 @@ GameObject::GameObject(const GameObject &prototype)
   m_Transform = Get_Component<Transform>();
 }
 
-HRESULT GameObject::Initialize_Prototype() {
-  Helper::CreateID(Helper::OBJECT_ID_TYPE, m_ObjectDesc);
-  if (m_ObjectDesc.m_typeID == 0) {
-    LOG_ERROR(L"GameObject Initialize Failed By Set TypeID");
-    MSG_BOX("GameObject Initialize Failed By Set TypeID");
-    return E_FAIL;
-  }
-
-  m_ObjectName =
-      Helper::To_wString(rttr::type::get(*this).get_name().to_string());
-  if (m_ObjectName.empty()) {
-    LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
-    MSG_BOX("GameObject Initialize Failed By Set Object Name");
-    return E_FAIL;
-  }
-
-  return __super::Initialize_Prototype();
-}
+HRESULT GameObject::Initialize_Prototype() { return __super::Initialize_Prototype(); }
 
 HRESULT GameObject::Initialize(void *arg) {
-  Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_ObjectDesc);
-  if (m_ObjectDesc.m_objectID == 0) {
-    LOG_ERROR(L"GameObject {} Initialize Failed By ObjectID", m_ObjectName);
-    MSG_BOX("GameObject Initialize Failed By ObjectID");
-    return E_FAIL;
-  }
 
-  m_Transform = Transform::Create(m_Device, m_Context);
-  if (nullptr == m_Transform)
-    return E_FAIL;
+    m_Transform = Transform::Create(m_Device, m_Context);
+    if (nullptr == m_Transform)
+      return E_FAIL;
 
-  if (FAILED(m_Transform->Initialize(nullptr)))
-    return E_FAIL;
+    if (FAILED(m_Transform->Initialize(nullptr)))
+      return E_FAIL;
 
-  m_Transform->Set_Owner(shared_from_this());
+    m_Transform->Set_Owner(shared_from_this());
 
-  if (Get_Component<Transform>() == nullptr)
-    m_Components.emplace(ETOI(COMPONENT_TYPE::TRANSFORM), m_Transform);
+    if (Get_Component<Transform>() == nullptr)
+      m_Components.emplace(ETOI(COMPONENT_TYPE::TRANSFORM), m_Transform);
 
-  return __super::Initialize(arg);
+    return __super::Initialize(arg);
 }
 
 void GameObject::On_Destroy() {
-  m_IsDestroy = true;
+	m_IsDestroy = true;
 
-  for (auto &component : m_Components)
-    Destroy(component.second);
-  m_Components.clear();
+    for (auto &component : m_Components)
+		Destroy(component.second);
+    m_Components.clear();
 
-  for (auto &component : m_Scripts)
-    Destroy(component.second);
-  m_Scripts.clear();
+    for (auto &component : m_Scripts)
+		Destroy(component.second);
+    m_Scripts.clear();
 
-  Destroy(m_Transform);
+    Destroy(m_Transform);
 
-  for (auto &child : m_Children)
-    Destroy(child);
-  m_Children.clear();
+    for (auto &child : m_Children)
+		Destroy(child);
+    m_Children.clear();
 
-  if (auto parent = m_Parent.lock())
-    parent->Remove_Child(shared_from_this());
-  m_Parent.reset();
+    if (auto parent = m_Parent.lock())
+		parent->Remove_Child(shared_from_this());
+    m_Parent.reset();
 
-  Object::On_Destroy();
+    Object::On_Destroy();
 }
 
 void GameObject::On_Enable() {

@@ -93,9 +93,6 @@
     <ClInclude Include="..\public\Hierarchy.h">
       <Filter>01. EditorObject\Hierarchy</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\ComponentEditUI.h">
-      <Filter>01. EditorObject</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -127,9 +124,6 @@
     </ClCompile>
     <ClCompile Include="..\private\Hierarchy.cpp">
       <Filter>01. EditorObject\Hierarchy</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\ComponentEditUI.cpp">
-      <Filter>01. EditorObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

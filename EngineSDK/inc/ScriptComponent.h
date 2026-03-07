@@ -28,7 +28,7 @@ public:
   void Set_Active(Bool isActive) final { Component::Set_Active(isActive); };
 
 public:
-  virtual Shared<Component> Clone(void *arg = nullptr) PURE;
+  virtual Shared<Component> Clone(void *arg = nullptr) override PURE;
 };
 
 NS_END

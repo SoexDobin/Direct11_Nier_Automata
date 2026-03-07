@@ -8,6 +8,8 @@ class GameObject;
 class ENGINE_DLL Component abstract : public Object {
     RTTR_ENABLE(Object)
 public:
+	typedef struct tagComponentDesc : public OBJECT_DESC {} COMPONENT_DESC;
+public:
     Component();
 	explicit Component(const ComPtr<ID3D11Device> &pDevice, const ComPtr<ID3D11DeviceContext> &context);
 	explicit Component(const Component& prototype);
@@ -37,7 +39,7 @@ public:
   constexpr virtual Shared<Component> Clone(void *arg) PURE;
 
 private:
-  using Object::m_ObjectDesc;
+  using Object::m_DescID;
 };
 
 NS_END

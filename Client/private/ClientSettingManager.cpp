@@ -15,6 +15,121 @@ IMPLEMENT_SINGLETON(ClientSettingManager)
 
 ENGINE_DESC ClientSettingManager::g_EngineDesc{};
 
+HRESULT ClientSettingManager::Load_Textures_FromJson() const
+{
+	wstring fullPath = m_ProjectSettingPath + L"TextureSettings.json";
+
+	if (!filesystem::exists(fullPath))
+	{
+		nlohmann::json defaultJson;
+		defaultJson["TextureSettings"] = nlohmann::json::array();
+		// 초기 템플릿 예시 추가 가능
+		std::ofstream outFile(fullPath);
+		if (outFile.is_open()) {
+			outFile << defaultJson.dump(4);
+			outFile.close();
+		}
+		SpdLogger::Info(L"Created Default TextureSettings.json: " + fullPath);
+	}
+
+	if (!filesystem::exists(fullPath))
+	{
+		LOG_WARN(L"Failed To Find Texture Settings : {}", fullPath);
+		return S_OK;
+	}
+
+	ifstream file(fullPath);
+	if (!file.is_open()) return E_FAIL;
+
+	nlohmann::json json;
+	file >> json;
+	file.close();
+
+	auto& settings = json["TextureSettings"];
+	for (auto& item : settings)
+	{
+
+		string levelStr = item["level"];
+		LEVEL level = LEVEL::STATIC;
+		if (levelStr == "1" || levelStr == "Loading" || levelStr == "LOADING")
+			level = LEVEL::LOADING;
+		else if (levelStr == "2" || levelStr == "Logo" || levelStr == "LOGO")
+			level = LEVEL::LOGO;
+		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
+			level = LEVEL::GAMEPLAY;
+		
+		wstring tag = Helper::To_wString(item["tag"]);
+		wstring relativePath = Helper::To_wString(item["path"]);
+		uint32 count = 1;
+		if (item["count"].is_string())
+			count = std::stoul(item["count"].get<string>());
+		else
+			count = item.value("count", 1);
+
+		wstring fullTexturePath = m_ResourcePath + relativePath;
+
+		if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(level), Texture::Create(
+			GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+			fullTexturePath.c_str(), count
+		), tag)))
+		{
+			LOG_ERROR(L"Failed to Load Texture Prototype: {}", tag);
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
+{
+	wstring csvPath = m_ResourcePath + L"TextureSettings.csv";
+
+	// CSV가 없을 경우 템플릿 생성
+	if (!filesystem::exists(csvPath))
+	{
+		std::ofstream outFile(csvPath);
+		if (outFile.is_open()) {
+			// 헤더 및 템플릿 행 작성
+			outFile << "Level, Tag, Path, Count" << std::endl;
+			outFile << "STATIC, Prototype_Component_Texture_Default, Default/Default.dds, 1" << std::endl;
+			outFile.close();
+		}
+		SpdLogger::Info(L"Created Template TextureSettings.csv: " + csvPath);
+	}
+
+	if (!filesystem::exists(csvPath)) return S_OK;
+
+	ifstream csvFile(csvPath);
+	nlohmann::json jsonRoot;
+	string line;
+
+	getline(csvFile, line);
+	while (getline(csvFile, line))
+	{
+		if (line.empty()) continue;
+
+		stringstream stream(line);
+		string level, tag, path, count;
+		getline(stream, level, ',');
+		getline(stream, tag, ',');
+		getline(stream, path, ',');
+		getline(stream, count);
+
+		jsonRoot["TextureSettings"].push_back({
+			{"level", Helper::Trim(level)},
+			{"tag", Helper::Trim(tag)},
+			{"path", Helper::Trim(path)},
+			{"count", stoi(Helper::Trim(count))},
+			});
+	}
+
+	ofstream jsonFile(m_ProjectSettingPath + L"TextureSettings.json");
+	jsonFile << jsonRoot.dump(4);
+
+	return S_OK;
+}
+
 HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const 
 {
 	std::wstring path = m_ProjectSettingPath + L"EngineDesc.json";
@@ -46,18 +161,18 @@ HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const
 
 HRESULT ClientSettingManager::Apply_LayerAndTagSettings() const
 {
-  auto layerRegistry = GAME_INSTANCE->Get_LayerRegister();
-  auto tagRegistry = GAME_INSTANCE->Get_TagRegister();
+	auto layerRegistry = GAME_INSTANCE->Get_LayerRegister();
+	auto tagRegistry = GAME_INSTANCE->Get_TagRegister();
 
-  if (layerRegistry) {
-    layerRegistry->LoadFromFile(m_ProjectSettingPath + L"LayerSettings.json");
-  }
+	if (layerRegistry) {
+	  layerRegistry->LoadFromFile(m_ProjectSettingPath + L"LayerSettings.json");
+	}
 
-  if (tagRegistry) {
-    tagRegistry->LoadFromFile(m_ProjectSettingPath + L"TagSettings.json");
-  }
+	if (tagRegistry) {
+	  tagRegistry->LoadFromFile(m_ProjectSettingPath + L"TagSettings.json");
+	}
 
-  return S_OK;
+	return S_OK;
 }
 
 HRESULT ClientSettingManager::Load_Texture(LEVEL level) const
@@ -186,6 +301,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
 							(m_ShaderPath + tagName).c_str(),
 							VTXTEX::Elements, VTXTEX::numElements)
+							
 					);
 				}
 				else if (itNormTex != tagName.end())

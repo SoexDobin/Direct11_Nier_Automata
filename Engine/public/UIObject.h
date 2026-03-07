@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "GameObject.h"
 
 NS_BEGIN(Engine)
@@ -9,17 +9,8 @@ class VIBuffer_Rect;
 
 class ENGINE_DLL UIObject abstract : public GameObject {
 public:
-  typedef struct tagUIObjectDesc {
+  typedef struct tagUIObjectDesc : public GAMEOBJECT_DESC {
     Float x, y, sizeX, sizeY;
-
-    const Char *constantWorld;
-    const Char *constantView;
-    const Char *constantProj;
-    const Char *constantTex;
-
-    wstring shaderPath;
-    wstring texturePath;
-    uint32_t numSRV;
   } UI_DESC;
 
 public:
@@ -39,43 +30,25 @@ public:
 
 
 public:
-  virtual void Priority_Update(Float timeDelta) override;
-  virtual void Update(Float timeDelta) override;
-  virtual void Late_Update(Float timeDelta) override;
-  virtual void Fixed_Update(Float fixedDelta) override;
-  virtual HRESULT Render() override;
+    virtual void Priority_Update(Float timeDelta) override;
+    virtual void Update(Float timeDelta) override;
+    virtual void Late_Update(Float timeDelta) override;
+    virtual void Fixed_Update(Float fixedDelta) override;
+    virtual HRESULT Render() override;
 
 protected:
-  void Update_Transform() const;
-  HRESULT Bind_ShaderResource(const Shared<Shader> &shader,
+    void Update_Transform() const;
+    HRESULT Bind_ShaderResource(const Shared<Shader> &shader,
                               const Char *constantName,
                               D3DTS transformState) const;
 
-private:
-  HRESULT Ready_Components(void *arg = nullptr);
-
 protected:
-  Float m_X{}, m_Y{}, m_SizeX{}, m_SizeY{};
-  Float m_ViewportHeight{}, m_ViewportWidth{};
-  Matrix m_TransformationMatrices[ETOI(D3DTS::END)];
-
-protected:
-  Shared<Shader> m_Shader = {nullptr};
-  Shared<Texture> m_Texture = {nullptr};
-  Shared<VIBuffer_Rect> m_BufferRect = {nullptr};
-
-protected:
-  const Char *m_ConstantWorld = {};
-  const Char *m_ConstantView = {};
-  const Char *m_ConstantProj = {};
-  const Char *m_ConstantTex = {};
-
-  wstring m_ShaderPath;
-  wstring m_TexturePath;
-  uint32_t m_NumSRV = {};
+    Float m_X{}, m_Y{}, m_SizeX{}, m_SizeY{};
+    Float m_ViewportHeight{}, m_ViewportWidth{};
+    Matrix m_TransformationMatrices[ETOI(D3DTS::END)];
 
 public:
-  Shared<GameObject> Clone(void *arg = nullptr) override PURE;
+	virtual Shared<GameObject> Clone(void *arg = nullptr) override PURE;
 };
 
 NS_END

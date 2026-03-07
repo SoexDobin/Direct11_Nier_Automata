@@ -9,6 +9,7 @@
 HRESULT PrototypeManager::Initialize(void* arg) {
     m_LevelCount = arg == nullptr ? 0 : *static_cast<uintptr_t*>(arg);
 
+    m_ObjectsID.resize(m_LevelCount);
     m_GameObjects.resize(m_LevelCount);
     m_Components.resize(m_LevelCount);
 
@@ -16,36 +17,73 @@ HRESULT PrototypeManager::Initialize(void* arg) {
 }
 
 void PrototypeManager::On_Destroy() {
-  for (uint32 i = 0; i < m_LevelCount; ++i) {
-    m_GameObjects[i].clear();
-    m_Components[i].clear();
-  }
+    for (uint32 i = 0; i < m_LevelCount; ++i) {
+        m_GameObjects[i].clear();
+        m_Components[i].clear();
+        m_ObjectsID[i].clear();
+    }
 
-  m_GameObjects.clear();
-  m_Components.clear();
+    m_ObjectsID.clear();
+    m_GameObjects.clear();
+    m_Components.clear();
 }
 
-HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object> &object) 
+uint32 PrototypeManager::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag)
+{
+    if (false == m_ObjectsID[GAME_INSTANCE->Get_CurrentLevelIndex()].contains(prototypeTag))
+    {
+        LOG_ERROR(L"{} has no ObjectID", prototypeTag);
+        return 0;
+    }
+
+    return m_ObjectsID[GAME_INSTANCE->Get_CurrentLevelIndex()].at(prototypeTag);
+}
+
+const wstring& PrototypeManager::Get_PrototypeTagFromObjectID(uint32 objectID)
+{
+    for (auto objectsID : m_ObjectsID[GAME_INSTANCE->Get_CurrentLevelIndex()])
+    {
+        if (objectsID.second == objectID)
+            return objectsID.first;
+    }
+
+    return nullptr;
+}
+
+HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag)
 {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+
 	if (!Validate_Level(levIndex)) {
 		return E_FAIL;
 	}
 
     PROTOTYPE prototype = object->Get_Prototype();
-    if (Find_Prototype(prototype, levIndex, object->Get_TypeID()) != nullptr) {
+    if (Find_Prototype(prototype, levIndex, object->Get_ObjectID()) != nullptr) {
         LOG_ERROR(L"{}: Already Added Prototype", m_ObjectName);
         MSG_BOX("Already Added Prototype");
         return E_FAIL;
     }
 
-    if (prototype == PROTOTYPE::GAMEOBJECT) {
-		m_GameObjects[levIndex].emplace(object->Get_TypeID(), static_pointer_cast<GameObject>(object));
-        m_TypeObjects[levIndex][object->Get_TypeID()].push_back(object);
-    } else if (prototype == PROTOTYPE::COMPONENT) {
-		m_Components[levIndex].emplace(object->Get_TypeID(), static_pointer_cast<Component>(object));
-        m_TypeObjects[levIndex][object->Get_TypeID()].push_back(object);
+    wstring finalTag = prototypeTag;
+    if (finalTag.empty()) {
+        finalTag = object->Get_Name();
     }
+    wstring baseTag = finalTag;
+    int index = 0;
+
+    while (m_ObjectsID[levIndex].find(finalTag) != m_ObjectsID[levIndex].end()) {
+        finalTag = baseTag + L"_" + to_wstring(index);
+        index++;
+    }
+
+    if (prototype == PROTOTYPE::GAMEOBJECT) {
+		m_GameObjects[levIndex].emplace(object->Get_ObjectID(), static_pointer_cast<GameObject>(object));
+    } else if (prototype == PROTOTYPE::COMPONENT) {
+		m_Components[levIndex].emplace(object->Get_ObjectID(), static_pointer_cast<Component>(object));
+    }
+    m_ObjectsID[levIndex].emplace(prototypeTag, object->Get_ObjectID());
+
 
     return S_OK;
 }
@@ -58,9 +96,13 @@ HRESULT PrototypeManager::Clear_Prototypes()
     for (auto container : m_Components)
         container.clear();
     m_Components.shrink_to_fit();
+    for (auto container : m_ObjectsID)
+        container.clear();
+    m_ObjectsID.shrink_to_fit();
 
     m_GameObjects.resize(m_LevelCount);
     m_Components.resize(m_LevelCount);
+    m_ObjectsID.resize(m_LevelCount);
 
     return S_OK;
 }
@@ -72,62 +114,73 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
 
     m_GameObjects[levIndex].clear();
     m_Components[levIndex].clear();
+    m_ObjectsID[levIndex].clear();
 
     return S_OK;
 }
 
 Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
                                                 uint32 levIndex,
-                                                uint32 typeID) const
-{
+                                                uint32 objectID) const {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
 	if (!Validate_Level(levIndex)) {
 		return nullptr;
 	}
 
+    if (prototype == PROTOTYPE::GAMEOBJECT) {
+        if (m_GameObjects[0].contains(objectID)) {
+            return m_GameObjects[0].at(objectID);
+        }
+    }
+    else if (prototype == PROTOTYPE::COMPONENT) {
+        if (m_Components[0].contains(objectID)) {
+            return m_Components[0].at(objectID);
+        }
+    }
+
 	if (prototype == PROTOTYPE::GAMEOBJECT) {
-		if (m_GameObjects[levIndex].contains(typeID))
-		{
-			return m_GameObjects[levIndex].at(typeID);
+		if (m_GameObjects[levIndex].contains(objectID)) {
+			return m_GameObjects[levIndex].at(objectID);
 		}
-        return nullptr;
 	} 
-	if (prototype == PROTOTYPE::COMPONENT) {
-		if (m_Components[levIndex].contains(typeID))
-		{
-			return m_Components[levIndex].at(typeID);
+	else if (prototype == PROTOTYPE::COMPONENT) {
+		if (m_Components[levIndex].contains(objectID)) {
+			return m_Components[levIndex].at(objectID);
 		}
-        return nullptr;
 	}
 
     return nullptr;
 }
 
-const vector<Shared<Object>>& PrototypeManager::Find_Prototypes(uint32 levIndex, uint32 typeID)
+Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype, 
+												uint32 levIndex, 
+												const wstring& prototypeTag) const
 {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
-    static const vector<Shared<Object>> empty_object;
     if (!Validate_Level(levIndex)) {
-        return empty_object;
+        return nullptr;
     }
+    if (prototypeTag.empty()) return nullptr;
 
-    if (m_TypeObjects[levIndex].contains(typeID))
+    if (false == m_ObjectsID[levIndex].contains(prototypeTag))
     {
-        return m_TypeObjects[levIndex][typeID];
+		MSG_BOX("Can not found such prototypeTag");
+        LOG_ERROR(L"Can not found such prototypeTag : {}", prototypeTag);
+        return nullptr;
     }
-
-    return empty_object;
+    
+    return Find_Prototype(prototype, levIndex, m_ObjectsID[levIndex].at(prototypeTag));
 }
 
 Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {
-  auto prototypeManager = make_unique<PrototypeManager>();
+    auto prototypeManager = make_unique<PrototypeManager>();
 
-  if (FAILED(prototypeManager->Initialize(&levCount))) {
-        MSG_BOX("Failed To Create PrototypeManager");
-        return nullptr;
-  }
+    if (FAILED(prototypeManager->Initialize(&levCount))) {
+          MSG_BOX("Failed To Create PrototypeManager");
+          return nullptr;
+    }
 
-  return prototypeManager;
+    return prototypeManager;
 }
 
 Bool PrototypeManager::Validate_Level(uint32 levIndex) const {

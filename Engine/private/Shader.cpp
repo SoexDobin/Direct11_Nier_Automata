@@ -8,7 +8,7 @@ Shader::Shader(const Shader& rhs)
     : Component(rhs), m_Effect{rhs.m_Effect}, m_NumPasses{rhs.m_NumPasses},
       m_InputLayouts{rhs.m_InputLayouts} {}
 
-HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC *elements, uint32 numElements) 
+HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements) 
 {
     uint32 hlslFlag = {};
 
@@ -50,7 +50,7 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
     } else
     return E_FAIL;
 
-  return Component::Initialize_Prototype();
+	return Component::Initialize_Prototype();
 }
 
 HRESULT Shader::Initialize(void *arg) { return Component::Initialize(arg); }

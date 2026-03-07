@@ -31,10 +31,11 @@ HRESULT EditorManager::Initialize()
         desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
         desc.up = Vector4{ 0.f, 1.f, 0.f, 1.f };
         desc.fovY = XMConvertToRadians(60.f);
-        desc.aspect = g_projectSettings.viewportWidth / g_projectSettings.viewportHeight;
+        desc.aspect = static_cast<Float>(g_projectSettings.viewportWidth) / static_cast<Float>(g_projectSettings.viewportHeight);
         desc.nearPlane = 0.1f;
         desc.farPlane = 500.f;
     }
+
     m_EditorCamera = EditorCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),desc);
     if (FAILED(m_EditorCamera->Bind_EditorMatrix()))
         return E_FAIL;

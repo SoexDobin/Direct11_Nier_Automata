@@ -9,8 +9,8 @@ Object::~Object() {}
 
 HRESULT Object::Initialize_Prototype()
 {
-    m_ObjectDesc.m_typeID = rttr::type::get(*this).get_id();
-    if (m_ObjectDesc.m_typeID == 0) {
+    m_DescID.m_typeID = rttr::type::get(*this).get_id();
+    if (m_DescID.m_typeID == 0) {
         LOG_ERROR(L"GameObject Initialize Failed By Set TypeID");
         MSG_BOX("GameObject Initialize Failed By Set TypeID");
         return E_FAIL;
@@ -24,8 +24,8 @@ HRESULT Object::Initialize_Prototype()
         return E_FAIL;
     }
 	
-    Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_ObjectDesc);
-    if (m_ObjectDesc.m_objectID == 0) {
+    Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_DescID);
+    if (m_DescID.m_objectID == 0) {
         LOG_ERROR(L"GameObject {} Initialize Failed By ObjectID", m_ObjectName);
         MSG_BOX("GameObject Initialize Failed By ObjectID");
         return E_FAIL;

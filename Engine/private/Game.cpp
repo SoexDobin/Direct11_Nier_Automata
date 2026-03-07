@@ -72,14 +72,13 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   if (nullptr == (m_ObjectManager = ObjectManager::Create()))
     return E_FAIL;
 
-  if (nullptr == (m_ResourceManager = ResourceManager::Create()))
+  if (nullptr == (m_ResourceManager = ResourceManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
       return E_FAIL;
 
   if (nullptr == (m_CameraManager = CameraManager::Create()))
     return E_FAIL;
 
-  if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),
-                                     m_GraphicDevice->Get_Context())))
+  if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),m_GraphicDevice->Get_Context())))
     return E_FAIL;
 
   if (nullptr == (m_LightManager = LightManager::Create()))
@@ -235,13 +234,14 @@ HRESULT Game::Change_Level(uint32 levIndex, Unique<Level> newLevel) {
   return S_OK;
 }
 
-HRESULT Game::Add_Prototype(uint32 levIndex,
-                            const Shared<Object> &prototype) const {
-  if (FAILED(m_PrototypeManager->Add_Prototype(levIndex, prototype))) {
-    return E_FAIL;
-  }
+uint32 Game::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag) const
+{
+    return m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag);
+}
 
-  return S_OK;
+const wstring& Game::Get_PrototypeTagFromObjectID(uint32 objectID) const
+{
+    return m_PrototypeManager->Get_PrototypeTagFromObjectID(objectID);
 }
 
 HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
@@ -255,7 +255,7 @@ HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
 
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
 
-unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects() const {
+const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects() const {
     return m_ObjectManager->Get_GameObjects();
 }
 
@@ -269,14 +269,19 @@ Shared<Camera> Game::Get_MainCamera() const {
   return m_CameraManager->Get_MainCamera();
 }
 
-uint32 Game::Get_ResourceTypeID(const wstring& resourcePath) const
+HRESULT Game::Load_Texture(const tChar* textureFilePath, uint32 numSRVs) const
 {
-    return m_ResourceManager->Get_ResourceTypeID(resourcePath);
+    return m_ResourceManager->Load_Texture(textureFilePath, numSRVs);
 }
 
-HRESULT Game::Add_ResourceTypeID(const wstring& resourcePath, uint32 typeID) const
+const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(const tChar* textureFilePath) const
 {
-    return m_ResourceManager->Add_ResourceTypeID(resourcePath, typeID);
+    return m_ResourceManager->Get_Texture(textureFilePath);
+}
+
+const vector<ComPtr<ID3D11ShaderResourceView>>& Game::Get_Textures(const tChar* textureFilePath, uint32 numSRVs) const
+{
+    return m_ResourceManager->Get_Textures(textureFilePath, numSRVs);
 }
 
 void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObject) const {
@@ -324,60 +329,49 @@ HRESULT Game::Remove_Light(uint32 index) const {
   return m_LightManager->Remove_Light(index);
 }
 
-Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 typeID,
-                                          uint32 levIndex) const {
-  uint32 level =
-      levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
+Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const {
+    uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
-  if (Shared<Object> object =
-          m_PrototypeManager->Find_Prototype(prototype, level, typeID)) {
-    return static_pointer_cast<Object>(object);
-  }
-  return nullptr;
-}
+    if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, objectID)) {
+      return static_pointer_cast<Object>(object);
+    }
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
-                                          uint32 typeID, void *arg) const {
-  auto prototypeInstance =
-      m_PrototypeManager->Find_Prototype(prototype, levIndex, typeID);
-  if (!prototypeInstance)
     return nullptr;
-
-  if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
-    auto gameObject = static_pointer_cast<GameObject>(prototypeInstance);
-    m_ObjectManager->Add_GameObject(gameObject->Clone(arg));
-
-    return gameObject;
-  } else if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
-    return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
-  }
-
-  LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
-  MSG_BOX("Prototype Miss Match In Instantiate Internal");
-  return nullptr;
 }
 
-//Shared<Object> Game::Instantiate_Internal(PROTOTYPE prototype, uint32 levIndex,
-//                                          const wstring &className,
-//                                          void *arg) const {
-//  auto prototypeInstance = m_PrototypeManager->Find_Prototype(prototype, levIndex, className);
-//
-//    if (!prototypeInstance) {
-//		return nullptr;
-//    }
-//
-//    if (prototypeInstance->Get_Prototype() == PROTOTYPE::GAMEOBJECT) {
-//		auto gameObject = static_pointer_cast<GameObject>(prototypeInstance)->Clone(arg);
-//		m_ObjectManager->Add_GameObject(gameObject);
-//
-//		return gameObject;
-//    }
-//
-//    if (prototypeInstance->Get_Prototype() == PROTOTYPE::COMPONENT) {
-//		return static_pointer_cast<Component>(prototypeInstance)->Clone(arg);
-//    }
-//
-//    LOG_CRITICAL(L"Prototype Miss Match In Instantiate Internal");
-//    MSG_BOX("Prototype Miss Match In Instantiate Internal");
-//    return nullptr;
-//}
+HRESULT Game::Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag) const 
+{
+    return m_PrototypeManager->Add_Prototype(levIndex, object, prototypeTag);
+}
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
+{
+    uint32 level = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
+    
+    Shared<Object> pPrototype = m_PrototypeManager->Find_Prototype(protoType, level, objectID);
+    if (!pPrototype) return nullptr;
+    Shared<Object> pCloned = nullptr;
+    if (protoType == PROTOTYPE::GAMEOBJECT) {
+        auto pGameObject = std::static_pointer_cast<GameObject>(pPrototype);
+        pCloned = pGameObject->Clone(arg);
+        m_ObjectManager->Add_GameObject(std::static_pointer_cast<GameObject>(pCloned));
+    }
+    else {
+        auto pComponent = std::static_pointer_cast<Component>(pPrototype);
+        pCloned = pComponent->Clone(arg);
+    }
+    return pCloned;
+}
+
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& prototypeTag, uint32 levIndex, void* arg) const
+{
+    uint32 level = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
+
+    uint32 objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag);
+    if (objectID == 0)
+    {
+        MSG_BOX("Failed to Instantiate By prototypeTag");
+        return nullptr;
+    }
+
+    return Instantiate_Internal(protoType, objectID, level, arg);
+}

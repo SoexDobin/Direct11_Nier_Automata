@@ -1,7 +1,6 @@
+#include "pch.h"
 #include "Inspector.h"
 #include "EditorManager.h"
-#include "pch.h"
-
 #include "Component.h"
 #include "GameObject.h"
 #include "LayerRegistry.h"
@@ -66,13 +65,13 @@ void Inspector::GameObjectGUI(const Shared<GameObject> &pObj) {
   if (!components.empty()) {
     // Transform 은 위에서 이미 그렸으니 카운트 제외
     size_t count = 0;
-    for (auto &[id, pComp] : components) {
+    for (auto &pComp : components) {
       if (pComp->Get_ComponentType() != COMPONENT_TYPE::TRANSFORM)
         ++count;
     }
     ImGui::Text("Components (%zu)", count);
 
-    for (auto &[id, pComp] : components) {
+    for (auto& pComp : components) {
       if (pComp->Get_ComponentType() == COMPONENT_TYPE::TRANSFORM)
         continue;
 
@@ -87,7 +86,7 @@ void Inspector::GameObjectGUI(const Shared<GameObject> &pObj) {
   const auto &scripts = pObj->Get_Scripts();
   if (!scripts.empty()) {
     ImGui::Text("Scripts (%zu)", scripts.size());
-    for (auto &[id, pScript] : scripts) {
+    for (auto& pScript : scripts) {
       string typeName = rttr::type::get(*pScript).get_name().to_string();
       ComponentGUI(typeName, pScript);
     }

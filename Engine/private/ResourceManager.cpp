@@ -1,8 +1,9 @@
 #include "ResourceManager.h"
-
+#include <tchar.h>
 #include "SpdLogger.h"
 
-ResourceManager::ResourceManager() {}
+ResourceManager::ResourceManager(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) 
+    : m_Device{ device }, m_Context{ context } {}
 
 ResourceManager::~ResourceManager() {}
 
@@ -13,52 +14,107 @@ HRESULT ResourceManager::Initialize_Prototype()
 	return EngineManager::Initialize_Prototype();
 }
 
-void ResourceManager::Load_Texture(const tChar* texturePath, uint32 numSRVs)
+HRESULT ResourceManager::Load_Texture(const tChar* texturePath, uint32 numSRVs)
 {
+    for (uint32 i = 0; i < numSRVs; ++i) {
+        tChar szFullPath[MAX_PATH] = TEXT("");
+        wsprintf(szFullPath, texturePath, i);
+
+        tChar szDrive[MAX_PATH] = TEXT("");
+        tChar szDir[MAX_PATH] = TEXT("");
+        tChar szName[MAX_PATH] = TEXT("");
+        tChar szExt[MAX_PATH] = TEXT("");
+
+        _tsplitpath_s(szFullPath, szDrive, MAX_PATH, szDir, MAX_PATH, szName,
+            MAX_PATH, szExt, MAX_PATH);
+
+        HRESULT hr = {};
+        ComPtr<ID3D11Resource> texture{ nullptr };
+        ComPtr<ID3D11ShaderResourceView> srv{ nullptr };
+
+        if (!lstrcmp(szExt, TEXT(".dds"))) {
+            hr = CreateDDSTextureFromFile(m_Device.Get(), szFullPath,
+                texture.GetAddressOf(),
+                srv.GetAddressOf());
+        }
+        else if (!lstrcmp(szExt, TEXT(".tga"))) {
+            MSG_BOX("TGA Texture Loading Not Supported Yet");
+            return E_FAIL;
+        }
+        else {
+            hr = CreateWICTextureFromFile(m_Device.Get(), szFullPath,
+                texture.GetAddressOf(),
+                srv.GetAddressOf());
+        }
+
+        if (FAILED(hr)) { return E_FAIL; }
+
+        m_SRVs.emplace(texturePath, srv);
+    }
+
+    return S_OK;
 }
 
-const vector<ComPtr<ID3D11ShaderResourceView>>& ResourceManager::Get_Textures()
+const ComPtr<ID3D11ShaderResourceView>& ResourceManager::Get_Texture(const tChar* texturePath)
 {
+    if (m_SRVs.contains(texturePath) == false)
+    {
+        LOG_ERROR(L"{} is not texture path", texturePath);
+    }
+
+    return m_SRVs[texturePath];
 }
 
-HRESULT ResourceManager::Add_ResourceTypeID(const wstring& resourcePath, uint32 typeID)
+const vector<ComPtr<ID3D11ShaderResourceView>>& ResourceManager::Get_Textures(const tChar* texturePath, uint32 numSRVs)
 {
-	std::lock_guard<std::recursive_mutex> lock(m_ResourceMutex);
+    std::vector<ComPtr<ID3D11ShaderResourceView>> textures;
+    textures.reserve(numSRVs); 
 
-	if (m_ResourcePrototypes.contains(resourcePath))
-	{
-		LOG_ERROR(L"{} is Already Added ResourceTypeID", resourcePath);
-		MSG_BOX("Already Added ResourceTypeID");
-		return E_FAIL;
-	}
+    for (uint32 i = 0; i < numSRVs; ++i)
+    {
+        TCHAR fullPath[MAX_PATH];
 
-	m_ResourcePrototypes.emplace(resourcePath, typeID);
+        _stprintf_s(fullPath, MAX_PATH, TEXT("%s_%u.dds"), texturePath, i);
 
-	return S_OK;
-}
+        ComPtr<ID3D11Resource> texture{ nullptr };
+        ComPtr<ID3D11ShaderResourceView> srv{ nullptr };
 
-uint32 ResourceManager::Get_ResourceTypeID(const wstring& resourcePath) {
-	std::lock_guard<std::recursive_mutex> lock(m_ResourceMutex);
+        HRESULT hr = CreateDDSTextureFromFile(
+            m_Device.Get(), fullPath, 
+            texture.GetAddressOf(), 
+            srv.GetAddressOf());
 
-	if (m_ResourcePrototypes.contains(resourcePath) == false)
-	{
-		LOG_ERROR(L"{} is Not Contain ResourceTypeID", resourcePath);
-		MSG_BOX("Not Contain ResourceTypeID");
-		return E_FAIL;
-	}
+        if (SUCCEEDED(hr))
+        {
+            textures.push_back(srv);
+        }
+        else {
+            hr = CreateWICTextureFromFile(
+                m_Device.Get(), texturePath,
+                texture.GetAddressOf(),
+                srv.GetAddressOf());
+        }
+        
+        if (FAILED(hr))
+        {
+            LOG_ERROR(L"Failed to find Textures Path : {}, numSRVs ", fullPath, numSRVs);
+            MSG_BOX("Failed to find Textures");
+            return EMPTY_VECTOR<ComPtr<ID3D11ShaderResourceView>>;
+        }
+    }
 
-	return m_ResourcePrototypes[resourcePath];
+    return textures;
 }
 
 HRESULT ResourceManager::Clear_Resources() {
 	std::lock_guard<std::recursive_mutex> lock(m_ResourceMutex);
-	m_ResourcePrototypes.clear();
+    m_SRVs.clear();
 	return S_OK;
 }
 
-Unique<ResourceManager> ResourceManager::Create()
+Unique<ResourceManager> ResourceManager::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
-	auto resourceManager = make_unique<ResourceManager>();
+	auto resourceManager = make_unique<ResourceManager>(device, context);
 
 	if (FAILED(resourceManager->Initialize_Prototype()))
 	{

@@ -1,4 +1,4 @@
-﻿#include "Texture.h"
+#include "Texture.h"
 #include <rttr/registration>
 using namespace rttr;
 using namespace Engine;

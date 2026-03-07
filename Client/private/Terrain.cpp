@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Terrain.h"
 
+#include "Game.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Transform.h"
@@ -57,21 +58,21 @@ HRESULT Terrain::Render() {
 }
 
 HRESULT Terrain::Ready_Components() {
-  m_Shader = Add_Component<Shader>(nullptr, 0);
-  if (!m_Shader) {
-    LOG_ERROR(L"Failed To Add Component Shader To Terrain");
-    return E_FAIL;
-  }
-  m_Texture = Add_Component<Texture>(nullptr, 0);
-  if (!m_Texture) {
-    LOG_ERROR(L"Failed To Add Component Texture To Terrain");
-    return E_FAIL;
-  }
-  m_VIBuffer = Add_Component<VIBuffer_Terrain>(nullptr, 0);
-  if (!m_VIBuffer) {
-    LOG_ERROR(L"Failed To Add Component TerrainBuffer To Terrain");
-    return E_FAIL;
-  }
+	m_Shader = static_pointer_cast<Shader>(Add_Component(Helper::To_wString(rttr::type::get<VTXNORMTEX>().get_name().to_string())));
+	if (!m_Shader) {
+		LOG_ERROR(L"Failed To Add Component Shader To Terrain");
+		return E_FAIL;
+	}
+	m_Texture = static_pointer_cast<Texture>(Add_Component(L"Tile_0"));
+	if (!m_Texture) {
+		LOG_ERROR(L"Failed To Add Component Texture To Terrain");
+		return E_FAIL;
+	}
+	m_VIBuffer = static_pointer_cast<VIBuffer_Terrain>(Add_Component(L"Default_Terrain"));
+	if (!m_VIBuffer) {
+		LOG_ERROR(L"Failed To Add Component TerrainBuffer To Terrain");
+		return E_FAIL;
+	}
 
   return S_OK;
 }

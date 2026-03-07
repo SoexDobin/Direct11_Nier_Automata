@@ -31,9 +31,8 @@ HRESULT ClientApp::Ready_StartLevel(LEVEL startLevel) {
     return E_FAIL;
 
   if (FAILED(GAME_INSTANCE->Change_Level(
-          ETOI(LEVEL::LOADING),
-          LevelLoading::Create(GAME_INSTANCE->Get_Device(),
-                               GAME_INSTANCE->Get_Context(), startLevel)))) {
+          ETOI(LEVEL::LOGO),
+          LevelLoading::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), startLevel)))) {
     return E_FAIL;
   }
 

@@ -370,5 +370,8 @@
     <ClCompile Include="..\private\Model.cpp">
       <Filter>01. Utility\05. Component\Model</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

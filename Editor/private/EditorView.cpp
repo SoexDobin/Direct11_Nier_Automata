@@ -40,12 +40,21 @@ void EditorView::RenderView() {
 	if (srvScene)
 	{
 		ImGui::Text("FPS : %3f", GAME_INSTANCE->Get_FPS());
-
-		
 		ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), sceneViewportSize);
-		
 	}
 	ImGui::End();
+
+
+	ImVec2 gameViewportSize = ImGui::GetContentRegionAvail();
+	if (gameViewportSize.x != prevGameViewportSize.x || gameViewportSize.y != prevGameViewportSize.y)
+	{
+		if (gameViewportSize.x > 0 && gameViewportSize.y > 0)
+		{
+			//GAME_INSTANCE->OnResize(static_cast<uint32_t>(gameViewportSize.x), static_cast<uint32_t>(gameViewportSize.y));
+			prevGameViewportSize = gameViewportSize;
+		}
+	}
+
 
 	ImGui::Begin("Game View");
 	if (ImGui::Button("Play")) {

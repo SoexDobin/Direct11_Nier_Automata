@@ -105,5 +105,21 @@ NS_BEGIN(Helper)
         }
         return rawName;
     }
+
+    static std::string Trim(const std::string& s) {
+        const std::string whitespace = " \t\n\r\f\v";
+        size_t start = s.find_first_not_of(whitespace);
+        if (start == std::string::npos) return ""; // 공백만 있는 경우
+        size_t end = s.find_last_not_of(whitespace);
+        return s.substr(start, end - start + 1);
+    }
+
+    static std::wstring Trim(const std::wstring& s) {
+        const std::wstring whitespace = L" \t\n\r\f\v";
+        size_t start = s.find_first_not_of(whitespace);
+        if (start == std::wstring::npos) return L"";
+        size_t end = s.find_last_not_of(whitespace);
+        return s.substr(start, end - start + 1);
+    }
 NS_END
 NS_END

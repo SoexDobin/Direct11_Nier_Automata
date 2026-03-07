@@ -7,11 +7,11 @@ class ResourceManager final : public EngineManager
 {
 	RTTR_ENABLE(EngineManager)
 public:
-	ResourceManager();
+	ResourceManager(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	~ResourceManager() override;
 
 public:
-	HRESULT Initialize_Prototype() override ;
+	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override { return S_OK; };
 	void On_Destroy() override {};
 	void On_Disable() override {};
@@ -19,22 +19,21 @@ public:
 	void Set_Active(Bool isActive) override {};
 
 public:
-	void Load_Texture(const tChar* texturePath, uint32  numSRVs);
-	const vector<ComPtr<ID3D11ShaderResourceView>>& Get_Textures();
+	HRESULT Load_Texture(const tChar* texturePath, uint32 numSRVs = 1);
+	const ComPtr<ID3D11ShaderResourceView>& Get_Texture(const tChar* texturePath);
+	const vector<ComPtr<ID3D11ShaderResourceView>>& Get_Textures(const tChar* texturePath, uint32 numSRVs);
 
 public:
-	HRESULT Add_ResourceTypeID(const wstring& resourcePath, uint32 typeID);
-	uint32 Get_ResourceTypeID(const wstring& res);
 	HRESULT Clear_Resources();
 
 private:
+	ComPtr<ID3D11Device> m_Device{nullptr};
+	ComPtr<ID3D11DeviceContext> m_Context{ nullptr };
+	unordered_map<wstring, ComPtr<ID3D11ShaderResourceView>> m_SRVs;
 	mutable std::recursive_mutex m_ResourceMutex;
-	unordered_map<wstring, uint32>	m_ResourcePrototypes;
-	
-	unordered_map<uint32, vector<ComPtr<ID3D11ShaderResourceView>>> m_SRVs;
 	
 public:
-	static Unique<ResourceManager> Create();
+	static Unique<ResourceManager> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 };
 
 NS_END

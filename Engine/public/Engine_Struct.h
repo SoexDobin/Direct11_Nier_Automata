@@ -20,6 +20,7 @@ namespace Engine
 	typedef struct tagGuidDesc {
 		uint32_t m_typeID = {};
 		uint32_t m_objectID = {};
+		uint32_t m_instanceID = {};
 	} ID_DESC, ObjectID;
 
 	typedef struct tagLightDesc

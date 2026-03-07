@@ -2,9 +2,11 @@
 #include "UIObject.h"
 
 NS_BEGIN(Engine)
+
 class VIBuffer;
 class Texture;
 class Shader;
+
 NS_END
 
 NS_BEGIN(Client)
@@ -36,6 +38,11 @@ public:
 
 private:
     HRESULT Ready_Components();
+
+private:
+    Shared<Texture> m_Texture{ nullptr };
+    Shared<Shader> m_Shader{ nullptr };
+    Shared<VIBuffer_Rect> m_BufferRect{ nullptr };
 
 public:
     static Shared<LoadingBackground> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

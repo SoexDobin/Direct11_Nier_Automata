@@ -6,6 +6,9 @@
 
 namespace Engine
 {
+	template <typename T>
+	inline const std::vector<T> EMPTY_VECTOR{};
+
 	using Bool = bool;
 
 	using Byte = signed char;

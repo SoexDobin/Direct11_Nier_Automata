@@ -29,15 +29,21 @@ HRESULT EditorApp::Initialize() {
     desc.renderTargetCount = 2;
   }
 
+  /* 엔진 Core 설정 1순위 그래야만 하고 그래야하게 만들어야 함. 여기서
+   * PrototypeManager가 호출됩니다. */
+  if (FAILED(GAME_INSTANCE->Initialize_Engine(desc)))
+    return E_FAIL;
+
   ClientSettingManager::GetInstance()->Set_ResourcePath(
       L"../../Client/bin/resources/");
   ClientSettingManager::GetInstance()->Set_ShaderPath(
       L"../../Client/bin/shaders/");
 
-  /* 엔진 Core 설정 1순위 그래야만 하고 그래야하게 만들어야 함. 여기서
-   * PrototypeManager가 호출됩니다. */
-  if (FAILED(GAME_INSTANCE->Initialize_Engine(desc)))
-    return E_FAIL;
+  if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV()))
+  {
+      if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson()))
+          return E_FAIL;
+  }
 
   m_EngineDesc = desc;
 
@@ -109,53 +115,52 @@ Unique<EditorApp> EditorApp::Create() {
 }
 
 HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC &desc) {
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
 
-  ImGuiIO &io = ImGui::GetIO();
-  (void)io;
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
 
-  io.ConfigFlags |=
-      ImGuiConfigFlags_NavEnableKeyboard;           // Enable Keyboard Controls
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
-  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
-                                                      // Platform Windows
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;           // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
+                                                        // Platform Windows
 
-  ImGui::StyleColorsDark();
-  ImGuiStyle &style = ImGui::GetStyle();
-  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-    style.WindowRounding = 0.f;
-    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-  }
+    ImGui::StyleColorsDark();
+    ImGuiStyle &style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+      style.WindowRounding = 0.f;
+      style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 
-  ImGui_ImplWin32_Init(desc.hWnd);
-  if (GAME_INSTANCE->Get_Device().Get() == nullptr ||
-      GAME_INSTANCE->Get_Context().Get() == nullptr) {
-    MSG_BOX("Failed ImGui_ImplDX11_Init");
-    return E_FAIL;
-  }
-  if (!ImGui_ImplDX11_Init(GAME_INSTANCE->Get_Device().Get(),
-                           GAME_INSTANCE->Get_Context().Get())) {
-    MSG_BOX("Failed ImGui_ImplDX11_Init");
-    return E_FAIL;
-  }
+    ImGui_ImplWin32_Init(desc.hWnd);
+    if (GAME_INSTANCE->Get_Device().Get() == nullptr ||
+        GAME_INSTANCE->Get_Context().Get() == nullptr) {
+      MSG_BOX("Failed ImGui_ImplDX11_Init");
+      return E_FAIL;
+    }
+    if (!ImGui_ImplDX11_Init(GAME_INSTANCE->Get_Device().Get(),
+                             GAME_INSTANCE->Get_Context().Get())) {
+      MSG_BOX("Failed ImGui_ImplDX11_Init");
+      return E_FAIL;
+    }
 
-  {
-    RECT rc{};
-    GetClientRect(g_hWnd, &rc);
-    uint32 width = rc.right - rc.left;
-    uint32 height = rc.bottom - rc.top;
-    GAME_INSTANCE->OnResize(width, height);
-  }
-  return S_OK;
+    {
+      RECT rc{};
+      GetClientRect(g_hWnd, &rc);
+      uint32 width = rc.right - rc.left;
+      uint32 height = rc.bottom - rc.top;
+      GAME_INSTANCE->OnResize(width, height);
+    }
+    return S_OK;
 }
 
 HRESULT EditorApp::Destruct_IMGUI() {
   GAME_INSTANCE->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
   GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
 
-  GAME_INSTANCE->DestroyInstance();
   m_Game.reset();
+  GAME_INSTANCE->DestroyInstance();
 
   ImGui_ImplDX11_Shutdown();
   ImGui_ImplWin32_Shutdown();

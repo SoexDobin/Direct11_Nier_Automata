@@ -52,9 +52,7 @@ void LoadingBackground::Fixed_Update(Float fixedDelta) {
 }
 
 HRESULT LoadingBackground::Render() {
-  if (nullptr == m_Shader || nullptr == m_Texture || nullptr == m_BufferRect) {
-    return E_FAIL;
-  }
+  
 
   return UIObject::Render();
 }

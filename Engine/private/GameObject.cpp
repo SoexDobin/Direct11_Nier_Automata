@@ -1,8 +1,8 @@
 #include "GameObject.h"
 #include "Game.h"
 #include "ID_Helper.h"
+#include "ScriptComponent.h"
 #include "SpdLogger.h"
-#include "String_Helper.h"
 #include "Transform.h"
 
 GameObject::GameObject() {}
@@ -10,41 +10,53 @@ GameObject::GameObject() {}
 GameObject::GameObject(const ComPtr<ID3D11Device> &device,
                        const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(device), m_Context(context) {}
-GameObject::GameObject(const GameObject &prototype)
+GameObject::GameObject(const GameObject& prototype)
     : m_Device(prototype.m_Device), m_Context(prototype.m_Context),
-      m_LayerMask(prototype.m_LayerMask), m_TagMask(prototype.m_TagMask) {
-  m_ObjectName = prototype.m_ObjectName;
-  m_ObjectDesc.m_typeID = prototype.m_ObjectDesc.m_typeID;
+      m_LayerMask(prototype.m_LayerMask), m_TagMask(prototype.m_TagMask) 
+{
+    m_ObjectName = prototype.m_ObjectName;
+    m_DescID.m_typeID = prototype.m_DescID.m_typeID;
 
-  // TODO : Clone 시점에 부모 자식 관계는 어떻게 할 것인지 고민 필요
-  // TODO : Prototype의 자식들은 어떻게 할 것인지 고민 필요
-  // TODO : 이전 속성, 상태들은 어떻게 할거인지 고민 필요
+    // TODO : Clone 시점에 부모 자식 관계는 어떻게 할 것인지 고민 필요
+    // TODO : Prototype의 자식들은 어떻게 할 것인지 고민 필요
+    // TODO : 이전 속성, 상태들은 어떻게 할거인지 고민 필요
 
-  for (auto &pair : prototype.m_Components) {
-    m_Components.emplace(pair.first, pair.second->Clone(nullptr));
-  }
-  for (auto &pair : prototype.m_Scripts) {
-    m_Scripts.emplace(pair.first, pair.second->Clone(nullptr));
-  }
+    for (auto& pair : prototype.m_Components) {
+		m_Components.emplace(pair.first, pair.second->Clone(pair.second->Get_ObjectDesc()));
+    }
+    
+    for (auto& pair : prototype.m_Scripts) {
+        auto script = static_pointer_cast<Component>(pair.second)->Clone(pair.second->Get_ObjectDesc());
+		m_Scripts.emplace(pair.first, static_pointer_cast<ScriptComponent>(script));
+    }
 
-  m_Transform = Get_Component<Transform>();
+	m_Transform = Get_Component<Transform>();
 }
 
-HRESULT GameObject::Initialize_Prototype() { return __super::Initialize_Prototype(); }
+HRESULT GameObject::Initialize_Prototype()
+{
+	return __super::Initialize_Prototype();
+}
 
 HRESULT GameObject::Initialize(void *arg) {
+    Helper::CreateID(Helper::OBJECT_ID_INSTANCE, m_DescID);
+    if (m_DescID.m_instanceID == 0) {
+        LOG_ERROR(L"Component {} Initialize Failed By InstanceID", m_ObjectName);
+        MSG_BOX("Component Initialize Failed By InstanceID");
+        return E_FAIL;
+    }
 
     m_Transform = Transform::Create(m_Device, m_Context);
     if (nullptr == m_Transform)
-      return E_FAIL;
+		return E_FAIL;
 
     if (FAILED(m_Transform->Initialize(nullptr)))
-      return E_FAIL;
+		return E_FAIL;
 
     m_Transform->Set_Owner(shared_from_this());
 
     if (Get_Component<Transform>() == nullptr)
-      m_Components.emplace(ETOI(COMPONENT_TYPE::TRANSFORM), m_Transform);
+		m_Components.emplace(ETOI(COMPONENT_TYPE::TRANSFORM), m_Transform);
 
     return __super::Initialize(arg);
 }
@@ -200,4 +212,88 @@ Shared<Component> GameObject::Get_Component(uint32 objectID) {
   }
 
   return nullptr;
+}
+
+const vector<Shared<Component>>& GameObject::Get_Components()
+{
+    if (m_Components.empty())
+        return EMPTY_VECTOR<Shared<Component>>;
+
+    vector<Shared<Component>> components;
+    for (auto& [objectID, component]: m_Components)
+    {
+        components.push_back(component);
+    }
+
+    return components;
+}
+
+const vector<Shared<ScriptComponent>>& GameObject::Get_Scripts()
+{
+    if (m_Components.empty())
+        return EMPTY_VECTOR<Shared<ScriptComponent>>;
+
+    vector<Shared<ScriptComponent>> scripts;
+    for (auto& [objectID, script] : m_Scripts)
+    {
+        scripts.push_back(script);
+    }
+
+    return scripts;
+}
+
+HRESULT GameObject::Add_Component(const Shared<Component>& component) {
+    if (!component) return E_FAIL;
+
+    uint32 instID = component->Get_InstanceID();
+    uint32 objectID = component->Get_ObjectID();
+
+    if (component->Get_ComponentType() == COMPONENT_TYPE::SCRIPT) {
+        for (auto& [instanceID, script] : m_Scripts) {
+            if (objectID == script->Get_ObjectID())
+                LOG_WARN(L"Already Added Script {}", component->Get_Name());
+        }
+
+        if (!m_Scripts.contains(instID)) {
+            m_Scripts.emplace(instID, static_pointer_cast<ScriptComponent>(component));
+        }
+        else LOG_ERROR(L"{} is same id value : {} ", component->Get_Name(), instID);
+    }
+    else {
+        for (auto& [instanceID, comp] : m_Components) {
+            if (objectID == comp->Get_ObjectID())
+                LOG_WARN(L"Already Added Component {}", component->Get_Name());
+        }
+
+        if (!m_Components.contains(instID)) {
+            m_Components.emplace(instID, component);
+        }
+        else LOG_ERROR(L"{} is same id value : {} ", component->Get_Name(), instID);
+    }
+
+    component->Set_Owner(shared_from_this());
+    return S_OK;
+}
+
+
+Shared<Component> GameObject::Add_Component(uint32 objectID, void* arg)
+{
+    uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+
+    Shared<Component> newComponent = GAME_INSTANCE->Instantiate<Component>(objectID, levIndex, arg);
+    if (newComponent) 
+        Add_Component(newComponent);
+    
+    return newComponent;
+}
+
+Shared<Component> GameObject::Add_Component(const wstring& prototypeTag, void* arg)
+{
+    uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+
+    Shared<Component> newComponent = GAME_INSTANCE->Instantiate<Component>(prototypeTag, levIndex, arg);
+    if (newComponent)
+        Add_Component(newComponent);
+
+    return newComponent;
 }

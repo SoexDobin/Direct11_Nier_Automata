@@ -1,60 +1,69 @@
 #include "Texture.h"
-
 #include "Shader.h"
-#include <tchar.h>
+#include "Game.h"
+#include "SpdLogger.h"
 
-Texture::Texture() 
-	: Component {} {}
+Texture::Texture() : Component {} {}
 
 Texture::Texture(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
     : Component{ device, context } {}
 
 Texture::Texture(const Texture& rhs)
-    : Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs } {
+    : Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs }, 
+    m_FilePath{ rhs.m_FilePath } {
 }
 
-HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs) {
-    m_NumSRVs = numSRVs;
-
-    for (uint32 i = 0; i < m_NumSRVs; ++i) {
-        tChar szFullPath[MAX_PATH] = TEXT("");
-        wsprintf(szFullPath, textureFilePath, i);
-
-        tChar szDrive[MAX_PATH] = TEXT("");
-        tChar szDir[MAX_PATH] = TEXT("");
-        tChar szName[MAX_PATH] = TEXT("");
-        tChar szExt[MAX_PATH] = TEXT("");
-
-        _tsplitpath_s(szFullPath, szDrive, MAX_PATH, szDir, MAX_PATH, szName,
-                      MAX_PATH, szExt, MAX_PATH);
-
-        HRESULT hr = {};
-        ComPtr<ID3D11Resource> texture{nullptr};
-        ComPtr<ID3D11ShaderResourceView> srv{nullptr};
-
-        if (!lstrcmp(szExt, TEXT(".dds"))) {
-            hr = CreateDDSTextureFromFile(m_Device.Get(), szFullPath,
-                texture.GetAddressOf(),
-                srv.GetAddressOf());
-        }
-        else if (!lstrcmp(szExt, TEXT(".tga"))) {
-            MSG_BOX("TGA Texture Loading Not Supported Yet");
-            return E_FAIL;
-        }
-        else {
-            hr = CreateWICTextureFromFile(m_Device.Get(), szFullPath,
-                texture.GetAddressOf(),
-                srv.GetAddressOf());
-        }
-        if (FAILED(hr)) {
-            return E_FAIL;
-        }
-    	m_SRVs.push_back(srv);
+HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs) 
+{
+    if (FAILED(GAME_INSTANCE->Load_Texture(textureFilePath, numSRVs)))
+    {
+        LOG_ERROR(L"Failed to Load Texture At : {}, numSRVs : {}", textureFilePath, numSRVs);
+        MSG_BOX("Failed to Load Texture");
     }
+
     return Component::Initialize_Prototype();
 }
 
-HRESULT Texture::Initialize(void *arg) { return Component::Initialize(arg); }
+HRESULT Texture::Initialize(void* arg)
+{
+    if (m_FilePath.empty() || m_NumSRVs == 0)
+    {
+        if (arg == nullptr)
+        {
+            LOG_ERROR(L"There is no TextureDesc");
+            MSG_BOX("There is no TextureDesc");
+            return E_FAIL;
+        }
+
+        TEXTURE_DESC& desc = *static_cast<TEXTURE_DESC*>(arg);
+        m_NumSRVs = desc.m_NumSRVs;
+        m_FilePath = desc.m_FilePath;
+
+        m_SRVs.shrink_to_fit();
+        if (m_NumSRVs == 1)
+        {
+            m_SRVs.push_back(GAME_INSTANCE->Get_Texture(m_FilePath.c_str()));
+        }
+        else
+        {
+            m_SRVs = GAME_INSTANCE->Get_Textures(m_FilePath.c_str(), m_NumSRVs);
+        }
+    }
+    else
+    {
+        m_SRVs.shrink_to_fit();
+        if (m_NumSRVs == 1)
+        {
+            m_SRVs.push_back(GAME_INSTANCE->Get_Texture(m_FilePath.c_str()));
+        }
+        else
+        {
+            m_SRVs = GAME_INSTANCE->Get_Textures(m_FilePath.c_str(), m_NumSRVs);
+        }
+    }
+
+	return Component::Initialize(arg);
+}
 
 void Texture::On_Destroy() {
   m_SRVs.clear();
@@ -92,7 +101,6 @@ HRESULT Texture::Bind_Texture(const wstring& texturefilePath)
     
     // 여기 까지되면 AssetManager를 통해서 Clone Scene
     // Create 시트도 만들어야함
-
     // TODO : Resource Manager 한테 해당 path를 가진 typeid 부탁해서 Clone
 
     return S_OK;
@@ -111,7 +119,7 @@ Shared<Texture> Texture::Create(const ComPtr<ID3D11Device> &device,
 	return texture;
 }
 
-Shared<Component> Texture::Clone(void *arg) 
+Shared<Component> Texture::Clone(void* arg) 
 {
     auto texture = make_shared<Texture>(*this);
 

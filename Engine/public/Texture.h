@@ -9,6 +9,12 @@ class ENGINE_DLL Texture final : public Component, enable_shared_from_this<Textu
 {
 	RTTR_ENABLE(Component)
 public:
+	typedef struct tagTextureDesc : public COMPONENT_DESC {
+		wstring m_FilePath{};
+		uint32 m_NumSRVs{};
+	} TEXTURE_DESC;
+
+public:
 	Texture();
 	Texture(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Texture(const Texture& rhs);
@@ -16,19 +22,22 @@ public:
 
 public:
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::TEXTURE; }
-	HRESULT Initialize_Prototype(const tChar *textureFilePath, uint32 numSRVs);
+	HRESULT Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs);
 	HRESULT Initialize(void *arg) override;
 	void On_Destroy() override;
 
 public:
 	wstring Get_TextureFilePath() const { return m_FilePath; }
-	uint32 Get_NumSRVs() const { return m_NumSRVs; }
+	uint32 Get_TextureNumSRVs() const { return m_NumSRVs; }
 	HRESULT Bind_ShaderResourceView(const Shared<Shader> &shader, const Char *constantName, uint32 index);
-	HRESULT Bind_Texture(const wstring& texturefilePath);
+	HRESULT Bind_Texture(const wstring& textureFilePath);
+
+public:
+	const vector<ComPtr<ID3D11ShaderResourceView>>& Get_Textures() { return m_SRVs; }
 
 private:
 	wstring m_FilePath{};
-	uint32 m_NumSRVs = {};
+	uint32 m_NumSRVs{};
 	vector<ComPtr<ID3D11ShaderResourceView>> m_SRVs;
 
 public:

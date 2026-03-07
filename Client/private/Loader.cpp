@@ -98,35 +98,20 @@ HRESULT Loader::Loading_For_LogoLevel() {
 	m_isFinished = false;
 
     lstrcpy(m_LoadingText, TEXT("Loading Logo Level Texture... "));
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::LOGO)))
-    {
-        LOG_ERROR(L"Failed To Load Level Texture");
-        m_isFinished = true;
-        return E_FAIL;
-    }
-    
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::LOADING),
-        Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-            L"C:/Users/a9018/Desktop/Direct11_Nier_Automata/Client/bin/resources/lev0_static/texture/Terrain/Tile0.dds", 1))))
-        return E_FAIL;
 
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::LOADING),
-        Shader::Create(m_Device, m_Context,
-            L"C:/Users/a9018/Desktop/Direct11_Nier_Automata/Client/bin/shaders/Shader_VtxNormTex.hlsl",
-            VTXNORMTEX::Elemnets, VTXNORMTEX::numElements))))
-        return E_FAIL;
 
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::LOADING),
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
         VIBuffer_Terrain::Create(m_Device, m_Context,
-            L"C:/Users/a9018/Desktop/Direct11_Nier_Automata/Client/bin/resources/lev0_static/texture/Terrain/Height.bmp"))))
+        L"../../Client/bin/resources/Default/Height.bmp"), 
+        L"Default_Terrain")))
         return E_FAIL;
 
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::LOADING),
-        Terrain::Create(m_Device, m_Context))))
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
+        Terrain::Create(m_Device, m_Context), L"MainTerrain")))
         return E_FAIL;
 
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::LOADING),
-        FreeCamera::Create(m_Device, m_Context))))
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
+        FreeCamera::Create(m_Device, m_Context), L"MainCamera")))
         return E_FAIL;
 
 
@@ -153,15 +138,15 @@ HRESULT Loader::Loading_For_LogoLevel() {
 	desc.nearPlane = 0.1f;
     desc.farPlane = 500.f;
 
-    auto one = GAME_INSTANCE->Instantiate<Terrain>();
-    auto two = GAME_INSTANCE->Instantiate<Terrain>();
-    auto three = GAME_INSTANCE->Instantiate<Terrain>();
-    one->Set_Parent(two);
-    two->Set_Parent(three);
-    
-
-    auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(&desc);
-    GAME_INSTANCE->Set_MainCamera(cam);
+    auto one = GAME_INSTANCE->Instantiate<Terrain>(L"MainTerrain", ETOI(m_NextLevelID));
+    //auto two = GAME_INSTANCE->Instantiate<Terrain>();
+    //auto three = GAME_INSTANCE->Instantiate<Terrain>();
+    //one->Set_Parent(two);
+    //two->Set_Parent(three);
+    //
+    //
+    auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"MainCamera", ETOI(m_NextLevelID), &desc);
+	GAME_INSTANCE->Set_MainCamera(cam);
 
 	return S_OK;
 }

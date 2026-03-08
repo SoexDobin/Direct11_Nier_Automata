@@ -3,7 +3,7 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Mesh final : public VIBuffer, public enable_shared_from_this<Mesh>
+class ENGINE_DLL Mesh final : public VIBuffer
 {
 	RTTR_ENABLE(VIBuffer)
 public:

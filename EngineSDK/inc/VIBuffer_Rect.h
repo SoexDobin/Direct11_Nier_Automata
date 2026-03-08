@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "VIBuffer.h"
 
 NS_BEGIN(Engine)
@@ -23,10 +23,9 @@ public:
   };
 
 public:
-  static Shared<VIBuffer_Rect>
-  Create(const ComPtr<ID3D11Device> &device,
-         const ComPtr<ID3D11DeviceContext> &context);
-  Shared<Component> Clone(void *arg) override;
+    static Shared<VIBuffer_Rect> CreatePrototype();
+    static Shared<VIBuffer_Rect> Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
+    Shared<Component> Clone(void *arg) override;
 };
 
 NS_END

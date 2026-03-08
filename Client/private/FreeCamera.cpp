@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "FreeCamera.h"
-
+#include "Game.h"
 #include <SpdLogger.h>
 #include <Transform.h>
 
@@ -104,7 +104,7 @@ Shared<GameObject> FreeCamera::Clone(void* arg)
 
 	if (FAILED(camera->Initialize(arg)))
 	{
-		MSG_BOX("Failed to Clone : FreeCamera");
+		MSG_BOX("Failed to CreateComponent : FreeCamera");
 		return nullptr;
 	}
 

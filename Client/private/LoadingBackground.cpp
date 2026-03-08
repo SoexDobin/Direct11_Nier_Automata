@@ -77,7 +77,7 @@ Shared<GameObject> LoadingBackground::Clone(void *arg) {
   auto bg = make_shared<LoadingBackground>(*this);
 
   if (FAILED(bg->Initialize(arg))) {
-    LOG_ERROR(L"Failed To Clone LoadingBackground");
+    LOG_ERROR(L"Failed To CreateComponent LoadingBackground");
     return nullptr;
   }
 

@@ -58,8 +58,8 @@ HRESULT ClientSettingManager::Load_Textures_FromJson() const
 		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
 			level = LEVEL::GAMEPLAY;
 		
-		wstring tag = Helper::To_wString(item["tag"]);
-		wstring relativePath = Helper::To_wString(item["path"]);
+		wstring tag = Helper::To_wString(item["tag"].get<string>());
+		wstring relativePath = Helper::To_wString(item["path"].get<string>());
 		uint32 count = 1;
 		if (item["count"].is_string())
 			count = std::stoul(item["count"].get<string>());
@@ -67,11 +67,8 @@ HRESULT ClientSettingManager::Load_Textures_FromJson() const
 			count = item.value("count", 1);
 
 		wstring fullTexturePath = m_ResourcePath + relativePath;
-
-		if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(level), Texture::Create(
-			GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-			fullTexturePath.c_str(), count
-		), tag)))
+		
+		if (FAILED(GAME_INSTANCE->Load_Texture(fullTexturePath.c_str(), count, tag)))
 		{
 			LOG_ERROR(L"Failed to Load Texture Prototype: {}", tag);
 			return E_FAIL;
@@ -177,74 +174,74 @@ HRESULT ClientSettingManager::Apply_LayerAndTagSettings() const
 
 HRESULT ClientSettingManager::Load_Texture(LEVEL level) const
 {
-	if (!filesystem::exists(m_ResourcePath))
-	{
-		SpdLogger::Warn(L"Failed To Find Resource Folder " + m_ResourcePath);
-		return E_FAIL; 
-	}
-	
-	std::wregex levelRegEx(L"lev(\\d+)_.*", std::regex_constants::icase);
-	std::wregex fileRegEx(L"(.+?)(_*)(\\d+)\\.(dds|png|tga|jpg)", std::regex_constants::icase);
-	for (const auto& entry : filesystem::recursive_directory_iterator(m_ResourcePath))
-	{
-		if (entry.is_regular_file()) // 파일일 경우에만 처리
-		{
-			std::wstring FilePath = entry.path().wstring();
-			std::replace(FilePath.begin(), FilePath.end(), L'\\', L'/');
-			
-			uint32 levIndex = { 0 };
-			std::wsmatch levelMatch;
-			if (std::regex_search(FilePath, levelMatch, levelRegEx))
-			{
-				levIndex = std::stoul(levelMatch[1].str());
-			}
-			
-			std::wsmatch fileMatch;
-			std::wstring entryFileName = entry.path().filename().wstring();
-			if (std::regex_match(entryFileName, fileMatch, fileRegEx))
-			{
-				std::wstring baseName = fileMatch[1].str();
-				std::wstring separator = fileMatch[2].str();
-				std::wstring extension = fileMatch[4].str();
-
-				// 상위 폴더 경로까지 합쳐서 L"../bin/resources/lev0_static/Textures/p10000_%d.dds" 포맷 만들기
-				std::wstring parentPath = entry.path().parent_path().wstring();
-				std::replace(parentPath.begin(), parentPath.end(), L'\\', L'/');
-				std::wstring formatPath = parentPath + L"/" + baseName + separator + L"%d." + extension;
-
-
-				std::wstring tagName = baseName;
-				uint32 sequenceCount = 0;
-				for (const auto& peerEntry : filesystem::directory_iterator(entry.path().parent_path()))
-				{
-					std::wsmatch peerMatch;
-					std::wstring peerFileName = peerEntry.path().filename().wstring();
-					if (std::regex_match(peerFileName, peerMatch, fileRegEx))
-					{
-						// 같은 시퀀스(BaseName 일치)라면 카운트 증가
-						if (peerMatch[1].str() == baseName)
-						{
-							sequenceCount++;
-						}
-					}
-				}
-
-				GAME_INSTANCE->Add_Prototype(levIndex,
-					Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-						formatPath.c_str(), sequenceCount)
-				);
-			}
-			else
-			{
-				std::wstring formatPath = FilePath;
-				std::wstring tagName = entry.path().stem().wstring();
-				GAME_INSTANCE->Add_Prototype(levIndex,
-					Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-						formatPath.c_str(), 1)
-				);
-			}
-		}
-	}
+	//if (!filesystem::exists(m_ResourcePath))
+	//{
+	//	SpdLogger::Warn(L"Failed To Find Resource Folder " + m_ResourcePath);
+	//	return E_FAIL; 
+	//}
+	//
+	//std::wregex levelRegEx(L"lev(\\d+)_.*", std::regex_constants::icase);
+	//std::wregex fileRegEx(L"(.+?)(_*)(\\d+)\\.(dds|png|tga|jpg)", std::regex_constants::icase);
+	//for (const auto& entry : filesystem::recursive_directory_iterator(m_ResourcePath))
+	//{
+	//	if (entry.is_regular_file()) // 파일일 경우에만 처리
+	//	{
+	//		std::wstring FilePath = entry.path().wstring();
+	//		std::replace(FilePath.begin(), FilePath.end(), L'\\', L'/');
+	//		
+	//		uint32 levIndex = { 0 };
+	//		std::wsmatch levelMatch;
+	//		if (std::regex_search(FilePath, levelMatch, levelRegEx))
+	//		{
+	//			levIndex = std::stoul(levelMatch[1].str());
+	//		}
+	//		
+	//		std::wsmatch fileMatch;
+	//		std::wstring entryFileName = entry.path().filename().wstring();
+	//		if (std::regex_match(entryFileName, fileMatch, fileRegEx))
+	//		{
+	//			std::wstring baseName = fileMatch[1].str();
+	//			std::wstring separator = fileMatch[2].str();
+	//			std::wstring extension = fileMatch[4].str();
+	//
+	//			// 상위 폴더 경로까지 합쳐서 L"../bin/resources/lev0_static/Textures/p10000_%d.dds" 포맷 만들기
+	//			std::wstring parentPath = entry.path().parent_path().wstring();
+	//			std::replace(parentPath.begin(), parentPath.end(), L'\\', L'/');
+	//			std::wstring formatPath = parentPath + L"/" + baseName + separator + L"%d." + extension;
+	//
+	//
+	//			std::wstring tagName = baseName;
+	//			uint32 sequenceCount = 0;
+	//			for (const auto& peerEntry : filesystem::directory_iterator(entry.path().parent_path()))
+	//			{
+	//				std::wsmatch peerMatch;
+	//				std::wstring peerFileName = peerEntry.path().filename().wstring();
+	//				if (std::regex_match(peerFileName, peerMatch, fileRegEx))
+	//				{
+	//					// 같은 시퀀스(BaseName 일치)라면 카운트 증가
+	//					if (peerMatch[1].str() == baseName)
+	//					{
+	//						sequenceCount++;
+	//					}
+	//				}
+	//			}
+	//
+	//			GAME_INSTANCE->Add_Prototype(levIndex,
+	//				Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+	//					formatPath.c_str(), sequenceCount)
+	//			);
+	//		}
+	//		else
+	//		{
+	//			std::wstring formatPath = FilePath;
+	//			std::wstring tagName = entry.path().stem().wstring();
+	//			GAME_INSTANCE->Add_Prototype(levIndex,
+	//				Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
+	//					formatPath.c_str(), 1)
+	//			);
+	//		}
+	//	}
+	//}
 
 	return S_OK;
 }
@@ -297,28 +294,18 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				if (itTex != tagName.end())
 				{
-					GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-							(m_ShaderPath + tagName).c_str(),
-							VTXTEX::Elements, VTXTEX::numElements)
-							
-					);
+					if (FAILED(GAME_INSTANCE->Load_Shader((m_ShaderPath + tagName).c_str(), VTXTEX::Elements, VTXTEX::numElements, VTXTEX::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXTEX::Tag);
 				}
 				else if (itNormTex != tagName.end())
 				{
-					GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-							(m_ShaderPath + tagName).c_str(), 
-							VTXNORMTEX::Elemnets, VTXNORMTEX::numElements)
-					);
+					if (FAILED(GAME_INSTANCE->Load_Shader((m_ShaderPath + tagName).c_str(), VTXNORMTEX::Elements, VTXNORMTEX::numElements, VTXNORMTEX::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXNORMTEX::Tag);
 				}
 				else if (itMeshTex != tagName.end())
 				{
-					GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-						Shader::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-							(m_ShaderPath + tagName).c_str(),
-							VTXMESH::Elemnets, VTXMESH::numElements) // TODO: mesh 셰이더
-					);
+					if (FAILED(GAME_INSTANCE->Load_Shader((m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXMESH::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXMESH::Tag);
 				}
 				else
 				{

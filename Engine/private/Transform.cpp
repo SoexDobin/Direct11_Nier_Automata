@@ -1,6 +1,7 @@
 #include "Transform.h"
 #include "GameObject.h"
 #include "Shader.h"
+#include "Game.h"
 
 Transform::Transform() : Component{} {}
 Transform::Transform(const ComPtr<ID3D11Device> &device,
@@ -341,6 +342,19 @@ void Transform::Update_WorldMatrix() {
   }
 
   m_IsDirty = false; // dirty 플래그 리셋
+}
+
+Shared<Transform> Transform::CreatePrototype()
+{
+    auto transform = make_shared<Transform>(
+        GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+
+    if (FAILED(transform->Initialize_Prototype())) {
+        MSG_BOX("Failed To Create Transform Prototype");
+        return nullptr;
+    }
+
+    return transform;
 }
 
 Shared<Transform> Transform::Create(ComPtr<ID3D11Device> device,

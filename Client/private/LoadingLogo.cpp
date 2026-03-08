@@ -1,4 +1,4 @@
-﻿#include "LoadingLogo.h"
+#include "LoadingLogo.h"
 #include "pch.h"
 
 
@@ -59,7 +59,7 @@ Shared<GameObject> LoadingLogo::Clone(void *arg) {
   auto logo = make_shared<LoadingLogo>(*this);
 
   if (FAILED(logo->Initialize(arg))) {
-    LOG_ERROR(L"Failed To Clone LoadingLogo");
+    LOG_ERROR(L"Failed To CreateComponent LoadingLogo");
     return nullptr;
   }
 

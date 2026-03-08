@@ -1,4 +1,6 @@
 #include "Shader.h"
+#include "Game.h"
+#include "SpdLogger.h"
 
 Shader::Shader() : Component{} {}
 Shader::Shader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -24,6 +26,7 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
 
     if (ComPtr<ID3DX11EffectTechnique> technique = m_Effect->GetTechniqueByIndex(0)) 
     {
+        Shader::SHADER_DESC desc;
     	D3DX11_TECHNIQUE_DESC techniqueDesc = {};
     	
     	technique->GetDesc(&techniqueDesc);
@@ -45,6 +48,10 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
             passDesc.IAInputSignatureSize, inputLayout.GetAddressOf())))
               return E_FAIL;
 
+            
+            desc.m_elementsDesc = elements;
+            desc.m_numPasses = numElements;
+            m_ObjectDesc = &desc;
             m_InputLayouts.push_back(inputLayout);
         }
     } else
@@ -53,7 +60,15 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
 	return Component::Initialize_Prototype();
 }
 
-HRESULT Shader::Initialize(void *arg) { return Component::Initialize(arg); }
+HRESULT Shader::Initialize_Prototype()
+{
+	return Component::Initialize_Prototype();
+}
+
+HRESULT Shader::Initialize(void* arg)
+{
+	return Component::Initialize(arg);
+}
 
 void Shader::On_Destroy() {
   m_InputLayouts.clear();
@@ -63,7 +78,7 @@ void Shader::On_Destroy() {
 
 HRESULT Shader::Begin(uint32 passIndex) {
   if (passIndex >= m_NumPasses || nullptr == m_InputLayouts[passIndex])
-    return E_FAIL;
+    return S_OK;
 
   m_Effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex)->Apply(
       0, m_Context.Get());
@@ -74,6 +89,8 @@ HRESULT Shader::Begin(uint32 passIndex) {
 
 HRESULT Shader::Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderResourceView> &srv) 
 {
+    if (!m_Effect) return S_OK;
+
 	ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
 	if (nullptr == variable) {
 		MSG_BOX("Failed To Throw Value To Shader");
@@ -91,6 +108,8 @@ HRESULT Shader::Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderReso
 
 HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix) 
 {
+    if (!m_Effect) return S_OK;
+
 	ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
     if (nullptr == variable) {
 		MSG_BOX("Failed To Throw Value To Shader");
@@ -108,6 +127,8 @@ HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix)
 
 HRESULT Shader::Bind_RawValue(const Char* constantName, const void* data, uint32 length)
 {
+    if (!m_Effect) return S_OK;
+
     ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
     if (nullptr == variable) {
         MSG_BOX("Failed To Throw Value To Shader");
@@ -115,6 +136,18 @@ HRESULT Shader::Bind_RawValue(const Char* constantName, const void* data, uint32
     }
 
 	return variable->SetRawValue(data, 0, length);
+}
+
+Shared<Shader> Shader::CreatePrototype()
+{
+    auto shader = make_shared<Shader>(
+        GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+
+    if (FAILED(shader->Initialize_Prototype())) {
+        MSG_BOX("Failed To Create : Shader");
+    }
+
+    return shader;
 }
 
 Shared<Shader> Shader::Create(const ComPtr<ID3D11Device> &device,
@@ -131,8 +164,18 @@ Shared<Shader> Shader::Create(const ComPtr<ID3D11Device> &device,
     return shader;
 }
 
-Shared<Component> Shader::Clone(void *arg) {
-	auto shader = make_shared<Shader>(*this);
+Shared<Component> Shader::Clone(void* arg) {
+    if (arg == nullptr)
+    {
+        LOG_ERROR(L"There is no ShaderDesc");
+        MSG_BOX("There is no ShaderDesc");
+        return nullptr;
+    }
+
+    SHADER_DESC& desc = *static_cast<SHADER_DESC*>(arg);
+    auto resShader = GAME_INSTANCE->Get_Shader(desc.m_VertexTag.c_str());
+
+	auto shader = make_shared<Shader>(*resShader.get());
 
     if (FAILED(shader->Initialize(arg))) {
     	MSG_BOX("Failed To Cloned : Shader");

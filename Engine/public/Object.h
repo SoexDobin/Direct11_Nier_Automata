@@ -30,14 +30,14 @@ public:
 	virtual void Set_Active(Bool isActive);
 	Bool Is_Active() const;
 
-	OBJECT_DESC* Get_ObjectDesc() { return &m_ObjectDesc; }
+	OBJECT_DESC* Get_ObjectDesc() const { return m_ObjectDesc; }
 
 public:
 	virtual PROTOTYPE Get_Prototype() const PURE;
 	static void Destroy(const Shared<Object> &object);
 
 protected:
-	OBJECT_DESC m_ObjectDesc{};
+	OBJECT_DESC* m_ObjectDesc{};
 	Bool m_IsDestroy = {false};
 	Bool m_IsActive = {true};
 	ID_DESC m_DescID = {};

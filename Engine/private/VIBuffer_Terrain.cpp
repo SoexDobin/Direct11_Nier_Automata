@@ -1,5 +1,5 @@
 #include "VIBuffer_Terrain.h"
-
+#include "Game.h"
 #include "SpdLogger.h"
 
 VIBuffer_Terrain::VIBuffer_Terrain()
@@ -14,7 +14,10 @@ VIBuffer_Terrain::VIBuffer_Terrain(const VIBuffer_Terrain& rhs)
 HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 {
 	uLong byte{};
-	HANDLE fileHandle{};
+	HANDLE fileHandle{ INVALID_HANDLE_VALUE };
+	uint32_t* pixels{ nullptr };
+	m_NumVertices = {1};
+
 	if (heightMapFilePath != L"")
 	{
 		fileHandle = CreateFile(
@@ -24,41 +27,55 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 			nullptr,
 			OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL,
-			nullptr);
+			nullptr
+		);
 
-		if (fileHandle == nullptr)
+		if (fileHandle == INVALID_HANDLE_VALUE || fileHandle == nullptr)
 		{
 			MSG_BOX("Failed To Open Height Map File");
 			return E_FAIL;
 		}
-	}
-	BITMAPFILEHEADER fh{};
-	ReadFile(fileHandle, &fh, sizeof(BITMAPFILEHEADER), &byte, nullptr);
-	if (fileHandle == INVALID_HANDLE_VALUE)
-	{
-		MSG_BOX("Failed To Read Header Height Map File");
-		return E_FAIL;
-	}
 
-	BITMAPINFOHEADER ih{};
-	ReadFile(fileHandle, &ih, sizeof(BITMAPINFOHEADER), &byte, nullptr);
-	if (fileHandle == INVALID_HANDLE_VALUE)
-	{
-		MSG_BOX("Failed To Read Info Height Map File");
-		return E_FAIL;
-	}
+		Bool isRead{};
+		BITMAPFILEHEADER fh{};
+		isRead = ReadFile(fileHandle, &fh, sizeof(BITMAPFILEHEADER), &byte, nullptr);
+		if (fileHandle != nullptr && fileHandle == INVALID_HANDLE_VALUE && isRead)
+		{
+			MSG_BOX("Failed To Read Header Height Map File");
+			return E_FAIL;
+		}
 
-	m_NumVerticesX = ih.biWidth;
-	m_NumVerticesZ = ih.biHeight;
-	m_NumVertices = m_NumVerticesX * m_NumVerticesZ;
+		BITMAPINFOHEADER ih{};
+		isRead = ReadFile(fileHandle, &ih, sizeof(BITMAPINFOHEADER), &byte, nullptr);
+		if (fileHandle != nullptr && fileHandle == INVALID_HANDLE_VALUE && isRead)
+		{
+			MSG_BOX("Failed To Read Info Height Map File");
+			return E_FAIL;
+		}
 
-	uint32* pixels = new uint32[m_NumVertices];
-	ReadFile(fileHandle, pixels, sizeof(uint32) * m_NumVertices, &byte, nullptr);
-	if (fileHandle == INVALID_HANDLE_VALUE)
-	{
-		MSG_BOX("Failed To Read Data Height Map File");
-		return E_FAIL;
+		m_NumVerticesX = ih.biWidth;
+		m_NumVerticesZ = ih.biHeight;
+		m_NumVertices = m_NumVerticesX * m_NumVerticesZ;
+
+		pixels = new uint32_t[m_NumVertices];
+
+		isRead = ReadFile(fileHandle, pixels, sizeof(uint32_t) * m_NumVertices, &byte, nullptr);
+		if (fileHandle != nullptr && fileHandle == INVALID_HANDLE_VALUE && isRead)
+		{
+			delete[] pixels;
+			MSG_BOX("Failed To Read Data Height Map File");
+			return E_FAIL;
+		}
 	}
+	else
+	{
+		m_NumVerticesX = 129;
+		m_NumVerticesZ = 129;
+		m_NumVertices = m_NumVerticesX * m_NumVerticesZ;
+		pixels = new uint32_t[m_NumVertices];
+		memset(pixels, 0, sizeof(uint32_t) * m_NumVertices);
+	}
+	
 
 	m_NumVtxBuffers = 1;
 	m_VtxStride = sizeof(VTXNORMTEX);
@@ -76,11 +93,11 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 
 	VTXNORMTEX* vertices = new VTXNORMTEX[m_NumVertices];
 
-	for (uint32 i = 0; i < m_NumVerticesZ; ++i)
+	for (uint32_t i = 0; i < m_NumVerticesZ; ++i)
 	{
-		for (uint32 j = 0; j < m_NumVerticesX; ++j)
+		for (uint32_t j = 0; j < m_NumVerticesX; ++j)
 		{
-			uint32 index = i * m_NumVerticesX + j;
+			uint32_t index = i * m_NumVerticesX + j;
 
 			vertices[index].position = Vector3{ 
 				static_cast<Float>(j), 
@@ -104,16 +121,16 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 	IdxBufferDesc.CPUAccessFlags = 0;
 	IdxBufferDesc.MiscFlags = 0;
 
-	uint32* indices = new uint32[m_NumIndices];
-	uint32 numIndices = { 0 };
+	uint32_t* indices = new uint32_t[m_NumIndices];
+	uint32_t numIndices = { 0 };
 
-	for (uint32 i = 0; i < m_NumVerticesZ - 1; ++i)
+	for (size_t i = 0; i < m_NumVerticesZ - 1; ++i)
 	{
-		for (uint32 j = 0; j < m_NumVerticesX - 1; ++j)
+		for (size_t j = 0; j < m_NumVerticesX - 1; ++j)
 		{
-			uint32 index = i * m_NumVerticesX + j;
+			uint32_t index = i * m_NumVerticesX + j;
 
-			uint32 indexPoint[4] = {
+			uint32_t indexPoint[4] = {
 				index + m_NumVerticesX, 
 				index + m_NumVerticesX + 1, 
 				index + 1, 
@@ -150,7 +167,7 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 		}	
 	}
 
-	for (uint32 i = 0; i < m_NumVertices; ++i)
+	for (uint32_t i = 0; i < m_NumVertices; ++i)
 	{
 		vertices[i].normal.Normalize();
 	}
@@ -159,6 +176,10 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 	vtxInitialData.pSysMem = vertices;
 	if (FAILED(m_Device->CreateBuffer(&vtxBufferDesc, &vtxInitialData, m_VB.GetAddressOf())))
 	{
+		delete[] indices;
+		delete[] vertices;
+		delete[] pixels;
+
 		LOG_ERROR(L"Failed To Create Vertex Buffer At TerrainBuffer");
 		MSG_BOX("Failed To Create Vertex Buffer");
 		return E_FAIL;
@@ -168,6 +189,10 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 	idxInitialData.pSysMem = indices;
 	if (FAILED(m_Device->CreateBuffer(&IdxBufferDesc, &idxInitialData, m_IB.GetAddressOf())))
 	{
+		delete[] indices;
+		delete[] vertices;
+		delete[] pixels;
+
 		LOG_ERROR(L"Failed To Create Index Buffer At TerrainBuffer");
 		MSG_BOX("Failed To Create Index Buffer");
 		return E_FAIL;
@@ -177,7 +202,10 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 	delete[] vertices;
 	delete[] pixels;
 
-	CloseHandle(fileHandle);
+	if (fileHandle != nullptr && fileHandle != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(fileHandle);
+	}
 
 	return VIBuffer::Initialize_Prototype();
 }
@@ -185,6 +213,20 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const tChar* heightMapFilePath)
 HRESULT VIBuffer_Terrain::Initialize(void* arg)
 {
 	return VIBuffer::Initialize(arg);
+}
+
+Shared<VIBuffer_Terrain> VIBuffer_Terrain::CreatePrototype()
+{
+	auto bufferTerrain = make_shared<VIBuffer_Terrain>(
+		GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+
+	if (FAILED(bufferTerrain->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed To Create VIBuffer_Terrain");
+		return nullptr;
+	}
+
+	return bufferTerrain;
 }
 
 Shared<VIBuffer_Terrain> VIBuffer_Terrain::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const tChar* heightMapFilePath)

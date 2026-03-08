@@ -36,7 +36,7 @@ protected:
   Weak<GameObject> m_Owner = {};
 
 public:
-  constexpr virtual Shared<Component> Clone(void *arg) PURE;
+  constexpr virtual Shared<Component> Clone(void *arg = nullptr) PURE;
 
 private:
   using Object::m_DescID;

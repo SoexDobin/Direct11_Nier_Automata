@@ -1,36 +1,32 @@
 {
   "layers": [
     {
-      "bit": 0,
+      "bit": 1,
       "name": "LAYER0"
     },
     {
-      "bit": 1,
+      "bit": 2,
       "name": "LAYER1"
     },
     {
-      "bit": 2,
+      "bit": 4,
       "name": "LAYER2"
     },
     {
-      "bit": 4,
+      "bit": 8,
       "name": "LAYER3"
     },
     {
-      "bit": 8,
+      "bit": 16,
       "name": "LAYER4"
     },
     {
-      "bit": 16,
+      "bit": 32,
       "name": "LAYER5"
     },
     {
-      "bit": 32,
-      "name": "LAYER6"
-    },
-    {
       "bit": 64,
-      "name": "LAYER7"
+      "name": "LAYER6"
     },
     {
       "bit": 128,

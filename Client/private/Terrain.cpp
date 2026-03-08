@@ -58,17 +58,19 @@ HRESULT Terrain::Render() {
 }
 
 HRESULT Terrain::Ready_Components() {
-	m_Shader = static_pointer_cast<Shader>(Add_Component(Helper::To_wString(rttr::type::get<VTXNORMTEX>().get_name().to_string())));
+    Shader::SHADER_DESC shaderDesc = Shader::SHADER_DESC{ VTXNORMTEX::Tag,VTXNORMTEX::Elements, VTXNORMTEX::numElements };
+    m_Shader = Add_Component<Shader>(&shaderDesc);
 	if (!m_Shader) {
 		LOG_ERROR(L"Failed To Add Component Shader To Terrain");
 		return E_FAIL;
 	}
-	m_Texture = static_pointer_cast<Texture>(Add_Component(L"Tile_0"));
+    Texture::TEXTURE_DESC textureDesc = Texture::TEXTURE_DESC{ L"Tile_0" };
+	m_Texture = Add_Component<Texture>(&textureDesc);
 	if (!m_Texture) {
 		LOG_ERROR(L"Failed To Add Component Texture To Terrain");
 		return E_FAIL;
 	}
-	m_VIBuffer = static_pointer_cast<VIBuffer_Terrain>(Add_Component(L"Default_Terrain"));
+	m_VIBuffer = Add_Component<VIBuffer_Terrain>();
 	if (!m_VIBuffer) {
 		LOG_ERROR(L"Failed To Add Component TerrainBuffer To Terrain");
 		return E_FAIL;
@@ -120,7 +122,7 @@ Shared<GameObject> Terrain::Clone(void *arg) {
   auto terrain = make_shared<Terrain>(*this);
 
   if (FAILED(terrain->Initialize(arg))) {
-    LOG_ERROR(L"Failed To Clone Terrain Prototype");
+    LOG_ERROR(L"Failed To CreateComponent Terrain Prototype");
     return nullptr;
   }
 

@@ -19,29 +19,36 @@
 IMPLEMENT_SINGLETON(Game);
 
 Game::~Game() {
-  m_GraphicDevice.reset();
-  m_TimeManager.reset();
-  m_InputDevice.reset();
+    m_TimeManager.reset();
+    m_InputDevice.reset();
 
-  m_LevelManager->On_Destroy();
-  m_LevelManager.reset();
+    m_ResourceManager->On_Destroy();
+    m_ResourceManager.reset();
 
-  m_ObjectManager->On_Destroy();
-  m_ObjectManager.reset();
+    m_LevelManager->On_Destroy();
+    m_LevelManager.reset();
 
-  m_Renderer->On_Destroy();
-  m_Renderer.reset();
+    m_ObjectManager->On_Destroy();
+    m_ObjectManager.reset();
 
-  m_PrototypeManager->On_Destroy();
-  m_PrototypeManager.reset();
+    m_Renderer->On_Destroy();
+    m_Renderer.reset();
 
-  m_CameraManager->On_Destroy();
-  m_CameraManager.reset();
+    m_PrototypeManager->On_Destroy();
+    m_PrototypeManager.reset();
 
-  m_LayerRegistry.reset();
-  m_TagRegistry.reset();
+    m_CameraManager->On_Destroy();
+    m_CameraManager.reset();
 
-  LOG_SHUTDOWN(); /* Debug Helper SpdLogger */
+    m_LayerRegistry.reset();
+    m_TagRegistry.reset();
+
+    m_LightManager->On_Destroy();
+    m_LightManager.reset();
+
+    m_GraphicDevice.reset();
+
+    LOG_SHUTDOWN(); /* Debug Helper SpdLogger */
 }
 
 HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
@@ -234,14 +241,14 @@ HRESULT Game::Change_Level(uint32 levIndex, Unique<Level> newLevel) {
   return S_OK;
 }
 
-uint32 Game::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag) const
+uint32 Game::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const
 {
-    return m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag);
+    return m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, levIndex);
 }
 
-const wstring& Game::Get_PrototypeTagFromObjectID(uint32 objectID) const
+const wstring& Game::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
 {
-    return m_PrototypeManager->Get_PrototypeTagFromObjectID(objectID);
+    return m_PrototypeManager->Get_PrototypeTagFromObjectID(objectID, levIndex);
 }
 
 HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
@@ -259,19 +266,28 @@ const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects() const {
     return m_ObjectManager->Get_GameObjects();
 }
 
-HRESULT Game::Add_Camera(const Shared<Camera> &camera) const {
-  return m_CameraManager->Add_Camera(camera);
-}
-HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const {
-  return m_CameraManager->Set_MainCamera(camera);
-}
-Shared<Camera> Game::Get_MainCamera() const {
-  return m_CameraManager->Get_MainCamera();
+HRESULT Game::Add_Camera(const Shared<Camera> &camera) const { return m_CameraManager->Add_Camera(camera); }
+HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const { return m_CameraManager->Set_MainCamera(camera); }
+Shared<Camera> Game::Get_MainCamera() const { return m_CameraManager->Get_MainCamera(); }
+
+HRESULT Game::Load_Shader(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const
+{
+    return m_ResourceManager->Load_Shader(shaderFilePath, elements, numElements, descriptionTag);
 }
 
-HRESULT Game::Load_Texture(const tChar* textureFilePath, uint32 numSRVs) const
+Shared<Shader> Game::Get_Shader(const tChar* shaderFilePath) const
 {
-    return m_ResourceManager->Load_Texture(textureFilePath, numSRVs);
+    return m_ResourceManager->Get_Shader(shaderFilePath);
+}
+
+HRESULT Game::Load_Texture(const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const
+{
+    return m_ResourceManager->Load_Texture(textureFilePath, numSRVs, descriptionTag);
+}
+
+const Texture::TEXTURE_DESC& Game::Get_TextureDesc(const wstring& descriptionTag) const
+{
+    return m_ResourceManager->Get_TextureDescByTag(descriptionTag);
 }
 
 const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(const tChar* textureFilePath) const
@@ -279,42 +295,42 @@ const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(const tChar* textureFi
     return m_ResourceManager->Get_Texture(textureFilePath);
 }
 
-const vector<ComPtr<ID3D11ShaderResourceView>>& Game::Get_Textures(const tChar* textureFilePath, uint32 numSRVs) const
+const vector<ComPtr<ID3D11ShaderResourceView>> Game::Get_Textures(const tChar* textureFilePath, uint32 numSRVs) const
 {
     return m_ResourceManager->Get_Textures(textureFilePath, numSRVs);
 }
 
 void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObject) const {
-  m_Renderer->Add_RenderGroup(group, gameObject);
+	m_Renderer->Add_RenderGroup(group, gameObject);
 }
 
 HRESULT Game::Bind_CameraPosition(const Shared<Shader> &shader,
                                   const Char *constantName) const {
-  return m_Pipeline->Bind_CameraPosition(shader, constantName);
+	return m_Pipeline->Bind_CameraPosition(shader, constantName);
 }
 
 HRESULT Game::Bind_TransformMatrix(const Shared<Shader> &shader,
                                    const Char *constantName,
                                    D3DTS transformState) {
-  return m_Pipeline->Bind_TransformMatrix(shader, constantName, transformState);
+	return m_Pipeline->Bind_TransformMatrix(shader, constantName, transformState);
 }
 
 HRESULT Game::Bind_TransformMatrix_Inverse(const Shared<Shader> &shader,
                                            const Char *constantName,
                                            D3DTS transformState) {
-  return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName, transformState);
+	return m_Pipeline->Bind_TransformMatrix_Inverse(shader, constantName, transformState);
 }
 
 Matrix Game::Get_Transform(D3DTS transformState) const {
-  return m_Pipeline->Get_Transform(transformState);
+	return m_Pipeline->Get_Transform(transformState);
 }
 
 Vector4 Game::Get_CamTransform() const {
-  return m_Pipeline->Get_CamTransform();
+	return m_Pipeline->Get_CamTransform();
 }
 
 void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix) {
-  m_Pipeline->Set_Transform(transformState, transformStateMatrix);
+	m_Pipeline->Set_Transform(transformState, transformStateMatrix);
 }
 
 void Game::Update_Pipeline() const { m_Pipeline->Update_Pipeline(); }
@@ -333,7 +349,7 @@ Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 objectID, 
     uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
     if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, objectID)) {
-      return static_pointer_cast<Object>(object);
+		return static_pointer_cast<Object>(object);
     }
 
     return nullptr;
@@ -366,7 +382,7 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& pr
 {
     uint32 level = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
-    uint32 objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag);
+    uint32 objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, level);
     if (objectID == 0)
     {
         MSG_BOX("Failed to Instantiate By prototypeTag");

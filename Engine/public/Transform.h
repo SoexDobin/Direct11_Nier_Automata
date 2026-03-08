@@ -94,6 +94,7 @@ private:
     Bool m_IsDirty = {true};
 
 public:
+    static Shared<Transform> CreatePrototype();
     static Shared<Transform> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
     Shared<Component> Clone(void *arg) override;
 

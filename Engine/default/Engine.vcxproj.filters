@@ -373,5 +373,14 @@
     <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp">
       <Filter>96. RTTR</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

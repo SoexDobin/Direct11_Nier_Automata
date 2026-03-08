@@ -1,10 +1,22 @@
-﻿#pragma once
+#pragma once
 #include "Component.h"
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL VIBuffer abstract : public Component {
+class ENGINE_DLL VIBuffer abstract : public Component 
+{
     RTTR_ENABLE(Component)
+public:
+	typedef struct tagVIBuffer : public Component
+	{
+		uint32 m_NumVtxBuffers{};
+		uint32 m_NumVertices{};
+		uint32 m_VtxStride{};
+
+		uint32 m_NumIndices{};
+		uint32 m_IndexStride{};
+	} VIBUFFER;
+
 public:
     VIBuffer();
   VIBuffer(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);

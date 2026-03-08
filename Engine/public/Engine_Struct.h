@@ -39,8 +39,9 @@ namespace Engine
 	{
 		Vector3			position;
 		Vector2			texcoord;
-		static const uint32_t numElements = { 2 };
 
+		inline static const std::wstring Tag = { L"VTX_Tex" };
+		static const uint32_t numElements = { 2 };
 		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
@@ -53,9 +54,9 @@ namespace Engine
 		Vector3			normal;
 		Vector2			texcoord;
 
+		inline static const std::wstring Tag = { L"VTX_NormalTex" };
 		static const uint32_t numElements = { 3 };
-
-		static constexpr D3D11_INPUT_ELEMENT_DESC Elemnets[] = {
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
@@ -69,9 +70,9 @@ namespace Engine
 		Vector3			tangent;
 		Vector2			texcoord;
 
+		inline static const std::wstring Tag = {L"VTX_Mesh"};
 		static const uint32_t numElements = { 4 };
-
-		static constexpr D3D11_INPUT_ELEMENT_DESC Elemnets[] = {
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},

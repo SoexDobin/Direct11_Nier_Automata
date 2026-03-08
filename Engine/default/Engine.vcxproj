@@ -264,10 +264,13 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\GameObject_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />

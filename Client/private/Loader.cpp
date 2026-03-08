@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "Loader.h"
-
-#include <Transform.h>
-
 #include "ClientApp.h"
 #include "SpdLogger.h"
 
@@ -101,12 +98,6 @@ HRESULT Loader::Loading_For_LogoLevel() {
 
 
     if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
-        VIBuffer_Terrain::Create(m_Device, m_Context,
-        L"../../Client/bin/resources/Default/Height.bmp"), 
-        L"Default_Terrain")))
-        return E_FAIL;
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
         Terrain::Create(m_Device, m_Context), L"MainTerrain")))
         return E_FAIL;
 
@@ -184,22 +175,6 @@ HRESULT Loader::Loading_Global_Prototype()
     }
 
     lstrcpy(m_LoadingText, TEXT("Loading Static Level Shader... "));
- 
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-        Texture::Create(m_Device, m_Context,
-            L"C:/Users/a9018/Desktop/Direct11_Nier_Automata/Client/bin/resources/lev0_static/texture/Terrain/Tile0.dds", 1))))
-		return E_FAIL;
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-        Shader::Create(m_Device, m_Context,
-            L"C:/Users/a9018/Desktop/Direct11_Nier_Automata/Client/bin/shaders/Shader_VtxNormTex.hlsl", 
-            VTXNORMTEX::Elemnets, VTXNORMTEX::numElements))))
-        return E_FAIL;
-
-	if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-	VIBuffer_Terrain::Create(m_Device, m_Context,
-        L"C:/Users/a9018/Desktop/Direct11_Nier_Automata/Client/bin/resources/lev0_static/texture/Terrain/Height.bmp"))))
-		return E_FAIL;
 
     if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
         Terrain::Create(m_Device, m_Context))))

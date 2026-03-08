@@ -4,7 +4,7 @@
 #include "Object.h"
 #include "ScriptComponent.h"
 #include "TagRegistry.h"
-
+#include "String_Helper.h"
 
 NS_BEGIN(Engine)
 class Game;
@@ -74,11 +74,17 @@ protected: /* Component */
 
 public:
     inline Shared<Component> Get_Component(uint32 objectID);
-    const vector<Shared<Component>> &Get_Components();
-    const vector<Shared<ScriptComponent>> &Get_Scripts();
+    const vector<Shared<Component>> Get_Components();
+    const vector<Shared<ScriptComponent>> Get_Scripts();
     HRESULT Add_Component(const Shared<Component> &component);
     Shared<Component> Add_Component(uint32 objectID, void* arg = nullptr);
     Shared<Component> Add_Component(const wstring& prototypeTag, void* arg = nullptr);
+
+    template <typename T>
+    Shared<T> Add_Component(void* arg = nullptr)
+    {
+        return static_pointer_cast<T>(Add_Component(Helper::To_wString(rttr::type::get<T>().get_name()), arg));
+    }
 
 protected:
      template <typename T>

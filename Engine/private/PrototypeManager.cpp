@@ -13,6 +13,11 @@ HRESULT PrototypeManager::Initialize(void* arg) {
     m_GameObjects.resize(m_LevelCount);
     m_Components.resize(m_LevelCount);
 
+    if (FAILED(Register_EngineComponents()))
+    {
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
@@ -28,23 +33,38 @@ void PrototypeManager::On_Destroy() {
     m_Components.clear();
 }
 
-uint32 PrototypeManager::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag)
+uint32 PrototypeManager::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const
 {
-    if (false == m_ObjectsID[GAME_INSTANCE->Get_CurrentLevelIndex()].contains(prototypeTag))
+    uint32 targetLevel = levIndex;
+
+    if (false == m_ObjectsID[targetLevel].contains(prototypeTag))
     {
-        LOG_ERROR(L"{} has no ObjectID", prototypeTag);
-        return 0;
+        targetLevel = 0;
+        if (false == m_ObjectsID[targetLevel].contains(prototypeTag))
+        {
+            LOG_ERROR(L"{} has no ObjectID", prototypeTag);
+            return 0;
+        }
     }
 
-    return m_ObjectsID[GAME_INSTANCE->Get_CurrentLevelIndex()].at(prototypeTag);
+    return m_ObjectsID[targetLevel].at(prototypeTag);
 }
 
-const wstring& PrototypeManager::Get_PrototypeTagFromObjectID(uint32 objectID)
+const tChar* PrototypeManager::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
 {
-    for (auto objectsID : m_ObjectsID[GAME_INSTANCE->Get_CurrentLevelIndex()])
+    uint32 targetLevel = levIndex;
+
+    for (auto objectsID : m_ObjectsID[targetLevel])
     {
         if (objectsID.second == objectID)
-            return objectsID.first;
+            return objectsID.first.c_str();
+    }
+
+    targetLevel = 0;
+    for (auto objectsID : m_ObjectsID[targetLevel])
+    {
+        if (objectsID.second == objectID)
+            return objectsID.first.c_str();
     }
 
     return nullptr;
@@ -115,6 +135,41 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
     m_GameObjects[levIndex].clear();
     m_Components[levIndex].clear();
     m_ObjectsID[levIndex].clear();
+
+    return S_OK;
+}
+
+HRESULT PrototypeManager::Register_EngineComponents()
+{
+    rttr::type componentType = type::get<Component>();
+    auto derivedTypes = componentType.get_derived_classes();
+
+    for (auto& searchedType : derivedTypes)
+    {
+        rttr::method createMethod = searchedType.get_method("CreatePrototype");
+        if (createMethod.is_valid())
+        {
+            variant result = createMethod.invoke({});
+
+            if (result.is_valid())
+            {
+                auto prototype = result.get_value<Shared<Component>>();
+
+                wstring tag = Helper::To_wString(searchedType.get_name().to_string());
+                if (FAILED(Add_Prototype(0, prototype, tag)))
+                    continue;
+
+                LOG_INFO(L"Auto-Registered Prototype: {}", tag);
+            } else
+            {
+                LOG_ERROR(L"[Reflection] : Failed to Create Prototype");
+                return E_FAIL;
+            }
+        } else
+        {
+            LOG_WARN(L"[Reflection] : Don't have \"CreatePrototype\"");
+        }
+    }
 
     return S_OK;
 }

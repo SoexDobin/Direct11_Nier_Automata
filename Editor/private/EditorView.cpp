@@ -26,35 +26,15 @@ void EditorView::RenderView() {
 	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
 	auto srvScene = GAME_INSTANCE->Get_OffScreenSRV(1);
 
-	ImVec2 sceneViewportSize = ImGui::GetContentRegionAvail();
-	if (sceneViewportSize.x != prevSceneViewportSize.x || sceneViewportSize.y != prevSceneViewportSize.y)
-	{
-		if (sceneViewportSize.x > 0 && sceneViewportSize.y > 0)
-		{
-			GAME_INSTANCE->OnResize(static_cast<uint32_t>(sceneViewportSize.x), static_cast<uint32_t>(sceneViewportSize.y));
-			prevSceneViewportSize = sceneViewportSize;
-		}
-	}
 
 	ImGui::Begin("Scene View");
 	if (srvScene)
 	{
+		prevSceneViewportSize = ImGui::GetContentRegionAvail();
 		ImGui::Text("FPS : %3f", GAME_INSTANCE->Get_FPS());
-		ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), sceneViewportSize);
+		ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), prevSceneViewportSize);
 	}
 	ImGui::End();
-
-
-	ImVec2 gameViewportSize = ImGui::GetContentRegionAvail();
-	if (gameViewportSize.x != prevGameViewportSize.x || gameViewportSize.y != prevGameViewportSize.y)
-	{
-		if (gameViewportSize.x > 0 && gameViewportSize.y > 0)
-		{
-			//GAME_INSTANCE->OnResize(static_cast<uint32_t>(gameViewportSize.x), static_cast<uint32_t>(gameViewportSize.y));
-			prevGameViewportSize = gameViewportSize;
-		}
-	}
-
 
 	ImGui::Begin("Game View");
 	if (ImGui::Button("Play")) {
@@ -73,8 +53,8 @@ void EditorView::RenderView() {
 	ImGui::Separator();
 
 	if (srvGame) {
-		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-		ImGui::Image(reinterpret_cast<ImTextureID>(srvGame.Get()), viewportSize);
+		prevGameViewportSize = ImGui::GetContentRegionAvail();
+		ImGui::Image(reinterpret_cast<ImTextureID>(srvGame.Get()), prevGameViewportSize);
 		
 	}
 

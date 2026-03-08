@@ -5,7 +5,6 @@
 using namespace rttr;
 using namespace Engine;
 
-#line 10523
 RTTR_REGISTRATION
 {
 	registration::class_<Terrain>("Terrain")

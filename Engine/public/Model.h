@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Component.h"
 
 NS_BEGIN(Engine)
@@ -6,6 +6,7 @@ class Mesh;
 
 class ENGINE_DLL Model final : public Component, public enable_shared_from_this<Model>
 {
+
 public:
 	explicit Model();
 	explicit Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

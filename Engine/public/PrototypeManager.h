@@ -19,8 +19,8 @@ public:
 	void On_Destroy() override;
 
 public:
-    uint32 Get_ObjectIDFromPrototypeTag(const wstring &prototypeTag);
-    const wstring &Get_PrototypeTagFromObjectID(uint32 objectID);
+    uint32 Get_ObjectIDFromPrototypeTag(const wstring &prototypeTag, uint32 levIndex) const;
+    const tChar* Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
     HRESULT Add_Prototype(uint32 levIndex, const Shared<Object> &object, const wstring &prototypeTag);
     Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex, uint32 objectID) const;
     Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex, const wstring &prototypeTag) const;
@@ -32,6 +32,9 @@ public: /* Read Only */
     Get_GameObjects() const { return m_GameObjects; }
     const vector<unordered_map<uint32, Shared<Component>>> &
     Get_Components() const { return m_Components; }
+
+private:
+    HRESULT Register_EngineComponents();
 
 private:
     uint32 m_LevelCount = {};

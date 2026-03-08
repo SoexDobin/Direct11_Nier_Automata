@@ -5,7 +5,10 @@
 
 Object::Object() {}
 
-Object::~Object() {}
+Object::~Object()
+{
+	delete m_ObjectDesc;
+}
 
 HRESULT Object::Initialize_Prototype()
 {
@@ -16,8 +19,7 @@ HRESULT Object::Initialize_Prototype()
         return E_FAIL;
     }
 
-    m_ObjectName =
-        Helper::To_wString(rttr::type::get(*this).get_name().to_string());
+    m_ObjectName = Helper::To_wString(rttr::type::get(*this).get_name().to_string());
     if (m_ObjectName.empty()) {
         LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
         MSG_BOX("GameObject Initialize Failed By Set Object Name");

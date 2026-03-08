@@ -13,9 +13,9 @@ Texture::Texture(const Texture& rhs)
     m_FilePath{ rhs.m_FilePath } {
 }
 
-HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs) 
+HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs, const wstring& textureTag)
 {
-    if (FAILED(GAME_INSTANCE->Load_Texture(textureFilePath, numSRVs)))
+    if (FAILED(GAME_INSTANCE->Load_Texture(textureFilePath, numSRVs, textureTag)))
     {
         LOG_ERROR(L"Failed to Load Texture At : {}, numSRVs : {}", textureFilePath, numSRVs);
         MSG_BOX("Failed to Load Texture");
@@ -24,22 +24,28 @@ HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSR
     return Component::Initialize_Prototype();
 }
 
+HRESULT Texture::Initialize_Prototype()
+{
+	return Component::Initialize_Prototype();
+}
+
 HRESULT Texture::Initialize(void* arg)
 {
-    if (m_FilePath.empty() || m_NumSRVs == 0)
+    if (arg == nullptr)
     {
-        if (arg == nullptr)
-        {
-            LOG_ERROR(L"There is no TextureDesc");
-            MSG_BOX("There is no TextureDesc");
-            return E_FAIL;
-        }
+        LOG_ERROR(L"There is no TextureDesc");
+        MSG_BOX("There is no TextureDesc");
+        return E_FAIL;
+    }
 
-        TEXTURE_DESC& desc = *static_cast<TEXTURE_DESC*>(arg);
-        m_NumSRVs = desc.m_NumSRVs;
-        m_FilePath = desc.m_FilePath;
+    TEXTURE_DESC& desc = *static_cast<TEXTURE_DESC*>(arg);
+    m_NumSRVs = desc.m_NumSRVs;
+    m_FilePath = desc.m_FilePath;
+    m_SRVs.shrink_to_fit();
 
-        m_SRVs.shrink_to_fit();
+
+    if (desc.m_TextureTag.empty())
+    {
         if (m_NumSRVs == 1)
         {
             m_SRVs.push_back(GAME_INSTANCE->Get_Texture(m_FilePath.c_str()));
@@ -51,7 +57,10 @@ HRESULT Texture::Initialize(void* arg)
     }
     else
     {
-        m_SRVs.shrink_to_fit();
+        const TEXTURE_DESC& registDesc = GAME_INSTANCE->Get_TextureDesc(desc.m_TextureTag);
+        m_NumSRVs = registDesc.m_NumSRVs;
+        m_FilePath = registDesc.m_FilePath;
+
         if (m_NumSRVs == 1)
         {
             m_SRVs.push_back(GAME_INSTANCE->Get_Texture(m_FilePath.c_str()));
@@ -61,6 +70,8 @@ HRESULT Texture::Initialize(void* arg)
             m_SRVs = GAME_INSTANCE->Get_Textures(m_FilePath.c_str(), m_NumSRVs);
         }
     }
+
+    
 
 	return Component::Initialize(arg);
 }
@@ -106,13 +117,26 @@ HRESULT Texture::Bind_Texture(const wstring& texturefilePath)
     return S_OK;
 }
 
+Shared<Texture> Texture::CreatePrototype()
+{
+    auto texture = make_shared<Texture>(
+        GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+
+    if (FAILED(texture->Initialize_Prototype()))
+    {
+        MSG_BOX("Failed to Created : Texture");
+    }
+
+    return texture;
+}
+
 Shared<Texture> Texture::Create(const ComPtr<ID3D11Device> &device,
                                 const ComPtr<ID3D11DeviceContext> &context,
-                                const tChar* textureFilePath, uint32 numSRVs) 
+                                const tChar* textureFilePath, uint32 numSRVs, const wstring& textureTag)
 {
 	auto texture = make_shared<Texture>(device, context);
 
-	if (FAILED(texture->Initialize_Prototype(textureFilePath, numSRVs))) {
+	if (FAILED(texture->Initialize_Prototype(textureFilePath, numSRVs, textureTag))) {
 		MSG_BOX("Failed to Created : Texture");
 	}
 

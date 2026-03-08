@@ -214,7 +214,7 @@ Shared<Component> GameObject::Get_Component(uint32 objectID) {
   return nullptr;
 }
 
-const vector<Shared<Component>>& GameObject::Get_Components()
+const vector<Shared<Component>> GameObject::Get_Components()
 {
     if (m_Components.empty())
         return EMPTY_VECTOR<Shared<Component>>;
@@ -228,7 +228,7 @@ const vector<Shared<Component>>& GameObject::Get_Components()
     return components;
 }
 
-const vector<Shared<ScriptComponent>>& GameObject::Get_Scripts()
+const vector<Shared<ScriptComponent>> GameObject::Get_Scripts()
 {
     if (m_Components.empty())
         return EMPTY_VECTOR<Shared<ScriptComponent>>;
@@ -283,6 +283,8 @@ Shared<Component> GameObject::Add_Component(uint32 objectID, void* arg)
     Shared<Component> newComponent = GAME_INSTANCE->Instantiate<Component>(objectID, levIndex, arg);
     if (newComponent) 
         Add_Component(newComponent);
+    else
+        LOG_ERROR(L"Failed to Add Component {}", objectID);
     
     return newComponent;
 }
@@ -291,9 +293,11 @@ Shared<Component> GameObject::Add_Component(const wstring& prototypeTag, void* a
 {
     uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
 
-    Shared<Component> newComponent = GAME_INSTANCE->Instantiate<Component>(prototypeTag, levIndex, arg);
+    Shared<Component> newComponent = static_pointer_cast<Component>(GAME_INSTANCE->Instantiate(prototypeTag, levIndex, arg));
     if (newComponent)
         Add_Component(newComponent);
+    else
+        LOG_ERROR(L"Failed to Add Component {}", prototypeTag);
 
     return newComponent;
 }

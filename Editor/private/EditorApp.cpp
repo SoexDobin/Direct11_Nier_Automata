@@ -39,12 +39,6 @@ HRESULT EditorApp::Initialize() {
   ClientSettingManager::GetInstance()->Set_ShaderPath(
       L"../../Client/bin/shaders/");
 
-  if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV()))
-  {
-      if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson()))
-          return E_FAIL;
-  }
-
   m_EngineDesc = desc;
 
   if ((m_ClientApp = ClientApp::Create(desc))) {

@@ -76,8 +76,8 @@ public: /* For LevelManager */
   HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
 
 public: /* For PrototypeManager */
-    uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag) const;
-    const wstring& Get_PrototypeTagFromObjectID(uint32 objectID) const;
+    uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const;
+    const wstring& Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
 	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID,
                                       uint32 levIndex = UINT_MAX) const;
@@ -95,11 +95,13 @@ public: /* For CameraManager */
   Shared<class Camera> Get_MainCamera() const;
 
 public: /* For ResourceManager */
-  HRESULT Load_Texture(const tChar *textureFilePath, uint32 numSRVs = 1) const;
-  const ComPtr<ID3D11ShaderResourceView> &
-  Get_Texture(const tChar *textureFilePath) const;
-  const vector<ComPtr<ID3D11ShaderResourceView>> &
-  Get_Textures(const tChar *textureFilePath, uint32 numSRVs) const;
+    HRESULT Load_Shader(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const;
+    Shared<Shader> Get_Shader(const tChar* shaderFilePath) const;
+
+    HRESULT Load_Texture(const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const;
+    const Texture::TEXTURE_DESC& Get_TextureDesc(const wstring& descriptionTag) const;
+    const ComPtr<ID3D11ShaderResourceView> & Get_Texture(const tChar *textureFilePath) const;
+    const vector<ComPtr<ID3D11ShaderResourceView>> Get_Textures(const tChar *textureFilePath, uint32 numSRVs) const;
 
 public: /* For Renderer */
   void Add_RenderGroup(RENDERGROUP group,
@@ -139,6 +141,10 @@ public: /* Prototype & Instantiate Facade */
         PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
         Shared<Object> cloned = Instantiate_Internal(protoType, prototypeTag, levIndex, arg);
         return std::static_pointer_cast<T>(cloned);
+    }
+    Shared<Object> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) const {
+        Shared<Object> cloned = Instantiate_Internal(PROTOTYPE::COMPONENT, prototypeTag, levIndex, arg);
+        return cloned;
     }
 private: /* Internal Implementation (Non-Template) */
     HRESULT Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag = L"") const;

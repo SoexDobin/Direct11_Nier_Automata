@@ -3,13 +3,12 @@
 using namespace rttr;
 using namespace Engine;
 
-#line 5763
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Texture_RTTR)
 {
     registration::class_<Texture>("Texture")
         .constructor<>()
         .method("Clone", &Texture::Clone)
         .method("Create", &Texture::Create)
+		.method("CreatePrototype", &Texture::CreatePrototype)
         ;
 }
-

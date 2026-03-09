@@ -23,13 +23,18 @@ void EditorView::Render() {
 void EditorView::RenderView() {
 	static ImVec2 prevSceneViewportSize{};
 	static ImVec2 prevGameViewportSize{};
-	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
 	auto srvScene = GAME_INSTANCE->Get_OffScreenSRV(1);
+	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
 
 
 	ImGui::Begin("Scene View");
 	if (srvScene)
 	{
+		ImVec2 currentSize = ImGui::GetContentRegionAvail();
+		if (prevSceneViewportSize.x != currentSize.x || prevSceneViewportSize.y != currentSize.y) {
+			prevSceneViewportSize = currentSize;
+			EDITOR->RequestResize(currentSize.x,currentSize.y,0);
+		}
 		prevSceneViewportSize = ImGui::GetContentRegionAvail();
 		ImGui::Text("FPS : %3f", GAME_INSTANCE->Get_FPS());
 		ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), prevSceneViewportSize);
@@ -52,16 +57,12 @@ void EditorView::RenderView() {
 	}
 	ImGui::Separator();
 
-
-	ImVec2 currentSize = ImGui::GetContentRegionAvail();
-	static ImVec2 lastSize = { 0, 0 };
-	if (lastSize.x != currentSize.x || lastSize.y != currentSize.y) {
-		lastSize = currentSize;
-		// 엔진을 직접 건들지 않고 Manager에게 요청만 함
-		EDITOR->RequestResize((uint32)currentSize.x, (uint32)currentSize.y, 0);
-	}
-
 	if (srvGame) {
+		ImVec2 currentSize = ImGui::GetContentRegionAvail();
+		if (prevGameViewportSize.x != currentSize.x || prevGameViewportSize.y != currentSize.y) {
+			prevGameViewportSize = currentSize;
+			EDITOR->RequestResize(currentSize.x,currentSize.y,0);
+		}
 		prevGameViewportSize = ImGui::GetContentRegionAvail();
 		ImGui::Image(reinterpret_cast<ImTextureID>(srvGame.Get()), prevGameViewportSize);
 		

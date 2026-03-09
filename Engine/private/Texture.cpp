@@ -1,4 +1,6 @@
 #include "Texture.h"
+#include <tchar.h>
+
 #include "Shader.h"
 #include "Game.h"
 #include "SpdLogger.h"
@@ -15,12 +17,6 @@ Texture::Texture(const Texture& rhs)
 
 HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs, const wstring& textureTag)
 {
-    if (FAILED(GAME_INSTANCE->Load_Texture(textureFilePath, numSRVs, textureTag)))
-    {
-        LOG_ERROR(L"Failed to Load Texture At : {}, numSRVs : {}", textureFilePath, numSRVs);
-        MSG_BOX("Failed to Load Texture");
-    }
-
     return Component::Initialize_Prototype();
 }
 
@@ -39,41 +35,34 @@ HRESULT Texture::Initialize(void* arg)
     }
 
     TEXTURE_DESC& desc = *static_cast<TEXTURE_DESC*>(arg);
-    m_NumSRVs = desc.m_NumSRVs;
-    m_FilePath = desc.m_FilePath;
+    m_levIndex = desc.m_levIndex;
     m_SRVs.shrink_to_fit();
 
+    if (!desc.m_TextureTag.empty())
+    {
+        // 1. 태그로 메타데이터 우선 획득
+        const TEXTURE_DESC& registDesc = GAME_INSTANCE->Get_TextureDesc(desc.m_levIndex, desc.m_TextureTag);
 
-    if (desc.m_TextureTag.empty())
-    {
-        if (m_NumSRVs == 1)
-        {
-            m_SRVs.push_back(GAME_INSTANCE->Get_Texture(m_FilePath.c_str()));
-        }
-        else
-        {
-            m_SRVs = GAME_INSTANCE->Get_Textures(m_FilePath.c_str(), m_NumSRVs);
-        }
-    }
-    else
-    {
-        const TEXTURE_DESC& registDesc = GAME_INSTANCE->Get_TextureDesc(desc.m_TextureTag);
         m_NumSRVs = registDesc.m_NumSRVs;
         m_FilePath = registDesc.m_FilePath;
+        m_SRVs.clear();
+        m_SRVs.reserve(m_NumSRVs);
+        // 2. 메타데이터에 기록된 정확한 개수만큼 리소스 요청
+        for (uint32 i = 0; i < m_NumSRVs; ++i)
+        {
+            tChar szFullPath[MAX_PATH] = TEXT("");
+            _stprintf_s(szFullPath, m_FilePath.c_str(), i);
+            const ComPtr<ID3D11ShaderResourceView>& pSRV = GAME_INSTANCE->Get_Texture(desc.m_levIndex, szFullPath);
 
-        if (m_NumSRVs == 1)
-        {
-            m_SRVs.push_back(GAME_INSTANCE->Get_Texture(m_FilePath.c_str()));
-        }
-        else
-        {
-            m_SRVs = GAME_INSTANCE->Get_Textures(m_FilePath.c_str(), m_NumSRVs);
+            if (pSRV == nullptr) {
+                LOG_ERROR(L"[Texture] : Failed to find Tag '{}' Texture At '{}'", desc.m_TextureTag, szFullPath);
+                return E_FAIL;
+            }
+            m_SRVs.push_back(pSRV);
         }
     }
-
-    
-
-	return Component::Initialize(arg);
+   
+    return Component::Initialize(arg);
 }
 
 void Texture::On_Destroy() {

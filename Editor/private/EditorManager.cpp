@@ -80,7 +80,6 @@ void EditorManager::Update() {
 HRESULT EditorManager::Render() {
 
 	Shared<Float4> vClearColor = make_shared<Float4>(0.f, 0.f, 1.f, 1.f);
-    
 
     if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0)))
         return E_FAIL;

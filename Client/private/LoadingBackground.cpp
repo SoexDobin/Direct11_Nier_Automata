@@ -1,8 +1,9 @@
+#include "pch.h"
 #include "LoadingBackground.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "VIBuffer_Rect.h"
-#include "pch.h"
+#include "Game.h"
 
 #include "SpdLogger.h"
 

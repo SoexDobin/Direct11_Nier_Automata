@@ -64,7 +64,7 @@ HRESULT Terrain::Ready_Components() {
 		LOG_ERROR(L"Failed To Add Component Shader To Terrain");
 		return E_FAIL;
 	}
-    Texture::TEXTURE_DESC textureDesc = Texture::TEXTURE_DESC{ L"Tile_0" };
+    Texture::TEXTURE_DESC textureDesc = Texture::TEXTURE_DESC{ 0, L"Tile_0" };
 	m_Texture = Add_Component<Texture>(&textureDesc);
 	if (!m_Texture) {
 		LOG_ERROR(L"Failed To Add Component Texture To Terrain");
@@ -86,7 +86,7 @@ HRESULT Terrain::Bind_ShaderResources() {
       return E_FAIL;
     if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, "g_ProjMatrix",D3DTS::PROJ)))
       return E_FAIL;
-    if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, "g_Texture", 0)))
+    if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, "g_DiffuseTexture", 0)))
       return E_FAIL;
     if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, "g_CameraPosition")))
       return E_FAIL;

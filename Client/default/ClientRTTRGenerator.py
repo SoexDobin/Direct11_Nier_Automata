@@ -10,7 +10,7 @@ import sys
 import re
 import argparse
 from pathlib import Path
-from typing import Set
+from typing import Set, Tuple
 
 def print_header():
     print("=" * 40)
@@ -18,7 +18,7 @@ def print_header():
     print("=" * 40)
     print()
 
-def process_header_file(header_path: Path, processed_classes: Set[str]) -> tuple[str, str]:
+def process_header_file(header_path: Path, processed_classes: Set[str]) -> Tuple[str, str]:
     """헤더 파일 분석 후 클래스 이름과 등록 코드 조각 반환"""
     try:
         content = header_path.read_text(encoding='utf-8')
@@ -62,7 +62,7 @@ def process_header_file(header_path: Path, processed_classes: Set[str]) -> tuple
         method_registrations += '\n        .method("Create", &{}::Create)'.format(class_name)
 
     # ⭐ RTTR 문자열 칸에만 clean_name을 적용!
-    rttr_block = f'''    rttr::registration::class_<{class_name}>(L"{clean_name}")
+    rttr_block = f'''    rttr::registration::class_<{class_name}>("{class_name}")
         .constructor<>()''' + method_registrations + ''';\n\n'''
     return class_name, rttr_block
 
@@ -107,12 +107,26 @@ def main():
         print(f"===== [ERROR] Could not read {output_file}: {e}")
         sys.exit(1)
         
-    final_code = re.sub(r'(//\s*<AUTO_GENERATED_INCLUDES>\n).*?(\n//\s*</AUTO_GENERATED_INCLUDES>)',
-                        r'\g<1>' + new_includes + r'\g<2>',
+    print(f"========== [DEBUG] Content length: {len(content)}")
+    
+    include_pattern = r'(//\s*<AUTO_GENERATED_INCLUDES>).*?(//\s*</AUTO_GENERATED_INCLUDES>)'
+    if re.search(include_pattern, content, flags=re.DOTALL):
+        print("========== [DEBUG] Found Includes Marker")
+    else:
+        print("========== [DEBUG] Includes Marker NOT FOUND")
+
+    final_code = re.sub(include_pattern,
+                        r'\g<1>\n' + new_includes + r'\g<2>',
                         content, flags=re.DOTALL)
                         
-    final_code = re.sub(r'(//\s*<AUTO_GENERATED_RTTR>\n).*?(\n//\s*</AUTO_GENERATED_RTTR>)',
-                        r'\g<1>' + new_rttr_blocks + r'\g<2>',
+    rttr_pattern = r'(//\s*<AUTO_GENERATED_RTTR>).*?(//\s*</AUTO_GENERATED_RTTR>)'
+    if re.search(rttr_pattern, final_code, flags=re.DOTALL):
+        print("========== [DEBUG] Found RTTR Marker")
+    else:
+        print("========== [DEBUG] RTTR Marker NOT FOUND")
+
+    final_code = re.sub(rttr_pattern,
+                        r'\g<1>\n' + new_rttr_blocks + r'\g<2>',
                         final_code, flags=re.DOTALL)
                         
     try:

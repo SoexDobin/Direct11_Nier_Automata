@@ -2,10 +2,15 @@
 #include "framework.h"
 #include "Launcher.h"
 
+#include "MainApp.h"
+
 #define MAX_LOADSTRING 100
 
 
-HINSTANCE hInst;                    
+HWND g_hWnd;
+HINSTANCE g_hInst;
+ENGINE_DESC g_EngineDesc;
+
 WCHAR szTitle[MAX_LOADSTRING];      
 WCHAR szWindowClass[MAX_LOADSTRING];
 
@@ -32,10 +37,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LAUNCHER));
+    MSG msg{};
 
-    MSG msg;
-
-    // 기본 메시지 루프입니다:
+    Unique<MainApp> App = MainApp::Create();
+    
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -43,6 +48,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        App->Update();
+        App->Render();
     }
 
     return static_cast<int>(msg.wParam);
@@ -71,7 +79,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+    g_hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
@@ -83,6 +91,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
+
+   g_hWnd = hWnd;
+
+   g_EngineDesc.hWnd = g_hWnd;
+   g_EngineDesc.hInst = g_hInst;
+   g_EngineDesc.windowTitle = L"NieRAutomata";
 
    return TRUE;
 }
@@ -98,7 +112,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+                DialogBox(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);

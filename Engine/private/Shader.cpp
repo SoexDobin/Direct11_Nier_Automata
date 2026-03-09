@@ -173,7 +173,7 @@ Shared<Component> Shader::Clone(void* arg) {
     }
 
     SHADER_DESC& desc = *static_cast<SHADER_DESC*>(arg);
-    auto resShader = GAME_INSTANCE->Get_Shader(desc.m_VertexTag.c_str());
+    auto resShader = GAME_INSTANCE->Get_Shader(0, desc.m_VertexTag.c_str());
 
 	auto shader = make_shared<Shader>(*resShader.get());
 

@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "ClientApp.h"
 #include "Client_Function.h"
-#include "pch.h"
 
 #include "ClientSettingManager.h"
 #include "Game.h"

@@ -1,5 +1,5 @@
 #include "CameraManager.h"
-
+#include "Game.h"
 #include "Camera.h"
 #include "SpdLogger.h"
 #include "Transform.h"
@@ -60,6 +60,11 @@ Shared<Camera> CameraManager::Get_MainCamera() const
 	}
 
 	return m_MainCamera.lock();
+}
+
+vector<Shared<Camera>> CameraManager::Get_Cameras()
+{
+	return m_Cameras;
 }
 
 HRESULT CameraManager::Set_MainCamera(const Shared<Camera>& camera)

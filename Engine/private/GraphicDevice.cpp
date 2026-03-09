@@ -91,8 +91,7 @@ HRESULT GraphicDevice::Present() const {
   return m_SwapChain->Present(0, 0);
 }
 
-HRESULT GraphicDevice::OnResize(uint32 width, uint32 height,
-                                uint32 screenIndex) {
+HRESULT GraphicDevice::OnResize(uint32 width, uint32 height, uint32 screenIndex) {
   if (nullptr == m_SwapChain || nullptr == m_Device)
     return E_FAIL;
 

@@ -75,11 +75,11 @@ using namespace rttr;
 using namespace std;
 using namespace Engine;
 
-#ifdef _DEBUG
-#pragma comment(lib, "rttr_core_d.lib")
-#else
-#pragma comment(lib, "rttr_core.lib")
-#endif
+//#ifdef _DEBUG
+//#pragma comment(lib, "rttr_core_d.lib")
+//#else
+//#pragma comment(lib, "rttr_core.lib")
+//#endif
 
 #pragma warning(disable : 4251)
 

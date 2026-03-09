@@ -125,7 +125,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
     desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
     desc.up = Vector4{ 0.f, 1.f, 0.f, 1.f };
     desc.fovY = XMConvertToRadians(60.f);
-    desc.aspect = static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportWidth) / ClientSettingManager::g_EngineDesc.viewportHeight;
+    desc.aspect = static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportWidth) / static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportHeight);
 	desc.nearPlane = 0.1f;
     desc.farPlane = 500.f;
 
@@ -134,8 +134,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
     //auto three = GAME_INSTANCE->Instantiate<Terrain>();
     //one->Set_Parent(two);
     //two->Set_Parent(three);
-    //
-    //
+
     auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"MainCamera", ETOI(m_NextLevelID), &desc);
 	GAME_INSTANCE->Set_MainCamera(cam);
 

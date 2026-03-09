@@ -20,6 +20,13 @@ class EditorCamera;
 class EditorManager {
   DECLARE_SINGLETON(EditorManager)
 public:
+    typedef struct tagResizeInfo
+    {
+        Float width{};
+        Float height{};
+        uint32 screenIndex{};
+    } RESIZE_INFO;
+public:
   EditorManager();
   ~EditorManager();
 
@@ -39,12 +46,17 @@ public:
     m_InGameCamera = camera;
   }
 public:
-    Bool Is_ResizeView() const { return m_IsResizeView; }
-    Vector3 Get_ResizeInfo() { return Vector3{ (Float)m_NewWidth, (Float)m_NewHeight, (Float)m_TargetIdx }; }
-    void RequestResize(uint32 width, uint32 height, uint32 screenIndex)
+    Bool Is_ResizeRequest() const { return m_IsResizeView; }
+    RESIZE_INFO Get_ResizeInfo() const
+    {
+        return RESIZE_INFO{ m_ResizeWidth, m_ResizeHeight, m_ScreenIndex };
+    }
+    void RequestResize(Float width, Float height, uint32 screenIndex)
     {
         m_IsResizeView = true;
-        m_NewWidth = width; m_NewHeight = height; m_TargetIdx = screenIndex;
+        m_ResizeWidth = width; 
+    	m_ResizeHeight = height; 
+    	m_ScreenIndex = screenIndex;
     }
     void Clear_ResizeRequest() { m_IsResizeView = false; }
 
@@ -59,20 +71,21 @@ public: /* Selected Object (Hierarchy <-> Inspector 공유) */
 
 private:
     Bool m_IsResizeView{ false };
-    uint32 m_NewWidth, m_NewHeight, m_TargetIdx;
+    Float m_ResizeWidth{}, m_ResizeHeight{};
+	uint32 m_ScreenIndex{};
 
-  EDITOR_STATE m_State = EDITOR_STATE::STOP;
-  Shared<EditorCamera> m_EditorCamera{nullptr};
-  Shared<Engine::Camera> m_InGameCamera{nullptr};
-  Weak<Engine::GameObject> m_SelectedObject = {};
+    EDITOR_STATE m_State = EDITOR_STATE::STOP;
+    Shared<EditorCamera> m_EditorCamera{nullptr};
+    Shared<Engine::Camera> m_InGameCamera{nullptr};
+    Weak<Engine::GameObject> m_SelectedObject = {};
 
 private:
-  Shared<Inspector> m_Inspector = {nullptr};
-  Shared<EditorView> m_EditorView = {nullptr};
-  Shared<MenuBar> m_MenuBar = {nullptr};
-  Shared<PrefabTab> m_PrefabTab = {nullptr};
-  Shared<LogConsole> m_LogConsole = {nullptr};
-  Shared<Hierarchy> m_Hierarchy = {nullptr};
+    Shared<Inspector> m_Inspector = {nullptr};
+    Shared<EditorView> m_EditorView = {nullptr};
+    Shared<MenuBar> m_MenuBar = {nullptr};
+    Shared<PrefabTab> m_PrefabTab = {nullptr};
+    Shared<LogConsole> m_LogConsole = {nullptr};
+    Shared<Hierarchy> m_Hierarchy = {nullptr};
 };
 
 NS_END

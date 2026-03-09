@@ -2,6 +2,8 @@
 #include "TagRegistry.h"
 
 #include "Game.h"
+
+#include "Camera.h"
 #include "GraphicDevice.h"
 #include "LevelManager.h"
 #include "ObjectManager.h"
@@ -79,7 +81,7 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   if (nullptr == (m_ObjectManager = ObjectManager::Create()))
     return E_FAIL;
 
-  if (nullptr == (m_ResourceManager = ResourceManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
+  if (nullptr == (m_ResourceManager = ResourceManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context(), engineDesc.levelCount)))
       return E_FAIL;
 
   if (nullptr == (m_CameraManager = CameraManager::Create()))
@@ -136,7 +138,7 @@ void Game::Clear_AllResource() const {
     m_Renderer->Clear_RenderGroup();
     m_CameraManager->Clear_Cameras();
     m_LightManager->Clear_Lights();
-    m_ResourceManager->Clear_Resources();
+    m_ResourceManager->Clear_AllResources();
 }
 
 void Game::Clear_Resource(uint32 levIndex) const {
@@ -148,7 +150,7 @@ void Game::Clear_Resource(uint32 levIndex) const {
     LOG_CRITICAL(L"Failed To Clear GameObjects");
   }
 
-  if (FAILED(m_ResourceManager->Clear_Resources())) {
+  if (FAILED(m_ResourceManager->Clear_Resource(levIndex))) {
       LOG_CRITICAL(L"Failed To Clear Resources");
   }
 
@@ -181,6 +183,10 @@ HRESULT Game::Present() const { return m_GraphicDevice->Present(); }
 HRESULT Game::OnResize(uint32 width, uint32 height, uint32 offscreenIndex) {
   if (nullptr == m_GraphicDevice)
     return S_OK;
+
+  m_CameraManager->Get_MainCamera()->Bind_Aspect(width / height);
+  for (auto camera : m_CameraManager->Get_Cameras())
+      camera->Set_Aspect(width / height);
 
   return m_GraphicDevice->OnResize(width, height, offscreenIndex);
 }
@@ -246,7 +252,7 @@ uint32 Game::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 le
     return m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, levIndex);
 }
 
-const wstring& Game::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
+const tChar* Game::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
 {
     return m_PrototypeManager->Get_PrototypeTagFromObjectID(objectID, levIndex);
 }
@@ -270,34 +276,29 @@ HRESULT Game::Add_Camera(const Shared<Camera> &camera) const { return m_CameraMa
 HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const { return m_CameraManager->Set_MainCamera(camera); }
 Shared<Camera> Game::Get_MainCamera() const { return m_CameraManager->Get_MainCamera(); }
 
-HRESULT Game::Load_Shader(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const
+HRESULT Game::Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const
 {
-    return m_ResourceManager->Load_Shader(shaderFilePath, elements, numElements, descriptionTag);
+    return m_ResourceManager->Load_Shader(levIndex, shaderFilePath, elements, numElements, descriptionTag);
 }
 
-Shared<Shader> Game::Get_Shader(const tChar* shaderFilePath) const
+Shared<Shader> Game::Get_Shader(uint32 levIndex, const tChar* shaderFilePath) const
 {
-    return m_ResourceManager->Get_Shader(shaderFilePath);
+    return m_ResourceManager->Get_Shader(levIndex, shaderFilePath);
 }
 
-HRESULT Game::Load_Texture(const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const
+HRESULT Game::Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const
 {
-    return m_ResourceManager->Load_Texture(textureFilePath, numSRVs, descriptionTag);
+    return m_ResourceManager->Load_Texture(levIndex, textureFilePath, numSRVs, descriptionTag);
 }
 
-const Texture::TEXTURE_DESC& Game::Get_TextureDesc(const wstring& descriptionTag) const
+const Texture::TEXTURE_DESC& Game::Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const
 {
-    return m_ResourceManager->Get_TextureDescByTag(descriptionTag);
+    return m_ResourceManager->Get_TextureDescByTag(levIndex, descriptionTag);
 }
 
-const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(const tChar* textureFilePath) const
+const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(uint32 levIndex, const tChar* textureFilePath) const
 {
-    return m_ResourceManager->Get_Texture(textureFilePath);
-}
-
-const vector<ComPtr<ID3D11ShaderResourceView>> Game::Get_Textures(const tChar* textureFilePath, uint32 numSRVs) const
-{
-    return m_ResourceManager->Get_Textures(textureFilePath, numSRVs);
+    return m_ResourceManager->Get_Texture(levIndex, textureFilePath);
 }
 
 void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObject) const {

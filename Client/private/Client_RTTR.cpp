@@ -8,6 +8,9 @@ using rttr::registration;
 // 자동으로 Client/public 내부의 헤더를 스캔하여 포함시킵니다.
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
+#include "FreeCamera.h"
+#include "LoadingBackground.h"
+#include "Terrain.h"
 // </AUTO_GENERATED_INCLUDES>
 
 namespace Client {
@@ -31,6 +34,21 @@ void Register_Client_Reflection() {
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
   // <AUTO_GENERATED_RTTR>
-  // </AUTO_GENERATED_RTTR>
+    rttr::registration::class_<FreeCamera>("FreeCamera")
+        .constructor<>()
+        .method("Clone", &FreeCamera::Clone)
+        .method("Create", &FreeCamera::Create);
+
+    rttr::registration::class_<LoadingBackground>("LoadingBackground")
+        .constructor<>()
+        .method("Clone", &LoadingBackground::Clone)
+        .method("Create", &LoadingBackground::Create);
+
+    rttr::registration::class_<Terrain>("Terrain")
+        .constructor<>()
+        .method("Clone", &Terrain::Clone)
+        .method("Create", &Terrain::Create);
+
+// </AUTO_GENERATED_RTTR>
 }
 } // namespace Client

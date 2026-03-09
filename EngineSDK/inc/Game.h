@@ -70,14 +70,12 @@ public: /* For TimeManager */
   Float Compute_TimeDelta(const wstring &timerTag) const;
 
 public: /* For LevelManager */
-  uint32 Get_CurrentLevelIndex() const {
-    return m_LevelManager->Get_CurrentLevelIndex();
-  }
-  HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
+    uint32 Get_CurrentLevelIndex() const { return m_LevelManager->Get_CurrentLevelIndex(); }
+    HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
 
 public: /* For PrototypeManager */
     uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const;
-    const wstring& Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
+    const tChar* Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
 	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID,
                                       uint32 levIndex = UINT_MAX) const;
@@ -95,13 +93,12 @@ public: /* For CameraManager */
   Shared<class Camera> Get_MainCamera() const;
 
 public: /* For ResourceManager */
-    HRESULT Load_Shader(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const;
-    Shared<Shader> Get_Shader(const tChar* shaderFilePath) const;
+    HRESULT Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const;
+    Shared<Shader> Get_Shader(uint32 levIndex, const tChar* shaderFilePath) const;
 
-    HRESULT Load_Texture(const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const;
-    const Texture::TEXTURE_DESC& Get_TextureDesc(const wstring& descriptionTag) const;
-    const ComPtr<ID3D11ShaderResourceView> & Get_Texture(const tChar *textureFilePath) const;
-    const vector<ComPtr<ID3D11ShaderResourceView>> Get_Textures(const tChar *textureFilePath, uint32 numSRVs) const;
+    HRESULT Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const;
+    const Texture::TEXTURE_DESC& Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const;
+    const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
 public: /* For Renderer */
   void Add_RenderGroup(RENDERGROUP group,

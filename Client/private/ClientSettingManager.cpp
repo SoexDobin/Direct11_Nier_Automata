@@ -68,7 +68,7 @@ HRESULT ClientSettingManager::Load_Textures_FromJson() const
 
 		wstring fullTexturePath = m_ResourcePath + relativePath;
 		
-		if (FAILED(GAME_INSTANCE->Load_Texture(fullTexturePath.c_str(), count, tag)))
+		if (FAILED(GAME_INSTANCE->Load_Texture(ETOI(level), fullTexturePath.c_str(), count, tag)))
 		{
 			LOG_ERROR(L"Failed to Load Texture Prototype: {}", tag);
 			return E_FAIL;
@@ -271,7 +271,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
-				std::wstring meshTex = L"meshtex";
+				std::wstring meshTex = L"vtxmesh";
 				
 				auto itTex = 
 					std::search(
@@ -294,17 +294,17 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				if (itTex != tagName.end())
 				{
-					if (FAILED(GAME_INSTANCE->Load_Shader((m_ShaderPath + tagName).c_str(), VTXTEX::Elements, VTXTEX::numElements, VTXTEX::Tag)))
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXTEX::Elements, VTXTEX::numElements, VTXTEX::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXTEX::Tag);
 				}
 				else if (itNormTex != tagName.end())
 				{
-					if (FAILED(GAME_INSTANCE->Load_Shader((m_ShaderPath + tagName).c_str(), VTXNORMTEX::Elements, VTXNORMTEX::numElements, VTXNORMTEX::Tag)))
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXNORMTEX::Elements, VTXNORMTEX::numElements, VTXNORMTEX::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXNORMTEX::Tag);
 				}
 				else if (itMeshTex != tagName.end())
 				{
-					if (FAILED(GAME_INSTANCE->Load_Shader((m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXMESH::Tag)))
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXMESH::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXMESH::Tag);
 				}
 				else

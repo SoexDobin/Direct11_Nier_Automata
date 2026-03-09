@@ -11,9 +11,10 @@ class ENGINE_DLL Texture final : public Component, enable_shared_from_this<Textu
 public:
 	typedef struct tagTextureDesc : public COMPONENT_DESC {
 		tagTextureDesc(){}
-		tagTextureDesc(const wstring& textureTag) : m_TextureTag(textureTag) {}
-		tagTextureDesc(const wstring& filePath, uint32 numSRVs) : m_FilePath(filePath), m_NumSRVs(numSRVs) {}
+		tagTextureDesc(uint32 levIndex, const wstring& textureTag) : m_levIndex(levIndex), m_TextureTag(textureTag) {}
+		tagTextureDesc(uint32 levIndex, const wstring& filePath, uint32 numSRVs) : m_levIndex(levIndex), m_FilePath(filePath), m_NumSRVs(numSRVs) {}
 
+		uint32 m_levIndex{};
 		wstring m_TextureTag{};
 		wstring m_FilePath{};
 		uint32 m_NumSRVs{};
@@ -42,6 +43,7 @@ public:
 	const vector<ComPtr<ID3D11ShaderResourceView>>& Get_Textures() { return m_SRVs; }
 
 private:
+	uint32 m_levIndex{};
 	wstring m_FilePath{};
 	uint32 m_NumSRVs{};
 	vector<ComPtr<ID3D11ShaderResourceView>> m_SRVs;

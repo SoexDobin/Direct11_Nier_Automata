@@ -57,30 +57,29 @@ HRESULT EditorApp::Initialize() {
 }
 
 void EditorApp::Update() {
-  static EDITOR_STATE prevState = EDITOR_STATE::STOP;
-  EDITOR_STATE curState = EDITOR->Get_State();
-  if (curState == EDITOR_STATE::STOP && prevState != EDITOR_STATE::STOP) {
-    Reset_ClientApp();
-    m_IsReset = true;
-  }
-  prevState = curState; // 다음 프레임을 위해 상태 갱신
+    static EDITOR_STATE prevState = EDITOR_STATE::STOP;
+    EDITOR_STATE curState = EDITOR->Get_State();
+    if (curState == EDITOR_STATE::STOP && prevState != EDITOR_STATE::STOP) {
+		Reset_ClientApp();
+		m_IsReset = true;
+    }
+    prevState = curState; // 다음 프레임을 위해 상태 갱신
 
-  if (m_IsReset) {
-    return;
-  }
+    if (m_IsReset) {
+		return;
+    }
 
-  if (EDITOR->Is_ResizeView()) {
-      Vector3 info = EDITOR->Get_ResizeInfo();
-      GAME_INSTANCE->OnResize(info.x, info.y, info.z);
-      return; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
-  }
+    if (EDITOR->Is_ResizeRequest()) {
+        EditorManager::RESIZE_INFO info = EDITOR->Get_ResizeInfo();
+        GAME_INSTANCE->OnResize(info.width, info.height, info.screenIndex);
+        return; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
+    }
 
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
 
-  ImGui_ImplDX11_NewFrame();
-  ImGui_ImplWin32_NewFrame();
-  ImGui::NewFrame();
-
-  EDITOR->Update();
+    EDITOR->Update();
 }
 
 HRESULT EditorApp::Render() {
@@ -89,7 +88,7 @@ HRESULT EditorApp::Render() {
     return S_OK;
   }
 
-  if (EDITOR->Is_ResizeView()) {
+  if (EDITOR->Is_ResizeRequest()) {
       EDITOR->Clear_ResizeRequest(); // 플래그 해제
       return S_OK; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
   }

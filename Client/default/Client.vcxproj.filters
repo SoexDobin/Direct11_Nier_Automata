@@ -112,6 +112,9 @@
     <FxCompile Include="..\bin\shaders\Shader_VtxNormTex.hlsl">
       <Filter>97. Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\bin\shaders\Shader_VtxMesh.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="PostBuildCopy.bat">

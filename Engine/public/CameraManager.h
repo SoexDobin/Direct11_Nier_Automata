@@ -23,14 +23,15 @@ public:
   void On_Enable() override { EngineManager::On_Enable(); }
 
 public:
-  HRESULT Add_Camera(const Shared<Camera> &camera);
-  Shared<Camera> Get_MainCamera() const;
-  HRESULT Set_MainCamera(const Shared<Camera> &camera);
-  void Bind_MainCamera_Transform();
-  HRESULT Clear_Cameras();
+	HRESULT Add_Camera(const Shared<Camera> &camera);
+	Shared<Camera> Get_MainCamera() const;
+	vector<Shared<Camera>> Get_Cameras();
+	HRESULT Set_MainCamera(const Shared<Camera> &camera);
+	void Bind_MainCamera_Transform();
+	HRESULT Clear_Cameras();
 
 private:
-  vector<Weak<Camera>> m_Cameras;
+  vector<Shared<Camera>> m_Cameras;
   Weak<Camera> m_MainCamera{};
 
 public:

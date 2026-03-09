@@ -16,19 +16,11 @@ GameObject::GameObject(const GameObject& prototype)
 {
     m_ObjectName = prototype.m_ObjectName;
     m_DescID.m_typeID = prototype.m_DescID.m_typeID;
+    m_DescID.m_objectID = prototype.m_DescID.m_objectID;
 
     // TODO : Clone 시점에 부모 자식 관계는 어떻게 할 것인지 고민 필요
     // TODO : Prototype의 자식들은 어떻게 할 것인지 고민 필요
     // TODO : 이전 속성, 상태들은 어떻게 할거인지 고민 필요
-
-    for (auto& pair : prototype.m_Components) {
-		m_Components.emplace(pair.first, pair.second->Clone(pair.second->Get_ObjectDesc()));
-    }
-    
-    for (auto& pair : prototype.m_Scripts) {
-        auto script = static_pointer_cast<Component>(pair.second)->Clone(pair.second->Get_ObjectDesc());
-		m_Scripts.emplace(pair.first, static_pointer_cast<ScriptComponent>(script));
-    }
 
 	m_Transform = Get_Component<Transform>();
 }
@@ -247,11 +239,20 @@ HRESULT GameObject::Add_Component(const Shared<Component>& component) {
 
     uint32 instID = component->Get_InstanceID();
     uint32 objectID = component->Get_ObjectID();
+    uint32 typeID = component->Get_TypeID();
 
     if (component->Get_ComponentType() == COMPONENT_TYPE::SCRIPT) {
         for (auto& [instanceID, script] : m_Scripts) {
             if (objectID == script->Get_ObjectID())
+            {
                 LOG_WARN(L"Already Added Script {}", component->Get_Name());
+                return E_FAIL;
+            }
+            if (typeID == script->Get_TypeID())
+            {
+                LOG_WARN(L"Already Added Script By TypeID {}", component->Get_Name());
+                return E_FAIL;
+            }
         }
 
         if (!m_Scripts.contains(instID)) {
@@ -262,7 +263,15 @@ HRESULT GameObject::Add_Component(const Shared<Component>& component) {
     else {
         for (auto& [instanceID, comp] : m_Components) {
             if (objectID == comp->Get_ObjectID())
-                LOG_WARN(L"Already Added Component {}", component->Get_Name());
+            {
+                LOG_WARN(L"Already Added Component By ObjectID {}", component->Get_Name());
+                return E_FAIL;
+            }
+            if (typeID == comp->Get_TypeID())
+            {
+                LOG_WARN(L"Already Added Component By TypeID {}", component->Get_Name());
+                return E_FAIL;
+            }
         }
 
         if (!m_Components.contains(instID)) {

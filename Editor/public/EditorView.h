@@ -16,6 +16,7 @@ public:
 
 private:
 	void RenderView();
+	void MousePicking(ImVec2 viewport);
 
 private:
 	Bool m_PlayMode = { false };

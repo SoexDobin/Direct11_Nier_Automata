@@ -15,6 +15,7 @@ Component::Component(const Component& prototype)
 {
 	m_ObjectName = prototype.m_ObjectName;
 	m_DescID.m_typeID = prototype.m_DescID.m_typeID;
+    m_DescID.m_objectID = prototype.m_DescID.m_objectID;
 }
 
 HRESULT Component::Initialize_Prototype() {

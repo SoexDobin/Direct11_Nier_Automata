@@ -15,20 +15,27 @@ Terrain::Terrain(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceCo
 Terrain::Terrain(const Terrain &rhs) : GameObject{rhs} {}
 
 HRESULT Terrain::Initialize_Prototype() {
-  return GameObject::Initialize_Prototype();
+
+    if (FAILED(GameObject::Initialize_Prototype()))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 HRESULT Terrain::Initialize(void *arg) {
-  if (FAILED(GameObject::Initialize(arg)))
-    return E_FAIL;
+	if (FAILED(GameObject::Initialize(arg)))
+        return E_FAIL;
 
-  if (FAILED(Ready_Components()))
-    return E_FAIL;
+    if (FAILED(Ready_Components()))
+        return E_FAIL;
 
-  return S_OK;
+	return S_OK;
 }
 
-void Terrain::On_Destroy() { GameObject::On_Destroy(); }
+void Terrain::On_Destroy()
+{
+	GameObject::On_Destroy();
+}
 void Terrain::On_Enable() { GameObject::On_Enable(); }
 void Terrain::On_Disable() { GameObject::On_Disable(); }
 
@@ -58,6 +65,15 @@ HRESULT Terrain::Render() {
 }
 
 HRESULT Terrain::Ready_Components() {
+
+    if (Get_Component<Shader>())
+        LOG_INFO(L"Already1");
+    if (Get_Component<Texture>())
+        LOG_INFO(L"Already2");
+    if (Get_Component<VIBuffer_Terrain>())
+        LOG_INFO(L"Already3");
+
+
     Shader::SHADER_DESC shaderDesc = Shader::SHADER_DESC{ VTXNORMTEX::Tag,VTXNORMTEX::Elements, VTXNORMTEX::numElements };
     m_Shader = Add_Component<Shader>(&shaderDesc);
 	if (!m_Shader) {

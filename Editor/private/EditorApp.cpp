@@ -143,19 +143,19 @@ HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC &desc) {
       MSG_BOX("Failed ImGui_ImplDX11_Init");
       return E_FAIL;
     }
-    if (!ImGui_ImplDX11_Init(GAME_INSTANCE->Get_Device().Get(),
-                             GAME_INSTANCE->Get_Context().Get())) {
+    if (!ImGui_ImplDX11_Init(GAME_INSTANCE->Get_Device().Get(), GAME_INSTANCE->Get_Context().Get())) {
       MSG_BOX("Failed ImGui_ImplDX11_Init");
       return E_FAIL;
     }
 
-    {
+    /*{
       RECT rc{};
       GetClientRect(g_hWnd, &rc);
       uint32 width = rc.right - rc.left;
       uint32 height = rc.bottom - rc.top;
       GAME_INSTANCE->OnResize(width, height);
-    }
+    }*/
+
     return S_OK;
 }
 

@@ -33,11 +33,25 @@ HRESULT Camera::Initialize(void* arg)
 	m_Near = desc.nearPlane;
 	m_Far = desc.farPlane;
 
+	m_ObjectDesc = &desc;
+
 	Update_CameraTransform();
 
 	GAME_INSTANCE->Add_Camera(static_pointer_cast<Camera>(shared_from_this()));
 
 	return S_OK;
+}
+
+void Camera::Set_Aspect(Float aspect)
+{
+	m_Aspect = aspect;
+}
+
+void Camera::Bind_Aspect(Float aspect)
+{
+	m_Aspect = aspect;
+		
+	Bind_CameraTransform();
 }
 
 void Camera::Update_CameraTransform() const

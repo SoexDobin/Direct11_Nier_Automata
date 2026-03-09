@@ -6,7 +6,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL Camera abstract : public GameObject
 {
 public:
-	typedef struct tagCameraDesc {
+	typedef struct tagCameraDesc : public GAMEOBJECT_DESC {
 		Vector4 eye{}, at{}, up{ Vector4{0.f,0.f,0.f,1.f} };
 		Float fovY = {};
 		Float aspect = {};
@@ -15,9 +15,9 @@ public:
 	} CAMERA_DESC;
 
 public:
-	Camera();
-	Camera(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	Camera(const Camera& rhs);
+	explicit Camera();
+	explicit Camera(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit Camera(const Camera& rhs);
 	virtual ~Camera() override = default;
 
 public:
@@ -27,8 +27,8 @@ public:
 	Float Get_FarPlane() const { return m_Far; }
 
 public:
-	void Set_Aspect(Float aspect) { m_Aspect = aspect; }
-	void Bind_Aspect(Float aspect) { m_Aspect = aspect; Bind_CameraTransform(); }
+	void Set_Aspect(Float aspect);
+	void Bind_Aspect(Float aspect);
 
 public:
 	void Set_Active(Bool isActive) final { GameObject::Set_Active(isActive); }

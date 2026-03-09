@@ -326,6 +326,10 @@ Matrix Game::Get_Transform(D3DTS transformState) const {
 	return m_Pipeline->Get_Transform(transformState);
 }
 
+Matrix Game::Get_InvTransform(D3DTS transformState) const {
+    return m_Pipeline->Get_InvTransform(transformState);
+}
+
 Vector4 Game::Get_CamTransform() const {
 	return m_Pipeline->Get_CamTransform();
 }

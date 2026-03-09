@@ -105,9 +105,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
         FreeCamera::Create(m_Device, m_Context), L"MainCamera")))
         return E_FAIL;
 
-
 	m_isFinished = true;
-
 
     LIGHT_DESC			LightDesc{};
     LightDesc.type = LIGHT::DIRECTIONAL;

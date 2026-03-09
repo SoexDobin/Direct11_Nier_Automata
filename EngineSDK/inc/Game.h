@@ -113,6 +113,7 @@ public: /* For Pipeline */
                                        const Char *constantName,
                                        D3DTS transformState);
   Matrix Get_Transform(D3DTS transformState) const;
+  Matrix Get_InvTransform(D3DTS transformState) const;
   Vector4 Get_CamTransform() const;
   void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
   void Update_Pipeline() const;

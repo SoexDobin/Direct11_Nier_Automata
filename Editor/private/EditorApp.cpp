@@ -71,7 +71,7 @@ void EditorApp::Update() {
 
     if (EDITOR->Is_ResizeRequest()) {
         EditorManager::RESIZE_INFO info = EDITOR->Get_ResizeInfo();
-        GAME_INSTANCE->OnResize(info.width, info.height, info.screenIndex);
+        GAME_INSTANCE->OnResize(static_cast<uint32>(info.width), static_cast<uint32>(info.height), info.screenIndex);
         return; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
     }
 

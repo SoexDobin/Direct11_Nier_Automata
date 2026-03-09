@@ -29,7 +29,7 @@ HRESULT ClientSettingManager::Load_Textures_FromJson() const
 			outFile << defaultJson.dump(4);
 			outFile.close();
 		}
-		SpdLogger::Info(L"Created Default TextureSettings.json: " + fullPath);
+		LOG_INFO(L"Created Default TextureSettings.json: {}", fullPath);
 	}
 
 	if (!filesystem::exists(fullPath))
@@ -92,7 +92,7 @@ HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
 			outFile << "STATIC, Prototype_Component_Texture_Default, Default/Default.dds, 1" << std::endl;
 			outFile.close();
 		}
-		SpdLogger::Info(L"Created Template TextureSettings.csv: " + csvPath);
+		LOG_INFO(L"Created Template TextureSettings.csv: {}", csvPath);
 	}
 
 	if (!filesystem::exists(csvPath)) return S_OK;
@@ -132,7 +132,7 @@ HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const
 	std::wstring path = m_ProjectSettingPath + L"EngineDesc.json";
 
 	if (!filesystem::exists(path)) {
-		SpdLogger::Warn(L"Failed To Find Path " + path);
+		LOG_WARN(L"Failed To Find Path : {}",path);
 		return E_FAIL;
 	}
 
@@ -250,7 +250,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 {
 	if (!filesystem::exists(m_ShaderPath))
 	{
-		SpdLogger::Warn(L"Failed To Find Shader Folder: " + m_ShaderPath);
+		LOG_WARN(L"Failed To Find Shader Folder : {}", m_ShaderPath);
 		return E_FAIL;
 	}
 

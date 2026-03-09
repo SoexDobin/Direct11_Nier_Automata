@@ -45,7 +45,7 @@ void Inspector::GameObjectGUI(const Shared<GameObject> &pObj) {
 	
 	string name = Helper::To_String(Clean_RTTR_Name(pObj->Get_Name()));
 	ImGui::Text("Name : %s", name.c_str());
-	ImGui::Text("ID   : %u", pObj->Get_ObjectID());
+	ImGui::Text("ID   : %u", pObj->Get_InstanceID());
 	ImGui::Separator();
 
 	/*GameObject*/

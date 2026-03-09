@@ -38,6 +38,15 @@ public:
   void Set_InGameCamera(const Shared<Engine::Camera> &camera) {
     m_InGameCamera = camera;
   }
+public:
+    Bool Is_ResizeView() const { return m_IsResizeView; }
+    Vector3 Get_ResizeInfo() { return Vector3{ (Float)m_NewWidth, (Float)m_NewHeight, (Float)m_TargetIdx }; }
+    void RequestResize(uint32 width, uint32 height, uint32 screenIndex)
+    {
+        m_IsResizeView = true;
+        m_NewWidth = width; m_NewHeight = height; m_TargetIdx = screenIndex;
+    }
+    void Clear_ResizeRequest() { m_IsResizeView = false; }
 
 public: /* Selected Object (Hierarchy <-> Inspector 공유) */
   Shared<Engine::GameObject> Get_SelectedObject() const {
@@ -49,6 +58,9 @@ public: /* Selected Object (Hierarchy <-> Inspector 공유) */
   void Clear_SelectedObject() { m_SelectedObject.reset(); }
 
 private:
+    Bool m_IsResizeView{ false };
+    uint32 m_NewWidth, m_NewHeight, m_TargetIdx;
+
   EDITOR_STATE m_State = EDITOR_STATE::STOP;
   Shared<EditorCamera> m_EditorCamera{nullptr};
   Shared<Engine::Camera> m_InGameCamera{nullptr};

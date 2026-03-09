@@ -51,7 +51,7 @@ public: /* For Input Manager */
 public: /* For GraphicDevice */
   HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
   HRESULT Present() const;
-  HRESULT OnResize(uint32 width, uint32 height);
+  HRESULT OnResize(uint32 width, uint32 height, uint32 offscreeenIndex = UINT_MAX);
   HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
   HRESULT End_RenderOffScreen() const;
   ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;

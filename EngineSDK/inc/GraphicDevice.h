@@ -10,6 +10,7 @@ private:
     ComPtr<ID3D11Texture2D> texture;
     ComPtr<ID3D11RenderTargetView> RTV;
     ComPtr<ID3D11ShaderResourceView> SRV;
+    ComPtr<ID3D11DepthStencilView> DSV;
     D3D11_VIEWPORT viewport;
   };
 
@@ -28,7 +29,7 @@ public:
     HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
     HRESULT Clear_DepthStencilView() const;
     HRESULT Present() const;
-    HRESULT OnResize(uint32 width, uint32 height);
+    HRESULT OnResize(uint32 width, uint32 height, uint32 screenIndex = UINT_MAX);
 
 public:
     HRESULT Begin_RenderOffScreen(uint32 screenIndex);

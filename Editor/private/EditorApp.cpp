@@ -57,7 +57,6 @@ HRESULT EditorApp::Initialize() {
 }
 
 void EditorApp::Update() {
-
   static EDITOR_STATE prevState = EDITOR_STATE::STOP;
   EDITOR_STATE curState = EDITOR->Get_State();
   if (curState == EDITOR_STATE::STOP && prevState != EDITOR_STATE::STOP) {
@@ -70,6 +69,13 @@ void EditorApp::Update() {
     return;
   }
 
+  if (EDITOR->Is_ResizeView()) {
+      Vector3 info = EDITOR->Get_ResizeInfo();
+      GAME_INSTANCE->OnResize(info.x, info.y, info.z);
+      return; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
+  }
+
+
   ImGui_ImplDX11_NewFrame();
   ImGui_ImplWin32_NewFrame();
   ImGui::NewFrame();
@@ -81,6 +87,11 @@ HRESULT EditorApp::Render() {
   if (m_IsReset) {
     m_IsReset = false;
     return S_OK;
+  }
+
+  if (EDITOR->Is_ResizeView()) {
+      EDITOR->Clear_ResizeRequest(); // 플래그 해제
+      return S_OK; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
   }
 
   EDITOR->Render();

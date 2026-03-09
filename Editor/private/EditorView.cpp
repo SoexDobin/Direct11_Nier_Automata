@@ -52,6 +52,15 @@ void EditorView::RenderView() {
 	}
 	ImGui::Separator();
 
+
+	ImVec2 currentSize = ImGui::GetContentRegionAvail();
+	static ImVec2 lastSize = { 0, 0 };
+	if (lastSize.x != currentSize.x || lastSize.y != currentSize.y) {
+		lastSize = currentSize;
+		// 엔진을 직접 건들지 않고 Manager에게 요청만 함
+		EDITOR->RequestResize((uint32)currentSize.x, (uint32)currentSize.y, 0);
+	}
+
 	if (srvGame) {
 		prevGameViewportSize = ImGui::GetContentRegionAvail();
 		ImGui::Image(reinterpret_cast<ImTextureID>(srvGame.Get()), prevGameViewportSize);

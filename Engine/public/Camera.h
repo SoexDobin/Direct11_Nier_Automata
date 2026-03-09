@@ -27,6 +27,9 @@ public:
 	Float Get_FarPlane() const { return m_Far; }
 
 public:
+	void Set_Aspect(Float aspect) { m_Aspect = aspect; Bind_CameraTransform(); }
+
+public:
 	void Set_Active(Bool isActive) final { GameObject::Set_Active(isActive); }
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* arg) override;

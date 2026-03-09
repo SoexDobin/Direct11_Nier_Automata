@@ -57,7 +57,7 @@ NS_BEGIN(Helper)
                 if (SUCCEEDED(CoCreateGuid(&guid)))
                 {
                     idDesc.m_objectID = Hash_GUID(guid);
-                    g_InstanceIDCounter.fetch_add(1);  // 카운터는 로깅용
+                    g_ObjectIDCounter.fetch_add(1);  // 카운터는 로깅용
                 }
                 break;
 			case OBJECT_ID_INSTANCE:

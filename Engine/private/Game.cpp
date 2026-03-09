@@ -178,11 +178,11 @@ HRESULT Game::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
 
 HRESULT Game::Present() const { return m_GraphicDevice->Present(); }
 
-HRESULT Game::OnResize(uint32 width, uint32 height) {
+HRESULT Game::OnResize(uint32 width, uint32 height, uint32 offscreenIndex) {
   if (nullptr == m_GraphicDevice)
     return S_OK;
 
-  return m_GraphicDevice->OnResize(width, height);
+  return m_GraphicDevice->OnResize(width, height, offscreenIndex);
 }
 
 HRESULT Game::Begin_RenderOffScreen(uint32 screenIndex) const {

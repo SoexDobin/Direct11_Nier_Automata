@@ -152,8 +152,10 @@ HRESULT ResourceManager::Load_Shader(const tChar* shaderPath, const D3D11_INPUT_
 }
 
 HRESULT ResourceManager::Clear_Resources() {
-	std::lock_guard<std::recursive_mutex> lock(m_ResourceMutex);
+    m_Shaders.clear();
+    m_TextureDescTags.clear();
     m_SRVs.clear();
+
 	return S_OK;
 }
 

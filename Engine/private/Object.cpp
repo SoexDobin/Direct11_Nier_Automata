@@ -7,7 +7,7 @@ Object::Object() {}
 
 Object::~Object()
 {
-	delete m_ObjectDesc;
+
 }
 
 HRESULT Object::Initialize_Prototype()

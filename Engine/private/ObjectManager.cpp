@@ -126,7 +126,7 @@ HRESULT ObjectManager::Add_GameObject(const Shared<GameObject>& object) {
     m_ObjectByLayer[object->Get_LayerMask().Get_Layer()].push_back(object);
     m_ObjectByType[object->Get_TypeID()].push_back(object);
     m_ObjectByObject[object->Get_ObjectID()].push_back(object);
-    m_ObjectByInstance.emplace(object->Get_ObjectID(), object);
+    m_ObjectByInstance.emplace(object->Get_InstanceID(), object);
 
     return S_OK;
 }

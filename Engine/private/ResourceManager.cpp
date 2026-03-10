@@ -88,19 +88,18 @@ HRESULT ResourceManager::Load_Texture(uint32 levIndex, const tChar* texturePath,
     return S_OK;
 }
 
-const Texture::TEXTURE_DESC& ResourceManager::Get_TextureDescByTag(uint32 levIndex, const wstring& descriptionTag)
+const Texture::TEXTURE_DESC* ResourceManager::Get_TextureDescByTag(uint32 levIndex, const wstring& descriptionTag)
 {
     if (m_TextureDescTags[0].contains(descriptionTag))
-        return m_TextureDescTags[0][descriptionTag];
+        return &m_TextureDescTags[0][descriptionTag];
 
     if (false == m_TextureDescTags[levIndex].contains(descriptionTag))
     {
         LOG_ERROR(L" \"{}\" has no Texture Description", descriptionTag);
-        Texture::TEXTURE_DESC emptyDesc = Texture::TEXTURE_DESC{};
-        return emptyDesc;
+        return nullptr;
     }
 
-    return m_TextureDescTags[levIndex][descriptionTag];
+    return &m_TextureDescTags[levIndex][descriptionTag];
 }
 
 

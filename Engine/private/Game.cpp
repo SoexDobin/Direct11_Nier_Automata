@@ -291,7 +291,7 @@ HRESULT Game::Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32
     return m_ResourceManager->Load_Texture(levIndex, textureFilePath, numSRVs, descriptionTag);
 }
 
-const Texture::TEXTURE_DESC& Game::Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const
+const Texture::TEXTURE_DESC* Game::Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const
 {
     return m_ResourceManager->Get_TextureDescByTag(levIndex, descriptionTag);
 }

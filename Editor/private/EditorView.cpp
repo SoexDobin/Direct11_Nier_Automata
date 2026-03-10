@@ -98,12 +98,12 @@ void EditorView::MousePicking(ImVec2 viewport)
 		Vector4 vFar = Vector4(ndcX, ndcY, 1.f, 1.f);
 		
 		vNear = Vector4::Transform(vNear, invProj);
-		vNear /= vNear.w; // [필수] Perspective Divide
+		vNear /= vNear.w;
 		vNear = Vector4::Transform(vNear, invView);
 		vFar = Vector4::Transform(vFar, invProj);
-		vFar /= vFar.w;   // [필수] Perspective Divide
+		vFar /= vFar.w;   
 		vFar = Vector4::Transform(vFar, invView);
-		// 5. 레이 시작점과 방향
+		
 		Vector3 rayOrigin = Vector3(vNear.x, vNear.y, vNear.z);
 		Vector3 rayTarget = Vector3(vFar.x, vFar.y, vFar.z);
 		Vector3 rayDir = rayTarget - rayOrigin;

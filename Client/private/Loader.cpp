@@ -8,10 +8,9 @@
 #include "Game.h"
 #include "LoadingBackground.h"
 
-#include "Texture.h"
-#include "Shader.h"
+#include "Monster.h"
 #include "Terrain.h"
-#include "VIBuffer_Terrain.h"
+
 
 
 Loader::Loader(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
@@ -102,8 +101,14 @@ HRESULT Loader::Loading_For_LogoLevel() {
         return E_FAIL;
 
     if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
+        Monster::Create(m_Device, m_Context), L"Monster")))
+        return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
         FreeCamera::Create(m_Device, m_Context), L"MainCamera")))
         return E_FAIL;
+
+
 
 	m_isFinished = true;
 
@@ -127,11 +132,8 @@ HRESULT Loader::Loading_For_LogoLevel() {
 	desc.nearPlane = 0.1f;
     desc.farPlane = 500.f;
 
-    auto one = GAME_INSTANCE->Instantiate<Terrain>(L"MainTerrain", ETOI(m_NextLevelID));
-    //auto two = GAME_INSTANCE->Instantiate<Terrain>();
-    //auto three = GAME_INSTANCE->Instantiate<Terrain>();
-    //one->Set_Parent(two);
-    //two->Set_Parent(three);
+    GAME_INSTANCE->Instantiate<Terrain>(L"MainTerrain", ETOI(m_NextLevelID));
+    GAME_INSTANCE->Instantiate<Monster>(L"Monster", ETOI(m_NextLevelID));
 
     auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"MainCamera", ETOI(m_NextLevelID), &desc);
 	GAME_INSTANCE->Set_MainCamera(cam);

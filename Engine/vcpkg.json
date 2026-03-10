@@ -2,12 +2,13 @@
   "name": "dx11-engine",
   "version-string": "1.0.0",
   "dependencies": [
-    "magic-enum",
-    "directxtk",
-    "nlohmann-json",
-    "spdlog",
-    "python3",
-    "rttr",
-    "effects11"
-  ]
+        "magic-enum",
+        "directxtk",
+        "nlohmann-json",
+        "spdlog",
+        "python3",
+        "rttr",
+        "effects11",
+        "assimp"
+    ]
 }

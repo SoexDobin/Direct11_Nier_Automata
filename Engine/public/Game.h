@@ -97,7 +97,7 @@ public: /* For ResourceManager */
     Shared<Shader> Get_Shader(uint32 levIndex, const tChar* shaderFilePath) const;
 
     HRESULT Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const;
-    const Texture::TEXTURE_DESC& Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const;
+    const Texture::TEXTURE_DESC* Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const;
     const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
 public: /* For Renderer */

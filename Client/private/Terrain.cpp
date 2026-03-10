@@ -65,15 +65,6 @@ HRESULT Terrain::Render() {
 }
 
 HRESULT Terrain::Ready_Components() {
-
-    if (Get_Component<Shader>())
-        LOG_INFO(L"Already1");
-    if (Get_Component<Texture>())
-        LOG_INFO(L"Already2");
-    if (Get_Component<VIBuffer_Terrain>())
-        LOG_INFO(L"Already3");
-
-
     Shader::SHADER_DESC shaderDesc = Shader::SHADER_DESC{ VTXNORMTEX::Tag,VTXNORMTEX::Elements, VTXNORMTEX::numElements };
     m_Shader = Add_Component<Shader>(&shaderDesc);
 	if (!m_Shader) {

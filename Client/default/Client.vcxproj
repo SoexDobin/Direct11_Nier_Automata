@@ -188,6 +188,7 @@
     <ClInclude Include="..\public\LoadingBackground.h" />
     <ClInclude Include="..\public\LoadingLogo.h" />
     <ClInclude Include="..\public\ClientApp.h" />
+    <ClInclude Include="..\public\Monster.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -200,6 +201,7 @@
     <ClCompile Include="..\private\LoadingBackground.cpp" />
     <ClCompile Include="..\private\LoadingLogo.cpp" />
     <ClCompile Include="..\private\ClientApp.cpp" />
+    <ClCompile Include="..\private\Monster.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

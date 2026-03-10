@@ -22,7 +22,7 @@ public:
 
 public:
 	HRESULT Load_Texture(uint32 levIndex, const tChar* texturePath, uint32 numSRVs, const wstring& descriptionTag);
-	const Texture::TEXTURE_DESC& Get_TextureDescByTag(uint32 levIndex, const wstring& descriptionTag);
+	const Texture::TEXTURE_DESC* Get_TextureDescByTag(uint32 levIndex, const wstring& descriptionTag);
 	const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar* texturePath);
 
 public:

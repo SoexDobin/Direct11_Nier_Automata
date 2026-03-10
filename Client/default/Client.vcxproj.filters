@@ -34,6 +34,9 @@
     <ClInclude Include="..\public\FreeCamera.h">
       <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Monster.h">
+      <Filter>02. GameObject\Monster</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="..\private\FreeCamera.cpp">
       <Filter>02. GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Monster.cpp">
+      <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +109,9 @@
     </Filter>
     <Filter Include="02. GameObject\Camera">
       <UniqueIdentifier>{3dd8255e-639e-40e9-a996-130834996b2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster">
+      <UniqueIdentifier>{c932032b-94df-43d7-9e98-c5d255458cae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

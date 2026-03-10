@@ -1,15 +1,15 @@
-﻿#include "Model.h"
+#include "Model.h"
 #include <rttr/registration>
 using namespace rttr;
 using namespace Engine;
 
-#line 2880
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Model_RTTR)
 {
     registration::class_<Model>("Model")
         .constructor<>()
         .method("Clone", &Model::Clone)
         .method("Create", &Model::Create)
+		.method("CreatePrototype", &Model::CreatePrototype)
         ;
 }
 

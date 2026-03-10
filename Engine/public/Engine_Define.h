@@ -62,6 +62,10 @@
 #include <rttr/type>
 #pragma warning(pop)
 
+#include "Assimp/scene.h"
+#include "Assimp/Importer.hpp"
+#include "Assimp/postprocess.h"
+
 #include "Engine_Enum.h"
 #include "Engine_Function.h"
 #include "Engine_Macro.h"
@@ -75,11 +79,7 @@ using namespace rttr;
 using namespace std;
 using namespace Engine;
 
-//#ifdef _DEBUG
-//#pragma comment(lib, "rttr_core_d.lib")
-//#else
-//#pragma comment(lib, "rttr_core.lib")
-//#endif
+
 
 #pragma warning(disable : 4251)
 

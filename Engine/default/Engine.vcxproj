@@ -214,6 +214,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\EngineManager.h" />
     <ClInclude Include="..\public\Light.h" />
     <ClInclude Include="..\public\LightManager.h" />
+    <ClInclude Include="..\public\Material.h" />
     <ClInclude Include="..\public\Mesh.h" />
     <ClInclude Include="..\public\Model.h" />
     <ClInclude Include="..\public\Object.h" />
@@ -250,6 +251,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\EngineManager.cpp" />
     <ClCompile Include="..\private\Light.cpp" />
     <ClCompile Include="..\private\LightManager.cpp" />
+    <ClCompile Include="..\private\Material.cpp" />
     <ClCompile Include="..\private\Mesh.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
@@ -264,12 +266,14 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\GameObject_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />

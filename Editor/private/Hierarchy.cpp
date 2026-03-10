@@ -13,15 +13,15 @@ Hierarchy::~Hierarchy() {}
 
 HRESULT Hierarchy::Initialize() { return EditorObject::Initialize(); }
 
-void Hierarchy::Update() {
+void Hierarchy::Update(Bool isResize) {
   if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
     Delete_Selected();
   }
 
-  EditorObject::Update();
+  EditorObject::Update(isResize);
 }
 
-void Hierarchy::Render() {
+void Hierarchy::Render(Bool isResize) {
   ImGui::Begin("Hierarchy");
 
   auto& allObjects = GAME_INSTANCE->Get_GameObjects();

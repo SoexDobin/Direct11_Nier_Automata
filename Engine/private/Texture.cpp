@@ -106,6 +106,17 @@ HRESULT Texture::Bind_Texture(const wstring& texturefilePath)
     return S_OK;
 }
 
+void Texture::Set_TextureByIndex(uint32 texIndex)
+{
+    if (texIndex >= m_SRVs.size() || m_SRVs.empty())
+    {
+        LOG_ERROR(L"Texture Out of Bounds");
+        return;
+    }
+
+    m_SRVs[texIndex];
+}
+
 Shared<Texture> Texture::CreatePrototype()
 {
     auto texture = make_shared<Texture>(

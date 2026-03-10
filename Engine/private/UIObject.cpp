@@ -1,9 +1,7 @@
 #include "UIObject.h"
 
+#include "Game.h"
 #include "Shader.h"
-#include "Texture.h"
-#include "Transform.h"
-#include "VIBuffer_Rect.h"
 
 UIObject::UIObject() : GameObject() {}
 
@@ -34,7 +32,7 @@ HRESULT UIObject::Initialize(void *arg) {
 	if (FAILED(GameObject::Initialize(arg)))
 		return E_FAIL;
 
-    D3D11_VIEWPORT viewPortDesc{};
+    D3D11_VIEWPORT viewPortDesc = GAME_INSTANCE->Get_ViewportDesc();
     uint32 numViewPorts{1};
     m_Context->RSGetViewports(&numViewPorts, &viewPortDesc);
     m_ViewportWidth = viewPortDesc.Width;
@@ -58,7 +56,9 @@ void UIObject::Set_Active(Bool isActive) { GameObject::Set_Active(isActive); }
 void UIObject::Priority_Update(Float timeDelta) {
 	GameObject::Priority_Update(timeDelta);
 }
-void UIObject::Update(Float timeDelta) { GameObject::Update(timeDelta); }
+void UIObject::Update(Float timeDelta) {
+	GameObject::Update(timeDelta);
+}
 void UIObject::Late_Update(Float timeDelta) {
 	GameObject::Late_Update(timeDelta);
 }

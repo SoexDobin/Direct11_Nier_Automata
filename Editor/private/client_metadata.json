@@ -99,6 +99,12 @@
                                                    {
                                                        "access":  "private",
                                                        "default":  "",
+                                                       "name":  "m_OwnerLevel",
+                                                       "type":  "Weak\u003cLevel\u003e"
+                                                   },
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "",
                                                        "name":  "m_CriticalSection",
                                                        "type":  "CRITICAL_SECTION"
                                                    },

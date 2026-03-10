@@ -46,21 +46,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_EDITOR));
 
   MSG msg = {};
+  Bool quit = { false };
 
   Unique<EditorApp> pEditorApp = EditorApp::Create();
   if (nullptr == pEditorApp)
     return FALSE;
 
 	while (true) {
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-	    	if (WM_QUIT == msg.message)
-	    		break;
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (WM_QUIT == msg.message)
+            {
+                quit = true;
+                break;
+            }
 
             if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
         }
+
+        if (quit) 
+            break;
 
         if (g_ResizePending && GAME_INSTANCE)
         {

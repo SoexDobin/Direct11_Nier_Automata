@@ -21,17 +21,11 @@ public:
 	HRESULT Render_Level() override;
 
 private:
-
-#ifdef _DEBUG
-	bool idididi = false;
-#endif
-
-
 	LEVEL			m_NextLevel = {};
 	Shared<Loader>	m_Loader = { nullptr };
 
 public:
-	static Unique<LevelLoading> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);
+	static Shared<LevelLoading> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);
 	
 };
 

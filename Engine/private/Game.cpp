@@ -238,8 +238,8 @@ Float Game::Compute_TimeDelta(const wstring &timerTag) const {
   return m_TimeManager->Get_Timer(timerTag)->GetDeltaTime();
 }
 
-HRESULT Game::Change_Level(uint32 levIndex, Unique<Level> newLevel) {
-  if (FAILED(m_LevelManager->Change_Level(levIndex, std::move(newLevel)))) {
+HRESULT Game::Change_Level(uint32 levIndex, const Shared<Level>& newLevel) {
+  if (FAILED(m_LevelManager->Change_Level(levIndex, newLevel))) {
     MSG_BOX("Change To New Level Got a Trouble");
     return E_FAIL;
   }

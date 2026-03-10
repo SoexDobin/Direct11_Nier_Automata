@@ -55,7 +55,7 @@ HRESULT EditorManager::Initialize()
 	return S_OK;
 }
 
-void EditorManager::Update() {
+void EditorManager::Update(Bool IsResetView) {
     Float timeDelta = GAME_INSTANCE->Compute_UnscaledTimeDelta();
     EDITOR_STATE state = EDITOR->Get_State();
 
@@ -70,14 +70,14 @@ void EditorManager::Update() {
         }
     }
 
-    m_Inspector->Update();
-    m_EditorView->Update();
-    m_MenuBar->Update();
-    m_LogConsole->Update();
-    m_Hierarchy->Update();
+    m_Inspector->Update(IsResetView);
+	m_EditorView->Update(IsResetView);
+    m_MenuBar->Update(IsResetView);
+    m_LogConsole->Update(IsResetView);
+    m_Hierarchy->Update(IsResetView);
 }
 
-HRESULT EditorManager::Render() {
+HRESULT EditorManager::Render(Bool IsResetView) {
 
 	Shared<Float4> vClearColor = make_shared<Float4>(0.f, 0.f, 1.f, 1.f);
 
@@ -140,11 +140,11 @@ HRESULT EditorManager::Render() {
     }
     ImGui::End();
 
-    m_Inspector->Render();
-    m_EditorView->Render();
-    m_MenuBar->Render();
-    m_LogConsole->Render();
-    m_Hierarchy->Render();
+    m_Inspector->Render(IsResetView);
+	m_EditorView->Render(IsResetView);
+    m_MenuBar->Render(IsResetView);
+    m_LogConsole->Render(IsResetView);
+    m_Hierarchy->Render(IsResetView);
 
     return S_OK;
 }

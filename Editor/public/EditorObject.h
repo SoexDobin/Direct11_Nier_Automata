@@ -18,8 +18,8 @@ public:
 
 public:
 	virtual HRESULT Initialize() { return S_OK; }
-	virtual void Update() {}
-	virtual void Render() {}
+	virtual void Update(Bool isResize) {}
+	virtual void Render(Bool isResize) {}
 		
 protected:
 	Bool m_Enable = { true };

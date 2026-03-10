@@ -10,8 +10,8 @@ public:
     typedef struct tagShaderDesc : public COMPONENT_DESC
     {
         tagShaderDesc(){}
-        tagShaderDesc(const wstring& path, const D3D11_INPUT_ELEMENT_DESC* desc, uint32_t numPasses)
-	        : m_VertexTag(path), m_elementsDesc(desc), m_numPasses(numPasses) {}
+        tagShaderDesc(const wstring& vertextag, const D3D11_INPUT_ELEMENT_DESC* desc, uint32_t numPasses)
+	        : m_VertexTag(vertextag), m_elementsDesc(desc), m_numPasses(numPasses) {}
 
         wstring m_VertexTag{};
         const D3D11_INPUT_ELEMENT_DESC* m_elementsDesc{nullptr};

@@ -1,4 +1,4 @@
-﻿#include "VIBuffer.h"
+#include "VIBuffer.h"
 
 VIBuffer::VIBuffer()
 	: Component{}

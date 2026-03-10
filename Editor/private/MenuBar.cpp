@@ -11,9 +11,9 @@ HRESULT MenuBar::Initialize() {
     return E_FAIL;
   return EditorObject::Initialize();
 }
-void MenuBar::Update() { EditorObject::Update(); }
-void MenuBar::Render() {
-  EditorObject::Render();
+void MenuBar::Update(Bool isResize) { EditorObject::Update(isResize); }
+void MenuBar::Render(Bool isResize) {
+  EditorObject::Render(isResize);
   if (ImGui::BeginMainMenuBar()) {
     if (ImGui::BeginMenu("WindowSetting")) {
       if (ImGui::MenuItem("EngineDesc", nullptr, m_Enable))

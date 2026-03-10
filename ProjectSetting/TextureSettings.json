@@ -11,6 +11,24 @@
             "level": "STATIC",
             "path": "Default/Tile_0.dds",
             "tag": "Tile_0"
+        },
+        {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Default/UI/Loading/Loading_BackGround.dds",
+            "tag": "UI_Loading_BackGround"
+        },
+        {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Default/UI/Loading/Loading_Pixel.dds",
+            "tag": "UI_Loading_Pixel"
+        },
+        {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Default/UI/Loading/Loading_Logo.dds",
+            "tag": "UI_Loading_Logo"
         }
     ]
 }

@@ -79,7 +79,7 @@ HRESULT Monster::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	uint32 numMeshes = m_Model->Get_NumMeshes();
+	size_t numMeshes = m_Model->Get_NumMeshes();
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
 		m_Model->Bind_Material(m_Shader, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);

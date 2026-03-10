@@ -1,5 +1,5 @@
-#include "LogConsole.h"
 #include "pch.h"
+#include "LogConsole.h"
 #include <chrono>
 #include <imgui.h>
 
@@ -11,7 +11,7 @@ LogConsole::~LogConsole() {
 
 HRESULT LogConsole::Initialize() { return EditorObject::Initialize(); }
 
-void LogConsole::Update()
+void LogConsole::Update(Bool isResize)
 {
 }
 
@@ -49,7 +49,7 @@ void LogConsole::Clear() {
 	m_Entries.clear();
 }
 
-void LogConsole::Render() 
+void LogConsole::Render(Bool isResize) 
 {
     ImGui::Begin("Log Console");
 

@@ -23,7 +23,7 @@ HRESULT Inspector::Initialize() {
   return EditorObject::Initialize();
 }
 
-void Inspector::Render() {
+void Inspector::Render(Bool isResize) {
   ImGui::Begin("Inspector");
 
   Shared<GameObject> selected = EDITOR->Get_SelectedObject();

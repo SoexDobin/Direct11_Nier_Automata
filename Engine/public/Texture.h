@@ -40,6 +40,7 @@ public:
 	HRESULT Bind_Texture(const wstring& textureFilePath);
 
 public:
+	void Set_TextureByIndex(uint32 texIndex);
 	const vector<ComPtr<ID3D11ShaderResourceView>>& Get_Textures() { return m_SRVs; }
 
 private:

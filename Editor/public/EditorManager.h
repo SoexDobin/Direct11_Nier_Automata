@@ -32,8 +32,8 @@ public:
 
 public:
   HRESULT Initialize();
-  void Update();
-  HRESULT Render();
+  void Update(Bool IsResetView);
+  HRESULT Render(Bool IsResetView);
 
 public:
   EDITOR_STATE Get_State() const { return m_State; }
@@ -53,6 +53,8 @@ public:
     }
     void RequestResize(Float width, Float height, uint32 screenIndex)
     {
+        if (width <= 0.f) width = 10.f;
+        if (height <= 0.f) height = 10.f;
         m_IsResizeView = true;
         m_ResizeWidth = width; 
     	m_ResizeHeight = height; 
@@ -61,10 +63,10 @@ public:
     void Clear_ResizeRequest() { m_IsResizeView = false; }
 
 public: /* Selected Object (Hierarchy <-> Inspector 공유) */
-  Shared<Engine::GameObject> Get_SelectedObject() const {
+  Shared<GameObject> Get_SelectedObject() const {
     return m_SelectedObject.lock();
   }
-  void Set_SelectedObject(const Shared<Engine::GameObject> &obj) {
+  void Set_SelectedObject(const Shared<GameObject>& obj) {
     m_SelectedObject = obj;
   }
   void Clear_SelectedObject() { m_SelectedObject.reset(); }

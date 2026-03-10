@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "ImGuizmo.h"
 #include "EditorApp.h"
 #include "ClientApp.h"
 #include "ClientSettingManager.h"
@@ -10,7 +11,10 @@
 #include "TagRegistry.h"
 
 EditorApp::EditorApp() {}
-EditorApp::~EditorApp() { Destruct_IMGUI(); }
+EditorApp::~EditorApp()
+{
+	Destruct_IMGUI();
+}
 
 HRESULT EditorApp::Initialize() {
   m_Game = GAME_INSTANCE;
@@ -48,10 +52,14 @@ HRESULT EditorApp::Initialize() {
     return E_FAIL;
   }
 
+  if (FAILED(Initialize_IMGUI(desc)))
+      return E_FAIL;
+
   if (FAILED(EDITOR->Initialize()))
     return E_FAIL;
-  if (FAILED(Initialize_IMGUI(desc)))
-    return E_FAIL;
+  
+  GAME_INSTANCE->OnResize(desc.viewportWidth, desc.viewportHeight, 0);
+  GAME_INSTANCE->OnResize(desc.viewportWidth, desc.viewportHeight, 1);
 
   return S_OK;
 }
@@ -59,52 +67,45 @@ HRESULT EditorApp::Initialize() {
 void EditorApp::Update() {
     static EDITOR_STATE prevState = EDITOR_STATE::STOP;
     EDITOR_STATE curState = EDITOR->Get_State();
+    
     if (curState == EDITOR_STATE::STOP && prevState != EDITOR_STATE::STOP) {
-		Reset_ClientApp();
-		m_IsReset = true;
+        m_IsReset = true;
     }
-    prevState = curState; // 다음 프레임을 위해 상태 갱신
-
+    prevState = curState;
+    
     if (m_IsReset) {
-		return;
+        Reset_ClientApp();
     }
-
+    
     if (EDITOR->Is_ResizeRequest()) {
         EditorManager::RESIZE_INFO info = EDITOR->Get_ResizeInfo();
         GAME_INSTANCE->OnResize(static_cast<uint32>(info.width), static_cast<uint32>(info.height), info.screenIndex);
-        return; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
     }
-
+    
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-
-    EDITOR->Update();
+    ImGuizmo::BeginFrame();
+    
+    EDITOR->Update(m_IsReset);
 }
 
 HRESULT EditorApp::Render() {
-  if (m_IsReset) {
-    m_IsReset = false;
-    return S_OK;
-  }
+    EDITOR->Render(m_IsReset);
+    
+    ImGui::Render();
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+    }
+    
+    if (m_IsReset) {
+        m_IsReset = false;
+    }
 
-  if (EDITOR->Is_ResizeRequest()) {
-      EDITOR->Clear_ResizeRequest(); // 플래그 해제
-      return S_OK; // 중요: 리소스가 바뀐 이 프레임은 NewFrame을 생략하고 건너뜀
-  }
-
-  EDITOR->Render();
-
-  ImGui::Render();
-  ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-  ImGuiIO &io = ImGui::GetIO();
-  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-    ImGui::UpdatePlatformWindows();
-    ImGui::RenderPlatformWindowsDefault();
-  }
-
-  return GAME_INSTANCE->Present();
+    return GAME_INSTANCE->Present();
 }
 
 Unique<EditorApp> EditorApp::Create() {
@@ -137,6 +138,11 @@ HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC &desc) {
       style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
+    if (desc.hWnd == nullptr) {
+        MSG_BOX("ERROR: HWND NULL! Failed ton Initialize ImGui");
+        return E_FAIL;
+    }
+
     ImGui_ImplWin32_Init(desc.hWnd);
     if (GAME_INSTANCE->Get_Device().Get() == nullptr ||
         GAME_INSTANCE->Get_Context().Get() == nullptr) {
@@ -148,29 +154,22 @@ HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC &desc) {
       return E_FAIL;
     }
 
-    /*{
-      RECT rc{};
-      GetClientRect(g_hWnd, &rc);
-      uint32 width = rc.right - rc.left;
-      uint32 height = rc.bottom - rc.top;
-      GAME_INSTANCE->OnResize(width, height);
-    }*/
-
     return S_OK;
 }
 
 HRESULT EditorApp::Destruct_IMGUI() {
-  GAME_INSTANCE->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
-  GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
+    GAME_INSTANCE->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
+    GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
 
-  m_Game.reset();
-  GAME_INSTANCE->DestroyInstance();
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+    
+    m_ClientApp.reset();
+    m_Game.reset();
+    GAME_INSTANCE->DestroyInstance();
 
-  ImGui_ImplDX11_Shutdown();
-  ImGui_ImplWin32_Shutdown();
-  ImGui::DestroyContext();
-
-  return S_OK;
+	return S_OK;
 }
 
 void EditorApp::Reset_ClientApp() {

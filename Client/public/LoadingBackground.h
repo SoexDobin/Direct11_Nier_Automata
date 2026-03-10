@@ -13,8 +13,8 @@ NS_BEGIN(Client)
 
 class LoadingBackground final : public UIObject
 {
-private:
-    typedef struct tagLoadingBackgroundUI final : public UIObject::UI_DESC
+public:
+    typedef struct tagLoadingBackgroundUI final : public UI_DESC
     {
 	    
     } LOADING_BG_UI;
@@ -35,8 +35,9 @@ public:
     void Late_Update(Float timeDelta) override;
     void Fixed_Update(Float fixedDelta) override;
     HRESULT Render() override;
+    void Submit_RenderGroup() override;
 
-private:
+protected:
     HRESULT Ready_Components();
 
 private:

@@ -36,25 +36,22 @@ public:
   void Clear_AllResource() const;
 
 public: /* For Editor / Tool */
-  ComPtr<ID3D11Device> Get_Device() const {
-    return m_GraphicDevice->Get_Device();
-  }
-  ComPtr<ID3D11DeviceContext> Get_Context() const {
-    return m_GraphicDevice->Get_Context();
-  }
-  Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
-  Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
+    const D3D11_VIEWPORT& Get_ViewportDesc() const { return m_GraphicDevice->Get_ViewportDesc(); }
+    ComPtr<ID3D11Device> Get_Device() const { return m_GraphicDevice->Get_Device(); }
+    ComPtr<ID3D11DeviceContext> Get_Context() const { return m_GraphicDevice->Get_Context(); }
+    Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
+    Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
 
 public: /* For Input Manager */
-  void Update_Input() const;
+	void Update_Input() const;
 
 public: /* For GraphicDevice */
-  HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
-  HRESULT Present() const;
-  HRESULT OnResize(uint32 width, uint32 height, uint32 offscreeenIndex = UINT_MAX);
-  HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
-  HRESULT End_RenderOffScreen() const;
-  ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
+    HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
+    HRESULT Present() const;
+    HRESULT OnResize(uint32 width, uint32 height, uint32 offScreenIndex = UINT_MAX);
+    HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
+    HRESULT End_RenderOffScreen() const;
+    ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
 
 public:
   Byte Get_DIKeyState(uByte byKeyID) const;
@@ -70,8 +67,9 @@ public: /* For TimeManager */
   Float Compute_TimeDelta(const wstring &timerTag) const;
 
 public: /* For LevelManager */
+    Bool LevelLoad_Finished() const { return m_LevelManager->Is_LoadFinished(); }
     uint32 Get_CurrentLevelIndex() const { return m_LevelManager->Get_CurrentLevelIndex(); }
-    HRESULT Change_Level(uint32 levIndex, Unique<class Level> newLevel);
+    HRESULT Change_Level(uint32 levIndex, const Shared<class Level>& newLevel);
 
 public: /* For PrototypeManager */
     uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const;

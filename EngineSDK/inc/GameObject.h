@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "Transform.h"
 #include "LayerRegistry.h"
 #include "Object.h"
 #include "ScriptComponent.h"

@@ -7,6 +7,7 @@
 #include "FreeCamera.h"
 #include "Game.h"
 #include "LoadingBackground.h"
+#include "LoadingLogo.h"
 
 #include "Monster.h"
 #include "Terrain.h"
@@ -34,10 +35,19 @@ uint32 APIENTRY ThreadMain(void* arg)
 }
 HRESULT Loader::Initialize(void *arg) 
 {
-    m_NextLevelID = *static_cast<LEVEL*>(arg);
+    if (nullptr == arg)
+    {
+        LOG_CRITICAL(L"Failed to Initialize Loader By LoaderDesc");
+        return E_FAIL;
+    }
+
+    LOADER_DESC& desc = *static_cast<LOADER_DESC*>(arg);
+
+    m_NextLevelID = desc.nextLevelID;
+    m_OwnerLevel = desc.ownerLevel;
     InitializeCriticalSection(&m_CriticalSection);
 
-	auto pSharedPtrToPass = new Shared<Loader>(shared_from_this());
+	auto pSharedPtrToPass = new Shared<Loader>(static_pointer_cast<Loader>(shared_from_this()));
     
 	m_Thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadMain, pSharedPtrToPass, 0, nullptr));
     
@@ -101,16 +111,19 @@ HRESULT Loader::Loading_For_LogoLevel() {
         return E_FAIL;
 
     if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
+        LoadingBackground::Create(m_Device, m_Context), L"UI_Loading_BackGround")))
+        return E_FAIL;
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
+        LoadingLogo::Create(m_Device, m_Context), L"UI_Loading_Logo")))
+        return E_FAIL;
+
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
         Monster::Create(m_Device, m_Context), L"Monster")))
         return E_FAIL;
 
     if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
         FreeCamera::Create(m_Device, m_Context), L"MainCamera")))
         return E_FAIL;
-
-
-
-	m_isFinished = true;
 
     LIGHT_DESC			LightDesc{};
     LightDesc.type = LIGHT::DIRECTIONAL;
@@ -133,11 +146,19 @@ HRESULT Loader::Loading_For_LogoLevel() {
     desc.farPlane = 500.f;
 
     GAME_INSTANCE->Instantiate<Terrain>(L"MainTerrain", ETOI(m_NextLevelID));
+    auto back = GAME_INSTANCE->Instantiate<LoadingBackground>(L"UI_Loading_BackGround", ETOI(m_NextLevelID));
+    auto logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"UI_Loading_Logo", ETOI(m_NextLevelID));
+    //back->Add_Child(logo);
+
     GAME_INSTANCE->Instantiate<Monster>(L"Monster", ETOI(m_NextLevelID));
 
     auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"MainCamera", ETOI(m_NextLevelID), &desc);
 	GAME_INSTANCE->Set_MainCamera(cam);
 
+
+    m_isFinished = true;
+    if (!m_OwnerLevel.expired())
+		m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
 	return S_OK;
 }
 
@@ -152,6 +173,8 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
     }
 
     m_isFinished = true;
+    if (!m_OwnerLevel.expired())
+        m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
 	return S_OK;
 }
 
@@ -180,14 +203,20 @@ HRESULT Loader::Loading_Global_Prototype()
         return E_FAIL;
 
     m_isFinished = true;
+    if (!m_OwnerLevel.expired())
+        m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
     return S_OK;
 }
 
-Shared<Loader> Loader::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID)
+Shared<Loader> Loader::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID, const Shared<Level>& ownerLevel)
 {
     Shared<Loader> loader = make_shared<Loader>(device, context);
 
-    if (FAILED(loader->Initialize(&nextLevelID))) {
+    LOADER_DESC desc{};
+    desc.nextLevelID = nextLevelID;
+    desc.ownerLevel = ownerLevel;
+
+    if (FAILED(loader->Initialize(&desc))) {
 		MSG_BOX("Failed to Created : Loader");
     }
 

@@ -73,7 +73,6 @@ HRESULT VIBuffer_Rect::Initialize_Prototype() {
   delete[] indices;
 
   return VIBuffer::Initialize_Prototype();
-  ;
 }
 
 HRESULT VIBuffer_Rect::Initialize(void *arg) {

@@ -35,6 +35,11 @@ namespace Engine
 		Vector4 specular = {};
 	} LIGHT_DESC;
 
+	typedef struct tagModelDesc
+	{
+		
+	} MODEL_DESC;
+
 	typedef struct tagVertexTexcoord
 	{
 		Vector3			position;

@@ -266,6 +266,9 @@
     <ClInclude Include="..\public\Material.h">
       <Filter>01. Utility\05. Component\Material</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Engine_ModelStruct.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">

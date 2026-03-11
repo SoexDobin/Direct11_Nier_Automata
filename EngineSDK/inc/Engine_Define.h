@@ -71,6 +71,7 @@
 #include "Engine_Macro.h"
 #include "Engine_Struct.h"
 #include "Engine_Typedef.h"
+#include "Engine_ModelStruct.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

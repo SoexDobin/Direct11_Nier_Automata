@@ -18,7 +18,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "Editor\default\Ed
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Launcher", "Launcher\default\Launcher.vcxproj", "{D8530B07-8449-4272-B68C-921CDBCC485A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssimpTool", "AssimpTool\AssimpTool.vcxproj", "{FA264E35-6CB3-47E3-9DA8-408BED7DC346}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelConverter", "ModelConverter\ModelConverter.vcxproj", "{FA264E35-6CB3-47E3-9DA8-408BED7DC346}"
+	ProjectSection(ProjectDependencies) = postProject
+		{952F6B8A-F5A1-4BA4-8D10-085F731F01DB} = {952F6B8A-F5A1-4BA4-8D10-085F731F01DB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

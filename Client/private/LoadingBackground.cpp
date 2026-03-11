@@ -47,7 +47,8 @@ void LoadingBackground::Priority_Update(Float timeDelta) {
 }
 
 void LoadingBackground::Update(Float timeDelta) {
-    Update_Transform();
+    Update_UITransform();
+    
 	UIObject::Update(timeDelta);
 }
 

@@ -10,7 +10,8 @@ class VIBuffer_Rect;
 class ENGINE_DLL UIObject abstract : public GameObject {
 public:
   typedef struct tagUIObjectDesc : public GAMEOBJECT_DESC {
-    Float x, y, sizeX, sizeY;
+    UI_ANCHOR anchor = { UI_ANCHOR::CENTER };
+    Float x{}, y{}, sizeX{}, sizeY{};
   } UI_DESC;
 
 public:
@@ -19,6 +20,10 @@ public:
            const ComPtr<ID3D11DeviceContext> &context);
   UIObject(const UIObject& rhs);
   virtual ~UIObject() override = default;
+
+public:
+    void Set_Anchor(UI_ANCHOR anchor) { m_Anchor = anchor; Update_UITransform(); }
+    void Set_UIPosition(Vector2 position) { m_X = position.x; m_Y = position.y; Update_UITransform(); }
 
 public:
     void Set_Active(Bool isActive) final;
@@ -37,12 +42,13 @@ public:
     virtual HRESULT Render() override;
 
 protected:
-    void Update_Transform() const;
+    void Update_UITransform() const;
     HRESULT Bind_ShaderResource(const Shared<Shader> &shader,
                               const Char *constantName,
                               D3DTS transformState) const;
 
 protected:
+    UI_ANCHOR m_Anchor = { UI_ANCHOR::CENTER };
     Float m_X{}, m_Y{}, m_SizeX{}, m_SizeY{};
     Float m_ViewportHeight{}, m_ViewportWidth{};
     Matrix m_TransformationMatrices[ETOI(D3DTS::END)];

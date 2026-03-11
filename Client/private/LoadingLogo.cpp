@@ -45,7 +45,7 @@ void LoadingLogo::Priority_Update(Float timeDelta) {
 }
 
 void LoadingLogo::Update(Float timeDelta) {
-    Update_Transform();
+    Update_UITransform();
 	UIObject::Update(timeDelta);
 }
 

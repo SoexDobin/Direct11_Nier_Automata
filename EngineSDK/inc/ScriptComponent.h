@@ -4,6 +4,7 @@
 NS_BEGIN(Engine)
 
 class ENGINE_DLL ScriptComponent abstract : public Component {
+    RTTR_ENABLE(Component)
 public:
     explicit ScriptComponent();
 	explicit ScriptComponent(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
@@ -27,7 +28,7 @@ public:
   void Set_Active(Bool isActive) final { Component::Set_Active(isActive); };
 
 public:
-  virtual Shared<Component> Clone(void *arg = nullptr) PURE;
+  virtual Shared<Component> Clone(void *arg = nullptr) override PURE;
 };
 
 NS_END

@@ -6,6 +6,18 @@ namespace Engine
 #define ETOI(ENUM)              static_cast<unsigned int>(ENUM)
 #define GAME_INSTANCE                    Engine::Game::GetInstance()
 
+
+#define RTTR_REGISTRATION_NAMED(NAME)                                          \
+static void rttr_auto_register_##NAME();                                       \
+namespace {                                                                    \
+    struct rttr_reg_##NAME {                                                   \
+        rttr_reg_##NAME() { rttr_auto_register_##NAME(); }                     \
+    };                                                                         \
+}                                                                              \
+static const rttr_reg_##NAME global_reg_##NAME;                                \
+static void rttr_auto_register_##NAME()
+
+
 #ifndef MSG_BOX
 #define MSG_BOX(_message)                                                      \
 	MessageBox(NULL, TEXT(_message), L"System Message", MB_OK)

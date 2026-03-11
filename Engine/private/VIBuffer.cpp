@@ -9,11 +9,11 @@ VIBuffer::VIBuffer(ComPtr<ID3D11Device> device,
                    ComPtr<ID3D11DeviceContext> context)
     : Component(device, context) {}
 
-VIBuffer::VIBuffer(const Shared<VIBuffer> &rhs)
-    : Component{rhs}, m_VB{rhs->m_VB}, m_IB{rhs->m_IB},
-      m_NumVtxBuffers{rhs->m_NumVtxBuffers}, m_NumVertices{rhs->m_NumVertices},
-      m_VtxStride{rhs->m_VtxStride}, m_NumIndices{rhs->m_NumIndices},
-      m_IndexStride{rhs->m_IndexStride}, m_PrimitiveType{rhs->m_PrimitiveType} {
+VIBuffer::VIBuffer(const VIBuffer& rhs)
+    : Component{rhs}, m_VB{rhs.m_VB}, m_IB{rhs.m_IB},
+      m_NumVtxBuffers{rhs.m_NumVtxBuffers}, m_NumVertices{rhs.m_NumVertices},
+      m_VtxStride{rhs.m_VtxStride}, m_NumIndices{rhs.m_NumIndices},
+      m_IndexStride{rhs.m_IndexStride}, m_PrimitiveType{rhs.m_PrimitiveType} {
 }
 
 HRESULT VIBuffer::Initialize_Prototype() {

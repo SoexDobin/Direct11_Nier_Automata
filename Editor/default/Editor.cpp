@@ -46,33 +46,40 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
   HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_EDITOR));
 
   MSG msg = {};
+  Bool quit = { false };
 
   Unique<EditorApp> pEditorApp = EditorApp::Create();
   if (nullptr == pEditorApp)
     return FALSE;
 
-  while (true) {
-    if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-      if (WM_QUIT == msg.message)
-        break;
+	while (true) {
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (WM_QUIT == msg.message)
+            {
+                quit = true;
+                break;
+            }
 
-      if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-      }
-    }
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
 
-    if (g_ResizePending && GAME_INSTANCE)
-    {
-        GAME_INSTANCE->OnResize(g_PendingWidth, g_PendingHeight);
-        g_ResizePending = false;
-    }
+        if (quit) 
+            break;
 
-    pEditorApp->Update();
-    pEditorApp->Render();
-  }
+        if (g_ResizePending && GAME_INSTANCE)
+        {
+            GAME_INSTANCE->OnResize(g_PendingWidth, g_PendingHeight);
+            g_ResizePending = false;
+        }
 
-  pEditorApp.reset();
+        pEditorApp->Update();
+        pEditorApp->Render();
+	}
+
+	pEditorApp.reset();
 
   return static_cast<int32>(msg.wParam);
 }

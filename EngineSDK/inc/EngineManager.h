@@ -14,7 +14,7 @@ public:
 	PROTOTYPE Get_Prototype() const final { return PROTOTYPE::ENGINE_MANAGER; }
 
 private:
-	using Object::m_ObjectDesc;
+	using Object::m_DescID;
 };
 
 NS_END

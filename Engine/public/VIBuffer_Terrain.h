@@ -3,16 +3,24 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL VIBuffer_Terrain final : public VIBuffer, public enable_shared_from_this<VIBuffer_Terrain>
+class ENGINE_DLL VIBuffer_Terrain final : public VIBuffer
 {
+	RTTR_ENABLE(VIBuffer)
 public:
-	VIBuffer_Terrain();
-	VIBuffer_Terrain(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	VIBuffer_Terrain(const Shared<VIBuffer_Terrain>& rhs);
+	typedef struct tagVIBufferTerrain : public VIBuffer
+	{
+		uint32 m_NumVerticesX{};
+		uint32 m_NumVerticesZ{};
+	} VIBUFFER_TERRAIN;
+
+public:
+	explicit VIBuffer_Terrain();
+	explicit VIBuffer_Terrain(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit VIBuffer_Terrain(const VIBuffer_Terrain& rhs);
 	~VIBuffer_Terrain() override = default;
 
 public:
-	HRESULT Initialize_Prototype(const tChar* pHeightMapFilePath);
+	HRESULT Initialize_Prototype(const tChar* pHeightMapFilePath = L"");
 	HRESULT Initialize(void* arg = nullptr) override;
 
 public:
@@ -27,6 +35,7 @@ private:
 	uint32 m_NumVerticesZ = {};
 
 public:
+	static Shared<VIBuffer_Terrain> CreatePrototype();
 	static Shared<VIBuffer_Terrain> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const tChar* heightMapFilePath = L"");
 	Shared<Component> Clone(void* arg = nullptr) override;
 };

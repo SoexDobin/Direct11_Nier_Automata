@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine_Define.h"
 
+
 NS_BEGIN(Engine)
 
 typedef struct ENGINE_DLL LayerMask final {
@@ -38,11 +39,11 @@ public:
     void Set_LayerName(uint32 layerBit, const wstring &name);
 
     LAYER Get_LayerByName(const wstring &name) const;
-    const map<LAYER, wstring> &Get_AllLayers() const { return m_LayerToName; }
+    const map<LAYER, wstring>& Get_AllLayers() const { return m_LayerToName; }
 
 public:
-    void LoadFromFile(const wstring &path);
-    void SaveToFile(const wstring &path) const;
+    void LoadFromFile(const wstring& path);
+    void SaveToFile(const wstring& path) const;
     void Clear();
 
 private:

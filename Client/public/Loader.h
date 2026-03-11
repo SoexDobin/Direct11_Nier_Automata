@@ -2,12 +2,19 @@
 #include "Level.h"
 #include "Client_Define.h"
 
+
 NS_BEGIN(Client)
 
+class ClientApp;
 
-// TODO : 한번더 나눠서 Level의 로더로 사용하는 편이 좋음
-class Loader final : public Level, public enable_shared_from_this<Loader>
+class Loader final : public Level
 {
+public:
+	typedef struct tagLoaderDesc
+	{
+		LEVEL nextLevelID{};
+		Shared<Level> ownerLevel{ nullptr };
+	} LOADER_DESC;
 public:
 	Loader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	~Loader() override;
@@ -26,7 +33,6 @@ public:
 
 public:
 	HRESULT Loading();
-	HRESULT Print_LoadingText();
 
 private:
 	HRESULT Loading_For_LogoLevel();
@@ -36,12 +42,14 @@ private:
 private:
 	HANDLE				m_Thread = { nullptr };
 	LEVEL				m_NextLevelID = {LEVEL::LEVEL_END};
+	Weak<Level>			m_OwnerLevel = {};
 	CRITICAL_SECTION	m_CriticalSection = {};
 	tChar				m_LoadingText[MAX_PATH] = {};
-	atomic<BOOL>		m_isFinished = { false };
+
+	Bool				m_isFinished = { false };
 
 public:
-	static Shared<Loader> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);
+	static Shared<Loader> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID, const Shared<Level>& ownerLevel);
 
 };
 

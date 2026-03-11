@@ -1,0 +1,13 @@
+{
+    "name": "dx11-client",
+    "version-string": "1.0.0",
+    "dependencies": [
+        "magic-enum",
+        "directxtk",
+        "nlohmann-json",
+        "spdlog",
+        "python3",
+        "rttr",
+        "effects11"
+    ]
+}

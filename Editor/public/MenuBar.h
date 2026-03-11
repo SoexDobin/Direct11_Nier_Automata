@@ -11,8 +11,8 @@ public:
 
 public:
 	HRESULT Initialize() override;
-	void Update() override;
-	void Render() override;
+	void Update(Bool isResize) override;
+	void Render(Bool isResize) override;
 
 private:
 	void ViewEngineDesc();

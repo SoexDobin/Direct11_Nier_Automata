@@ -1,13 +1,11 @@
-﻿#include "VIBuffer.h"
+#include "VIBuffer.h"
 #include <rttr/registration>
 using namespace rttr;
 using namespace Engine;
 
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(VIBuffer_RTTR)
 {
-    registration::class_<VIBuffer>(L"VIBuffer")
-        .constructor<>()
-        .method("Clone", &VIBuffer::Clone)
+    registration::class_<VIBuffer>("VIBuffer")
         ;
 }
 

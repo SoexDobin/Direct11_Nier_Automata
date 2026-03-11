@@ -11,55 +11,37 @@ class Component;
 class PrototypeManager final : public EngineManager {
   NO_COPY(PrototypeManager)
 public:
-  explicit PrototypeManager() = default;
-  ~PrototypeManager() override = default;
+	explicit PrototypeManager() = default;
+	~PrototypeManager() override = default;
 
 public:
-  uint32 Get_TypeByName(const wstring &name);
-  const wstring &Get_NameByType(uint32 typeID);
+	HRESULT Initialize(void *arg) override;
+	void On_Destroy() override;
 
 public:
-  HRESULT Initialize(void *arg) override;
-  void On_Destroy() override;
+    uint32 Get_ObjectIDFromPrototypeTag(const wstring &prototypeTag, uint32 levIndex) const;
+    const tChar* Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
+    HRESULT Add_Prototype(uint32 levIndex, const Shared<Object> &object, const wstring &prototypeTag);
+    Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex, uint32 objectID) const;
+    Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex, const wstring &prototypeTag) const;
+    HRESULT Clear_Prototypes();
+    HRESULT Clear_Prototypes(uint32 levIndex);
 
-public:
-  HRESULT Create_Reflection(const ComPtr<ID3D11Device> &device,
-                            const ComPtr<ID3D11DeviceContext> &context);
-  HRESULT Add_Prototype(uint32 levIndex, const Shared<Object> &object,
-                        void *arg = nullptr);
-  HRESULT Clear_Prototypes(uint32 levIndex);
-
-public: /* 읽기 전용 Getter (Game 래핑용) */
-  const vector<unordered_map<uint32, Shared<GameObject>>> &
-  Get_GameObjects() const {
-    return m_GameObjects;
-  }
-  const vector<unordered_map<uint32, Shared<Component>>> &
-  Get_Components() const {
-    return m_Components;
-  }
-  const vector<unordered_map<uint32, wstring>> &Get_NameByTypes() const {
-    return m_NameByTypes;
-  }
-
-public:
-  Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex,
-                                uint32 typeID) const;
-  Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex,
-                                const wstring &typeName) const;
+public: /* Read Only */
+    const vector<unordered_map<uint32, Shared<GameObject>>> &
+    Get_GameObjects() const { return m_GameObjects; }
+    const vector<unordered_map<uint32, Shared<Component>>> &
+    Get_Components() const { return m_Components; }
 
 private:
-  vector<unordered_map<uint32, wstring>> m_NameByTypes;
-  vector<unordered_map<wstring, uint32>> m_TypesByName;
-  vector<unordered_map<uint32, Shared<GameObject>>> m_GameObjects;
-  vector<unordered_map<uint32, Shared<Component>>> m_Components;
-
-  uint32 m_LevelCount = {};
+    HRESULT Register_EngineComponents();
 
 private:
-  void Register_Type(rttr::type type, PROTOTYPE protoType,
-                     const ComPtr<ID3D11Device> &device,
-                     const ComPtr<ID3D11DeviceContext> &context);
+    uint32 m_LevelCount = {};
+    vector<unordered_map<wstring, uint32>> m_ObjectsID;
+    vector<unordered_map<uint32, Shared<GameObject>>> m_GameObjects; // ObjectID
+    vector<unordered_map<uint32, Shared<Component>>> m_Components;   // ObjectID
+    mutable std::recursive_mutex m_PrototypeMutex;
 
 public:
   static Unique<PrototypeManager> Create(uint32 levCount);

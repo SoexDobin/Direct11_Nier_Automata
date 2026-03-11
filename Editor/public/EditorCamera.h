@@ -5,31 +5,36 @@ NS_BEGIN(Editor)
 
 class EditorCamera final : public Camera
 {
+	RTTR_ENABLE(Camera)
 public:
-	EditorCamera();
-	EditorCamera(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	EditorCamera(const Shared<EditorCamera>& rhs);
+	typedef struct tagEditorCameraDesc final : public CAMERA_DESC
+	{
+		Float cameraSpeed{ 10.0f };
+		Float mouseSensitive{ 0.1f };
+	} EDITOR_CAMERA_DESC;
+
+public:
+	explicit EditorCamera(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	~EditorCamera() override = default;
 
 public:
-	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
-
-	void Set_Active(Bool isActive) override { Camera::Set_Active(isActive); }
-	void On_Destroy() override { Camera::On_Destroy(); }
-	void On_Enable() override { Camera::On_Enable(); }
-	void On_Disable() override { Camera::On_Disable(); }
 
 	void Priority_Update(Float timeDelta) override;
 	void Update(Float timeDelta) override;
 	void Late_Update(Float timeDelta) override;
 	void Fixed_Update(Float fixedDelta) override;
-	HRESULT Render() override { return S_OK; }
-	
-private:
+	HRESULT Render() override;
 
 public:
-	static Shared<EditorCamera> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, void* cameraDesc);
+	HRESULT Bind_EditorMatrix() const;
+	
+private:
+	Float m_CameraSpeed{};
+	Float m_MouseSensitive{};
+
+public:
+	static Shared<EditorCamera> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, EDITOR_CAMERA_DESC& desc);
 	Shared<GameObject> Clone(void* arg) override { return nullptr; }
 };
 

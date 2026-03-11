@@ -9,13 +9,13 @@ NS_END
 
 NS_BEGIN(Client)
 
-class Terrain final : public GameObject, public enable_shared_from_this<Terrain>
+class Terrain final : public GameObject
 {
-	RTTR_ENABLE()
+	RTTR_ENABLE(GameObject)
 public:
 	Terrain();
 	Terrain(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	Terrain(const Shared<Terrain>& rhs);
+	Terrain(const Terrain& rhs);
 	~Terrain() override = default;
 public:
 	HRESULT Initialize_Prototype() override;
@@ -27,6 +27,7 @@ public:
 	void Update(Float timeDelta) override;
 	void Late_Update(Float timeDelta) override;
 	void Fixed_Update(Float fixedDelta) override;
+	void Submit_RenderGroup() override;
 	HRESULT Render() override;
 	
 protected:

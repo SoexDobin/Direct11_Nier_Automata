@@ -4,17 +4,21 @@
 NS_BEGIN(Engine)
 
 class ENGINE_DLL Object abstract {
+	RTTR_ENABLE()
+public:
+	typedef struct tagObjectDesc{} OBJECT_DESC;
 public:
 	Object();
 	virtual ~Object();
 
 public:
-	uint32 Get_TypeID() const { return m_ObjectDesc.m_typeID; }
-	uint32 Get_ObjectID() const { return m_ObjectDesc.m_objectID; }
+	uint32 Get_TypeID() const { return m_DescID.m_typeID; }
+	uint32 Get_ObjectID() const { return m_DescID.m_objectID; }
+	uint32 Get_InstanceID() const { return m_DescID.m_instanceID; }
 	const wstring &Get_Name() const { return m_ObjectName; }
 
 public:
-	virtual HRESULT Initialize_Prototype() { return S_OK; }
+	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void *arg) { return S_OK; }
 
 	Bool Is_Destroy() const { return m_IsDestroy; }
@@ -26,14 +30,17 @@ public:
 	virtual void Set_Active(Bool isActive);
 	Bool Is_Active() const;
 
+	OBJECT_DESC* Get_ObjectDesc() const { return m_ObjectDesc; }
+
 public:
 	virtual PROTOTYPE Get_Prototype() const PURE;
 	static void Destroy(const Shared<Object> &object);
 
 protected:
+	OBJECT_DESC* m_ObjectDesc{};
 	Bool m_IsDestroy = {false};
 	Bool m_IsActive = {true};
-	ID_DESC m_ObjectDesc = {};
+	ID_DESC m_DescID = {};
 	wstring m_ObjectName = {};
 };
 

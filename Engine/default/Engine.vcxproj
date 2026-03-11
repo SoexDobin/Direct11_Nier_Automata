@@ -195,6 +195,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Camera.h" />
+    <ClInclude Include="..\public\CameraManager.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\Engine_Define.h" />
     <ClInclude Include="..\public\Engine_Enum.h" />
@@ -213,6 +214,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\EngineManager.h" />
     <ClInclude Include="..\public\Light.h" />
     <ClInclude Include="..\public\LightManager.h" />
+    <ClInclude Include="..\public\Material.h" />
     <ClInclude Include="..\public\Mesh.h" />
     <ClInclude Include="..\public\Model.h" />
     <ClInclude Include="..\public\Object.h" />
@@ -220,6 +222,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Pipeline.h" />
     <ClInclude Include="..\public\PrototypeManager.h" />
     <ClInclude Include="..\public\Renderer.h" />
+    <ClInclude Include="..\public\ResourceManager.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
@@ -236,6 +239,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Camera.cpp" />
+    <ClCompile Include="..\private\CameraManager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
@@ -247,6 +251,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\EngineManager.cpp" />
     <ClCompile Include="..\private\Light.cpp" />
     <ClCompile Include="..\private\LightManager.cpp" />
+    <ClCompile Include="..\private\Material.cpp" />
     <ClCompile Include="..\private\Mesh.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
@@ -254,6 +259,22 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Pipeline.cpp" />
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
+    <ClCompile Include="..\private\ResourceManager.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
+      <IncludeInUnityFile>false</IncludeInUnityFile>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\GameObject_rttr.cpp">
+      <IncludeInUnityFile>false</IncludeInUnityFile>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
+      <IncludeInUnityFile>false</IncludeInUnityFile>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />

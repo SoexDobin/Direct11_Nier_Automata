@@ -15,7 +15,7 @@ void ObjectManager::On_Destroy() {
 
 void ObjectManager::PriorityUpdate(Float timeDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
+    if ((m_LayerMask & layerBit) == 1)
       continue;
 
     for (auto &obj : objects) {
@@ -30,7 +30,7 @@ void ObjectManager::PriorityUpdate(Float timeDelta) {
 
 void ObjectManager::Update(Float timeDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
+    if ((m_LayerMask & layerBit) == 1)
       continue;
 
     for (auto &obj : objects) {
@@ -45,7 +45,7 @@ void ObjectManager::Update(Float timeDelta) {
 
 void ObjectManager::LateUpdate(Float timeDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
+    if ((m_LayerMask & layerBit) == 1)
       continue;
 
     for (auto &obj : objects) {
@@ -60,7 +60,7 @@ void ObjectManager::LateUpdate(Float timeDelta) {
 
 void ObjectManager::FixedUpdate(Float fixedDelta) {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 0)
+    if ((m_LayerMask & layerBit) == 1)
       continue;
 
     for (auto &obj : objects) {
@@ -73,61 +73,132 @@ void ObjectManager::FixedUpdate(Float fixedDelta) {
   }
 }
 
-void ObjectManager::Cleanup_GameObjects() {
+void ObjectManager::Submit_RenderGroup() {
   for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    std::erase_if(objects, [this](const Shared<GameObject> &object) {
-      if (object->Is_Destroy()) // 삭제 대상 처리
-      {
-        m_ObjectByUnique.erase(object->Get_ObjectID());
-        if (m_ObjectByType.contains(object->Get_TypeID())) {
-          auto &typeVec = m_ObjectByType[object->Get_TypeID()];
-          std::erase(typeVec, object);
-        }
-        object->On_Destroy();
-        return true;
-      }
-      return false;
-    });
+    if ((m_LayerMask & layerBit) == 1)
+      continue;
+
+    for (auto &obj : objects) {
+      if (obj->Is_Destroy())
+        continue;
+
+      if (obj->Is_Active())
+        obj->Submit_RenderGroup();
+    }
   }
 }
 
-HRESULT ObjectManager::Add_GameObject(const Shared<GameObject> &object) {
-  m_ObjectByLayer[object->Get_LayerMask().Get_Layer()].push_back(object);
-  m_ObjectByType[object->Get_TypeID()].push_back(object);
-  m_ObjectByUnique.emplace(object->Get_ObjectID(), object);
+void ObjectManager::Cleanup_GameObjects() {
+    vector<Shared<GameObject>> garbages;
+    for (auto &[layerBit, objects] : m_ObjectByLayer) {
+		for (auto &obj : objects) {
+			if (obj->Is_Destroy()) {
+				garbages.push_back(obj);
+			}
+		}
+    }
 
-  return S_OK;
+    for (auto &garbage : garbages) {
+		garbage->On_Destroy();
+    }
+
+    for (auto &[layerBit, objects] : m_ObjectByLayer) {
+		std::erase_if(objects, [this](const Shared<GameObject> &object) {
+			if (object->Is_Destroy()) // 삭제 대상 처리
+			{
+                m_ObjectByInstance.erase(object->Get_InstanceID());
+                if (m_ObjectByObject.contains(object->Get_ObjectID())) {
+                    auto& objectVec = m_ObjectByObject[object->Get_ObjectID()];
+                    std::erase(objectVec, object);
+                }
+				if (m_ObjectByType.contains(object->Get_TypeID())) {
+					auto& typeVec = m_ObjectByType[object->Get_TypeID()];
+					std::erase(typeVec, object);
+				}
+				return true;
+			}
+			return false;
+		});
+    }
+}
+
+HRESULT ObjectManager::Add_GameObject(const Shared<GameObject>& object) {
+    m_ObjectByLayer[object->Get_LayerMask().Get_Layer()].push_back(object);
+    m_ObjectByType[object->Get_TypeID()].push_back(object);
+    m_ObjectByObject[object->Get_ObjectID()].push_back(object);
+    m_ObjectByInstance.emplace(object->Get_InstanceID(), object);
+
+    return S_OK;
 }
 
 HRESULT ObjectManager::Clear_GameObjects() {
-  for (auto &layer : m_ObjectByLayer)
-    layer.second.clear();
-  m_ObjectByType.clear();
+    for (auto &layer : m_ObjectByLayer) {
+		for (auto &obj : layer.second) {
+			if (!obj->Is_Destroy()) {
+			obj->On_Destroy();
+			Object::Destroy(obj);
+			}
+		}
+		layer.second.clear();
+    }
 
-  for (auto &type : m_ObjectByType)
-    type.second.clear();
-  m_ObjectByUnique.clear();
+    m_ObjectByType.clear();
+    m_ObjectByObject.clear();
+    m_ObjectByInstance.clear();
 
-  m_LayerMask = ETOI(LAYER::ALL_LAYER);
-  return S_OK;
+    m_LayerMask = ETOI(LAYER::ALL_LAYER);
+    return S_OK;
 }
 
-Shared<GameObject> ObjectManager::Find_GameObjectByType(uint32 typeID) {
-  if (!m_ObjectByType.contains(typeID) || m_ObjectByType[typeID].empty()) {
-    MSG_BOX("Failed To Find GameObject By ObjectID");
-    return nullptr;
-  }
+Shared<GameObject> ObjectManager::Find_ObjectByType(uint32 typeID) {
+    if (!m_ObjectByType.contains(typeID) || m_ObjectByType[typeID].empty()) {
+		MSG_BOX("Failed To Find GameObject By TypeID");
+		return nullptr;
+    }
 
-  return m_ObjectByType[typeID].front();
+    return m_ObjectByType[typeID].front();
 }
 
-Shared<GameObject> ObjectManager::Find_GameObjectByID(uint32 objectID) {
-  if (!m_ObjectByUnique.contains(objectID)) {
-    MSG_BOX("Failed To Find GameObject By ObjectID");
-    return nullptr;
-  }
+const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByTypes(uint32 typeID) {
+    if (!m_ObjectByType.contains(typeID) || m_ObjectByType[typeID].empty()) {
+        MSG_BOX("Failed To Find GameObject By TypeID");
+        return EMPTY_VECTOR<Shared<GameObject>>;
+    }
 
-  return m_ObjectByUnique[objectID];
+    return m_ObjectByType[typeID];
+}
+
+Shared<GameObject> ObjectManager::Find_ObjectByObjectID(uint32 objectID) {
+    if (!m_ObjectByObject.contains(objectID)) {
+        MSG_BOX("Failed To Find GameObject By ObjectID");
+        return nullptr;
+    }
+
+    return m_ObjectByObject[objectID].front();
+}
+
+const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByObjectID(uint32 objectID) {
+    if (!m_ObjectByObject.contains(objectID)) {
+        MSG_BOX("Failed To Find GameObject By ObjectID");
+        return EMPTY_VECTOR<Shared<GameObject>>;
+    }
+
+    return m_ObjectByObject[objectID];
+}
+
+
+Shared<GameObject> ObjectManager::Find_ByInstanceID(uint32 instanceID)
+{
+    if (!m_ObjectByInstance.contains(instanceID)) {
+        MSG_BOX("Failed To Find GameObject By InstanceID");
+        return nullptr;
+    }
+
+    return m_ObjectByInstance[instanceID];
+}
+
+const unordered_map<uint32, Shared<GameObject>>& ObjectManager::Get_GameObjects() {
+	return m_ObjectByInstance;
 }
 
 Unique<ObjectManager> ObjectManager::Create() {

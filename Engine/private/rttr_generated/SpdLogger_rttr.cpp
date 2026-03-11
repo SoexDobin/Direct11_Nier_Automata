@@ -3,10 +3,12 @@
 using namespace rttr;
 using namespace Engine;
 
+#line 3229
 RTTR_REGISTRATION
 {
-    registration::class_<SpdLogger>(L"SpdLogger")
+    registration::class_<SpdLogger>("SpdLogger")
         .constructor<>()
         ;
 }
+
 

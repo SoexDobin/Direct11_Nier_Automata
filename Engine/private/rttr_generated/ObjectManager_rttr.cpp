@@ -3,9 +3,10 @@
 using namespace rttr;
 using namespace Engine;
 
+#line 10088
 RTTR_REGISTRATION
 {
-    registration::class_<ObjectManager>(L"ObjectManager")
+    registration::class_<ObjectManager>("ObjectManager")
         .constructor<>()
         .method("Create", &ObjectManager::Create)
         ;

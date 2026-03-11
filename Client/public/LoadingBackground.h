@@ -2,19 +2,27 @@
 #include "UIObject.h"
 
 NS_BEGIN(Engine)
+
 class VIBuffer;
 class Texture;
 class Shader;
+
 NS_END
 
 NS_BEGIN(Client)
 
-class LoadingBackground final : public UIObject, public enable_shared_from_this<LoadingBackground> 
+class LoadingBackground final : public UIObject
 {
+public:
+    typedef struct tagLoadingBackgroundUI final : public UI_DESC
+    {
+	    
+    } LOADING_BG_UI;
+
 public:
     LoadingBackground();
     LoadingBackground(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
-    LoadingBackground(const Shared<LoadingBackground> &rhs);
+    LoadingBackground(const LoadingBackground& rhs);
     ~LoadingBackground() override = default;
 
 public:
@@ -27,9 +35,15 @@ public:
     void Late_Update(Float timeDelta) override;
     void Fixed_Update(Float fixedDelta) override;
     HRESULT Render() override;
+    void Submit_RenderGroup() override;
+
+protected:
+    HRESULT Ready_Components();
 
 private:
-    HRESULT Ready_Components();
+    Shared<Texture> m_Texture{ nullptr };
+    Shared<Shader> m_Shader{ nullptr };
+    Shared<VIBuffer_Rect> m_BufferRect{ nullptr };
 
 public:
     static Shared<LoadingBackground> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

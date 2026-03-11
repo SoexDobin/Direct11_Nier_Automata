@@ -11,11 +11,13 @@ public:
 
 public:
 	HRESULT Initialize() override;
-	void Update() override;
-	void Render() override;
+	void Update(Bool isResize) override;
+	void Render(Bool isResize) override;
 
 private:
-	void RenderView();
+	void RenderView(Bool isResize);
+	void MousePicking(ImVec2 viewport);
+	void Update_ImGuizmo(ImVec2 viewport);
 
 private:
 	Bool m_PlayMode = { false };

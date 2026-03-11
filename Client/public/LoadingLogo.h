@@ -11,10 +11,11 @@ NS_BEGIN(Client)
 
 class LoadingLogo : public UIObject
 {
+    RTTR_ENABLE(UIObject)
 public:
     LoadingLogo();
     LoadingLogo(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-    LoadingLogo(const Shared<LoadingLogo>& rhs);
+    LoadingLogo(const LoadingLogo& rhs);
     ~LoadingLogo() override = default;
 
 public:
@@ -27,6 +28,15 @@ public:
     void Late_Update(Float timeDelta) override;
     void Fixed_Update(Float fixedDelta) override;
     HRESULT Render() override;
+    void Submit_RenderGroup() override;
+
+protected:
+    HRESULT Ready_Components();
+
+private:
+    Shared<Texture> m_Texture{ nullptr };
+    Shared<Shader> m_Shader{ nullptr };
+    Shared<VIBuffer_Rect> m_BufferRect{ nullptr };
 
 public:
     static Shared<LoadingLogo> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

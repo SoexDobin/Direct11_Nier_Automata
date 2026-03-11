@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -78,9 +78,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\bin\</OutDir>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnabled>false</VcpkgEnabled>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -135,6 +132,10 @@
       <ShaderType>Effect</ShaderType>
       <EntryPointName>main</EntryPointName>
     </FxCompile>
+    <PreBuildEvent>
+      <Command>call "$(ProjectDir)GenerateRTTR_Client.bat"</Command>
+      <Message>Reflection Client Class</Message>
+    </PreBuildEvent>
     <PreLinkEvent>
       <Command>
       </Command>
@@ -181,21 +182,26 @@
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
+    <ClInclude Include="..\public\FreeCamera.h" />
     <ClInclude Include="..\public\LevelLoading.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\LoadingBackground.h" />
     <ClInclude Include="..\public\LoadingLogo.h" />
     <ClInclude Include="..\public\ClientApp.h" />
+    <ClInclude Include="..\public\Monster.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
+    <ClCompile Include="..\private\Client_RTTR.cpp" />
+    <ClCompile Include="..\private\FreeCamera.cpp" />
     <ClCompile Include="..\private\LevelLoading.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\LoadingBackground.cpp" />
     <ClCompile Include="..\private\LoadingLogo.cpp" />
     <ClCompile Include="..\private\ClientApp.cpp" />
+    <ClCompile Include="..\private\Monster.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -205,13 +211,30 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\bin\shaders\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxNormTex.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClientRTTRGenerator.py" />
+    <None Include="GenerateRTTR_Client.bat" />
     <None Include="PostBuildCopy.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>true</VcpkgEnabled>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgUseStatic>false</VcpkgUseStatic>
+    <VcpkgTriplet>x64-windows</VcpkgTriplet>
+    <VcpkgHostTriplet>x64-windows</VcpkgHostTriplet>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgUseStatic>false</VcpkgUseStatic>
+    <VcpkgTriplet>x64-windows</VcpkgTriplet>
+    <VcpkgHostTriplet>x64-windows</VcpkgHostTriplet>
+  </PropertyGroup>
 </Project>

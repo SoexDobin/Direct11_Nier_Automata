@@ -22,8 +22,8 @@ public:
 
 public:
   HRESULT Initialize() override;
-  void Update() override;
-  void Render() override;
+  void Update(Bool isResize) override;
+  void Render(Bool isResize) override;
 
 public:
   void AddLog(Engine::LogLevel level, const string &message);

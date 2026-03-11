@@ -1,7 +1,9 @@
 #include "Transform.h"
 #include "GameObject.h"
 #include "Shader.h"
+#include "Game.h"
 
+Transform::Transform() : Component{} {}
 Transform::Transform(const ComPtr<ID3D11Device> &device,
                      const ComPtr<ID3D11DeviceContext> &context)
     : Component(device, context) {
@@ -10,18 +12,22 @@ Transform::Transform(const ComPtr<ID3D11Device> &device,
   m_LocalPosition = {Vector3::Zero};
   m_WorldMatrix = {Matrix::Identity};
 }
-
-Transform::Transform(const Shared<Transform> &prototype)
-    : Component(prototype), m_LocalScale(prototype->m_LocalScale),
-      m_LocalRotation(prototype->m_LocalRotation),
-      m_LocalPosition(prototype->m_LocalPosition),
-      m_WorldMatrix(prototype->m_WorldMatrix), m_IsDirty(true) {}
+Transform::Transform(const Transform &prototype)
+    : Component(prototype), m_LocalScale(prototype.m_LocalScale),
+      m_LocalRotation(prototype.m_LocalRotation),
+      m_LocalPosition(prototype.m_LocalPosition),
+      m_WorldMatrix(prototype.m_WorldMatrix), m_IsDirty(true) {}
 
 Vector3 Transform::Get_LocalScale() const { return m_LocalScale; }
 Vector3 Transform::Get_LocalPosition() const { return m_LocalPosition; }
 Quaternion Transform::Get_LocalRotation() const { return m_LocalRotation; }
 Vector3 Transform::Get_LocalEulerAngles() const {
-  return m_LocalRotation.ToEuler();
+    Vector3 rad = m_LocalRotation.ToEuler();
+    return Vector3{
+        XMConvertToDegrees(rad.x),
+        XMConvertToDegrees(rad.y),
+        XMConvertToDegrees(rad.z)
+    };
 }
 Matrix Transform::Get_LocalMatrix() const {
   Matrix scale = Matrix::CreateScale(m_LocalScale);
@@ -31,12 +37,30 @@ Matrix Transform::Get_LocalMatrix() const {
   return scale * rotation * position;
 }
 
-void Transform::Set_LocalScale(const Vector3 &scale) {
-  m_LocalScale = scale;
-  m_IsDirty = true;
+void Transform::Set_LocalScale(const Vector3& scale) {
+    m_LocalScale = scale;
+    m_IsDirty = true;
 }
+
 void Transform::Set_LocalScale(Float x, Float y, Float z) {
   Set_LocalScale(Vector3{x, y, z});
+}
+
+void Transform::Set_LocalScaleByValue(Vector3 scale) {
+    m_LocalScale = scale;
+    m_IsDirty = true;
+    Update_WorldMatrix();
+}
+
+void Transform::Set_LocalEulerAngleByValue(Vector3 rotation) {
+    Set_LocalRotation(rotation);
+    Update_WorldMatrix();
+}
+
+void Transform::Set_LocalPositionByValue(Vector3 position) {
+    m_LocalPosition = position;
+    m_IsDirty = true;
+    Update_WorldMatrix();
 }
 
 void Transform::Set_LocalRotation(const Quaternion &rotation) {
@@ -85,6 +109,21 @@ Quaternion Transform::Get_RotationQuaternion() const {
 Vector3 Transform::Get_Position() const { return m_WorldMatrix.Translation(); }
 Matrix Transform::Get_WorldMatrix() const { return m_WorldMatrix; }
 
+Vector3 Transform::Get_Right() const
+{
+    return m_WorldMatrix.Right();
+}
+
+Vector3 Transform::Get_Up() const
+{
+    return m_WorldMatrix.Up();
+}
+
+Vector3 Transform::Get_Look() const
+{
+    return m_WorldMatrix.Backward();
+}
+
 void Transform::Set_Scale(Float scaleX, Float scaleY, Float scaleZ) {
   Set_Scale(Vector3{scaleX, scaleY, scaleZ});
 }
@@ -121,137 +160,201 @@ void Transform::Set_Rotation(Float pitch, Float yaw, Float roll) {
   Set_Rotation(Vector3{pitch, yaw, roll});
 }
 void Transform::Set_Rotation(Quaternion rotation) {
-    if (!m_Owner.lock()->Has_Parent())
-		Set_LocalRotation(rotation);
-    else {
-        auto parent = Get_Parent();
-        Quaternion parentQuat = parent->Get_RotationQuaternion();
-        parentQuat.Inverse(parentQuat);
-        m_LocalRotation = rotation * parentQuat;
-        m_IsDirty = true;
-    }
+  if (!m_Owner.lock()->Has_Parent())
+    Set_LocalRotation(rotation);
+  else {
+    auto parent = Get_Parent();
+    Quaternion parentQuat = parent->Get_RotationQuaternion();
+    parentQuat.Inverse(parentQuat);
+    m_LocalRotation = rotation * parentQuat;
+    m_IsDirty = true;
+  }
 }
 
 void Transform::Set_Position(Float x, Float y, Float z) {
-	Set_Position(Vector3{x, y, z});
+  Set_Position(Vector3{x, y, z});
 }
 void Transform::Set_Position(Vector3 positionVec) {
-	if (!m_Owner.lock()->Has_Parent())
-		Set_LocalPosition(positionVec);
-	else {
-        auto parent = Get_Parent();
-        Matrix parentWorldInv = parent->Get_WorldMatrix().Invert();
-        m_LocalPosition = Vector3::Transform(positionVec, parentWorldInv);
-        m_IsDirty = true;
-	}
+  if (!m_Owner.lock()->Has_Parent())
+    Set_LocalPosition(positionVec);
+  else {
+    auto parent = Get_Parent();
+    Matrix parentWorldInv = parent->Get_WorldMatrix().Invert();
+    m_LocalPosition = Vector3::Transform(positionVec, parentWorldInv);
+    m_IsDirty = true;
+  }
 }
 
 void Transform::Move_Forward(Float delta, Float amount) {
-    Vector3 look = XMVector3Normalize(m_WorldMatrix.Backward());
-    m_LocalPosition += look * amount * delta;
-    m_IsDirty = true;
+  Vector3 look = XMVector3Normalize(m_WorldMatrix.Backward());
+  m_LocalPosition += look * amount * delta;
+  m_IsDirty = true;
 }
 
 void Transform::Move_Backward(Float delta, Float amount) {
-    Vector3 look = XMVector3Normalize(m_WorldMatrix.Backward());
-    m_LocalPosition -= look * amount * delta;
-    m_IsDirty = true;
+  Vector3 look = XMVector3Normalize(m_WorldMatrix.Backward());
+  m_LocalPosition -= look * amount * delta;
+  m_IsDirty = true;
 }
 
 void Transform::Move_Right(Float delta, Float amount) {
-    Vector3 right = XMVector3Normalize(m_WorldMatrix.Right());
-    m_LocalPosition += right * amount * delta;
-    m_IsDirty = true;
+  Vector3 right = XMVector3Normalize(m_WorldMatrix.Right());
+  m_LocalPosition += right * amount * delta;
+  m_IsDirty = true;
 }
 
 void Transform::Move_Left(Float delta, Float amount) {
-    Vector3 right = XMVector3Normalize(m_WorldMatrix.Right());
-    m_LocalPosition -= right * amount * delta;
-    m_IsDirty = true;
+  Vector3 right = XMVector3Normalize(m_WorldMatrix.Right());
+  m_LocalPosition -= right * amount * delta;
+  m_IsDirty = true;
 }
 
 void Transform::LookAt(Vector3 atVec, Vector3 upVector) {
-    Vector3 position = m_WorldMatrix.Translation();
-    Vector3 lookDir = atVec - position;
-    if (upVector != Vector3::UnitY)
-		upVector = XMVector3Normalize(upVector);
+  Update_WorldMatrix();
+  Vector3 position = m_WorldMatrix.Translation();
+  Vector3 lookDir = atVec - position;
 
-    Vector3 rightDir = XMVector3Cross(upVector, lookDir);
-    Vector3 upDir = XMVector3Cross(lookDir, rightDir);
+  if (lookDir.LengthSquared() < 0.0001f)
+    return;
 
-    Matrix rotationMat = {};
-    rotationMat.Right(XMVector3Normalize(rightDir));
-    rotationMat.Up(XMVector3Normalize(upDir));
-    rotationMat.Backward(XMVector3Normalize(lookDir));
+  lookDir.Normalize();
+  if (upVector != Vector3::UnitY)
+    upVector.Normalize();
 
-    m_LocalRotation = Quaternion::CreateFromRotationMatrix(rotationMat);
+  if (abs(lookDir.Dot(upVector)) > 0.999f)
+    upVector = (abs(lookDir.y) > 0.999f) ? Vector3::UnitZ : Vector3::UnitY;
 
-    if (m_Owner.lock()->Has_Parent()) {
-        auto parent = Get_Parent();
-        Quaternion parentQuat = parent->Get_RotationQuaternion();
-        parentQuat.Inverse(parentQuat);
-        m_LocalRotation = m_LocalRotation * parentQuat;
+  Vector3 rightDir = XMVector3Cross(upVector, lookDir);
+  rightDir.Normalize();
+  Vector3 upDir = XMVector3Cross(lookDir, rightDir);
+
+  Matrix rotationMat = Matrix::Identity;
+  rotationMat.Right(rightDir);
+  rotationMat.Up(upDir);
+  rotationMat.Backward(lookDir);
+
+  m_LocalRotation = Quaternion::CreateFromRotationMatrix(rotationMat);
+
+  if (!m_Owner.expired() && m_Owner.lock()->Has_Parent()) {
+    auto parent = Get_Parent();
+    Quaternion parentQuat = parent->Get_RotationQuaternion();
+    parentQuat.Inverse(parentQuat);
+    m_LocalRotation = m_LocalRotation * parentQuat;
+  }
+
+  m_IsDirty = true;
+}
+
+void Transform::Turn(Vector3 eulerAmount, Float timeDelta, Float amount) {
+    Float deltaPitch = XMConvertToRadians(eulerAmount.x) * timeDelta * amount;
+    Float deltaYaw = XMConvertToRadians(eulerAmount.y) * timeDelta * amount;
+    Float deltaRoll = XMConvertToRadians(eulerAmount.z) * timeDelta * amount;
+
+    Quaternion yawQuat = Quaternion::CreateFromAxisAngle(Vector3::UnitY, deltaYaw);
+
+    Vector3 rightVec = m_WorldMatrix.Right();
+    rightVec.Normalize();
+    Quaternion pitchQuat = Quaternion::CreateFromAxisAngle(rightVec, deltaPitch);
+
+    Vector3 lookVec = m_WorldMatrix.Backward();
+    lookVec.Normalize();
+    Quaternion rollQuat = Quaternion::CreateFromAxisAngle(lookVec, deltaRoll);
+
+    Quaternion rotate = m_LocalRotation * yawQuat * pitchQuat * rollQuat;
+
+    if (auto parent = m_Owner.lock()->Get_Parent())
+    {
+        Quaternion parentQuat = parent->Get_Transform()->Get_RotationQuaternion();
+        Quaternion parentQuatInv;
+        parentQuat.Inverse(parentQuatInv);
+
+        // 내 회전 * 부모 역행렬 = 순수 Local 회전
+        m_LocalRotation = rotate * parentQuatInv;
     }
-
+    else
+    {
+        m_LocalRotation = rotate;
+    }
+    
+    m_LocalRotation.Normalize();
     m_IsDirty = true;
 }
 
-HRESULT Transform::Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const
-{
-    return shader->Bind_Matrix(constantName, &m_WorldMatrix);
+HRESULT Transform::Bind_ShaderResource(const Shared<Shader> &shader,
+                                       const Char *constantName) const {
+  return shader->Bind_Matrix(constantName, &m_WorldMatrix);
 }
 
 Shared<Transform> Transform::Get_Parent() const {
-	return m_Owner.lock()->Get_Parent()->Get_Transform();
+  if (auto owner = m_Owner.lock()) {
+    if (owner->Has_Parent()) {
+      auto parentObj = owner->Get_Parent();
+      if (parentObj)
+        return parentObj->Get_Transform();
+    }
+  }
+  return nullptr;
 }
 
 HRESULT Transform::Initialize_Prototype() {
-	return Component::Initialize_Prototype();
+    m_WorldMatrix = Matrix::Identity;
+  return Component::Initialize_Prototype();
 }
 
 HRESULT Transform::Initialize(void *arg) {
-    Update_WorldMatrix();
-    return Component::Initialize(arg);
+  Update_WorldMatrix();
+  return Component::Initialize(arg);
 }
 
 void Transform::On_Destroy() {
-    m_Owner.reset();
+  m_Owner.reset();
 
-    Component::On_Destroy();
+  Component::On_Destroy();
 }
 
-void Transform::On_Disable() {
-	Component::On_Disable();
-}
+void Transform::On_Disable() { Component::On_Disable(); }
 
 void Transform::On_Enable() {
-    m_IsDirty = true;
-    Update_WorldMatrix();
+  m_IsDirty = true;
+  Update_WorldMatrix();
 
-    Component::On_Enable();
+  Component::On_Enable();
 }
 
 void Transform::Update_WorldMatrix() {
-	if (m_IsDestroy == false)
-        return;
-	if (m_IsActive == false)
-		return;
-	if (m_IsDirty == false)
-   		return;
+  if (m_IsDestroy == true)
+    return;
+  if (m_IsActive == false)
+    return;
+  if (m_IsDirty == false)
+    return;
 
-	Matrix localMatrix = Get_LocalMatrix();
+  Matrix localMatrix = Get_LocalMatrix();
 
-    if (!m_Owner.lock()->Has_Parent())
-		m_WorldMatrix = localMatrix;
-    else {
-        auto parent = Get_Parent();
-        if (parent)
-			m_WorldMatrix = localMatrix * parent->Get_WorldMatrix();
-        else
-			m_WorldMatrix = localMatrix;
+  if (!m_Owner.lock() || !m_Owner.lock()->Has_Parent())
+    m_WorldMatrix = localMatrix;
+  else {
+    auto parent = Get_Parent();
+    if (parent)
+      m_WorldMatrix = localMatrix * parent->Get_WorldMatrix();
+    else
+      m_WorldMatrix = localMatrix;
+  }
+
+  m_IsDirty = false; // dirty 플래그 리셋
+}
+
+Shared<Transform> Transform::CreatePrototype()
+{
+    auto transform = make_shared<Transform>(
+        GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+
+    if (FAILED(transform->Initialize_Prototype())) {
+        MSG_BOX("Failed To Create Transform Prototype");
+        return nullptr;
     }
 
-    m_IsDirty = false; // dirty 플래그 리셋
+    return transform;
 }
 
 Shared<Transform> Transform::Create(ComPtr<ID3D11Device> device,

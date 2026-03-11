@@ -16,6 +16,10 @@ public:
 	{
 		return m_TransformStateMatrices[ETOI(transformState)];
 	}
+	Matrix Get_InvTransform(D3DTS transformState) const
+	{
+		return m_TransformStateInverseMatrices[ETOI(transformState)];
+	}
 	void Set_Transform(D3DTS transformState, Matrix transformStateMatrix)
 	{
 		m_TransformStateMatrices[ETOI(transformState)] = transformStateMatrix;

@@ -1,6 +1,11 @@
 #pragma once
 #include "EditorObject.h"
 
+NS_BEGIN(Engine)
+class GameObject;
+class Component;
+NS_END
+
 NS_BEGIN(Editor)
 
 class PrefabRegistry;
@@ -13,19 +18,17 @@ public:
 
 public:
   HRESULT Initialize() override;
-  void Update() override {}
-  void Render() override;
-
-public:
-  void Set_SelectedClass(const string &className) {
-    m_SelectedClass = className;
-  }
+  void Update(Bool isResize) override {}
+  void Render(Bool isResize) override;
 
 private:
-    void LayerTagGUI();
+	void Render_Properties(rttr::property prop, const Shared<Component>& component);
 
 private:
-  string m_SelectedClass;
+	void GameObjectGUI(const Shared<Engine::GameObject> &pObj);
+	void GameObjectPropertiesGUI(const Shared<GameObject> &pObj);
+	void ComponentGUI(const string &label,
+                    const Shared<Engine::Component> &pComp);
 
 public:
   static Shared<Inspector> Create();

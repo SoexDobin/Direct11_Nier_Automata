@@ -3,9 +3,10 @@
 using namespace rttr;
 using namespace Engine;
 
+#line 7220
 RTTR_REGISTRATION
 {
-    registration::class_<Light>(L"Light")
+    registration::class_<Light>("Light")
         .constructor<>()
         .method("Create", &Light::Create)
         ;

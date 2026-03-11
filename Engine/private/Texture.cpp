@@ -8,11 +8,12 @@
 Texture::Texture() : Component {} {}
 
 Texture::Texture(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
-    : Component{ device, context } {}
+    : Component{ device, context }, m_RGBA{ Vector4::One } {
+}
 
 Texture::Texture(const Texture& rhs)
     : Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs }, 
-    m_FilePath{ rhs.m_FilePath } {
+    m_FilePath{ rhs.m_FilePath }, m_RGBA{ rhs.m_RGBA } {
 }
 
 HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs, const wstring& textureTag)

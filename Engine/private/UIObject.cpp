@@ -67,6 +67,18 @@ HRESULT UIObject::Render() {
 }
 
 void UIObject::Update_UITransform() const {
+    Float baseWidth = m_ViewportWidth;
+    Float baseHeight = m_ViewportHeight;
+    auto parent = Get_Parent();
+    if (parent) {
+        // 부모가 UIObject라면 그 크기를 가져옴 (캐스팅 필요)
+        auto uiParent = std::dynamic_pointer_cast<UIObject>(parent);
+        if (uiParent) {
+            baseWidth = uiParent->Get_SizeX();
+            baseHeight = uiParent->Get_SizeY();
+        }
+    }
+
     Float anchorRatioX = 0.5f;
     Float anchorRatioY = 0.5f;
 
@@ -82,13 +94,13 @@ void UIObject::Update_UITransform() const {
     case UI_ANCHOR::BOTTOM_RIGHT:  anchorRatioX = 1.0f; anchorRatioY = 1.0f; break;
     }
 
-    Float anchorPosX = m_ViewportWidth * anchorRatioX;
-    Float anchorPosY = m_ViewportHeight * anchorRatioY;
+    Float anchorPosX = baseWidth * anchorRatioX;
+    Float anchorPosY = baseHeight * anchorRatioY;
 
     m_Transform->Set_Scale(m_SizeX, m_SizeY, 1.f);
     m_Transform->Set_Position(Vector3{
-    	(m_X + anchorPosX) - (m_ViewportWidth * 0.5f),
-    	-(m_Y + anchorPosY) + (m_ViewportHeight * 0.5f),
+    	(m_X + anchorPosX) - (baseWidth * 0.5f),
+    	-(m_Y + anchorPosY) + (baseHeight * 0.5f),
     	0.f});
 
     m_Transform->Update_WorldMatrix();

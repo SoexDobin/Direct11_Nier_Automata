@@ -24,6 +24,8 @@ public:
 public:
     void Set_Anchor(UI_ANCHOR anchor) { m_Anchor = anchor; Update_UITransform(); }
     void Set_UIPosition(Vector2 position) { m_X = position.x; m_Y = position.y; Update_UITransform(); }
+    Float Get_SizeX() const { return m_SizeX; }
+    Float Get_SizeY() const { return m_SizeY; }
 
 public:
     void Set_Active(Bool isActive) final;

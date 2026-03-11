@@ -82,6 +82,11 @@ HRESULT GraphicDevice::Clear_DepthStencilView() const {
   return S_OK;
 }
 
+void GraphicDevice::Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref)
+{
+    m_Context->OMSetDepthStencilState(state, ref);
+}
+
 HRESULT GraphicDevice::Present() const {
   if (nullptr == m_SwapChain)
     return E_FAIL;
@@ -190,7 +195,7 @@ HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {
 
   auto &rt = m_Offscreens[screenIndex];
 
-  Float clearColor[4] = {0.2f, 0.2f, 0.2f, 1.f};
+  Float clearColor[4] = { 0.f, 0.f, 0.f, 1.f };
   m_Context->ClearRenderTargetView(rt.RTV.Get(), clearColor);
 
   m_Context->ClearDepthStencilView(

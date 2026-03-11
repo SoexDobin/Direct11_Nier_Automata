@@ -22,14 +22,15 @@ public:
 	HRESULT Clear_RenderGroup();
 
 public:
-  HRESULT Initialize(void *arg) override;
-  void On_Destroy() override;
-  void On_Disable() override;
-  void On_Enable() override;
-  void Set_Active(Bool isActive) override;
+	HRESULT Initialize(void *arg) override;
+	void On_Destroy() override;
+	void On_Disable() override;
+	void On_Enable() override;
+	void Set_Active(Bool isActive) override;
 
 private:
-  void Render_Group(uint32 groupIndex);
+	void Render_Group(uint32 groupIndex) const;
+	void Render_Recursive(const Shared<GameObject>& object) const;
 
 private:
   ComPtr<ID3D11Device> m_Device = {nullptr};

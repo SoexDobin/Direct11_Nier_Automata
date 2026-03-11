@@ -52,6 +52,7 @@ public: /* For GraphicDevice */
     HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
     HRESULT End_RenderOffScreen() const;
     ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
+    void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref) const;
 
 public:
   Byte Get_DIKeyState(uByte byKeyID) const;

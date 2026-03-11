@@ -148,7 +148,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
     GAME_INSTANCE->Instantiate<Terrain>(L"MainTerrain", ETOI(m_NextLevelID));
     auto back = GAME_INSTANCE->Instantiate<LoadingBackground>(L"UI_Loading_BackGround", ETOI(m_NextLevelID));
     auto logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"UI_Loading_Logo", ETOI(m_NextLevelID));
-    //back->Add_Child(logo);
+    back->Add_Child(logo);
 
     GAME_INSTANCE->Instantiate<Monster>(L"Monster", ETOI(m_NextLevelID));
 

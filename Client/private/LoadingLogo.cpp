@@ -24,8 +24,9 @@ HRESULT LoadingLogo::Initialize_Prototype() {
 HRESULT LoadingLogo::Initialize(void *arg)
 {
     UI_DESC desc{};
-    desc.x = 100.f;
-    desc.y = 100.f;
+    desc.anchor = UI_ANCHOR::CENTER;
+    desc.x = 0.f;
+    desc.y = 0.f;
     desc.sizeX = 1600;
     desc.sizeY = 512.f;
 
@@ -65,6 +66,8 @@ HRESULT LoadingLogo::Render() {
     if (FAILED(Bind_ShaderResource(m_Shader, "g_ProjMatrix", D3DTS::PROJ)))
         return E_FAIL;
     if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, "g_Texture", 0)))
+        return E_FAIL;
+    if (FAILED(m_Shader->Bind_RawValue("g_RGBA", m_Texture->Get_RGBA_Absolute(), sizeof(Color))))
         return E_FAIL;
 
     if (FAILED(m_Shader->Begin(0)))

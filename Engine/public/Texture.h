@@ -18,6 +18,7 @@ public:
 		wstring m_TextureTag{};
 		wstring m_FilePath{};
 		uint32 m_NumSRVs{};
+		Color m_RGBA{};
 	} TEXTURE_DESC;
 
 public:
@@ -25,6 +26,30 @@ public:
 	Texture(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Texture(const Texture& rhs);
 	~Texture() override = default;
+
+public:
+	Color Get_RGBAByValue() const { return m_RGBA; }
+	const Color* Get_RGBA_Absolute() const { 
+		return &m_RGBA;
+	}
+	void Set_RGBA(Color rgba)
+	{
+		if (rgba.x <= 0.f) m_RGBA.x = 0.f;
+		else if (rgba.x >= 255.f) m_RGBA.x = 255.f;
+		else m_RGBA.x = rgba.x;
+
+		if (rgba.y <= 0.f) m_RGBA.y = 0.f;
+		else if (rgba.y >= 255.f) m_RGBA.y = 255.f;
+		else m_RGBA.y = rgba.y;
+
+		if (rgba.z <= 0.f) m_RGBA.z = 0.f;
+		else if (rgba.z >= 255.f) m_RGBA.z = 255.f;
+		else m_RGBA.z = rgba.z;
+
+		if (rgba.w <= 0.f) m_RGBA.w = 0.f;
+		else if (rgba.w >= 255.f) m_RGBA.w = 255.f;
+		else m_RGBA.w = rgba.w;
+	}
 
 public:
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::TEXTURE; }
@@ -47,6 +72,7 @@ private:
 	uint32 m_levIndex{};
 	wstring m_FilePath{};
 	uint32 m_NumSRVs{};
+	Color m_RGBA{};
 	vector<ComPtr<ID3D11ShaderResourceView>> m_SRVs;
 
 public:

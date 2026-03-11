@@ -30,11 +30,11 @@ Vector3 Transform::Get_LocalEulerAngles() const {
     };
 }
 Matrix Transform::Get_LocalMatrix() const {
-  Matrix scale = Matrix::CreateScale(m_LocalScale);
-  Matrix rotation = Matrix::CreateFromQuaternion(m_LocalRotation);
-  Matrix position = Matrix::CreateTranslation(m_LocalPosition);
+    Matrix scale = Matrix::CreateScale(m_LocalScale);
+    Matrix rotation = Matrix::CreateFromQuaternion(m_LocalRotation);
+    Matrix position = Matrix::CreateTranslation(m_LocalPosition);
 
-  return scale * rotation * position;
+    return scale * rotation * position;
 }
 
 void Transform::Set_LocalScale(const Vector3& scale) {
@@ -297,8 +297,11 @@ Shared<Transform> Transform::Get_Parent() const {
 }
 
 HRESULT Transform::Initialize_Prototype() {
+    m_LocalPosition = Vector3::Zero;
+    m_LocalRotation = Quaternion{0.f, 0.f, 0.f, 1.f};
+    m_LocalScale = Vector3::One;
     m_WorldMatrix = Matrix::Identity;
-  return Component::Initialize_Prototype();
+	return Component::Initialize_Prototype();
 }
 
 HRESULT Transform::Initialize(void *arg) {

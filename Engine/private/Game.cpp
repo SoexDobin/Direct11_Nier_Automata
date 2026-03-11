@@ -202,6 +202,11 @@ Game::Get_OffScreenSRV(uint32 screenIndex) const {
   return m_GraphicDevice->Get_OffscreenSRV(screenIndex);
 }
 
+void Game::Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref) const
+{
+    m_GraphicDevice->Set_DepthStencilState(state, ref);
+}
+
 Byte Game::Get_DIKeyState(uByte byKeyID) const {
   return m_InputDevice->Get_DIKeyState(byKeyID);
 }

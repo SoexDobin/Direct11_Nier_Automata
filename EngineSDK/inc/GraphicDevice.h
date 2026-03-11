@@ -22,6 +22,7 @@ public:
 	ComPtr<ID3D11Device> Get_Device() const { return m_Device; }
 	ComPtr<ID3D11DeviceContext> Get_Context() const { return m_Context; }
     const D3D11_VIEWPORT& Get_ViewportDesc() const { return m_ViewPort; }
+    void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref);
 
 public:
     PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }

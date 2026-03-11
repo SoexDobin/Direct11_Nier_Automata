@@ -26,8 +26,9 @@ HRESULT LoadingBackground::Initialize_Prototype() {
 
 HRESULT LoadingBackground::Initialize(void *arg) {
     UI_DESC desc{};
-    desc.x = 100.f;
-    desc.y = 100.f;
+    desc.anchor = UI_ANCHOR::CENTER;
+    desc.x = 0.f;
+    desc.y = 0.f;
     desc.sizeX = 1980.f;
     desc.sizeY = 1080.f;
 
@@ -47,7 +48,8 @@ void LoadingBackground::Priority_Update(Float timeDelta) {
 }
 
 void LoadingBackground::Update(Float timeDelta) {
-    Update_Transform();
+    Update_UITransform();
+    
 	UIObject::Update(timeDelta);
 }
 
@@ -69,7 +71,9 @@ HRESULT LoadingBackground::Render() {
         return E_FAIL;
     if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, "g_Texture", 0)))
         return E_FAIL;
-
+    if (FAILED(m_Shader->Bind_RawValue("g_RGBA", m_Texture->Get_RGBA_Absolute(), sizeof(Color))))
+        return E_FAIL;
+    
     if (FAILED(m_Shader->Begin(0)))
         return E_FAIL;
     if (FAILED(m_BufferRect->Bind_Resources()))

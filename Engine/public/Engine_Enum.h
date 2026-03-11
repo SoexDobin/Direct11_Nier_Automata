@@ -11,6 +11,19 @@ enum class DIMB { LBUTTON, RBUTTON, WHEEL, END };
 enum class DIMM { X, Y, WHEEL, END };
 enum class LIGHT { DIRECTIONAL, POINT, END };
 enum class MODEL { NONANIM, ANIM, END };
+
+enum class UI_ANCHOR {
+	TOP_LEFT,      // (0.0, 0.0)
+	TOP_CENTER,    // (0.5, 0.0)
+	TOP_RIGHT,     // (1.0, 0.0)
+	CENTER_LEFT,   // (0.0, 0.5)
+	CENTER,        // (0.5, 0.5) 
+	CENTER_RIGHT,  // (1.0, 0.5)
+	BOTTOM_LEFT,   // (0.0, 1.0)
+	BOTTOM_CENTER, // (0.5, 1.0)
+	BOTTOM_RIGHT   // (1.0, 1.0) 
+	};
+
 enum class COMPONENT_TYPE {
 	SCRIPT,
 	TRANSFORM,
@@ -20,7 +33,8 @@ enum class COMPONENT_TYPE {
 	SHADER,
 	MESH,
 	MODEL, 
-	MATERIAL
+	MATERIAL,
+	COLLIDER,
 };
 
 } // namespace Engine

@@ -6,8 +6,10 @@ Renderer::Renderer(const ComPtr<ID3D11Device> &device,
                    const ComPtr<ID3D11DeviceContext> &context)
     : m_Device(device), m_Context(context) {}
 
-void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject> &gameObject) {
-  m_RenderGroup[ETOI(renderGroup)].push_back(gameObject);
+void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject>& gameObject) {
+    if (gameObject->Get_Parent()) return;
+
+	m_RenderGroup[ETOI(renderGroup)].push_back(gameObject);
 }
 
 void Renderer::Draw() {
@@ -53,15 +55,32 @@ void Renderer::Set_Active(Bool isActive) {
   EngineManager::Set_Active(isActive);
 }
 
-void Renderer::Render_Group(uint32 groupIndex) {
-  for (auto &object : m_RenderGroup[groupIndex]) {
-    uint32 objLayer = object->Get_LayerMask().Get_Layer();
+void Renderer::Render_Group(uint32 groupIndex) const
+{
+	for (auto& object : m_RenderGroup[groupIndex])
+	{
+		uint32 objLayer = object->Get_LayerMask().Get_Layer();
+		if ((m_LayerMask & objLayer) == 1)
+			continue;
+		if (!object->Is_Active() || object->Is_Destroy())
+			continue;
 
-    if ((m_LayerMask & objLayer) == 1)
-        continue;
+		Render_Recursive(object);
+	}
 
-    object->Render();
-  }
+	if (ETOI(RENDERGROUP::UI) == groupIndex)
+		GAME_INSTANCE->Set_DepthStencilState(nullptr, 0);
+}
+void Renderer::Render_Recursive(const Shared<GameObject>& object) const
+{
+	object->Render();
+
+	for (auto& child : object->Get_Children())
+	{
+		if (!child->Is_Active() || child->Is_Destroy())
+			continue;
+		Render_Recursive(child);
+	}
 }
 
 Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device> &device,

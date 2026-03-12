@@ -77,13 +77,13 @@ void Shader::On_Destroy() {
 }
 
 HRESULT Shader::Begin(uint32 passIndex) {
-  if (passIndex >= m_NumPasses || nullptr == m_InputLayouts[passIndex])
+    if (passIndex >= m_NumPasses || nullptr == m_InputLayouts[passIndex])
+      return S_OK;
+
+    m_Effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex)->Apply(0, m_Context.Get());
+    m_Context->IASetInputLayout(m_InputLayouts[passIndex].Get());
+
     return S_OK;
-
-  m_Effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex)->Apply(0, m_Context.Get());
-  m_Context->IASetInputLayout(m_InputLayouts[passIndex].Get());
-
-  return S_OK;
 }
 
 HRESULT Shader::Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderResourceView> &srv) 

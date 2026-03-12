@@ -19,7 +19,12 @@ Model::Model(const Model& rhs)
 	m_Meshes{ rhs.m_Meshes },
 	m_NumMaterials{ rhs.m_NumMaterials }, 
 	m_Materials{ rhs.m_Materials },
-	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix } {}
+	m_NumBones {rhs.m_NumBones},
+	m_Bones{rhs.m_Bones},
+	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix }
+{
+	
+}
 
 HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& preLocalTransformMatrix)
 {
@@ -64,25 +69,6 @@ HRESULT Model::Initialize_Prototype()
 
 HRESULT Model::Initialize(void* arg)
 {
-	if (arg == nullptr)
-	{
-		LOG_ERROR(L"There is no ModelDesc");
-		MSG_BOX("There is no ModelDesc");
-		return E_FAIL;
-	}
-
-	MODEL_DESC& desc = *static_cast<MODEL_DESC*>(arg);
-	
-	uint32 levIndex = GAME_INSTANCE->Get_ContainLevelByModelTag(desc.modelTag);
-	if (levIndex)
-	{
-		LOG_ERROR(L"Failed to find Model {} in level searching", desc.modelTag);
-		return E_FAIL;
-	}
-
-	auto prototype = GAME_INSTANCE->Get_Model(levIndex, desc.modelTag.c_str());
-	
-
 	return Component::Initialize(arg);
 }
 
@@ -205,8 +191,6 @@ HRESULT Model::Ready_Materials(ifstream& in, const std::string& directoryPath)
 
 HRESULT Model::Ready_Bones(ifstream& in)
 {
-
-	return S_OK;
 	for (uint32 i = 0; i < m_NumBones; ++i)
 	{
 		MODEL_BONE boneData{};
@@ -266,7 +250,26 @@ Shared<Model> Model::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3
 
 Shared<Component> Model::Clone(void* arg)
 {
-	auto model = make_shared<Model>(*this);
+	if (arg == nullptr)
+	{
+		LOG_ERROR(L"There is no ModelDesc");
+		MSG_BOX("There is no ModelDesc");
+		return nullptr;
+	}
+
+	MODEL_DESC& desc = *static_cast<MODEL_DESC*>(arg);
+
+	int32 levIndex = GAME_INSTANCE->Get_ContainLevelByModelTag(desc.modelTag);
+	if (levIndex == -1)
+	{
+		LOG_ERROR(L"Failed to find Model {} in level searching", desc.modelTag);
+		return nullptr;
+	}
+
+	auto prototype = GAME_INSTANCE->Get_Model(levIndex, desc.modelTag.c_str());
+
+	auto model = make_shared<Model>(*prototype);
+
 
 	if (FAILED(model->Initialize(arg)))
 	{

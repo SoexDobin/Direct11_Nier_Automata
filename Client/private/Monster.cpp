@@ -99,8 +99,6 @@ void Monster::Submit_RenderGroup()
 
 HRESULT Monster::Ready_Components()
 {
-	Matrix	preLocalTransformMatrix = { Matrix::CreateScale(0.01f) * Matrix::CreateRotationY(XMConvertToRadians(180.f)) };
-
 	Shader::SHADER_DESC shaderDesc{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
 	m_Shader = Add_Component<Shader>(&shaderDesc);
 	if (nullptr == m_Shader)
@@ -110,7 +108,16 @@ HRESULT Monster::Ready_Components()
 	m_Model = Add_Component<Model>(&modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;
-	
+
+
+	if (m_Transform)
+	{
+		m_Transform->Set_LocalScale(3.f, 3.f, 3.f); // 확실히 보이게 3배로 키움
+		m_Transform->Set_LocalPosition(0.f, 5.f, 0.f); // 카메라가 내려다보는 중앙 허공에 띄움
+		m_Transform->Set_LocalRotation(0.f, XMConvertToRadians(180.f), 0.f);
+		m_Transform->Update_WorldMatrix();
+	}
+
 	return S_OK;
 }
 

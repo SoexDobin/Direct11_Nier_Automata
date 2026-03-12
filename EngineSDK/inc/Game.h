@@ -60,12 +60,12 @@ public:
   Long Get_DIMouseMove(DIMM mouseState) const;
 
 public: /* For TimeManager */
-  HRESULT Add_Timer(const wstring &timerTag) const;
-  void Set_TimeScale(Float timeScale) const;
-  Float Get_FPS() const;
-  Float Compute_TimeDelta() const;
-  Float Compute_UnscaledTimeDelta() const;
-  Float Compute_TimeDelta(const wstring &timerTag) const;
+    HRESULT Add_Timer(const wstring &timerTag) const;
+    void Set_TimeScale(Float timeScale) const;
+    Float Get_FPS() const;
+    Float Compute_TimeDelta() const;
+    Float Compute_UnscaledTimeDelta() const;
+    Float Compute_TimeDelta(const wstring &timerTag) const;
 
 public: /* For LevelManager */
     Bool LevelLoad_Finished() const { return m_LevelManager->Is_LoadFinished(); }
@@ -76,20 +76,19 @@ public: /* For PrototypeManager */
     uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const;
     const tChar* Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
-	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID,
-                                      uint32 levIndex = UINT_MAX) const;
+	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex = UINT_MAX) const;
 
 private: /* For ObjectManager */
-  HRESULT Add_GameObject(const Shared<GameObject> &GameObject) const;
+	HRESULT Add_GameObject(const Shared<GameObject> &GameObject) const;
 
 public: /* For ObjectManager */
-  void Submit_RenderGroup() const;
-  const unordered_map<uint32, Shared<GameObject>> &Get_GameObjects() const;
+	void Submit_RenderGroup() const;
+	const unordered_map<uint32, Shared<GameObject>> &Get_GameObjects() const;
 
 public: /* For CameraManager */
-  HRESULT Add_Camera(const Shared<class Camera> &camera) const;
-  HRESULT Set_MainCamera(const Shared<class Camera> &camera) const;
-  Shared<class Camera> Get_MainCamera() const;
+    HRESULT Add_Camera(const Shared<class Camera> &camera) const;
+    HRESULT Set_MainCamera(const Shared<class Camera> &camera) const;
+    Shared<class Camera> Get_MainCamera() const;
 
 public: /* For ResourceManager */
     HRESULT Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const;
@@ -99,9 +98,12 @@ public: /* For ResourceManager */
     const Texture::TEXTURE_DESC* Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const;
     const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
+    HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag) const;
+    Shared<Model> Get_Model(uint32 levIndex, const tChar* modelFilePath) const;
+    int32 Get_ContainLevelByModelTag(const wstring& modelTag) const;
+
 public: /* For Renderer */
-  void Add_RenderGroup(RENDERGROUP group,
-                       const Shared<class GameObject> &gameObject) const;
+	void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
 
 public: /* For Pipeline */
   HRESULT Bind_CameraPosition(const Shared<class Shader> &shader,

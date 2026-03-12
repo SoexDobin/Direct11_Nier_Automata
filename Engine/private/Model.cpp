@@ -1,8 +1,13 @@
 #include "Model.h"
-
 #include "Game.h"
+#include "Bone.h"
 #include "Material.h"
 #include "Mesh.h"
+
+#include <fstream>
+#include <istream>
+#include <filesystem>
+#include "SpdLogger.h"
 
 Model::Model() : Component{} {}
 Model::Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -10,30 +15,43 @@ Model::Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContex
 
 Model::Model(const Model& rhs)
 	: Component{ rhs }, 
-	m_NumMeshes{ rhs.m_NumMeshes }, m_Meshes{ rhs.m_Meshes },
-	m_NumMaterials{ rhs.m_NumMaterials }, m_Materials{ rhs.m_Materials },
-	m_Type{ rhs.m_Type }, 
-	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix },
-	m_AIScene{ rhs.m_AIScene } {}
+	m_NumMeshes{ rhs.m_NumMeshes }, 
+	m_Meshes{ rhs.m_Meshes },
+	m_NumMaterials{ rhs.m_NumMaterials }, 
+	m_Materials{ rhs.m_Materials },
+	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix } {}
 
-HRESULT Model::Initialize_Prototype(MODEL type, const Char* modelFilePath, const Matrix& preLocalTransformMatrix)
+HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& preLocalTransformMatrix)
 {
-	uint32 flag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
-
-	if (MODEL::NONANIM == type)
-		flag |= aiProcess_PreTransformVertices;
-
-	m_AIScene = m_Importer.ReadFile(modelFilePath, flag);
-	if (nullptr == m_AIScene)
-		return E_FAIL;
-
-	m_Type = type;
 	m_PreLocalTransformMatrix = preLocalTransformMatrix;
 
-	if (FAILED(Ready_Meshes()))
+	ifstream in(modelFilePath, std::ios::binary);
+	if (!in.is_open())
+	{
+		LOG_ERROR(L"Failed to open model binary : {}", modelFilePath);
+		return E_FAIL;
+	}
+
+	/* Header */
+	MODEL_HEADER header{};
+	in.read(reinterpret_cast<Char*>(&header), sizeof(header));
+	if (memcmp(header.magic, "NMDL", 4) != 0)
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(modelFilePath)))
+	m_NumMeshes = header.numMeshes;
+	m_NumMaterials = header.numMaterials;
+	m_NumBones = header.numBones;
+	// TODO Anim
+
+	std::string currentModelDirectory = std::filesystem::path(modelFilePath).parent_path().string() + "\\";
+
+	if (FAILED(Ready_Meshes(in, header.isAnim)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Materials(in, currentModelDirectory)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Bones(in)))
 		return E_FAIL;
 
 	return Component::Initialize_Prototype();
@@ -46,6 +64,25 @@ HRESULT Model::Initialize_Prototype()
 
 HRESULT Model::Initialize(void* arg)
 {
+	if (arg == nullptr)
+	{
+		LOG_ERROR(L"There is no ModelDesc");
+		MSG_BOX("There is no ModelDesc");
+		return E_FAIL;
+	}
+
+	MODEL_DESC& desc = *static_cast<MODEL_DESC*>(arg);
+	
+	uint32 levIndex = GAME_INSTANCE->Get_ContainLevelByModelTag(desc.modelTag);
+	if (levIndex)
+	{
+		LOG_ERROR(L"Failed to find Model {} in level searching", desc.modelTag);
+		return E_FAIL;
+	}
+
+	auto prototype = GAME_INSTANCE->Get_Model(levIndex, desc.modelTag.c_str());
+	
+
 	return Component::Initialize(arg);
 }
 
@@ -53,6 +90,7 @@ void Model::On_Destroy()
 {
 	m_Meshes.clear();
 	m_Materials.clear();
+	m_Bones.clear();
 	Component::On_Destroy();
 }
 
@@ -64,13 +102,52 @@ HRESULT Model::Render(uint32 meshIndex)
 	return S_OK;
 }
 
-HRESULT Model::Ready_Meshes()
+HRESULT Model::Ready_Meshes(ifstream& in, Bool isAnim)
 {
-	m_NumMeshes = m_AIScene->mNumMeshes;
-
-	for (size_t i = 0; i < m_NumMeshes; ++i)
+	for (uint32 i = 0; i < m_NumMeshes; ++i)
 	{
-		auto mesh = Mesh::Create(m_Device, m_Context, m_AIScene->mMeshes[i], XMLoadFloat4x4(&m_PreLocalTransformMatrix));
+		MODEL_MESH modelData{};
+		uint32 nameLength = 0;
+		in.read(reinterpret_cast<char*>(&nameLength), sizeof(uint32));
+		if (nameLength > 0)
+		{
+			modelData.name.resize(nameLength);
+			in.read(&modelData.name[0], nameLength);
+		}
+
+		// materialIndex 읽기
+		in.read(reinterpret_cast<char*>(&modelData.materialIndex), sizeof(int32));
+
+		// numBones 및 boneIndices 읽기
+		in.read(reinterpret_cast<char*>(&modelData.numBones), sizeof(uint32));
+		if (modelData.numBones > 0)
+		{
+			modelData.boneIndices.resize(modelData.numBones);
+			in.read(reinterpret_cast<char*>(modelData.boneIndices.data()), modelData.numBones * sizeof(uint32));
+		}
+
+		// numVertex 및 numIndex 읽기
+		uint32 numVertex = 0, numIndex = 0;
+		in.read(reinterpret_cast<Char*>(&numVertex), sizeof(uint32));
+		in.read(reinterpret_cast<Char*>(&numIndex), sizeof(uint32));
+
+		// vertices 읽기
+		if (isAnim)
+		{
+			modelData.animVertices.resize(numVertex);
+			in.read(reinterpret_cast<Char*>(modelData.animVertices.data()), numVertex * sizeof(VTXANIMMESH));
+		}
+		else
+		{
+			modelData.vertices.resize(numVertex);
+			in.read(reinterpret_cast<Char*>(modelData.vertices.data()), numVertex * sizeof(VTXMESH));
+		}
+
+		// indices 읽기
+		modelData.indices.resize(numIndex);
+		in.read(reinterpret_cast<Char*>(modelData.indices.data()), numIndex * sizeof(uint32));
+
+		auto mesh = Mesh::Create(m_Device, m_Context, isAnim, modelData, m_PreLocalTransformMatrix);
 		if (mesh == nullptr)
 			return E_FAIL;
 
@@ -80,48 +157,107 @@ HRESULT Model::Ready_Meshes()
 	return S_OK;
 }
 
-HRESULT Model::Ready_Materials(const Char* modelFilePath)
+HRESULT Model::Ready_Materials(ifstream& in, const std::string& directoryPath)
 {
-	m_NumMaterials = m_AIScene->mNumMaterials;
-
 	for (size_t i = 0; i < m_NumMaterials; ++i)
 	{
-		auto material = Material::Create(m_Device, m_Context, m_AIScene->mMaterials[i], modelFilePath);
+		MODEL_MATERIAL materialData{};
+		uint32 nameLength = 0;
+		in.read(reinterpret_cast<Char*>(&nameLength), sizeof(uint32));
+		if (nameLength > 0)
+		{
+			materialData.name.resize(nameLength);
+			in.read(&materialData.name[0], nameLength);
+		}
+
+		// textureTypeMax 읽기
+		in.read(reinterpret_cast<Char*>(&materialData.textureTypeMax), sizeof(uint32));
+
+		// directoryPath 세팅 (바이너리에서 읽지 않고 파라미터 복사)
+		materialData.directoryPath = directoryPath;
+
+		// textures 읽기
+		uint32 numTex = 0;
+		in.read(reinterpret_cast<Char*>(&numTex), sizeof(uint32));
+		for (uint32 t = 0; t < numTex; ++t)
+		{
+			MODEL_ENTRY entry{};
+			in.read(reinterpret_cast<Char*>(&entry.typeIndex), sizeof(uint32));
+			uint32 pathLength = 0;
+			in.read(reinterpret_cast<Char*>(&pathLength), sizeof(uint32));
+			if (pathLength > 0)
+			{
+				entry.path.resize(pathLength);
+				in.read(&entry.path[0], pathLength);
+			}
+			materialData.textures.push_back(entry);
+		}
+
+		auto material = Material::Create(m_Device, m_Context, materialData);
 		if (material == nullptr)
 			return E_FAIL;
-
+		
 		m_Materials.push_back(material);
 	}
 
 	return S_OK;
 }
 
-HRESULT Model::Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, aiTextureType materialType, uint32 textureIndex)
+HRESULT Model::Ready_Bones(ifstream& in)
+{
+
+	return S_OK;
+	for (uint32 i = 0; i < m_NumBones; ++i)
+	{
+		MODEL_BONE boneData{};
+		uint32 nameLength = 0;
+		in.read(reinterpret_cast<Char*>(&nameLength), sizeof(uint32));
+		if (nameLength > 0)
+		{
+			boneData.name.resize(nameLength);
+			in.read(&boneData.name[0], nameLength);
+		}
+
+		in.read(reinterpret_cast<Char*>(&boneData.index), sizeof(int32));
+		in.read(reinterpret_cast<Char*>(&boneData.parent), sizeof(int32));
+		in.read(reinterpret_cast<Char*>(&boneData.transform), sizeof(Matrix));
+
+		auto bone = Bone::Create(m_Device, m_Context, boneData);
+		if (bone == nullptr)
+			return E_FAIL;
+
+		m_Bones.push_back(bone);
+	}
+
+	return S_OK;
+}
+
+HRESULT Model::Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex)
 {
 	return m_Materials[m_Meshes[meshIndex]->Get_MaterialIndex()]->Bind_Material(shader, constantName, materialType, textureIndex);
 }
 
 Shared<Model> Model::CreatePrototype()
 {
-	auto model = make_shared<Model>(
-		GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+	auto model = make_shared<Model>(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
 
-	//if (FAILED(model->Initialize_Prototype(type, path, preLocalTransformMatrix)))
-	//{
-	//	MSG_BOX("Failed To Create Model");
-	//	return nullptr;
-	//}
+	if (FAILED(model->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed To CreatePrototype Model");
+		return nullptr;
+	}
 
 	return model;
 }
 
-Shared<Model> Model::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, MODEL type, const Char* path, const Matrix& preLocalTransformMatrix)
+Shared<Model> Model::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const tChar* path, const Matrix& preLocalTransformMatrix)
 {
 	auto model = make_shared<Model>(device, context);
 
-	if (FAILED(model->Initialize_Prototype(type, path, preLocalTransformMatrix)))
+	if (FAILED(model->Initialize_Prototype(path, preLocalTransformMatrix)))
 	{
-		MSG_BOX("Failed To Create Model");
+		LOG_ERROR(L"Failed To Create Model Resource Path : {}", path);
+		MSG_BOX("Failed To Create Model Resource");
 		return nullptr;
 	}
 

@@ -10,51 +10,21 @@ Mesh::Mesh(const Mesh& rhs)
 	: VIBuffer{ rhs } {}
 
 
-HRESULT Mesh::Initialize_Prototype(const aiMesh* aiMesh, const Matrix& preTransformMatrix)
+HRESULT Mesh::Initialize_Prototype(Bool isAnim, const MODEL_MESH& modelMesh, const Matrix& preTransformMatrix)
 {
-	m_MaterialIndex = aiMesh->mMaterialIndex;
-
+	m_MaterialIndex = modelMesh.materialIndex;
 	m_NumVtxBuffers = 1;
-	m_NumVertices = aiMesh->mNumVertices;
-	m_VtxStride = sizeof(VTXMESH);
-	m_NumIndices = aiMesh->mNumFaces * 3;
+	m_NumIndices = modelMesh.indices.size();
 	m_IndexStride = 4;
 	m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
+	HRESULT		hr = false == isAnim ?
+				Ready_VertexBuffer_For_NonAnim(modelMesh, preTransformMatrix) :
+				Ready_VertexBuffer_For_Anim(modelMesh);
 
-	D3D11_BUFFER_DESC vertexBufferDesc{};
-	vertexBufferDesc.ByteWidth = m_VtxStride * m_NumVertices;
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.StructureByteStride = m_VtxStride;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-
-	VTXMESH* vertices = new VTXMESH[m_NumVertices];
-	for (size_t i = 0; i < m_NumVertices; i++)
+	if (FAILED(hr))
 	{
-		memcpy(&vertices[i].position, &aiMesh->mVertices[i], sizeof(Float3));
-		XMStoreFloat3(&vertices[i].position,
-			XMVector3TransformCoord(vertices[i].position, preTransformMatrix));
-
-		memcpy(&vertices[i].normal, &aiMesh->mNormals[i], sizeof(Float3));
-		XMStoreFloat3(&vertices[i].normal,
-			XMVector3TransformNormal(vertices[i].normal, preTransformMatrix));
-
-		memcpy(&vertices[i].tangent, &aiMesh->mTangents[i], sizeof(Float3));
-		XMStoreFloat3(&vertices[i].tangent,
-			XMVector3TransformCoord(vertices[i].tangent, preTransformMatrix));
-
-		memcpy(&vertices[i].texcoord, &aiMesh->mTextureCoords[0][i], sizeof(Float2));
-	}
-
-	D3D11_SUBRESOURCE_DATA vertexInitialData{};
-	vertexInitialData.pSysMem = vertices;
-
-	if (FAILED(m_Device->CreateBuffer(&vertexBufferDesc, &vertexInitialData, &m_VB)))
-	{
-		LOG_ERROR(L"Failed to Create Mesh vertices");
-		MSG_BOX("Failed to Create Mesh vertices");
+		LOG_ERROR(L"Failed to Create Model Buffer {}", Helper::To_wString(modelMesh.name));
 		return E_FAIL;
 	}
 
@@ -69,16 +39,12 @@ HRESULT Mesh::Initialize_Prototype(const aiMesh* aiMesh, const Matrix& preTransf
 	uint32 numIndices{};
 	uint32* indices = new uint32[m_NumIndices];
 
-	for (size_t i = 0; i < aiMesh->mNumFaces; i++)
+	for (size_t i = 0; i < m_NumIndices; i++)
 	{
-		aiFace aiFace = aiMesh->mFaces[i];
-
-		indices[numIndices++] = aiFace.mIndices[0];
-		indices[numIndices++] = aiFace.mIndices[1];
-		indices[numIndices++] = aiFace.mIndices[2];
+		indices[numIndices++] = modelMesh.indices[i];
 	}
 
-	D3D11_SUBRESOURCE_DATA			indexInitialData{};
+	D3D11_SUBRESOURCE_DATA		indexInitialData{};
 	indexInitialData.pSysMem = indices;
 
 	if (FAILED(m_Device->CreateBuffer(&IndexBufferDesc, &indexInitialData, &m_IB)))
@@ -88,8 +54,6 @@ HRESULT Mesh::Initialize_Prototype(const aiMesh* aiMesh, const Matrix& preTransf
 		return E_FAIL;
 	}
 
-
-	delete[] vertices;
 	delete[] indices;
 
 	return S_OK;
@@ -110,6 +74,95 @@ void Mesh::On_Destroy()
 	VIBuffer::On_Destroy();
 }
 
+HRESULT Mesh::Ready_VertexBuffer_For_NonAnim(const MODEL_MESH& meshData, const Matrix& preTransformMatrix)
+{
+	m_VtxStride = sizeof(VTXMESH);
+	m_NumVertices = meshData.vertices.size();
+
+	D3D11_BUFFER_DESC vertexBufferDesc{};
+	vertexBufferDesc.ByteWidth = m_VtxStride * m_NumVertices;
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.StructureByteStride = m_VtxStride;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+
+	VTXMESH* vertices = new VTXMESH[m_NumVertices];
+	for (size_t i = 0; i < m_NumVertices; i++)
+	{
+		vertices[i].position = meshData.vertices[i].position;
+		vertices[i].normal   = meshData.vertices[i].normal;
+		vertices[i].tangent  = meshData.vertices[i].tangent;
+		vertices[i].texcoord = meshData.vertices[i].texcoord;
+
+		// Pre-Transform 적용
+		XMVECTOR vPos = XMLoadFloat3(&vertices[i].position);
+		vPos = XMVector3TransformCoord(vPos, preTransformMatrix);
+		XMStoreFloat3(&vertices[i].position, vPos);
+
+		XMVECTOR vNorm = XMLoadFloat3(&vertices[i].normal);
+		vNorm = XMVector3TransformNormal(vNorm, preTransformMatrix);
+		XMStoreFloat3(&vertices[i].normal, XMVector3Normalize(vNorm));
+
+		XMVECTOR vTangent = XMLoadFloat3(&vertices[i].tangent);
+		vTangent = XMVector3TransformNormal(vTangent, preTransformMatrix);
+		XMStoreFloat3(&vertices[i].tangent, XMVector3Normalize(vTangent));
+	}
+
+	m_NumVtxBuffers = 1;
+
+	D3D11_SUBRESOURCE_DATA vertexInitialData{};
+	vertexInitialData.pSysMem = vertices;
+	
+	if (FAILED(m_Device->CreateBuffer(&vertexBufferDesc, &vertexInitialData, &m_VB)))
+	{
+		LOG_ERROR(L"Failed to Create Mesh vertices");
+		MSG_BOX("Failed to Create Mesh vertices");
+		delete[] vertices;
+		return E_FAIL;
+	}
+
+	delete[] vertices;
+	return S_OK;
+}
+
+HRESULT Mesh::Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData)
+{
+	m_VtxStride = sizeof(VTXANIMMESH);
+	m_NumVertices = meshData.animVertices.size();
+	m_NumVtxBuffers = 1;
+
+	D3D11_BUFFER_DESC vertexBufferDesc{};
+	vertexBufferDesc.ByteWidth = m_VtxStride * m_NumVertices;
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.StructureByteStride = m_VtxStride;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+
+	VTXANIMMESH* vertices = new VTXANIMMESH[m_NumVertices];
+	for (size_t i = 0; i < m_NumVertices; i++)
+	{
+		vertices[i] = meshData.animVertices[i];
+	}
+
+	m_NumBones = meshData.numBones;
+
+	D3D11_SUBRESOURCE_DATA vertexInitialData{};
+	vertexInitialData.pSysMem = vertices;
+
+	if (FAILED(m_Device->CreateBuffer(&vertexBufferDesc, &vertexInitialData, &m_VB)))
+	{
+		LOG_ERROR(L"Failed to Create Mesh vertices");
+		MSG_BOX("Failed to Create Mesh vertices");
+		delete[] vertices;
+		return E_FAIL;
+	}
+
+	delete[] vertices;
+	return S_OK;
+}
+
 Shared<Mesh> Mesh::CreatePrototype()
 {
 	auto mesh = make_shared<Mesh>(
@@ -118,11 +171,11 @@ Shared<Mesh> Mesh::CreatePrototype()
 	return mesh;
 }
 
-Shared<Mesh> Mesh::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const aiMesh* aiMesh, const Matrix& preTransformMatrix)
+Shared<Mesh> Mesh::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, Bool isAnim, const MODEL_MESH& meshData, const Matrix& preTransformMatrix)
 {
 	auto mesh = make_shared<Mesh>(device, context);
 
-	if (FAILED(mesh->Initialize_Prototype(aiMesh, preTransformMatrix)))
+	if (FAILED(mesh->Initialize_Prototype(isAnim, meshData, preTransformMatrix)))
 	{
 		MSG_BOX("Failed to Created : Mesh");
 		return nullptr;

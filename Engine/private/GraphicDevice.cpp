@@ -76,8 +76,7 @@ HRESULT GraphicDevice::Clear_DepthStencilView() const {
   if (nullptr == m_Context)
     return E_FAIL;
 
-  m_Context->ClearDepthStencilView(
-      m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+  m_Context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
   return S_OK;
 }
@@ -88,12 +87,12 @@ void GraphicDevice::Set_DepthStencilState(ID3D11DepthStencilState* state, UINT r
 }
 
 HRESULT GraphicDevice::Present() const {
-  if (nullptr == m_SwapChain)
-    return E_FAIL;
+    if (nullptr == m_SwapChain)
+      return E_FAIL;
 
-  m_Context->OMSetRenderTargets(0, nullptr, nullptr);
+    m_Context->OMSetRenderTargets(0, nullptr, nullptr);
 
-  return m_SwapChain->Present(0, 0);
+    return m_SwapChain->Present(0, 0);
 }
 
 HRESULT GraphicDevice::OnResize(uint32 width, uint32 height, uint32 screenIndex) {

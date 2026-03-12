@@ -194,6 +194,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <None Include="RTTRGenerator.py" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\Bone.h" />
     <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\public\CameraManager.h" />
     <ClInclude Include="..\public\Component.h" />
@@ -239,6 +240,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\VIBuffer_Terrain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Bone.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\private\CameraManager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />

@@ -121,8 +121,11 @@
     <Filter Include="01. Utility\05. Component\Manager">
       <UniqueIdentifier>{9d6db1e0-3bf5-4ff2-b23e-e1e9a2f0f4a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Utility\05. Component\Material">
+    <Filter Include="01. Utility\05. Component\Model\Material">
       <UniqueIdentifier>{a2472ff3-252f-4e1f-b77c-8035ac844f1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Model\Bone">
+      <UniqueIdentifier>{381578b8-85cf-40b9-a287-c0e46c7ebc8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -264,10 +267,13 @@
       <Filter>01. Utility\05. Component\Model</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Material.h">
-      <Filter>01. Utility\05. Component\Material</Filter>
+      <Filter>01. Utility\05. Component\Model\Material</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Engine_ModelStruct.h">
       <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bone.h">
+      <Filter>01. Utility\05. Component\Model\Bone</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -392,13 +398,16 @@
       <Filter>96. RTTR</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Material.cpp">
-      <Filter>01. Utility\05. Component\Material</Filter>
+      <Filter>01. Utility\05. Component\Model\Material</Filter>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\VIBuffer_rttr.cpp">
       <Filter>96. RTTR</Filter>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp">
       <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bone.cpp">
+      <Filter>01. Utility\05. Component\Model\Bone</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
 #pragma once
+#include <assimp/material.h>
+
 #include "Component.h"
 
 NS_BEGIN(Engine)
@@ -22,19 +24,21 @@ public:
 	void Set_Active(Bool isActive) override { Component::Set_Active(isActive); }
 	
 public:
-	HRESULT Initialize_Prototype(const aiMaterial* aiMaterial, const Char* modelFilePath);
+	HRESULT Initialize_Prototype(const MODEL_MATERIAL& materialData);
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
 
 public:
-	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, aiTextureType materialType, uint32 textureIndex);
-	
-public:
-	vector<ComPtr<ID3D11ShaderResourceView>> m_MaterialTextures[AI_TEXTURE_TYPE_MAX];
+	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 textureTypeIndex, uint32 textureIndex);
+
+private:
+	uint32 m_TextureTypeMax{};
+	Shared<vector<ComPtr<ID3D11ShaderResourceView>>[]> m_MaterialTextures;
+
 
 public:
 	static Shared<Material> CreatePrototype();
-	static Shared<Material> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const aiMaterial* aiMaterial, const Char* modelFilePath);
+	static Shared<Material> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_MATERIAL& modelMaterial);
 	Shared<Component> Clone(void* arg = nullptr) override;
 };
 

@@ -80,8 +80,7 @@ HRESULT Shader::Begin(uint32 passIndex) {
   if (passIndex >= m_NumPasses || nullptr == m_InputLayouts[passIndex])
     return S_OK;
 
-  m_Effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex)->Apply(
-      0, m_Context.Get());
+  m_Effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex)->Apply(0, m_Context.Get());
   m_Context->IASetInputLayout(m_InputLayouts[passIndex].Get());
 
   return S_OK;

@@ -1,0 +1,9 @@
+{
+    "ModelSettings": [
+        {
+            "level": "STATIC",
+            "path": "Models/Test2B/Test2B.model",
+            "tag": "Test2B"
+        }
+    ]
+}

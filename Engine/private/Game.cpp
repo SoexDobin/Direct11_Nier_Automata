@@ -306,6 +306,21 @@ const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(uint32 levIndex, const
     return m_ResourceManager->Get_Texture(levIndex, textureFilePath);
 }
 
+HRESULT Game::Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag) const
+{
+    return m_ResourceManager->Load_Model(levIndex, modelFilePath, descriptionTag);
+}
+
+Shared<Model> Game::Get_Model(uint32 levIndex, const tChar* modelFilePath) const
+{
+    return m_ResourceManager->Get_Model(levIndex, modelFilePath);
+}
+
+int32 Game::Get_ContainLevelByModelTag(const wstring& modelTag) const
+{
+    return m_ResourceManager->Get_ContainLevelByModelTag(modelTag);
+}
+
 void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObject) const {
 	m_Renderer->Add_RenderGroup(group, gameObject);
 }

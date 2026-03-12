@@ -23,7 +23,7 @@ HRESULT ClientSettingManager::Load_Textures_FromJson() const
 	{
 		nlohmann::json defaultJson;
 		defaultJson["TextureSettings"] = nlohmann::json::array();
-		// 초기 템플릿 예시 추가 가능
+		
 		std::ofstream outFile(fullPath);
 		if (outFile.is_open()) {
 			outFile << defaultJson.dump(4);
@@ -124,6 +124,109 @@ HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
 	ofstream jsonFile(m_ProjectSettingPath + L"TextureSettings.json");
 	jsonFile << jsonRoot.dump(4);
 
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Load_Model_FromJson() const
+{
+	wstring fullPath = m_ProjectSettingPath + L"ModelSettings.json";
+
+	if (!filesystem::exists(fullPath))
+	{
+		nlohmann::json defaultJson;
+		defaultJson["ModelSettings"] = nlohmann::json::array();
+
+		std::ofstream outFile(fullPath);
+		if (outFile.is_open()) {
+			outFile << defaultJson.dump(3);
+			outFile.close();
+		}
+		LOG_INFO(L"Created Default ModelSettings.json: {}", fullPath);
+	}
+
+	if (!filesystem::exists(fullPath))
+	{
+		LOG_WARN(L"Failed To Find Model Settings : {}", fullPath);
+		return S_OK;
+	}
+
+	ifstream file(fullPath);
+	if (!file.is_open()) return E_FAIL;
+
+	nlohmann::json json;
+	file >> json;
+	file.close();
+
+	auto& settings = json["ModelSettings"];
+	for (auto& item : settings)
+	{
+		string levelStr = item["level"];
+		LEVEL level = LEVEL::STATIC;
+		if (levelStr == "1" || levelStr == "Loading" || levelStr == "LOADING")
+			level = LEVEL::LOADING;
+		else if (levelStr == "2" || levelStr == "Logo" || levelStr == "LOGO")
+			level = LEVEL::LOGO;
+		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
+			level = LEVEL::GAMEPLAY;
+		
+		wstring tag = Helper::To_wString(item["tag"].get<string>());
+		wstring relativePath = Helper::To_wString(item["path"].get<string>());
+
+		wstring fullTexturePath = m_ResourcePath + relativePath;
+
+		if (FAILED(GAME_INSTANCE->Load_Model(ETOI(level), fullTexturePath.c_str(), tag)))
+		{
+			LOG_ERROR(L"Failed to Load Model Prototype: {}", tag);
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Sync_ModelJson_FromCSV() const
+{
+	wstring csvPath = m_ResourcePath + L"ModelSettings.csv";
+
+	if (!filesystem::exists(csvPath))
+	{
+		ofstream outFile(csvPath);
+		if (outFile.is_open())
+		{
+			outFile << "Level, Tag, Path" << std::endl;
+			outFile << "STATIC, Prototype_Model_Default, Models/Default.Model" << std::endl;
+			outFile.close();
+		}
+		LOG_INFO(L"Created Template ModelSettings.csv: {}", csvPath);
+	}
+
+	if (!filesystem::exists(csvPath)) return S_OK;
+
+	ifstream csvFile(csvPath);
+	nlohmann::json jsonRoot;
+	string line;
+
+
+	getline(csvFile, line);
+	while (getline(csvFile, line))
+	{
+		if (line.empty()) continue;
+
+		stringstream stream(line);
+		string level, tag, path;
+		getline(stream, level, ',');
+		getline(stream, tag, ',');
+		getline(stream, path, ',');
+
+		jsonRoot["ModelSettings"].push_back({
+			{"level", Helper::Trim(level)},
+			{"tag", Helper::Trim(tag)},
+			{"path", Helper::Trim(path)},
+			});
+	}
+
+	ofstream jsonFile(m_ProjectSettingPath + L"ModelSettings.json");
+	jsonFile << jsonRoot.dump(4);
 	return S_OK;
 }
 
@@ -271,7 +374,8 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
-				std::wstring meshTex = L"vtxmesh";
+				std::wstring staticMesh = L"vtxmesh";
+				std::wstring animMesh = L"vtxanimmesh";
 				
 				auto itTex = 
 					std::search(
@@ -288,7 +392,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 				auto itMeshTex =
 					std::search(
 						tagName.begin(), tagName.end(),
-						meshTex.begin(), meshTex.end(),
+						staticMesh.begin(), staticMesh.end(),
 						CaseInsensitiveCompare
 					);
 
@@ -306,6 +410,11 @@ HRESULT ClientSettingManager::Load_Shader() const
 				{
 					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXMESH::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXMESH::Tag);
+				}
+				else if (itMeshTex != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXANIMMESH::Elements, VTXANIMMESH::numElements, VTXANIMMESH::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXANIMMESH::Tag);
 				}
 				else
 				{

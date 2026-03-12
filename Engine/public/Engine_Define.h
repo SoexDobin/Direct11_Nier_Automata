@@ -35,7 +35,6 @@
 
 #include <Effects11/d3dx11effect.h>
 
-
 #include "fmod.hpp"
 #include "fmod_common.h"
 #include "fmod_errors.h"
@@ -62,10 +61,6 @@
 #include <rttr/type>
 #pragma warning(pop)
 
-#include "Assimp/scene.h"
-#include "Assimp/Importer.hpp"
-#include "Assimp/postprocess.h"
-
 #include "Engine_Enum.h"
 #include "Engine_Function.h"
 #include "Engine_Macro.h"
@@ -79,8 +74,6 @@ using namespace Microsoft::WRL;
 using namespace rttr;
 using namespace std;
 using namespace Engine;
-
-
 
 #pragma warning(disable : 4251)
 

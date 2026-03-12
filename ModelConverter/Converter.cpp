@@ -14,6 +14,10 @@ void Tool::Converter::Initialize()
 
 Bool Tool::Converter::ReadAssetFile(const wstring& path)
 {
+	m_Bones.clear();
+	m_Meshes.clear();
+	m_Material.clear();
+
 	string modelFilePath(path.begin(), path.end());
 
 	m_AiScene = m_Importer->ReadFile(
@@ -21,7 +25,8 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 		aiProcess_ConvertToLeftHanded |
 		aiProcess_Triangulate |
 		aiProcess_GenNormals |
-		aiProcess_CalcTangentSpace
+		aiProcess_CalcTangentSpace |
+		aiProcess_JoinIdenticalVertices
 	);
 
 	if (!m_AiScene || m_AiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
@@ -33,10 +38,11 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 		<< " mNumMaterials=" << m_AiScene->mNumMaterials << "\n";
 
 	// TODO : Anim뜨면 Bone 적용
-	//ReadModelData(m_AiScene->mRootNode, 0, -1);
+	
 
-	ReadMeshData(m_AiScene->mRootNode, 0);
+	ReadMeshData();
 	ReadMaterialData();
+	ReadBoneData(m_AiScene->mRootNode, 0, -1);
 
 	return true;
 }
@@ -53,13 +59,9 @@ Bool Tool::Converter::ExportModel(const wstring& outPath)
 	return true;
 }
 
-void Tool::Converter::ExportMaterialData(const wstring& outPath)
+void Tool::Converter::ReadBoneData(aiNode* node, int32_t index, int32_t parent)
 {
-}
-
-void Tool::Converter::ReadModelData(aiNode* node, int32_t index, int32_t parent)
-{
-	auto bone = make_shared<AS_BONE>();
+	auto bone = make_shared<MODEL_BONE>();
 	bone->name = node->mName.C_Str();
 	bone->index = index;
 	bone->parent = parent;
@@ -75,44 +77,126 @@ void Tool::Converter::ReadModelData(aiNode* node, int32_t index, int32_t parent)
 
 	m_Bones.push_back(bone);
 
-	for (uint32 i = 0; i < node->mNumChildren; ++i)
-	{
-		ReadModelData(node->mChildren[i], static_cast<int32_t>(m_Bones.size()), index);
+	
+
+
+	size_t boneIndex = m_Bones.size() - 1;
+	for (uint32 i = 0; i < node->mNumChildren; ++i) {
+		ReadBoneData(node->mChildren[i], static_cast<int32_t>(boneIndex), static_cast<int32_t>(boneIndex));
 	}
 }
 
-void Tool::Converter::ReadMeshData(aiNode* node, int32_t boneIndex)
+void Tool::Converter::ReadMeshData()
 {
-	for (uint32 i = 0; i < node->mNumMeshes; ++i)
-	{
-		auto aiMesh = m_AiScene->mMeshes[node->mMeshes[i]];
-		auto mesh = make_shared<AS_MESH>();
+	Bool isAnim = m_AiScene->HasAnimations();
 
+	for (uint32 i = 0; i < m_AiScene->mNumMeshes; ++i)
+	{
+		auto aiMesh = m_AiScene->mMeshes[i];
+		auto mesh = make_shared<MODEL_MESH>();
+		
 		mesh->name = aiMesh->mName.C_Str();
-		mesh->boneIndex = boneIndex;
+		if (mesh->name.empty())
+			mesh->name = "Mesh_" + std::to_string(i);
 		mesh->materialIndex = aiMesh->mMaterialIndex;
 
 		/* vertices */
-		mesh->vertices.resize(aiMesh->mNumVertices);
-		for (uint32 j = 0; j < aiMesh->mNumVertices; ++j)
+		if (isAnim)
 		{
-			VTXMESH& vtxMesh = mesh->vertices[j];
-			auto aiPos = aiMesh->mVertices[j];
-			vtxMesh.position = Vector3{ aiPos.x, aiPos.y, aiPos.z };
+			mesh->animVertices.resize(aiMesh->mNumVertices);
+			for (uint32 j = 0; j < aiMesh->mNumVertices; ++j)
+			{
+				VTXANIMMESH& vtxMesh = mesh->animVertices[j];
+				auto aiPos = aiMesh->mVertices[j];
+				vtxMesh.position = Vector3{ aiPos.x, aiPos.y, aiPos.z };
 
-			if (aiMesh->HasNormals()) {
-				auto aiNorm = aiMesh->mNormals[j];
-				vtxMesh.normal = Vector3{ aiNorm.x, aiNorm.y, aiNorm.z };
+				if (aiMesh->HasNormals()) {
+					auto aiNorm = aiMesh->mNormals[j];
+					vtxMesh.normal = Vector3{ aiNorm.x, aiNorm.y, aiNorm.z };
+				}
+
+				if (aiMesh->HasTangentsAndBitangents()) {
+					auto aiTangent = aiMesh->mTangents[j];
+					vtxMesh.tangent = Vector3{ aiTangent.x, aiTangent.y, aiTangent.z };
+				}
+
+				if (aiMesh->HasTextureCoords(0)) {
+					auto aiTexcoord = aiMesh->mTextureCoords[0][j];
+					vtxMesh.texcoord = Vector2{ aiTexcoord.x, aiTexcoord.y };
+				}
+
+				vtxMesh.blendIndex = Vector4{ 0.f, 0.f, 0.f, 0.f };
+				vtxMesh.blendWeight = Vector4{ 0.f, 0.f, 0.f, 0.f };
 			}
-				
-			if (aiMesh->HasTangentsAndBitangents()) {
-				auto aiTangent = aiMesh->mTangents[j];
-				vtxMesh.tangent = Vector3{ aiTangent.x, aiTangent.y, aiTangent.z };
+		}
+		else
+		{
+			mesh->vertices.resize(aiMesh->mNumVertices);
+			for (uint32 j = 0; j < aiMesh->mNumVertices; ++j)
+			{
+				VTXMESH& vtxMesh = mesh->vertices[j];
+				auto aiPos = aiMesh->mVertices[j];
+				vtxMesh.position = Vector3{ aiPos.x, aiPos.y, aiPos.z };
+
+				if (aiMesh->HasNormals()) {
+					auto aiNorm = aiMesh->mNormals[j];
+					vtxMesh.normal = Vector3{ aiNorm.x, aiNorm.y, aiNorm.z };
+				}
+
+				if (aiMesh->HasTangentsAndBitangents()) {
+					auto aiTangent = aiMesh->mTangents[j];
+					vtxMesh.tangent = Vector3{ aiTangent.x, aiTangent.y, aiTangent.z };
+				}
+
+				if (aiMesh->HasTextureCoords(0)) {
+					auto aiTexcoord = aiMesh->mTextureCoords[0][j];
+					vtxMesh.texcoord = Vector2{ aiTexcoord.x, aiTexcoord.y };
+				}
 			}
+		}
+
+		/* Animation / Bone Info */
+		if (isAnim)
+		{
+			mesh->numBones = aiMesh->mNumBones;
+			for (uint32 b = 0; b < aiMesh->mNumBones; ++b)
+			{
+				aiBone* pAIBone = aiMesh->mBones[b];
 				
-			if (aiMesh->HasTextureCoords(0)) {
-				auto aiTexcoord = aiMesh->mTextureCoords[0][j];
-				vtxMesh.texcoord = Vector2{ aiTexcoord.x, aiTexcoord.y };  // z 제거
+				// 글로벌 본 리스트에서 해당 본의 인덱스 찾기
+				uint32 globalBoneIndex = 0;
+				for (uint32 g = 0; g < m_Bones.size(); ++g)
+				{
+					if (m_Bones[g]->name == pAIBone->mName.C_Str())
+					{
+						globalBoneIndex = g;
+						break;
+					}
+				}
+				mesh->boneIndices.push_back(globalBoneIndex);
+
+				for (uint32 w = 0; w < pAIBone->mNumWeights; ++w)
+				{
+					aiVertexWeight vertexWeight = pAIBone->mWeights[w];
+					uint32 vId = vertexWeight.mVertexId;
+
+					if (mesh->animVertices[vId].blendWeight.x == 0.f) {
+						mesh->animVertices[vId].blendIndex.x = static_cast<Float>(b);
+						mesh->animVertices[vId].blendWeight.x = vertexWeight.mWeight;
+					}
+					else if (mesh->animVertices[vId].blendWeight.y == 0.f) {
+						mesh->animVertices[vId].blendIndex.y = static_cast<Float>(b);
+						mesh->animVertices[vId].blendWeight.y = vertexWeight.mWeight;
+					}
+					else if (mesh->animVertices[vId].blendWeight.z == 0.f) {
+						mesh->animVertices[vId].blendIndex.z = static_cast<Float>(b);
+						mesh->animVertices[vId].blendWeight.z = vertexWeight.mWeight;
+					}
+					else if (mesh->animVertices[vId].blendWeight.w == 0.f) {
+						mesh->animVertices[vId].blendIndex.w = static_cast<Float>(b);
+						mesh->animVertices[vId].blendWeight.w = vertexWeight.mWeight;
+					}
+				}
 			}
 		}
 
@@ -127,9 +211,6 @@ void Tool::Converter::ReadMeshData(aiNode* node, int32_t boneIndex)
 
 		m_Meshes.push_back(mesh);
 	}
-
-	for (uint32 i = 0; i < node->mNumChildren; ++i)
-		ReadMeshData(node->mChildren[i], boneIndex);
 }
 
 void Tool::Converter::ReadMaterialData()
@@ -137,33 +218,34 @@ void Tool::Converter::ReadMaterialData()
 	for (uint32 i = 0; i < m_AiScene->mNumMaterials; ++i)
 	{
 		const aiMaterial* aiMat = m_AiScene->mMaterials[i];
-		auto mat = make_shared<AS_MATERIAL>();
+		auto mat = make_shared<MODEL_MATERIAL>();
+
 		aiString name;
 		aiMat->Get(AI_MATKEY_NAME, name);
 		mat->name = name.C_Str();
-		aiColor4D color;
-		if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_AMBIENT, color)) mat->ambient = ToFloat4(color);
-		if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color)) mat->diffuse = ToFloat4(color);
-		if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_SPECULAR, color)) mat->specular = ToFloat4(color);
-		if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_EMISSIVE, color)) mat->emissive = ToFloat4(color);
-		// AI_TEXTURE_TYPE_MAX 전체 순회
+
 		for (uint32 t = 0; t < AI_TEXTURE_TYPE_MAX; ++t)
 		{
 			const aiTextureType texType = static_cast<aiTextureType>(t);
 			const uint32        numTex = aiMat->GetTextureCount(texType);
+
 			if (0 == numTex) continue;
+
 			for (uint32 j = 0; j < numTex; ++j)
 			{
 				aiString texPath;
 				if (AI_SUCCESS != aiMat->GetTexture(texType, j, &texPath))
 					continue;
-				AS_TEX_ENTRY entry;
+
+				MODEL_ENTRY entry;
 				entry.typeIndex = t;
-				// 절대경로 혼재 방지: 파일명만 저장
+
+				// 절대경로 혼재 방지: 순수 파일명(ex: "diffuse.dds")만 파싱해서 저장
 				entry.path = filesystem::path(texPath.C_Str()).filename().string();
 				mat->textures.push_back(entry);
 			}
 		}
+
 		m_Material.push_back(mat);
 	}
 }
@@ -174,70 +256,77 @@ void Tool::Converter::WriteModelFile(const wstring& path)
 	ofstream out(path, std::ios::binary);
 
 	/* Header */
-	ModelFileHeader header{};
+	MODEL_HEADER header{};
 	memcpy(header.magic, "NMDL", 4);
 	header.version = 1;
+	header.isAnim = m_AiScene->HasAnimations();
 	header.numBones = static_cast<uint32>(m_Bones.size());
 	header.numMeshes = static_cast<uint32>(m_Meshes.size());
 	header.numMaterials = static_cast<uint32>(m_Material.size());
-	out.write(reinterpret_cast<const Char*>(&header), sizeof(header));
-
-	/* Bones */
-	for (auto& bone : m_Bones)
-	{
-		uint32 length = static_cast<uint32>(bone->name.size());
-		out.write(reinterpret_cast<const Char*>(&length), sizeof(uint32));
-		out.write(bone->name.data(), length);
-		out.write(reinterpret_cast<const Char*>(&bone->parent), sizeof(int32));
-		out.write(reinterpret_cast<const Char*>(&bone->transform), sizeof(Matrix));
-	}
+	out.write(BIN(&header), sizeof(header));
 
 	/* Meshes */
 	for (auto& mesh : m_Meshes)
 	{
 		uint32 nameLength = static_cast<uint32>(mesh->name.size());
-		out.write(reinterpret_cast<const Char*>(&nameLength), sizeof(uint32));
+		out.write(BIN(&nameLength), sizeof(uint32));
 		out.write(mesh->name.data(), nameLength);
-		out.write(reinterpret_cast<const Char*>(&mesh->boneIndex), sizeof(int32));
-		out.write(reinterpret_cast<const Char*>(&mesh->materialIndex), sizeof(uint32));
+		out.write(BIN(&mesh->materialIndex), sizeof(uint32));
 
-		uint32 numVertex = static_cast<uint32>(mesh->vertices.size());
+		// numBones 및 boneIndices 기록
+		out.write(BIN(&mesh->numBones), sizeof(uint32));
+		if (mesh->numBones > 0)
+		{
+			out.write(BIN(mesh->boneIndices.data()), mesh->numBones * sizeof(uint32));
+		}
+
+		uint32 numVertex = (header.isAnim) ? static_cast<uint32>(mesh->animVertices.size()) : static_cast<uint32>(mesh->vertices.size());
 		uint32 numIndex = static_cast<uint32>(mesh->indices.size());
-		out.write(reinterpret_cast<const Char*>(&numVertex), sizeof(uint32));
-		out.write(reinterpret_cast<const Char*>(&numIndex), sizeof(uint32));
-		out.write(reinterpret_cast<const Char*>(mesh->vertices.data()), numVertex * sizeof(Engine::VTXMESH));
-		out.write(reinterpret_cast<const Char*>(mesh->indices.data()),numIndex * sizeof(uint32));
+		out.write(BIN(&numVertex), sizeof(uint32));
+		out.write(BIN(&numIndex), sizeof(uint32));
+
+		if (header.isAnim)
+		{
+			out.write(BIN(mesh->animVertices.data()), numVertex * sizeof(Engine::VTXANIMMESH));
+		}
+		else
+		{
+			out.write(BIN(mesh->vertices.data()), numVertex * sizeof(Engine::VTXMESH));
+		}
+		
+		out.write(BIN(mesh->indices.data()), numIndex * sizeof(uint32));
 	}
 
 	/* Materials */
+	uint32 maxTextureType = AI_TEXTURE_TYPE_MAX;
 	for (auto& mat : m_Material)
 	{
-		uint32 nameLen = static_cast<uint32>(mat->name.size());
-		Float  amb[4] = { mat->ambient.x,  mat->ambient.y,  mat->ambient.z,  mat->ambient.w };
-		Float  dif[4] = { mat->diffuse.x,  mat->diffuse.y,  mat->diffuse.z,  mat->diffuse.w };
-		Float  spc[4] = { mat->specular.x, mat->specular.y, mat->specular.z, mat->specular.w };
-		Float  emi[4] = { mat->emissive.x, mat->emissive.y, mat->emissive.z, mat->emissive.w };
+		uint32 nameLength = static_cast<uint32>(mat->name.size());
+		out.write(reinterpret_cast<const Char*>(&nameLength), sizeof(uint32));
+		out.write(mat->name.data(), nameLength);
+		out.write(BIN(&maxTextureType), sizeof(uint32));
+		
 		uint32 numTex = static_cast<uint32>(mat->textures.size());
-		out.write(reinterpret_cast<const Char*>(&nameLen), sizeof(uint32));
-		out.write(mat->name.data(), nameLen);
-		out.write(reinterpret_cast<const Char*>(amb), sizeof(float) * 4);
-		out.write(reinterpret_cast<const Char*>(dif), sizeof(float) * 4);
-		out.write(reinterpret_cast<const Char*>(spc), sizeof(float) * 4);
-		out.write(reinterpret_cast<const Char*>(emi), sizeof(float) * 4);
-		out.write(reinterpret_cast<const Char*>(&numTex), sizeof(uint32));
-		for (auto& tex : mat->textures)
+		out.write(BIN(&numTex), sizeof(uint32));
+		for (auto& texture : mat->textures)
 		{
-			uint32 pathLen = static_cast<uint32>(tex.path.size());
-			out.write(reinterpret_cast<const Char*>(&tex.typeIndex), sizeof(uint32));
-			out.write(reinterpret_cast<const Char*>(&pathLen), sizeof(uint32));
-			out.write(tex.path.data(), pathLen);
+			uint32 pathLength = static_cast<uint32>(texture.path.size());
+			out.write(BIN(&texture.typeIndex), sizeof(uint32));
+			out.write(BIN(&pathLength), sizeof(uint32));
+			out.write(texture.path.data(), pathLength);
 		}
 	}
 
-	out.close();
-}
+	/* Bones */
+	for (auto& bone : m_Bones)
+	{
+		uint32 length = static_cast<uint32>(bone->name.size());
+		out.write(BIN(&length), sizeof(uint32));
+		out.write(bone->name.data(), length);
+		out.write(BIN(&bone->index), sizeof(int32));
+		out.write(BIN(&bone->parent), sizeof(int32));
+		out.write(BIN(&bone->transform), sizeof(Matrix));
+	}
 
-void Tool::Converter::WriteMaterialFile(const wstring& path)
-{
-	
+	out.close();
 }

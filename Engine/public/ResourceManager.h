@@ -2,6 +2,7 @@
 #include "EngineManager.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "Model.h"
 
 NS_BEGIN(Engine)
 
@@ -26,8 +27,13 @@ public:
 	const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar* texturePath);
 
 public:
-	HRESULT Load_Shader(uint32 levIndex, const tChar* texturePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag);
+	HRESULT Load_Shader(uint32 levIndex, const tChar* shaderPath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag);
 	Shared<Shader> Get_Shader(uint32 levIndex, const tChar* vertexTag);
+
+public:
+	HRESULT Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag);
+	Shared<Model> Get_Model(uint32 levIndex, const tChar* modelTag);
+	int32 Get_ContainLevelByModelTag(const wstring& tag);
 
 public:
 	HRESULT Clear_AllResources();
@@ -39,6 +45,11 @@ private:
 	ComPtr<ID3D11DeviceContext> m_Context{ nullptr };
 
 	vector<unordered_map<wstring, Shared<Shader>>> m_Shaders;
+
+	vector<unordered_map<wstring, Shared<Model>>> m_Models;
+	unordered_map<wstring, uint32> m_StaticModelContainLev;
+	unordered_map<wstring, uint32> m_ModelContainLev;
+
 	vector<unordered_map<wstring, Texture::TEXTURE_DESC>> m_TextureDescTags;
 	vector<unordered_map<wstring, ComPtr<ID3D11ShaderResourceView>>> m_SRVs;
 	mutable std::recursive_mutex m_ResourceMutex;

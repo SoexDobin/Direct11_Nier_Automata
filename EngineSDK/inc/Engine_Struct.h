@@ -85,6 +85,29 @@ namespace Engine
 		};
 	} VTXMESH;
 
+	typedef struct tagVertexAnimationMesh
+	{
+		Vector3			position;
+		Vector3			normal;
+		Vector3			tangent;
+		Vector2			texcoord;
+
+		Vector4			blendIndex; 
+		Vector4			blendWeight;
+
+		inline static const std::wstring Tag = { L"VTX_Animation_Mesh" };
+		static const uint32_t numElements = { 6 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"BLENDINDEX", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 60, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+
+	} VTXANIMMESH;
+
 }
 
 #endif // Engine_Struct_h__

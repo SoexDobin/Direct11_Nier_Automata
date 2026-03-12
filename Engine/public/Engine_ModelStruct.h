@@ -1,48 +1,64 @@
 #ifndef Engine_ModelStruc_h__
 #define Engine_ModelStruct_h__
 
-#pragma pack(push, 1)
 namespace Engine
 {
 	constexpr char MODEL_MAGIC[4] = { 'N','M','D','L' };
 	constexpr uint32 MODEL_VERSION = 1;
 
-	struct ModelFileHeader
+	typedef struct MatTexEntry
+	{
+		uint32_t typeIndex;
+		std::string path;
+	} MODEL_ENTRY;
+
+	typedef struct ModelFileHeader
 	{
 		Char   magic[4];       // "NMDL"포멧
 		uint32 version;        // 1
+		Bool   isAnim;
 		uint32 numBones;
 		uint32 numMeshes;
 		uint32 numMaterials;
-	};
+		uint32 numAnimations;
+	} MODEL_HEADER;
 
-	struct MeshHeader
+	typedef struct BoneData
 	{
-		uint32 nameLength;     // 메시 이름 길이 (바이트)
-		uint32 materialIndex;  // 대응 Material 인덱스
-		uint32 numVertices;
-		uint32 numIndices;
-	};
+		std::string name;
+		int32_t index{ 0 };
+		int32_t parent{ -1 };
+		Matrix transform{};
+	} MODEL_BONE;
 
-	// aiTextureType 인덱스 + 상대 경로를 기록
-	struct MatTexEntry
+	typedef struct MeshData
 	{
-		uint32_t typeIndex;      
-		uint32_t pathLen;       
-		// 뒤에 char[pathLen] 경로 문자열이 이어짐
-	};
+		std::string name;
+		int32 materialIndex{ 0 };
+		uint32 numBones{ 0 };
+		std::vector<uint32> boneIndices;
+		std::vector<VTXMESH> vertices;       // Non-Anim Vertices
+		std::vector<VTXANIMMESH> animVertices; // Anim Vertices
+		std::vector<uint32> indices;
+	} MODEL_MESH;
 
-	struct MaterialHeader
+	typedef struct WeightData
 	{
-		uint32_t nameLen;        // 머티리얼 이름 길이
-		float    ambient[4];
-		float    diffuse[4];
-		float    specular[4];
-		float    emissive[4];
-		uint32_t numTextures;    // MatTexEntry 개수
-	};
+		uint32 vertexID;
+		Float weight;
+	} MODEL_WEIGHT;
+
+	typedef struct MaterialData {
+		std::string name;
+		uint32 textureTypeMax;
+		std::string directoryPath;
+		std::vector<MODEL_ENTRY> textures;
+	} MODEL_MATERIAL;
+
+	typedef struct AnimationData
+	{
+		std::string name;
+	} MODEL_ANIMATION;
 }
-
-#pragma pack(pop)
 
 #endif

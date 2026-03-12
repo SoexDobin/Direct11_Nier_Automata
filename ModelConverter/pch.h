@@ -13,7 +13,12 @@
 #include "Assimp/Importer.hpp"
 #include "Assimp/postprocess.h"
 
-#include "ConverterStructs.h"
+#define BIN(_DATA_) reinterpret_cast<const Char*>(_DATA_)
+
+namespace Tool
+{
+}
+using namespace Tool;
 
 using namespace Engine;
 using namespace Tool;

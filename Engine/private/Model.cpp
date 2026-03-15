@@ -213,18 +213,20 @@ HRESULT Model::Ready_Animation(ifstream& in)
 		in.read(reinterpret_cast<Char*>(&animationData.tickPerSecond), sizeof(Float));
 		in.read(reinterpret_cast<Char*>(&animationData.numChannel), sizeof(uint32));
 
-		
+		animationData.channels.reserve(animationData.numChannel);
 		for (uint32 j = 0; j < animationData.numChannel; ++j)
 		{
 			MODEL_CHANNEL channelData{};
 			uint32 channelNameLength = 0;
 			in.read(reinterpret_cast<Char*>(&channelNameLength), sizeof(uint32));
-			animationData.name.resize(channelNameLength);
-			in.read(channelData.name.data(), animNameLength);
+			channelData.name.resize(channelNameLength);
+			in.read(channelData.name.data(), channelNameLength);
 			in.read(reinterpret_cast<Char*>(&channelData.numKeyFrames), sizeof(uint32));
 
 			channelData.keyFrames.resize(channelData.numKeyFrames);
 			in.read(reinterpret_cast<Char*>(channelData.keyFrames.data()), channelData.numKeyFrames * sizeof(KEYFRAME));
+
+			animationData.channels.push_back(channelData);
 		}
 
 		auto animation = Animation::Create(m_Device, m_Context, animationData);

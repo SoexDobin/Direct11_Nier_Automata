@@ -1,0 +1,38 @@
+#pragma once
+#include "Component.h"
+
+NS_BEGIN(Engine)
+
+class Channel;
+
+class Animation final : public Component
+{
+	RTTR_ENABLE(Component)
+public:
+	explicit Animation();
+	explicit Animation(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit Animation(const Animation& rhs);
+	~Animation() override = default;
+
+public:
+	void On_Destroy() override;
+
+public:
+	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::ANIMATION; }
+	HRESULT Initialize_Prototype(const MODEL_ANIMATION& modelAnimation);
+	HRESULT Initialize_Prototype() override;
+	HRESULT Initialize(void* arg) override;
+
+private:
+	Float m_Duration{}; // 애니메이션의 길이 절대 값
+	Float m_TickPerSecond{};
+
+	uint32 m_NumChannels{};
+	vector<Shared<Channel>> m_Channels;
+
+public:
+	static Shared<Animation> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_ANIMATION& animationData);
+	Shared<Component> Clone(void* arg = nullptr) override { return nullptr; }
+};
+
+NS_END

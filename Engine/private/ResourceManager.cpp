@@ -1,4 +1,6 @@
 #include "ResourceManager.h"
+
+#include <fstream>
 #include <tchar.h>
 #include "SpdLogger.h"
 #include "Game.h"
@@ -16,6 +18,7 @@ HRESULT ResourceManager::Initialize_Prototype(uint32 levCount)
     m_Shaders.resize(m_LevelCount);
     m_TextureDescTags.resize(m_LevelCount);
     m_SRVs.resize(m_LevelCount);
+    m_Models.resize(m_LevelCount);
 
 	return EngineManager::Initialize_Prototype();
 }
@@ -26,9 +29,14 @@ void ResourceManager::On_Destroy()
         shaders.clear();
     m_Shaders.clear();
 
+    for (auto& model : m_Models)
+        model.clear();
+    m_Models.clear();
+
     for (auto& textureDescs : m_TextureDescTags)
         textureDescs.clear();
     m_TextureDescTags.clear();
+
     for (auto& SRVs : m_SRVs)
         SRVs.clear();
     m_SRVs.clear();
@@ -137,10 +145,54 @@ Shared<Shader> ResourceManager::Get_Shader(uint32 levIndex, const tChar* vertexT
 {
     if (m_Shaders[levIndex].contains(vertexTag) == false)
     {
-        LOG_ERROR(L"{} is not shader path", vertexTag);
+        LOG_ERROR(L"{} is not shader Tag", vertexTag);
+        return nullptr;
     }
 
     return m_Shaders[levIndex][vertexTag];
+}
+
+HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag, const Matrix& preTransformMatrix)
+{
+    auto model = Model::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), modelPath, preTransformMatrix);
+    if (nullptr == model)
+    {
+        LOG_ERROR(L"Failed to Create Shader Resource. Path : {}", modelPath);
+    }
+
+    m_Models[levIndex].emplace(descriptionTag, model);
+    if (levIndex == 0)
+        m_StaticModelContainLev.emplace(descriptionTag, levIndex);
+    else
+        m_ModelContainLev.emplace(descriptionTag, levIndex);
+
+    return S_OK;
+}
+
+Shared<Model> ResourceManager::Get_Model(uint32 levIndex, const tChar* modelTag)
+{
+    if (m_Models[levIndex].contains(modelTag) == false)
+    {
+        LOG_ERROR(L"{} is not shader Tag", modelTag);
+        return nullptr;
+    }
+
+    return m_Models[levIndex][modelTag];
+}
+
+int32 ResourceManager::Get_ContainLevelByModelTag(const wstring& tag)
+{
+    if (!m_ModelContainLev.contains(tag))
+    {
+        if (m_StaticModelContainLev.contains(tag))
+        {
+            return m_StaticModelContainLev[tag];
+        }
+        LOG_ERROR(L"Model {} is not in such level", tag);
+        return -1;
+    }
+
+    return m_ModelContainLev[tag];
 }
 
 HRESULT ResourceManager::Clear_AllResources() {
@@ -148,9 +200,14 @@ HRESULT ResourceManager::Clear_AllResources() {
     m_TextureDescTags.clear();
     m_SRVs.clear();
 
+    m_Models.clear();
+    m_StaticModelContainLev.clear();
+    m_ModelContainLev.clear();
+
     m_Shaders.resize(m_LevelCount);
     m_TextureDescTags.resize(m_LevelCount);
     m_SRVs.resize(m_LevelCount);
+    m_Models.resize(m_LevelCount);
 
 	return S_OK;
 }
@@ -160,6 +217,10 @@ HRESULT ResourceManager::Clear_Resource(uint32 levIndex)
     m_Shaders[levIndex].clear();
     m_TextureDescTags[levIndex].clear();
     m_SRVs[levIndex].clear();
+
+    m_Models.clear();
+    m_StaticModelContainLev.clear();
+    m_ModelContainLev.clear();
 
     return S_OK;
 }

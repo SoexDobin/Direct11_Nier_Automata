@@ -24,11 +24,11 @@ HRESULT VIBuffer::Initialize(void *arg) { return Component::Initialize(arg); }
 
 
 HRESULT VIBuffer::Bind_Resources() {
-    ComPtr<ID3D11Buffer> vertexBuffer[] = { m_VB, };
+    ID3D11Buffer* pVBs[] = { m_VB.Get() };
     uint32 vtxStrides[] = { m_VtxStride, };
     uint32 offsets[] = { 0, };
 
-    m_Context->IASetVertexBuffers(0, m_NumVtxBuffers, vertexBuffer->GetAddressOf(), vtxStrides, offsets);
+    m_Context->IASetVertexBuffers(0, m_NumVtxBuffers, pVBs, vtxStrides, offsets);
     m_Context->IASetIndexBuffer(m_IB.Get(), 2 == m_IndexStride ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
     m_Context->IASetPrimitiveTopology(m_PrimitiveType);
 

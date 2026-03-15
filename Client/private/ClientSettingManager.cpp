@@ -23,7 +23,7 @@ HRESULT ClientSettingManager::Load_Textures_FromJson() const
 	{
 		nlohmann::json defaultJson;
 		defaultJson["TextureSettings"] = nlohmann::json::array();
-		// 초기 템플릿 예시 추가 가능
+		
 		std::ofstream outFile(fullPath);
 		if (outFile.is_open()) {
 			outFile << defaultJson.dump(4);
@@ -124,6 +124,172 @@ HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
 	ofstream jsonFile(m_ProjectSettingPath + L"TextureSettings.json");
 	jsonFile << jsonRoot.dump(4);
 
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Load_Model_FromJson() const
+{
+	wstring fullPath = m_ProjectSettingPath + L"ModelSettings.json";
+
+	if (!filesystem::exists(fullPath))
+	{
+		nlohmann::json defaultJson;
+		defaultJson["ModelSettings"] = nlohmann::json::array();
+
+		std::ofstream outFile(fullPath);
+		if (outFile.is_open()) {
+			outFile << defaultJson.dump(3);
+			outFile.close();
+		}
+		LOG_INFO(L"Created Default ModelSettings.json: {}", fullPath);
+	}
+
+	if (!filesystem::exists(fullPath))
+	{
+		LOG_WARN(L"Failed To Find Model Settings : {}", fullPath);
+		return S_OK;
+	}
+
+	ifstream file(fullPath);
+	if (!file.is_open()) return E_FAIL;
+
+	nlohmann::json json;
+	file >> json;
+	file.close();
+
+	auto& settings = json["ModelSettings"];
+	for (auto& item : settings)
+	{
+		string levelStr = item["level"];
+		LEVEL level = LEVEL::STATIC;
+		if (levelStr == "1" || levelStr == "Loading" || levelStr == "LOADING")
+			level = LEVEL::LOADING;
+		else if (levelStr == "2" || levelStr == "Logo" || levelStr == "LOGO")
+			level = LEVEL::LOGO;
+		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
+			level = LEVEL::GAMEPLAY;
+		
+		wstring tag = Helper::To_wString(item["tag"].get<string>());
+		wstring relativePath = Helper::To_wString(item["path"].get<string>());
+		wstring fullTexturePath = m_ResourcePath + relativePath;
+
+		// JSON에서 트랜스포메이션 데이터 추출 및 기본값 처리
+		Vector3 vPos = Vector3::Zero;
+		if (item.contains("position"))
+		{
+			vPos.x = item["position"].value("x", 0.f);
+			vPos.y = item["position"].value("y", 0.f);
+			vPos.z = item["position"].value("z", 0.f);
+		}
+
+		Vector3 vRot = Vector3::Zero;
+		if (item.contains("rotation"))
+		{
+			vRot.x = item["rotation"].value("x", 0.f);
+			vRot.y = item["rotation"].value("y", 0.f);
+			vRot.z = item["rotation"].value("z", 0.f);
+		}
+
+		Vector3 vScale = Vector3::One;
+		if (item.contains("scale"))
+		{
+			vScale.x = item["scale"].value("x", 1.f);
+			vScale.y = item["scale"].value("y", 1.f);
+			vScale.z = item["scale"].value("z", 1.f);
+		}
+
+		// 월드 행렬 생성 (Scale * Rotation * Translation)
+		// Rotation은 오일러(Degree) -> Radian 변환 후 YawPitchRoll로 생성
+		Matrix matWorld = Matrix::CreateScale(vScale) * 
+						  Matrix::CreateFromYawPitchRoll(XMConvertToRadians(vRot.y), XMConvertToRadians(vRot.x), XMConvertToRadians(vRot.z)) * 
+						  Matrix::CreateTranslation(vPos);
+
+		if (FAILED(GAME_INSTANCE->Load_Model(ETOI(level), fullTexturePath.c_str(), tag, matWorld)))
+		{
+			LOG_ERROR(L"Failed to Load Model Prototype: {}", tag);
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Sync_ModelJson_FromCSV() const
+{
+	wstring csvPath = m_ResourcePath + L"ModelSettings.csv";
+
+	if (!filesystem::exists(csvPath))
+	{
+		ofstream outFile(csvPath);
+		if (outFile.is_open())
+		{
+			outFile << "Level, Tag, Path, PosX, PosY, PosZ, RotX, RotY, RotZ, ScaleX, ScaleY, ScaleZ" << std::endl;
+			outFile << "STATIC, Prototype_Model_Default, Models/Default.Model, 0, 0, 0, 0, 0, 0, 1, 1, 1" << std::endl;
+			outFile.close();
+		}
+		LOG_INFO(L"Created Template ModelSettings.csv: {}", csvPath);
+	}
+
+	if (!filesystem::exists(csvPath)) return S_OK;
+
+	ifstream csvFile(csvPath);
+	nlohmann::json jsonRoot;
+	string line;
+
+
+	getline(csvFile, line);
+	while (getline(csvFile, line))
+	{
+		if (line.empty()) continue;
+
+		stringstream stream(line);
+		string level, tag, path;
+		string px, py, pz, rx, ry, rz, sx, sy, sz;
+
+		getline(stream, level, ',');
+		getline(stream, tag, ',');
+		getline(stream, path, ',');
+		getline(stream, px, ','); getline(stream, py, ','); getline(stream, pz, ','); // Position
+		getline(stream, rx, ','); getline(stream, ry, ','); getline(stream, rz, ','); // Rotation (Euler)
+		getline(stream, sx, ','); getline(stream, sy, ','); getline(stream, sz, ','); // Scale
+
+		// 빈 문자열 및 기본값 처리 람다 (Sync 시 적용)
+		auto GetFloat = [](string str, float defaultValue) {
+			string trimmed = Helper::Trim(str);
+			// 따옴표 제거 (혹시 포함될 경우)
+			trimmed.erase(remove(trimmed.begin(), trimmed.end(), '\"'), trimmed.end());
+			if (trimmed.empty()) return defaultValue;
+			try { return stof(trimmed); } catch (...) { return defaultValue; }
+		};
+
+		auto CleanString = [](string str) {
+			string trimmed = Helper::Trim(str);
+			// 앞뒤 따옴표 제거
+			if (trimmed.size() >= 2 && trimmed.front() == '\"' && trimmed.back() == '\"')
+				trimmed = trimmed.substr(1, trimmed.size() - 2);
+			return Helper::Trim(trimmed); // 따옴표 제거 후 한 번 더 트림
+		};
+
+		string cleanLevel = CleanString(level);
+		string cleanTag = CleanString(tag);
+		string cleanPath = CleanString(path);
+
+		float fPx = GetFloat(px, 0.f); float fPy = GetFloat(py, 0.f); float fPz = GetFloat(pz, 0.f);
+		float fRx = GetFloat(rx, 0.f); float fRy = GetFloat(ry, 0.f); float fRz = GetFloat(rz, 0.f);
+		float fSx = GetFloat(sx, 1.f); float fSy = GetFloat(sy, 1.f); float fSz = GetFloat(sz, 1.f);
+
+		jsonRoot["ModelSettings"].push_back({
+			{"level", cleanLevel},
+			{"tag", cleanTag},
+			{"path", cleanPath},
+			{"position", {{"x", fPx}, {"y", fPy}, {"z", fPz}}},
+			{"rotation", {{"x", fRx}, {"y", fRy}, {"z", fRz}}},
+			{"scale", {{"x", fSx}, {"y", fSy}, {"z", fSz}}}
+			});
+	}
+
+	ofstream jsonFile(m_ProjectSettingPath + L"ModelSettings.json");
+	jsonFile << jsonRoot.dump(4);
 	return S_OK;
 }
 
@@ -271,7 +437,8 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
-				std::wstring meshTex = L"vtxmesh";
+				std::wstring staticMesh = L"vtxmesh";
+				std::wstring animMesh = L"vtxanimmesh";
 				
 				auto itTex = 
 					std::search(
@@ -288,24 +455,35 @@ HRESULT ClientSettingManager::Load_Shader() const
 				auto itMeshTex =
 					std::search(
 						tagName.begin(), tagName.end(),
-						meshTex.begin(), meshTex.end(),
+						staticMesh.begin(), staticMesh.end(),
+						CaseInsensitiveCompare
+					);
+				auto itAnimTex =
+					std::search(
+						tagName.begin(), tagName.end(),
+						animMesh.begin(), animMesh.end(),
 						CaseInsensitiveCompare
 					);
 
-				if (itTex != tagName.end())
+				if (itAnimTex != tagName.end())
 				{
-					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXTEX::Elements, VTXTEX::numElements, VTXTEX::Tag)))
-						LOG_ERROR(L"Failed to Load Shader {}", VTXTEX::Tag);
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXANIMMESH::Elements, VTXANIMMESH::numElements, VTXANIMMESH::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXANIMMESH::Tag);
+				}
+				else if (itMeshTex != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXMESH::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXMESH::Tag);
 				}
 				else if (itNormTex != tagName.end())
 				{
 					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXNORMTEX::Elements, VTXNORMTEX::numElements, VTXNORMTEX::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXNORMTEX::Tag);
 				}
-				else if (itMeshTex != tagName.end())
+				else if (itTex != tagName.end())
 				{
-					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXMESH::Tag)))
-						LOG_ERROR(L"Failed to Load Shader {}", VTXMESH::Tag);
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXTEX::Elements, VTXTEX::numElements, VTXTEX::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXTEX::Tag);
 				}
 				else
 				{

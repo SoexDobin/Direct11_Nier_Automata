@@ -60,7 +60,7 @@ void Renderer::Render_Group(uint32 groupIndex) const
 	for (auto& object : m_RenderGroup[groupIndex])
 	{
 		uint32 objLayer = object->Get_LayerMask().Get_Layer();
-		if ((m_LayerMask & objLayer) == 1)
+		if (objLayer != 0 && !(m_LayerMask & objLayer))
 			continue;
 		if (!object->Is_Active() || object->Is_Destroy())
 			continue;

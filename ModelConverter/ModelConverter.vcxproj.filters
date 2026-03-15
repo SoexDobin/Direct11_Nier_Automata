@@ -13,18 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="00. ToolFile">
+      <UniqueIdentifier>{e0e6a150-c7ad-410b-a75f-bca0d850907c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AssimpTool.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Converter.cpp">
+      <Filter>00. ToolFile</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>00. ToolFile</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelConverter.cpp">
+      <Filter>00. ToolFile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Converter.h">
+      <Filter>00. ToolFile</Filter>
+    </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>00. ToolFile</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

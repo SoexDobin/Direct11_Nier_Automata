@@ -21,6 +21,10 @@ public: /* Texture */
 	HRESULT Load_Textures_FromJson() const;
 	HRESULT Sync_TextureJson_FromCSV() const;
 
+public: /* Model */
+	HRESULT Load_Model_FromJson() const;
+	HRESULT Sync_ModelJson_FromCSV() const;
+
 public:
 	HRESULT Load_EngineDesc(ENGINE_DESC& outDesc) const;
 	HRESULT Apply_LayerAndTagSettings() const;

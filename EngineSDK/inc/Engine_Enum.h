@@ -10,7 +10,6 @@ enum class D3DTS { VIEW, PROJ, END };
 enum class DIMB { LBUTTON, RBUTTON, WHEEL, END };
 enum class DIMM { X, Y, WHEEL, END };
 enum class LIGHT { DIRECTIONAL, POINT, END };
-enum class MODEL { NONANIM, ANIM, END };
 
 enum class UI_ANCHOR {
 	TOP_LEFT,      // (0.0, 0.0)
@@ -33,8 +32,12 @@ enum class COMPONENT_TYPE {
 	SHADER,
 	MESH,
 	MODEL, 
+	BONE,
 	MATERIAL,
 	COLLIDER,
+
+	ANIMATION,
+	CHANNEL,
 };
 
 } // namespace Engine

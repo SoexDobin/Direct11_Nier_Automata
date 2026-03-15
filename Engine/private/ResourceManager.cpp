@@ -152,9 +152,9 @@ Shared<Shader> ResourceManager::Get_Shader(uint32 levIndex, const tChar* vertexT
     return m_Shaders[levIndex][vertexTag];
 }
 
-HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag)
+HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag, const Matrix& preTransformMatrix)
 {
-    auto model = Model::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), modelPath);
+    auto model = Model::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), modelPath, preTransformMatrix);
     if (nullptr == model)
     {
         LOG_ERROR(L"Failed to Create Shader Resource. Path : {}", modelPath);

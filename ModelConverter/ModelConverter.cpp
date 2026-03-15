@@ -61,9 +61,10 @@ int main(int argc, char* argv[])
 		}
 
 		// ★ 변환 결과 출력
-		std::cout << "  Meshes    : " << conv.GetMeshCount() << "\n";
-		std::cout << "  Materials : " << conv.GetMaterialCount() << "\n";
-		std::cout << "  Bones     : " << conv.GetBoneCount() << "\n";
+		std::cout << "  Meshes		: " << conv.GetMeshCount() << "\n";
+		std::cout << "  Materials		: " << conv.GetMaterialCount() << "\n";
+		std::cout << "  Bones			: " << conv.GetBoneCount() << "\n";
+		std::cout << "  Animations		: " << conv.GetAnimationCount() << "\n";
 
 		if (!conv.ExportModel(outPath.wstring()))
 		{

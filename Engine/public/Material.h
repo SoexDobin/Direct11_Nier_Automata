@@ -39,7 +39,7 @@ private:
 public:
 	static Shared<Material> CreatePrototype();
 	static Shared<Material> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_MATERIAL& modelMaterial);
-	Shared<Component> Clone(void* arg = nullptr) override;
+	Shared<Component> Clone(void* arg = nullptr) override { return nullptr; }
 };
 
 NS_END

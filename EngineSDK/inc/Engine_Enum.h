@@ -35,7 +35,9 @@ enum class COMPONENT_TYPE {
 	BONE,
 	MATERIAL,
 	COLLIDER,
-	
+
+	ANIMATION,
+	CHANNEL,
 };
 
 } // namespace Engine

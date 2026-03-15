@@ -130,8 +130,3 @@ Shared<Material> Material::Create(const ComPtr<ID3D11Device>& device, const ComP
 	}
 	return material;
 }
-
-Shared<Component> Material::Clone(void* arg)
-{
-	return nullptr;
-}

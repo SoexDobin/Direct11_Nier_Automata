@@ -79,11 +79,11 @@ public: /* For PrototypeManager */
 	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex = UINT_MAX) const;
 
 private: /* For ObjectManager */
-	HRESULT Add_GameObject(const Shared<GameObject> &GameObject) const;
+	HRESULT Add_GameObject(const Shared<GameObject>& GameObject) const;
 
 public: /* For ObjectManager */
 	void Submit_RenderGroup() const;
-	const unordered_map<uint32, Shared<GameObject>> &Get_GameObjects() const;
+	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects() const;
 
 public: /* For CameraManager */
     HRESULT Add_Camera(const Shared<class Camera> &camera) const;
@@ -98,7 +98,7 @@ public: /* For ResourceManager */
     const Texture::TEXTURE_DESC* Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const;
     const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
-    HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag) const;
+    HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;
     Shared<Model> Get_Model(uint32 levIndex, const tChar* modelFilePath) const;
     int32 Get_ContainLevelByModelTag(const wstring& modelTag) const;
 

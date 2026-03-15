@@ -3,6 +3,7 @@
 #include "Bone.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "Animation.h"
 
 #include <fstream>
 #include <istream>
@@ -21,6 +22,8 @@ Model::Model(const Model& rhs)
 	m_Materials{ rhs.m_Materials },
 	m_NumBones {rhs.m_NumBones},
 	m_Bones{rhs.m_Bones},
+	m_NumAnimation{rhs.m_NumAnimation},
+	m_Animations{ rhs.m_Animations },
 	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix }
 {
 	
@@ -46,9 +49,12 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	m_NumMeshes = header.numMeshes;
 	m_NumMaterials = header.numMaterials;
 	m_NumBones = header.numBones;
-	// TODO Anim
+	m_NumAnimation = header.numAnimations;
 
 	std::string currentModelDirectory = std::filesystem::path(modelFilePath).parent_path().string() + "\\";
+
+	if (FAILED(Ready_Bones(in)))
+		return E_FAIL;
 
 	if (FAILED(Ready_Meshes(in, header.isAnim)))
 		return E_FAIL;
@@ -56,8 +62,10 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	if (FAILED(Ready_Materials(in, currentModelDirectory)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Bones(in)))
+	if (FAILED(Ready_Animation(in)))
 		return E_FAIL;
+	
+	Update_Model(0.f);
 
 	return Component::Initialize_Prototype();
 }
@@ -80,6 +88,14 @@ void Model::On_Destroy()
 	Component::On_Destroy();
 }
 
+void Model::Update_Model(Float timeDelta)
+{
+	for (auto& bone : m_Bones)
+	{
+		bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
+	}
+}
+
 HRESULT Model::Render(uint32 meshIndex)
 {
 	m_Meshes[meshIndex]->Bind_Resources();
@@ -93,31 +109,29 @@ HRESULT Model::Ready_Meshes(ifstream& in, Bool isAnim)
 	for (uint32 i = 0; i < m_NumMeshes; ++i)
 	{
 		MODEL_MESH modelData{};
-		uint32 nameLength = 0;
-		in.read(reinterpret_cast<char*>(&nameLength), sizeof(uint32));
+		uint32 nameLength, numBones, numOffsetMatrices, numVertex, numIndex;
+		in.read(reinterpret_cast<Char*>(&nameLength), sizeof(uint32));
 		if (nameLength > 0)
 		{
 			modelData.name.resize(nameLength);
 			in.read(&modelData.name[0], nameLength);
 		}
+		in.read(reinterpret_cast<Char*>(&modelData.materialIndex), sizeof(int32));
 
-		// materialIndex 읽기
-		in.read(reinterpret_cast<char*>(&modelData.materialIndex), sizeof(int32));
-
-		// numBones 및 boneIndices 읽기
-		in.read(reinterpret_cast<char*>(&modelData.numBones), sizeof(uint32));
-		if (modelData.numBones > 0)
+		in.read(reinterpret_cast<Char*>(&numBones), sizeof(uint32));
+		if (numBones > 0)
 		{
-			modelData.boneIndices.resize(modelData.numBones);
-			in.read(reinterpret_cast<char*>(modelData.boneIndices.data()), modelData.numBones * sizeof(uint32));
+			// 1. 본 인덱스 배열 로드
+			modelData.boneIndices.resize(numBones);
+			in.read(reinterpret_cast<Char*>(modelData.boneIndices.data()), numBones * sizeof(uint32));
+
+			// 2. 오프셋 행렬 배열 로드 
+			in.read(reinterpret_cast<Char*>(&numOffsetMatrices), sizeof(uint32));
+			modelData.offsetMatrices.resize(numOffsetMatrices);
+			in.read(reinterpret_cast<Char*>(modelData.offsetMatrices.data()), numOffsetMatrices * sizeof(Matrix));
 		}
 
-		// numVertex 및 numIndex 읽기
-		uint32 numVertex = 0, numIndex = 0;
 		in.read(reinterpret_cast<Char*>(&numVertex), sizeof(uint32));
-		in.read(reinterpret_cast<Char*>(&numIndex), sizeof(uint32));
-
-		// vertices 읽기
 		if (isAnim)
 		{
 			modelData.animVertices.resize(numVertex);
@@ -129,14 +143,11 @@ HRESULT Model::Ready_Meshes(ifstream& in, Bool isAnim)
 			in.read(reinterpret_cast<Char*>(modelData.vertices.data()), numVertex * sizeof(VTXMESH));
 		}
 
-		// indices 읽기
+		in.read(reinterpret_cast<Char*>(&numIndex), sizeof(uint32));
 		modelData.indices.resize(numIndex);
 		in.read(reinterpret_cast<Char*>(modelData.indices.data()), numIndex * sizeof(uint32));
-
 		auto mesh = Mesh::Create(m_Device, m_Context, isAnim, modelData, m_PreLocalTransformMatrix);
-		if (mesh == nullptr)
-			return E_FAIL;
-
+		if (mesh == nullptr) return E_FAIL;
 		m_Meshes.push_back(mesh);
 	}
 
@@ -174,7 +185,7 @@ HRESULT Model::Ready_Materials(ifstream& in, const std::string& directoryPath)
 			if (pathLength > 0)
 			{
 				entry.path.resize(pathLength);
-				in.read(&entry.path[0], pathLength);
+				in.read(entry.path.data(), pathLength);
 			}
 			materialData.textures.push_back(entry);
 		}
@@ -189,6 +200,43 @@ HRESULT Model::Ready_Materials(ifstream& in, const std::string& directoryPath)
 	return S_OK;
 }
 
+HRESULT Model::Ready_Animation(ifstream& in)
+{
+	for (uint32 i = 0; i < m_NumAnimation; ++i)
+	{
+		MODEL_ANIMATION animationData{};
+		uint32 animNameLength = 0;
+		in.read(reinterpret_cast<Char*>(&animNameLength), sizeof(uint32));
+		animationData.name.resize(animNameLength);
+		in.read(animationData.name.data(), animNameLength);
+		in.read(reinterpret_cast<Char*>(&animationData.duration), sizeof(Float));
+		in.read(reinterpret_cast<Char*>(&animationData.tickPerSecond), sizeof(Float));
+		in.read(reinterpret_cast<Char*>(&animationData.numChannel), sizeof(uint32));
+
+		
+		for (uint32 j = 0; j < animationData.numChannel; ++j)
+		{
+			MODEL_CHANNEL channelData{};
+			uint32 channelNameLength = 0;
+			in.read(reinterpret_cast<Char*>(&channelNameLength), sizeof(uint32));
+			animationData.name.resize(channelNameLength);
+			in.read(channelData.name.data(), animNameLength);
+			in.read(reinterpret_cast<Char*>(&channelData.numKeyFrames), sizeof(uint32));
+
+			channelData.keyFrames.resize(channelData.numKeyFrames);
+			in.read(reinterpret_cast<Char*>(channelData.keyFrames.data()), channelData.numKeyFrames * sizeof(KEYFRAME));
+		}
+
+		auto animation = Animation::Create(m_Device, m_Context, animationData);
+		if (animation == nullptr)
+			return E_FAIL;
+
+		m_Animations.push_back(animation);
+	}
+
+	return S_OK;
+}
+
 HRESULT Model::Ready_Bones(ifstream& in)
 {
 	for (uint32 i = 0; i < m_NumBones; ++i)
@@ -196,14 +244,9 @@ HRESULT Model::Ready_Bones(ifstream& in)
 		MODEL_BONE boneData{};
 		uint32 nameLength = 0;
 		in.read(reinterpret_cast<Char*>(&nameLength), sizeof(uint32));
-		if (nameLength > 0)
-		{
-			boneData.name.resize(nameLength);
-			in.read(&boneData.name[0], nameLength);
-		}
-
-		in.read(reinterpret_cast<Char*>(&boneData.index), sizeof(int32));
-		in.read(reinterpret_cast<Char*>(&boneData.parent), sizeof(int32));
+		boneData.name.resize(nameLength);
+		in.read(&boneData.name[0], nameLength);
+		in.read(reinterpret_cast<Char*>(&boneData.parentIndex), sizeof(int32));
 		in.read(reinterpret_cast<Char*>(&boneData.transform), sizeof(Matrix));
 
 		auto bone = Bone::Create(m_Device, m_Context, boneData);
@@ -219,6 +262,11 @@ HRESULT Model::Ready_Bones(ifstream& in)
 HRESULT Model::Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex)
 {
 	return m_Materials[m_Meshes[meshIndex]->Get_MaterialIndex()]->Bind_Material(shader, constantName, materialType, textureIndex);
+}
+
+HRESULT Model::Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex)
+{
+	return m_Meshes[meshIndex]->Bind_BoneMatrices(shader, constantName, m_Bones);
 }
 
 Shared<Model> Model::CreatePrototype()

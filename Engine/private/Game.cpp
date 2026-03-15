@@ -306,9 +306,9 @@ const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(uint32 levIndex, const
     return m_ResourceManager->Get_Texture(levIndex, textureFilePath);
 }
 
-HRESULT Game::Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag) const
+HRESULT Game::Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const
 {
-    return m_ResourceManager->Load_Model(levIndex, modelFilePath, descriptionTag);
+    return m_ResourceManager->Load_Model(levIndex, modelFilePath, descriptionTag, preTransformMatrix);
 }
 
 Shared<Model> Game::Get_Model(uint32 levIndex, const tChar* modelFilePath) const

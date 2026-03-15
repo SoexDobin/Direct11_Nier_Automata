@@ -124,6 +124,27 @@ HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix)
     return matrixVariable->SetMatrix(reinterpret_cast<const Float*>(matrix));
 }
 
+HRESULT Shader::Bind_Matrices(const Char* constantName, const Float4x4* matrices, uint32 numMatrices)
+{
+    ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
+    if (nullptr == variable)
+    {
+        MSG_BOX("Failed to throw value to shader");
+        LOG_ERROR(L"Failed to throw value to shader {}", Helper::To_wString(constantName));
+        return E_FAIL;
+    }
+
+    ComPtr<ID3DX11EffectMatrixVariable> matrixVariable = variable->AsMatrix();
+    if (nullptr == matrixVariable)
+    {
+        MSG_BOX("Shader types do not match");
+        LOG_ERROR(L"Shader types do not match {}", Helper::To_wString(constantName));
+        return E_FAIL;
+    }
+
+    return matrixVariable->SetMatrixArray(reinterpret_cast<const Float*>(matrices), 0, numMatrices);
+}
+
 HRESULT Shader::Bind_RawValue(const Char* constantName, const void* data, uint32 length)
 {
     if (!m_Effect) return S_OK;

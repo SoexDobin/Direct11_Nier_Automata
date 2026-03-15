@@ -5,6 +5,7 @@ NS_BEGIN(Engine)
 class Mesh;
 class Material;
 class Bone;
+class Animation;
 class Shader;
 
 class ENGINE_DLL Model final : public Component
@@ -33,13 +34,16 @@ public:
 	void On_Destroy() override;
 
 public:
+	void Update_Model(Float timeDelta);
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);
+	HRESULT Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex);
 
 private:
+	HRESULT Ready_Bones(ifstream& in);
 	HRESULT Ready_Meshes(ifstream& in, Bool isAnim);
 	HRESULT Ready_Materials(ifstream& in, const std::string& directoryPath);
-	HRESULT Ready_Bones(ifstream& in);
+	HRESULT Ready_Animation(ifstream& in);
 
 private:
 	Matrix m_PreLocalTransformMatrix{};
@@ -51,6 +55,8 @@ private:
 	vector<Shared<Material>> m_Materials;
 	uint32 m_NumBones = {};
 	vector<Shared<Bone>> m_Bones;
+	uint32 m_NumAnimation = {};
+	vector<Shared<Animation>> m_Animations;
 
 public:
 	static Shared<Model> CreatePrototype();

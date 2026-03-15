@@ -1,5 +1,6 @@
 #include "Mesh.h"
 
+#include "Bone.h"
 #include "Game.h"
 #include "SpdLogger.h"
 
@@ -13,6 +14,10 @@ Mesh::Mesh(const Mesh& rhs)
 HRESULT Mesh::Initialize_Prototype(Bool isAnim, const MODEL_MESH& modelMesh, const Matrix& preTransformMatrix)
 {
 	m_MaterialIndex = modelMesh.materialIndex;
+	m_BoneIndices = modelMesh.boneIndices;
+	m_OffsetMatrices = modelMesh.offsetMatrices;
+	m_NumBones = static_cast<uint32>(m_BoneIndices.size());
+
 	m_NumVtxBuffers = 1;
 	m_NumIndices = modelMesh.indices.size();
 	m_IndexStride = 4;
@@ -74,6 +79,18 @@ void Mesh::On_Destroy()
 	VIBuffer::On_Destroy();
 }
 
+HRESULT Mesh::Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, const vector<Shared<Bone>>& Bones)
+{
+	ZeroMemory(m_BoneMatrices, sizeof(Matrix) * MODEL_BONE_MAX);
+
+	for (uint32 i = 0;  i < m_NumBones; ++i)
+	{
+		m_BoneMatrices[i] = m_OffsetMatrices[i] * *Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrixPtr();
+	}
+
+	return shader->Bind_Matrices(constantName, m_BoneMatrices, m_NumBones);
+}
+
 HRESULT Mesh::Ready_VertexBuffer_For_NonAnim(const MODEL_MESH& meshData, const Matrix& preTransformMatrix)
 {
 	m_VtxStride = sizeof(VTXMESH);
@@ -90,26 +107,20 @@ HRESULT Mesh::Ready_VertexBuffer_For_NonAnim(const MODEL_MESH& meshData, const M
 	VTXMESH* vertices = new VTXMESH[m_NumVertices];
 	for (size_t i = 0; i < m_NumVertices; i++)
 	{
-		vertices[i].position = meshData.vertices[i].position;
-		vertices[i].normal   = meshData.vertices[i].normal;
-		vertices[i].tangent  = meshData.vertices[i].tangent;
+		Vector3 position = meshData.vertices[i].position;
+		position = XMVector3TransformCoord(position, preTransformMatrix);
+		vertices[i].position = position;
+
+		Vector3 normal = meshData.vertices[i].normal;
+		normal = XMVector3TransformNormal(normal, preTransformMatrix);
+		vertices[i].normal= XMVector3Normalize(normal);
+
+		Vector3 tangent = meshData.vertices[i].tangent;
+		tangent = XMVector3TransformNormal(tangent, preTransformMatrix);
+		vertices[i].tangent = XMVector3Normalize(tangent);
+
 		vertices[i].texcoord = meshData.vertices[i].texcoord;
-
-		// Pre-Transform 적용
-		XMVECTOR vPos = XMLoadFloat3(&vertices[i].position);
-		vPos = XMVector3TransformCoord(vPos, preTransformMatrix);
-		XMStoreFloat3(&vertices[i].position, vPos);
-
-		XMVECTOR vNorm = XMLoadFloat3(&vertices[i].normal);
-		vNorm = XMVector3TransformNormal(vNorm, preTransformMatrix);
-		XMStoreFloat3(&vertices[i].normal, XMVector3Normalize(vNorm));
-
-		XMVECTOR vTangent = XMLoadFloat3(&vertices[i].tangent);
-		vTangent = XMVector3TransformNormal(vTangent, preTransformMatrix);
-		XMStoreFloat3(&vertices[i].tangent, XMVector3Normalize(vTangent));
 	}
-
-	m_NumVtxBuffers = 1;
 
 	D3D11_SUBRESOURCE_DATA vertexInitialData{};
 	vertexInitialData.pSysMem = vertices;
@@ -130,7 +141,6 @@ HRESULT Mesh::Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData)
 {
 	m_VtxStride = sizeof(VTXANIMMESH);
 	m_NumVertices = meshData.animVertices.size();
-	m_NumVtxBuffers = 1;
 
 	D3D11_BUFFER_DESC vertexBufferDesc{};
 	vertexBufferDesc.ByteWidth = m_VtxStride * m_NumVertices;
@@ -145,8 +155,9 @@ HRESULT Mesh::Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData)
 	{
 		vertices[i] = meshData.animVertices[i];
 	}
+	
 
-	m_NumBones = meshData.numBones;
+	m_NumBones = meshData.boneIndices.size();
 
 	D3D11_SUBRESOURCE_DATA vertexInitialData{};
 	vertexInitialData.pSysMem = vertices;
@@ -178,19 +189,6 @@ Shared<Mesh> Mesh::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D1
 	if (FAILED(mesh->Initialize_Prototype(isAnim, meshData, preTransformMatrix)))
 	{
 		MSG_BOX("Failed to Created : Mesh");
-		return nullptr;
-	}
-
-	return mesh;
-}
-
-Shared<Component> Mesh::Clone(void* arg)
-{
-	auto  mesh = make_shared<Mesh>(*this);
-
-	if (FAILED(mesh->Initialize(arg)))
-	{
-		MSG_BOX("Failed to Clone : Mesh");
 		return nullptr;
 	}
 

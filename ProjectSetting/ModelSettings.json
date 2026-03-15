@@ -3,7 +3,42 @@
         {
             "level": "STATIC",
             "path": "Models/Test2B/Test2B.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
             "tag": "Test2B"
+        },
+        {
+            "level": "STATIC",
+            "path": "Models/Test2B/Test2BAnim2.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "Test2BAnim2"
         }
     ]
 }

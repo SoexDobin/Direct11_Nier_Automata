@@ -1,6 +1,8 @@
 #ifndef Engine_Struct_h__
 #define Engine_Struct_h__
 
+using namespace DirectX;
+
 namespace Engine
 {
 	typedef struct tagEngineDesc
@@ -35,10 +37,13 @@ namespace Engine
 		Vector4 specular = {};
 	} LIGHT_DESC;
 
-	typedef struct tagModelDesc
+	typedef struct tagKeyFrame
 	{
-		
-	} MODEL_DESC;
+		Vector3 scale;
+		Vector4 rotation;
+		Vector3 position;
+		Float trackPosition; // Animation의 Duration 절대값 위치
+	} KEYFRAME;
 
 	typedef struct tagVertexTexcoord
 	{
@@ -92,7 +97,7 @@ namespace Engine
 		Vector3			tangent;
 		Vector2			texcoord;
 
-		Vector4			blendIndex; 
+		XMUINT4			blendIndex; 
 		Vector4			blendWeight;
 
 		inline static const std::wstring Tag = { L"VTX_Animation_Mesh" };

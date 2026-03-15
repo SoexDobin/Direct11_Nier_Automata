@@ -55,22 +55,22 @@ void Monster::On_Disable()
 
 void Monster::Priority_Update(Float timeDelta)
 {
-	GameObject::Priority_Update(timeDelta);
+
 }
 
 void Monster::Update(Float timeDelta)
 {
-	GameObject::Update(timeDelta);
+	m_Model->Update_Model(timeDelta);
 }
 
 void Monster::Late_Update(Float timeDelta)
 {
-	GameObject::Late_Update(timeDelta);
+	
 }
 
 void Monster::Fixed_Update(Float fixedDelta)
 {
-	GameObject::Fixed_Update(fixedDelta);
+	
 }
 
 HRESULT Monster::Render()
@@ -82,7 +82,8 @@ HRESULT Monster::Render()
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
 		m_Model->Bind_Material(m_Shader, "g_DiffuseTexture", i, 1, 0);
-	
+		m_Model->Bind_BoneMatrices(m_Shader, "g_BoneMatrices", i);
+
 		if (FAILED(m_Shader->Begin(0)))
 			return E_FAIL;
 	
@@ -99,24 +100,15 @@ void Monster::Submit_RenderGroup()
 
 HRESULT Monster::Ready_Components()
 {
-	Shader::SHADER_DESC shaderDesc{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
+	Shader::SHADER_DESC shaderDesc{ VTXANIMMESH::Tag,  VTXANIMMESH::Elements, VTXANIMMESH::numElements };
 	m_Shader = Add_Component<Shader>(&shaderDesc);
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	Model::MODEL_DESC modelDesc{ L"Test2B" };
+	Model::MODEL_DESC modelDesc{ L"Test2BAnim2" };
 	m_Model = Add_Component<Model>(&modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;
-
-
-	if (m_Transform)
-	{
-		m_Transform->Set_LocalScale(3.f, 3.f, 3.f); // 확실히 보이게 3배로 키움
-		m_Transform->Set_LocalPosition(0.f, 5.f, 0.f); // 카메라가 내려다보는 중앙 허공에 띄움
-		m_Transform->Set_LocalRotation(0.f, XMConvertToRadians(180.f), 0.f);
-		m_Transform->Update_WorldMatrix();
-	}
 
 	return S_OK;
 }

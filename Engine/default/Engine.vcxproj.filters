@@ -112,9 +112,6 @@
     <Filter Include="01. Utility\05. Component\Model">
       <UniqueIdentifier>{651fcdc6-a7ce-4e46-ac6e-8c8272c4bfdd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Utility\05. Component\VIBuffer\Mesh">
-      <UniqueIdentifier>{aca5f482-fe70-44c1-8cf7-0f225b986a41}</UniqueIdentifier>
-    </Filter>
     <Filter Include="96. RTTR">
       <UniqueIdentifier>{761f8863-5b6b-4ef2-bd71-87a411a4e533}</UniqueIdentifier>
     </Filter>
@@ -126,6 +123,15 @@
     </Filter>
     <Filter Include="01. Utility\05. Component\Model\Bone">
       <UniqueIdentifier>{381578b8-85cf-40b9-a287-c0e46c7ebc8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Model\Animation">
+      <UniqueIdentifier>{921cbc58-1993-4c7c-a2ac-463f40fadd24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Model\Mesh">
+      <UniqueIdentifier>{aca5f482-fe70-44c1-8cf7-0f225b986a41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Model\Channel">
+      <UniqueIdentifier>{55e26edb-262a-4985-8a86-c292eea419e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -255,7 +261,7 @@
       <Filter>01. Utility\08. Light\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Mesh.h">
-      <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
+      <Filter>01. Utility\05. Component\Model\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CameraManager.h">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
@@ -274,6 +280,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Bone.h">
       <Filter>01. Utility\05. Component\Model\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Animation.h">
+      <Filter>01. Utility\05. Component\Model\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Channel.h">
+      <Filter>01. Utility\05. Component\Model\Channel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -365,7 +377,7 @@
       <Filter>01. Utility\08. Light\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Mesh.cpp">
-      <Filter>01. Utility\05. Component\VIBuffer\Mesh</Filter>
+      <Filter>01. Utility\05. Component\Model\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CameraManager.cpp">
       <Filter>01. Utility\04. GameObject\Manager</Filter>
@@ -408,6 +420,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Bone.cpp">
       <Filter>01. Utility\05. Component\Model\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Animation.cpp">
+      <Filter>01. Utility\05. Component\Model\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Channel.cpp">
+      <Filter>01. Utility\05. Component\Model\Channel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

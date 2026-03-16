@@ -48,11 +48,31 @@ HRESULT Animation::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop)
+{
+	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;
+
+	if (m_CurrentTrackPosition >= m_Duration)
+	{
+		if (false == isLoop)
+			return true;
+
+		m_CurrentTrackPosition = 0.f;
+	}
+
+	for (auto& channel : m_Channels)
+	{
+		channel->Update_TransformationMatrix(m_CurrentTrackPosition, bones);
+	}
+
+	return false;
+}
+
 Shared<Animation> Animation::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_ANIMATION& animationData)
 {
 	auto animation = make_shared<Animation>(device, context);
 
-	if (FAILED(animation->Initialize_Prototype()))
+	if (FAILED(animation->Initialize_Prototype(animationData)))
 	{
 		LOG_ERROR(L"Failed to Created : Animation {}", Helper::To_wString(animationData.name));
 		MSG_BOX("Failed to Created : Animation");

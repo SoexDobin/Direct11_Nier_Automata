@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Transform.h"
 #include "SpdLogger.h"
+#include "Engine_Function.h"
 
 Camera::Camera() : GameObject{} {}
 Camera::Camera(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -23,7 +24,7 @@ HRESULT Camera::Initialize(void* arg)
 	}
 	if (FAILED(GameObject::Initialize(arg)))
 		return E_FAIL;
-		
+
 	CAMERA_DESC& desc = *static_cast<CAMERA_DESC*>(arg);
 	m_Transform->Set_Position(Vector3{ desc.eye });
 	m_Transform->LookAt(Vector3{ desc.at });
@@ -50,13 +51,48 @@ void Camera::Set_Aspect(Float aspect)
 void Camera::Bind_Aspect(Float aspect)
 {
 	m_Aspect = aspect;
-		
+
 	Bind_CameraTransform();
+}
+
+void Camera::Set_Target(const Shared<GameObject>& target)
+{
+	m_Target = target;
+	m_Transform = target->Get_Transform();
+}
+
+Shared<GameObject> Camera::Get_Target() const
+{
+	if (m_Target.expired())
+		return nullptr;
+
+	return m_Target.lock();
 }
 
 void Camera::Update_CameraTransform() const
 {
+	//if (!m_Target.expired())
+	//{
+	//	m_Transform = m_Target.lock()->Get_Transform();
+	//}
+
 	m_Transform->Update_WorldMatrix();
+}
+
+void Camera::Priority_Update(Float timeDelta)
+{
+	GameObject::Priority_Update(timeDelta);
+	//Update_CameraTransform(timeDelta); // Removed as per instruction
+}
+
+void Camera::Handle_Orbit(Float mouseX, Float mouseY, Float sensitivity, Float timeDelta)
+{
+	// Removed as per instruction
+}
+
+void Camera::Handle_Zoom(Long mouseWheel, Float sensitivity, Float timeDelta)
+{
+	// Removed as per instruction
 }
 
 void Camera::Bind_CameraTransform() const

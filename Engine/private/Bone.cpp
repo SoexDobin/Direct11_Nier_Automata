@@ -33,6 +33,11 @@ HRESULT Bone::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+void Bone::Update_TransformationMatrix(const Matrix& transformationMatrix)
+{
+	m_TransformationMatrix = transformationMatrix;
+}
+
 void Bone::Update_CombinedTransformationMatrix(const vector<Shared<Bone>>& modelBones, const Matrix& preTransformMatrix)
 {
 	if (-1 == m_ParentBoneIndex)

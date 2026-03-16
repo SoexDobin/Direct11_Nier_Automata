@@ -31,6 +31,10 @@ public:
 	void Bind_Aspect(Float aspect);
 
 public:
+	void Set_Target(const Shared<GameObject>& target);
+	Shared<GameObject> Get_Target() const;
+
+public:
 	void Set_Active(Bool isActive) final { GameObject::Set_Active(isActive); }
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* arg) override;
@@ -52,6 +56,7 @@ public:
 
 protected:
 	Float		m_FovY{}, m_Aspect{}, m_Near{}, m_Far{};
+	Weak<GameObject> m_Target{};
 
 };
 

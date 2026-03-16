@@ -18,6 +18,8 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 	m_Bones.clear();
 	m_Meshes.clear();
 	m_Material.clear();
+	m_Animation.clear();
+	m_Channels.clear();
 
 	string modelFilePath(path.begin(), path.end());
 
@@ -35,6 +37,9 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 		return false;
 	}
 	std::cout << "  mNumMeshes=" << m_AiScene->mNumMeshes << " mNumMaterials=" << m_AiScene->mNumMaterials << "\n";
+
+	m_IsSkeletal = false;
+	m_IsSkeletal = m_AiScene->mNumAnimations > 0;
 
 	ReadBoneData(m_AiScene->mRootNode, -1);
 	ReadMeshData();
@@ -81,8 +86,6 @@ void Tool::Converter::ReadBoneData(aiNode* node, int32_t parentIndex)
 
 void Tool::Converter::ReadMeshData()
 {
-	m_IsSkeletal = m_AiScene->mMeshes[0]->HasBones();
-
 	for (uint32 i = 0; i < m_AiScene->mNumMeshes; ++i)
 	{
 		auto aiMesh = m_AiScene->mMeshes[i];
@@ -206,8 +209,6 @@ void Tool::Converter::ReadMeshData()
 
 void Tool::Converter::ReadMaterialData()
 {
-	if (false == m_IsSkeletal) return;
-
 	for (uint32 i = 0; i < m_AiScene->mNumMaterials; ++i)
 	{
 		const aiMaterial* aiMat = m_AiScene->mMaterials[i];
@@ -247,23 +248,24 @@ void Converter::ReadAnimation()
 {
 	if (false == m_IsSkeletal) return;
 
+	m_Channels.resize(m_AiScene->mNumAnimations);
 	for (uint32 i = 0; i < m_AiScene->mNumAnimations; ++i)
 	{
 		const aiAnimation* aiAnim = m_AiScene->mAnimations[i];
 		auto anim = make_shared<MODEL_ANIMATION>();
 
 		anim->name = aiAnim->mName.C_Str();
-		anim->duration = aiAnim->mDuration;
-		anim->tickPerSecond = aiAnim->mTicksPerSecond;
-		anim->numChannel = aiAnim->mNumChannels;
+		anim->duration = static_cast<Float>(aiAnim->mDuration);
+		anim->tickPerSecond = static_cast<Float>(aiAnim->mTicksPerSecond);
+		anim->numChannel = static_cast<uint32>(aiAnim->mNumChannels);
 
-		m_Channels.resize(anim->numChannel);
 		for (uint32 j = 0; j < aiAnim->mNumChannels; ++j)
 		{
 			const aiNodeAnim* aiChannel = aiAnim->mChannels[j];
 			auto channel = make_shared<MODEL_CHANNEL>();
 
 			channel->name = aiChannel->mNodeName.C_Str();
+			channel->boneIndex = Get_BoneIndex(channel->name.c_str());
 			uint32 numKeys = std::max(aiChannel->mNumPositionKeys, aiChannel->mNumRotationKeys);
 			numKeys = std::max(numKeys, aiChannel->mNumScalingKeys);
 			channel->numKeyFrames = numKeys;
@@ -276,18 +278,21 @@ void Converter::ReadAnimation()
 				KEYFRAME keyFrame{}; 
 				if (aiChannel->mNumScalingKeys > k)
 				{
-					memcpy(&scale, &aiChannel->mScalingKeys[i].mValue, sizeof(Float3));
-					keyFrame.trackPosition = static_cast<Float>(aiChannel->mScalingKeys[i].mTime);
+					memcpy(&scale, &aiChannel->mScalingKeys[k].mValue, sizeof(Float3));
+					keyFrame.trackPosition = static_cast<Float>(aiChannel->mScalingKeys[k].mTime);
 				}
 				if (aiChannel->mNumRotationKeys > k)
 				{
-					memcpy(&rotation, &aiChannel->mRotationKeys[i].mValue, sizeof(Float4));
-					keyFrame.trackPosition = static_cast<Float>(aiChannel->mRotationKeys[i].mTime);
+					rotation.x = aiChannel->mRotationKeys[k].mValue.x;
+					rotation.y = aiChannel->mRotationKeys[k].mValue.y;
+					rotation.z = aiChannel->mRotationKeys[k].mValue.z;
+					rotation.w = aiChannel->mRotationKeys[k].mValue.w;
+					keyFrame.trackPosition = static_cast<Float>(aiChannel->mRotationKeys[k].mTime);
 				}
 				if (aiChannel->mNumPositionKeys > k)
 				{
-					memcpy(&translation, &aiChannel->mPositionKeys[i].mValue, sizeof(Float3));
-					keyFrame.trackPosition = static_cast<Float>(aiChannel->mPositionKeys[i].mTime);
+					memcpy(&translation, &aiChannel->mPositionKeys[k].mValue, sizeof(Float3));
+					keyFrame.trackPosition = static_cast<Float>(aiChannel->mPositionKeys[k].mTime);
 				}
 
 				keyFrame.scale = scale;
@@ -397,6 +402,7 @@ void Tool::Converter::WriteModelFile(const wstring& path)
 			uint32 channelNameLength = static_cast<uint32>(channel->name.size());
 			out.write(BIN(&channelNameLength), sizeof(uint32));
 			out.write(channel->name.data(), channelNameLength);
+			out.write(BIN(&channel->boneIndex), sizeof(int32));
 			out.write(BIN(&channel->numKeyFrames), sizeof(uint32));
 			
 			if (channel->numKeyFrames > 0)

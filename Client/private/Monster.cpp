@@ -60,7 +60,7 @@ void Monster::Priority_Update(Float timeDelta)
 
 void Monster::Update(Float timeDelta)
 {
-	m_Model->Update_Model(timeDelta);
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void Monster::Late_Update(Float timeDelta)

@@ -134,8 +134,8 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         // 7. 이 패널 공간 전체를 "도킹 가능한 구역(DockSpace)"으로 만듦
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable)
         {
-            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+            ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
+            ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
         }
     }
     ImGui::End();

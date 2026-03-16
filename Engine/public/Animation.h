@@ -3,6 +3,7 @@
 
 NS_BEGIN(Engine)
 
+class Bone;
 class Channel;
 
 class Animation final : public Component
@@ -23,9 +24,13 @@ public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
 
+public:
+	Bool  Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop);
+
 private:
 	Float m_Duration{}; // 애니메이션의 길이 절대 값
 	Float m_TickPerSecond{};
+	Float m_CurrentTrackPosition{};
 
 	uint32 m_NumChannels{};
 	vector<Shared<Channel>> m_Channels;

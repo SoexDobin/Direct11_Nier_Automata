@@ -16,8 +16,8 @@ public:
 
 private:
 	void RenderView(Bool isResize);
-	void MousePicking(ImVec2 viewport);
-	void Update_ImGuizmo(ImVec2 viewport);
+	void MousePicking(ImVec2 viewport, ImVec2 imageStartPos);
+	void Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos);
 
 private:
 	Bool m_PlayMode = { false };

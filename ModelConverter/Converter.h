@@ -1,6 +1,5 @@
 #pragma once
 #include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
 
 
 NS_BEGIN(Engine)
@@ -63,7 +62,7 @@ public: /* static */
 NS_END
 
 /*
-	typedef struct ChanelData
+	typedef struct ChannelData
 	{
 		std::string name;
 		uint32 numKeyFrames;

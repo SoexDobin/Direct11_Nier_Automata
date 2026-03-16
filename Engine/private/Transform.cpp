@@ -75,15 +75,15 @@ void Transform::Set_LocalRotation(const Vector3 &eulerAngles) {
 }
 
 void Transform::Set_LocalRotation(Float pitch, Float yaw, Float roll) {
-  Set_LocalRotation(Vector3{pitch, yaw, roll});
+	Set_LocalRotation(Vector3{pitch, yaw, roll});
 }
 
 void Transform::Set_LocalPosition(const Vector3 &position) {
-  m_LocalPosition = position;
-  m_IsDirty = true;
+	m_LocalPosition = position;
+	m_IsDirty = true;
 }
 void Transform::Set_LocalPosition(Float x, Float y, Float z) {
-  Set_LocalPosition(Vector3{x, y, z});
+	Set_LocalPosition(Vector3{x, y, z});
 }
 
 Vector3 Transform::Get_Scale() const {

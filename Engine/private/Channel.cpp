@@ -39,10 +39,10 @@ HRESULT Channel::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
-void Channel::Update_TransformationMatrix(Float currentTrackPosition, const vector<Shared<Bone>>& bones)
+void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, const vector<Shared<Bone>>& bones)
 {
 	if (0.f == currentTrackPosition)
-		m_CurrentKeyFrameIndex = 0;
+		currentKeyFrameIndex = 0;
 
 	KEYFRAME lastKeyFrame = m_KeyFrames.back();
 	Vector4 scale{}, rotation{}, translation{};
@@ -63,10 +63,10 @@ void Channel::Update_TransformationMatrix(Float currentTrackPosition, const vect
 	}
 	else
 	{
-		while (currentTrackPosition >= m_KeyFrames[m_CurrentKeyFrameIndex + 1].trackPosition)
-			++m_CurrentKeyFrameIndex;
+		while (currentTrackPosition >= m_KeyFrames[currentKeyFrameIndex + 1].trackPosition)
+			++currentKeyFrameIndex;
 
-		uint32 curIndex = m_CurrentKeyFrameIndex, nextIndex = curIndex + 1;
+		uint32 curIndex = currentKeyFrameIndex, nextIndex = curIndex + 1;
 
 		Float beforeTrackPos = m_KeyFrames[curIndex].trackPosition;
 		Float nextTrackPos = m_KeyFrames[nextIndex].trackPosition;

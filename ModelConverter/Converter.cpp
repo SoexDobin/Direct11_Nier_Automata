@@ -76,6 +76,8 @@ void Tool::Converter::ReadBoneData(aiNode* node, int32_t parentIndex)
 	);
 	bone->transform = matrix;
 
+	std::cout << "========================================\n";
+	std::cout << "Bone Scan: " << bone->name << "\n";
 	m_Bones.push_back(bone);
 
 	size_t boneIndex = m_Bones.size() - 1;
@@ -203,6 +205,9 @@ void Tool::Converter::ReadMeshData()
 			}
 		}
 
+		std::cout << "========================================\n";
+		std::cout << "Mesh Scan: " << mesh->name << "\n";
+
 		m_Meshes.push_back(mesh);
 	}
 }
@@ -303,6 +308,10 @@ void Converter::ReadAnimation()
 			}
 			m_Channels[i].push_back(channel);
 		}
+
+		std::cout << "========================================\n";
+		std::cout << "Animation Scan: " << anim->name << "\n";
+
 		m_Animation.push_back(anim);
 	}
 }

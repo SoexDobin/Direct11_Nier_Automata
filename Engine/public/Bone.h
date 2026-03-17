@@ -9,6 +9,7 @@ class Bone final : public Component
 public:
 	explicit Bone();
 	explicit Bone(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit Bone(const Bone& rhs);
 	~Bone() override = default;
 
 public:
@@ -30,14 +31,14 @@ public:
 	void Update_CombinedTransformationMatrix(const vector<Shared<Bone>>& modelBones, const Matrix& preTransformMatrix);
 
 private:
-	Char		m_BoneName[MAX_PATH]{};
-	int32		m_ParentBoneIndex{};
-	Matrix		m_TransformationMatrix{};
-	Matrix		m_CombinedTransformationMatrix{};
+	Char			m_BoneName[MAX_PATH]{};
+	int32			m_ParentBoneIndex{};
+	Matrix			m_TransformationMatrix{};
+	Matrix			m_CombinedTransformationMatrix{};
 
 public:
 	static Shared<Bone> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_BONE& boneData);
-	Shared<Component> Clone(void* arg = nullptr) override { return nullptr; }
+	Shared<Component> Clone(void* arg = nullptr) override;
 };
 
 NS_END

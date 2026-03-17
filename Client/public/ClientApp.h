@@ -8,7 +8,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class ClientApp final 
+class CLIENT_DLL ClientApp final 
 {
 public:
 	ClientApp();

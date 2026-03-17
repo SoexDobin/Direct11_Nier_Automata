@@ -155,12 +155,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
 HRESULT Loader::Loading_For_GamePlayLevel() {
     m_isFinished = false;
 
-    lstrcpy(m_LoadingText, TEXT("Loading GamePlay Level Texture... "));
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::GAMEPLAY)))
-    {
-        LOG_ERROR(L"Failed To Load GamePlay Texture");
-        return E_FAIL;
-    }
+
 
     m_isFinished = true;
     if (!m_OwnerLevel.expired())
@@ -172,25 +167,7 @@ HRESULT Loader::Loading_Global_Prototype()
 {
     m_isFinished = false;
 
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level... "));
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level Texture... "));
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::STATIC)))
-    {
-        LOG_ERROR(L"Failed To Load Global Texture");
-        return E_FAIL;
-    }
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level Shader... "));
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
-    {
-        LOG_ERROR(L"Failed To Load Shader");
-        return E_FAIL;
-    }
 
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level Shader... "));
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-        Terrain::Create(m_Device, m_Context))))
-        return E_FAIL;
 
     m_isFinished = true;
     if (!m_OwnerLevel.expired())

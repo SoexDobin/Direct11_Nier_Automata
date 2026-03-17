@@ -5,7 +5,7 @@ NS_BEGIN(Client)
 
 class Loader;
 
-class LevelLoading final : public Level
+class CLIENT_DLL LevelLoading final : public Level
 {
 public:
 	LevelLoading(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

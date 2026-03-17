@@ -8,7 +8,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class Monster : public GameObject
+class CLIENT_DLL Monster : public GameObject
 {
 	RTTR_ENABLE(GameObject)
 public:

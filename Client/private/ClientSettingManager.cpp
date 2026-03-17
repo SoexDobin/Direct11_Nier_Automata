@@ -350,11 +350,20 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
     rttr::type gameObjectType = rttr::type::get<GameObject>();
     auto allTypes = rttr::type::get_types();
 
+    // 전역/정적 세트를 사용하여 여러 번 호출(STATIC, LOGO 등)되더라도 
+    // 동일 타입의 프로토타입은 전 생명주기 동안 단 한 번만 등록되도록 보장합니다.
+    static unordered_set<string> globalProcessedTypes;
+
     for (auto& type : allTypes)
     {
         // 1. GameObject를 상속받은(derived_from) 자기자신 제외 클래스만 순회
-        if (type.is_derived_from(gameObjectType) && type != gameObjectType)
+        if (type.is_derived_from(gameObjectType) && type != gameObjectType && !type.is_pointer())
         {
+            // 중복 처리 방지: 동일한 타입 이름이 이미 등록되었다면 건너뜀
+            string typeName = type.get_name().to_string();
+            if (globalProcessedTypes.contains(typeName))
+                continue;
+
             // 2. 파이썬이 통일해준 Create 메서드 가져오기
             rttr::method createMethod = type.get_method("Create");
             if (createMethod.is_valid())
@@ -366,13 +375,22 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
                 {
                     if (metaLevel.is_type<uint32>())
                         targetLevel = metaLevel.get_value<uint32>();
-                    else if (metaLevel.is_type<LEVEL>()) // Enum Class 타입이라면 캐스팅
+                    else if (metaLevel.is_type<int>()) 
+                        targetLevel = static_cast<uint32>(metaLevel.get_value<int>());
+                    else if (metaLevel.is_type<int32>()) 
+                        targetLevel = static_cast<uint32>(metaLevel.get_value<int32>());
+                    else if (metaLevel.is_type<LEVEL>()) 
                         targetLevel = ETOI(metaLevel.get_value<LEVEL>());
                 }
                 
-                // 0번(STATIC)이거나 현재 baseLevel과 일치할 때만 진행
-                if (targetLevel != 0 && targetLevel != ETOI(baseLevel))
+                // 0번(STATIC)이더라도 현재 baseLevel과 일치할 때만 진행 (중복 등록 방지)
+                if (targetLevel != ETOI(baseLevel))
                     continue;
+
+                // 해당 레벨에 등록하기로 결정된 타입만 마킹 (실제 등록 직전)
+                globalProcessedTypes.insert(typeName);
+
+                LOG_INFO(L"[RTTR-Debug] Try Reg: {}, Target: {}, Current: {}", Helper::To_wString(typeName), targetLevel, ETOI(baseLevel));
 
                 // 4. Create Invoke (매개변수: Device, Context)
                 rttr::variant result = createMethod.invoke({}, GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());

@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class ThirdPersonCamera final : public Camera
+class CLIENT_DLL ThirdPersonCamera final : public Camera
 {
 	RTTR_ENABLE(Camera)
 public:
@@ -51,6 +51,10 @@ protected:
 	Float		m_OrbitY{};
 	Float		m_MouseSensitive{};
 	Float		m_WheelSensitive{};
+
+	Float		m_Friction{};
+	Float		m_OrbitVelocityX{};
+	Float		m_OrbitVelocityY{};
 
 public:
 	static Shared<ThirdPersonCamera> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

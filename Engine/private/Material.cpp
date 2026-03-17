@@ -1,7 +1,5 @@
 #include "Material.h"
 
-#include <assimp/material.h>
-
 #include "Game.h"
 #include "Shader.h"
 #include "SpdLogger.h"

@@ -9,9 +9,9 @@
 #include "Engine_Define.h"
 #include <DirectXMath.h>
 
-#include "Assimp/scene.h"
-#include "Assimp/Importer.hpp"
-#include "Assimp/postprocess.h"
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 
 #define BIN(_DATA_) reinterpret_cast<const Char*>(_DATA_)
 

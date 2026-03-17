@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "ThirdPersonCamera.h"
-
 #include <SpdLogger.h>
-
 #include "Game.h"
 
 ThirdPersonCamera::ThirdPersonCamera() : Camera{} {}
@@ -66,6 +64,10 @@ HRESULT ThirdPersonCamera::Initialize(void* arg)
 	m_MouseSensitive = desc.mouseSensitive;
 	m_WheelSensitive = desc.wheelSensitive;
 
+	m_Friction = 0.9f;
+	m_OrbitVelocityX = 0.f;
+	m_OrbitVelocityY = 0.f;
+
 	return S_OK;
 }
 
@@ -80,8 +82,21 @@ void ThirdPersonCamera::Priority_Update(Float timeDelta)
 	{
 		auto targetTransform = m_Target.lock()->Get_Transform();
 
-		m_OrbitX += m_MouseSensitive * GAME_INSTANCE->Get_DIMouseMove(DIMM::X);
-		m_OrbitY += m_MouseSensitive * GAME_INSTANCE->Get_DIMouseMove(DIMM::Y);
+		if (GAME_INSTANCE->Get_DIKeyState(DIKEYBOARD_ESCAPE) & 0x80)
+			GAME_INSTANCE->Set_MouseLock(false);
+
+		if (GAME_INSTANCE->Get_DIMouseState(DIMB::LBUTTON) & 0x80)
+			GAME_INSTANCE->Set_MouseLock(true);
+
+		m_OrbitVelocityX += m_MouseSensitive * GAME_INSTANCE->Get_DIMouseMove(DIMM::X);
+		m_OrbitVelocityY += m_MouseSensitive * GAME_INSTANCE->Get_DIMouseMove(DIMM::Y);
+		
+		Float frictionFactor = pow(m_Friction, timeDelta * 60.f);
+		m_OrbitVelocityX *= frictionFactor;
+		m_OrbitVelocityY *= frictionFactor;
+
+		m_OrbitX += m_OrbitVelocityX * timeDelta * 60.f;
+		m_OrbitY += m_OrbitVelocityY * timeDelta * 60.f;
 		m_OrbitY = clamp(m_OrbitY, -30.f, 60.f);
 
 		Long mouseWheel = GAME_INSTANCE->Get_DIMouseMove(DIMM::WHEEL);

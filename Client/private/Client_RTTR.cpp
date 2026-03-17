@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Client_Function.h"
 #include <rttr/registration>|
 
@@ -20,6 +20,9 @@ using rttr::registration;
 
 namespace Client {
 void Register_Client_Reflection() {
+  static bool bRegistered = false;
+  if (bRegistered) return;
+  bRegistered = true;
   // ==============================================================
   // [수동 등록 구역 예제]
   // 파이썬 자동화 스크립트는 이 주석 바깥의 코드를 절대 삭제하거나 수정하지

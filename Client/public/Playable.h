@@ -3,7 +3,7 @@
 
 NS_BEGIN(Engine)
 
-class Playable abstract : public GameObject
+class CLIENT_DLL Playable abstract : public GameObject
 {
 	RTTR_ENABLE(GameObject)
 public:

@@ -4,7 +4,7 @@
 
 NS_BEGIN(Client)
 
-class ClientSettingManager
+class CLIENT_DLL ClientSettingManager
 {
 	DECLARE_SINGLETON(ClientSettingManager)
 	ClientSettingManager() = default;

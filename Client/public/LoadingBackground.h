@@ -11,7 +11,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class LoadingBackground final : public UIObject
+class CLIENT_DLL LoadingBackground final : public UIObject
 {
     RTTR_ENABLE(UIObject)
 public:

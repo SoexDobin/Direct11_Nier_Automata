@@ -16,18 +16,20 @@ Model::Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContex
 
 Model::Model(const Model& rhs)
 	: Component{ rhs }, 
-	m_NumMeshes{ rhs.m_NumMeshes }, 
+	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix }, 
+	m_IsSkeletal{rhs.m_IsSkeletal},
+	m_IsAnimLoop{rhs.m_IsAnimLoop}, 
+	m_NumMeshes{ rhs.m_NumMeshes },
 	m_Meshes{ rhs.m_Meshes },
-	m_NumMaterials{ rhs.m_NumMaterials }, 
+	m_NumMaterials{ rhs.m_NumMaterials },
 	m_Materials{ rhs.m_Materials },
-	m_NumBones {rhs.m_NumBones},
-	m_Bones{rhs.m_Bones},
-	m_NumAnimation{rhs.m_NumAnimation},
-	m_Animations{ rhs.m_Animations },
-	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix },
-	m_IsSkeletal{rhs.m_IsSkeletal}, m_IsAnimLoop{rhs.m_IsAnimLoop}
+	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation}
 {
-	
+	for (auto& prototypeAnim : rhs.m_Animations)
+		m_Animations.push_back(static_pointer_cast<Animation>(prototypeAnim->Clone()));
+
+	for (auto& prototypeBone : rhs.m_Bones)
+		m_Bones.push_back(static_pointer_cast<Bone>(prototypeBone->Clone()));
 }
 
 HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& preLocalTransformMatrix)

@@ -5,6 +5,7 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL Camera abstract : public GameObject
 {
+	RTTR_ENABLE(GameObject)
 public:
 	typedef struct tagCameraDesc : public GAMEOBJECT_DESC {
 		Vector4 eye{}, at{}, up{ Vector4{0.f,0.f,0.f,1.f} };

@@ -60,6 +60,7 @@ void EditorManager::Update(Bool IsResetView) {
     EDITOR_STATE state = EDITOR->Get_State();
 
     if (state == EDITOR_STATE::PLAY) {
+
         GAME_INSTANCE->Update_Engine();
     }
     else {

@@ -5,10 +5,6 @@
 #include "Loader.h"
 #include <SpdLogger.h>
 
-#include "FreeCamera.h"
-#include "LoadingBackground.h"
-#include "Terrain.h"
-
 LevelLoading::LevelLoading(const ComPtr<ID3D11Device> &device,
                            const ComPtr<ID3D11DeviceContext> &context)
     : Level{device, context}, m_Loader{nullptr}, m_NextLevel{LEVEL::LEVEL_END} {

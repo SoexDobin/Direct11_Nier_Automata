@@ -143,10 +143,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
       return DefWindowProc(hWnd, message, wParam, lParam);
     }
   } break;
-  case WM_KEYDOWN: {
-    if (wParam == VK_ESCAPE)
-      PostQuitMessage(0);
-  } break;
+  case WM_KEYDOWN:
+      break;
   case WM_SIZE: {
       if (wParam != SIZE_MINIMIZED)
       {

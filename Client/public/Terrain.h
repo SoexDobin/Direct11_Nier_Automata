@@ -9,7 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class Terrain final : public GameObject
+class CLIENT_DLL Terrain final : public GameObject
 {
 	RTTR_ENABLE(GameObject)
 public:
@@ -23,12 +23,14 @@ public:
 	void On_Destroy() override;
 	void On_Enable() override;
 	void On_Disable() override;
+
+public:
 	void Priority_Update(Float timeDelta) override;
 	void Update(Float timeDelta) override;
 	void Late_Update(Float timeDelta) override;
 	void Fixed_Update(Float fixedDelta) override;
-	void Submit_RenderGroup() override;
 	HRESULT Render() override;
+	void Submit_RenderGroup() override;
 	
 protected:
 	HRESULT Ready_Components();

@@ -176,7 +176,4 @@ void EditorApp::Reset_ClientApp() {
   m_ClientApp.reset();
   GAME_INSTANCE->Clear_AllResource();
   m_ClientApp = ClientApp::Create(m_EngineDesc);
-  if (FAILED(GAME_INSTANCE->Add_Camera(EDITOR->Get_EditorCamera()))) {
-    MSG_BOX("Reset ClientApp : Failed to Add Editor Camera");
-  }
 }

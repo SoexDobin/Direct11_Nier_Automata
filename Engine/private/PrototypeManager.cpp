@@ -110,13 +110,13 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
 
 HRESULT PrototypeManager::Clear_Prototypes()
 {
-    for (auto container : m_GameObjects)
+    for (auto& container : m_GameObjects)
         container.clear();
     m_GameObjects.shrink_to_fit();
-    for (auto container : m_Components)
+    for (auto& container : m_Components)
         container.clear();
     m_Components.shrink_to_fit();
-    for (auto container : m_ObjectsID)
+    for (auto& container : m_ObjectsID)
         container.clear();
     m_ObjectsID.shrink_to_fit();
 

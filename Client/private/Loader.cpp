@@ -5,6 +5,7 @@
 
 #include "ClientSettingManager.h"
 #include "FreeCamera.h"
+#include "ThirdPersonCamera.h"
 #include "Game.h"
 #include "LoadingBackground.h"
 #include "LoadingLogo.h"
@@ -103,27 +104,28 @@ HRESULT Loader::Loading() {
 HRESULT Loader::Loading_For_LogoLevel() {
 	m_isFinished = false;
 
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
+        return E_FAIL;
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::STATIC))) {
+            LOG_ERROR(L"Failed to Load Textures");
+            return E_FAIL;
+        }
+    }
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::STATIC))) {
+            LOG_ERROR(L"Failed to Load Model");
+            return E_FAIL;
+        }
+    }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::STATIC))) {
+        LOG_ERROR(L"Failed to Ready Client Prototypes");
+        return E_FAIL;
+    }
+
+
     lstrcpy(m_LoadingText, TEXT("Loading Logo Level Texture... "));
-
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
-        Terrain::Create(m_Device, m_Context), L"MainTerrain")))
-        return E_FAIL;
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
-        LoadingBackground::Create(m_Device, m_Context), L"UI_Loading_BackGround")))
-        return E_FAIL;
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
-        LoadingLogo::Create(m_Device, m_Context), L"UI_Loading_Logo")))
-        return E_FAIL;
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
-        Monster::Create(m_Device, m_Context), L"Monster")))
-        return E_FAIL;
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(m_NextLevelID),
-        FreeCamera::Create(m_Device, m_Context), L"MainCamera")))
-        return E_FAIL;
 
     LIGHT_DESC			LightDesc{};
     LightDesc.type = LIGHT::DIRECTIONAL;
@@ -135,7 +137,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
         return E_FAIL;
 
-    FreeCamera::FREE_CAMERA_DESC desc{};
+    ThirdPersonCamera::THIRD_PERSON_CAMERA_DESC desc{};
     desc.mouseSensitive = 5.f;
     desc.eye = Vector4{ 0.f, 10.f, -10.f, 1.f };
     desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
@@ -145,15 +147,24 @@ HRESULT Loader::Loading_For_LogoLevel() {
 	desc.nearPlane = 0.1f;
     desc.farPlane = 500.f;
 
-    GAME_INSTANCE->Instantiate<Terrain>(L"MainTerrain", ETOI(m_NextLevelID));
-    auto back = GAME_INSTANCE->Instantiate<LoadingBackground>(L"UI_Loading_BackGround", ETOI(m_NextLevelID));
-    auto logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"UI_Loading_Logo", ETOI(m_NextLevelID));
+    desc.distance = 10.f;
+    desc.minDistance = 3.f;
+    desc.maxDistance = 15.f;
+    desc.offset = Vector3{ 0.f, 1.f, 0.f };
+    desc.mouseSensitive = 0.1f;
+    desc.wheelSensitive = 0.01f;
+
+    GAME_INSTANCE->Instantiate<Terrain>(L"Terrain", ETOI(m_NextLevelID));
+    auto back = GAME_INSTANCE->Instantiate<LoadingBackground>(L"LoadingBackground", ETOI(m_NextLevelID));
+    auto logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"LoadingLogo", ETOI(m_NextLevelID));
     back->Add_Child(logo);
 
-    GAME_INSTANCE->Instantiate<Monster>(L"Monster", ETOI(m_NextLevelID));
+    auto mon = GAME_INSTANCE->Instantiate<Monster>(L"Monster", ETOI(m_NextLevelID));
 
-    auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"MainCamera", ETOI(m_NextLevelID), &desc);
-	GAME_INSTANCE->Set_MainCamera(cam);
+    auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"FreeCamera", ETOI(m_NextLevelID), &desc);
+    auto tpcam = GAME_INSTANCE->Instantiate<ThirdPersonCamera>(L"ThirdPersonCamera", ETOI(m_NextLevelID), &desc);
+	GAME_INSTANCE->Set_MainCamera(tpcam);
+    tpcam->Set_Target(mon);
 
 
     m_isFinished = true;
@@ -165,12 +176,7 @@ HRESULT Loader::Loading_For_LogoLevel() {
 HRESULT Loader::Loading_For_GamePlayLevel() {
     m_isFinished = false;
 
-    lstrcpy(m_LoadingText, TEXT("Loading GamePlay Level Texture... "));
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::GAMEPLAY)))
-    {
-        LOG_ERROR(L"Failed To Load GamePlay Texture");
-        return E_FAIL;
-    }
+
 
     m_isFinished = true;
     if (!m_OwnerLevel.expired())
@@ -182,25 +188,7 @@ HRESULT Loader::Loading_Global_Prototype()
 {
     m_isFinished = false;
 
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level... "));
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level Texture... "));
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Texture(LEVEL::STATIC)))
-    {
-        LOG_ERROR(L"Failed To Load Global Texture");
-        return E_FAIL;
-    }
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level Shader... "));
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
-    {
-        LOG_ERROR(L"Failed To Load Shader");
-        return E_FAIL;
-    }
 
-    lstrcpy(m_LoadingText, TEXT("Loading Static Level Shader... "));
-
-    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC),
-        Terrain::Create(m_Device, m_Context))))
-        return E_FAIL;
 
     m_isFinished = true;
     if (!m_OwnerLevel.expired())

@@ -28,7 +28,7 @@ HRESULT FreeCamera::Initialize(void* arg)
 
 void FreeCamera::Priority_Update(Float timeDelta)
 {
-	Float speed = 20.f * timeDelta;
+	Float speed = 30.f * timeDelta;
 	Vector3 look = m_Transform->Get_WorldMatrix().Backward(); // (또는 Forward)
 	Vector3 right = m_Transform->Get_WorldMatrix().Right();
 	
@@ -76,7 +76,6 @@ void FreeCamera::Priority_Update(Float timeDelta)
 		}
 	}
 
-	Update_CameraTransform();
 	Camera::Priority_Update(timeDelta);
 }
 

@@ -16,17 +16,20 @@ Model::Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContex
 
 Model::Model(const Model& rhs)
 	: Component{ rhs }, 
-	m_NumMeshes{ rhs.m_NumMeshes }, 
+	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix }, 
+	m_IsSkeletal{rhs.m_IsSkeletal},
+	m_IsAnimLoop{rhs.m_IsAnimLoop}, 
+	m_NumMeshes{ rhs.m_NumMeshes },
 	m_Meshes{ rhs.m_Meshes },
-	m_NumMaterials{ rhs.m_NumMaterials }, 
+	m_NumMaterials{ rhs.m_NumMaterials },
 	m_Materials{ rhs.m_Materials },
-	m_NumBones {rhs.m_NumBones},
-	m_Bones{rhs.m_Bones},
-	m_NumAnimation{rhs.m_NumAnimation},
-	m_Animations{ rhs.m_Animations },
-	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix }
+	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation}
 {
-	
+	for (auto& prototypeAnim : rhs.m_Animations)
+		m_Animations.push_back(static_pointer_cast<Animation>(prototypeAnim->Clone()));
+
+	for (auto& prototypeBone : rhs.m_Bones)
+		m_Bones.push_back(static_pointer_cast<Bone>(prototypeBone->Clone()));
 }
 
 HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& preLocalTransformMatrix)
@@ -46,6 +49,7 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	if (memcmp(header.magic, "NMDL", 4) != 0)
 		return E_FAIL;
 
+	m_IsSkeletal = header.isAnim;
 	m_NumMeshes = header.numMeshes;
 	m_NumMaterials = header.numMaterials;
 	m_NumBones = header.numBones;
@@ -65,7 +69,7 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	if (FAILED(Ready_Animation(in)))
 		return E_FAIL;
 	
-	Update_Model(0.f);
+	Update_ModelAnimation(0.f);
 
 	return Component::Initialize_Prototype();
 }
@@ -85,11 +89,16 @@ void Model::On_Destroy()
 	m_Meshes.clear();
 	m_Materials.clear();
 	m_Bones.clear();
+	m_Animations.clear();
 	Component::On_Destroy();
 }
 
-void Model::Update_Model(Float timeDelta)
+void Model::Update_ModelAnimation(Float timeDelta)
 {
+	if (!m_IsActive || !m_IsSkeletal) return;
+
+	m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+
 	for (auto& bone : m_Bones)
 	{
 		bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
@@ -221,6 +230,7 @@ HRESULT Model::Ready_Animation(ifstream& in)
 			in.read(reinterpret_cast<Char*>(&channelNameLength), sizeof(uint32));
 			channelData.name.resize(channelNameLength);
 			in.read(channelData.name.data(), channelNameLength);
+			in.read(reinterpret_cast<Char*>(&channelData.boneIndex), sizeof(int32));
 			in.read(reinterpret_cast<Char*>(&channelData.numKeyFrames), sizeof(uint32));
 
 			channelData.keyFrames.resize(channelData.numKeyFrames);

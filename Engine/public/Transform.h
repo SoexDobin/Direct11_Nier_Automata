@@ -40,7 +40,7 @@ public: /* Local Setter */
 public: /* World Getter */
     Vector3 Get_Scale() const;
     Vector3 Get_Rotation() const;
-    Quaternion Get_RotationQuaternion() const;
+    Quaternion Get_Quaternion() const;
     Vector3 Get_Position() const;
     Matrix Get_WorldMatrix() const;
     Vector3 Get_Right() const;
@@ -57,6 +57,11 @@ public: /* World Setter */
 
     void Set_Position(Float scaleX, Float scaleY, Float scaleZ);
     void Set_Position(Vector3 positionVec);
+
+    void Set_WorldMatrix(const Matrix& matrix) {
+        m_WorldMatrix = matrix;
+        m_IsDirty = false; // 엔진의 자동 연산을 방지
+    }
 
 public: /* Util Method */
     void Move_Forward(Float delta, Float amount = 1.f);

@@ -49,9 +49,10 @@ namespace Engine
 		std::vector<MODEL_ENTRY> textures;
 	} MODEL_MATERIAL;
 
-	typedef struct ChanelData
+	typedef struct ChannelData
 	{
 		std::string name;
+		int32 boneIndex;
 		uint32 numKeyFrames;
 		std::vector<KEYFRAME> keyFrames;
 	} MODEL_CHANNEL;

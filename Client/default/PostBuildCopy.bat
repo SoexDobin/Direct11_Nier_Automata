@@ -44,6 +44,10 @@ if not exist "%SOLUTION_DIR%Launcher\bin" (
 echo [Client Post-Build] Copying to Editor\bin...
 copy /Y "%SOURCE_PATH%" "%SOLUTION_DIR%Editor\bin\%TARGET_NAME%"
 copy /Y "%SOURCE_PATH%" "%SOLUTION_DIR%Editor\bin\Client.pdb"
+set LIB_PATH=%SOURCE_PATH:.dll=.lib%
+if exist "%LIB_PATH%" (
+    copy /Y "%LIB_PATH%" "%SOLUTION_DIR%Editor\bin\Client.lib"
+)
 if %errorlevel% neq 0 (
     echo [Error] Failed to copy to Editor\bin.
     exit /b %errorlevel%
@@ -53,6 +57,9 @@ if %errorlevel% neq 0 (
 echo [Client Post-Build] Copying to Launcher\bin...
 copy /Y "%SOURCE_PATH%" "%SOLUTION_DIR%Launcher\bin\%TARGET_NAME%"
 copy /Y "%SOURCE_PATH%" "%SOLUTION_DIR%Launcher\bin\Client.pdb"
+if exist "%LIB_PATH%" (
+    copy /Y "%LIB_PATH%" "%SOLUTION_DIR%Launcher\bin\Client.lib"
+)
 if %errorlevel% neq 0 (
     echo [Error] Failed to copy to Launcher\bin.
     exit /b %errorlevel%

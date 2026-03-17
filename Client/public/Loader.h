@@ -7,7 +7,7 @@ NS_BEGIN(Client)
 
 class ClientApp;
 
-class Loader final : public Level
+class CLIENT_DLL Loader final : public Level
 {
 public:
 	typedef struct tagLoaderDesc

@@ -9,13 +9,14 @@
 #include "LayerRegistry.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "GameObject.h"
 #include <regex>
 
 IMPLEMENT_SINGLETON(ClientSettingManager)
 
 ENGINE_DESC ClientSettingManager::g_EngineDesc{};
 
-HRESULT ClientSettingManager::Load_Textures_FromJson() const
+HRESULT ClientSettingManager::Load_Textures_FromJson(LEVEL baseLevel) const
 {
 	wstring fullPath = m_ProjectSettingPath + L"TextureSettings.json";
 
@@ -57,6 +58,9 @@ HRESULT ClientSettingManager::Load_Textures_FromJson() const
 			level = LEVEL::LOGO;
 		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
 			level = LEVEL::GAMEPLAY;
+		
+        if (level != baseLevel)
+            continue;
 		
 		wstring tag = Helper::To_wString(item["tag"].get<string>());
 		wstring relativePath = Helper::To_wString(item["path"].get<string>());
@@ -127,7 +131,7 @@ HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
 	return S_OK;
 }
 
-HRESULT ClientSettingManager::Load_Model_FromJson() const
+HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 {
 	wstring fullPath = m_ProjectSettingPath + L"ModelSettings.json";
 
@@ -168,6 +172,9 @@ HRESULT ClientSettingManager::Load_Model_FromJson() const
 			level = LEVEL::LOGO;
 		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
 			level = LEVEL::GAMEPLAY;
+		
+        if (level != baseLevel)
+            continue;
 		
 		wstring tag = Helper::To_wString(item["tag"].get<string>());
 		wstring relativePath = Helper::To_wString(item["path"].get<string>());
@@ -336,6 +343,81 @@ HRESULT ClientSettingManager::Apply_LayerAndTagSettings() const
 	}
 
 	return S_OK;
+}
+
+HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
+{
+    rttr::type gameObjectType = rttr::type::get<GameObject>();
+    auto allTypes = rttr::type::get_types();
+
+    // 전역/정적 세트를 사용하여 여러 번 호출(STATIC, LOGO 등)되더라도 
+    // 동일 타입의 프로토타입은 전 생명주기 동안 단 한 번만 등록되도록 보장합니다.
+    static unordered_set<string> globalProcessedTypes;
+
+    for (auto& type : allTypes)
+    {
+        // 1. GameObject를 상속받은(derived_from) 자기자신 제외 클래스만 순회
+        if (type.is_derived_from(gameObjectType) && type != gameObjectType && !type.is_pointer())
+        {
+            // 중복 처리 방지: 동일한 타입 이름이 이미 등록되었다면 건너뜀
+            string typeName = type.get_name().to_string();
+            if (globalProcessedTypes.contains(typeName))
+                continue;
+
+            // 2. 파이썬이 통일해준 Create 메서드 가져오기
+            rttr::method createMethod = type.get_method("Create");
+            if (createMethod.is_valid())
+            {
+                // 3. 메타데이터 파싱 (기본값: STATIC 0번 레벨)
+                uint32 targetLevel = 0; 
+                rttr::variant metaLevel = createMethod.get_metadata("Level");
+                if (metaLevel.is_valid())
+                {
+                    if (metaLevel.is_type<uint32>())
+                        targetLevel = metaLevel.get_value<uint32>();
+                    else if (metaLevel.is_type<int>()) 
+                        targetLevel = static_cast<uint32>(metaLevel.get_value<int>());
+                    else if (metaLevel.is_type<int32>()) 
+                        targetLevel = static_cast<uint32>(metaLevel.get_value<int32>());
+                    else if (metaLevel.is_type<LEVEL>()) 
+                        targetLevel = ETOI(metaLevel.get_value<LEVEL>());
+                }
+                
+                // 0번(STATIC)이더라도 현재 baseLevel과 일치할 때만 진행 (중복 등록 방지)
+                if (targetLevel != ETOI(baseLevel))
+                    continue;
+
+                // 해당 레벨에 등록하기로 결정된 타입만 마킹 (실제 등록 직전)
+                globalProcessedTypes.insert(typeName);
+
+                LOG_INFO(L"[RTTR-Debug] Try Reg: {}, Target: {}, Current: {}", Helper::To_wString(typeName), targetLevel, ETOI(baseLevel));
+
+                // 4. Create Invoke (매개변수: Device, Context)
+                rttr::variant result = createMethod.invoke({}, GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+                
+                // 5. 엔진 PrototypeManager에 삽입
+                if (result.is_valid())
+                {
+                    auto prototype = result.get_value<Shared<GameObject>>();
+                    
+                    // 태그는 RTTR 클래스 이름(std::string)을 wstring으로 변환하여 사용
+                    wstring tag = Helper::To_wString(type.get_name().to_string());
+                    
+                    // 현재 준비 중인 레벨(baseLevel)에 등록
+                    if (SUCCEEDED(GAME_INSTANCE->Add_Prototype(ETOI(baseLevel), prototype, tag)))
+                    {
+                        LOG_INFO(L"Auto-Registered Client Prototype: {} (Level: {})", tag, ETOI(baseLevel));
+                    }
+                    else
+                    {
+                        LOG_ERROR(L"Failed To Register Client Prototype: {}", tag);
+                    }
+                }
+            }
+        }
+    }
+
+    return S_OK;
 }
 
 HRESULT ClientSettingManager::Load_Texture(LEVEL level) const

@@ -9,6 +9,9 @@ public:
   ~InputDevice();
 
 public:
+    Bool Get_MouseLock() const { return m_IsMouseLocked; }
+    void Set_MouseLock(Bool isLock) { m_IsMouseLocked = isLock; }
+
     Byte Get_DIKeyState(uByte keyID) const { return m_ByKeyStates[keyID]; }
     Byte Get_DIMouseState(DIMB buttonID) const {
       return m_MouseState.rgbButtons[ETOI(buttonID)];
@@ -23,12 +26,16 @@ public:
     void Update();
 
 private:
-  LPDIRECTINPUT8 m_InputSDK = {nullptr};
-  LPDIRECTINPUTDEVICE8 m_Keyboard = {nullptr};
-  LPDIRECTINPUTDEVICE8 m_Mouse = {nullptr};
+    HWND m_hWnd{ nullptr };
+    LPDIRECTINPUT8 m_InputSDK = {nullptr};
+    LPDIRECTINPUTDEVICE8 m_Keyboard = {nullptr};
+    LPDIRECTINPUTDEVICE8 m_Mouse = {nullptr};
+    
+    Byte m_ByKeyStates[256] = {};
+    DIMOUSESTATE m_MouseState = {};
 
-  Byte m_ByKeyStates[256] = {};
-  DIMOUSESTATE m_MouseState = {};
+private:
+    Bool m_IsMouseLocked{ false };
 
 public:
   static Unique<InputDevice> Create(HWND hWnd, HINSTANCE hInst);

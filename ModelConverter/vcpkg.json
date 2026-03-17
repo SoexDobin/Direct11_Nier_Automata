@@ -1,14 +1,13 @@
 {
-  "name": "dx11-engine",
+  "name": "model-converter",
   "version-string": "1.0.0",
   "dependencies": [
-        "magic-enum",
-        "directxtk",
-        "nlohmann-json",
-        "spdlog",
-        "python3",
-        "rttr",
-        "effects11",
-        "assimp"
-    ]
+    "assimp",
+    "directxtk",
+    "magic-enum",
+    "nlohmann-json",
+    "spdlog",
+    "rttr",
+    "effects11"
+  ]
 }

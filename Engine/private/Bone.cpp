@@ -10,6 +10,16 @@ Bone::Bone() : Component{}
 Bone::Bone(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Component{device, context}
 {
+
+}
+
+Bone::Bone(const Bone& rhs)
+	: Component{rhs},
+	m_ParentBoneIndex{ rhs.m_ParentBoneIndex },
+	m_TransformationMatrix{ rhs.m_TransformationMatrix },
+	m_CombinedTransformationMatrix{ rhs.m_CombinedTransformationMatrix } 
+{
+	strcpy_s(m_BoneName, rhs.m_BoneName);
 }
 
 HRESULT Bone::Initialize_Prototype(const MODEL_BONE& modelBone)
@@ -33,6 +43,11 @@ HRESULT Bone::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+void Bone::Update_TransformationMatrix(const Matrix& transformationMatrix)
+{
+	m_TransformationMatrix = transformationMatrix;
+}
+
 void Bone::Update_CombinedTransformationMatrix(const vector<Shared<Bone>>& modelBones, const Matrix& preTransformMatrix)
 {
 	if (-1 == m_ParentBoneIndex)
@@ -50,5 +65,18 @@ Shared<Bone> Bone::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D1
 		LOG_ERROR(L"Failed to Created : Bone {}", Helper::To_wString(boneData.name));
 		MSG_BOX("Failed to Created : Bone");
 	}
+	return bone;
+}
+
+Shared<Component> Bone::Clone(void* arg)
+{
+	auto bone = make_shared<Bone>(*this);
+
+	if (FAILED(bone->Initialize(arg)))
+	{
+		LOG_ERROR(L"Failed to Created : Bone");
+		MSG_BOX("Failed to Created : Bone");
+	}
+
 	return bone;
 }

@@ -26,6 +26,22 @@ $processedClasses = @{}
 $newIncludes = ""
 $newRttrBlocks = ""
 
+# Pre-scan output file for already manually registered classes
+if (Test-Path $OutputFile) {
+    try {
+        $existingContent = [System.IO.File]::ReadAllText($OutputFile, [System.Text.Encoding]::UTF8)
+        $manualContent = [regex]::Replace($existingContent, '(?s)//\s*<AUTO_GENERATED_RTTR>.*?//\s*</AUTO_GENERATED_RTTR>', '')
+        $matches = [regex]::Matches($manualContent, 'rttr::registration::class_<([A-Za-z0-9_]+)>')
+        foreach ($match in $matches) {
+            $manualClass = $match.Groups[1].Value
+            $processedClasses[$manualClass] = $true
+            # Write-Host "==========      [Info] Found manual registration: $manualClass"
+        }
+    } catch {
+        Write-Host "==========      [Warning] Could not pre-scan manual registrations: $_"
+    }
+}
+
 $headerFiles = Get-ChildItem -Path $InputDir -Filter "*.h" | Sort-Object Name
 
 foreach ($file in $headerFiles) {
@@ -61,15 +77,24 @@ foreach ($file in $headerFiles) {
         $hasClone = $content -match "\bClone\s*\("
         $hasCreate = $content -match "\bstatic\s+.*\bCreate\s*\("
 
+        if (-not $hasCreate) {
+            continue
+        }
+
+        $targetLevel = "0"
+        if ($content -match "//\s*\[RTTR_LEVEL\]\s*(LEVEL::[a-zA-Z0-9_]+|\d+)") {
+            $targetLevel = $Matches[1]
+        }
+
         $methodRegistrations = ""
         if ($hasClone) {
             $methodRegistrations += "`n        .method(`"Clone`", &$className::Clone)"
         }
         if ($hasCreate) {
-            $methodRegistrations += "`n        .method(`"Create`", &$className::Create)"
+            $methodRegistrations += "`n        .method(`"Create`", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return $className::Create(device, context); })(rttr::metadata(`"Level`", $targetLevel))"
         }
 
-        $rttrBlock = "    rttr::registration::class_<$className>(L`"$className`")`n        .constructor<>()" + $methodRegistrations + ";`n`n"
+        $rttrBlock = "    rttr::registration::class_<$className>(`"$className`")`n        .constructor<>()" + $methodRegistrations + ";`n`n"
         
         $newIncludes += "#include `"$className.h`"`n"
         $newRttrBlocks += $rttrBlock
@@ -91,10 +116,10 @@ catch {
 }
 
 # Regex replacement for includes
-$outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_INCLUDES>\n).*?(\n//\s*</AUTO_GENERATED_INCLUDES>)', "`${1}$newIncludes`${2}")
+$outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_INCLUDES>\r?\n).*?(\r?\n//\s*</AUTO_GENERATED_INCLUDES>)', "`${1}$newIncludes`${2}")
 
 # Regex replacement for RTTR blocks
-$outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_RTTR>\n).*?(\n//\s*</AUTO_GENERATED_RTTR>)', "`${1}$newRttrBlocks`${2}")
+$outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_RTTR>\r?\n).*?(\r?\n//\s*</AUTO_GENERATED_RTTR>)', "`${1}$newRttrBlocks`${2}")
 
 try {
     [System.IO.File]::WriteAllText($OutputFile, $outContent, [System.Text.Encoding]::UTF8)

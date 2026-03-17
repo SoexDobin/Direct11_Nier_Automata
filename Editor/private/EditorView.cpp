@@ -2,6 +2,7 @@
 #include "EditorView.h"
 #include "ImGuizmo.h"
 #include <Transform.h>
+#include "UIObject.h"
 
 #include "EditorManager.h"
 
@@ -18,9 +19,7 @@ HRESULT EditorView::Initialize()
 void EditorView::Update(Bool isResize) {}
 
 void EditorView::Render(Bool isResize) {
-	if (!m_IsDirty)
-		return;
-
+	// m_IsDirty 체크 제거하여 항상 렌더링되게 함 (기즈모/피킹 상태 반영 보장)
 	EditorView::RenderView(isResize);
 }
 
@@ -31,19 +30,30 @@ void EditorView::RenderView(Bool isResize) {
 	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
 
 	ImGui::Begin("Scene View");
-	if (srvScene && !isResize)
 	{
-		ImVec2 currentSize = ImGui::GetContentRegionAvail();
-		if (prevSceneViewportSize.x != currentSize.x || prevSceneViewportSize.y != currentSize.y) {
-			prevSceneViewportSize = currentSize;
-			EDITOR->RequestResize(currentSize.x,currentSize.y,1);
+		auto selected = EDITOR->Get_SelectedObject();
+		if (selected)
+			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected: %S", selected->Get_Name().c_str());
+		else
+			ImGui::Text("Selected: None");
+
+		if (srvScene && !isResize)
+		{
+			ImVec2 currentSize = ImGui::GetContentRegionAvail();
+			if (prevSceneViewportSize.x != currentSize.x || prevSceneViewportSize.y != currentSize.y) {
+				prevSceneViewportSize = currentSize;
+				EDITOR->RequestResize(currentSize.x, currentSize.y, 1);
+			}
+
+			ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), prevSceneViewportSize);
+			
+			// 이미지 바로 아래에서 좌표 캡처
+			ImVec2 imageRectMin = ImGui::GetItemRectMin();
+			ImVec2 imageRectSize = ImGui::GetItemRectSize();
+
+			EditorView::MousePicking(imageRectSize, imageRectMin);
+			Update_ImGuizmo(imageRectSize, imageRectMin);
 		}
-		
-		ImGui::Text("FPS : %3f", GAME_INSTANCE->Get_FPS());
-		ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), prevSceneViewportSize);
-		prevSceneViewportSize = currentSize;
-		EditorView::MousePicking(prevSceneViewportSize);
-		Update_ImGuizmo(prevSceneViewportSize);
 	}
 	ImGui::End();
 
@@ -117,21 +127,30 @@ void EditorView::RenderView(Bool isResize) {
 	ImGui::End();
 }
 
-void EditorView::MousePicking(ImVec2 viewport)
+void EditorView::MousePicking(ImVec2 viewport, ImVec2 imageStartPos)
 {
-	Matrix invView = GAME_INSTANCE->Get_InvTransform(D3DTS::VIEW);
-	Matrix invProj = GAME_INSTANCE->Get_InvTransform(D3DTS::PROJ);
+	ImVec2 mousePos = ImGui::GetMousePos();
+	
+	// 마우스가 이미지 영역 안에 있는지 수동 체크
+	Bool isHovered = (mousePos.x >= imageStartPos.x && mousePos.x <= imageStartPos.x + viewport.x &&
+					  mousePos.y >= imageStartPos.y && mousePos.y <= imageStartPos.y + viewport.y);
 
-	if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+	if (!isHovered) return;
+
+	// 좌클릭 시에만 연산 수행
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
-		ImVec2 mousePos = ImGui::GetMousePos();
-		ImVec2 imageStartPos = ImGui::GetItemRectMin(); // 현재 그려진 아이템(이미지)의 최소 좌표
+		if (ImGuizmo::IsOver()) return;
+
 		Float localX = mousePos.x - imageStartPos.x;
 		Float localY = mousePos.y - imageStartPos.y;
 		
 		Float ndcX = (localX / viewport.x) * 2.f - 1.f;
 		Float ndcY = 1.f - (localY / viewport.y) * 2.f;
-		
+
+		Matrix invView = GAME_INSTANCE->Get_InvTransform(D3DTS::VIEW);
+		Matrix invProj = GAME_INSTANCE->Get_InvTransform(D3DTS::PROJ);
+
 		Vector4 vNear = Vector4(ndcX, ndcY, 0.f, 1.f);
 		Vector4 vFar = Vector4(ndcX, ndcY, 1.f, 1.f);
 		
@@ -147,16 +166,43 @@ void EditorView::MousePicking(ImVec2 viewport)
 		Vector3 rayDir = rayTarget - rayOrigin;
 		rayDir.Normalize();
 		
-		if (ImGuizmo::IsOver()) return;
 		Shared<GameObject> pickedObject = nullptr;
-		float minDistance = FLT_MAX;
+		Float minDistance = FLT_MAX;
+		
 		// 모든 객체를 순회하며 피킹 검사
 		for (auto& pair : GAME_INSTANCE->Get_GameObjects()) {
 			auto obj = pair.second;
-			Vector3 pos = obj->Get_Transform()->Get_Position();
 
-			// 임시로 구체(Sphere) 반경 0.5f 정도로 피킹 영역 설정
-			BoundingSphere sphere(pos, 0.5f);
+			if (obj == EDITOR->Get_EditorCamera()) continue;
+
+			auto uiObj = std::dynamic_pointer_cast<UIObject>(obj);
+			if (uiObj)
+			{
+				uiObj->Update_UITransform(viewport.x, viewport.y);
+
+				Matrix uiWorld = uiObj->Get_Transform()->Get_WorldMatrix();
+				Matrix invUIWorld = uiWorld.Invert();
+
+				Vector3 mousePos_Center;
+				mousePos_Center.x = localX - viewport.x * 0.5f;
+				mousePos_Center.y = -localY + viewport.y * 0.5f;
+				mousePos_Center.z = 0.f;
+
+				Vector3 localMouse = Vector3::Transform(mousePos_Center, invUIWorld);
+
+				if (localMouse.x >= -0.5f && localMouse.x <= 0.5f &&
+					localMouse.y >= -0.5f && localMouse.y <= 0.5f)
+				{
+					pickedObject = obj;
+					minDistance = -1.f; 
+					break;
+				}
+				continue;
+			}
+
+			// 3D 객체 피킹 (충돌체 없으면 간단한 Sphere 체크)
+			Vector3 pos = obj->Get_Transform()->Get_Position();
+			BoundingSphere sphere(pos, 1.0f); // 범위를 약간 넓힘 (0.5f -> 1.0f)
 			float dist = 0.f;
 
 			if (sphere.Intersects(rayOrigin, rayDir, dist)) {
@@ -166,40 +212,17 @@ void EditorView::MousePicking(ImVec2 viewport)
 				}
 			}
 		}
-		// 선택 결과 업데이트
+		
 		if (pickedObject) {
 			EDITOR->Set_SelectedObject(pickedObject);
 		}
 		else {
 			EDITOR->Clear_SelectedObject();
 		}
-
-		if (fabs(rayDir.y) > 0.0001f)
-		{
-			Float t = -rayOrigin.y / rayDir.y;
-			if (t > 0.f)
-			{
-				Vector3 worldPickPos = rayOrigin + rayDir * t;
-				// [디버깅 출력]
-				ImGui::BeginTooltip();
-				ImGui::Text("Picking Info (Fixed)");
-				ImGui::Separator();
-				ImGui::Text("NDC      X:%.3f, Y:%.3f", ndcX, ndcY);
-				ImGui::TextColored(ImVec4(0, 0.8f, 0.f, 1),
-					"World Pos X:%.2f, Y:%.2f, Z:%.2f", worldPickPos.x, worldPickPos.y, worldPickPos.z);
-				ImGui::EndTooltip();
-			}
-		}
-		// 클릭 중인 좌표를 시각적으로 강조 (선택 사항)
-		if (ndcX >= -1.f && ndcX <= 1.f && ndcY >= -1.f && ndcY <= 1.f)
-			ImGui::TextColored(ImVec4(0, 0.5f, 0.1f, 1), "Inside Viewport");
-		else
-			ImGui::TextColored(ImVec4(1.f, 0.2f, 0.2f, 1.f), "Outside Viewport");
-
 	}
 }
 
-void EditorView::Update_ImGuizmo(ImVec2 viewport)
+void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 {
 	if (EDITOR->Get_State() == EDITOR_STATE::PLAY) return;
 
@@ -208,31 +231,65 @@ void EditorView::Update_ImGuizmo(ImVec2 viewport)
 	auto transform = selectedObj->Get_Transform();
 
 	// 1. 기즈모 드로잉 설정
-	ImGuizmo::SetDrawlist();
-	ImGuizmo::SetRect(ImGui::GetItemRectMin().x, ImGui::GetItemRectMin().y, viewport.x, viewport.y);
+	ImGuizmo::SetDrawlist(); // 기본값 사용 (현재 윈도우)
+	ImGuizmo::SetRect(imageStartPos.x, imageStartPos.y, viewport.x, viewport.y);
+	ImGuizmo::Enable(true);
+
 	// 2. 행렬 준비 (SimpleMath::Matrix 사용)
 	Matrix view = GAME_INSTANCE->Get_Transform(D3DTS::VIEW);
 	Matrix proj = GAME_INSTANCE->Get_Transform(D3DTS::PROJ);
-	Matrix world = transform->Get_WorldMatrix();
+	
 	// 3. 조작 처리
-	// ImGuizmo는 내부적으로 float[16]을 수정하므로 world 행렬이 직접 바뀝니다.
-	if (ImGuizmo::Manipulate(
-		reinterpret_cast<Float*>(&view), 
-		reinterpret_cast<Float*>(&proj),
-		m_CurrentGizmoMode, // 현재 조작 모드
-		ImGuizmo::WORLD,
-		reinterpret_cast<Float*>(&world)))
+	auto uiObj = std::dynamic_pointer_cast<UIObject>(selectedObj);
+	if (uiObj)
 	{
-		// 4. [핵심] 조작 결과 반영
-		// 부모가 있을 경우 World 행렬에서 Local 행렬로 변환이 필요할 수 있으나,
-		// 단순 구현을 위해 World 값을 분해해 바로 넣어줍니다.
-		Vector3 scale, pos;
-		Quaternion rot;
-		if (world.Decompose(scale, rot, pos)) {
-			transform->Set_LocalPositionByValue(pos);
-			transform->Set_LocalRotation(rot);
-			transform->Set_LocalScaleByValue(scale);
-			transform->Update_WorldMatrix();
+		ImGuizmo::SetOrthographic(true);
+		Matrix uiView = Matrix::Identity;
+		Matrix uiProj = XMMatrixOrthographicOffCenterLH(0, viewport.x, viewport.y, 0, 0.f, 1.f);
+		
+		Vector2 anchorPos = uiObj->Get_AnchorPos(viewport.x, viewport.y);
+		uiObj->Update_UITransform(viewport.x, viewport.y);
+
+		Matrix uiScreenWorld = transform->Get_LocalMatrix() * Matrix::CreateTranslation(anchorPos.x, anchorPos.y, 0);
+
+		if (ImGuizmo::Manipulate(
+			reinterpret_cast<Float*>(&uiView),
+			reinterpret_cast<Float*>(&uiProj),
+			m_CurrentGizmoMode,
+			ImGuizmo::LOCAL,
+			reinterpret_cast<Float*>(&uiScreenWorld)))
+		{
+			Vector3 scale, pos;
+			Quaternion rot;
+			if (uiScreenWorld.Decompose(scale, rot, pos)) {
+				transform->Set_LocalPositionByValue(Vector3(pos.x - anchorPos.x, pos.y - anchorPos.y, 0.f));
+				transform->Set_LocalRotation(rot);
+				transform->Set_LocalScaleByValue(scale);
+				uiObj->Update_UITransform(viewport.x, viewport.y);
+			}
+		}
+	}
+	else
+	{
+		ImGuizmo::SetOrthographic(false);
+		transform->Update_WorldMatrix();
+		Matrix world = transform->Get_WorldMatrix();
+
+		if (ImGuizmo::Manipulate(
+			reinterpret_cast<Float*>(&view),
+			reinterpret_cast<Float*>(&proj),
+			m_CurrentGizmoMode,
+			ImGuizmo::WORLD,
+			reinterpret_cast<Float*>(&world)))
+		{
+			Vector3 scale, pos;
+			Quaternion rot;
+			if (world.Decompose(scale, rot, pos)) {
+				transform->Set_LocalPositionByValue(pos);
+				transform->Set_LocalRotation(rot);
+				transform->Set_LocalScaleByValue(scale);
+				transform->Update_WorldMatrix();
+			}
 		}
 	}
 }

@@ -34,7 +34,7 @@ public:
 	void On_Destroy() override;
 
 public:
-	void Update_Model(Float timeDelta);
+	void Update_ModelAnimation(Float timeDelta);
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);
 	HRESULT Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex);
@@ -46,7 +46,10 @@ private:
 	HRESULT Ready_Animation(ifstream& in);
 
 private:
-	Matrix m_PreLocalTransformMatrix{};
+	Matrix	m_PreLocalTransformMatrix{};
+	Bool	m_IsSkeletal{ false };
+	Bool	m_IsAnimLoop{ false };
+	uint32	m_CurrentAnimIndex{};
 
 private:
 	uint32 m_NumMeshes = {};

@@ -9,7 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class LoadingLogo : public UIObject
+class CLIENT_DLL LoadingLogo : public UIObject
 {
     RTTR_ENABLE(UIObject)
 public:

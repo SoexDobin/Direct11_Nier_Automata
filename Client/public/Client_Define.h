@@ -1,6 +1,12 @@
 #pragma once
 #include <windows.h>
 
+#ifdef CLIENT_EXPORTS
+#define CLIENT_DLL __declspec(dllexport)
+#else
+#define CLIENT_DLL __declspec(dllimport)
+#endif
+
 namespace Client
 {
 	enum class LEVEL { STATIC, LOADING, LOGO, GAMEPLAY, LEVEL_END };

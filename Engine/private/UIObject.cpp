@@ -20,17 +20,17 @@ HRESULT UIObject::Initialize_Prototype() {
 }
 
 HRESULT UIObject::Initialize(void *arg) {
-    if (arg != nullptr) {
-        UI_DESC *desc = static_cast<UI_DESC *>(arg);
-
-        m_X = desc->x;
-        m_Y = desc->y;
-        m_SizeX = desc->sizeX;
-        m_SizeY = desc->sizeY;
-    }
-
 	if (FAILED(GameObject::Initialize(arg)))
 		return E_FAIL;
+
+    if (arg != nullptr) {
+        UI_DESC* desc = static_cast<UI_DESC*>(arg);
+        m_Anchor = desc->anchor;
+
+        // Desc 값을 바로 Transform에 저장
+        m_Transform->Set_LocalPosition(desc->x, desc->y, 0.f);
+        m_Transform->Set_LocalScale(desc->sizeX, desc->sizeY, 1.f);
+    }
 
     D3D11_VIEWPORT viewPortDesc = GAME_INSTANCE->Get_ViewportDesc();
     uint32 numViewPorts{1};
@@ -49,29 +49,70 @@ HRESULT UIObject::Initialize(void *arg) {
 void UIObject::On_Destroy()                 { GameObject::On_Destroy(); }
 void UIObject::On_Enable()                  { GameObject::On_Enable(); }
 void UIObject::On_Disable()                 { GameObject::On_Disable(); }
-void UIObject::Set_Active(Bool isActive)    { GameObject::Set_Active(isActive); }
 void UIObject::Priority_Update(Float timeDelta) {
 	GameObject::Priority_Update(timeDelta);
 }
 void UIObject::Update(Float timeDelta) {
-	GameObject::Update(timeDelta);
+	Update_UITransform();
 }
 void UIObject::Late_Update(Float timeDelta) {
-	GameObject::Late_Update(timeDelta);
+	
 }
 void UIObject::Fixed_Update(Float fixedDelta) {
-	GameObject::Fixed_Update(fixedDelta);
+	
 }
 HRESULT UIObject::Render() {
 	return GameObject::Render();
 }
 
 void UIObject::Update_UITransform() const {
-    Float baseWidth = m_ViewportWidth;
-    Float baseHeight = m_ViewportHeight;
+    Update_UITransform(m_ViewportWidth, m_ViewportHeight);
+}
+
+void UIObject::Update_UITransform(Float viewportWidth, Float viewportHeight) const {
+    if (false == m_IsActive || true == m_IsDestroy) return;
+
+    Float baseWidth = viewportWidth;
+    Float baseHeight = viewportHeight;
+
+    Vector2 anchorPos = Get_AnchorPos(baseWidth, baseHeight);
+    Float anchorPosX = anchorPos.x;
+    Float anchorPosY = anchorPos.y;
+
     auto parent = Get_Parent();
     if (parent) {
-        // 부모가 UIObject라면 그 크기를 가져옴 (캐스팅 필요)
+        auto uiParent = std::dynamic_pointer_cast<UIObject>(parent);
+        if (uiParent) {
+            // 부모가 있으면 부모 사이즈 기준으로 앵커 재계산이 필요할 수 있으나 
+            // 현재 Get_AnchorPos 내부에서 이미 처리하고 있으므로 로직 일관성을 유지합니다.
+        }
+    }
+
+    Vector3 offset = m_Transform->Get_LocalPosition();
+    Vector3 size = m_Transform->Get_LocalScale();
+    Quaternion rotation = m_Transform->Get_LocalRotation();
+    
+    Vector3 finalPos;
+    finalPos.x = (offset.x + anchorPosX) - (baseWidth * 0.5f);
+    finalPos.y = -(offset.y + anchorPosY) + (baseHeight * 0.5f);
+    finalPos.z = 0.f;
+    
+    Matrix matScale = Matrix::CreateScale(size.x, size.y, 1.f);
+    Matrix matRotation = Matrix::CreateFromQuaternion(rotation);
+    Matrix matTranslation = Matrix::CreateTranslation(finalPos);
+
+    m_Transform->Set_WorldMatrix(matScale * matRotation * matTranslation);
+}
+
+Vector2 UIObject::Get_AnchorPos() const {
+    return Get_AnchorPos(m_ViewportWidth, m_ViewportHeight);
+}
+
+Vector2 UIObject::Get_AnchorPos(Float viewportWidth, Float viewportHeight) const {
+    Float baseWidth = viewportWidth;
+    Float baseHeight = viewportHeight;
+    auto parent = Get_Parent();
+    if (parent) {
         auto uiParent = std::dynamic_pointer_cast<UIObject>(parent);
         if (uiParent) {
             baseWidth = uiParent->Get_SizeX();
@@ -94,16 +135,7 @@ void UIObject::Update_UITransform() const {
     case UI_ANCHOR::BOTTOM_RIGHT:  anchorRatioX = 1.0f; anchorRatioY = 1.0f; break;
     }
 
-    Float anchorPosX = baseWidth * anchorRatioX;
-    Float anchorPosY = baseHeight * anchorRatioY;
-
-    m_Transform->Set_Scale(m_SizeX, m_SizeY, 1.f);
-    m_Transform->Set_Position(Vector3{
-    	(m_X + anchorPosX) - (baseWidth * 0.5f),
-    	-(m_Y + anchorPosY) + (baseHeight * 0.5f),
-    	0.f});
-
-    m_Transform->Update_WorldMatrix();
+    return Vector2(baseWidth * anchorRatioX, baseHeight * anchorRatioY);
 }
 
 HRESULT UIObject::Bind_ShaderResource(const Shared<Shader> &shader,
@@ -111,3 +143,4 @@ HRESULT UIObject::Bind_ShaderResource(const Shared<Shader> &shader,
                                       D3DTS transformState) const {
 	return shader->Bind_Matrix(constantName, &m_TransformationMatrices[ETOI(transformState)]);
 }
+

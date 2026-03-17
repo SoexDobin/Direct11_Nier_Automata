@@ -60,6 +60,7 @@ void EditorManager::Update(Bool IsResetView) {
     EDITOR_STATE state = EDITOR->Get_State();
 
     if (state == EDITOR_STATE::PLAY) {
+
         GAME_INSTANCE->Update_Engine();
     }
     else {
@@ -123,8 +124,7 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         ImGuiWindowFlags_NoBringToFrontOnFocus | 
         ImGuiWindowFlags_NoNavFocus |
         ImGuiWindowFlags_NoBackground; // 배경 투명화
-    // 4. (선택 사항) 만약 화면 윗부분에 메뉴바(File, Edit 등)를 넣고 싶다면 이 속성 추가
-    // window_flags |= ImGuiWindowFlags_MenuBar;
+    
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -134,8 +134,8 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         // 7. 이 패널 공간 전체를 "도킹 가능한 구역(DockSpace)"으로 만듦
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable)
         {
-            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+            ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
+            ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
         }
     }
     ImGui::End();

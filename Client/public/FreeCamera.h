@@ -2,7 +2,7 @@
 #include "Camera.h"
 
 NS_BEGIN(Client)
-	class FreeCamera final : public Camera
+	class CLIENT_DLL FreeCamera final : public Camera
 {
 	RTTR_ENABLE(Camera)
 public:

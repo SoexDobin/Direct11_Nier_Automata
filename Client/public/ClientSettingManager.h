@@ -18,18 +18,22 @@ public: /* Project Path */
 	void Set_ShaderPath(const wstring& path) { m_ShaderPath = path; }
 
 public: /* Texture */
-	HRESULT Load_Textures_FromJson() const;
+	HRESULT Load_Textures_FromJson(LEVEL level) const;
 	HRESULT Sync_TextureJson_FromCSV() const;
 
 public: /* Model */
-	HRESULT Load_Model_FromJson() const;
+	HRESULT Load_Model_FromJson(LEVEL level) const;
 	HRESULT Sync_ModelJson_FromCSV() const;
 
+public: /* Shader */
+	HRESULT Load_Shader() const;
+
 public:
+	HRESULT Ready_Client_Prototypes(LEVEL level) const;
 	HRESULT Load_EngineDesc(ENGINE_DESC& outDesc) const;
 	HRESULT Apply_LayerAndTagSettings() const;
 	HRESULT Load_Texture(LEVEL level) const;
-	HRESULT Load_Shader() const;
+	
 
 private:
 

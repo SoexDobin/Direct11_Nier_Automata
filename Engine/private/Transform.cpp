@@ -93,10 +93,10 @@ Vector3 Transform::Get_Scale() const {
 }
 
 Vector3 Transform::Get_Rotation() const {
-  return Get_RotationQuaternion().ToEuler();
+  return Get_Quaternion().ToEuler();
 }
 
-Quaternion Transform::Get_RotationQuaternion() const {
+Quaternion Transform::Get_Quaternion() const {
   Matrix normalized = m_WorldMatrix;
 
   normalized.Right(XMVector3Normalize(normalized.Right()));
@@ -149,7 +149,7 @@ void Transform::Set_Rotation(Vector3 eulerAngles) {
     Quaternion worldQuat = Quaternion::CreateFromYawPitchRoll(
         XMConvertToRadians(eulerAngles.y), XMConvertToRadians(eulerAngles.x),
         XMConvertToRadians(eulerAngles.z));
-    Quaternion parentQuat = parent->Get_RotationQuaternion();
+    Quaternion parentQuat = parent->Get_Quaternion();
     parentQuat.Inverse(parentQuat);
     m_LocalRotation = worldQuat * parentQuat;
     m_IsDirty = true;
@@ -164,7 +164,7 @@ void Transform::Set_Rotation(Quaternion rotation) {
     Set_LocalRotation(rotation);
   else {
     auto parent = Get_Parent();
-    Quaternion parentQuat = parent->Get_RotationQuaternion();
+    Quaternion parentQuat = parent->Get_Quaternion();
     parentQuat.Inverse(parentQuat);
     m_LocalRotation = rotation * parentQuat;
     m_IsDirty = true;
@@ -237,7 +237,7 @@ void Transform::LookAt(Vector3 atVec, Vector3 upVector) {
 
   if (!m_Owner.expired() && m_Owner.lock()->Has_Parent()) {
     auto parent = Get_Parent();
-    Quaternion parentQuat = parent->Get_RotationQuaternion();
+    Quaternion parentQuat = parent->Get_Quaternion();
     parentQuat.Inverse(parentQuat);
     m_LocalRotation = m_LocalRotation * parentQuat;
   }
@@ -264,7 +264,7 @@ void Transform::Turn(Vector3 eulerAmount, Float timeDelta, Float amount) {
 
     if (auto parent = m_Owner.lock()->Get_Parent())
     {
-        Quaternion parentQuat = parent->Get_Transform()->Get_RotationQuaternion();
+        Quaternion parentQuat = parent->Get_Transform()->Get_Quaternion();
         Quaternion parentQuatInv;
         parentQuat.Inverse(parentQuatInv);
 

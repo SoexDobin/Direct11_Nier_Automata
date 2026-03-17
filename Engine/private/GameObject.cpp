@@ -113,6 +113,11 @@ void GameObject::On_Disable() {
   Object::On_Disable();
 }
 
+void GameObject::Set_Active(Bool isActive)
+{
+	__super::Set_Active(isActive);
+}
+
 void GameObject::Priority_Update(Float timeDelta) {}
 
 void GameObject::Update(Float timeDelta) {}

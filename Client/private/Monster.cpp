@@ -6,15 +6,13 @@
 
 #include "SpdLogger.h"
 
+Monster::Monster() : GameObject{} {}
 Monster::Monster(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: GameObject{device, context}
-{
-}
-
+{}
 Monster::Monster(const Monster& rhs)
 	: GameObject(rhs)
-{
-}
+{}
 
 HRESULT Monster::Initialize_Prototype()
 {

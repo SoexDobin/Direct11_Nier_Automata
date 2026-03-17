@@ -49,7 +49,6 @@ HRESULT UIObject::Initialize(void *arg) {
 void UIObject::On_Destroy()                 { GameObject::On_Destroy(); }
 void UIObject::On_Enable()                  { GameObject::On_Enable(); }
 void UIObject::On_Disable()                 { GameObject::On_Disable(); }
-void UIObject::Set_Active(Bool isActive)    { GameObject::Set_Active(isActive); }
 void UIObject::Priority_Update(Float timeDelta) {
 	GameObject::Priority_Update(timeDelta);
 }

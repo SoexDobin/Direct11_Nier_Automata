@@ -36,7 +36,8 @@ public:
     virtual HRESULT Initialize(void *arg) override;
     void On_Destroy() override;
     void On_Enable() override;
-    void On_Disable() override;
+    virtual void On_Disable() override;
+    void Set_Active(Bool isActive) final;
     PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
 
 public:

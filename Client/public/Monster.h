@@ -12,6 +12,7 @@ class Monster : public GameObject
 {
 	RTTR_ENABLE(GameObject)
 public:
+	explicit Monster();
 	explicit Monster(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Monster(const Monster& rhs);
 	virtual ~Monster() override = default;

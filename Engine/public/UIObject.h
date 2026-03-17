@@ -34,7 +34,6 @@ public:
 public:
     void Update_UITransform() const;
     void Update_UITransform(Float viewportWidth, Float viewportHeight) const;
-    void Set_Active(Bool isActive) final;
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void *arg) override;
     virtual void On_Destroy() override;

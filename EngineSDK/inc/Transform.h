@@ -40,7 +40,7 @@ public: /* Local Setter */
 public: /* World Getter */
     Vector3 Get_Scale() const;
     Vector3 Get_Rotation() const;
-    Quaternion Get_RotationQuaternion() const;
+    Quaternion Get_Quaternion() const;
     Vector3 Get_Position() const;
     Matrix Get_WorldMatrix() const;
     Vector3 Get_Right() const;

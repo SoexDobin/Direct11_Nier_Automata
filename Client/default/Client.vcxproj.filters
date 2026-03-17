@@ -37,6 +37,12 @@
     <ClInclude Include="..\public\Monster.h">
       <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ThirdPersonCamera.h">
+      <Filter>02. GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Playable.h">
+      <Filter>02. GameObject\Playable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -71,6 +77,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Monster.cpp">
       <Filter>02. GameObject\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ThirdPersonCamera.cpp">
+      <Filter>02. GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Playable.cpp">
+      <Filter>02. GameObject\Playable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +124,12 @@
     </Filter>
     <Filter Include="02. GameObject\Monster">
       <UniqueIdentifier>{c932032b-94df-43d7-9e98-c5d255458cae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable">
+      <UniqueIdentifier>{fb7ab57d-06ad-47cd-aa75-fc9259684988}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B">
+      <UniqueIdentifier>{81f89b32-9daf-4665-8d11-2b6081a9a216}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

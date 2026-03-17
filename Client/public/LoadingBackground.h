@@ -13,6 +13,7 @@ NS_BEGIN(Client)
 
 class LoadingBackground final : public UIObject
 {
+    RTTR_ENABLE(UIObject)
 public:
     typedef struct tagLoadingBackgroundUI final : public UI_DESC
     {
@@ -48,8 +49,6 @@ private:
 public:
     static Shared<LoadingBackground> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
     Shared<GameObject> Clone(void *arg) override;
-
-    RTTR_ENABLE()
 };
 
 NS_END

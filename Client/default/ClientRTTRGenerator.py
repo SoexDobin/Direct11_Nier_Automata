@@ -51,15 +51,25 @@ def process_header_file(header_path: Path, processed_classes: Set[str]) -> Tuple
         
     processed_classes.add(class_name)
     
+    # 메타데이터 파싱
+    level_match = re.search(r'//\s*\[RTTR_LEVEL\]\s*(LEVEL::[a-zA-Z0-9_]+|\d+)', content)
+    target_level = level_match.group(1) if level_match else "0"
+
     has_clone = bool(re.search(r'\bClone\s*\(', content))
     has_create = bool(re.search(r'\bstatic\s+.*\bCreate\s*\(', content))
+    
+    if not has_create:
+        return None, None
     
     # 등록 덩어리 생성
     method_registrations = ""
     if has_clone:
         method_registrations += '\n        .method("Clone", &{}::Clone)'.format(class_name)
     if has_create:
-        method_registrations += '\n        .method("Create", &{}::Create)'.format(class_name)
+        method_registrations += f'''
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> {{
+            return {class_name}::Create(device, context);
+        }})(rttr::metadata("Level", {target_level}))'''
 
     # ⭐ RTTR 문자열 칸에만 clean_name을 적용!
     rttr_block = f'''    rttr::registration::class_<{class_name}>("{class_name}")
@@ -88,6 +98,18 @@ def main():
     processed_classes: Set[str] = set()
     new_includes = ""
     new_rttr_blocks = ""
+    
+    # Pre-scan output file for already manually registered classes
+    if output_file.exists():
+        try:
+            existing_content = output_file.read_text(encoding='utf-8')
+            manual_content = re.sub(r'(?s)//\s*<AUTO_GENERATED_RTTR>.*?//\s*</AUTO_GENERATED_RTTR>', '', existing_content)
+            for match in re.finditer(r'rttr::registration::class_<([A-Za-z0-9_]+)>', manual_content):
+                manual_class = match.group(1)
+                processed_classes.add(manual_class)
+                # print(f"==========      [Info] Found manual registration: {manual_class}")
+        except Exception as e:
+            print(f"==========      [Warning] Could not pre-scan manual registrations: {e}")
     
     for header_file in sorted(input_dir.glob("*.h")):
         class_name, rttr_block = process_header_file(header_file, processed_classes)

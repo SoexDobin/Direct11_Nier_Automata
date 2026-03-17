@@ -336,6 +336,19 @@
                                                                     ],
                                               "has_clone":  true
                                           },
+                    "ThirdPersonCamera":  {
+                                              "members":  [
+
+                                                          ],
+                                              "base_class":  "Camera",
+                                              "inherited_members":  {
+
+                                                                    },
+                                              "namespace":  "Client",
+                                              "has_create":  true,
+                                              "has_clone":  true,
+                                              "category":  "other"
+                                          },
                     "Monster":  {
                                     "namespace":  "Engine",
                                     "base_class":  "GameObject",

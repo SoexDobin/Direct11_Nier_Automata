@@ -123,8 +123,7 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         ImGuiWindowFlags_NoBringToFrontOnFocus | 
         ImGuiWindowFlags_NoNavFocus |
         ImGuiWindowFlags_NoBackground; // 배경 투명화
-    // 4. (선택 사항) 만약 화면 윗부분에 메뉴바(File, Edit 등)를 넣고 싶다면 이 속성 추가
-    // window_flags |= ImGuiWindowFlags_MenuBar;
+    
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));

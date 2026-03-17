@@ -21,27 +21,6 @@ HRESULT ClientApp::Initialize(const ENGINE_DESC &desc) {
     if (FAILED(ClientSettingManager::GetInstance()->Load_EngineDesc(ClientSettingManager::g_EngineDesc)))
         return E_FAIL;
 
-    if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
-        return E_FAIL;
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::STATIC))) {
-            LOG_ERROR(L"Failed to Load Textures");
-            return E_FAIL;
-        }
-    }
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
-	    if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::STATIC))) {
-            LOG_ERROR(L"Failed to Load Model");
-            return E_FAIL;
-	    }
-    }
-
-    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::STATIC))) {
-        LOG_ERROR(L"Failed to Ready Client Prototypes");
-        return E_FAIL;
-    }
-
-
     if (FAILED(Ready_StartLevel(LEVEL::LOGO)))
       return E_FAIL;
 

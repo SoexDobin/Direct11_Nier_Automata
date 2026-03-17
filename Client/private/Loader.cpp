@@ -104,6 +104,27 @@ HRESULT Loader::Loading() {
 HRESULT Loader::Loading_For_LogoLevel() {
 	m_isFinished = false;
 
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
+        return E_FAIL;
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::STATIC))) {
+            LOG_ERROR(L"Failed to Load Textures");
+            return E_FAIL;
+        }
+    }
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::STATIC))) {
+            LOG_ERROR(L"Failed to Load Model");
+            return E_FAIL;
+        }
+    }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::STATIC))) {
+        LOG_ERROR(L"Failed to Ready Client Prototypes");
+        return E_FAIL;
+    }
+
+
     lstrcpy(m_LoadingText, TEXT("Loading Logo Level Texture... "));
 
     LIGHT_DESC			LightDesc{};

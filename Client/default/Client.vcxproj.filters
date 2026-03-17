@@ -43,6 +43,36 @@
     <ClInclude Include="..\public\Playable.h">
       <Filter>02. GameObject\Playable</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LoadingPixelPanel.h">
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
+    </ClInclude>
+    <ClInclude Include="P10000.h">
+      <Filter>02. GameObject\Playable\2B</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateMachine.h">
+      <Filter>02. GameObject\Playable\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State.h">
+      <Filter>02. GameObject\Playable\StateMachine\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B.h">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Attack.h">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Idle.h">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Jump.h">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
+    <ClInclude Include="State2B_Run.h">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Walk.h">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -83,6 +113,36 @@
     </ClCompile>
     <ClCompile Include="..\private\Playable.cpp">
       <Filter>02. GameObject\Playable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingPixelPanel.cpp">
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
+    </ClCompile>
+    <ClCompile Include="P10000.cpp">
+      <Filter>02. GameObject\Playable\2B</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateMachine.cpp">
+      <Filter>02. GameObject\Playable\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State.cpp">
+      <Filter>02. GameObject\Playable\StateMachine\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B.cpp">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Attack.cpp">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Idle.cpp">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Jump.cpp">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClCompile>
+    <ClCompile Include="State2B_Run.cpp">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Walk.cpp">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +190,15 @@
     </Filter>
     <Filter Include="02. GameObject\Playable\2B">
       <UniqueIdentifier>{81f89b32-9daf-4665-8d11-2b6081a9a216}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\StateMachine">
+      <UniqueIdentifier>{5f1f5503-d429-4a82-8c0c-f8f1e1a51f48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\StateMachine\State">
+      <UniqueIdentifier>{59f48ab0-7800-40e8-b8b4-27d209ca254b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\State">
+      <UniqueIdentifier>{58e488f6-9331-4015-979d-3a180ad82f16}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

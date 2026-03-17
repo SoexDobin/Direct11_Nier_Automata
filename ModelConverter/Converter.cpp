@@ -14,7 +14,6 @@ void Tool::Converter::Initialize()
 
 Bool Tool::Converter::ReadAssetFile(const wstring& path)
 {
-
 	m_Bones.clear();
 	m_Meshes.clear();
 	m_Material.clear();

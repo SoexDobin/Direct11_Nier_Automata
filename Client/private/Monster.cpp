@@ -11,7 +11,7 @@ Monster::Monster(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCo
 	: GameObject{device, context}
 {}
 Monster::Monster(const Monster& rhs)
-	: GameObject(rhs)
+	: GameObject{rhs}
 {}
 
 HRESULT Monster::Initialize_Prototype()
@@ -58,17 +58,16 @@ void Monster::Priority_Update(Float timeDelta)
 
 void Monster::Update(Float timeDelta)
 {
-	m_Model->Update_ModelAnimation(timeDelta);
+	
 }
 
 void Monster::Late_Update(Float timeDelta)
 {
-	
 }
 
 void Monster::Fixed_Update(Float fixedDelta)
 {
-	
+	m_Model->Update_ModelAnimation(fixedDelta);
 }
 
 HRESULT Monster::Render()
@@ -98,12 +97,12 @@ void Monster::Submit_RenderGroup()
 
 HRESULT Monster::Ready_Components()
 {
-	Shader::SHADER_DESC shaderDesc{ VTXANIMMESH::Tag,  VTXANIMMESH::Elements, VTXANIMMESH::numElements };
+	Shader::SHADER_DESC shaderDesc{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
 	m_Shader = Add_Component<Shader>(&shaderDesc);
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	Model::MODEL_DESC modelDesc{ L"Test2BAnim2" };
+	Model::MODEL_DESC modelDesc{ L"CityOfRuinsMainField" };
 	m_Model = Add_Component<Model>(&modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;

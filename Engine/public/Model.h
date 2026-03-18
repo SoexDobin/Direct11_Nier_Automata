@@ -24,7 +24,8 @@ public:
 	~Model() override = default;
 
 public:
-	size_t Get_NumMeshes() const { return m_NumMeshes; }
+	uint32 Get_NumMeshes() const { return m_NumMeshes; }
+	uint32 Get_NumAnimations() const { return m_NumAnimation; }
 
 public:
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::MODEL; }
@@ -35,9 +36,23 @@ public:
 
 public:
 	void Update_ModelAnimation(Float timeDelta);
+	void Set_Animation(uint32 index, Float blendDuration = 0.5f);
+
+public:
+	int32 Get_AnimationIndexByName(const wstring& name);
+	const wstring& Get_AnimationNameByIndex(uint32 index);
+	void Set_AnimationIndex(uint32 index) { m_CurrentAnimIndex = index; }
+	uint32 Get_AnimationIndex() const { return m_CurrentAnimIndex; }
+	void Set_AnimLoop(Bool isLoop) { m_IsAnimLoop = isLoop; }
+	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
+
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);
 	HRESULT Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex);
+
+public:
+	const wstring& Get_ModelTag() const { return m_ModelTag; }
+	void Set_ModelTag(const wstring& tag) { m_ModelTag = tag; }
 
 private:
 	HRESULT Ready_Bones(ifstream& in);
@@ -46,10 +61,21 @@ private:
 	HRESULT Ready_Animation(ifstream& in);
 
 private:
+	wstring	m_ModelTag{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
+
+
+private:
 	Bool	m_IsAnimLoop{ false };
+	Bool	m_IsAnimEnd{ false };
 	uint32	m_CurrentAnimIndex{};
+
+private:
+	Bool	m_IsBlending{ false };
+	uint32	m_NextAnimIndex{};
+	Float	m_BlendingElapsed{};
+	Float	m_BlendingDuration{};
 
 private:
 	uint32 m_NumMeshes = {};
@@ -60,6 +86,7 @@ private:
 	vector<Shared<Bone>> m_Bones;
 	uint32 m_NumAnimation = {};
 	vector<Shared<Animation>> m_Animations;
+	map<wstring, uint32> m_AnimationNames;
 
 public:
 	static Shared<Model> CreatePrototype();

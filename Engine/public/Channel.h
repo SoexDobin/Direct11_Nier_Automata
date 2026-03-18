@@ -24,7 +24,9 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
-	void Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, const vector<Shared<Bone>>& bones);
+	int32 Get_BoneIndex() const { return m_BoneIndex; }
+	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, _Out_ TRANSFORM_FRAME& outTransform);
+	void Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones);
 
 private:
 	uint32				m_NumKeyFrames{};
@@ -34,6 +36,7 @@ private:
 public:
 	static Shared<Channel> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_CHANNEL& keyFrame);
 	Shared<Component> Clone(void* arg = nullptr) override { return nullptr; }
+
 };
 
 NS_END

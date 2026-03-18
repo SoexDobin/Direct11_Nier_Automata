@@ -1,0 +1,43 @@
+{
+  "levels": [
+    {
+      "levelIndex": 2,
+      "objects": [
+        {
+          "instanceID": 30118730,
+          "modelTag": "",
+          "name": "P10000",
+          "objectID": 2197762100,
+          "parentInstanceID": 0,
+          "prototypeTag": [
+            80,
+            49,
+            48,
+            48,
+            48,
+            48
+          ],
+          "textureTag": "",
+          "transform": {
+            "position": [
+              -2.1228556632995605,
+              0.0,
+              0.49632930755615234
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "version": "1.1"
+}

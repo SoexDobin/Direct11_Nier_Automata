@@ -16,6 +16,7 @@ public:
     m_LayerSettingsPath = m_ProjectSettingDir + L"LayerSettings.json";
     m_TagSettingsPath = m_ProjectSettingDir + L"TagSettings.json";
     m_EngineDescSettingsPath = m_ProjectSettingDir + L"EngineDesc.json";
+    m_SceneDataPath = m_ProjectSettingDir + L"SceneData.json";
     m_AssetsDir = m_ProjectRoot + L"Assets/";
     m_ShadersDir = m_AssetsDir + L"Shaders/";
     m_TexturesDir = m_AssetsDir + L"Textures/";
@@ -29,6 +30,7 @@ public:
   const wstring& GetLayerSettingsPath() const { return m_LayerSettingsPath; }
   const wstring& GetTagSettingsPath() const { return m_TagSettingsPath; }
   const wstring& GetRenderSettingsPath() const { return m_EngineDescSettingsPath; }
+  const wstring& GetSceneDataPath() const { return m_SceneDataPath; }
 
   const wstring& GetAssetsDir() const { return m_AssetsDir; }
   const wstring& GetShadersDir() const { return m_ShadersDir; }
@@ -49,6 +51,7 @@ private:
   wstring m_LayerSettingsPath = L"../../ProjectSetting/LayerSettings.json";
   wstring m_TagSettingsPath = L"../../ProjectSetting/TagSettings.json";
   wstring m_EngineDescSettingsPath = L"../../ProjectSetting/EngineDesc.json";
+  wstring m_SceneDataPath = L"../../ProjectSetting/SceneData.json";
   wstring m_AssetsDir = L"../../Assets/";
   wstring m_ShadersDir = L"../../Assets/Shaders/";
   wstring m_TexturesDir = L"../../Assets/Textures/";

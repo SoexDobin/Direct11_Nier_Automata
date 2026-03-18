@@ -23,7 +23,9 @@ Model::Model(const Model& rhs)
 	m_Meshes{ rhs.m_Meshes },
 	m_NumMaterials{ rhs.m_NumMaterials },
 	m_Materials{ rhs.m_Materials },
-	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation}
+	m_AnimationNames{ rhs.m_AnimationNames },
+	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation},
+	m_ModelTag { rhs.m_ModelTag }
 {
 	for (auto& prototypeAnim : rhs.m_Animations)
 		m_Animations.push_back(static_pointer_cast<Animation>(prototypeAnim->Clone()));
@@ -90,19 +92,86 @@ void Model::On_Destroy()
 	m_Materials.clear();
 	m_Bones.clear();
 	m_Animations.clear();
+	m_AnimationNames.clear();
 	Component::On_Destroy();
+}
+
+int32 Model::Get_AnimationIndexByName(const wstring& name)
+{
+	if (!m_AnimationNames.contains(name))
+	{
+		LOG_ERROR(L"Failed to Get Animation Index by Name {}", name); 
+		return - 1;
+	}
+
+
+	return m_AnimationNames[name];
+}
+
+const wstring& Model::Get_AnimationNameByIndex(uint32 index)
+{
+	static wstring s_EmptyString = L"";
+	if (index >= m_Animations.size())
+	{
+		LOG_ERROR(L"Failed to Get Animation Name by Index {}", index);
+		return s_EmptyString;
+	}
+
+	return m_Animations[index]->Get_Name();
 }
 
 void Model::Update_ModelAnimation(Float timeDelta)
 {
 	if (!m_IsActive || !m_IsSkeletal) return;
 
-	m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+	if (m_IsBlending)
+	{
+		m_BlendingElapsed += timeDelta;
+		Float ratio = m_BlendingElapsed / m_BlendingDuration;
+
+		if (ratio >= 1.f)
+		{
+			m_IsBlending = false;
+			m_CurrentAnimIndex = m_NextAnimIndex;
+			m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+		}
+		else
+		{
+			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones);
+		}
+	}
+	else
+	{
+		m_IsAnimEnd = m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+
+		if (m_IsAnimEnd && m_IsAnimLoop)
+		{
+		}
+	}
 
 	for (auto& bone : m_Bones)
 	{
 		bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
 	}
+}
+
+void Model::Set_Animation(uint32 index, Float blendDuration)
+{
+	if (m_CurrentAnimIndex == index) return;
+
+	if (m_IsBlending)
+	{
+		m_CurrentAnimIndex = m_NextAnimIndex;
+	}
+
+	m_NextAnimIndex = index;
+	m_IsBlending = true;
+	m_BlendingElapsed = 0.f;
+	m_BlendingDuration = blendDuration;
+
+	Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
+	m_Animations[m_NextAnimIndex]->Set_Progress(progress);
+
 }
 
 HRESULT Model::Render(uint32 meshIndex)
@@ -222,6 +291,9 @@ HRESULT Model::Ready_Animation(ifstream& in)
 		in.read(reinterpret_cast<Char*>(&animationData.tickPerSecond), sizeof(Float));
 		in.read(reinterpret_cast<Char*>(&animationData.numChannel), sizeof(uint32));
 
+		in.read(reinterpret_cast<Char*>(&animationData.rootTotalTranslation), sizeof(Vector3));
+		in.read(reinterpret_cast<Char*>(&animationData.rootTotalRotation), sizeof(Vector4));
+
 		animationData.channels.reserve(animationData.numChannel);
 		for (uint32 j = 0; j < animationData.numChannel; ++j)
 		{
@@ -239,10 +311,12 @@ HRESULT Model::Ready_Animation(ifstream& in)
 			animationData.channels.push_back(channelData);
 		}
 
+		
 		auto animation = Animation::Create(m_Device, m_Context, animationData);
 		if (animation == nullptr)
 			return E_FAIL;
 
+		m_AnimationNames.emplace(Helper::To_wString(animationData.name), i);
 		m_Animations.push_back(animation);
 	}
 

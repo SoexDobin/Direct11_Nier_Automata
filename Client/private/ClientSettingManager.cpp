@@ -348,6 +348,7 @@ HRESULT ClientSettingManager::Apply_LayerAndTagSettings() const
 HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
 {
     rttr::type gameObjectType = rttr::type::get<GameObject>();
+    rttr::type componentType = rttr::type::get<Component>();
     auto allTypes = rttr::type::get_types();
 
     // 전역/정적 세트를 사용하여 여러 번 호출(STATIC, LOGO 등)되더라도 
@@ -356,8 +357,11 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
 
     for (auto& type : allTypes)
     {
-        // 1. GameObject를 상속받은(derived_from) 자기자신 제외 클래스만 순회
-        if (type.is_derived_from(gameObjectType) && type != gameObjectType && !type.is_pointer())
+        // 1. GameObject 또는 Component를 상속받은(derived_from) 자기자신 제외 클래스만 순회
+        bool isGameObject = type.is_derived_from(gameObjectType) && type != gameObjectType;
+        bool isComponent = type.is_derived_from(componentType) && type != componentType;
+
+        if ((isGameObject || isComponent) && !type.is_pointer())
         {
             // 중복 처리 방지: 동일한 타입 이름이 이미 등록되었다면 건너뜀
             string typeName = type.get_name().to_string();
@@ -398,8 +402,22 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
                 // 5. 엔진 PrototypeManager에 삽입
                 if (result.is_valid())
                 {
-                    auto prototype = result.get_value<Shared<GameObject>>();
+                    Shared<Object> prototype = nullptr;
+                    if (isGameObject)
+                    {
+                        prototype = result.get_value<Shared<GameObject>>();
+                    }
+                    else if (isComponent)
+                    {
+                        prototype = result.get_value<Shared<Component>>();
+                    }
                     
+                    if (prototype == nullptr)
+                    {
+                        LOG_ERROR(L"Failed to cast prototype to GameObject or Component: {}", Helper::To_wString(typeName));
+                        continue;
+                    }
+
                     // 태그는 RTTR 클래스 이름(std::string)을 wstring으로 변환하여 사용
                     wstring tag = Helper::To_wString(type.get_name().to_string());
                     

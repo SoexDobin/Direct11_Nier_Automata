@@ -12,7 +12,7 @@ public:
 	virtual ~ScriptComponent() override = default;
 
 public:
-  COMPONENT_TYPE Get_ComponentType() const final {
+  COMPONENT_TYPE Get_ComponentType() const override {
     return COMPONENT_TYPE::SCRIPT;
   }
   virtual HRESULT Initialize_Prototype() override {

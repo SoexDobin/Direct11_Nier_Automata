@@ -34,6 +34,7 @@ public:
 	HRESULT Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag, const Matrix& preTransformMatrix);
 	Shared<Model> Get_Model(uint32 levIndex, const tChar* modelTag);
 	int32 Get_ContainLevelByModelTag(const wstring& tag);
+	vector<Shared<Model>> Get_Models(uint32 levIndex);
 
 public:
 	HRESULT Clear_AllResources();

@@ -12,6 +12,7 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "TimeManager.h"
+#include "LevelSerializer.h"
 
 #include "GameObject.h"
 #include "Component.h"
@@ -75,8 +76,9 @@ public: /* For LevelManager */
     HRESULT Change_Level(uint32 levIndex, const Shared<class Level>& newLevel);
 
 public: /* For PrototypeManager */
+    const unordered_map<uint32, Shared<GameObject>>& Get_Prototypes(uint32 levIndex) const;
     uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const;
-    const tChar* Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
+    wstring Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
 	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex = UINT_MAX) const;
 
@@ -86,6 +88,8 @@ private: /* For ObjectManager */
 public: /* For ObjectManager */
 	void Submit_RenderGroup() const;
 	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects() const;
+	HRESULT Clear_AllGameObjects() const;
+    Shared<GameObject> Find_ByInstanceID(uint32 instanceID) const;
 
 public: /* For CameraManager */
     HRESULT Add_Camera(const Shared<class Camera> &camera) const;
@@ -103,28 +107,33 @@ public: /* For ResourceManager */
     HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;
     Shared<Model> Get_Model(uint32 levIndex, const tChar* modelFilePath) const;
     int32 Get_ContainLevelByModelTag(const wstring& modelTag) const;
+    vector<Shared<Model>> Get_Models(uint32 levIndex) const;
 
 public: /* For Renderer */
 	void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
 
 public: /* For Pipeline */
-  HRESULT Bind_CameraPosition(const Shared<class Shader> &shader,
-                              const Char *constantName) const;
-  HRESULT Bind_TransformMatrix(const Shared<class Shader> &shader,
-                               const Char *constantName, D3DTS transformState);
-  HRESULT Bind_TransformMatrix_Inverse(const Shared<class Shader> &shader,
-                                       const Char *constantName,
-                                       D3DTS transformState);
-  Matrix Get_Transform(D3DTS transformState) const;
-  Matrix Get_InvTransform(D3DTS transformState) const;
-  Vector4 Get_CamTransform() const;
-  void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
-  void Update_Pipeline() const;
+    HRESULT Bind_CameraPosition(const Shared<class Shader> &shader,
+                                const Char *constantName) const;
+    HRESULT Bind_TransformMatrix(const Shared<class Shader> &shader,
+                                 const Char *constantName, D3DTS transformState);
+    HRESULT Bind_TransformMatrix_Inverse(const Shared<class Shader> &shader,
+                                         const Char *constantName,
+                                         D3DTS transformState);
+    Matrix Get_Transform(D3DTS transformState) const;
+    Matrix Get_InvTransform(D3DTS transformState) const;
+    Vector4 Get_CamTransform() const;
+    void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
+    void Update_Pipeline() const;
 
-public: /* For.Light_Manager */
-  const LIGHT_DESC *Get_LightDesc(uint32 index) const;
-  HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
-  HRESULT Remove_Light(uint32 index) const;
+public: /* For.LightManager */
+    const LIGHT_DESC *Get_LightDesc(uint32 index) const;
+    HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
+    HRESULT Remove_Light(uint32 index) const;
+
+public: /* For LevelSerialize */
+    HRESULT SerializeLevel(const wstring& path) const;
+    HRESULT DeSerializeLevel(const wstring& path) const;
 
 public: /* Prototype & Instantiate Facade */
     template <typename T>
@@ -153,20 +162,21 @@ private: /* Internal Implementation (Non-Template) */
     Shared<Object> Instantiate_Internal(PROTOTYPE protoType, const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) const;
 
 private:
-  Shared<LayerRegistry> m_LayerRegistry = {nullptr};
-  Shared<TagRegistry> m_TagRegistry = {nullptr};
+    Shared<LayerRegistry> m_LayerRegistry = {nullptr};
+    Shared<TagRegistry> m_TagRegistry = {nullptr};
 
-  Unique<GraphicDevice> m_GraphicDevice = {nullptr};
-  Unique<TimeManager> m_TimeManager = {nullptr};
-  Unique<InputDevice> m_InputDevice = {nullptr};
-  Unique<Pipeline> m_Pipeline = {nullptr};
-  Unique<LevelManager> m_LevelManager = {nullptr};
-  Unique<PrototypeManager> m_PrototypeManager = {nullptr};
-  Unique<ObjectManager> m_ObjectManager = {nullptr};
-  Unique<CameraManager> m_CameraManager = {nullptr};
-  Unique<ResourceManager> m_ResourceManager = {nullptr};
-  Unique<Renderer> m_Renderer = {nullptr};
-  Unique<LightManager> m_LightManager = {nullptr};
+    Unique<GraphicDevice> m_GraphicDevice = {nullptr};
+    Unique<TimeManager> m_TimeManager = {nullptr};
+    Unique<InputDevice> m_InputDevice = {nullptr};
+    Unique<Pipeline> m_Pipeline = {nullptr};
+    Unique<LevelManager> m_LevelManager = {nullptr};
+    Unique<PrototypeManager> m_PrototypeManager = {nullptr};
+    Unique<ObjectManager> m_ObjectManager = {nullptr};
+    Unique<CameraManager> m_CameraManager = {nullptr};
+    Unique<ResourceManager> m_ResourceManager = {nullptr};
+    Unique<Renderer> m_Renderer = {nullptr};
+    Unique<LightManager> m_LightManager = {nullptr};
+    Unique<LevelSerializer> m_LevelSerializer = {nullptr};
 };
 
 NS_END

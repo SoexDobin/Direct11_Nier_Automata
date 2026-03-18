@@ -1,35 +1,57 @@
 #pragma once
 #include "Playable.h"
 
-NS_BEGIN(Engine)
-class StateMachine;
-NS_END
 
-class C2B : public Playable
+NS_BEGIN(Engine)
+    class Shader;
+    class Model;
+}
+
+NS_BEGIN(Client)
+
+class StateMachine;
+
+class CLIENT_DLL P10000 final : public Playable
 {
 	RTTR_ENABLE(Playable)
 public:
-	explicit C2B();
-	explicit C2B(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	explicit C2B(const C2B& rhs);
-	virtual ~C2B() override = default;
+	explicit P10000();
+	explicit P10000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit P10000(const P10000& rhs);
+	~P10000() override = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* arg) override;
-	virtual void Priority_Update(Float timeDelta) override;
-	virtual void Update(Float timeDelta) override;
-	virtual void Late_Update(Float timeDelta) override;
-	virtual void Fixed_Update(Float fixedDelta) override;
-	virtual HRESULT Render() override;
+    HRESULT Initialize_Prototype() override;
+    HRESULT Initialize(void* arg) override;
+    void On_Destroy() override;
 
 public:
-	virtual Shared<GameObject> Clone(void* arg) override;
+    void Priority_Update(Float timeDelta) override;
+    void Update(Float timeDelta) override;
+    void Late_Update(Float timeDelta) override;
+    void Fixed_Update(Float fixedDelta) override;
+    HRESULT Render() override;
+    void Submit_RenderGroup() override;
 
 private:
-	HRESULT Add_Components();
-	HRESULT Bind_ShaderResources();
+    HRESULT Ready_PlayerCamera();
+    HRESULT Ready_Components();
+    HRESULT Bind_ShaderResources();
+
+public:
+    Shared<StateMachine> Get_StateMachine() const { return m_StateMachine; }
+    Shared<Model> Get_Model() const { return m_Model; }
 
 private:
-	Shared<StateMachine> m_pStateMachine = nullptr;
+    Shared<StateMachine>    m_StateMachine{ nullptr };
+    Shared<Model>           m_Model{ nullptr };
+    Shared<Shader>          m_Shader{ nullptr };
+
+    uint32 m_tempIdx = { 0 };
+
+public:
+	static Shared<P10000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	Shared<GameObject> Clone(void* arg) override;
 };
+
+NS_END

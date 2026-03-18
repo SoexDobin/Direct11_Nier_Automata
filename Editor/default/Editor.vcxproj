@@ -184,6 +184,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\vcpkg.json" />
+    <ClInclude Include="..\public\AssetBrowser.h" />
+    <ClInclude Include="..\public\ComponentEditUI.h" />
     <ClInclude Include="..\public\EditorCamera.h" />
     <ClInclude Include="..\public\EditorManager.h" />
     <ClInclude Include="..\public\EditorObject.h" />
@@ -194,6 +196,7 @@
     <ClInclude Include="..\public\Inspector.h" />
     <ClInclude Include="..\public\LogConsole.h" />
     <ClInclude Include="..\public\MenuBar.h" />
+    <ClInclude Include="..\public\ModelViewer.h" />
     <ClInclude Include="..\public\PathManager.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="framework.h" />
@@ -204,6 +207,8 @@
     <None Include="ProjectSetting.bat" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\AssetBrowser.cpp" />
+    <ClCompile Include="..\private\ComponentEditUI.cpp" />
     <ClCompile Include="..\private\EditorApp.cpp" />
     <ClCompile Include="..\private\EditorCamera.cpp" />
     <ClCompile Include="..\private\EditorManager.cpp" />
@@ -212,6 +217,7 @@
     <ClCompile Include="..\private\Inspector.cpp" />
     <ClCompile Include="..\private\LogConsole.cpp" />
     <ClCompile Include="..\private\MenuBar.cpp" />
+    <ClCompile Include="..\private\ModelViewer.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -12,7 +12,7 @@
 
 #include "Monster.h"
 #include "Terrain.h"
-
+#include "P10000.h"
 
 
 Loader::Loader(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
@@ -137,34 +137,19 @@ HRESULT Loader::Loading_For_LogoLevel() {
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
         return E_FAIL;
 
-    ThirdPersonCamera::THIRD_PERSON_CAMERA_DESC desc{};
-    desc.mouseSensitive = 5.f;
-    desc.eye = Vector4{ 0.f, 10.f, -10.f, 1.f };
-    desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
-    desc.up = Vector4{ 0.f, 1.f, 0.f, 1.f };
-    desc.fovY = XMConvertToRadians(60.f);
-    desc.aspect = static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportWidth) / static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportHeight);
-	desc.nearPlane = 0.1f;
-    desc.farPlane = 500.f;
 
-    desc.distance = 10.f;
-    desc.minDistance = 3.f;
-    desc.maxDistance = 15.f;
-    desc.offset = Vector3{ 0.f, 1.f, 0.f };
-    desc.mouseSensitive = 0.1f;
-    desc.wheelSensitive = 0.01f;
-
-    GAME_INSTANCE->Instantiate<Terrain>(L"Terrain", ETOI(m_NextLevelID));
-    auto back = GAME_INSTANCE->Instantiate<LoadingBackground>(L"LoadingBackground", ETOI(m_NextLevelID));
-    auto logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"LoadingLogo", ETOI(m_NextLevelID));
-    back->Add_Child(logo);
-
-    auto mon = GAME_INSTANCE->Instantiate<Monster>(L"Monster", ETOI(m_NextLevelID));
-
-    auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"FreeCamera", ETOI(m_NextLevelID), &desc);
-    auto tpcam = GAME_INSTANCE->Instantiate<ThirdPersonCamera>(L"ThirdPersonCamera", ETOI(m_NextLevelID), &desc);
-	GAME_INSTANCE->Set_MainCamera(tpcam);
-    tpcam->Set_Target(mon);
+    //auto back = GAME_INSTANCE->Instantiate<LoadingBackground>(L"LoadingBackground", ETOI(m_NextLevelID));
+    //auto logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"LoadingLogo", ETOI(m_NextLevelID));
+    //back->Add_Child(logo);
+    //
+    //auto p10000 = GAME_INSTANCE->Instantiate<P10000>(L"P10000", ETOI(m_NextLevelID));
+    //GAME_INSTANCE->Instantiate<Monster>(L"CityOfRuins", ETOI(m_NextLevelID));
+    //
+    //auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"FreeCamera", ETOI(m_NextLevelID), &desc);
+    //auto tpcam = GAME_INSTANCE->Instantiate<ThirdPersonCamera>(L"ThirdPersonCamera", ETOI(m_NextLevelID), &desc);
+    //
+	//GAME_INSTANCE->Set_MainCamera(tpcam);
+	//tpcam->Set_Target(p10000);
 
 
     m_isFinished = true;

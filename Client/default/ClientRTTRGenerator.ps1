@@ -57,12 +57,21 @@ foreach ($file in $headerFiles) {
         continue
     }
 
-    $isTarget = ($content -match ":\s*public\s+GameObject") -or 
-                ($content -match ":\s*public\s+Script") -or 
-                ($content -match ":\s*public\s+Component") -or 
-                ($content -match "\bRTTR_ENABLE\s*\(\s*(GameObject|Script|Component|.*?)\s*\)")
+    # 상속 관계를 분석하여 반환 타입(GameObject vs Component) 결정
+    # Component 계열 감지 (부모 클래스 이름 또는 직접 상속 텍스트 확인)
+    $isComponent = ($content -match ":\s*public\s+(?:Script|Component|StateMachine)") -or 
+                   ($content -match "\bRTTR_ENABLE\s*\(\s*(?:Script|Component|StateMachine)\s*\)")
+    
+    $returnType = "Shared<GameObject>"
+    if ($isComponent) {
+        $returnType = "Shared<Component>"
+    }
 
-    if (-not $isTarget) {
+    # RTTR_ENABLE과 static Create가 모두 있으면 타겟으로 간주 (상속 깊이 상관없음)
+    $hasRttr = $content -match "\bRTTR_ENABLE\b"
+    $hasCreate = $content -match "\bstatic\s+.*\bCreate\s*\("
+
+    if (-not ($hasRttr -and $hasCreate)) {
         continue
     }
 
@@ -88,15 +97,15 @@ foreach ($file in $headerFiles) {
 
         $methodRegistrations = ""
         if ($hasClone) {
-            $methodRegistrations += "`n        .method(`"Clone`", &$className::Clone)"
+            $methodRegistrations += "`r`n        .method(`"Clone`", &$className::Clone)"
         }
         if ($hasCreate) {
-            $methodRegistrations += "`n        .method(`"Create`", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return $className::Create(device, context); })(rttr::metadata(`"Level`", $targetLevel))"
+            $methodRegistrations += "`r`n        .method(`"Create`", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> $returnType { return $className::Create(device, context); })(rttr::metadata(`"Level`", $targetLevel))"
         }
 
-        $rttrBlock = "    rttr::registration::class_<$className>(`"$className`")`n        .constructor<>()" + $methodRegistrations + ";`n`n"
+        $rttrBlock = "    rttr::registration::class_<$className>(`"$className`")`r`n        .constructor<>()" + $methodRegistrations + ";`r`n`r`n"
         
-        $newIncludes += "#include `"$className.h`"`n"
+        $newIncludes += "#include `"$className.h`"`r`n"
         $newRttrBlocks += $rttrBlock
         Write-Host "==========      [Auto] Discovered target class: $className"
     }
@@ -122,6 +131,8 @@ $outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_INCLUDES>
 $outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_RTTR>\r?\n).*?(\r?\n//\s*</AUTO_GENERATED_RTTR>)', "`${1}$newRttrBlocks`${2}")
 
 try {
+    # Replace all LFs with CRLFs to ensure consistency
+    $outContent = $outContent -replace "(?<!`r)`n", "`r`n"
     [System.IO.File]::WriteAllText($OutputFile, $outContent, [System.Text.Encoding]::UTF8)
     Write-Host "========== [SUCCESS] Sandboxed rewrite complete: $(Split-Path $OutputFile -Leaf)"
 }

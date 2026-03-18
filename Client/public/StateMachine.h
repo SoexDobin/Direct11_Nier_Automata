@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL StateMachine : public ScriptComponent
 {
-	RTTR_ENABLE()
+	RTTR_ENABLE(ScriptComponent)
 public:
 	explicit StateMachine();
 	explicit StateMachine(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -14,16 +14,23 @@ public:
 	~StateMachine() override = default;
 
 public:
-	Add_State(const wstring& stateTag, const Shared<State>&);
+	Shared<State> Get_CurrentState();
+	HRESULT Add_State(const Shared<State>& state);
+	Bool Change_State(const wstring& stateTag);
 
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg = nullptr) override;
 	void On_Destroy() override;
-	void On_Disable() override;
-	void On_Enable() override;
+	void On_Disable() override { ScriptComponent::On_Disable(); }
+	void On_Enable() override { ScriptComponent::On_Enable(); }
 
+public:
+	void Update_State(Float timeDelta);
 
+public:
+	Shared<State> m_CurrentState{nullptr};
+	unordered_map<wstring, Shared<State>> m_States;
 
 public:
 	static Shared<StateMachine> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

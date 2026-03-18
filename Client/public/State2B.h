@@ -1,7 +1,7 @@
 #pragma once
 #include "State.h"
 
-NS_BEGIN(Engine)
+NS_BEGIN(Client)
 	class P10000;
 NS_END
 
@@ -12,10 +12,10 @@ class CLIENT_DLL State2B abstract : public State
 	RTTR_ENABLE(State)
 public:
 	explicit State2B(const wstring& tag, const Shared<P10000>& owner);
-	virtual ~State2B() override =default;
+	virtual ~State2B() override;
 
 protected:
-	Shared<P10000> m_Owner{ nullptr };
+	Weak<P10000> m_Owner{};
 };
 
 NS_END

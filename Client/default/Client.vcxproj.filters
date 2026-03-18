@@ -46,9 +46,6 @@
     <ClInclude Include="..\public\LoadingPixelPanel.h">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
-    <ClInclude Include="P10000.h">
-      <Filter>02. GameObject\Playable\2B</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\StateMachine.h">
       <Filter>02. GameObject\Playable\StateMachine</Filter>
     </ClInclude>
@@ -67,10 +64,16 @@
     <ClInclude Include="..\public\State2B_Jump.h">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClInclude>
-    <ClInclude Include="State2B_Run.h">
+    <ClInclude Include="..\public\State2B_Walk.h">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\State2B_Walk.h">
+    <ClInclude Include="..\public\CityOfRuins.h">
+      <Filter>02. GameObject\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\P10000.h">
+      <Filter>02. GameObject\Playable\2B</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Run.h">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClInclude>
   </ItemGroup>
@@ -117,9 +120,6 @@
     <ClCompile Include="..\private\LoadingPixelPanel.cpp">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
-    <ClCompile Include="P10000.cpp">
-      <Filter>02. GameObject\Playable\2B</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\StateMachine.cpp">
       <Filter>02. GameObject\Playable\StateMachine</Filter>
     </ClCompile>
@@ -138,10 +138,16 @@
     <ClCompile Include="..\private\State2B_Jump.cpp">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClCompile>
-    <ClCompile Include="State2B_Run.cpp">
+    <ClCompile Include="..\private\State2B_Walk.cpp">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\State2B_Walk.cpp">
+    <ClCompile Include="..\private\CityOfRuins.cpp">
+      <Filter>02. GameObject\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\P10000.cpp">
+      <Filter>02. GameObject\Playable\2B</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Run.cpp">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClCompile>
   </ItemGroup>

@@ -50,21 +50,21 @@ uint32 PrototypeManager::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTa
     return m_ObjectsID[targetLevel].at(prototypeTag);
 }
 
-const tChar* PrototypeManager::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
+wstring PrototypeManager::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
 {
     uint32 targetLevel = levIndex;
 
     for (auto objectsID : m_ObjectsID[targetLevel])
     {
         if (objectsID.second == objectID)
-            return objectsID.first.c_str();
+            return objectsID.first;
     }
 
     targetLevel = 0;
     for (auto objectsID : m_ObjectsID[targetLevel])
     {
         if (objectsID.second == objectID)
-            return objectsID.first.c_str();
+            return objectsID.first;
     }
 
     return nullptr;

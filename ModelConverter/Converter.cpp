@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Converter.h"
+#include <nlohmann/json.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -57,6 +58,11 @@ Bool Tool::Converter::ExportModel(const wstring& outPath)
 	}
 
 	WriteModelFile(outPath);
+
+	// JSON 파일 경로는 확장자만 변경
+	wstring jsonPath = filesystem::path(outPath).replace_extension(L".json").wstring();
+	WriteJsonFile(jsonPath);
+
 	return true;
 }
 
@@ -239,7 +245,14 @@ void Tool::Converter::ReadMaterialData()
 				entry.typeIndex = t;
 
 				// 절대경로 혼재 방지: 순수 파일명(ex: "diffuse.dds")만 파싱해서 저장
-				entry.path = filesystem::path(texPath.C_Str()).filename().string();
+				// std::filesystem::path는 인코딩 변환 중 예외(ERROR_NO_UNICODE_TRANSLATION)를 던질 수 있으므로 string 연산 사용
+				string fullPath = texPath.C_Str();
+				size_t lastPos = fullPath.find_last_of("\\/"); // 윈도우/리눅스 구분자 모두 체크
+				if (lastPos != string::npos)
+					entry.path = fullPath.substr(lastPos + 1);
+				else
+					entry.path = fullPath;
+
 				mat->textures.push_back(entry);
 			}
 		}
@@ -262,6 +275,45 @@ void Converter::ReadAnimation()
 		anim->duration = static_cast<Float>(aiAnim->mDuration);
 		anim->tickPerSecond = static_cast<Float>(aiAnim->mTicksPerSecond);
 		anim->numChannel = static_cast<uint32>(aiAnim->mNumChannels);
+		
+
+		// --- 루트 모션 추출 로직 수정 ---
+		// 1. 애니메이션 채널들 중 계층 구조상 가장 최상위에 있는 본을 '루트 모션 본'으로 간주합니다.
+		aiNodeAnim* rootMotionChannel = nullptr;
+		int32 minParentIndex = 100000; // 부모 인덱스가 작을수록 최상위에 가까움 (-1이 최상위)
+
+		for (uint32 k = 0; k < aiAnim->mNumChannels; ++k) {
+			aiNodeAnim* aiChannel = aiAnim->mChannels[k];
+			int32 boneIdx = Get_BoneIndex(aiChannel->mNodeName.C_Str());
+
+			if (boneIdx != -1) {
+				int32 parentIdx = m_Bones[boneIdx]->parentIndex;
+				// 가장 부모에 가까운 본 채널을 선택 (보통 parentIndex가 -1이거나 0, 1 정도인 본)
+				if (parentIdx < minParentIndex) {
+					minParentIndex = parentIdx;
+					rootMotionChannel = aiChannel;
+					if (minParentIndex == -1) break; // 완벽한 루트를 찾으면 즉시 종료
+				}
+			}
+		}
+
+		if (rootMotionChannel) {
+			// 2. 선택된 루트 모션 본 채널에서 변위 계산
+			aiVector3D startPos = rootMotionChannel->mPositionKeys[0].mValue;
+			aiVector3D endPos = rootMotionChannel->mPositionKeys[rootMotionChannel->mNumPositionKeys - 1].mValue;
+			anim->rootTotalTranslation = Vector3(endPos.x - startPos.x, endPos.y - startPos.y, endPos.z - startPos.z);
+
+			aiQuaternion startRot = rootMotionChannel->mRotationKeys[0].mValue;
+			aiQuaternion endRot = rootMotionChannel->mRotationKeys[rootMotionChannel->mNumRotationKeys - 1].mValue;
+			aiQuaternion startInverse = startRot;
+			startInverse.Conjugate();
+			aiQuaternion deltaRot = endRot * startInverse;
+			anim->rootTotalRotation = Vector4(deltaRot.x, deltaRot.y, deltaRot.z, deltaRot.w);
+
+			// std::cout << "[RootMotion Found] Bone: " << rootMotionChannel->mNodeName.C_Str() << " (ParentIdx: " << minParentIndex << ")\n";
+		}
+		// -------------------------
+
 
 		for (uint32 j = 0; j < aiAnim->mNumChannels; ++j)
 		{
@@ -403,6 +455,9 @@ void Tool::Converter::WriteModelFile(const wstring& path)
 		out.write(BIN(&anim->tickPerSecond), sizeof(Float));
 		out.write(BIN(&anim->numChannel), sizeof(uint32));
 
+		out.write(BIN(&anim->rootTotalTranslation), sizeof(Vector3));
+		out.write(BIN(&anim->rootTotalRotation), sizeof(Vector4));
+
 		for (uint32 j = 0; j < m_Channels[i].size(); ++j)
 		{
 			auto& channel = m_Channels[i][j];
@@ -435,4 +490,50 @@ int32 Converter::Get_BoneIndex(const Char* boneName)
 	if (iter == m_Bones.end())
 		return -1;
 	return boneIndex;
+}
+void Tool::Converter::WriteJsonFile(const wstring& path)
+{
+	using json = nlohmann::json;
+	json root;
+
+	// 1. Materials
+	for (auto& mat : m_Material)
+	{
+		json matJson;
+		matJson["name"] = mat->name;
+		
+		json textures = json::array();
+		for (auto& tex : mat->textures)
+		{
+			json texEntry;
+			texEntry["type"] = tex.typeIndex;
+			texEntry["path"] = tex.path;
+			textures.push_back(texEntry);
+		}
+		matJson["textures"] = textures;
+		root["materials"].push_back(matJson);
+	}
+
+	// 2. Animations
+	for (auto& anim : m_Animation)
+	{
+		json animJson;
+		animJson["name"] = anim->name;
+		animJson["duration"] = anim->duration;
+		animJson["tickPerSecond"] = anim->tickPerSecond;
+		
+		// Root Motion
+		animJson["rootMove"] = { anim->rootTotalTranslation.x, anim->rootTotalTranslation.y, anim->rootTotalTranslation.z };
+		animJson["rootRot"] = { anim->rootTotalRotation.x, anim->rootTotalRotation.y, anim->rootTotalRotation.z, anim->rootTotalRotation.w };
+
+		root["animations"].push_back(animJson);
+	}
+
+	ofstream out(path);
+	if (out.is_open())
+	{
+		out << root.dump(4);
+		out.close();
+		std::cout << "  [JSON] Export Success: " << string(path.begin(), path.end()) << "\n";
+	}
 }

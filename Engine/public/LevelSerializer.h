@@ -1,0 +1,31 @@
+#pragma once
+#include "EngineManager.h"
+
+NS_BEGIN(Engine)
+class LevelSerializer : public EngineManager
+{
+	NO_COPY(LevelSerializer)
+public:
+	explicit LevelSerializer();
+	~LevelSerializer() override = default;
+
+	HRESULT SerializeLevel(const wstring& filePath);
+	HRESULT DeSerializeLevel(const wstring& filePath);
+
+private:
+	
+	static string ToUtf8(const wstring& ws);
+	static wstring FromUtf8(const string& s);
+
+public:
+	HRESULT Initialize_Prototype() override { return EngineManager::Initialize_Prototype(); }
+	HRESULT Initialize(void* arg) override { return EngineManager::Initialize(arg); }
+	void On_Destroy() override { EngineManager::On_Destroy(); }
+	void On_Disable() override { EngineManager::On_Disable(); }
+	void On_Enable() override { EngineManager::On_Enable(); }
+	void Set_Active(Bool isActive) override { EngineManager::Set_Active(isActive); }
+	
+public:
+	static Unique<LevelSerializer> Create();
+};
+NS_END

@@ -76,6 +76,7 @@ using namespace std;
 using namespace Engine;
 
 #pragma warning(disable : 4251)
+#pragma warning(disable : 26498)
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC

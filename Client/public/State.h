@@ -7,6 +7,7 @@ NS_END
 NS_BEGIN(Client)
 	class CLIENT_DLL State abstract
 {
+	RTTR_ENABLE()
 public:
 	explicit State(const wstring& tag);
 	virtual ~State() = default;

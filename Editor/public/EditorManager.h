@@ -11,9 +11,10 @@ NS_BEGIN(Editor)
 class Inspector;
 class EditorView;
 class MenuBar;
-class PrefabTab;
+class AssetBrowser;
 class LogConsole;
 class Hierarchy;
+class ModelViewer;
 
 class EditorCamera;
 
@@ -40,11 +41,14 @@ public:
   void Set_State(EDITOR_STATE state) { m_State = state; }
 
 public:
-  Shared<EditorCamera> Get_EditorCamera() const { return m_EditorCamera; }
-  Shared<Engine::Camera> Get_InGameCamera() const { return m_InGameCamera; }
-  void Set_InGameCamera(const Shared<Engine::Camera> &camera) {
-    m_InGameCamera = camera;
-  }
+    Shared<EditorCamera> Get_EditorCamera() const { return m_EditorCamera; }
+    Shared<Engine::Camera> Get_InGameCamera() const { return m_InGameCamera; }
+    void Set_InGameCamera(const Shared<Engine::Camera> &camera) {
+      m_InGameCamera = camera;
+    }
+
+    Shared<ModelViewer> Get_ModelViewer() const { return m_ModelViewer; }
+
 public:
     Bool Is_ResizeRequest() const { return m_IsResizeView; }
     RESIZE_INFO Get_ResizeInfo() const
@@ -85,9 +89,10 @@ private:
     Shared<Inspector> m_Inspector = {nullptr};
     Shared<EditorView> m_EditorView = {nullptr};
     Shared<MenuBar> m_MenuBar = {nullptr};
-    Shared<PrefabTab> m_PrefabTab = {nullptr};
+    Shared<AssetBrowser> m_AssetBrowser = {nullptr};
     Shared<LogConsole> m_LogConsole = {nullptr};
     Shared<Hierarchy> m_Hierarchy = {nullptr};
+    Shared<ModelViewer> m_ModelViewer = {nullptr};
 };
 
 NS_END

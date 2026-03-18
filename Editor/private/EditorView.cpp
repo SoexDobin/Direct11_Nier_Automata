@@ -47,6 +47,74 @@ void EditorView::RenderView(Bool isResize) {
 
 			ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), prevSceneViewportSize);
 			
+			// ── Scene View 드래그 앤 드롭 수신 ──────────────────────────────────
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(Drag_PayLoadKey.c_str()))
+				{
+					const wchar_t *rawTag = static_cast<const wchar_t *>(payload->Data);
+					wstring prototypeTag(rawTag);
+
+					// 드롭된 마우스 위치 계산 (Viewport NDC 변환)
+					ImVec2 mousePos = ImGui::GetMousePos();
+					ImVec2 imageRectMin = ImGui::GetItemRectMin();
+					ImVec2 imageRectSize = ImGui::GetItemRectSize();
+
+					Float localX = mousePos.x - imageRectMin.x;
+					Float localY = mousePos.y - imageRectMin.y;
+					Float ndcX = (localX / imageRectSize.x) * 2.f - 1.f;
+					Float ndcY = 1.f - (localY / imageRectSize.y) * 2.f;
+
+					// 레이 생성
+					Matrix invView = GAME_INSTANCE->Get_InvTransform(D3DTS::VIEW);
+					Matrix invProj = GAME_INSTANCE->Get_InvTransform(D3DTS::PROJ);
+
+					Vector4 vNear = Vector4(ndcX, ndcY, 0.f, 1.f);
+					Vector4 vFar = Vector4(ndcX, ndcY, 1.f, 1.f);
+					vNear = Vector4::Transform(vNear, invProj); 
+					vNear /= vNear.w; 
+					vNear = Vector4::Transform(vNear, invView);
+
+					vFar = Vector4::Transform(vFar, invProj);   
+					vFar /= vFar.w;   
+					vFar = Vector4::Transform(vFar, invView);
+
+					Vector3 rayOrigin = Vector3(vNear.x, vNear.y, vNear.z);
+					Vector3 rayTarget = Vector3(vFar.x, vFar.y, vFar.z);
+					Vector3 rayDir = rayTarget - rayOrigin;
+					rayDir.Normalize();
+
+					// 스폰 위치 결정: 지면(Y=0)과의 교점 또는 특정 거리 앞
+					Vector3 spawnPos{};
+					if (abs(rayDir.y) > 0.0001f)
+					{
+						Float t = -rayOrigin.y / rayDir.y;
+						if (t > 0)
+						{
+							spawnPos = rayOrigin + rayDir * t;
+						}
+						else
+						{
+							spawnPos = rayOrigin + rayDir * 5.f;
+						}
+					}
+					else
+					{
+						spawnPos = rayOrigin + rayDir * 5.f;
+					}
+
+					// 객체 생성 및 배치
+					Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
+					if (cloned)
+					{
+						cloned->Get_Transform()->Set_LocalPositionByValue(spawnPos);
+						LOG_INFO(L"[SceneView] Dropped {} at ({}, {}, {})", prototypeTag, spawnPos.x, spawnPos.y, spawnPos.z);
+						EDITOR->Set_SelectedObject(cloned);
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+
 			// 이미지 바로 아래에서 좌표 캡처
 			ImVec2 imageRectMin = ImGui::GetItemRectMin();
 			ImVec2 imageRectSize = ImGui::GetItemRectSize();

@@ -64,6 +64,10 @@ public:
 	HRESULT Bind_ShaderResourceView(const Shared<Shader> &shader, const Char *constantName, uint32 index);
 	HRESULT Bind_Texture(const wstring& textureFilePath);
 
+	/* 씬 직렬화용 태그 접근자 */
+	const wstring& Get_TextureTag() const { return m_TextureTag; }
+	void Set_TextureTag(const wstring& tag) { m_TextureTag = tag; }
+
 public:
 	void Set_TextureByIndex(uint32 texIndex);
 	const vector<ComPtr<ID3D11ShaderResourceView>>& Get_Textures() { return m_SRVs; }
@@ -73,6 +77,7 @@ private:
 	wstring m_FilePath{};
 	uint32 m_NumSRVs{};
 	Color m_RGBA{};
+	wstring m_TextureTag{};		/* 씬 직렬화용 태그 */
 	vector<ComPtr<ID3D11ShaderResourceView>> m_SRVs;
 
 public:

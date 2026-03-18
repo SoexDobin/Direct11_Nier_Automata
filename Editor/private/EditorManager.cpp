@@ -10,13 +10,16 @@
 #include "LogConsole.h"
 #include "MenuBar.h"
 #include "Hierarchy.h"
+#include "ModelViewer.h"
+#include "AssetBrowser.h"
 #include "Transform.h"
 
 IMPLEMENT_SINGLETON(EditorManager)
 
 EditorManager::EditorManager()
     : m_Inspector{nullptr}, m_EditorView{nullptr}, m_MenuBar{nullptr},
-      m_PrefabTab{nullptr}, m_LogConsole{nullptr}, m_Hierarchy{nullptr}
+      m_AssetBrowser{nullptr}, m_LogConsole{nullptr}, m_Hierarchy{nullptr},
+	  m_ModelViewer{nullptr}
 {}
 
 EditorManager::~EditorManager() {}
@@ -51,6 +54,10 @@ HRESULT EditorManager::Initialize()
 		return E_FAIL;
     if (nullptr == (m_Hierarchy = Hierarchy::Create()))
         return E_FAIL;
+    if (nullptr == (m_ModelViewer = ModelViewer::Create()))
+        return E_FAIL;
+    if (nullptr == (m_AssetBrowser = AssetBrowser::Create()))
+        return E_FAIL;
 
 	return S_OK;
 }
@@ -76,6 +83,8 @@ void EditorManager::Update(Bool IsResetView) {
     m_MenuBar->Update(IsResetView);
     m_LogConsole->Update(IsResetView);
     m_Hierarchy->Update(IsResetView);
+    m_ModelViewer->Update(IsResetView);
+    m_AssetBrowser->Update(IsResetView);
 }
 
 HRESULT EditorManager::Render(Bool IsResetView) {
@@ -145,6 +154,8 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     m_MenuBar->Render(IsResetView);
     m_LogConsole->Render(IsResetView);
     m_Hierarchy->Render(IsResetView);
+    m_ModelViewer->Render(IsResetView);
+    m_AssetBrowser->Render(IsResetView);
 
     return S_OK;
 }

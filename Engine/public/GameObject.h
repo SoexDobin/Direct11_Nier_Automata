@@ -53,8 +53,8 @@ protected:
     ComPtr<ID3D11Device> m_Device = {nullptr};
     ComPtr<ID3D11DeviceContext> m_Context = {nullptr};
     Shared<Transform> m_Transform = {nullptr};
-    LayerMask m_LayerMask = {};
-    TagMask m_TagMask = {};
+    LayerMask m_LayerMask{};
+    TagMask m_TagMask{};
 
 protected: /* Parent Child */
     Weak<GameObject> m_Parent = {};

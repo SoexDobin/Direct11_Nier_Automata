@@ -1,6 +1,10 @@
+#include "pch.h"
 #include "MenuBar.h"
 #include "PathManager.h"
-#include "pch.h"
+#include "EditorManager.h"
+#include "ModelViewer.h"
+#include "ModelViewer.h"
+
 
 
 MenuBar::MenuBar() {}
@@ -18,9 +22,46 @@ void MenuBar::Render(Bool isResize) {
     if (ImGui::BeginMenu("WindowSetting")) {
       if (ImGui::MenuItem("EngineDesc", nullptr, m_Enable))
         m_Enable = !m_Enable;
+      
       ImGui::Separator();
+
+      Bool showModelViewer = EDITOR->Get_ModelViewer()->Is_Enabled();
+      if (ImGui::MenuItem("Model Viewer", nullptr, showModelViewer))
+          EDITOR->Get_ModelViewer()->Set_Enable(!showModelViewer);
+
       ImGui::EndMenu();
     }
+
+    // ── SceneData 메뉴 ─────────────────────────────────────────────────
+    if (ImGui::BeginMenu("SceneData"))
+    {
+      Bool isStop = (EDITOR->Get_State() == EDITOR_STATE::STOP);
+
+      if (ImGui::MenuItem("Save", nullptr, false, isStop))
+      {
+        if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetSceneDataPath())))
+          LOG_INFO("Scene saved successfully.");
+        else
+          LOG_ERROR(L"Scene save failed.");
+      }
+
+      if (ImGui::MenuItem("Load", nullptr, false, isStop))
+      {
+        if (SUCCEEDED(GAME_INSTANCE->DeSerializeLevel(PATH.GetSceneDataPath())))
+          LOG_INFO("Scene loaded successfully.");
+        else
+          LOG_ERROR(L"Scene load failed.");
+      }
+
+      if (!isStop)
+      {
+        ImGui::Separator();
+        ImGui::TextDisabled("(Stop editor to Save/Load)");
+      }
+
+      ImGui::EndMenu();
+    }
+
     ImGui::EndMainMenuBar();
   }
   if (m_Enable) {

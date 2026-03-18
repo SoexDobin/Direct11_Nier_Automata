@@ -10,7 +10,7 @@ import sys
 import re
 import argparse
 from pathlib import Path
-from typing import Set, Tuple
+from typing import Set, Tuple, Optional
 
 def print_header():
     print("=" * 40)
@@ -18,7 +18,7 @@ def print_header():
     print("=" * 40)
     print()
 
-def process_header_file(header_path: Path, processed_classes: Set[str]) -> Tuple[str, str]:
+def process_header_file(header_path: Path, processed_classes: Set[str]) -> Tuple[Optional[str], Optional[str]]:
     """헤더 파일 분석 후 클래스 이름과 등록 코드 조각 반환"""
     try:
         content = header_path.read_text(encoding='utf-8')
@@ -26,18 +26,19 @@ def process_header_file(header_path: Path, processed_classes: Set[str]) -> Tuple
         print(f"===== [ERROR] Failed to read {header_path.name}: {e}")
         return None, None
         
-    # RTTR_ENABLE 매크로가 없으면 무시
-    if not re.search(r'\bRTTR_ENABLE\b', content):
-        return None, None
-        
-    # GameObject 또는 Script(Component)를 상속/포함하는지 텍스트로 대략적으로 체크 (질문자 요청사항)
-    is_target = re.search(r':\s*public\s+GameObject', content) or \
-                re.search(r':\s*public\s+Script', content) or \
-                re.search(r':\s*public\s+Component', content) or \
-                re.search(r'\bRTTR_ENABLE\s*\(\s*(GameObject|Script|Component|.*?)\s*\)', content)
+    # RTTR_ENABLE과 static Create가 모두 있으면 타겟으로 간주 (상속 깊이 상관없음)
+    has_rttr = bool(re.search(r'\bRTTR_ENABLE\b', content))
+    has_create = bool(re.search(r'\bstatic\s+.*\bCreate\s*\(', content))
     
-    if not is_target:
+    if not (has_rttr and has_create):
         return None, None
+ 
+    # 상속 관계를 분석하여 반환 타입(GameObject vs Component) 결정
+    # Component 계열 감지 (부모 클래스 이름 또는 직접 상속 텍스트 확인)
+    is_component = re.search(r':\s*public\s+(?:Script|Component|StateMachine)', content) or \
+                   re.search(r'\bRTTR_ENABLE\s*\(\s*(?:Script|Component|StateMachine)\s*\)', content)
+    
+    return_type = "Shared<Component>" if is_component else "Shared<GameObject>"
 
     # 클래스 이름 추출
     class_match = re.search(r'\bclass\s+(?:CLIENT_DLL\s+)?([A-Za-z0-9_]+)(?:\s+(?:final|abstract))?\s*[:{]', content)
@@ -67,7 +68,7 @@ def process_header_file(header_path: Path, processed_classes: Set[str]) -> Tuple
         method_registrations += '\n        .method("Clone", &{}::Clone)'.format(class_name)
     if has_create:
         method_registrations += f'''
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> {{
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> {return_type} {{
             return {class_name}::Create(device, context);
         }})(rttr::metadata("Level", {target_level}))'''
 
@@ -113,7 +114,7 @@ def main():
     
     for header_file in sorted(input_dir.glob("*.h")):
         class_name, rttr_block = process_header_file(header_file, processed_classes)
-        if class_name:
+        if class_name and rttr_block:
             new_includes += f'#include "{class_name}.h"\n'
             new_rttr_blocks += rttr_block
             print(f"==========      [Auto] Discovered target class: {class_name}")
@@ -152,7 +153,11 @@ def main():
                         final_code, flags=re.DOTALL)
                         
     try:
-        output_file.write_text(final_code, encoding='utf-8')
+        # 모든 줄바꿈을 LF(\n)로 통일 (기존에 섞여있을 수 있는 \r\n 제거)
+        # 그 후 open의 newline='\r\n' 옵션이 모든 \n을 \r\n으로 변환함
+        final_code = final_code.replace('\r\n', '\n')
+        with open(output_file, "w", encoding='utf-8', newline='\r\n') as f:
+            f.write(final_code)
         print(f"========== [SUCCESS] Sandboxed rewrite complete: {output_file.name}")
     except Exception as e:
         print(f"===== [ERROR] Failed to write changes: {e}")

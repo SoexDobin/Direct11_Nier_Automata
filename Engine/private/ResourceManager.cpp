@@ -195,6 +195,17 @@ int32 ResourceManager::Get_ContainLevelByModelTag(const wstring& tag)
     return m_ModelContainLev[tag];
 }
 
+vector<Shared<Model>> ResourceManager::Get_Models(uint32 levIndex)
+{
+    vector<Shared<Model>> vector;
+    for (auto [tag, model] : m_Models[levIndex])
+    {
+        vector.push_back(model);
+    }
+
+    return std::move(vector);
+}
+
 HRESULT ResourceManager::Clear_AllResources() {
     m_Shaders.clear();
     m_TextureDescTags.clear();

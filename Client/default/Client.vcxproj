@@ -179,6 +179,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\CityOfRuins.h" />
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
@@ -190,21 +191,22 @@
     <ClInclude Include="..\public\ClientApp.h" />
     <ClInclude Include="..\public\LoadingPixelPanel.h" />
     <ClInclude Include="..\public\Monster.h" />
+    <ClInclude Include="..\public\P10000.h" />
     <ClInclude Include="..\public\Playable.h" />
     <ClInclude Include="..\public\State.h" />
     <ClInclude Include="..\public\State2B.h" />
     <ClInclude Include="..\public\State2B_Attack.h" />
     <ClInclude Include="..\public\State2B_Idle.h" />
     <ClInclude Include="..\public\State2B_Jump.h" />
+    <ClInclude Include="..\public\State2B_Run.h" />
     <ClInclude Include="..\public\State2B_Walk.h" />
     <ClInclude Include="..\public\StateMachine.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\ThirdPersonCamera.h" />
-    <ClInclude Include="P10000.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="State2B_Run.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\CityOfRuins.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
     <ClCompile Include="..\private\FreeCamera.cpp" />
@@ -215,24 +217,26 @@
     <ClCompile Include="..\private\ClientApp.cpp" />
     <ClCompile Include="..\private\LoadingPixelPanel.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\private\P10000.cpp" />
     <ClCompile Include="..\private\Playable.cpp" />
     <ClCompile Include="..\private\State.cpp" />
     <ClCompile Include="..\private\State2B.cpp" />
     <ClCompile Include="..\private\State2B_Attack.cpp" />
     <ClCompile Include="..\private\State2B_Idle.cpp" />
     <ClCompile Include="..\private\State2B_Jump.cpp" />
+    <ClCompile Include="..\private\State2B_Run.cpp" />
     <ClCompile Include="..\private\State2B_Walk.cpp" />
     <ClCompile Include="..\private\StateMachine.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\ThirdPersonCamera.cpp" />
-    <ClCompile Include="P10000.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</IncludeInUnityFile>
+      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</IncludeInUnityFile>
     </ClCompile>
-    <ClCompile Include="State2B_Run.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxAnimMesh.hlsl" />

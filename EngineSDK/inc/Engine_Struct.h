@@ -37,6 +37,13 @@ namespace Engine
 		Vector4 specular = {};
 	} LIGHT_DESC;
 
+	typedef struct tagTransformFrame
+	{
+		Vector3 scale;
+		Vector4 rotation;
+		Vector3 position;
+	} TRANSFORM_FRAME;
+
 	typedef struct tagKeyFrame
 	{
 		Vector3 scale;

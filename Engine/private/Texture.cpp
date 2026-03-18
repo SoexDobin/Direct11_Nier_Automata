@@ -13,7 +13,7 @@ Texture::Texture(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceCo
 
 Texture::Texture(const Texture& rhs)
     : Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs }, 
-    m_FilePath{ rhs.m_FilePath }, m_RGBA{ rhs.m_RGBA } {
+    m_FilePath{ rhs.m_FilePath }, m_RGBA{ rhs.m_RGBA }, m_TextureTag{ rhs.m_TextureTag } {
 }
 
 HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs, const wstring& textureTag)
@@ -61,6 +61,7 @@ HRESULT Texture::Initialize(void* arg)
             }
             m_SRVs.push_back(pSRV);
         }
+        m_TextureTag = desc.m_TextureTag;
     }
    
     return Component::Initialize(arg);

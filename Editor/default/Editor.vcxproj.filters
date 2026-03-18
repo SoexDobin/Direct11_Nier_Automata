@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="99. SystemFiles">
@@ -42,6 +42,12 @@
     </Filter>
     <Filter Include="01. EditorObject\Hierarchy">
       <UniqueIdentifier>{6f0edfde-6a1f-40b5-9938-d128cfd8f0bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. EditorObject\ModelViewer">
+      <UniqueIdentifier>{3200f14f-a83d-41b5-9843-95e29ebb7c5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. EditorObject\AssetBrowser">
+      <UniqueIdentifier>{7d5e7feb-fea8-4240-a4ea-bc786b988079}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +99,15 @@
     <ClInclude Include="..\public\Hierarchy.h">
       <Filter>01. EditorObject\Hierarchy</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ModelViewer.h">
+      <Filter>01. EditorObject\ModelViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AssetBrowser.h">
+      <Filter>01. EditorObject\AssetBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ComponentEditUI.h">
+      <Filter>01. EditorObject\Inspector</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -124,6 +139,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Hierarchy.cpp">
       <Filter>01. EditorObject\Hierarchy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ModelViewer.cpp">
+      <Filter>01. EditorObject\ModelViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AssetBrowser.cpp">
+      <Filter>01. EditorObject\AssetBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ComponentEditUI.cpp">
+      <Filter>01. EditorObject\Inspector</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

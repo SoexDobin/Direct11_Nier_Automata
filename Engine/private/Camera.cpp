@@ -16,16 +16,24 @@ HRESULT Camera::Initialize_Prototype()
 
 HRESULT Camera::Initialize(void* arg)
 {
+	CAMERA_DESC localDesc{};
 	if (nullptr == arg)
 	{
-		LOG_ERROR(L"Need Camera_Desc to Clone Camera");
-		return E_FAIL;
+		localDesc.eye = Vector4{ 0.f, 5.f, -10.f, 1.f };
+		localDesc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
+		localDesc.up = Vector4{ 0.f, 1.f, 0.f, 0.f };
+		localDesc.fovY = XMConvertToRadians(60.0f);
+		localDesc.aspect = 1.6f;
+		localDesc.nearPlane = 0.1f;
+		localDesc.farPlane = 1000.f;
+		arg = &localDesc;
 	}
+
 	if (FAILED(GameObject::Initialize(arg)))
 		return E_FAIL;
 
-	m_ObjectDesc = static_cast<OBJECT_DESC*>(arg);
-	CAMERA_DESC& desc = *static_cast<CAMERA_DESC*>(m_ObjectDesc);
+	m_ObjectDesc = static_pointer_cast<OBJECT_DESC>(make_shared<CAMERA_DESC>(*static_cast<CAMERA_DESC*>(arg))).get();
+	CAMERA_DESC& desc = *static_cast<CAMERA_DESC*>(arg);
 	m_Transform->Set_Position(Vector3{ desc.eye });
 	m_Transform->LookAt(Vector3{ desc.at });
 
@@ -66,9 +74,16 @@ void Camera::Bind_CameraTransform() const
 	const auto& worldMatrix = m_Transform->Get_WorldMatrix();
 
 	Matrix viewMat = worldMatrix.Invert();
+
+	Float fAspect = m_Aspect;
+	if (XMScalarNearEqual(fAspect, 0.0f, 0.00001f))
+	{
+		fAspect = 0.001f;
+	}
+
 	Matrix projMat = XMMatrixPerspectiveFovLH(
 		m_FovY,
-		m_Aspect,
+		fAspect,
 		m_Near,
 		m_Far
 	);

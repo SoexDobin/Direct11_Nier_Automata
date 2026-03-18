@@ -33,11 +33,26 @@ HRESULT ThirdPersonCamera::Initialize_Prototype()
 
 HRESULT ThirdPersonCamera::Initialize(void* arg)
 {
+	THIRD_PERSON_CAMERA_DESC localDesc{};
 	if (nullptr == arg)
 	{
-		LOG_ERROR(L"Need Third_Person_Camera_Desc to Clone Camera");
-		return E_FAIL;
+		localDesc.eye = Vector4{ 0.f, 5.f, -10.f, 1.f };
+		localDesc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
+		localDesc.up = Vector4{ 0.f, 1.f, 0.f, 0.f };
+		localDesc.fovY = XMConvertToRadians(60.0f);
+		localDesc.aspect = 1.6f;
+		localDesc.nearPlane = 0.1f;
+		localDesc.farPlane = 1000.f;
+
+		localDesc.distance = 5.f;
+		localDesc.minDistance = 1.f;
+		localDesc.maxDistance = 20.f;
+		localDesc.offset = Vector3{ 0.f, 1.5f, 0.f };
+		localDesc.mouseSensitive = 0.1f;
+		localDesc.wheelSensitive = 0.01f;
+		arg = &localDesc;
 	}
+
 	if (FAILED(Camera::Initialize(arg)))
 		return E_FAIL;
 

@@ -13,6 +13,7 @@
 
 #include "Level.h"
 #include "SpdLogger.h"
+#include "LevelSerializer.h"
 #include "Timer.h"
 
 #include "Component.h"
@@ -92,6 +93,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
 
   if (nullptr == (m_LightManager = LightManager::Create()))
     return E_FAIL;
+
+  if (nullptr == (m_LevelSerializer = LevelSerializer::Create()))
+      return E_FAIL;
 
   return S_OK;
 }
@@ -180,15 +184,30 @@ HRESULT Game::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
 
 HRESULT Game::Present() const { return m_GraphicDevice->Present(); }
 
-HRESULT Game::OnResize(uint32 width, uint32 height, uint32 offscreenIndex) {
-  if (nullptr == m_GraphicDevice)
-    return S_OK;
+HRESULT Game::OnResize(uint32 width, uint32 height, uint32 offscreenIndex)
+{
+	if (nullptr == m_GraphicDevice)
+	{
+		return S_OK;
+	}
 
-  m_CameraManager->Get_MainCamera()->Bind_Aspect(width / height);
-  for (auto camera : m_CameraManager->Get_Cameras())
-      camera->Set_Aspect(width / height);
+	Float fAspect = 1.6f;
+	if (height > 0)
+	{
+		fAspect = static_cast<Float>(width) / height;
+	}
 
-  return m_GraphicDevice->OnResize(width, height, offscreenIndex);
+	if (nullptr != m_CameraManager->Get_MainCamera())
+	{
+		m_CameraManager->Get_MainCamera()->Bind_Aspect(fAspect);
+	}
+
+	for (auto &camera : m_CameraManager->Get_Cameras())
+	{
+		camera->Set_Aspect(fAspect);
+	}
+
+	return m_GraphicDevice->OnResize(width, height, offscreenIndex);
 }
 
 HRESULT Game::Begin_RenderOffScreen(uint32 screenIndex) const {
@@ -252,12 +271,17 @@ HRESULT Game::Change_Level(uint32 levIndex, const Shared<Level>& newLevel) {
   return S_OK;
 }
 
+const unordered_map<uint32, Shared<GameObject>>& Game::Get_Prototypes(uint32 levIndex) const
+{
+    return m_PrototypeManager->Get_GameObjects()[levIndex];
+}
+
 uint32 Game::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const
 {
     return m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, levIndex);
 }
 
-const tChar* Game::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
+wstring Game::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
 {
     return m_PrototypeManager->Get_PrototypeTagFromObjectID(objectID, levIndex);
 }
@@ -271,10 +295,31 @@ HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
   return S_OK;
 }
 
+Shared<GameObject> Game::Find_ByInstanceID(uint32 instanceID) const
+{
+    return m_ObjectManager->Find_ByInstanceID(instanceID);
+}
+
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
 
 const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects() const {
     return m_ObjectManager->Get_GameObjects();
+}
+
+HRESULT Game::Clear_AllGameObjects() const
+{
+	if (FAILED(m_ObjectManager->Clear_GameObjects()))
+	{
+		LOG_ERROR(L"[Game] Failed To Clear All GameObjects");
+		return E_FAIL;
+	}
+	if (FAILED(m_Renderer->Clear_RenderGroup()))
+	{
+		LOG_ERROR(L"[Game] Failed To Clear RenderGroup");
+		return E_FAIL;
+	}
+	m_CameraManager->Clear_Cameras();
+	return S_OK;
 }
 
 HRESULT Game::Add_Camera(const Shared<Camera> &camera) const { return m_CameraManager->Add_Camera(camera); }
@@ -319,6 +364,11 @@ Shared<Model> Game::Get_Model(uint32 levIndex, const tChar* modelFilePath) const
 int32 Game::Get_ContainLevelByModelTag(const wstring& modelTag) const
 {
     return m_ResourceManager->Get_ContainLevelByModelTag(modelTag);
+}
+
+vector<Shared<Model>> Game::Get_Models(uint32 levIndex) const
+{
+    return m_ResourceManager->Get_Models(levIndex);
 }
 
 void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObject) const {
@@ -384,17 +434,40 @@ HRESULT Game::Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& obje
 {
     return m_PrototypeManager->Add_Prototype(levIndex, object, prototypeTag);
 }
+HRESULT Game::SerializeLevel(const wstring &path) const
+{
+    return m_LevelSerializer->SerializeLevel(path);
+}
+
+HRESULT Game::DeSerializeLevel(const wstring &path) const
+{
+    return m_LevelSerializer->DeSerializeLevel(path);
+}
+
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
 {
-    uint32 level = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
-    
-    Shared<Object> pPrototype = m_PrototypeManager->Find_Prototype(protoType, level, objectID);
-    if (!pPrototype) return nullptr;
+    Shared<Object> pPrototype = nullptr;
+
+    if (levIndex != UINT_MAX)
+        pPrototype = m_PrototypeManager->Find_Prototype(protoType, levIndex, objectID);
+    if (!pPrototype)
+        pPrototype = m_PrototypeManager->Find_Prototype(protoType, 0, objectID);
+
+    // 3. 그래도 없으면 현재 레벨 시도
+    if (!pPrototype)
+    {
+        pPrototype = m_PrototypeManager->Find_Prototype(protoType, m_LevelManager->Get_CurrentLevelIndex(), objectID);
+    }
+
+    if (!pPrototype) 
+        return nullptr;
+
     Shared<Object> pCloned = nullptr;
     if (protoType == PROTOTYPE::GAMEOBJECT) {
         auto pGameObject = std::static_pointer_cast<GameObject>(pPrototype);
         pCloned = pGameObject->Clone(arg);
-        m_ObjectManager->Add_GameObject(std::static_pointer_cast<GameObject>(pCloned));
+        if (pCloned)
+            m_ObjectManager->Add_GameObject(std::static_pointer_cast<GameObject>(pCloned));
     }
     else {
         auto pComponent = std::static_pointer_cast<Component>(pPrototype);
@@ -403,16 +476,32 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, 
     return pCloned;
 }
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& prototypeTag, uint32 levIndex, void* arg) const
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring &prototypeTag, uint32 levIndex, void *arg) const
 {
-    uint32 level = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
+	if (prototypeTag.empty())
+	{
+		return nullptr;
+	}
 
-    uint32 objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, level);
+    uint32 objectID = 0;
+
+    // ── 검색 전략: Level 0 (Global) -> Current Level (Local) ──
+    // 1. Level 0(Static)에서 먼저 검색 (공용 프리펩 우선)
+    objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, 0);
+
+    // 2. 없으면 요청된 레벨(또는 현재 레벨)에서 검색
     if (objectID == 0)
     {
-        MSG_BOX("Failed to Instantiate By prototypeTag");
+        uint32 searchLevel = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
+        objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, searchLevel);
+    }
+
+    if (objectID == 0)
+    {
+        LOG_WARN(L"[Game] Failed to find prototype by tag: {}. (Searched Level 0 and {})", prototypeTag, 
+            (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex);
         return nullptr;
     }
 
-    return Instantiate_Internal(protoType, objectID, level, arg);
+    return Instantiate_Internal(protoType, objectID, UINT_MAX, arg);
 }

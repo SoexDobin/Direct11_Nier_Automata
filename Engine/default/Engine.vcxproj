@@ -228,6 +228,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\ResourceManager.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
+    <ClInclude Include="..\public\LevelSerializer.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
     <ClInclude Include="..\public\String_Helper.h" />
@@ -282,6 +283,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp" />
+    <ClCompile Include="..\private\LevelSerializer.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />

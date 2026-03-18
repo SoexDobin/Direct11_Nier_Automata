@@ -24,7 +24,7 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
         0, m_Device.Get(), m_Effect.GetAddressOf(), nullptr)))
 		return E_FAIL;
 
-    if (ComPtr<ID3DX11EffectTechnique> technique = m_Effect->GetTechniqueByIndex(0)) 
+    if (ID3DX11EffectTechnique* technique = m_Effect->GetTechniqueByIndex(0)) 
     {
         Shader::SHADER_DESC desc;
     	D3DX11_TECHNIQUE_DESC techniqueDesc = {};
@@ -36,7 +36,7 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
         for (uint32 i = 0; i < m_NumPasses; ++i) 
         {
             ComPtr<ID3D11InputLayout> inputLayout = {nullptr};
-            ComPtr<ID3DX11EffectPass> pass = technique->GetPassByIndex(i);
+            ID3DX11EffectPass* pass = technique->GetPassByIndex(i);
             if (nullptr == pass)
 				return E_FAIL;
 
@@ -90,13 +90,13 @@ HRESULT Shader::Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderReso
 {
     if (!m_Effect) return S_OK;
 
-	ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
+	ID3DX11EffectVariable* variable = m_Effect->GetVariableByName(constantName);
 	if (nullptr == variable) {
 		MSG_BOX("Failed To Throw Value To Shader");
 		return E_FAIL;
 	}
 
-	ComPtr<ID3DX11EffectShaderResourceVariable> srvVariable = variable->AsShaderResource();
+	ID3DX11EffectShaderResourceVariable* srvVariable = variable->AsShaderResource();
     if (nullptr == srvVariable) {
 		MSG_BOX("Shader Types Do Not Match");
 		return E_FAIL;
@@ -109,13 +109,13 @@ HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix)
 {
     if (!m_Effect) return S_OK;
 
-	ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
+	ID3DX11EffectVariable* variable = m_Effect->GetVariableByName(constantName);
     if (nullptr == variable) {
 		MSG_BOX("Failed To Throw Value To Shader");
 		return E_FAIL;
     }
 
-  ComPtr<ID3DX11EffectMatrixVariable> matrixVariable = variable->AsMatrix();
+	ID3DX11EffectMatrixVariable* matrixVariable = variable->AsMatrix();
     if (nullptr == matrixVariable) {
         MSG_BOX("Matrix Types Do Not Match");
         return E_FAIL;
@@ -126,7 +126,7 @@ HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix)
 
 HRESULT Shader::Bind_Matrices(const Char* constantName, const Float4x4* matrices, uint32 numMatrices)
 {
-    ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
+    ID3DX11EffectVariable* variable = m_Effect->GetVariableByName(constantName);
     if (nullptr == variable)
     {
         MSG_BOX("Failed to throw value to shader");
@@ -134,7 +134,7 @@ HRESULT Shader::Bind_Matrices(const Char* constantName, const Float4x4* matrices
         return E_FAIL;
     }
 
-    ComPtr<ID3DX11EffectMatrixVariable> matrixVariable = variable->AsMatrix();
+  	ID3DX11EffectMatrixVariable* matrixVariable = variable->AsMatrix();
     if (nullptr == matrixVariable)
     {
         MSG_BOX("Shader types do not match");
@@ -149,7 +149,7 @@ HRESULT Shader::Bind_RawValue(const Char* constantName, const void* data, uint32
 {
     if (!m_Effect) return S_OK;
 
-    ComPtr<ID3DX11EffectVariable> variable = m_Effect->GetVariableByName(constantName);
+    ID3DX11EffectVariable* variable = m_Effect->GetVariableByName(constantName);
     if (nullptr == variable) {
         MSG_BOX("Failed To Throw Value To Shader");
         return E_FAIL;

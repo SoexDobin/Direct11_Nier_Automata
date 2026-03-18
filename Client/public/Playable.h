@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
-NS_BEGIN(Engine)
+NS_BEGIN(Client)
 
 class CLIENT_DLL Playable abstract : public GameObject
 {

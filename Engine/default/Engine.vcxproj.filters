@@ -133,6 +133,12 @@
     <Filter Include="01. Utility\05. Component\Model\Channel">
       <UniqueIdentifier>{55e26edb-262a-4985-8a86-c292eea419e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. GameObject\Container">
+      <UniqueIdentifier>{e69b1946-8273-450c-a3a9-0c9c02cc143d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. GameObject\Container\Part">
+      <UniqueIdentifier>{db95d63b-5f9b-4493-84f7-5da3fd5ba944}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -290,6 +296,12 @@
     <ClInclude Include="..\public\Channel.h">
       <Filter>01. Utility\05. Component\Model\Channel</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\PartObject.h">
+      <Filter>01. Utility\04. GameObject\Container\Part</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ContainerObject.h">
+      <Filter>01. Utility\04. GameObject\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -432,6 +444,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Channel.cpp">
       <Filter>01. Utility\05. Component\Model\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PartObject.cpp">
+      <Filter>01. Utility\04. GameObject\Container\Part</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ContainerObject.cpp">
+      <Filter>01. Utility\04. GameObject\Container</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

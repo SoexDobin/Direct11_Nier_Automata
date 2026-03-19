@@ -206,6 +206,9 @@
     <Filter Include="02. GameObject\Playable\2B\State">
       <UniqueIdentifier>{58e488f6-9331-4015-979d-3a180ad82f16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Container">
+      <UniqueIdentifier>{ff7c442c-47a2-4906-bafa-765b42b29c9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl">

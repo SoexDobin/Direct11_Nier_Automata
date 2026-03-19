@@ -31,6 +31,9 @@ public:
   const wstring& GetTagSettingsPath() const { return m_TagSettingsPath; }
   const wstring& GetRenderSettingsPath() const { return m_EngineDescSettingsPath; }
   const wstring& GetSceneDataPath() const { return m_SceneDataPath; }
+  wstring GetLevelDataPath(uint32 levIndex) const {
+      return m_ProjectSettingDir + L"LevelData_" + std::to_wstring(levIndex) + L".json";
+  }
 
   const wstring& GetAssetsDir() const { return m_AssetsDir; }
   const wstring& GetShadersDir() const { return m_ShadersDir; }

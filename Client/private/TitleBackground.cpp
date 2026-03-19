@@ -1,34 +1,34 @@
 #include "pch.h"
-#include "LoadingPixelPanel.h"
+#include "TitleBackground.h"
 
 #include <Game.h>
-#include "Shader.h"
-#include "Texture.h"
-#include "VIBuffer_Rect.h"
-#include "SpdLogger.h"
+#include <SpdLogger.h>
+#include <VIBuffer_Rect.h>
 
-LoadingPixelPanel::LoadingPixelPanel() : UIObject() {}
+#include "LoadingPixelPanel.h"
 
-LoadingPixelPanel::LoadingPixelPanel(const ComPtr<ID3D11Device>& device,
+TitleBackground::TitleBackground() : UIObject() {}
+
+TitleBackground::TitleBackground(const ComPtr<ID3D11Device>& device,
     const ComPtr<ID3D11DeviceContext>& context)
     : UIObject(device, context) {
 }
 
-LoadingPixelPanel::LoadingPixelPanel(const LoadingPixelPanel& rhs) : UIObject(rhs) {}
+TitleBackground::TitleBackground(const TitleBackground& rhs) : UIObject(rhs) {}
 
-HRESULT LoadingPixelPanel::Initialize_Prototype()
+HRESULT TitleBackground::Initialize_Prototype()
 {
-	return UIObject::Initialize_Prototype();
+    return UIObject::Initialize_Prototype();
 }
 
-HRESULT LoadingPixelPanel::Initialize(void* arg)
+HRESULT TitleBackground::Initialize(void* arg)
 {
     UI_DESC desc{};
     desc.anchor = UI_ANCHOR::CENTER;
     desc.x = 0.f;
     desc.y = 0.f;
-    desc.sizeX = 2240.f;
-    desc.sizeY = 1080.f;
+    desc.sizeX = 1920.f;
+    desc.sizeY = 1920.f;
 
     if (FAILED(UIObject::Initialize(&desc)))
         return E_FAIL;
@@ -39,26 +39,26 @@ HRESULT LoadingPixelPanel::Initialize(void* arg)
     return S_OK;
 }
 
-void LoadingPixelPanel::On_Destroy() { UIObject::On_Destroy(); }
+void TitleBackground::On_Destroy() { UIObject::On_Destroy(); }
 
-void LoadingPixelPanel::Priority_Update(Float timeDelta) {
+void TitleBackground::Priority_Update(Float timeDelta) {
     UIObject::Priority_Update(timeDelta);
 }
 
-void LoadingPixelPanel::Update(Float timeDelta) {
+void TitleBackground::Update(Float timeDelta) {
     Update_UITransform();
     UIObject::Update(timeDelta);
 }
 
-void LoadingPixelPanel::Late_Update(Float timeDelta) {
+void TitleBackground::Late_Update(Float timeDelta) {
     UIObject::Late_Update(timeDelta);
 }
 
-void LoadingPixelPanel::Fixed_Update(Float fixedDelta) {
+void TitleBackground::Fixed_Update(Float fixedDelta) {
     UIObject::Fixed_Update(fixedDelta);
 }
 
-HRESULT LoadingPixelPanel::Render() {
+HRESULT TitleBackground::Render() {
     if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, "g_WorldMatrix")))
         return E_FAIL;
     if (FAILED(Bind_ShaderResource(m_Shader, "g_ViewMatrix", D3DTS::VIEW)))
@@ -80,19 +80,19 @@ HRESULT LoadingPixelPanel::Render() {
     return S_OK;;
 }
 
-void LoadingPixelPanel::Submit_RenderGroup()
+void TitleBackground::Submit_RenderGroup()
 {
     GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::UI, shared_from_this());
 }
 
-HRESULT LoadingPixelPanel::Ready_Components()
+HRESULT TitleBackground::Ready_Components()
 {
     auto shaderDesc = Shader::SHADER_DESC{ VTXTEX::Tag, VTXTEX::Elements, VTXTEX::numElements };
     m_Shader = Add_Component<Shader>(&shaderDesc);
     if (nullptr == m_Shader)
         return E_FAIL;
 
-    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::LOADING), L"UI_Loading_Pixel" };
+    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::LOADING), L"UI_Title_BackGround" };
     m_Texture = Add_Component<Texture>(&textureDesc);
     if (nullptr == m_Texture)
         return E_FAIL;
@@ -104,25 +104,25 @@ HRESULT LoadingPixelPanel::Ready_Components()
     return S_OK;
 }
 
-Shared<LoadingPixelPanel> LoadingPixelPanel::Create(const ComPtr<ID3D11Device>& device,
+Shared<TitleBackground> TitleBackground::Create(const ComPtr<ID3D11Device>& device,
     const ComPtr<ID3D11DeviceContext>& context) {
-    auto logo = make_shared<LoadingPixelPanel>(device, context);
+    auto instance = make_shared<TitleBackground>(device, context);
 
-    if (FAILED(logo->Initialize_Prototype())) {
-        LOG_ERROR(L"Failed To Create LoadingLogo");
+    if (FAILED(instance->Initialize_Prototype())) {
+        LOG_ERROR(L"Failed To Create TitleBackground");
         return nullptr;
     }
 
-    return logo;
+    return instance;
 }
 
-Shared<GameObject> LoadingPixelPanel::Clone(void* arg) {
-    auto logo = make_shared<LoadingPixelPanel>(*this);
+Shared<GameObject> TitleBackground::Clone(void* arg) {
+    auto instance = make_shared<TitleBackground>(*this);
 
-    if (FAILED(logo->Initialize(arg))) {
-        LOG_ERROR(L"Failed To CreateComponent LoadingPixelPanel");
+    if (FAILED(instance->Initialize(arg))) {
+        LOG_ERROR(L"Failed To CreateComponent TitleBackground");
         return nullptr;
     }
 
-    return logo;
+    return instance;
 }

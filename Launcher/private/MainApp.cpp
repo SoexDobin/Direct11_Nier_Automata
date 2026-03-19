@@ -18,7 +18,7 @@ HRESULT MainApp::Initialize()
 	ClientSettingManager::GetInstance()->Load_EngineDesc(g_EngineDecs);
 	g_EngineDecs.winMode = WINMODE::WIN;
 	g_EngineDecs.levelCount = ClientSettingManager::GetInstance()->Get_LevelCount();
-	g_EngineDecs.startLevel = ETOI(LEVEL::LOGO);
+	g_EngineDecs.startLevel = ETOI(LEVEL::TITLE);
 	g_EngineDecs.useOffscreenRendering = false;
 	g_EngineDecs.renderTargetCount = 0;
 

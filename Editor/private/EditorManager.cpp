@@ -95,7 +95,8 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         return E_FAIL;
 
     m_InGameCamera = GAME_INSTANCE->Get_MainCamera();
-    if (m_State == EDITOR_STATE::PLAY &&
+
+    if (m_State == EDITOR_STATE::PLAY && m_InGameCamera &&
         m_InGameCamera->Get_InstanceID() == m_EditorCamera->Get_InstanceID())
     {
         if (!GAME_INSTANCE->Get_Cameras().empty())

@@ -4,8 +4,10 @@
 #include "Game.h"
 #include "Loader.h"
 #include <SpdLogger.h>
+#include "LoadingFade.h"
 
 #include "ClientSettingManager.h"
+#include "LevelTitle.h"
 
 LevelLoading::LevelLoading(const ComPtr<ID3D11Device> &device,
                            const ComPtr<ID3D11DeviceContext> &context)
@@ -15,7 +17,28 @@ LevelLoading::LevelLoading(const ComPtr<ID3D11Device> &device,
 HRESULT LevelLoading::Initialize(void *arg) {
     m_NextLevel = *static_cast<LEVEL*>(arg);
 
-    m_Loader = Loader::Create(m_Device, m_Context, m_NextLevel, shared_from_this());
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV()))
+    {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::LOADING)))
+        {
+            LOG_ERROR(L"Failed to load Loading Texture");
+            return E_FAIL;
+        }
+    }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::LOADING)))
+    {
+        LOG_ERROR(L"Failed to load Loading Prototypes");
+        return E_FAIL;
+    }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(LEVEL::LOADING)))
+    {
+	    LOG_ERROR(L"Failed to load Loading Level");
+        return E_FAIL;
+    }
+    
+    m_Loader = Loader::Create(m_Device, m_Context, m_NextLevel, shared_from_this(), true);
     if (nullptr == m_Loader)
       return E_FAIL;
 
@@ -26,39 +49,23 @@ HRESULT LevelLoading::Initialize(void *arg) {
 void LevelLoading::On_Destroy() { Level::On_Destroy(); }
 
 void LevelLoading::Update_Level(Float timeDelta) {
-    m_IsFinished = m_Loader->Is_Finished();
 
-    if (true == m_IsFinished) {
-        if (4 <= ETOI(m_NextLevel)) {
-        		MSG_BOX("Failed to Created : NextLevel");
-              return;
-        } 
-        
-        // 1. 데이터 역직렬화 (Deserialize) 실행
-        if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(m_NextLevel)))
-        {
-            LOG_ERROR(L"Failed to load level {}", ETOI(m_NextLevel));
-            return;
-        }
-            
+    //if (true == m_IsFinished) {
+    //    GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelTitle::Create(m_Device, m_Context, LEVEL::TITLE));
+    //}
 
-        // 2. 실제 게임 레벨로 전환
-        //GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), Level_GamePlay::Create(m_Device, m_Context));
-    }
     Level::Update_Level(timeDelta);
 }
 
 HRESULT LevelLoading::Render_Level() { return Level::Render_Level(); }
 
-Shared<LevelLoading> LevelLoading::Create(const ComPtr<ID3D11Device> &device,
-                     const ComPtr<ID3D11DeviceContext> &context,
-                     LEVEL nextLevelID) {
-  auto loadingLevel = make_shared<LevelLoading>(device, context);
+Shared<LevelLoading> LevelLoading::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID) {
+    auto loadingLevel = make_shared<LevelLoading>(device, context);
 
-  if (FAILED(loadingLevel->Initialize(&nextLevelID))) {
-    LOG_ERROR(L"Failed To Create LoadingBackground");
-    return nullptr;
-  }
+    if (FAILED(loadingLevel->Initialize(&nextLevelID))) {
+		LOG_ERROR(L"Failed To Create LoadingBackground");
+		return nullptr;
+    }
 
-  return loadingLevel;
+    return loadingLevel;
 }

@@ -12,6 +12,7 @@ class CLIENT_DLL Loader final : public Level
 public:
 	typedef struct tagLoaderDesc
 	{
+		Bool isLoadStatic{ false };
 		LEVEL nextLevelID{};
 		Shared<Level> ownerLevel{ nullptr };
 	} LOADER_DESC;
@@ -35,11 +36,13 @@ public:
 	HRESULT Loading();
 
 private:
-	HRESULT Loading_For_LogoLevel();
-	HRESULT Loading_For_GamePlayLevel();
 	HRESULT Loading_Global_Prototype();
+	HRESULT Loading_For_TitleLevel();
+	HRESULT Loading_For_GamePlayLevel();
+	
 
 private:
+	Bool				m_LoadStatic = { false };
 	HANDLE				m_Thread = { nullptr };
 	LEVEL				m_NextLevelID = {LEVEL::LEVEL_END};
 	Weak<Level>			m_OwnerLevel = {};
@@ -49,7 +52,7 @@ private:
 	Bool				m_isFinished = { false };
 
 public:
-	static Shared<Loader> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID, const Shared<Level>& ownerLevel);
+	static Shared<Loader> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID, const Shared<Level>& ownerLevel, Bool IsLoadStatic = false);
 
 };
 

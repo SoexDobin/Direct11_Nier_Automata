@@ -39,7 +39,7 @@ void MenuBar::Render(Bool isResize) {
 
       if (ImGui::MenuItem("Save", nullptr, false, isStop))
       {
-        if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetSceneDataPath())))
+        if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()))))
           LOG_INFO("Level saved successfully.");
         else
           LOG_ERROR(L"Level save failed.");
@@ -47,7 +47,7 @@ void MenuBar::Render(Bool isResize) {
 
       if (ImGui::MenuItem("Load", nullptr, false, isStop))
       {
-        if (SUCCEEDED(GAME_INSTANCE->DeSerializeLevel(PATH.GetSceneDataPath())))
+        if (SUCCEEDED(GAME_INSTANCE->DeSerializeLevel(PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()))))
           LOG_INFO("Level loaded successfully.");
         else
           LOG_ERROR(L"Level load failed.");

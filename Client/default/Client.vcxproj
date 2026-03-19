@@ -185,8 +185,10 @@
     <ClInclude Include="..\public\Client_Function.h" />
     <ClInclude Include="..\public\FreeCamera.h" />
     <ClInclude Include="..\public\LevelLoading.h" />
+    <ClInclude Include="..\public\LevelTitle.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\LoadingBackground.h" />
+    <ClInclude Include="..\public\LoadingFade.h" />
     <ClInclude Include="..\public\LoadingLogo.h" />
     <ClInclude Include="..\public\ClientApp.h" />
     <ClInclude Include="..\public\LoadingPixelPanel.h" />
@@ -204,6 +206,7 @@
     <ClInclude Include="..\public\StateMachine.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\ThirdPersonCamera.h" />
+    <ClInclude Include="..\public\TitleBackground.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -212,8 +215,10 @@
     <ClCompile Include="..\private\Client_RTTR.cpp" />
     <ClCompile Include="..\private\FreeCamera.cpp" />
     <ClCompile Include="..\private\LevelLoading.cpp" />
+    <ClCompile Include="..\private\LevelTitle.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\LoadingBackground.cpp" />
+    <ClCompile Include="..\private\LoadingFade.cpp" />
     <ClCompile Include="..\private\LoadingLogo.cpp" />
     <ClCompile Include="..\private\ClientApp.cpp" />
     <ClCompile Include="..\private\LoadingPixelPanel.cpp" />
@@ -231,6 +236,7 @@
     <ClCompile Include="..\private\StateMachine.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\ThirdPersonCamera.cpp" />
+    <ClCompile Include="..\private\TitleBackground.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

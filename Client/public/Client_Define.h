@@ -9,7 +9,7 @@
 
 namespace Client
 {
-	enum class LEVEL { STATIC, LOADING, LOGO, GAMEPLAY, LEVEL_END };
+	enum class LEVEL { STATIC, LOADING, TITLE, GAMEPLAY, LEVEL_END };
 
 
 	constexpr const Char* WorldMatrix = "g_WorldMatrix";

@@ -498,16 +498,10 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring &pr
 	}
 
     uint32 objectID = 0;
-
-    // ── 검색 전략: Level 0 (Global) -> Current Level (Local) ──
-    // 1. Level 0(Static)에서 먼저 검색 (공용 프리펩 우선)
-    objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, 0);
-
-    // 2. 없으면 요청된 레벨(또는 현재 레벨)에서 검색
+    objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, levIndex);
     if (objectID == 0)
     {
-        uint32 searchLevel = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
-        objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, searchLevel);
+        objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, 0);
     }
 
     if (objectID == 0)
@@ -517,5 +511,5 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring &pr
         return nullptr;
     }
 
-    return Instantiate_Internal(protoType, objectID, UINT_MAX, arg);
+    return Instantiate_Internal(protoType, objectID, levIndex, arg);
 }

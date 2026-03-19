@@ -92,7 +92,7 @@ HRESULT LoadingLogo::Ready_Components()
     if (nullptr == m_Shader)
         return E_FAIL;
 
-    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::STATIC), L"UI_Loading_Logo" };
+    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::LOADING), L"UI_Loading_Logo" };
     m_Texture = Add_Component<Texture>(&textureDesc);
     if (nullptr == m_Texture)
         return E_FAIL;

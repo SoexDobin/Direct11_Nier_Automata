@@ -109,8 +109,9 @@ public: /* For ResourceManager */
     const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
     HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;
-    Shared<Model> Get_Model(uint32 levIndex, const tChar* modelFilePath) const;
-    int32 Get_ContainLevelByModelTag(const wstring& modelTag) const;
+    Shared<Model> Get_Model(uint32 levIndex, const tChar *modelFilePath) const;
+    int32 Get_ContainLevelByModelTag(const wstring &modelTag) const;
+    int32 Get_ContainLevelByTextureTag(uint32 levIndex, const wstring &tag) const;
     vector<Shared<Model>> Get_Models(uint32 levIndex) const;
 
 public: /* For Renderer */
@@ -145,18 +146,18 @@ public: /* Prototype & Instantiate Facade */
         return Add_Prototype_Internal(levIndex, std::static_pointer_cast<Object>(prototype), prototypeTag);
     }
     template <typename T>
-    Shared<T> Instantiate(uint32 objectID, uint32 levIndex = UINT_MAX, void* arg = nullptr) {
+    Shared<T> Instantiate(uint32 objectID, uint32 levIndex, void* arg = nullptr) {
         PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
         Shared<Object> cloned = Instantiate_Internal(protoType, objectID, levIndex, arg);
         return std::static_pointer_cast<T>(cloned);
     }
     template <typename T>
-    Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) {
+    Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) {
         PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
         Shared<Object> cloned = Instantiate_Internal(protoType, prototypeTag, levIndex, arg);
         return std::static_pointer_cast<T>(cloned);
     }
-    Shared<Object> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) const {
+    Shared<Object> Instantiate(const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) const {
         Shared<Object> cloned = Instantiate_Internal(PROTOTYPE::COMPONENT, prototypeTag, levIndex, arg);
         return cloned;
     }

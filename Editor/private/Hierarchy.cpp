@@ -43,7 +43,7 @@ void Hierarchy::Render(Bool isResize) {
             const wchar_t *rawTag = static_cast<const wchar_t *>(payload->Data);
             wstring prototypeTag(rawTag);
 
-            Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
+            Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, GAME_INSTANCE->Get_CurrentLevelIndex());
             if (cloned)
             {
                 auto allObjs = GAME_INSTANCE->Get_GameObjects();

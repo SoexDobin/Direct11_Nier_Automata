@@ -7,8 +7,6 @@
 #include "Game.h"
 #include "TagRegistry.h"
 #include "LayerRegistry.h"
-#include "Texture.h"
-#include "Shader.h"
 #include "GameObject.h"
 #include <regex>
 
@@ -54,13 +52,14 @@ HRESULT ClientSettingManager::Load_Textures_FromJson(LEVEL baseLevel) const
 		LEVEL level = LEVEL::STATIC;
 		if (levelStr == "1" || levelStr == "Loading" || levelStr == "LOADING")
 			level = LEVEL::LOADING;
-		else if (levelStr == "2" || levelStr == "Logo" || levelStr == "LOGO")
-			level = LEVEL::LOGO;
+		else if (levelStr == "2" || levelStr == "Title" || levelStr == "TITLE")
+			level = LEVEL::TITLE;
 		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
 			level = LEVEL::GAMEPLAY;
 		
         if (level != baseLevel)
-            continue;
+			if (level != LEVEL::LOADING)
+				continue;
 		
 		wstring tag = Helper::To_wString(item["tag"].get<string>());
 		wstring relativePath = Helper::To_wString(item["path"].get<string>());
@@ -168,8 +167,8 @@ HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 		LEVEL level = LEVEL::STATIC;
 		if (levelStr == "1" || levelStr == "Loading" || levelStr == "LOADING")
 			level = LEVEL::LOADING;
-		else if (levelStr == "2" || levelStr == "Logo" || levelStr == "LOGO")
-			level = LEVEL::LOGO;
+		else if (levelStr == "2" || levelStr == "Title" || levelStr == "TITLE")
+			level = LEVEL::TITLE;
 		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
 			level = LEVEL::GAMEPLAY;
 		
@@ -281,9 +280,9 @@ HRESULT ClientSettingManager::Sync_ModelJson_FromCSV() const
 		string cleanTag = CleanString(tag);
 		string cleanPath = CleanString(path);
 
-		float fPx = GetFloat(px, 0.f); float fPy = GetFloat(py, 0.f); float fPz = GetFloat(pz, 0.f);
-		float fRx = GetFloat(rx, 0.f); float fRy = GetFloat(ry, 0.f); float fRz = GetFloat(rz, 0.f);
-		float fSx = GetFloat(sx, 1.f); float fSy = GetFloat(sy, 1.f); float fSz = GetFloat(sz, 1.f);
+		Float fPx = GetFloat(px, 0.f); Float fPy = GetFloat(py, 0.f); Float fPz = GetFloat(pz, 0.f);
+		Float fRx = GetFloat(rx, 0.f); Float fRy = GetFloat(ry, 0.f); Float fRz = GetFloat(rz, 0.f);
+		Float fSx = GetFloat(sx, 1.f); Float fSy = GetFloat(sy, 1.f); Float fSz = GetFloat(sz, 1.f);
 
 		jsonRoot["ModelSettings"].push_back({
 			{"level", cleanLevel},
@@ -319,7 +318,7 @@ HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const
 	file.close();
 
 	outDesc.levelCount = ETOI(LEVEL::LEVEL_END);
-	outDesc.startLevel = json.value("startLevel", ETOI(LEVEL::LOGO));
+	outDesc.startLevel = json.value("startLevel", ETOI(LEVEL::TITLE));
 	outDesc.viewportWidth = json.value("viewportWidth", 1920);
 	outDesc.viewportHeight = json.value("viewportHeight", 1080);
 	outDesc.windowTitle = Helper::To_wString(json.value("windowTitle", "NieRAutomata"));
@@ -351,7 +350,7 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
     rttr::type componentType = rttr::type::get<Component>();
     auto allTypes = rttr::type::get_types();
 
-    // 전역/정적 세트를 사용하여 여러 번 호출(STATIC, LOGO 등)되더라도 
+    // 전역/정적 세트를 사용하여 여러 번 호출(STATIC, TITLE 등)되더라도 
     // 동일 타입의 프로토타입은 전 생명주기 동안 단 한 번만 등록되도록 보장합니다.
     static unordered_set<string> globalProcessedTypes;
 
@@ -436,80 +435,6 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
     }
 
     return S_OK;
-}
-
-HRESULT ClientSettingManager::Load_Texture(LEVEL level) const
-{
-	//if (!filesystem::exists(m_ResourcePath))
-	//{
-	//	SpdLogger::Warn(L"Failed To Find Resource Folder " + m_ResourcePath);
-	//	return E_FAIL; 
-	//}
-	//
-	//std::wregex levelRegEx(L"lev(\\d+)_.*", std::regex_constants::icase);
-	//std::wregex fileRegEx(L"(.+?)(_*)(\\d+)\\.(dds|png|tga|jpg)", std::regex_constants::icase);
-	//for (const auto& entry : filesystem::recursive_directory_iterator(m_ResourcePath))
-	//{
-	//	if (entry.is_regular_file()) // 파일일 경우에만 처리
-	//	{
-	//		std::wstring FilePath = entry.path().wstring();
-	//		std::replace(FilePath.begin(), FilePath.end(), L'\\', L'/');
-	//		
-	//		uint32 levIndex = { 0 };
-	//		std::wsmatch levelMatch;
-	//		if (std::regex_search(FilePath, levelMatch, levelRegEx))
-	//		{
-	//			levIndex = std::stoul(levelMatch[1].str());
-	//		}
-	//		
-	//		std::wsmatch fileMatch;
-	//		std::wstring entryFileName = entry.path().filename().wstring();
-	//		if (std::regex_match(entryFileName, fileMatch, fileRegEx))
-	//		{
-	//			std::wstring baseName = fileMatch[1].str();
-	//			std::wstring separator = fileMatch[2].str();
-	//			std::wstring extension = fileMatch[4].str();
-	//
-	//			// 상위 폴더 경로까지 합쳐서 L"../bin/resources/lev0_static/Textures/p10000_%d.dds" 포맷 만들기
-	//			std::wstring parentPath = entry.path().parent_path().wstring();
-	//			std::replace(parentPath.begin(), parentPath.end(), L'\\', L'/');
-	//			std::wstring formatPath = parentPath + L"/" + baseName + separator + L"%d." + extension;
-	//
-	//
-	//			std::wstring tagName = baseName;
-	//			uint32 sequenceCount = 0;
-	//			for (const auto& peerEntry : filesystem::directory_iterator(entry.path().parent_path()))
-	//			{
-	//				std::wsmatch peerMatch;
-	//				std::wstring peerFileName = peerEntry.path().filename().wstring();
-	//				if (std::regex_match(peerFileName, peerMatch, fileRegEx))
-	//				{
-	//					// 같은 시퀀스(BaseName 일치)라면 카운트 증가
-	//					if (peerMatch[1].str() == baseName)
-	//					{
-	//						sequenceCount++;
-	//					}
-	//				}
-	//			}
-	//
-	//			GAME_INSTANCE->Add_Prototype(levIndex,
-	//				Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-	//					formatPath.c_str(), sequenceCount)
-	//			);
-	//		}
-	//		else
-	//		{
-	//			std::wstring formatPath = FilePath;
-	//			std::wstring tagName = entry.path().stem().wstring();
-	//			GAME_INSTANCE->Add_Prototype(levIndex,
-	//				Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-	//					formatPath.c_str(), 1)
-	//			);
-	//		}
-	//	}
-	//}
-
-	return S_OK;
 }
 
 HRESULT ClientSettingManager::Load_Shader() const

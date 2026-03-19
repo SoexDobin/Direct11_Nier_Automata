@@ -106,7 +106,7 @@ void EditorView::RenderView(Bool isResize) {
 					}
 
 					// 객체 생성 및 배치
-					Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
+					Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, GAME_INSTANCE->Get_CurrentLevelIndex());
 					if (cloned)
 					{
 						auto allObjs = GAME_INSTANCE->Get_GameObjects();
@@ -153,7 +153,7 @@ void EditorView::RenderView(Bool isResize) {
 	Bool isPlayDisabled = canPlay && loadFinished;
 	if (!isPlayDisabled) ImGui::BeginDisabled();
 	if (ImGui::Button("Play")) {
-		if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetSceneDataPath())))
+		if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()))))
 			EDITOR->Set_State(EDITOR_STATE::PLAY);
 		else
 			LOG_CRITICAL("Failed to Save Level Data");

@@ -41,14 +41,13 @@ HRESULT Texture::Initialize(void* arg)
 
     if (!desc.m_TextureTag.empty())
     {
-        // 1. 태그로 메타데이터 우선 획득
         const TEXTURE_DESC& registDesc = *GAME_INSTANCE->Get_TextureDesc(desc.m_levIndex, desc.m_TextureTag);
 
         m_NumSRVs = registDesc.m_NumSRVs;
         m_FilePath = registDesc.m_FilePath;
         m_SRVs.clear();
         m_SRVs.reserve(m_NumSRVs);
-        // 2. 메타데이터에 기록된 정확한 개수만큼 리소스 요청
+        
         for (uint32 i = 0; i < m_NumSRVs; ++i)
         {
             tChar szFullPath[MAX_PATH] = TEXT("");

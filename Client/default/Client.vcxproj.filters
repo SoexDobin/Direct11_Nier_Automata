@@ -17,7 +17,7 @@
       <Filter>01. Level\Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Loader.h">
-      <Filter>01. Level\Loading\Loader</Filter>
+      <Filter>01. Level\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Client_Function.h">
       <Filter>98. Headers</Filter>
@@ -79,6 +79,15 @@
     <ClInclude Include="..\public\P10000Body.h">
       <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LevelTitle.h">
+      <Filter>01. Level\Title</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadingFade.h">
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TitleBackground.h">
+      <Filter>02. GameObject\UI\Title</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -91,7 +100,7 @@
       <Filter>01. Level\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Loader.cpp">
-      <Filter>01. Level\Loading\Loader</Filter>
+      <Filter>01. Level\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingBackground.cpp">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
@@ -156,6 +165,15 @@
     <ClCompile Include="..\private\P10000Body.cpp">
       <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\LevelTitle.cpp">
+      <Filter>01. Level\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingFade.cpp">
+      <Filter>02. GameObject\UI\LoadingUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TitleBackground.cpp">
+      <Filter>02. GameObject\UI\Title</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="99. Default">
@@ -172,9 +190,6 @@
     </Filter>
     <Filter Include="01. Level\Loading">
       <UniqueIdentifier>{7a33b79a-7ac6-4cf8-9720-7373ff68f935}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Level\Loading\Loader">
-      <UniqueIdentifier>{03fcc313-3304-4541-a9eb-eee23cc2756e}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject">
       <UniqueIdentifier>{a4ca53d2-1ab1-4372-ad1b-faaaadec0d0b}</UniqueIdentifier>
@@ -217,6 +232,18 @@
     </Filter>
     <Filter Include="02. GameObject\Playable\2B\2BPartObject">
       <UniqueIdentifier>{860aeb7a-a17a-405c-af57-46faf234f476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\Title">
+      <UniqueIdentifier>{9e52baab-71d4-40bb-a8f9-4fe9b21ee4b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\Loader">
+      <UniqueIdentifier>{03fcc313-3304-4541-a9eb-eee23cc2756e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\GamePlay">
+      <UniqueIdentifier>{3fcd9f22-30f5-4ba0-9d2f-9128aedf3dfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Title">
+      <UniqueIdentifier>{896614d3-b3cd-47f2-81e6-34cf1ffd3744}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

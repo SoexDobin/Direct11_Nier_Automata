@@ -40,12 +40,12 @@ HRESULT Loader::Initialize(void *arg)
     m_OwnerLevel = desc.ownerLevel;
     InitializeCriticalSection(&m_CriticalSection);
 
-	auto pSharedPtrToPass = new Shared<Loader>(static_pointer_cast<Loader>(shared_from_this()));
+	auto sharedPtrToPass = new Shared<Loader>(static_pointer_cast<Loader>(shared_from_this()));
     
-	m_Thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadMain, pSharedPtrToPass, 0, nullptr));
+	m_Thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadMain, sharedPtrToPass, 0, nullptr));
     
     if (m_Thread == nullptr) {
-        delete pSharedPtrToPass; // 실패 시 메모리 해제
+        delete sharedPtrToPass; // 실패 시 메모리 해제
         return E_FAIL;
     }
   
@@ -66,35 +66,102 @@ void Loader::Update_Level(Float timeDelta)
 }
 
 HRESULT Loader::Loading() {
-  HRESULT hr = {};
+    HRESULT hr = {};
 
-  EnterCriticalSection(&m_CriticalSection);
-  if (SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)))
-  {
-      switch (m_NextLevelID) {
-      case LEVEL::STATIC:
-          hr = Loading_Global_Prototype();
-          break;
-      case LEVEL::LOGO:
-          hr = Loading_For_LogoLevel();
-          break;
-      case LEVEL::GAMEPLAY:
-          hr = Loading_For_GamePlayLevel();
-          break;
+    EnterCriticalSection(&m_CriticalSection);
 
-      default:
-          hr = E_FAIL;
-      }
-  }
+    if (SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)))
+    {
+        if (m_LoadStatic)
+            hr = Loading_Global_Prototype();
 
-  CoUninitialize();
-  LeaveCriticalSection(&m_CriticalSection);
+        switch (m_NextLevelID) {
+        case LEVEL::TITLE:
+            hr = Loading_For_TitleLevel();
+            break;
+        case LEVEL::GAMEPLAY:
+            hr = Loading_For_GamePlayLevel();
+            break;
+        default:
+            hr = E_FAIL;
+        }
+    }
 
-  return hr;
+    CoUninitialize();
+    LeaveCriticalSection(&m_CriticalSection);
+
+    return hr;
 }
 
-HRESULT Loader::Loading_For_LogoLevel() {
+HRESULT Loader::Loading_For_TitleLevel() {
 	m_isFinished = false;
+
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::TITLE))) {
+            LOG_ERROR(L"Failed to Load TITLE Textures");
+            return E_FAIL;
+        }
+    }
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::TITLE))) {
+            LOG_ERROR(L"Failed to Load TITLE Model");
+            return E_FAIL;
+        }
+    }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::TITLE))) {
+        LOG_ERROR(L"Failed to Ready Client TITLE Prototypes");
+        return E_FAIL;
+    }
+
+    m_isFinished = true;
+    if (!m_OwnerLevel.expired())
+		m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
+	return S_OK;
+}
+
+HRESULT Loader::Loading_For_GamePlayLevel() {
+    m_isFinished = false;
+
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
+        return E_FAIL;
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::GAMEPLAY))) {
+            LOG_ERROR(L"Failed to Load GAMEPLAY Textures");
+            return E_FAIL;
+        }
+    }
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::GAMEPLAY))) {
+            LOG_ERROR(L"Failed to Load GAMEPLAY Model");
+            return E_FAIL;
+        }
+    }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY))) {
+        LOG_ERROR(L"Failed to Ready Client GAMEPLAY Prototypes");
+        return E_FAIL;
+    }
+
+    LIGHT_DESC			LightDesc{};
+    LightDesc.type = LIGHT::DIRECTIONAL;
+    LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
+    LightDesc.diffuse = Vector4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
+
+    if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
+        return E_FAIL;
+
+    m_isFinished = true;
+    if (!m_OwnerLevel.expired())
+        m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
+	return S_OK;
+}
+
+HRESULT Loader::Loading_Global_Prototype()
+{
+    m_isFinished = false;
 
     if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
         return E_FAIL;
@@ -116,51 +183,15 @@ HRESULT Loader::Loading_For_LogoLevel() {
         return E_FAIL;
     }
 
-
-    LIGHT_DESC			LightDesc{};
-    LightDesc.type = LIGHT::DIRECTIONAL;
-    LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
-    LightDesc.diffuse = Vector4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
-
-    if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
-        return E_FAIL;
-
-    m_isFinished = true;
-    if (!m_OwnerLevel.expired())
-		m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
-	return S_OK;
-}
-
-HRESULT Loader::Loading_For_GamePlayLevel() {
-    m_isFinished = false;
-
-
-
-    m_isFinished = true;
-    if (!m_OwnerLevel.expired())
-        m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
-	return S_OK;
-}
-
-HRESULT Loader::Loading_Global_Prototype()
-{
-    m_isFinished = false;
-
-
-
-    m_isFinished = true;
-    if (!m_OwnerLevel.expired())
-        m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
     return S_OK;
 }
 
-Shared<Loader> Loader::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID, const Shared<Level>& ownerLevel)
+Shared<Loader> Loader::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID, const Shared<Level>& ownerLevel, Bool IsLoadStatic)
 {
     Shared<Loader> loader = make_shared<Loader>(device, context);
 
     LOADER_DESC desc{};
+    desc.isLoadStatic = IsLoadStatic;
     desc.nextLevelID = nextLevelID;
     desc.ownerLevel = ownerLevel;
 

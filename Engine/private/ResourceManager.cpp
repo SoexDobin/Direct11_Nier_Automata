@@ -110,6 +110,14 @@ const Texture::TEXTURE_DESC* ResourceManager::Get_TextureDescByTag(uint32 levInd
     return &m_TextureDescTags[levIndex][descriptionTag];
 }
 
+vector<wstring> ResourceManager::Get_TextureTags(uint32 levIndex)
+{
+    vector<wstring> tags;
+    for (auto& [tag, desc] : m_TextureDescTags[levIndex])
+        tags.push_back(tag);
+    return tags;
+}
+
 
 const ComPtr<ID3D11ShaderResourceView>& ResourceManager::Get_Texture(uint32 levIndex, const tChar* texturePath)
 {
@@ -158,13 +166,16 @@ HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, con
     if (nullptr == model)
     {
         LOG_ERROR(L"Failed to Create Shader Resource. Path : {}", modelPath);
+        return E_FAIL;
     }
 
-    m_Models[levIndex].emplace(descriptionTag, model);
     if (levIndex == 0)
         m_StaticModelContainLev.emplace(descriptionTag, levIndex);
     else
         m_ModelContainLev.emplace(descriptionTag, levIndex);
+
+    m_Models[levIndex].emplace(descriptionTag, model);
+    model->Set_ModelTag(descriptionTag); 
 
     return S_OK;
 }
@@ -198,12 +209,16 @@ int32 ResourceManager::Get_ContainLevelByModelTag(const wstring& tag)
 vector<Shared<Model>> ResourceManager::Get_Models(uint32 levIndex)
 {
     vector<Shared<Model>> vector;
+    
+    if (levIndex >= m_Models.size())
+        return vector;
+
     for (auto [tag, model] : m_Models[levIndex])
     {
         vector.push_back(model);
     }
 
-    return std::move(vector);
+    return vector;
 }
 
 HRESULT ResourceManager::Clear_AllResources() {
@@ -225,13 +240,27 @@ HRESULT ResourceManager::Clear_AllResources() {
 
 HRESULT ResourceManager::Clear_Resource(uint32 levIndex)
 {
+    if (levIndex >= m_LevelCount)
+        return E_FAIL;
+
     m_Shaders[levIndex].clear();
     m_TextureDescTags[levIndex].clear();
     m_SRVs[levIndex].clear();
 
-    m_Models.clear();
-    m_StaticModelContainLev.clear();
-    m_ModelContainLev.clear();
+    m_Models[levIndex].clear();
+    
+    for (auto it = m_ModelContainLev.begin(); it != m_ModelContainLev.end();)
+    {
+        if (it->second == levIndex)
+            it = m_ModelContainLev.erase(it);
+        else
+            ++it;
+    }
+    
+    if (levIndex == 0)
+    {
+        m_StaticModelContainLev.clear();
+    }
 
     return S_OK;
 }

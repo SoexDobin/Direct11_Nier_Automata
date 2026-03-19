@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "State2B_Run.h"
 
-State2B_Run::State2B_Run(const wstring& tag, const Shared<P10000> owner)
+State2B_Run::State2B_Run(const wstring& tag, const Shared<P10000>& owner)
 	: State2B{tag, owner}
 {
 }

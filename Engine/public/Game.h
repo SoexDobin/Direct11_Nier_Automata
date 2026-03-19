@@ -47,6 +47,7 @@ public: /* For Input Manager */
 	void Update_Input() const;
     Bool Get_MouseLock() const { return m_InputDevice->Get_MouseLock(); }
     void Set_MouseLock(Bool isLock) const { return m_InputDevice->Set_MouseLock(isLock); }
+    void Set_InputEnabled(Bool isEnabled) const { m_InputDevice->Set_InputEnabled(isEnabled); }
 
 public: /* For GraphicDevice */
     HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
@@ -90,10 +91,12 @@ public: /* For ObjectManager */
 	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects() const;
 	HRESULT Clear_AllGameObjects() const;
     Shared<GameObject> Find_ByInstanceID(uint32 instanceID) const;
+    Shared<GameObject> Find_ObjectByObjectID(uint32 objectID) const;
 
 public: /* For CameraManager */
     HRESULT Add_Camera(const Shared<class Camera> &camera) const;
-    HRESULT Set_MainCamera(const Shared<class Camera> &camera) const;
+    HRESULT Set_MainCamera(const Shared<class Camera>& camera) const;
+    vector<Shared<class Camera>> Get_Cameras() const;
     Shared<class Camera> Get_MainCamera() const;
 
 public: /* For ResourceManager */
@@ -102,6 +105,7 @@ public: /* For ResourceManager */
 
     HRESULT Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const;
     const Texture::TEXTURE_DESC* Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const;
+    vector<wstring> Get_TextureTags(uint32 levIndex) const;
     const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
     HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;

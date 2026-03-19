@@ -80,6 +80,7 @@ void EditorApp::Update() {
     if (EDITOR->Is_ResizeRequest()) {
         EditorManager::RESIZE_INFO info = EDITOR->Get_ResizeInfo();
         GAME_INSTANCE->OnResize(static_cast<uint32>(info.width), static_cast<uint32>(info.height), info.screenIndex);
+        EDITOR->Clear_ResizeRequest();
     }
     
     ImGui_ImplDX11_NewFrame();

@@ -18,6 +18,7 @@ public:
 private:
 	void Render_PrototypeList();
 	void Render_PrototypeItem(const Shared<GameObject> &pProto, uint32 objectID, uint32 levIndex);
+	void Render_ResourceItem(const wstring& tag, const string& assetType);
 
 public:
 	static Shared<AssetBrowser> Create();

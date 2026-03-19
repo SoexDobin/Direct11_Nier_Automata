@@ -595,3 +595,15 @@ HRESULT ClientSettingManager::Load_Shader() const
 	
 	return S_OK;
 }
+
+HRESULT ClientSettingManager::Load_LevelData(LEVEL level) const
+{
+	wstring fullPath = m_ProjectSettingPath + L"LevelData_" + std::to_wstring(ETOI(level)) + L".json";
+
+	if (filesystem::exists(fullPath))
+	{
+		return GAME_INSTANCE->DeSerializeLevel(fullPath);
+	}
+
+	return S_FALSE;
+}

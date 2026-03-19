@@ -7,7 +7,7 @@
 #include "StateMachine.h"
 #include "Camera.h"
 
-State2B_Walk::State2B_Walk(const wstring& tag, const Shared<P10000> owner)
+State2B_Walk::State2B_Walk(const wstring& tag, const Shared<P10000>& owner)
 	: State2B{tag, owner}
 {
 }

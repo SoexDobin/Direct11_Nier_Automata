@@ -300,6 +300,11 @@ Shared<GameObject> Game::Find_ByInstanceID(uint32 instanceID) const
     return m_ObjectManager->Find_ByInstanceID(instanceID);
 }
 
+Shared<GameObject> Game::Find_ObjectByObjectID(uint32 objectID) const
+{
+    return m_ObjectManager->Find_ObjectByObjectID(objectID);
+}
+
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
 
 const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects() const {
@@ -324,6 +329,9 @@ HRESULT Game::Clear_AllGameObjects() const
 
 HRESULT Game::Add_Camera(const Shared<Camera> &camera) const { return m_CameraManager->Add_Camera(camera); }
 HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const { return m_CameraManager->Set_MainCamera(camera); }
+vector<Shared<Camera>> Game::Get_Cameras() const { return m_CameraManager->Get_Cameras(); }
+
+
 Shared<Camera> Game::Get_MainCamera() const { return m_CameraManager->Get_MainCamera(); }
 
 HRESULT Game::Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const
@@ -344,6 +352,11 @@ HRESULT Game::Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32
 const Texture::TEXTURE_DESC* Game::Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const
 {
     return m_ResourceManager->Get_TextureDescByTag(levIndex, descriptionTag);
+}
+
+vector<wstring> Game::Get_TextureTags(uint32 levIndex) const
+{
+    return m_ResourceManager->Get_TextureTags(levIndex);
 }
 
 const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(uint32 levIndex, const tChar* textureFilePath) const
@@ -480,6 +493,7 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring &pr
 {
 	if (prototypeTag.empty())
 	{
+        LOG_ERROR("There is no Tag to prototype");
 		return nullptr;
 	}
 

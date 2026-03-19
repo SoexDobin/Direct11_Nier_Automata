@@ -82,24 +82,30 @@
                                       "has_clone":  false,
                                       "category":  "other"
                                   },
-                    "P10000":  {
-                                   "members":  [
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "0",
-                                                       "name":  "m_tempIdx",
-                                                       "type":  "uint32"
-                                                   }
-                                               ],
-                                   "base_class":  "Playable",
-                                   "inherited_members":  {
+                    "Level_GamePlay":  {
+                                           "members":  [
 
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
+                                                       ],
+                                           "base_class":  "Level",
+                                           "inherited_members":  [
+                                                                     {
+                                                                         "access":  "protected",
+                                                                         "default":  "nullptr",
+                                                                         "name":  "m_Device",
+                                                                         "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                     },
+                                                                     {
+                                                                         "access":  "protected",
+                                                                         "default":  "nullptr",
+                                                                         "name":  "m_Context",
+                                                                         "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                     }
+                                                                 ],
+                                           "namespace":  "Client",
+                                           "has_create":  true,
+                                           "has_clone":  false,
+                                           "category":  "level"
+                                       },
                     "LoadingLogo":  {
                                         "namespace":  "Engine",
                                         "base_class":  "UIObject",
@@ -284,6 +290,24 @@
                                          "has_clone":  false,
                                          "category":  "level"
                                      },
+                    "P10000":  {
+                                   "members":  [
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "0",
+                                                       "name":  "m_tempIdx",
+                                                       "type":  "uint32"
+                                                   }
+                                               ],
+                                   "base_class":  "ContainerObject",
+                                   "inherited_members":  {
+
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "Loader":  {
                                    "members":  [
                                                    {

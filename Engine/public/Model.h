@@ -52,7 +52,7 @@ public:
 
 public:
 	const wstring& Get_ModelTag() const { return m_ModelTag; }
-	void Set_ModelTag(const wstring& tag) { m_ModelTag = tag; }
+	void Set_ModelTag(const wstring& tag);
 
 private:
 	HRESULT Ready_Bones(ifstream& in);

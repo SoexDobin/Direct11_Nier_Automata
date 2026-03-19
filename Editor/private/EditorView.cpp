@@ -3,8 +3,10 @@
 #include "ImGuizmo.h"
 #include <Transform.h>
 #include "UIObject.h"
-
+#include "Game.h"
+#include "ID_Helper.h"
 #include "EditorManager.h"
+#include "PathManager.h"
 
 static ImGuizmo::OPERATION m_CurrentGizmoMode = ImGuizmo::TRANSLATE;
 
@@ -107,6 +109,22 @@ void EditorView::RenderView(Bool isResize) {
 					Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
 					if (cloned)
 					{
+						auto allObjs = GAME_INSTANCE->Get_GameObjects();
+						int suffix = 0;
+						wstring baseName = cloned->Get_Name();
+						wstring uniqueName = baseName;
+						while (true) {
+							uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
+							bool overlap = false;
+							for (auto& [id, obj] : allObjs) {
+								if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
+							}
+							if (!overlap) break;
+							suffix++;
+						}
+						cloned->Set_Name(uniqueName);
+						cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
+
 						cloned->Get_Transform()->Set_LocalPositionByValue(spawnPos);
 						LOG_INFO(L"[SceneView] Dropped {} at ({}, {}, {})", prototypeTag, spawnPos.x, spawnPos.y, spawnPos.z);
 						EDITOR->Set_SelectedObject(cloned);
@@ -115,7 +133,6 @@ void EditorView::RenderView(Bool isResize) {
 				ImGui::EndDragDropTarget();
 			}
 
-			// 이미지 바로 아래에서 좌표 캡처
 			ImVec2 imageRectMin = ImGui::GetItemRectMin();
 			ImVec2 imageRectSize = ImGui::GetItemRectSize();
 
@@ -126,12 +143,20 @@ void EditorView::RenderView(Bool isResize) {
 	ImGui::End();
 
 	ImGui::Begin("Game View");
+
+	// 마우스가 GameView 컨텐츠 영역 내에 있거나, 카메라 등으로 마우스가 락(Lock)되어 있으면 입력 허용
+	Bool isGameViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+	GAME_INSTANCE->Set_InputEnabled(isGameViewHovered || GAME_INSTANCE->Get_MouseLock());
+
 	Bool loadFinished = GAME_INSTANCE->LevelLoad_Finished();
 	Bool canPlay = (EDITOR->Get_State() != EDITOR_STATE::PLAY);
 	Bool isPlayDisabled = canPlay && loadFinished;
 	if (!isPlayDisabled) ImGui::BeginDisabled();
 	if (ImGui::Button("Play")) {
-		EDITOR->Set_State(EDITOR_STATE::PLAY);
+		if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetSceneDataPath())))
+			EDITOR->Set_State(EDITOR_STATE::PLAY);
+		else
+			LOG_CRITICAL("Failed to Save Level Data");
 	}
 	if (!isPlayDisabled) ImGui::EndDisabled();
 	ImGui::SameLine();

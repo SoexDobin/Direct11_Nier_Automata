@@ -40,9 +40,6 @@
     <ClInclude Include="..\public\ThirdPersonCamera.h">
       <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Playable.h">
-      <Filter>02. GameObject\Playable</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\LoadingPixelPanel.h">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
@@ -75,6 +72,12 @@
     </ClInclude>
     <ClInclude Include="..\public\State2B_Run.h">
       <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Sprint.h">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\P10000Body.h">
+      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -114,9 +117,6 @@
     <ClCompile Include="..\private\ThirdPersonCamera.cpp">
       <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Playable.cpp">
-      <Filter>02. GameObject\Playable</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\LoadingPixelPanel.cpp">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
@@ -149,6 +149,12 @@
     </ClCompile>
     <ClCompile Include="..\private\State2B_Run.cpp">
       <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Sprint.cpp">
+      <Filter>02. GameObject\Playable\2B\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\P10000Body.cpp">
+      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +214,9 @@
     </Filter>
     <Filter Include="02. GameObject\Container">
       <UniqueIdentifier>{ff7c442c-47a2-4906-bafa-765b42b29c9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\2BPartObject">
+      <UniqueIdentifier>{860aeb7a-a17a-405c-af57-46faf234f476}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

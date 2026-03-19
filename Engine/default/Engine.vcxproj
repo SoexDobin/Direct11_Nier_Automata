@@ -272,13 +272,16 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\ResourceManager.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Camera_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\ContainerObject_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\GameObject_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">

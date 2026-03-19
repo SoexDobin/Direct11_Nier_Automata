@@ -9,7 +9,7 @@ class State2B_Walk final : public State2B
 {
 	RTTR_ENABLE(State2B)
 public:
-	explicit State2B_Walk(const wstring& tag, const Shared<P10000> owner);
+	explicit State2B_Walk(const wstring& tag, const Shared<P10000>& owner);
 	~State2B_Walk() override = default;
 
 public:

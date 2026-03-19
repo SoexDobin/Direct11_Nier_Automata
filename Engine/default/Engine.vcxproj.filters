@@ -451,5 +451,14 @@
     <ClCompile Include="..\private\ContainerObject.cpp">
       <Filter>01. Utility\04. GameObject\Container</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\ContainerObject_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Camera_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

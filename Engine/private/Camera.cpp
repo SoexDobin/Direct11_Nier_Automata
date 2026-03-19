@@ -58,6 +58,37 @@ void Camera::Bind_Aspect(Float aspect)
 	Bind_CameraTransform();
 }
 
+void Camera::Set_Target(const Shared<GameObject>& target)
+{
+	m_Target = target;
+	m_TargetID = m_Target.lock() ? m_Target.lock()->Get_ObjectID() : 0;
+	Update_CameraTransform(0.f);
+}
+
+Shared<GameObject> Camera::Get_Target() const
+{
+	if (!m_Target.expired())
+	{
+		return m_Target.lock();
+	}
+
+	return nullptr;
+}
+
+void Camera::Set_TargetID(uint32 targetID)
+{
+	m_TargetID = targetID;
+	if (m_TargetID != 0)
+	{
+		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(m_TargetID);
+	}
+	else
+	{
+		m_Target.reset();
+	}
+	Update_CameraTransform(0.f);
+}
+
 void Camera::Priority_Update(Float timeDelta)
 {
 	Update_CameraTransform(timeDelta);

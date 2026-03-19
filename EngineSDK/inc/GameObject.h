@@ -47,6 +47,7 @@ public:
     virtual void Fixed_Update(Float fixedDelta);
     virtual HRESULT Render();
     virtual void Submit_RenderGroup();
+    virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) final;
 
 public: // 충돌 함수
 protected:
@@ -75,8 +76,8 @@ protected: /* Component */
 
 public:
     inline Shared<Component> Get_Component(uint32 objectID);
-    const vector<Shared<Component>> Get_Components();
-    const vector<Shared<ScriptComponent>> Get_Scripts();
+    vector<Shared<Component>> Get_Components();
+    vector<Shared<ScriptComponent>> Get_Scripts();
     HRESULT Add_Component(const Shared<Component> &component);
     Shared<Component> Add_Component(uint32 objectID, void* arg = nullptr);
     Shared<Component> Add_Component(const wstring& prototypeTag, void* arg = nullptr);

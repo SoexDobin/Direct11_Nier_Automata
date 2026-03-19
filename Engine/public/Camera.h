@@ -23,13 +23,23 @@ public:
 
 public:
 	Float Get_FovY() const { return m_FovY; }
+	void Set_FovY(Float fov) { m_FovY = fov; }
 	Float Get_Aspect() const { return m_Aspect; }
+	void Set_Aspect(Float aspect);
 	Float Get_NearPlane() const { return m_Near; }
+	void Set_NearPlane(Float nearPlane) { m_Near = nearPlane; }
 	Float Get_FarPlane() const { return m_Far; }
+	void Set_FarPlane(Float farPlane) { m_Far = farPlane; }
 
 public:
-	void Set_Aspect(Float aspect);
+
 	void Bind_Aspect(Float aspect);
+
+public:
+	void Set_Target(const Shared<GameObject>& target);
+	Shared<GameObject> Get_Target() const;
+	uint32 Get_TargetID() const { return m_TargetID; }
+	void Set_TargetID(uint32 targetID);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -51,6 +61,9 @@ public:
 
 
 protected:
+	Weak<GameObject> m_Target{};
+	uint32		m_TargetID = 0;
+
 	Float		m_FovY{}, m_Aspect{}, m_Near{}, m_Far{};
 
 public:

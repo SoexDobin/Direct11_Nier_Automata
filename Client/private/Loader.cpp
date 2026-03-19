@@ -4,15 +4,7 @@
 #include "SpdLogger.h"
 
 #include "ClientSettingManager.h"
-#include "FreeCamera.h"
-#include "ThirdPersonCamera.h"
 #include "Game.h"
-#include "LoadingBackground.h"
-#include "LoadingLogo.h"
-
-#include "Monster.h"
-#include "Terrain.h"
-#include "P10000.h"
 
 
 Loader::Loader(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
@@ -125,8 +117,6 @@ HRESULT Loader::Loading_For_LogoLevel() {
     }
 
 
-    lstrcpy(m_LoadingText, TEXT("Loading Logo Level Texture... "));
-
     LIGHT_DESC			LightDesc{};
     LightDesc.type = LIGHT::DIRECTIONAL;
     LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
@@ -136,21 +126,6 @@ HRESULT Loader::Loading_For_LogoLevel() {
 
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
         return E_FAIL;
-
-
-    //auto back = GAME_INSTANCE->Instantiate<LoadingBackground>(L"LoadingBackground", ETOI(m_NextLevelID));
-    //auto logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"LoadingLogo", ETOI(m_NextLevelID));
-    //back->Add_Child(logo);
-    //
-    //auto p10000 = GAME_INSTANCE->Instantiate<P10000>(L"P10000", ETOI(m_NextLevelID));
-    //GAME_INSTANCE->Instantiate<Monster>(L"CityOfRuins", ETOI(m_NextLevelID));
-    //
-    //auto cam = GAME_INSTANCE->Instantiate<FreeCamera>(L"FreeCamera", ETOI(m_NextLevelID), &desc);
-    //auto tpcam = GAME_INSTANCE->Instantiate<ThirdPersonCamera>(L"ThirdPersonCamera", ETOI(m_NextLevelID), &desc);
-    //
-	//GAME_INSTANCE->Set_MainCamera(tpcam);
-	//tpcam->Set_Target(p10000);
-
 
     m_isFinished = true;
     if (!m_OwnerLevel.expired())

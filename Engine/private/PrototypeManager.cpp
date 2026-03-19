@@ -85,17 +85,8 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
         return E_FAIL;
     }
 
-    wstring finalTag = prototypeTag;
-    if (finalTag.empty()) {
-        finalTag = object->Get_Name();
-    }
-    wstring baseTag = finalTag;
-    int index = 0;
-
-    while (m_ObjectsID[levIndex].find(finalTag) != m_ObjectsID[levIndex].end()) {
-        finalTag = baseTag + L"_" + to_wstring(index);
-        index++;
-    }
+    if (FAILED(object->Initialize_Prototype(prototypeTag)))
+        return E_FAIL;
 
     if (prototype == PROTOTYPE::GAMEOBJECT) {
 		m_GameObjects[levIndex].emplace(object->Get_ObjectID(), static_pointer_cast<GameObject>(object));

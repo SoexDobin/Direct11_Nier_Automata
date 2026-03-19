@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Editor_Define.h"
 #include "Inspector.h"
 #include "EditorManager.h"
 #include "Component.h"
@@ -9,6 +10,7 @@
 #include "Transform.h"
 
 using namespace Engine;
+using namespace Editor;
 
 Inspector::Inspector() {}
 Inspector::~Inspector() {}
@@ -59,6 +61,24 @@ void Inspector::GameObjectGUI(const Shared<GameObject> &pObj) {
       ComponentGUI(typeName, transform);
     }
     ImGui::Separator();
+
+	/*Camera (If applicable)*/
+    auto cameraType = rttr::type::get_by_name("Camera");
+    if (cameraType.is_valid() && rttr::type::get(*pObj).is_derived_from(cameraType))
+    {
+        if (ImGui::CollapsingHeader("Camera Properties", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            for (auto& prop : rttr::type::get(*pObj).get_properties())
+            {
+                // Camera 클래스(또는 상위 클래스 중 Camera)에서 선언된 값들만 표시
+                if (prop.get_declaring_type() == cameraType)
+                {
+                    Render_Properties(prop, pObj);
+                }
+            }
+        }
+        ImGui::Separator();
+    }
 
   // ── Components 섹션 (Transform 제외)
   const auto &components = pObj->Get_Components();
@@ -185,16 +205,16 @@ void Inspector::ComponentGUI(const string& label, const Shared<Component>& compo
     ImGui::PopID();
 }
 
-void Inspector::Render_Properties(rttr::property prop, const Shared<Component>& component)
+void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
 {
     std::string propName = prop.get_name().to_string();
-    rttr::variant varValue = prop.get_value(*component);
+    rttr::variant varValue = prop.get_value(instance);
     if (!varValue.is_valid())
         return;
 
     /* 메타데이터 파싱 (Widget 형태) */
     std::string widgetStr{};
-    rttr::variant metaWidget = prop.get_metadata("Widget");
+    rttr::variant metaWidget = prop.get_metadata("SaveData");
     if (metaWidget.is_valid() && metaWidget.can_convert<std::string>())
     {
         widgetStr = metaWidget.to_string();
@@ -213,7 +233,7 @@ void Inspector::Render_Properties(rttr::property prop, const Shared<Component>& 
 
         if (ImGui::DragFloat3(propName.c_str(), reinterpret_cast<Float*>(&vec), speed))
         {
-            if (!prop.set_value(*component, vec))
+            if (!prop.set_value(instance, vec))
                 LOG_WARN("Failed to Set : {}", propName);
         }
     }
@@ -222,7 +242,7 @@ void Inspector::Render_Properties(rttr::property prop, const Shared<Component>& 
         Color col = varValue.get_value<Color>();
         if (ImGui::ColorEdit4(propName.c_str(), reinterpret_cast<float*>(&col)))
         {
-            if (!prop.set_value(*component, col))
+            if (!prop.set_value(instance, col))
                 LOG_WARN("Failed to Set : {}", propName);
         }
     }
@@ -238,7 +258,7 @@ void Inspector::Render_Properties(rttr::property prop, const Shared<Component>& 
 
         if (ImGui::SliderFloat(propName.c_str(), &val, minVal, maxVal))
         {
-            if (!prop.set_value(*component, val))
+            if (!prop.set_value(instance, val))
                 LOG_WARN("Failed to Set : {}", propName);
         }
     }
@@ -254,29 +274,139 @@ void Inspector::Render_Properties(rttr::property prop, const Shared<Component>& 
 
         if (ImGui::SliderInt(propName.c_str(), &val, minVal, maxVal))
         {
-            if (!prop.set_value(*component, val))
+            if (!prop.set_value(instance, val))
                 LOG_WARN("Failed to Set : {}", propName);
         }
     }
     else if (varValue.is_type<int>())
     {
         int val = varValue.get_value<int>();
-        if (ImGui::DragInt(propName.c_str(), &val)) prop.set_value(*component, val);
+        if (ImGui::DragInt(propName.c_str(), &val)) prop.set_value(instance, val);
     }
     else if (varValue.is_type<float>())
     {
         float val = varValue.get_value<float>();
-        if (ImGui::DragFloat(propName.c_str(), &val, 0.1f)) prop.set_value(*component, val);
+        if (ImGui::DragFloat(propName.c_str(), &val, 0.1f)) prop.set_value(instance, val);
     }
     else if (varValue.is_type<bool>())
     {
         bool val = varValue.get_value<bool>();
-        if (ImGui::Checkbox(propName.c_str(), &val)) prop.set_value(*component, val);
+        if (ImGui::Checkbox(propName.c_str(), &val)) prop.set_value(instance, val);
     }
     else if (varValue.is_type<std::string>())
     {
         std::string valStr = varValue.get_value<std::string>();
         ImGui::LabelText(propName.c_str(), "%s", valStr.c_str());
+    }
+    else if (widgetStr == "AssetDrop")
+    {
+        // wstring 안전 변환 시도
+        wstring wTag{};
+        if (varValue.can_convert<wstring>())
+            wTag = varValue.get_value<wstring>();
+        else if (varValue.can_convert<std::wstring>())
+            wTag = varValue.get_value<std::wstring>();
+
+        string sTag = Helper::To_String(wTag);
+        
+        ImVec2 size = ImVec2(ImGui::GetContentRegionAvail().x, 25);
+        ImGui::Button(sTag.empty() ? "(Empty Asset)" : sTag.c_str(), size);
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
+            {
+                // 페이로드 구조: "Type|Tag"
+                string payloadStr = (const char*)payload->Data;
+                size_t delimPos = payloadStr.find('|');
+                if (delimPos != string::npos)
+                {
+                    string droppedType = payloadStr.substr(0, delimPos);
+                    string droppedTag = payloadStr.substr(delimPos + 1);
+                    
+                    // RTTR 메타데이터의 AssetType과 일치하는지 확인
+                    rttr::variant metaType = prop.get_metadata("AssetType");
+                    string requiredType = metaType.is_valid() ? metaType.to_string() : "";
+
+                    if (requiredType == droppedType)
+                    {
+                        prop.set_value(instance, Helper::To_wString(droppedTag));
+                        LOG_INFO("Asset Updated: {} ({})", droppedTag, droppedType);
+                    }
+                    else
+                    {
+                        LOG_WARN("Asset Type Mismatch! Required: {}, Dropped: {}", requiredType, droppedType);
+                    }
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+        ImGui::SameLine();
+        ImGui::Text(propName.c_str());
+    }
+    else if (widgetStr == "GameObject")
+    {
+        uint32 currentID = 0;
+        rttr::variant var = prop.get_value(instance);
+        if (var.is_type<uint32>()) currentID = var.get_value<uint32>();
+        else if (var.is_type<int>()) currentID = static_cast<uint32>(var.get_value<int>());
+
+        // 1. 현재 타겟 정보 확보
+        string targetName = "None";
+        bool isLinked = false;
+        if (currentID != 0)
+        {
+            Shared<GameObject> targetObj = GAME_INSTANCE->Find_ObjectByObjectID(currentID);
+            if (targetObj)
+            {
+                targetName = Helper::To_String(targetObj->Get_Name());
+                isLinked = true;
+            }
+            else targetName = "Missing (" + to_string(currentID) + ")";
+        }
+
+        // 2. 에셋 슬롯 스타일 UI 렌더링
+        ImGui::Text(propName.c_str());
+        ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.4f);
+
+        // 슬롯 배경/테두리 스타일
+        ImVec2 slotSize = ImVec2(ImGui::GetContentRegionAvail().x - 30.f, 20.f);
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, isLinked ? ImVec4(0.2f, 0.4f, 0.6f, 1.0f) : ImVec4(0.15f, 0.15f, 0.15f, 1.0f));
+        
+        // InputText를 사용하여 이름 표시 (Assertion 방지를 위해 고정 버퍼 사용)
+        char buf[256];
+        strncpy_s(buf, targetName.c_str(), sizeof(buf));
+        ImGui::SetNextItemWidth(slotSize.x);
+        ImGui::InputText(("##" + propName).c_str(), buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
+        
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ObjectMove_PayLoadKey.c_str()))
+            {
+                uint32 droppedInstanceID = *(uint32*)payload->Data;
+                Shared<GameObject> droppedObj = GAME_INSTANCE->Find_ByInstanceID(droppedInstanceID);
+                if (droppedObj)
+                {
+                    uint32 droppedObjectID = droppedObj->Get_ObjectID();
+                    prop.set_value(instance, droppedObjectID);
+                    LOG_INFO("GameObject Linked: {} (ObjectID: {})", propName, droppedObjectID);
+                }
+                else
+                {
+                    LOG_WARN("Failed to Link GameObject: Invalid InstanceID.");
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+        ImGui::PopStyleColor();
+
+        // 3. 지우기 버튼 (X)
+        ImGui::SameLine();
+        if (ImGui::Button(("X##" + propName).c_str(), ImVec2(20, 20)))
+        {
+            prop.set_value(instance, 0u);
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Clear Reference");
     }
 
     // --- 읽기 전용 해제 ---

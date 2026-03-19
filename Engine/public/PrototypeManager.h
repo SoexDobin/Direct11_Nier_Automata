@@ -9,7 +9,7 @@ class GameObject;
 class Component;
 
 class PrototypeManager final : public EngineManager {
-  NO_COPY(PrototypeManager)
+	NO_COPY(PrototypeManager)
 public:
 	explicit PrototypeManager() = default;
 	~PrototypeManager() override = default;
@@ -44,10 +44,10 @@ private:
     mutable std::recursive_mutex m_PrototypeMutex;
 
 public:
-  static Unique<PrototypeManager> Create(uint32 levCount);
+	static Unique<PrototypeManager> Create(uint32 levCount);
 
 private: /* validation method*/
-  Bool Validate_Level(uint32 levIndex) const;
+	Bool Validate_Level(uint32 levIndex) const;
 };
 
 NS_END

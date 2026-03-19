@@ -3,6 +3,7 @@
 #include "EditorManager.h"
 #include "Game.h"
 #include "GameObject.h"
+#include "ID_Helper.h"
 
 
 
@@ -44,7 +45,25 @@ void Hierarchy::Render(Bool isResize) {
 
             Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
             if (cloned)
+            {
+                auto allObjs = GAME_INSTANCE->Get_GameObjects();
+                int suffix = 0;
+                wstring baseName = cloned->Get_Name();
+                wstring uniqueName = baseName;
+                while (true) {
+                    uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
+                    bool overlap = false;
+                    for (auto& [id, obj] : allObjs) {
+                        if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
+                    }
+                    if (!overlap) break;
+                    suffix++;
+                }
+                cloned->Set_Name(uniqueName);
+                cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
+
 				LOG_INFO(L"[Hierarchy] Spawned from prefab: {}", prototypeTag);
+            }
             else
 				LOG_WARN(L"[Hierarchy] Failed to spawn: {}", prototypeTag);
         }
@@ -111,6 +130,22 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
           Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
           if (cloned)
           {
+              auto allObjs = GAME_INSTANCE->Get_GameObjects();
+              int suffix = 0;
+              wstring baseName = cloned->Get_Name();
+              wstring uniqueName = baseName;
+              while (true) {
+                  uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
+                  bool overlap = false;
+                  for (auto& [id, obj] : allObjs) {
+                      if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
+                  }
+                  if (!overlap) break;
+                  suffix++;
+              }
+              cloned->Set_Name(uniqueName);
+              cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
+
               cloned->Set_Parent(pObj);
               LOG_INFO(L"[Hierarchy] Spawned {} as child of {}", prototypeTag, pObj->Get_Name());
           }
@@ -152,8 +187,8 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
       ImGui::EndDragDropTarget();
   }
 
-  // 클릭 감지 → Inspector 연동
-  if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+  // 클릭 감지 → Inspector 연동 (드래그 중에는 선택 변경 방지)
+  if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
     EDITOR->Set_SelectedObject(pObj);
   }
 

@@ -22,7 +22,7 @@ public:
   void Render(Bool isResize) override;
 
 private:
-	void Render_Properties(rttr::property prop, const Shared<Component>& component);
+	void Render_Properties(rttr::property prop, rttr::instance instance);
 
 private:
 	void GameObjectGUI(const Shared<Engine::GameObject> &pObj);

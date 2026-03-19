@@ -7,8 +7,7 @@
 
 GameObject::GameObject() {}
 
-GameObject::GameObject(const ComPtr<ID3D11Device> &device,
-                       const ComPtr<ID3D11DeviceContext> &context)
+GameObject::GameObject(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
     : m_Device(device), m_Context(context) {}
 GameObject::GameObject(const GameObject& prototype)
     : m_Device(prototype.m_Device), m_Context(prototype.m_Context),
@@ -176,6 +175,82 @@ HRESULT GameObject::Add_Child(const Shared<GameObject> &child) {
   return S_OK;
 }
 
+void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap)
+{
+	// 1. 자기 자신(GameObject)의 RTTR 프로퍼티 중 참조 필드 해결
+	rttr::type type = rttr::type::get(*this);
+	for (auto& prop : type.get_properties())
+	{
+		if (prop.get_metadata("SaveData") == "GameObject")
+		{
+			rttr::variant var = prop.get_value(*this);
+			uint32 targetObjectID = 0;
+
+			// 파일에서 로드된 ObjectID 추출
+			if (var.is_type<uint32>()) targetObjectID = var.get_value<uint32>();
+			else if (var.is_type<int>()) targetObjectID = static_cast<uint32>(var.get_value<int>());
+
+			if (targetObjectID != 0)
+			{
+				auto it = instanceMap.find(targetObjectID);
+				if (it != instanceMap.end())
+				{
+					rttr::type propType = prop.get_type();
+					// A. SharedPtr을 기대하는 경우
+					if (propType == rttr::type::get<Shared<GameObject>>())
+					{
+						prop.set_value(*this, it->second);
+					}
+					// B. InstanceID(런타임 ID)를 기대하는 경우 (Camera 타겟 등)
+					else if (propType == rttr::type::get<uint32>() || propType == rttr::type::get<int>())
+					{
+						prop.set_value(*this, targetObjectID);
+					}
+					
+					LOG_INFO(L"Resolved Reference: {} -> {} (ObjectID: {})", Get_Name(), it->second->Get_Name(), targetObjectID);
+				}
+			}
+		}
+	}
+
+	// 2. 소속 컴포넌트들의 참조 필드 해결
+    for (auto& [id, comp] : m_Components)
+    {
+        if (!comp) continue;
+
+        rttr::type compType = rttr::type::get(*comp);
+        for (auto& prop : compType.get_properties())
+        {
+            if (prop.get_metadata("SaveData") == "GameObject")
+            {
+                rttr::variant var = prop.get_value(*comp);
+                uint32 targetObjectID = 0;
+
+                if (var.is_type<uint32>()) targetObjectID = var.get_value<uint32>();
+                else if (var.is_type<int>()) targetObjectID = static_cast<uint32>(var.get_value<int>());
+
+                if (targetObjectID != 0)
+                {
+                    auto it = instanceMap.find(targetObjectID);
+                    if (it != instanceMap.end())
+                    {
+                        rttr::type propType = prop.get_type();
+                        if (propType == rttr::type::get<Shared<GameObject>>())
+                        {
+                            prop.set_value(*comp, it->second);
+                        }
+                        else if (propType == rttr::type::get<uint32>() || propType == rttr::type::get<int>())
+                        {
+                            prop.set_value(*comp, targetObjectID);
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}
+
 HRESULT GameObject::Remove_Child(const Shared<GameObject> &child) {
   if (m_IsDestroy)
     return S_OK;
@@ -211,7 +286,7 @@ Shared<Component> GameObject::Get_Component(uint32 objectID) {
   return nullptr;
 }
 
-const vector<Shared<Component>> GameObject::Get_Components()
+vector<Shared<Component>> GameObject::Get_Components()
 {
     if (m_Components.empty())
         return EMPTY_VECTOR<Shared<Component>>;
@@ -225,7 +300,7 @@ const vector<Shared<Component>> GameObject::Get_Components()
     return components;
 }
 
-const vector<Shared<ScriptComponent>> GameObject::Get_Scripts()
+vector<Shared<ScriptComponent>> GameObject::Get_Scripts()
 {
     if (m_Components.empty())
         return EMPTY_VECTOR<Shared<ScriptComponent>>;

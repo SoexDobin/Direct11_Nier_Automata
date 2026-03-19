@@ -91,7 +91,15 @@ NS_BEGIN(Helper)
 			default: 
         		break;
         }
+
+        
     }
 
+    static uint32 Create_FixedObjectID(const wstring& prototypeTag, const wstring& objectName)
+    {
+        // 입력값(Tag + Name)이 바뀌지 않는 한, 결과인 ObjectID는 영구히 고정됩니다. (불변성 보장)
+        wstring uniqueSeed = prototypeTag + L"_" + objectName;
+        return static_cast<uint32>(std::hash<wstring>{}(uniqueSeed));
+    }
 	NS_END
 NS_END

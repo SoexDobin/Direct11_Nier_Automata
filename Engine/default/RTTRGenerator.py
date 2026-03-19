@@ -5,14 +5,18 @@ import os
 from pathlib import Path
 from typing import Set
 
-def generate_rttr_logic(class_name: str, has_clone: bool, has_create: bool) -> str:
+def generate_rttr_logic(class_name: str, has_clone: bool, has_create: bool, has_create_prototype: bool, is_abstract: bool) -> str:
 	method_registrations = ""
 	if has_clone:
 		method_registrations += f'\n\t\t.method("Clone", &{class_name}::Clone)'
 	if has_create:
 		method_registrations += f'\n\t\t.method("Create", &{class_name}::Create)'
+	if has_create_prototype:
+		method_registrations += f'\n\t\t.method("CreatePrototype", &{class_name}::CreatePrototype)'
 	
-	return f'\tregistration::class_<{class_name}>("{class_name}")\n\t\t.constructor<>()' + method_registrations + '\n\t\t;'
+	constructor = "" if is_abstract else "\n\t\t.constructor<>()"
+	
+	return f'\tregistration::class_<{class_name}>("{class_name}")' + constructor + method_registrations + '\n\t\t;'
 
 def get_full_file_content(class_name: str, rttr_logic: str, namespace: str) -> str:
 	return f'''#include "pch.h"
@@ -31,21 +35,32 @@ RTTR_REGISTRATION
 def process_header_file(header_path: Path, output_dir: Path, processed_classes: Set[str], namespace: str = "Engine") -> bool:
 	try:
 		content = header_path.read_text(encoding='utf-8')
-		# Extract class name
-		class_match = re.search(r'\bclass\s+(?:ENGINE_DLL\s+)?(\w+)', content)
+		# Extract class name and check for abstract keyword (ignore forward declarations by requiring : or {)
+		class_match = re.search(r'\bclass\s+(?:ENGINE_DLL\s+)?(\w+)(?:\s+abstract)?\s*[:{]', content)
 		if not class_match:
 			return False
 		
 		class_name = class_match.group(1)
+		full_match = class_match.group(0)
+		is_abstract = "abstract" in full_match
+		
 		if class_name in processed_classes: return False
 		processed_classes.add(class_name)
 
-		# Skip enums and structs
-		if re.search(r'\benum\s+', content) or re.search(r'\bstruct\s+', content):
-			return False
+		# Check for pure virtual functions or PURE macro
+		if not is_abstract:
+			if re.search(r'virtual\s+.*= 0\s*;', content) or re.search(r'\bPURE\b', content):
+				is_abstract = True
+
+		# Check if the class is actually registered via RTTR_ENABLE or has RTTR logic
+		if "RTTR_ENABLE" not in content and "rttr::registration" not in content:
+			# If it doesn't have RTTR_ENABLE, we might still want to generate if it's a known class type
+			# But for now, let's keep it safe.
+			pass
 
 		has_clone = bool(re.search(r'\bClone\s*\(', content))
 		has_create = bool(re.search(r'\bstatic\s+.*\bCreate\s*\(', content))
+		has_create_prototype = bool(re.search(r'\bstatic\s+.*\bCreatePrototype\s*\(', content))
 		
 		output_filename = f"{class_name}_rttr.cpp"
 		output_file_path = output_dir / output_filename
@@ -57,7 +72,7 @@ def process_header_file(header_path: Path, output_dir: Path, processed_classes: 
 			return False
 		
 		# Only generate if it doesn't exist
-		new_logic = generate_rttr_logic(class_name, has_clone, has_create)
+		new_logic = generate_rttr_logic(class_name, has_clone, has_create, has_create_prototype, is_abstract)
 		full_content = get_full_file_content(class_name, new_logic, namespace)
 		output_file_path.write_text(full_content, encoding='utf-8')
 		print(f"[Create] {output_filename} generated.")

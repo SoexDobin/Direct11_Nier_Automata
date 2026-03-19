@@ -62,11 +62,10 @@ public:
 	wstring Get_TextureFilePath() const { return m_FilePath; }
 	uint32 Get_TextureNumSRVs() const { return m_NumSRVs; }
 	HRESULT Bind_ShaderResourceView(const Shared<Shader> &shader, const Char *constantName, uint32 index);
-	HRESULT Bind_Texture(const wstring& textureFilePath);
 
 	/* 씬 직렬화용 태그 접근자 */
 	const wstring& Get_TextureTag() const { return m_TextureTag; }
-	void Set_TextureTag(const wstring& tag) { m_TextureTag = tag; }
+	void Set_TextureTag(const wstring& tag);
 
 public:
 	void Set_TextureByIndex(uint32 texIndex);

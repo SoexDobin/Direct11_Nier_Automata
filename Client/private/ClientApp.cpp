@@ -21,7 +21,7 @@ HRESULT ClientApp::Initialize(const ENGINE_DESC &desc) {
     if (FAILED(ClientSettingManager::GetInstance()->Load_EngineDesc(ClientSettingManager::g_EngineDesc)))
         return E_FAIL;
 
-    if (FAILED(Ready_StartLevel(LEVEL::LOGO)))
+    if (FAILED(Ready_StartLevel(static_cast<LEVEL>(ClientSettingManager::g_EngineDesc.startLevel))))
       return E_FAIL;
 
     return S_OK;

@@ -5,6 +5,8 @@
 #include "Loader.h"
 #include <SpdLogger.h>
 
+#include "ClientSettingManager.h"
+
 LevelLoading::LevelLoading(const ComPtr<ID3D11Device> &device,
                            const ComPtr<ID3D11DeviceContext> &context)
     : Level{device, context}, m_Loader{nullptr}, m_NextLevel{LEVEL::LEVEL_END} {
@@ -30,8 +32,18 @@ void LevelLoading::Update_Level(Float timeDelta) {
         if (4 <= ETOI(m_NextLevel)) {
         		MSG_BOX("Failed to Created : NextLevel");
               return;
-        } else
-          LOG_INFO(L"LoadEnd Next Level : {}", ETOI(m_NextLevel));
+        } 
+        
+        // 1. 데이터 역직렬화 (Deserialize) 실행
+        if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(m_NextLevel)))
+        {
+            LOG_ERROR(L"Failed to load level {}", ETOI(m_NextLevel));
+            return;
+        }
+            
+
+        // 2. 실제 게임 레벨로 전환
+        //GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), Level_GamePlay::Create(m_Device, m_Context));
     }
     Level::Update_Level(timeDelta);
 }

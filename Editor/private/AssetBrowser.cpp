@@ -74,6 +74,65 @@ void AssetBrowser::Render_PrototypeList()
 			}
 		}
 	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	// ── 3. Resource List (Models) ──
+	if (ImGui::CollapsingHeader("Model Assets", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		vector<Shared<Model>> models = GAME_INSTANCE->Get_Models(levIndex);
+		if (levIndex != 0)
+		{
+			auto staticModels = GAME_INSTANCE->Get_Models(0);
+			models.insert(models.end(), staticModels.begin(), staticModels.end());
+		}
+
+		for (auto& pModel : models)
+		{
+			Render_ResourceItem(pModel->Get_ModelTag(), "Model");
+		}
+	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	// ── 4. Resource List (Textures) ──
+	if (ImGui::CollapsingHeader("Texture Assets", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		vector<wstring> textureTags = GAME_INSTANCE->Get_TextureTags(levIndex);
+		if (levIndex != 0)
+		{
+			auto staticTags = GAME_INSTANCE->Get_TextureTags(0);
+			textureTags.insert(textureTags.end(), staticTags.begin(), staticTags.end());
+		}
+
+		for (const auto& tag : textureTags)
+		{
+			Render_ResourceItem(tag, "Texture");
+		}
+	}
+}
+
+void AssetBrowser::Render_ResourceItem(const wstring& tag, const string& assetType)
+{
+	if (tag.empty()) return;
+
+	string sTag = Helper::To_String(tag);
+	Bool bSelected = false;
+	ImGui::Selectable(sTag.c_str(), &bSelected, ImGuiSelectableFlags_None, ImVec2(0.f, 24.f));
+
+	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+	{
+		// 페이로드 구조: "Type|Tag"
+		string payload = assetType + "|" + sTag;
+		ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", payload.c_str(), static_cast<int32>(payload.size() + 1));
+
+		ImGui::Text("Dragging %s: %s", assetType.c_str(), sTag.c_str());
+		ImGui::EndDragDropSource();
+	}
 }
 
 void AssetBrowser::Render_PrototypeItem(const Shared<GameObject> &pProto, uint32 objectID, uint32 levIndex)

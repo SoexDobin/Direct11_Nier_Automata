@@ -10,6 +10,11 @@ RTTR_REGISTRATION_NAMED(Model_RTTR)
         .method("Clone", &Model::Clone)
         .method("Create", &Model::Create)
 		.method("CreatePrototype", &Model::CreatePrototype)
+        .property("ModelTag", &Model::Get_ModelTag, &Model::Set_ModelTag)
+        (
+            metadata("SaveData", "AssetDrop"),
+            metadata("AssetType", "Model")
+        )
         ;
 }
 

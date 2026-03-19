@@ -4,25 +4,59 @@
       "levelIndex": 2,
       "objects": [
         {
-          "instanceID": 30118730,
-          "modelTag": "",
-          "name": "P10000",
-          "objectID": 2197762100,
-          "parentInstanceID": 0,
-          "prototypeTag": [
-            80,
-            49,
-            48,
-            48,
-            48,
-            48
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  -2.7622764110565186,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1600.0,
+                  512.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "TextureTag": "UI_Loading_Logo"
+              },
+              "typeName": "Texture"
+            }
           ],
-          "textureTag": "",
+          "instanceID": 1717364458,
+          "name": "LoadingLogo",
+          "objectID": 3729526162,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "LoadingLogo",
           "transform": {
             "position": [
-              -2.1228556632995605,
+              -2.7622764110565186,
               0.0,
-              0.49632930755615234
+              0.0
             ],
             "rotation": [
               0.0,
@@ -30,14 +64,83 @@
               0.0
             ],
             "scale": [
-              1.0,
-              1.0,
+              1600.0,
+              512.0,
               1.0
             ]
-          }
+          },
+          "typeName": "LoadingLogo"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  -6.498483657836914,
+                  0.0,
+                  3.3541059494018555
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1920.0,
+                  1080.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.23137255012989044
+                ],
+                "TextureTag": "UI_Loading_Pixel"
+              },
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            }
+          ],
+          "instanceID": 923739523,
+          "name": "LoadingPixelPanel",
+          "objectID": 2233491490,
+          "parentObjectID": 3729526162,
+          "properties": null,
+          "prototypeTag": "LoadingPixelPanel",
+          "transform": {
+            "position": [
+              -6.498483657836914,
+              0.0,
+              3.3541059494018555
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1920.0,
+              1080.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingPixelPanel"
         }
       ]
     }
   ],
-  "version": "1.1"
+  "version": "2.0"
 }

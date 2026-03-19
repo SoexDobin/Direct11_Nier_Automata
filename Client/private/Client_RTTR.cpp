@@ -20,7 +20,6 @@ using rttr::registration;
 #include "LoadingPixelPanel.h"
 #include "Monster.h"
 #include "Terrain.h"
-#include "ThirdPersonCamera.h"
 
 // </AUTO_GENERATED_INCLUDES>
 
@@ -44,7 +43,11 @@ void Register_Client_Reflection() {
         .method("Clone", &StateMachine::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return StateMachine::Create(device, context); })
         (rttr::metadata("Level", 0));
-
+    rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
+        .constructor<>()
+        .method("Clone", &ThirdPersonCamera::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return ThirdPersonCamera::Create(device, context); })
+		(rttr::metadata("Level", 0));
 
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
@@ -85,11 +88,6 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Terrain::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Terrain::Create(device, context); })(rttr::metadata("Level", 0));
-
-    rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
-        .constructor<>()
-        .method("Clone", &ThirdPersonCamera::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return ThirdPersonCamera::Create(device, context); })(rttr::metadata("Level", 0));
 
 
 // </AUTO_GENERATED_RTTR>

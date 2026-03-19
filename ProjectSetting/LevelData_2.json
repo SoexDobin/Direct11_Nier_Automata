@@ -1,0 +1,381 @@
+{
+  "levels": [
+    {
+      "levelIndex": 2,
+      "objects": [
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  -1.4675776958465576,
+                  0.0,
+                  -2.686185359954834
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": {
+                "ModelTag": "p10000"
+              },
+              "typeName": "Model"
+            }
+          ],
+          "instanceID": 4292872259,
+          "name": "P10000",
+          "objectID": 304936146,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "P10000",
+          "transform": {
+            "position": [
+              -1.4675776958465576,
+              0.0,
+              -2.686185359954834
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "P10000"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1600.0,
+                  512.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "TextureTag": "UI_Loading_Logo"
+              },
+              "typeName": "Texture"
+            }
+          ],
+          "instanceID": 851399519,
+          "name": "LoadingLogo",
+          "objectID": 3729526162,
+          "parentObjectID": 2233491490,
+          "properties": null,
+          "prototypeTag": "LoadingLogo",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1600.0,
+              512.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingLogo"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1920.0,
+                  1080.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.40784314274787903
+                ],
+                "TextureTag": "UI_Loading_Pixel"
+              },
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "instanceID": 3025958520,
+          "name": "LoadingPixelPanel",
+          "objectID": 2233491490,
+          "parentObjectID": 2031777346,
+          "properties": null,
+          "prototypeTag": "LoadingPixelPanel",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1920.0,
+              1080.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingPixelPanel"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  10.0,
+                  -10.0
+                ],
+                "Rotation": [
+                  44.99999237060547,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            }
+          ],
+          "instanceID": 941079347,
+          "name": "ThirdPersonCamera",
+          "objectID": 4249569602,
+          "parentObjectID": 0,
+          "properties": {
+            "FovY": 1.0471975803375244,
+            "GameObject": 0
+          },
+          "prototypeTag": "ThirdPersonCamera",
+          "transform": {
+            "position": [
+              0.0,
+              10.0,
+              -10.0
+            ],
+            "rotation": [
+              44.99999237060547,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "ThirdPersonCamera"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1980.0,
+                  1080.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "TextureTag": "UI_Loading_BackGround"
+              },
+              "typeName": "Texture"
+            }
+          ],
+          "instanceID": 4281758479,
+          "name": "LoadingBackground",
+          "objectID": 2031777346,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "LoadingBackground",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1980.0,
+              1080.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingBackground"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  -1.6302194595336914,
+                  0.0,
+                  0.05099773406982422
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": {
+                "ModelTag": "CityOfRuinsMainField"
+              },
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "instanceID": 2608529618,
+          "name": "CityOfRuins",
+          "objectID": 1208553506,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuins",
+          "transform": {
+            "position": [
+              -1.6302194595336914,
+              0.0,
+              0.05099773406982422
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuins"
+        }
+      ]
+    }
+  ],
+  "version": "2.0"
+}

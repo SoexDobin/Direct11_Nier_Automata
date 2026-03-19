@@ -33,24 +33,24 @@ void MenuBar::Render(Bool isResize) {
     }
 
     // ── SceneData 메뉴 ─────────────────────────────────────────────────
-    if (ImGui::BeginMenu("SceneData"))
+    if (ImGui::BeginMenu("LevelData"))
     {
       Bool isStop = (EDITOR->Get_State() == EDITOR_STATE::STOP);
 
       if (ImGui::MenuItem("Save", nullptr, false, isStop))
       {
         if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetSceneDataPath())))
-          LOG_INFO("Scene saved successfully.");
+          LOG_INFO("Level saved successfully.");
         else
-          LOG_ERROR(L"Scene save failed.");
+          LOG_ERROR(L"Level save failed.");
       }
 
       if (ImGui::MenuItem("Load", nullptr, false, isStop))
       {
         if (SUCCEEDED(GAME_INSTANCE->DeSerializeLevel(PATH.GetSceneDataPath())))
-          LOG_INFO("Scene loaded successfully.");
+          LOG_INFO("Level loaded successfully.");
         else
-          LOG_ERROR(L"Scene load failed.");
+          LOG_ERROR(L"Level load failed.");
       }
 
       if (!isStop)

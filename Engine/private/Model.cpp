@@ -86,6 +86,56 @@ HRESULT Model::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+void Model::Set_ModelTag(const wstring& tag)
+{
+	if (m_ModelTag == tag) return;
+
+	// 1. 새로운 프로토타입 검색
+	int32 levIndex = GAME_INSTANCE->Get_ContainLevelByModelTag(tag);
+	if (levIndex == -1)
+	{
+		LOG_ERROR(L"Failed to find Model {} in levels", tag);
+		return;
+	}
+
+	auto prototype = GAME_INSTANCE->Get_Model(levIndex, tag.c_str());
+	if (!prototype) return;
+
+	// ── 핵심 방어 코드: 자기 자신이 복사 대상(프로토타입)일 경우 ──
+	if (prototype.get() == this)
+	{
+		m_ModelTag = tag;
+		return;
+	}
+
+	// 2. 기존 리소스 정리
+	On_Destroy();
+
+	// 3. 데이터 깊은 복사 (프로토타입으로부터)
+	m_ModelTag = tag;
+	m_PreLocalTransformMatrix = prototype->m_PreLocalTransformMatrix;
+	m_IsSkeletal = prototype->m_IsSkeletal;
+	m_NumMeshes = prototype->m_NumMeshes;
+	m_Meshes = prototype->m_Meshes; // Mesh는 공유
+	m_NumMaterials = prototype->m_NumMaterials;
+	m_Materials = prototype->m_Materials; // Material은 공유
+	m_AnimationNames = prototype->m_AnimationNames;
+	m_NumBones = prototype->m_NumBones;
+	m_NumAnimation = prototype->m_NumAnimation;
+
+	// 본과 애니메이션은 상태를 가지므로 클론(Clone) 필수
+	m_Bones.clear();
+	for (auto& pBone : prototype->m_Bones)
+		m_Bones.push_back(static_pointer_cast<Bone>(pBone->Clone()));
+
+	m_Animations.clear();
+	for (auto& pAnim : prototype->m_Animations)
+		m_Animations.push_back(static_pointer_cast<Animation>(pAnim->Clone()));
+
+	// 애니메이션 초기 바인딩 업데이트
+	Update_ModelAnimation(0.f);
+}
+
 void Model::On_Destroy()
 {
 	m_Meshes.clear();

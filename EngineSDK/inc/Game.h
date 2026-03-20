@@ -85,18 +85,18 @@ public: /* For PrototypeManager */
     uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const;
     wstring Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
-	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex = UINT_MAX) const;
+	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const;
 
 private: /* For ObjectManager */
-	HRESULT Add_GameObject(const Shared<GameObject>& GameObject) const;
+	HRESULT Add_GameObject(const Shared<GameObject>& GameObject, uint32 levIndex) const;
 
 public: /* For ObjectManager */
 	void Submit_RenderGroup() const;
-	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects() const;
+	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects(uint32 levIndex) const;
 	HRESULT Clear_AllGameObjects() const;
-    Shared<GameObject> Find_ByInstanceID(uint32 instanceID) const;
-    Shared<GameObject> Find_ObjectByObjectID(uint32 objectID) const;
-    void Clearing_ObjectManager() const;
+    Shared<GameObject> Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const;
+    Shared<GameObject> Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const;
+    void Clearing_ObjectManager(uint32 levIndex) const;
 
 public: /* For CameraManager */
     HRESULT Add_Camera(const Shared<class Camera> &camera) const;
@@ -141,7 +141,7 @@ public: /* For.LightManager */
     HRESULT Remove_Light(uint32 index) const;
 
 public: /* For LevelSerialize */
-    HRESULT SerializeLevel(const wstring& path) const;
+    HRESULT SerializeLevel(uint32 levIndex, const wstring& path) const;
     HRESULT DeSerializeLevel(const wstring& path) const;
 
 public: /* Prototype & Instantiate Facade */
@@ -156,12 +156,12 @@ public: /* Prototype & Instantiate Facade */
         return std::static_pointer_cast<T>(cloned);
     }
     template <typename T>
-    Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) {
+    Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) {
         PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
         Shared<Object> cloned = Instantiate_Internal(protoType, prototypeTag, levIndex, arg);
         return std::static_pointer_cast<T>(cloned);
     }
-    Shared<Object> Instantiate(const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) const {
+    Shared<Object> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) const {
         Shared<Object> cloned = Instantiate_Internal(PROTOTYPE::COMPONENT, prototypeTag, levIndex, arg);
         return cloned;
     }

@@ -805,12 +805,7 @@
                                       },
                     "LevelTitle":  {
                                        "members":  [
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "",
-                                                           "name":  "m_NextLevel",
-                                                           "type":  "LEVEL"
-                                                       }
+
                                                    ],
                                        "base_class":  "Level",
                                        "inherited_members":  [

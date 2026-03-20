@@ -79,7 +79,7 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
   if (nullptr == (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount)))
     return E_FAIL;
 
-  if (nullptr == (m_ObjectManager = ObjectManager::Create()))
+  if (nullptr == (m_ObjectManager = ObjectManager::Create(engineDesc.levelCount)))
     return E_FAIL;
 
   if (nullptr == (m_ResourceManager = ResourceManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context(), engineDesc.levelCount)))
@@ -120,7 +120,8 @@ void Game::Update_Engine() {
 
   m_ObjectManager->Submit_RenderGroup();
 
-  m_ObjectManager->Cleanup_GameObjects();
+  m_ObjectManager->Cleanup_GameObjects(0);
+  m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
   m_CameraManager->Bind_MainCamera_Transform();
   m_Pipeline->Update_Pipeline();
 
@@ -138,7 +139,7 @@ HRESULT Game::Draw_NoClearing() const {
 
 void Game::Clear_AllResource() const {
     m_PrototypeManager->Clear_Prototypes();
-    m_ObjectManager->Clear_GameObjects();
+    m_ObjectManager->Clear_AllGameObjects();
     m_Renderer->Clear_RenderGroup();
     m_CameraManager->Clear_Cameras();
     m_LightManager->Clear_Lights();
@@ -151,8 +152,8 @@ void Game::Clear_Resource(uint32 levIndex) const {
 	if (FAILED(m_PrototypeManager->Clear_Prototypes(levIndex))) 
 		LOG_CRITICAL(L"Failed To Clear Level{} Prototypes", levIndex);
   
-    if (FAILED(m_ObjectManager->Clear_GameObjects())) 
-        LOG_CRITICAL(L"Failed To Clear GameObjects");
+    if (FAILED(m_ObjectManager->Clear_GameObjects(levIndex)))
+        LOG_CRITICAL(L"Failed To Clear Level{} GameObjects", levIndex);
 
 	if (FAILED(m_ResourceManager->Clear_Resource(levIndex)))
 		LOG_CRITICAL(L"Failed To Clear Resources");
@@ -170,9 +171,8 @@ void Game::Clear_Resource(uint32 levIndex) const {
 
 void Game::Clear_LoaderResource() const
 {
-    if (FAILED(m_ObjectManager->Clear_GameObjects()))
+    if (FAILED(m_ObjectManager->Clear_GameObjects(1)))
         LOG_CRITICAL(L"Failed To Clear GameObjects");
-
     if (FAILED(m_ResourceManager->Clear_Resource(1)))
         LOG_CRITICAL(L"Failed To Clear Resources");
     if (FAILED(m_Renderer->Clear_RenderGroup()))
@@ -308,8 +308,8 @@ wstring Game::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) con
     return m_PrototypeManager->Get_PrototypeTagFromObjectID(objectID, levIndex);
 }
 
-HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
-  if (FAILED(m_ObjectManager->Add_GameObject(gameObject))) {
+HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject, uint32 levIndex) const {
+  if (FAILED(m_ObjectManager->Add_GameObject(levIndex, gameObject))) {
     LOG_ERROR(L"Failed To Add GameObject");
     return E_FAIL;
   }
@@ -317,30 +317,30 @@ HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
   return S_OK;
 }
 
-void Game::Clearing_ObjectManager() const
+void Game::Clearing_ObjectManager(uint32 levIndex) const
 {
-    m_ObjectManager->Cleanup_GameObjects();
+    m_ObjectManager->Cleanup_GameObjects(levIndex);
 }
 
-Shared<GameObject> Game::Find_ByInstanceID(uint32 instanceID) const
+Shared<GameObject> Game::Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const
 {
-    return m_ObjectManager->Find_ByInstanceID(instanceID);
+    return m_ObjectManager->Find_ByInstanceID(levIndex, instanceID);
 }
 
-Shared<GameObject> Game::Find_ObjectByObjectID(uint32 objectID) const
+Shared<GameObject> Game::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const
 {
-    return m_ObjectManager->Find_ObjectByObjectID(objectID);
+    return m_ObjectManager->Find_ObjectByObjectID(levIndex, objectID);
 }
 
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
 
-const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects() const {
-    return m_ObjectManager->Get_GameObjects();
+const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects(uint32 levIndex) const {
+    return m_ObjectManager->Get_GameObjects(levIndex);
 }
 
 HRESULT Game::Clear_AllGameObjects() const
 {
-	if (FAILED(m_ObjectManager->Clear_GameObjects()))
+	if (FAILED(m_ObjectManager->Clear_AllGameObjects()))
 	{
 		LOG_ERROR(L"[Game] Failed To Clear All GameObjects");
 		return E_FAIL;
@@ -474,9 +474,9 @@ HRESULT Game::Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& obje
 {
     return m_PrototypeManager->Add_Prototype(levIndex, object, prototypeTag);
 }
-HRESULT Game::SerializeLevel(const wstring &path) const
+HRESULT Game::SerializeLevel(uint32 levIndex, const wstring &path) const
 {
-    return m_LevelSerializer->SerializeLevel(path);
+    return m_LevelSerializer->SerializeLevel(levIndex, path);
 }
 
 HRESULT Game::DeSerializeLevel(const wstring &path) const
@@ -487,17 +487,18 @@ HRESULT Game::DeSerializeLevel(const wstring &path) const
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
 {
     Shared<Object> pPrototype = nullptr;
+	uint32 targetLevel = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
-    if (levIndex != UINT_MAX)
-        pPrototype = m_PrototypeManager->Find_Prototype(protoType, levIndex, objectID);
-    if (!pPrototype)
+	// 1. Search in target level
+	pPrototype = m_PrototypeManager->Find_Prototype(protoType, targetLevel, objectID);
+    
+	// 2. Search in Static level (0)
+	if (!pPrototype && targetLevel != 0)
         pPrototype = m_PrototypeManager->Find_Prototype(protoType, 0, objectID);
 
-    // 3. 그래도 없으면 현재 레벨 시도
-    if (!pPrototype)
-    {
+    // 3. Search in Current level (if targetLevel was something else)
+    if (!pPrototype && targetLevel != m_LevelManager->Get_CurrentLevelIndex())
         pPrototype = m_PrototypeManager->Find_Prototype(protoType, m_LevelManager->Get_CurrentLevelIndex(), objectID);
-    }
 
     if (!pPrototype) 
         return nullptr;
@@ -507,7 +508,7 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, 
         auto pGameObject = std::static_pointer_cast<GameObject>(pPrototype);
         pCloned = pGameObject->Clone(arg);
         if (pCloned)
-            m_ObjectManager->Add_GameObject(std::static_pointer_cast<GameObject>(pCloned));
+            m_ObjectManager->Add_GameObject(targetLevel, std::static_pointer_cast<GameObject>(pCloned));
     }
     else {
         auto pComponent = std::static_pointer_cast<Component>(pPrototype);

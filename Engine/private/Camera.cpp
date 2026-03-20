@@ -80,7 +80,7 @@ void Camera::Set_TargetID(uint32 targetID)
 	m_TargetID = targetID;
 	if (m_TargetID != 0)
 	{
-		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(m_TargetID);
+		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(m_TargetID, GAME_INSTANCE->Get_CurrentLevelIndex());
 	}
 	else
 	{

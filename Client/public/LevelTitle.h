@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class Loader;
+class LoadingFade;
 
 class CLIENT_DLL LevelTitle final : public Level
 {
@@ -21,7 +21,11 @@ public:
 	HRESULT Render_Level() override;
 
 private:
-	LEVEL			m_NextLevel = {};
+	void Ready_LoadingUI();
+
+private:
+	Shared<LoadingFade>	m_FadeIn{ nullptr };
+	Shared<LoadingFade>	m_FadeOut{ nullptr };
 
 public:
 	static Shared<LevelTitle> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);

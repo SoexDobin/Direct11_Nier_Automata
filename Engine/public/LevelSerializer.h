@@ -9,7 +9,7 @@ public:
 	explicit LevelSerializer();
 	~LevelSerializer() override = default;
 
-	HRESULT SerializeLevel(const wstring& filePath);
+	HRESULT SerializeLevel(uint32 levIndex, const wstring& filePath);
 	HRESULT DeSerializeLevel(const wstring& filePath);
 
 private:

@@ -1,96 +1,133 @@
 #include "ObjectManager.h"
+
+#include "Game.h"
 #include "GameObject.h"
 
 HRESULT ObjectManager::Initialize(void *arg) {
-  m_LayerMask = ETOI(LAYER::ALL_LAYER);
+	m_LayerMask = ETOI(LAYER::ALL_LAYER);
+    m_LevelCount = *static_cast<uint32*>(arg);
 
-  return EngineManager::Initialize(arg);
+	m_ObjectByLayer.resize(m_LevelCount);
+	m_ObjectByType.resize(m_LevelCount);
+	m_ObjectByObject.resize(m_LevelCount);
+	m_ObjectByInstance.resize(m_LevelCount);
+
+	return EngineManager::Initialize(arg);
 }
 
 void ObjectManager::On_Destroy() {
-  Clear_GameObjects();
-
-  EngineManager::On_Destroy();
+	Clear_AllGameObjects();
+	EngineManager::On_Destroy();
 }
 
 void ObjectManager::PriorityUpdate(Float timeDelta) {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 1)
-      continue;
+    auto curLevel = GAME_INSTANCE->Get_CurrentLevelIndex();
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+	for (auto& [layerBit, objects] : m_ObjectByLayer[0]) {
+		for (auto& obj : objects) {
+			if (!obj->Is_Destroy() && obj->Is_Active())
+				obj->Priority_Update(timeDelta);
+		}
+	}
 
-      if (obj->Is_Active())
-        obj->Priority_Update(timeDelta);
-    }
-  }
+	if (curLevel != 0) {
+		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
+			if ((m_LayerMask & layerBit) == 1) continue;
+			for (auto& obj : objects) {
+				if (!obj->Is_Destroy() && obj->Is_Active())
+					obj->Priority_Update(timeDelta);
+			}
+		}
+	}
 }
 
 void ObjectManager::Update(Float timeDelta) {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 1)
-      continue;
+    auto curLevel = GAME_INSTANCE->Get_CurrentLevelIndex();
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+	for (auto& [layerBit, objects] : m_ObjectByLayer[0]) {
+		for (auto& obj : objects) {
+			if (!obj->Is_Destroy() && obj->Is_Active())
+				obj->Update(timeDelta);
+		}
+	}
 
-      if (obj->Is_Active())
-        obj->Update(timeDelta);
-    }
-  }
+	if (curLevel != 0) {
+		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
+			if ((m_LayerMask & layerBit) == 1) continue;
+			for (auto& obj : objects) {
+				if (!obj->Is_Destroy() && obj->Is_Active())
+					obj->Update(timeDelta);
+			}
+		}
+	}
 }
 
 void ObjectManager::LateUpdate(Float timeDelta) {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 1)
-      continue;
+    auto curLevel = GAME_INSTANCE->Get_CurrentLevelIndex();
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+	for (auto& [layerBit, objects] : m_ObjectByLayer[0]) {
+		for (auto& obj : objects) {
+			if (!obj->Is_Destroy() && obj->Is_Active())
+				obj->Late_Update(timeDelta);
+		}
+	}
 
-      if (obj->Is_Active())
-        obj->Late_Update(timeDelta);
-    }
-  }
+	if (curLevel != 0) {
+		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
+			if ((m_LayerMask & layerBit) == 1) continue;
+			for (auto& obj : objects) {
+				if (!obj->Is_Destroy() && obj->Is_Active())
+					obj->Late_Update(timeDelta);
+			}
+		}
+	}
 }
 
 void ObjectManager::FixedUpdate(Float fixedDelta) {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 1)
-      continue;
+    auto curLevel = GAME_INSTANCE->Get_CurrentLevelIndex();
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+	for (auto& [layerBit, objects] : m_ObjectByLayer[0]) {
+		for (auto& obj : objects) {
+			if (!obj->Is_Destroy() && obj->Is_Active())
+				obj->Fixed_Update(fixedDelta);
+		}
+	}
 
-      if (obj->Is_Active())
-        obj->Fixed_Update(fixedDelta);
-    }
-  }
+	if (curLevel != 0) {
+		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
+			if ((m_LayerMask & layerBit) == 1) continue;
+			for (auto& obj : objects) {
+				if (!obj->Is_Destroy() && obj->Is_Active())
+					obj->Fixed_Update(fixedDelta);
+			}
+		}
+	}
 }
 
 void ObjectManager::Submit_RenderGroup() {
-  for (auto &[layerBit, objects] : m_ObjectByLayer) {
-    if ((m_LayerMask & layerBit) == 1)
-      continue;
+    auto curLevel = GAME_INSTANCE->Get_CurrentLevelIndex();
 
-    for (auto &obj : objects) {
-      if (obj->Is_Destroy())
-        continue;
+	for (auto& [layerBit, objects] : m_ObjectByLayer[0]) {
+		for (auto& obj : objects) {
+			if (!obj->Is_Destroy() && obj->Is_Active())
+				obj->Submit_RenderGroup();
+		}
+	}
 
-      if (obj->Is_Active())
-        obj->Submit_RenderGroup();
-    }
-  }
+	if (curLevel != 0) {
+		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
+			if ((m_LayerMask & layerBit) == 1) continue;
+			for (auto& obj : objects) {
+				if (!obj->Is_Destroy() && obj->Is_Active())
+					obj->Submit_RenderGroup();
+			}
+		}
+	}
 }
 
-void ObjectManager::Cleanup_GameObjects() {
+void ObjectManager::Cleanup_GameObjects(uint32 levIndex) {
     vector<Shared<GameObject>> garbages;
-    for (auto &[layerBit, objects] : m_ObjectByLayer) {
+    for (auto &[layerBit, objects] : m_ObjectByLayer[levIndex]) {
 		for (auto &obj : objects) {
 			if (obj->Is_Destroy()) {
 				garbages.push_back(obj);
@@ -102,17 +139,17 @@ void ObjectManager::Cleanup_GameObjects() {
 		garbage->On_Destroy();
     }
 
-    for (auto &[layerBit, objects] : m_ObjectByLayer) {
-		std::erase_if(objects, [this](const Shared<GameObject> &object) {
+    for (auto &[layerBit, objects] : m_ObjectByLayer[levIndex]) {
+		std::erase_if(objects, [&](const Shared<GameObject> &object) {
 			if (object->Is_Destroy()) // 삭제 대상 처리
 			{
-                m_ObjectByInstance.erase(object->Get_InstanceID());
-                if (m_ObjectByObject.contains(object->Get_ObjectID())) {
-                    auto& objectVec = m_ObjectByObject[object->Get_ObjectID()];
+                m_ObjectByInstance[levIndex].erase(object->Get_InstanceID());
+                if (m_ObjectByObject[levIndex].contains(object->Get_ObjectID())) {
+                    auto& objectVec = m_ObjectByObject[levIndex][object->Get_ObjectID()];
                     std::erase(objectVec, object);
                 }
-				if (m_ObjectByType.contains(object->Get_TypeID())) {
-					auto& typeVec = m_ObjectByType[object->Get_TypeID()];
+				if (m_ObjectByType[levIndex].contains(object->Get_TypeID())) {
+					auto& typeVec = m_ObjectByType[levIndex][object->Get_TypeID()];
 					std::erase(typeVec, object);
 				}
 				return true;
@@ -122,92 +159,118 @@ void ObjectManager::Cleanup_GameObjects() {
     }
 }
 
-HRESULT ObjectManager::Add_GameObject(const Shared<GameObject>& object) {
-    m_ObjectByLayer[object->Get_LayerMask().Get_Layer()].push_back(object);
-    m_ObjectByType[object->Get_TypeID()].push_back(object);
-    m_ObjectByObject[object->Get_ObjectID()].push_back(object);
-    m_ObjectByInstance.emplace(object->Get_InstanceID(), object);
+HRESULT ObjectManager::Add_GameObject(uint32 levIndex, const Shared<GameObject>& object) {
+    m_ObjectByLayer[levIndex][object->Get_LayerMask().Get_Layer()].push_back(object);
+    m_ObjectByType[levIndex][object->Get_TypeID()].push_back(object);
+    m_ObjectByObject[levIndex][object->Get_ObjectID()].push_back(object);
+    m_ObjectByInstance[levIndex].emplace(object->Get_InstanceID(), object);
 
     return S_OK;
 }
 
-HRESULT ObjectManager::Clear_GameObjects() {
-    for (auto &layer : m_ObjectByLayer) {
+HRESULT ObjectManager::Clear_GameObjects(uint32 levIndex) {
+	if (levIndex >= m_LevelCount) return E_FAIL;
+
+    for (auto &layer : m_ObjectByLayer[levIndex]) {
 		for (auto &obj : layer.second) {
 			if (!obj->Is_Destroy()) {
-			obj->On_Destroy();
-			Object::Destroy(obj);
+				obj->On_Destroy();
+				Object::Destroy(obj);
 			}
 		}
 		layer.second.clear();
     }
 
-    m_ObjectByType.clear();
-    m_ObjectByObject.clear();
-    m_ObjectByInstance.clear();
+	m_ObjectByLayer[levIndex].clear();
+    m_ObjectByType[levIndex].clear();
+    m_ObjectByObject[levIndex].clear();
+    m_ObjectByInstance[levIndex].clear();
 
     m_LayerMask = ETOI(LAYER::ALL_LAYER);
     return S_OK;
 }
 
-Shared<GameObject> ObjectManager::Find_ObjectByType(uint32 typeID) {
-    if (!m_ObjectByType.contains(typeID) || m_ObjectByType[typeID].empty()) {
+HRESULT ObjectManager::Clear_AllGameObjects()
+{
+	for (uint32 i = 0; i < m_LevelCount; ++i)
+	{
+		for (auto& layer : m_ObjectByLayer[i]) {
+			for (auto& obj : layer.second) {
+				if (!obj->Is_Destroy()) {
+					obj->On_Destroy();
+					Object::Destroy(obj);
+				}
+			}
+			layer.second.clear();
+		}
+		m_ObjectByLayer[i].clear();
+		m_ObjectByType[i].clear();
+		m_ObjectByObject[i].clear();
+		m_ObjectByInstance[i].clear();
+	}
+
+	m_LayerMask = ETOI(LAYER::ALL_LAYER);
+	return S_OK;
+}
+
+Shared<GameObject> ObjectManager::Find_ObjectByType(uint32 levIndex, uint32 typeID) {
+    if (!m_ObjectByType[levIndex].contains(typeID) || m_ObjectByType[levIndex][typeID].empty()) {
 		MSG_BOX("Failed To Find GameObject By TypeID");
 		return nullptr;
     }
 
-    return m_ObjectByType[typeID].front();
+    return m_ObjectByType[levIndex][typeID].front();
 }
 
-const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByTypes(uint32 typeID) {
-    if (!m_ObjectByType.contains(typeID) || m_ObjectByType[typeID].empty()) {
+const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByTypes(uint32 levIndex, uint32 typeID) {
+    if (!m_ObjectByType[levIndex].contains(typeID) || m_ObjectByType[levIndex][typeID].empty()) {
         MSG_BOX("Failed To Find GameObject By TypeID");
         return EMPTY_VECTOR<Shared<GameObject>>;
     }
 
-    return m_ObjectByType[typeID];
+    return m_ObjectByType[levIndex][typeID];
 }
 
-Shared<GameObject> ObjectManager::Find_ObjectByObjectID(uint32 objectID) {
-    if (!m_ObjectByObject.contains(objectID)) {
+Shared<GameObject> ObjectManager::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) {
+    if (!m_ObjectByObject[levIndex].contains(objectID)) {
         MSG_BOX("Failed To Find GameObject By ObjectID");
         return nullptr;
     }
 
-    return m_ObjectByObject[objectID].front();
+    return m_ObjectByObject[levIndex][objectID].front();
 }
 
-const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByObjectID(uint32 objectID) {
-    if (!m_ObjectByObject.contains(objectID)) {
+const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByObjectID(uint32 levIndex, uint32 objectID) {
+    if (!m_ObjectByObject[levIndex].contains(objectID)) {
         MSG_BOX("Failed To Find GameObject By ObjectID");
         return EMPTY_VECTOR<Shared<GameObject>>;
     }
 
-    return m_ObjectByObject[objectID];
+    return m_ObjectByObject[levIndex][objectID];
 }
 
 
-Shared<GameObject> ObjectManager::Find_ByInstanceID(uint32 instanceID)
+Shared<GameObject> ObjectManager::Find_ByInstanceID(uint32 levIndex, uint32 instanceID)
 {
-    if (!m_ObjectByInstance.contains(instanceID)) {
+    if (!m_ObjectByInstance[levIndex].contains(instanceID)) {
         MSG_BOX("Failed To Find GameObject By InstanceID");
         return nullptr;
     }
 
-    return m_ObjectByInstance[instanceID];
+    return m_ObjectByInstance[levIndex][instanceID];
 }
 
-const unordered_map<uint32, Shared<GameObject>>& ObjectManager::Get_GameObjects() {
-	return m_ObjectByInstance;
+const unordered_map<uint32, Shared<GameObject>>& ObjectManager::Get_GameObjects(uint32 levIndex) {
+	return m_ObjectByInstance[levIndex];
 }
 
-Unique<ObjectManager> ObjectManager::Create() {
-  auto objectManager = make_unique<ObjectManager>();
+Unique<ObjectManager> ObjectManager::Create(uint32 levCount) {
+	auto objectManager = make_unique<ObjectManager>();
 
-  if (FAILED(objectManager->Initialize(nullptr))) {
-    MSG_BOX("Failed To Create ObjectManager");
-    return nullptr;
-  }
+	if (FAILED(objectManager->Initialize(&levCount))) {
+		MSG_BOX("Failed To Create ObjectManager");
+		return nullptr;
+	}
 
-  return objectManager;
+	return objectManager;
 }

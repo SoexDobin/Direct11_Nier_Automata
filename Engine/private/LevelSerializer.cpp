@@ -45,20 +45,19 @@ LevelSerializer::LevelSerializer() : EngineManager{}
 {
 }
 
-HRESULT LevelSerializer::SerializeLevel(const wstring& filePath)
+HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath)
 {
 	nlohmann::json root;
 	root["version"] = "2.0"; // RTTR 기반 버전
 	auto& levelsArray = root["levels"];
 
-	const auto& allObjects = GAME_INSTANCE->Get_GameObjects();
+	const auto& allObjects = GAME_INSTANCE->Get_GameObjects(levIndex);
 	map<uint32, vector<Shared<GameObject>>> levelMap;
 
 	for (auto& [instanceID, pObj] : allObjects)
 	{
 		if (!pObj || pObj->Is_Destroy()) continue;
-		uint32 objLevel = GAME_INSTANCE->Get_CurrentLevelIndex(); 
-		levelMap[objLevel].push_back(pObj);
+		levelMap[levIndex].push_back(pObj);
 	}
 
 	for (auto& [levIndex, objects] : levelMap)

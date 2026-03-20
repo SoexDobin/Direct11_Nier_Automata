@@ -65,22 +65,18 @@ void LoadingFade::Update(Float timeDelta)
     if (m_IsFadeEnd) return;
     if (m_FadeFlag)
     {
-        m_Texture->Set_RGBA(Color{ 1.f, 1.f, 1.f, m_Alpha + (timeDelta / m_FadeSpeed) });
-        if (m_Alpha >= 255.f) m_IsFadeEnd = true;
+        m_Alpha = m_Alpha + (timeDelta * m_FadeSpeed);
+        m_Texture->Set_RGBA(Color{ 1.f, 1.f, 1.f, m_Alpha });
+        if (m_Alpha >= 1.f) 
+            m_IsFadeEnd = true;
     }
     else
     {
-        m_Texture->Set_RGBA(Color{ 1.f, 1.f, 1.f, m_Alpha - (timeDelta / m_FadeSpeed) });
-        if (m_Alpha <= 0.f) m_IsFadeEnd = true;
+        m_Alpha = m_Alpha - (timeDelta * m_FadeSpeed);
+        m_Texture->Set_RGBA(Color{ 1.f, 1.f, 1.f, m_Alpha });
+        if (m_Alpha <= 0.f) 
+            m_IsFadeEnd = true;
     }
-}
-
-void LoadingFade::Late_Update(Float timeDelta) {
-    
-}
-
-void LoadingFade::Fixed_Update(Float fixedDelta) {
-    
 }
 
 HRESULT LoadingFade::Render() {
@@ -130,7 +126,7 @@ HRESULT LoadingFade::Ready_Components()
     if (nullptr == m_Shader)
         return E_FAIL;
 
-    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::LOADING), L"UI_Loading_BackGround" };
+    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::STATIC), L"UI_Loading_Fade" };
     m_Texture = Add_Component<Texture>(&textureDesc);
     if (nullptr == m_Texture)
         return E_FAIL;
@@ -159,7 +155,7 @@ Shared<GameObject> LoadingFade::Clone(void* arg) {
     auto logo = make_shared<LoadingFade>(*this);
 
     if (FAILED(logo->Initialize(arg))) {
-        LOG_ERROR(L"Failed To CreateComponent LoadingFade");
+        LOG_ERROR(L"Failed To Create LoadingFade");
         return nullptr;
     }
 

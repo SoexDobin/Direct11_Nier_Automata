@@ -3,6 +3,8 @@
 
 #include <SpdLogger.h>
 
+#include "ClientSettingManager.h"
+
 LevelGamePlay::LevelGamePlay(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Level{ device, context }
 {
@@ -10,6 +12,13 @@ LevelGamePlay::LevelGamePlay(const ComPtr<ID3D11Device>& device, const ComPtr<ID
 
 HRESULT LevelGamePlay::Initialize(void* arg)
 {
+
+	if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(LEVEL::GAMEPLAY)))
+	{
+		LOG_CRITICAL(L"Failed To Load GamePlay Level");
+		return E_FAIL;
+	}
+
 	return Level::Initialize(arg);
 }
 

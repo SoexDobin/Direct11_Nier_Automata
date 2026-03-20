@@ -12,8 +12,7 @@ void LevelManager::On_Destroy() { m_CurrentLevel.reset(); }
 HRESULT LevelManager::Change_Level(uint32 levIndex,const Shared<Level>& level) {
     if (nullptr != m_CurrentLevel)
     {
-        if (levIndex == 1)
-			Game::GetInstance()->Clear_Resource(m_CurrentLevelIndex);
+        Game::GetInstance()->Clear_Resource(m_CurrentLevelIndex);
     }
 
     m_CurrentLevel = level;

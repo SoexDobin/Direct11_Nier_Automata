@@ -97,6 +97,8 @@ HRESULT LoadingPixelPanel::Ready_Components()
     if (nullptr == m_Texture)
         return E_FAIL;
 
+    m_Texture->Set_RGBA(Color{ 1.f, 1.f, 1.f, 0.2f });
+
     m_BufferRect = Add_Component<VIBuffer_Rect>();
     if (nullptr == m_BufferRect)
         return E_FAIL;

@@ -12,7 +12,13 @@ public:
 
 public:
 	void Clear_LevelMembers() { m_CurrentLevel = nullptr; m_CurrentLevelIndex= {}; }
-	Bool Is_LoadFinished() const { return m_CurrentLevel->Load_Finished(); }
+	Bool Is_LoadFinished() const
+	{
+		if (m_CurrentLevel)
+			return m_CurrentLevel->Load_Finished();
+		else
+			return false;
+	}
 	uint32 Get_CurrentLevelIndex() const { return m_CurrentLevelIndex; }
 	Shared<Level> Get_CurrentLevel() const { return m_CurrentLevel; }
 

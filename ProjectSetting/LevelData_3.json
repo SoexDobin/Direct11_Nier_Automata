@@ -1,0 +1,64 @@
+{
+  "levels": [
+    {
+      "levelIndex": 3,
+      "objects": [
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  10.0,
+                  -10.0
+                ],
+                "Rotation": [
+                  44.999996185302734,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            }
+          ],
+          "instanceID": 3998572193,
+          "name": "ThirdPersonCamera",
+          "objectID": 4249569602,
+          "parentObjectID": 0,
+          "properties": {
+            "Aspect": 1.7777777910232544,
+            "Far": 500.0,
+            "FovY": 1.0471975803375244,
+            "Near": 0.10000000149011612,
+            "TargetID": 0
+          },
+          "prototypeTag": "ThirdPersonCamera",
+          "transform": {
+            "position": [
+              0.0,
+              10.0,
+              -10.0
+            ],
+            "rotation": [
+              44.999996185302734,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "ThirdPersonCamera"
+        }
+      ]
+    }
+  ],
+  "version": "2.0"
+}

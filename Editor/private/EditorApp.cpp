@@ -23,7 +23,7 @@ HRESULT EditorApp::Initialize() {
     desc.hInst = g_hInst;
     desc.winMode = WINMODE::WIN;
     desc.levelCount = ClientSettingManager::GetInstance()->Get_LevelCount();
-    desc.startLevel = 2;
+    desc.startLevel = 3;
     desc.viewportWidth = 1920;
     desc.viewportHeight = 1080;
     desc.useOffscreenRendering = true;
@@ -73,25 +73,12 @@ void EditorApp::Update() {
     if (EDITOR->Is_ResetRequested()) {
         ENGINE_DESC& desc = EDITOR->Get_EngineDesc();
         uint32 oldLevel = desc.startLevel;
-        m_IsAutoLoadPending = EDITOR->Is_AutoLoadEnabled();
         Change_ClientLevel(oldLevel);
         EDITOR->Clear_ResetRequest();
     }
 
-    if (m_IsAutoLoadPending && GAME_INSTANCE->LevelLoad_Finished()) {
-        GAME_INSTANCE->DeSerializeLevel(PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()));
-        m_IsAutoLoadPending = false;
-    }
-
     if (m_IsReset) {
         Reset_ClientApp();
-    }
-
-    if (GAME_INSTANCE->Get_CurrentLevelIndex() == 1 &&
-        m_StartLevel != 1 &&
-        EDITOR->Get_State() == EDITOR_STATE::STOP)
-    {
-        GAME_INSTANCE->Get_CurrentLevel()->Update_LoadLevel(0.167777f);
     }
     
     if (EDITOR->Is_ResizeRequest()) {
@@ -198,15 +185,6 @@ void EditorApp::Reset_ClientApp() {
 
 void EditorApp::Change_ClientLevel(uint32 levIndex) {
     Bool isPassing = levIndex != 1;
-
-    if (isPassing )
-    {
-        EDITOR->Set_State(EDITOR_STATE::STOP);
-    }
-    else
-    {
-        EDITOR->Set_State(EDITOR_STATE::LOADING);
-    }
 
     m_ClientApp.reset();
     GAME_INSTANCE->Clear_Resource(levIndex);

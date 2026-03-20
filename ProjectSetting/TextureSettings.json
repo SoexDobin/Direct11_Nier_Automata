@@ -3,14 +3,8 @@
         {
             "count": 1,
             "level": "STATIC",
-            "path": "\" Default/Default.dds\"",
-            "tag": "\" Prototype_Component_Texture_Default\""
-        },
-        {
-            "count": 1,
-            "level": "STATIC",
-            "path": "Default/Tile_0.dds",
-            "tag": "Tile_0"
+            "path": "UI/Loading/Loading_Fade.dds",
+            "tag": "UI_Loading_Fade"
         },
         {
             "count": 1,

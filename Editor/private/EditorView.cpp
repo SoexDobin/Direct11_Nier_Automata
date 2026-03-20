@@ -112,7 +112,7 @@ void EditorView::RenderView(Bool isResize) {
 					Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, GAME_INSTANCE->Get_CurrentLevelIndex());
 					if (cloned)
 					{
-						auto allObjs = GAME_INSTANCE->Get_GameObjects();
+						auto allObjs = GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
 						int suffix = 0;
 						wstring baseName = cloned->Get_Name();
 						wstring uniqueName = baseName;
@@ -161,11 +161,10 @@ void EditorView::RenderView(Bool isResize) {
 
 	Bool loadFinished = GAME_INSTANCE->LevelLoad_Finished();
 	Bool canPlay = (EDITOR->Get_State() != EDITOR_STATE::PLAY);
-	Bool isLoading = (EDITOR->Get_State() != EDITOR_STATE::LOADING);
-	Bool isPlayDisabled = canPlay && loadFinished && isLoading;
+	Bool isPlayDisabled = canPlay && loadFinished;
 	if (!isPlayDisabled) ImGui::BeginDisabled();
 	if (ImGui::Button("Play")) {
-		if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()))))
+		if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(GAME_INSTANCE->Get_CurrentLevelIndex(), PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()))))
 			EDITOR->Set_State(EDITOR_STATE::PLAY);
 		else
 			LOG_CRITICAL("Failed to Save Level Data");
@@ -275,7 +274,7 @@ void EditorView::MousePicking(ImVec2 viewport, ImVec2 imageStartPos)
 		Float minDistance = FLT_MAX;
 		
 		// 모든 객체를 순회하며 피킹 검사
-		for (auto& pair : GAME_INSTANCE->Get_GameObjects()) {
+		for (auto& pair : GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex())) {
 			auto obj = pair.second;
 
 			if (obj == EDITOR->Get_EditorCamera()) continue;

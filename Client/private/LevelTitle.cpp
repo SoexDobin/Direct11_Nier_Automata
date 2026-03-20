@@ -5,6 +5,7 @@
 
 #include "ClientSettingManager.h"
 #include "LevelGamePlay.h"
+#include "LevelLoading.h"
 #include "Loader.h"
 #include "LoadingFade.h"
 
@@ -16,6 +17,8 @@ HRESULT LevelTitle::Initialize(void* arg)
 	if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(LEVEL::TITLE)))
 		return E_FAIL;
 
+	Ready_LoadingUI();
+
 	return Level::Initialize(arg);
 }
 
@@ -26,18 +29,44 @@ void LevelTitle::On_Destroy()
 
 void LevelTitle::Update_Level(Float timeDelta)
 {
-	if (GAME_INSTANCE->Get_DIKeyState(DIK_SPACE) & 0x80)
-	{
-		GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelGamePlay::Create(m_Device, m_Context, LEVEL::GAMEPLAY));
-	}
+	m_FadeOut->Update(timeDelta);
 
-	Level::Update_Level(timeDelta);
+	
+		
+	if (m_FadeOut->Fade_End())
+	{
+		if (!m_FadeIn->Is_Active() && GAME_INSTANCE->Get_DIKeyState(DIK_SPACE) & 0x80)
+			m_FadeIn->Set_Active(true);
+
+		m_FadeIn->Update(timeDelta);
+		if ( m_FadeIn->Fade_End())
+		{
+			GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelLoading::Create(m_Device, m_Context, LEVEL::GAMEPLAY));
+		}
+	}
 }
 
 HRESULT LevelTitle::Render_Level()
 {
-	return Level::Render_Level();
+	m_FadeOut->Render();
+	m_FadeIn->Render();
+
+	return S_OK;
 }
+
+void LevelTitle::Ready_LoadingUI()
+{
+	LoadingFade::LOADING_FADE_UI_DESC fadeIn{};
+	fadeIn.fadeSpeed = 0.35f;
+	fadeIn.isFadeIn = true;
+	fadeIn.isHuman = true;
+	m_FadeIn = GAME_INSTANCE->Instantiate<LoadingFade>(L"LoadingFade", ETOI(LEVEL::TITLE), &fadeIn);
+	LoadingFade::LOADING_FADE_UI_DESC fadeOut{};
+	fadeOut.fadeSpeed = 0.35f;
+	fadeOut.isFadeOut = true;
+	fadeOut.isHuman = false;
+	m_FadeOut = GAME_INSTANCE->Instantiate<LoadingFade>(L"LoadingFade", ETOI(LEVEL::TITLE), &fadeOut);
+};
 
 Shared<LevelTitle> LevelTitle::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID)
 {

@@ -41,7 +41,7 @@ void MenuBar::Render(Bool isResize) {
       string saveLabel = "Save (" + Helper::To_String(std::filesystem::path(PATH.GetLevelDataPath(displayIndex)).filename().wstring()) + ")";
       if (ImGui::MenuItem(saveLabel.c_str(), nullptr, false, isStop))
       {
-        if (SUCCEEDED(m_Game->SerializeLevel(PATH.GetLevelDataPath(displayIndex))))
+        if (SUCCEEDED(m_Game->SerializeLevel(GAME_INSTANCE->Get_CurrentLevelIndex(), PATH.GetLevelDataPath(displayIndex))))
           LOG_INFO("Level saved successfully.");
         else
           LOG_ERROR(L"Level save failed.");

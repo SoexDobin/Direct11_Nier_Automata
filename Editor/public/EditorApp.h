@@ -32,7 +32,6 @@ private:
 	uint32 m_StartLevelIndex{};
 	Bool m_IsReset = { false };
 	Unique<ClientApp> m_ClientApp = {nullptr};
-	Bool m_IsAutoLoadPending = { false };
 
 public:
   static Unique<EditorApp> Create();

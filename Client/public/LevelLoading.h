@@ -28,6 +28,7 @@ public:
 	HRESULT Render_Level() override;
 
 private:
+	void Transition_To_NextLevel(Float timeDelta);
 	void Ready_LoadingUI();
 
 private:

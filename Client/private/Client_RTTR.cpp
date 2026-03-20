@@ -8,6 +8,7 @@
 
 
 #include "FreeCamera.h"
+#include "LoadingFade.h"
 #include "ThirdPersonCamera.h"
 #include "StateMachine.h"
 #include "P10000.h"
@@ -23,7 +24,6 @@ using rttr::registration;
 // <AUTO_GENERATED_INCLUDES>
 #include "CityOfRuins.h"
 #include "FreeCamera.h"
-#include "LoadingFade.h"
 #include "Monster.h"
 #include "Terrain.h"
 
@@ -64,7 +64,11 @@ void Register_Client_Reflection() {
       .method("Clone", &StaticCamera::Clone)
       .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return StaticCamera::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::STATIC)));
-
+    rttr::registration::class_<LoadingFade>("LoadingFade")
+        .constructor<>()
+        .method("Clone", &LoadingFade::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingFade::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::STATIC)));
 
 
 
@@ -72,17 +76,17 @@ void Register_Client_Reflection() {
 		.constructor<>()
         .method("Clone", &P10000::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000::Create(device, context); })
-        (rttr::metadata("Level", 0));
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
     rttr::registration::class_<StateMachine>("StateMachine")
         .constructor<>()
         .method("Clone", &StateMachine::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return StateMachine::Create(device, context); })
-        (rttr::metadata("Level", 0));
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
     rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
         .constructor<>()
         .method("Clone", &ThirdPersonCamera::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return ThirdPersonCamera::Create(device, context); })
-		(rttr::metadata("Level", 0));
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
@@ -98,11 +102,6 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &FreeCamera::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return FreeCamera::Create(device, context); })(rttr::metadata("Level", 0));
-
-    rttr::registration::class_<LoadingFade>("LoadingFade")
-        .constructor<>()
-        .method("Clone", &LoadingFade::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingFade::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<Monster>("Monster")
         .constructor<>()

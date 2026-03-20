@@ -357,7 +357,7 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
         bool isLinked = false;
         if (currentID != 0)
         {
-            Shared<GameObject> targetObj = GAME_INSTANCE->Find_ObjectByObjectID(currentID);
+            Shared<GameObject> targetObj = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), currentID);
             if (targetObj)
             {
                 targetName = Helper::To_String(targetObj->Get_Name());
@@ -385,7 +385,7 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ObjectMove_PayLoadKey.c_str()))
             {
                 uint32 droppedInstanceID = *(uint32*)payload->Data;
-                Shared<GameObject> droppedObj = GAME_INSTANCE->Find_ByInstanceID(droppedInstanceID);
+                Shared<GameObject> droppedObj = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_CurrentLevelIndex(), droppedInstanceID);
                 if (droppedObj)
                 {
                     uint32 droppedObjectID = droppedObj->Get_ObjectID();

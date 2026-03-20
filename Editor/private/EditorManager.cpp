@@ -76,6 +76,8 @@ void EditorManager::Update(Bool IsResetView) {
             m_EditorCamera->Update(timeDelta);
             GAME_INSTANCE->Submit_RenderGroup();
         }
+        if (GAME_INSTANCE->Get_CurrentLevel())
+			GAME_INSTANCE->Get_CurrentLevel()->Update_LoadLevel(0.016777f);
     }
 
     m_Inspector->Update(IsResetView);

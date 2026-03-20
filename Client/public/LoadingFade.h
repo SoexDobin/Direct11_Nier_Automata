@@ -33,8 +33,6 @@ public:
 
     void Priority_Update(Float timeDelta) override;
     void Update(Float timeDelta) override;
-    void Late_Update(Float timeDelta) override;
-    void Fixed_Update(Float fixedDelta) override;
     HRESULT Render() override;
     void Submit_RenderGroup() override;
 

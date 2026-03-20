@@ -29,12 +29,14 @@ protected:
   ~Game();
 
 public:
-  HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
-  void Update_Engine();
-  HRESULT Draw() const;
-  HRESULT Draw_NoClearing() const;
-  void Clear_Resource(uint32 levIndex) const;
-  void Clear_AllResource() const;
+    HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
+    void Update_Engine();
+    HRESULT Draw() const;
+    HRESULT Draw_NoClearing() const;
+
+    void Clear_Resource(uint32 levIndex) const;
+    void Clear_LoaderResource() const;
+    void Clear_AllResource() const;
 
 public: /* For Editor / Tool */
     const D3D11_VIEWPORT& Get_ViewportDesc() const { return m_GraphicDevice->Get_ViewportDesc(); }
@@ -59,9 +61,9 @@ public: /* For GraphicDevice */
     void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref) const;
 
 public:
-  Byte Get_DIKeyState(uByte byKeyID) const;
-  Byte Get_DIMouseState(DIMB mouseInput) const;
-  Long Get_DIMouseMove(DIMM mouseState) const;
+    Byte Get_DIKeyState(uByte byKeyID) const;
+    Byte Get_DIMouseState(DIMB mouseInput) const;
+    Long Get_DIMouseMove(DIMM mouseState) const;
 
 public: /* For TimeManager */
     HRESULT Add_Timer(const wstring &timerTag) const;
@@ -72,6 +74,8 @@ public: /* For TimeManager */
     Float Compute_TimeDelta(const wstring &timerTag) const;
 
 public: /* For LevelManager */
+    Shared<Level> Get_CurrentLevel();
+    void Update_Level() const;
     Bool LevelLoad_Finished() const { return m_LevelManager->Is_LoadFinished(); }
     uint32 Get_CurrentLevelIndex() const { return m_LevelManager->Get_CurrentLevelIndex(); }
     HRESULT Change_Level(uint32 levIndex, const Shared<class Level>& newLevel);
@@ -92,6 +96,7 @@ public: /* For ObjectManager */
 	HRESULT Clear_AllGameObjects() const;
     Shared<GameObject> Find_ByInstanceID(uint32 instanceID) const;
     Shared<GameObject> Find_ObjectByObjectID(uint32 objectID) const;
+    void Clearing_ObjectManager() const;
 
 public: /* For CameraManager */
     HRESULT Add_Camera(const Shared<class Camera> &camera) const;
@@ -111,7 +116,6 @@ public: /* For ResourceManager */
     HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;
     Shared<Model> Get_Model(uint32 levIndex, const tChar *modelFilePath) const;
     int32 Get_ContainLevelByModelTag(const wstring &modelTag) const;
-    int32 Get_ContainLevelByTextureTag(uint32 levIndex, const wstring &tag) const;
     vector<Shared<Model>> Get_Models(uint32 levIndex) const;
 
 public: /* For Renderer */

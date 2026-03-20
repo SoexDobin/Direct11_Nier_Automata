@@ -44,10 +44,11 @@ public:
     Shared<EditorCamera> Get_EditorCamera() const { return m_EditorCamera; }
     Shared<Engine::Camera> Get_InGameCamera() const { return m_InGameCamera; }
     void Set_InGameCamera(const Shared<Engine::Camera> &camera) {
-      m_InGameCamera = camera;
+		m_InGameCamera = camera;
     }
 
     Shared<ModelViewer> Get_ModelViewer() const { return m_ModelViewer; }
+    Shared<MenuBar> Get_MenuBar() const { return m_MenuBar; }
 
 public:
     Bool Is_ResizeRequest() const { return m_IsResizeView; }
@@ -74,6 +75,26 @@ public: /* Selected Object (Hierarchy <-> Inspector 공유) */
     m_SelectedObject = obj;
   }
   void Clear_SelectedObject() { m_SelectedObject.reset(); }
+  
+public: /* Reset Request */
+    void Request_Reset(uint32 startLevel) {
+        m_IsResetRequested = true;
+        m_EngineDesc.startLevel = startLevel;
+    }
+    Bool Is_ResetRequested() const { return m_IsResetRequested; }
+    void Clear_ResetRequest() { m_IsResetRequested = false; }
+
+    ENGINE_DESC& Get_EngineDesc() { return m_EngineDesc; }
+    void Set_EngineDesc(const ENGINE_DESC& desc)
+    {
+        m_EngineDesc = desc;}
+
+public: /* Auto Load Settings */
+    Bool Is_AutoLoadEnabled() const { return m_IsAutoLoad; }
+    void Set_AutoLoadEnabled(Bool isEnabled) { m_IsAutoLoad = isEnabled; }
+
+    Bool Is_AutoLoadRequested() const { return m_IsAutoLoadRequested; }
+    void Request_AutoLoad(Bool isRequested) { m_IsAutoLoadRequested = isRequested; }
 
 private:
     Bool m_IsResizeView{ false };
@@ -84,6 +105,12 @@ private:
     Shared<EditorCamera> m_EditorCamera{nullptr};
     Shared<Engine::Camera> m_InGameCamera{nullptr};
     Weak<Engine::GameObject> m_SelectedObject = {};
+
+    Bool m_IsResetRequested{ false };
+    ENGINE_DESC m_EngineDesc = {};
+
+    Bool m_IsAutoLoad{ true };
+    Bool m_IsAutoLoadRequested{ false };
 
 private:
     Shared<Inspector> m_Inspector = {nullptr};

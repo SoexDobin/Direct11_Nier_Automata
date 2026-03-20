@@ -88,6 +88,12 @@
     <ClInclude Include="..\public\TitleBackground.h">
       <Filter>02. GameObject\UI\Title</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LevelGamePlay.h">
+      <Filter>01. Level\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StaticCamera.h">
+      <Filter>02. GameObject\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -173,6 +179,12 @@
     </ClCompile>
     <ClCompile Include="..\private\TitleBackground.cpp">
       <Filter>02. GameObject\UI\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LevelGamePlay.cpp">
+      <Filter>01. Level\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StaticCamera.cpp">
+      <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

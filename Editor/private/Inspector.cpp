@@ -8,6 +8,7 @@
 #include "PathManager.h"
 #include "TagRegistry.h"
 #include "Transform.h"
+#include "Engine_RTTR_Metadata.h"
 
 using namespace Engine;
 using namespace Editor;
@@ -214,7 +215,7 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
 
     /* 메타데이터 파싱 (Widget 형태) */
     std::string widgetStr{};
-    rttr::variant metaWidget = prop.get_metadata("SaveData");
+    rttr::variant metaWidget = prop.get_metadata(Meta_Key::Widget);
     if (metaWidget.is_valid() && metaWidget.can_convert<std::string>())
     {
         widgetStr = metaWidget.to_string();
@@ -228,7 +229,7 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
         Vector3 vec = varValue.get_value<Engine::Vector3>();
 
         Float speed = 0.1f;
-        auto metaSpeed = prop.get_metadata("Speed");
+        auto metaSpeed = prop.get_metadata(Meta_Key::Speed);
         if (metaSpeed.is_valid() && metaSpeed.can_convert<Float>()) speed = metaSpeed.to_float();
 
         if (ImGui::DragFloat3(propName.c_str(), reinterpret_cast<Float*>(&vec), speed))
@@ -237,7 +238,7 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
                 LOG_WARN("Failed to Set : {}", propName);
         }
     }
-    else if (widgetStr == "ColorPicker" || varValue.is_type<Color>())
+    else if (widgetStr == Widget_Type::ColorPicker || varValue.is_type<Color>())
     {
         Color col = varValue.get_value<Color>();
         if (ImGui::ColorEdit4(propName.c_str(), reinterpret_cast<float*>(&col)))
@@ -251,8 +252,8 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
         Float val = varValue.get_value<Float>();
         Float minVal = 0.f, maxVal = 100.f;
 
-        auto metaMin = prop.get_metadata("Min");
-        auto metaMax = prop.get_metadata("Max");
+        auto metaMin = prop.get_metadata(Meta_Key::Min);
+        auto metaMax = prop.get_metadata(Meta_Key::Max);
         if (metaMin.is_valid() && metaMin.can_convert<Float>()) minVal = metaMin.to_float();
         if (metaMax.is_valid() && metaMax.can_convert<Float>()) maxVal = metaMax.to_float();
 
@@ -267,8 +268,8 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
         int32 val = varValue.get_value<int32>();
         int32 minVal = 0, maxVal = 100;
 
-        auto metaMin = prop.get_metadata("Min");
-        auto metaMax = prop.get_metadata("Max");
+        auto metaMin = prop.get_metadata(Meta_Key::Min);
+        auto metaMax = prop.get_metadata(Meta_Key::Max);
         if (metaMin.is_valid() && metaMin.can_convert<int32>()) minVal = metaMin.to_int();
         if (metaMax.is_valid() && metaMax.can_convert<int32>()) maxVal = metaMax.to_int();
 
@@ -325,7 +326,7 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
                     string droppedTag = payloadStr.substr(delimPos + 1);
                     
                     // RTTR 메타데이터의 AssetType과 일치하는지 확인
-                    rttr::variant metaType = prop.get_metadata("AssetType");
+                    rttr::variant metaType = prop.get_metadata(Meta_Key::AssetType);
                     string requiredType = metaType.is_valid() ? metaType.to_string() : "";
 
                     if (requiredType == droppedType)
@@ -344,7 +345,7 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
         ImGui::SameLine();
         ImGui::Text(propName.c_str());
     }
-    else if (widgetStr == "GameObject")
+    else if (widgetStr == "GameObject" || prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
     {
         uint32 currentID = 0;
         rttr::variant var = prop.get_value(instance);

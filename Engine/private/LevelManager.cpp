@@ -10,13 +10,15 @@ HRESULT LevelManager::Initialize(void *arg) {
 void LevelManager::On_Destroy() { m_CurrentLevel.reset(); }
 
 HRESULT LevelManager::Change_Level(uint32 levIndex,const Shared<Level>& level) {
-  if (nullptr != m_CurrentLevel)
-    Game::GetInstance()->Clear_Resource(m_CurrentLevelIndex);
+    if (nullptr != m_CurrentLevel)
+    {
+        if (levIndex == 1)
+			Game::GetInstance()->Clear_Resource(m_CurrentLevelIndex);
+    }
 
-  m_CurrentLevel = level;
-  m_CurrentLevelIndex = levIndex;
-
-  return S_OK;
+    m_CurrentLevel = level;
+    m_CurrentLevelIndex = levIndex;
+    return S_OK;
 }
 
 void LevelManager::Update(Float timeDelta) {

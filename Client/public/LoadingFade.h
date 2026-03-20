@@ -15,6 +15,7 @@ class CLIENT_DLL LoadingFade final : public UIObject
 public:
     typedef struct tagLoadingFade : public UI_DESC
     {
+        Bool isHuman;
         Bool isFadeIn;
         Bool isFadeOut;
         Float fadeSpeed;

@@ -21,7 +21,7 @@ extern inline ENGINE_DESC g_projectSettings = {
 namespace Editor
 {
 	#define EDITOR		Editor::EditorManager::GetInstance()
-	enum class EDITOR_STATE { PLAY, PAUSE, STOP };
+	enum class EDITOR_STATE { PLAY, PAUSE, STOP, LOADING };
 
 	const string Drag_PayLoadKey = "PROTOTYPE_DRAG";
 	const string ObjectMove_PayLoadKey = "OBJECT_MOVE_DRAG";

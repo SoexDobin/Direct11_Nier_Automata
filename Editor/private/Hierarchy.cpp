@@ -201,13 +201,14 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
 }
 
 void Hierarchy::Delete_Selected() {
-  Shared<GameObject> selected = EDITOR->Get_SelectedObject();
-  if (!selected)
-    return;
+    Shared<GameObject> selected = EDITOR->Get_SelectedObject();
+    if (!selected)
+      return;
 
-  // Object::Destroy() → ObjectManager가 Update 종료 후 자동 정리
-  Object::Destroy(selected);
-  EDITOR->Clear_SelectedObject();
+    // Object::Destroy() → ObjectManager가 Update 종료 후 자동 정리
+    Object::Destroy(selected);
+    EDITOR->Clear_SelectedObject();
+    GAME_INSTANCE->Clearing_ObjectManager();
 }
 
 Shared<Hierarchy> Hierarchy::Create() {

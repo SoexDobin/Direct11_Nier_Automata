@@ -34,9 +34,10 @@ public:
 	HRESULT Apply_LayerAndTagSettings() const;
 	HRESULT Load_LevelData(LEVEL level) const;
 	
-
+public:
+	Bool AutoTransitionLevel(LEVEL curLevel, LEVEL nextLev);
+	
 private:
-
 	wstring m_ResourcePath = L"../../Client/bin/resources/";
 	wstring m_ShaderPath = L"../../Client/bin/shaders/";
 	wstring m_ProjectSettingPath = L"../../ProjectSetting/";

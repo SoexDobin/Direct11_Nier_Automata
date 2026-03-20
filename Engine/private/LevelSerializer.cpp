@@ -103,13 +103,13 @@ HRESULT LevelSerializer::SerializeLevel(const wstring& filePath)
 			nlohmann::json& objProps = objJson["properties"];
 			for (auto& prop : objType.get_properties())
 			{
-				if (prop.get_metadata("NoSerialize") == true) continue;
+				if (prop.get_metadata(Meta_Key::NoSerialize) == true) continue;
 				
 				rttr::variant var = prop.get_value(*pObj);
 				string propName = prop.get_name().to_string();
 
 				// GameObject 참조는 고정 해시 ID(ObjectID)로 저장
-				if (prop.get_metadata("SaveData") == "GameObject")
+				if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
 				{
 					if (var.is_type<Shared<GameObject>>())
 					{
@@ -118,11 +118,8 @@ HRESULT LevelSerializer::SerializeLevel(const wstring& filePath)
 					}
 					else if (var.is_type<uint32>() || var.is_type<int>())
 					{
-						// 이미 ID를 들고 있는 경우 (Camera 타겟 등)
-						// 해당 런타임 ID(InstanceID)에 대응하는 실제 객체를 찾아 고정 ObjectID를 추출
-						uint32 currentRuntimeID = var.convert<uint32>();
-						Shared<GameObject> pTarget = GAME_INSTANCE->Find_ByInstanceID(currentRuntimeID);
-						objProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
+						// 이미 고정 ID(ObjectID)를 직접 들고 있는 시스템이므로 그대로 저장
+						objProps[propName] = var.convert<uint32>();
 					}
 				}
 				else
@@ -165,12 +162,12 @@ HRESULT LevelSerializer::SerializeLevel(const wstring& filePath)
 				nlohmann::json& compProps = compJson["properties"];
 				for (auto& prop : compType.get_properties())
 				{
-					if (prop.get_metadata("NoSerialize") == true) continue;
+					if (prop.get_metadata(Meta_Key::NoSerialize) == true) continue;
 
 					rttr::variant var = prop.get_value(*comp);
 					string propName = prop.get_name().to_string();
 
-					if (prop.get_metadata("SaveData") == "GameObject")
+					if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
 					{
 						if (var.is_type<Shared<GameObject>>())
 						{
@@ -179,9 +176,8 @@ HRESULT LevelSerializer::SerializeLevel(const wstring& filePath)
 						}
 						else
 						{
-							uint32 currentRuntimeID = var.convert<uint32>();
-							Shared<GameObject> pTarget = GAME_INSTANCE->Find_ByInstanceID(currentRuntimeID);
-							compProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
+							// 이미 고정 ID(ObjectID)를 직접 들고 있는 시스템이므로 그대로 저장
+							compProps[propName] = var.convert<uint32>();
 						}
 					}
 					else
@@ -431,6 +427,12 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 								prop.set_value(*targetComp, Color(v[0], v[1], v[2], v[3]));
 							else if (v.size() == 4 && prop.get_type() == rttr::type::get<Float4>())
 								prop.set_value(*targetComp, Float4(v[0], v[1], v[2], v[3]));
+						}
+
+						// [Diagnostic] TextureTag 주입 확인
+						if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::TextureTag)
+						{
+							LOG_INFO(L"[Serializer] TextureTag injected into {} : {}", Helper::To_wString(typeName), FromUtf8(it.value().get<string>()));
 						}
 					}
 				}

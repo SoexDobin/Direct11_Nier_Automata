@@ -32,6 +32,8 @@ void AssetBrowser::Render(Bool isResize)
 void AssetBrowser::Render_PrototypeList()
 {
 	uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+	if (levIndex == 1) // 로딩 중이면 대상 레벨 표시
+		levIndex = EDITOR->Get_EngineDesc().startLevel;
 	
 	// ── 1. Global Prototypes (Level 0) ──
 	if (ImGui::CollapsingHeader("Global Prototypes (Level 0)", ImGuiTreeNodeFlags_DefaultOpen))

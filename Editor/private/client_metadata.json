@@ -187,6 +187,24 @@
                                                               ],
                                         "has_clone":  true
                                     },
+                    "P10000":  {
+                                   "members":  [
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "0",
+                                                       "name":  "m_tempIdx",
+                                                       "type":  "uint32"
+                                                   }
+                                               ],
+                                   "base_class":  "ContainerObject",
+                                   "inherited_members":  {
+
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "LoadingBackground":  {
                                               "namespace":  "Engine",
                                               "base_class":  "UIObject",
@@ -503,6 +521,19 @@
                                                           ],
                                     "has_clone":  true
                                 },
+                    "StaticCamera":  {
+                                         "members":  [
+
+                                                     ],
+                                         "base_class":  "Camera",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Client",
+                                         "has_create":  true,
+                                         "has_clone":  true,
+                                         "category":  "other"
+                                     },
                     "TitleBackground":  {
                                             "namespace":  "Engine",
                                             "base_class":  "UIObject",
@@ -737,24 +768,41 @@
                                                           ],
                                     "has_clone":  true
                                 },
-                    "P10000":  {
-                                   "members":  [
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "0",
-                                                       "name":  "m_tempIdx",
-                                                       "type":  "uint32"
-                                                   }
-                                               ],
-                                   "base_class":  "ContainerObject",
-                                   "inherited_members":  {
-
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
+                    "LevelGamePlay":  {
+                                          "members":  [
+                                                          {
+                                                              "access":  "private",
+                                                              "default":  "",
+                                                              "name":  "m_NextLevel",
+                                                              "type":  "LEVEL"
+                                                          },
+                                                          {
+                                                              "access":  "private",
+                                                              "default":  "nullptr",
+                                                              "name":  "m_Loader",
+                                                              "type":  "Shared\u003cLoader\u003e"
+                                                          }
+                                                      ],
+                                          "base_class":  "Level",
+                                          "inherited_members":  [
+                                                                    {
+                                                                        "access":  "protected",
+                                                                        "default":  "nullptr",
+                                                                        "name":  "m_Device",
+                                                                        "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                    },
+                                                                    {
+                                                                        "access":  "protected",
+                                                                        "default":  "nullptr",
+                                                                        "name":  "m_Context",
+                                                                        "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                    }
+                                                                ],
+                                          "namespace":  "Client",
+                                          "has_create":  true,
+                                          "has_clone":  false,
+                                          "category":  "level"
+                                      },
                     "LevelTitle":  {
                                        "members":  [
                                                        {
@@ -762,12 +810,6 @@
                                                            "default":  "",
                                                            "name":  "m_NextLevel",
                                                            "type":  "LEVEL"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "nullptr",
-                                                           "name":  "m_Loader",
-                                                           "type":  "Shared\u003cLoader\u003e"
                                                        }
                                                    ],
                                        "base_class":  "Level",

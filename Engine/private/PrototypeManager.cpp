@@ -78,15 +78,15 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
 		return E_FAIL;
 	}
 
-    PROTOTYPE prototype = object->Get_Prototype();
-    if (Find_Prototype(prototype, levIndex, object->Get_ObjectID()) != nullptr) {
-        LOG_ERROR(L"{}: Already Added Prototype", m_ObjectName);
-        MSG_BOX("Already Added Prototype");
-        return E_FAIL;
-    }
-
     if (FAILED(object->Initialize_Prototype(prototypeTag)))
         return E_FAIL;
+
+    PROTOTYPE prototype = object->Get_Prototype();
+    if (Find_Prototype(prototype, levIndex, object->Get_ObjectID()) != nullptr) {
+        return S_OK;
+    }
+
+  
 
     if (prototype == PROTOTYPE::GAMEOBJECT) {
 		m_GameObjects[levIndex].emplace(object->Get_ObjectID(), static_pointer_cast<GameObject>(object));
@@ -101,19 +101,13 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
 
 HRESULT PrototypeManager::Clear_Prototypes()
 {
-    for (auto& container : m_GameObjects)
-        container.clear();
-    m_GameObjects.shrink_to_fit();
-    for (auto& container : m_Components)
-        container.clear();
-    m_Components.shrink_to_fit();
-    for (auto& container : m_ObjectsID)
-        container.clear();
-    m_ObjectsID.shrink_to_fit();
-
-    m_GameObjects.resize(m_LevelCount);
-    m_Components.resize(m_LevelCount);
-    m_ObjectsID.resize(m_LevelCount);
+    // 레벨 0 (Static/Engine)은 엔진의 핵심 데이터이므로 전체 삭제 시에도 보존합니다.
+    // 일반적인 씬 전환이나 에디터 리셋 시에는 레벨 1 이상의 가용 레벨 데이터만 삭제합니다.
+    for (uint32 i = 1; i < m_LevelCount; ++i) {
+        m_GameObjects[i].clear();
+        m_Components[i].clear();
+        m_ObjectsID[i].clear();
+    }
 
     return S_OK;
 }

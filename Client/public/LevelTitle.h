@@ -22,7 +22,6 @@ public:
 
 private:
 	LEVEL			m_NextLevel = {};
-	Shared<Loader>	m_Loader = { nullptr };
 
 public:
 	static Shared<LevelTitle> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);

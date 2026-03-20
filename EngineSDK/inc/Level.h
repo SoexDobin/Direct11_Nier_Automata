@@ -27,8 +27,9 @@ public:
   PROTOTYPE Get_Prototype() const final { return PROTOTYPE::LEVEL; }
 
 public:
-  virtual void Update_Level(Float timeDelta);
-  virtual HRESULT Render_Level();
+	virtual void Update_Level(Float timeDelta);
+	virtual HRESULT Render_Level();
+    virtual void Update_LoadLevel(Float timeDelta) {};
 
 protected:
 	ComPtr<ID3D11Device> m_Device{nullptr};

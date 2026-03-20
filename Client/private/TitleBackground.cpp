@@ -92,7 +92,7 @@ HRESULT TitleBackground::Ready_Components()
     if (nullptr == m_Shader)
         return E_FAIL;
 
-    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::LOADING), L"UI_Title_BackGround" };
+    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::TITLE), L"UI_Title_BackGround" };
     m_Texture = Add_Component<Texture>(&textureDesc);
     if (nullptr == m_Texture)
         return E_FAIL;

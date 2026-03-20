@@ -31,8 +31,11 @@ void EditorView::RenderView(Bool isResize) {
 	auto srvScene = GAME_INSTANCE->Get_OffScreenSRV(1);
 	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
 
+	Bool isSceneViewHovered = false;
+
 	ImGui::Begin("Scene View");
 	{
+		isSceneViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
 		auto selected = EDITOR->Get_SelectedObject();
 		if (selected)
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected: %S", selected->Get_Name().c_str());
@@ -145,12 +148,21 @@ void EditorView::RenderView(Bool isResize) {
 	ImGui::Begin("Game View");
 
 	// 마우스가 GameView 컨텐츠 영역 내에 있거나, 카메라 등으로 마우스가 락(Lock)되어 있으면 입력 허용
+	EDITOR_STATE state = EDITOR->Get_State();
 	Bool isGameViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-	GAME_INSTANCE->Set_InputEnabled(isGameViewHovered || GAME_INSTANCE->Get_MouseLock());
+
+	Bool inputEnabled = false;
+	if (state == EDITOR_STATE::PLAY)
+		inputEnabled = isGameViewHovered || GAME_INSTANCE->Get_MouseLock();
+	else
+		inputEnabled = isSceneViewHovered || isGameViewHovered;
+
+	GAME_INSTANCE->Set_InputEnabled(inputEnabled);
 
 	Bool loadFinished = GAME_INSTANCE->LevelLoad_Finished();
 	Bool canPlay = (EDITOR->Get_State() != EDITOR_STATE::PLAY);
-	Bool isPlayDisabled = canPlay && loadFinished;
+	Bool isLoading = (EDITOR->Get_State() != EDITOR_STATE::LOADING);
+	Bool isPlayDisabled = canPlay && loadFinished && isLoading;
 	if (!isPlayDisabled) ImGui::BeginDisabled();
 	if (ImGui::Button("Play")) {
 		if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()))))

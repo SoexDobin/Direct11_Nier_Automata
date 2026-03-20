@@ -11,7 +11,8 @@
 #include "ThirdPersonCamera.h"
 #include "StateMachine.h"
 #include "P10000.h"
-
+#include "StaticCamera.h"
+#include "TitleBackground.h"
 
 using rttr::registration;
 
@@ -25,7 +26,6 @@ using rttr::registration;
 #include "LoadingFade.h"
 #include "Monster.h"
 #include "Terrain.h"
-#include "TitleBackground.h"
 
 // </AUTO_GENERATED_INCLUDES>
 
@@ -39,23 +39,33 @@ void Register_Client_Reflection() {
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
 
-  rttr::registration::class_<LoadingBackground>("LoadingBackground")
+	rttr::registration::class_<LoadingBackground>("LoadingBackground")
       .constructor<>()
       .method("Clone", &LoadingBackground::Clone)
       .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingBackground::Create(device, context); })
       (rttr::metadata("Level", ETOI(LEVEL::LOADING)));
-
-  rttr::registration::class_<LoadingLogo>("LoadingLogo")
+	rttr::registration::class_<LoadingLogo>("LoadingLogo")
       .constructor<>()
       .method("Clone", &LoadingLogo::Clone)
       .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingLogo::Create(device, context); })
       (rttr::metadata("Level", ETOI(LEVEL::LOADING)));
-
-  rttr::registration::class_<LoadingPixelPanel>("LoadingPixelPanel")
+	rttr::registration::class_<LoadingPixelPanel>("LoadingPixelPanel")
       .constructor<>()
       .method("Clone", &LoadingPixelPanel::Clone)
       .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingPixelPanel::Create(device, context); })
       (rttr::metadata("Level", ETOI(LEVEL::LOADING)));
+	rttr::registration::class_<TitleBackground>("TitleBackground")
+      .constructor<>()
+      .method("Clone", &TitleBackground::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return TitleBackground::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::TITLE)));
+	rttr::registration::class_<StaticCamera>("StaticCamera")
+      .constructor<>()
+      .method("Clone", &StaticCamera::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return StaticCamera::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::STATIC)));
+
+
 
 
 	rttr::registration::class_<P10000>("P10000")
@@ -103,11 +113,6 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Terrain::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Terrain::Create(device, context); })(rttr::metadata("Level", 0));
-
-    rttr::registration::class_<TitleBackground>("TitleBackground")
-        .constructor<>()
-        .method("Clone", &TitleBackground::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return TitleBackground::Create(device, context); })(rttr::metadata("Level", 0));
 
 
 // </AUTO_GENERATED_RTTR>

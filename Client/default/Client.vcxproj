@@ -118,7 +118,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -156,7 +156,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -184,6 +184,7 @@
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
     <ClInclude Include="..\public\FreeCamera.h" />
+    <ClInclude Include="..\public\LevelGamePlay.h" />
     <ClInclude Include="..\public\LevelLoading.h" />
     <ClInclude Include="..\public\LevelTitle.h" />
     <ClInclude Include="..\public\Loader.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="..\public\State2B_Sprint.h" />
     <ClInclude Include="..\public\State2B_Walk.h" />
     <ClInclude Include="..\public\StateMachine.h" />
+    <ClInclude Include="..\public\StaticCamera.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\ThirdPersonCamera.h" />
     <ClInclude Include="..\public\TitleBackground.h" />
@@ -214,6 +216,7 @@
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
     <ClCompile Include="..\private\FreeCamera.cpp" />
+    <ClCompile Include="..\private\LevelGamePlay.cpp" />
     <ClCompile Include="..\private\LevelLoading.cpp" />
     <ClCompile Include="..\private\LevelTitle.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
@@ -234,6 +237,7 @@
     <ClCompile Include="..\private\State2B_Sprint.cpp" />
     <ClCompile Include="..\private\State2B_Walk.cpp" />
     <ClCompile Include="..\private\StateMachine.cpp" />
+    <ClCompile Include="..\private\StaticCamera.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\ThirdPersonCamera.cpp" />
     <ClCompile Include="..\private\TitleBackground.cpp" />

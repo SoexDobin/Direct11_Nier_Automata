@@ -2,6 +2,10 @@
 #include "LevelTitle.h"
 #include <SpdLogger.h>
 #include <Game.h>
+
+#include "ClientSettingManager.h"
+#include "LevelGamePlay.h"
+#include "Loader.h"
 #include "LoadingFade.h"
 
 LevelTitle::LevelTitle(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -9,6 +13,8 @@ LevelTitle::LevelTitle(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11De
 
 HRESULT LevelTitle::Initialize(void* arg)
 {
+	if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(LEVEL::TITLE)))
+		return E_FAIL;
 
 	return Level::Initialize(arg);
 }
@@ -20,6 +26,11 @@ void LevelTitle::On_Destroy()
 
 void LevelTitle::Update_Level(Float timeDelta)
 {
+	if (GAME_INSTANCE->Get_DIKeyState(DIK_SPACE) & 0x80)
+	{
+		GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelGamePlay::Create(m_Device, m_Context, LEVEL::GAMEPLAY));
+	}
+
 	Level::Update_Level(timeDelta);
 }
 

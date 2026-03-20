@@ -12,12 +12,16 @@ RTTR_REGISTRATION_NAMED(Texture_RTTR)
 		.method("CreatePrototype", &Texture::CreatePrototype)
 
         .property("RGBA", &Texture::Get_RGBAByValue, &Texture::Set_RGBA)(
-            metadata("SaveData", "ColorPicker")
+            metadata(Meta_Key::DataType, "Color"),
+            metadata(Meta_Key::Widget, Widget_Type::ColorPicker),
+            metadata(Meta_Key::SaveData, Serialize_Data_Field::ColorVector4)
             )
         .property("TextureTag", &Texture::Get_TextureTag, &Texture::Set_TextureTag)
         (
-            metadata("SaveData", "AssetDrop"),
-            metadata("AssetType", "Texture")
+            metadata(Meta_Key::DataType, "wstring"),
+            metadata(Meta_Key::Widget, Widget_Type::AssetDrop),
+            metadata(Meta_Key::AssetType, "Texture"),
+            metadata(Meta_Key::SaveData, Serialize_Data_Field::TextureTag)
         )
         ;
 }

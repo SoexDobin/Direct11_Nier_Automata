@@ -11,8 +11,10 @@ public:
 	~LevelManager() override = default;
 
 public:
+	void Clear_LevelMembers() { m_CurrentLevel = nullptr; m_CurrentLevelIndex= {}; }
 	Bool Is_LoadFinished() const { return m_CurrentLevel->Load_Finished(); }
 	uint32 Get_CurrentLevelIndex() const { return m_CurrentLevelIndex; }
+	Shared<Level> Get_CurrentLevel() const { return m_CurrentLevel; }
 
 public:
 	HRESULT Initialize(void *arg) override;

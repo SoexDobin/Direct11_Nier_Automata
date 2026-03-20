@@ -143,32 +143,44 @@ void Game::Clear_AllResource() const {
     m_CameraManager->Clear_Cameras();
     m_LightManager->Clear_Lights();
     m_ResourceManager->Clear_AllResources();
+    m_LevelManager->Clear_LevelMembers();
 }
 
 void Game::Clear_Resource(uint32 levIndex) const {
-  if (FAILED(m_PrototypeManager->Clear_Prototypes(levIndex))) {
-    LOG_CRITICAL(L"Failed To Clear Level{} Prototypes", levIndex);
-  }
 
-  if (FAILED(m_ObjectManager->Clear_GameObjects())) {
-    LOG_CRITICAL(L"Failed To Clear GameObjects");
-  }
+	if (FAILED(m_PrototypeManager->Clear_Prototypes(levIndex))) 
+		LOG_CRITICAL(L"Failed To Clear Level{} Prototypes", levIndex);
+  
+    if (FAILED(m_ObjectManager->Clear_GameObjects())) 
+        LOG_CRITICAL(L"Failed To Clear GameObjects");
 
-  if (FAILED(m_ResourceManager->Clear_Resource(levIndex))) {
-      LOG_CRITICAL(L"Failed To Clear Resources");
-  }
+	if (FAILED(m_ResourceManager->Clear_Resource(levIndex)))
+		LOG_CRITICAL(L"Failed To Clear Resources");
 
-  if (FAILED(m_Renderer->Clear_RenderGroup())) {
-    LOG_CRITICAL(L"Failed To Clear RenderGroup");
-  }
+	if (FAILED(m_Renderer->Clear_RenderGroup()))
+      LOG_CRITICAL(L"Failed To Clear RenderGroup");
 
-  if (FAILED(m_CameraManager->Clear_Cameras())) {
-    LOG_CRITICAL(L"Failed To Clear Cameras");
-  }
+	if (FAILED(m_CameraManager->Clear_Cameras()))
+      LOG_CRITICAL(L"Failed To Clear Cameras");
 
-  if (FAILED(m_LightManager->Clear_Lights())) {
-    LOG_CRITICAL(L"Failed To Clear Lights");
-  }
+	if (FAILED(m_LightManager->Clear_Lights())) 
+		LOG_CRITICAL(L"Failed To Clear Lights");
+	
+}
+
+void Game::Clear_LoaderResource() const
+{
+    if (FAILED(m_ObjectManager->Clear_GameObjects()))
+        LOG_CRITICAL(L"Failed To Clear GameObjects");
+
+    if (FAILED(m_ResourceManager->Clear_Resource(1)))
+        LOG_CRITICAL(L"Failed To Clear Resources");
+    if (FAILED(m_Renderer->Clear_RenderGroup()))
+        LOG_CRITICAL(L"Failed To Clear RenderGroup");
+    if (FAILED(m_CameraManager->Clear_Cameras()))
+        LOG_CRITICAL(L"Failed To Clear Cameras");
+    if (FAILED(m_LightManager->Clear_Lights()))
+        LOG_CRITICAL(L"Failed To Clear Lights");
 }
 
 void Game::Update_Input() const { m_InputDevice->Update(); }
@@ -262,6 +274,16 @@ Float Game::Compute_TimeDelta(const wstring &timerTag) const {
   return m_TimeManager->Get_Timer(timerTag)->GetDeltaTime();
 }
 
+Shared<Level> Game::Get_CurrentLevel()
+{
+    return m_LevelManager->Get_CurrentLevel();
+}
+
+void Game::Update_Level() const
+{
+    m_LevelManager->Update(0.f);
+}
+
 HRESULT Game::Change_Level(uint32 levIndex, const Shared<Level>& newLevel) {
   if (FAILED(m_LevelManager->Change_Level(levIndex, newLevel))) {
     MSG_BOX("Change To New Level Got a Trouble");
@@ -293,6 +315,11 @@ HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject) const {
   }
 
   return S_OK;
+}
+
+void Game::Clearing_ObjectManager() const
+{
+    m_ObjectManager->Cleanup_GameObjects();
 }
 
 Shared<GameObject> Game::Find_ByInstanceID(uint32 instanceID) const

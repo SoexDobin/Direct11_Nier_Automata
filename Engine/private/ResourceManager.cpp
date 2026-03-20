@@ -222,18 +222,16 @@ vector<Shared<Model>> ResourceManager::Get_Models(uint32 levIndex)
 }
 
 HRESULT ResourceManager::Clear_AllResources() {
-    m_Shaders.clear();
-    m_TextureDescTags.clear();
-    m_SRVs.clear();
+    // 레벨 0 (Static)에 로드된 엔진 기본 리소스 및 모델들은 보존합니다.
+    // 레벨 1 이상의 게임 레벨 리소스들만 삭제하여 메모리 효율과 안정성을 확보합니다.
+    for (uint32 i = 1; i < m_LevelCount; ++i) {
+        m_Shaders[i].clear();
+        m_TextureDescTags[i].clear();
+        m_SRVs[i].clear();
+        m_Models[i].clear();
+    }
 
-    m_Models.clear();
-    m_StaticModelContainLev.clear();
     m_ModelContainLev.clear();
-
-    m_Shaders.resize(m_LevelCount);
-    m_TextureDescTags.resize(m_LevelCount);
-    m_SRVs.resize(m_LevelCount);
-    m_Models.resize(m_LevelCount);
 
 	return S_OK;
 }

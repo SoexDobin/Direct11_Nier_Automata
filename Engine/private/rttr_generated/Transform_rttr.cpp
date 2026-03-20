@@ -12,23 +12,23 @@ RTTR_REGISTRATION_NAMED(Transform_RTTR)
 	.method("Create", &Transform::Create)
 	.method("CreatePrototype", &Transform::CreatePrototype)
 
-	.property("Position", &Transform::Get_LocalPosition,
-		static_cast<void(Engine::Transform::*)(DirectX::SimpleMath::Vector3)>(&Transform::Set_LocalPositionByValue))(
-			metadata("DataType", "Vector3"),
-			metadata("Widget", "DragFloat3"),
-			metadata("SaveVector3", &Transform::Get_LocalPosition)
+	.property("Position", &Transform::Get_LocalPosition, &Transform::Set_LocalPositionByValue)
+	(
+		metadata(Meta_Key::DataType, "Vector3"),
+		metadata(Meta_Key::Widget, Widget_Type::DragFloat3),
+		metadata(Meta_Key::SaveData, Serialize_Data_Field::Position)
+	)
+	.property("Rotation", &Transform::Get_LocalEulerAngles, &Transform::Set_LocalEulerAngleByValue)
+		(
+			metadata(Meta_Key::DataType, "Vector3"),
+			metadata(Meta_Key::Widget, Widget_Type::DragFloat3),
+			metadata(Meta_Key::SaveData, Serialize_Data_Field::Rotation)
 		)
-	.property("Rotation", &Transform::Get_LocalEulerAngles,
-		static_cast<void(Engine::Transform::*)(DirectX::SimpleMath::Vector3)>(&Transform::Set_LocalEulerAngleByValue))(
-			metadata("DataType", "Vector3"),
-			metadata("Widget", "DragFloat3"),
-			metadata("SaveVector3", &Transform::Get_LocalEulerAngles)
-		)
-	.property("Scale", &Transform::Get_LocalScale, 
-		static_cast<void(Engine::Transform::*)(DirectX::SimpleMath::Vector3)>(&Transform::Set_LocalScaleByValue))(
-			metadata("DataType", "Vector3"),
-			metadata("Widget", "DragFloat3"),
-			metadata("SaveVector3", &Transform::Get_LocalEulerAngles)
-		)
+	.property("Scale", &Transform::Get_LocalScale, &Transform::Set_LocalScaleByValue)
+	(
+		metadata(Meta_Key::DataType, "Vector3"),
+		metadata(Meta_Key::Widget, Widget_Type::DragFloat3),
+		metadata(Meta_Key::SaveData, Serialize_Data_Field::Scale)
+	)
 		;
 }

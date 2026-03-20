@@ -350,9 +350,9 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
     rttr::type componentType = rttr::type::get<Component>();
     auto allTypes = rttr::type::get_types();
 
-    // 전역/정적 세트를 사용하여 여러 번 호출(STATIC, TITLE 등)되더라도 
-    // 동일 타입의 프로토타입은 전 생명주기 동안 단 한 번만 등록되도록 보장합니다.
-    static unordered_set<string> globalProcessedTypes;
+    // 전역/정적 세트(static unordered_set)를 제거합니다.
+    // 엔진의 PrototypeManager::Add_Prototype이 중복 등록을 안전하게 스킵하도록 수정되었으므로,
+    // 리셋 시마다 새로운 프로토타입 등록 시도를 허용하여 데이터 정합성을 유지합니다.
 
     for (auto& type : allTypes)
     {
@@ -362,10 +362,8 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
 
         if ((isGameObject || isComponent) && !type.is_pointer())
         {
-            // 중복 처리 방지: 동일한 타입 이름이 이미 등록되었다면 건너뜀
+            // 중복 처리 방지 로직은 엔진의 Add_Prototype 단계에 맡깁니다.
             string typeName = type.get_name().to_string();
-            if (globalProcessedTypes.contains(typeName))
-                continue;
 
             // 2. 파이썬이 통일해준 Create 메서드 가져오기
             rttr::method createMethod = type.get_method("Create");
@@ -390,8 +388,6 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
                 if (targetLevel != ETOI(baseLevel))
                     continue;
 
-                // 해당 레벨에 등록하기로 결정된 타입만 마킹 (실제 등록 직전)
-                globalProcessedTypes.insert(typeName);
 
                 LOG_INFO(L"[RTTR-Debug] Try Reg: {}, Target: {}, Current: {}", Helper::To_wString(typeName), targetLevel, ETOI(baseLevel));
 
@@ -531,4 +527,12 @@ HRESULT ClientSettingManager::Load_LevelData(LEVEL level) const
 	}
 
 	return S_FALSE;
+}
+
+Bool ClientSettingManager::AutoTransitionLevel(LEVEL curLevel, LEVEL nextLev)
+{
+	if (curLevel == LEVEL::LOADING)
+		return ETOI(nextLev) != 1;
+
+	return false;
 }

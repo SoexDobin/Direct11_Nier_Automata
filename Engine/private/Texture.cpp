@@ -12,8 +12,8 @@ Texture::Texture(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceCo
 }
 
 Texture::Texture(const Texture& rhs)
-    : Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs }, 
-    m_FilePath{ rhs.m_FilePath }, m_RGBA{ rhs.m_RGBA }, m_TextureTag{ rhs.m_TextureTag } {
+	: Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs },
+	m_FilePath{ rhs.m_FilePath }, m_RGBA{ rhs.m_RGBA }, m_TextureTag{ rhs.m_TextureTag }, m_levIndex{ rhs.m_levIndex } {
 }
 
 HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs, const wstring& textureTag)
@@ -85,28 +85,36 @@ HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader>& shader,
 
 void Texture::Set_TextureTag(const wstring& tag)
 {
-    uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
-    const TEXTURE_DESC& registDesc = *GAME_INSTANCE->Get_TextureDesc(levIndex, tag);
+	if (tag.empty()) return;
 
-    m_NumSRVs = registDesc.m_NumSRVs;
-    m_FilePath = registDesc.m_FilePath;
-    m_SRVs.clear();
-    m_SRVs.reserve(m_NumSRVs);
-    
-    for (uint32 i = 0; i < m_NumSRVs; ++i)
-    {
-        tChar szFullPath[MAX_PATH] = TEXT("");
-        _stprintf_s(szFullPath, m_FilePath.c_str(), i);
-        const ComPtr<ID3D11ShaderResourceView>& srv = GAME_INSTANCE->Get_Texture(levIndex, szFullPath);
+	const TEXTURE_DESC* pDesc = GAME_INSTANCE->Get_TextureDesc(m_levIndex, tag);
 
-        if (srv == nullptr) {
-            LOG_ERROR(L"[Texture] : Failed to find Tag '{}' Texture At '{}'", levIndex, szFullPath);
-            return;
-        }
-        m_SRVs.push_back(srv);
-    }
+	if (pDesc == nullptr)
+	{
+		LOG_ERROR(L"[Texture] Failed to find TextureDesc for Tag: {}", tag);
+		return;
+	}
 
-    m_TextureTag = tag;
+	m_NumSRVs = pDesc->m_NumSRVs;
+	m_FilePath = pDesc->m_FilePath;
+	m_SRVs.clear();
+	m_SRVs.reserve(m_NumSRVs);
+
+	for (uint32 i = 0; i < m_NumSRVs; ++i)
+	{
+		tChar szFullPath[MAX_PATH] = TEXT("");
+		_stprintf_s(szFullPath, m_FilePath.c_str(), i);
+		const ComPtr<ID3D11ShaderResourceView>& srv = GAME_INSTANCE->Get_Texture(m_levIndex, szFullPath);
+
+		if (srv == nullptr)
+		{
+			LOG_ERROR(L"[Texture] : Failed to find Texture SRV At '{}'", szFullPath);
+			continue;
+		}
+		m_SRVs.push_back(srv);
+	}
+
+	m_TextureTag = tag;
 }
 
 void Texture::Set_TextureByIndex(uint32 texIndex)

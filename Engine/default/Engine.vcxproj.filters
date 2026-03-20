@@ -302,6 +302,9 @@
     <ClInclude Include="..\public\ContainerObject.h">
       <Filter>01. Utility\04. GameObject\Container</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Engine_RTTR_Metadata.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">

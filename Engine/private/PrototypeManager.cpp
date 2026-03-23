@@ -54,20 +54,20 @@ wstring PrototypeManager::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 l
 {
     uint32 targetLevel = levIndex;
 
-    for (auto objectsID : m_ObjectsID[targetLevel])
+    for (const auto& pair : m_ObjectsID[targetLevel])
     {
-        if (objectsID.second == objectID)
-            return objectsID.first;
+        if (pair.second == objectID)
+            return pair.first;
     }
 
     targetLevel = 0;
-    for (auto objectsID : m_ObjectsID[targetLevel])
+    for (const auto& pair : m_ObjectsID[targetLevel])
     {
-        if (objectsID.second == objectID)
-            return objectsID.first;
+        if (pair.second == objectID)
+            return pair.first;
     }
 
-    return nullptr;
+    return L"";
 }
 
 HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag)

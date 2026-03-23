@@ -5,7 +5,8 @@ NS_BEGIN(Client)
 
 class Loader;
 class StaticCamera;
-class LoadingFade;
+class LoadingFadeIn;
+class LoadingFadeOut;
 class LoadingBackground;
 class LoadingLogo;
 class LoadingPixelPanel;
@@ -47,8 +48,8 @@ private:
 	Shared<LoadingPixelPanel> m_PixelPanel{ nullptr };
 	Shared<LoadingLogo> m_Logo{ nullptr };
 
-	Shared<LoadingFade>	m_FadeIn{ nullptr };
-	Shared<LoadingFade>	m_FadeOut{ nullptr };
+	Shared<LoadingFadeIn>	m_FadeIn{ nullptr };
+	Shared<LoadingFadeOut>	m_FadeOut{ nullptr };
 
 public:
 	static Shared<LevelLoading> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID, Bool loadStatic = false);

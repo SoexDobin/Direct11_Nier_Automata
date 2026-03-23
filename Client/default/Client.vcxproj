@@ -191,7 +191,8 @@
     <ClInclude Include="..\public\LevelTitle.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\LoadingBackground.h" />
-    <ClInclude Include="..\public\LoadingFade.h" />
+    <ClInclude Include="..\public\LoadingFadeIn.h" />
+    <ClInclude Include="..\public\LoadingFadeOut.h" />
     <ClInclude Include="..\public\LoadingLogo.h" />
     <ClInclude Include="..\public\ClientApp.h" />
     <ClInclude Include="..\public\LoadingPixelPanel.h" />
@@ -227,7 +228,8 @@
     <ClCompile Include="..\private\LevelTitle.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\LoadingBackground.cpp" />
-    <ClCompile Include="..\private\LoadingFade.cpp" />
+    <ClCompile Include="..\private\LoadingFadeIn.cpp" />
+    <ClCompile Include="..\private\LoadingFadeOut.cpp" />
     <ClCompile Include="..\private\LoadingLogo.cpp" />
     <ClCompile Include="..\private\ClientApp.cpp" />
     <ClCompile Include="..\private\LoadingPixelPanel.cpp" />

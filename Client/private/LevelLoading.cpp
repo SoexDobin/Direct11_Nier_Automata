@@ -4,7 +4,8 @@
 #include "Game.h"
 #include "Loader.h"
 #include <SpdLogger.h>
-#include "LoadingFade.h"
+#include "LoadingFadeIn.h"
+#include "LoadingFadeOut.h"
 
 #include "ClientSettingManager.h"
 #include "LevelGamePlay.h"
@@ -69,12 +70,12 @@ void LevelLoading::Update_Level(Float timeDelta)
     m_PixelPanel->Update(timeDelta);
     m_Logo->Update(timeDelta);
 
-    if (!m_FadeOut->Fade_End())
+    if (!m_FadeOut->Is_FadeFinished())
     {
         m_FadeOut->Update(timeDelta);
     }
 
-    if (true == m_IsFinished && m_FadeOut->Fade_End())
+    if (true == m_IsFinished && m_FadeOut->Is_FadeFinished())
     {
         Transition_To_NextLevel(timeDelta);
     }
@@ -86,11 +87,11 @@ void LevelLoading::Update_LoadLevel(Float timeDelta)
     m_PixelPanel->Update(timeDelta);
     m_Logo->Update(timeDelta);
     
-    if (!m_FadeOut->Fade_End())
+    if (!m_FadeOut->Is_FadeFinished())
     {
         m_FadeOut->Update(timeDelta);
     }
-    if (true == m_IsFinished && m_FadeOut->Fade_End())
+    if (true == m_IsFinished && m_FadeOut->Is_FadeFinished())
     {
         Transition_To_NextLevel(timeDelta);
     }
@@ -98,10 +99,10 @@ void LevelLoading::Update_LoadLevel(Float timeDelta)
 
 void LevelLoading::Transition_To_NextLevel(Float timeDelta)
 {
-	if (!m_FadeIn->Fade_End())
+	if (!m_FadeIn->Is_FadeFinished())
 	{
 		m_FadeIn->Set_Active(true);
-		m_FadeIn->Update(timeDelta); // Approximation or passed timeDelta
+		m_FadeIn->Update(timeDelta); 
 	}
 	else
 	{
@@ -140,16 +141,13 @@ void LevelLoading::Ready_LoadingUI()
     m_PixelPanel = GAME_INSTANCE->Instantiate<LoadingPixelPanel>(L"LoadingPixelPanel", ETOI(LEVEL::LOADING));
     m_Logo = GAME_INSTANCE->Instantiate<LoadingLogo>(L"LoadingLogo", ETOI(LEVEL::LOADING));
 
-    LoadingFade::LOADING_FADE_UI_DESC fadeIn{};
+    LoadingFadeIn::FADE_IN_DESC fadeIn{};
     fadeIn.fadeSpeed = 0.25f;
-    fadeIn.isFadeIn = true;
-    fadeIn.isHuman = true;
-    m_FadeIn = GAME_INSTANCE->Instantiate<LoadingFade>(L"LoadingFade", ETOI(LEVEL::LOADING), &fadeIn);
-    LoadingFade::LOADING_FADE_UI_DESC fadeOut{};
+    m_FadeIn = GAME_INSTANCE->Instantiate<LoadingFadeIn>(L"LoadingFadeIn", ETOI(LEVEL::LOADING), &fadeIn);
+
+    LoadingFadeOut::FADE_OUT_DESC fadeOut{};
     fadeOut.fadeSpeed = 0.25f;
-    fadeOut.isFadeOut = true;
-    fadeOut.isHuman = false;
-    m_FadeOut = GAME_INSTANCE->Instantiate<LoadingFade>(L"LoadingFade", ETOI(LEVEL::LOADING), &fadeOut);
+    m_FadeOut = GAME_INSTANCE->Instantiate<LoadingFadeOut>(L"LoadingFadeOut", ETOI(LEVEL::LOADING), &fadeOut);
 };
 
 Shared<LevelLoading> LevelLoading::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID, Bool loadStatic) {

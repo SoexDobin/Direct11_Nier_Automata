@@ -3,7 +3,8 @@
 
 NS_BEGIN(Client)
 
-class LoadingFade;
+class LoadingFadeIn;
+class LoadingFadeOut;
 
 class CLIENT_DLL LevelTitle final : public Level
 {
@@ -25,8 +26,8 @@ private:
 
 private:
 	Bool m_IsIntroPlayed{ false };
-	Shared<LoadingFade>	m_FadeIn{ nullptr };
-	Shared<LoadingFade>	m_FadeOut{ nullptr };
+	Shared<LoadingFadeIn>	m_FadeIn{ nullptr };
+	Shared<LoadingFadeOut>	m_FadeOut{ nullptr };
 
 public:
 	static Shared<LevelTitle> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

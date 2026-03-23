@@ -7,7 +7,8 @@
 #include "LevelLoading.h"
 #include <mutex>
 
-#include "LoadingFade.h"
+#include "LoadingFadeIn.h"
+#include "LoadingFadeOut.h"
 #include "SpdLogger.h"
 #include "StaticCamera.h"
 #include "VISphere.h"
@@ -49,8 +50,9 @@ HRESULT ClientApp::Ready_StartLevel(LEVEL startLevel)
 HRESULT ClientApp::Ready_InitialObject()
 {
     GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), StaticCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"StaticCamera");
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFade::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFade");
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), VISphere::CreatePrototype(), L"VISphere");
+    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeIn::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeIn");
+    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeOut::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeOut");
+    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), VISphere::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"VISphere");
     GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), SkySphere::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"SkySphere");
 
     return S_OK;

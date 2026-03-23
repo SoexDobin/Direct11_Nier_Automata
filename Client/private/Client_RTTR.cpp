@@ -8,8 +8,8 @@
 #include "LoadingPixelPanel.h"
 
 
-#include "FreeCamera.h"
-#include "LoadingFade.h"
+#include "LoadingFadeIn.h"
+#include "LoadingFadeOut.h"
 #include "ThirdPersonCamera.h"
 #include "StateMachine.h"
 #include "P10000.h"
@@ -41,6 +41,16 @@ void Register_Client_Reflection() {
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
+	rttr::registration::class_<LoadingFadeIn>("LoadingFadeIn")
+      .constructor<>()
+      .method("Clone", &LoadingFadeIn::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingFadeIn::Create(device, context); })
+      (rttr::metadata("Level", ETOI(LEVEL::STATIC)));
+	rttr::registration::class_<LoadingFadeOut>("LoadingFadeOut")
+      .constructor<>()
+      .method("Clone", &LoadingFadeOut::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingFadeOut::Create(device, context); })
+      (rttr::metadata("Level", ETOI(LEVEL::STATIC)));
 
 	rttr::registration::class_<LoadingBackground>("LoadingBackground")
       .constructor<>()
@@ -66,11 +76,6 @@ void Register_Client_Reflection() {
       .constructor<>()
       .method("Clone", &StaticCamera::Clone)
       .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return StaticCamera::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::STATIC)));
-    rttr::registration::class_<LoadingFade>("LoadingFade")
-        .constructor<>()
-        .method("Clone", &LoadingFade::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingFade::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::STATIC)));
 
 

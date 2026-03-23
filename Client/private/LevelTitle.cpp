@@ -7,7 +7,8 @@
 #include "LevelGamePlay.h"
 #include "LevelLoading.h"
 #include "Loader.h"
-#include "LoadingFade.h"
+#include "LoadingFadeIn.h"
+#include "LoadingFadeOut.h"
 
 LevelTitle::LevelTitle(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Level { device, context } {}
@@ -15,7 +16,7 @@ LevelTitle::LevelTitle(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11De
 HRESULT LevelTitle::Initialize(void* arg)
 {
 	if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(LEVEL::TITLE)))
-		return E_FAIL;
+		return E_FAIL;;
 
 	Ready_TitleUI();
 
@@ -38,7 +39,7 @@ void LevelTitle::Update_Level(Float timeDelta)
 
 	m_FadeOut->Update(timeDelta);
 
-	if (m_FadeOut->Fade_End())
+	if (m_FadeOut->Is_FadeFinished())
 	{
 		if (!m_FadeIn->Is_Active() && GAME_INSTANCE->Get_DIKeyState(DIK_SPACE) & 0x80)
 		{
@@ -48,7 +49,7 @@ void LevelTitle::Update_Level(Float timeDelta)
 			
 
 		m_FadeIn->Update(timeDelta);
-		if (m_FadeIn->Fade_End())
+		if (m_FadeIn->Is_FadeFinished())
 		{
 			GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelLoading::Create(m_Device, m_Context, LEVEL::GAMEPLAY, true));
 		}
@@ -65,16 +66,20 @@ HRESULT LevelTitle::Render_Level()
 
 void LevelTitle::Ready_TitleUI()
 {
-	LoadingFade::LOADING_FADE_UI_DESC fadeIn{};
+	auto dummyIn = GAME_INSTANCE->Find_ObjectByObjectID(ETOI(LEVEL::STATIC), GAME_INSTANCE->Get_ObjectIDFromPrototypeTag(L"LoadingFadeIn", ETOI(LEVEL::STATIC)));
+	if (dummyIn) Destroy(dummyIn);
+
+	LoadingFadeIn::FADE_IN_DESC fadeIn{};
 	fadeIn.fadeSpeed = 0.35f;
-	fadeIn.isFadeIn = true;
-	fadeIn.isHuman = true;
-	m_FadeIn = GAME_INSTANCE->Instantiate<LoadingFade>(L"LoadingFade", ETOI(LEVEL::TITLE), &fadeIn);
-	LoadingFade::LOADING_FADE_UI_DESC fadeOut{};
+	m_FadeIn = GAME_INSTANCE->Instantiate<LoadingFadeIn>(L"LoadingFadeIn", ETOI(LEVEL::TITLE), &fadeIn);
+
+
+	auto dummyOut = GAME_INSTANCE->Find_ObjectByObjectID(ETOI(LEVEL::STATIC), GAME_INSTANCE->Get_ObjectIDFromPrototypeTag(L"LoadingFadeOut", ETOI(LEVEL::STATIC)));
+	if (dummyOut) Destroy(dummyOut);
+
+	LoadingFadeOut::FADE_OUT_DESC fadeOut{};
 	fadeOut.fadeSpeed = 0.35f;
-	fadeOut.isFadeOut = true;
-	fadeOut.isHuman = false;
-	m_FadeOut = GAME_INSTANCE->Instantiate<LoadingFade>(L"LoadingFade", ETOI(LEVEL::TITLE), &fadeOut);
+	m_FadeOut = GAME_INSTANCE->Instantiate<LoadingFadeOut>(L"LoadingFadeOut", ETOI(LEVEL::TITLE), &fadeOut);
 };
 
 Shared<LevelTitle> LevelTitle::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

@@ -26,7 +26,7 @@
               "typeName": "Transform"
             }
           ],
-          "instanceID": 97269298,
+          "instanceID": 3832042894,
           "name": "StaticCamera",
           "objectID": 408974546,
           "parentObjectID": 0,
@@ -72,74 +72,6 @@
                   0.0
                 ],
                 "Scale": [
-                  1980.0,
-                  1080.0,
-                  1.0
-                ]
-              },
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "VIBuffer_Rect"
-            },
-            {
-              "properties": {
-                "RGBA": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "TextureTag": "UI_Loading_BackGround"
-              },
-              "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            }
-          ],
-          "instanceID": 2621687252,
-          "name": "LoadingBackground",
-          "objectID": 2031777346,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "LoadingBackground",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1980.0,
-              1080.0,
-              1.0
-            ]
-          },
-          "typeName": "LoadingBackground"
-        },
-        {
-          "components": [
-            {
-              "properties": {
-                "Position": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Rotation": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Scale": [
                   1920.0,
                   1920.0,
                   1.0
@@ -148,27 +80,27 @@
               "typeName": "Transform"
             },
             {
-              "properties": null,
-              "typeName": "Shader"
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.0
+                ],
+                "TextureTag": "UI_Loading_Fade"
+              },
+              "typeName": "Texture"
             },
             {
               "properties": null,
               "typeName": "VIBuffer_Rect"
             },
             {
-              "properties": {
-                "RGBA": [
-                  255.0,
-                  255.0,
-                  255.0,
-                  1.6777700185775757
-                ],
-                "TextureTag": "UI_Loading_BackGround"
-              },
-              "typeName": "Texture"
+              "properties": null,
+              "typeName": "Shader"
             }
           ],
-          "instanceID": 4190013280,
+          "instanceID": 2401506414,
           "name": "LoadingFade",
           "objectID": 3109598226,
           "parentObjectID": 0,
@@ -217,11 +149,11 @@
             },
             {
               "properties": null,
-              "typeName": "VIBuffer_Rect"
+              "typeName": "Shader"
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "VIBuffer_Rect"
             },
             {
               "properties": {
@@ -229,14 +161,14 @@
                   1.0,
                   1.0,
                   1.0,
-                  1.0
+                  0.20000000298023224
                 ],
                 "TextureTag": "UI_Loading_Pixel"
               },
               "typeName": "Texture"
             }
           ],
-          "instanceID": 1116713314,
+          "instanceID": 3413871773,
           "name": "LoadingPixelPanel",
           "objectID": 2233491490,
           "parentObjectID": 0,
@@ -276,8 +208,8 @@
                   0.0
                 ],
                 "Scale": [
-                  1920.0,
-                  1920.0,
+                  1980.0,
+                  1080.0,
                   1.0
                 ]
               },
@@ -288,28 +220,28 @@
               "typeName": "Shader"
             },
             {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
               "properties": {
                 "RGBA": [
-                  255.0,
-                  255.0,
-                  255.0,
-                  253.32223510742188
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
                 ],
                 "TextureTag": "UI_Loading_BackGround"
               },
               "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "VIBuffer_Rect"
             }
           ],
-          "instanceID": 1611068977,
-          "name": "LoadingFade",
-          "objectID": 3109598226,
+          "instanceID": 2468889854,
+          "name": "LoadingBackground",
+          "objectID": 2031777346,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "LoadingFade",
+          "prototypeTag": "LoadingBackground",
           "transform": {
             "position": [
               0.0,
@@ -322,12 +254,12 @@
               0.0
             ],
             "scale": [
-              1920.0,
-              1920.0,
+              1980.0,
+              1080.0,
               1.0
             ]
           },
-          "typeName": "LoadingFade"
+          "typeName": "LoadingBackground"
         },
         {
           "components": [
@@ -356,23 +288,23 @@
               "typeName": "VIBuffer_Rect"
             },
             {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
               "properties": {
                 "RGBA": [
                   1.0,
                   1.0,
                   1.0,
-                  1.0
+                  0.20000000298023224
                 ],
                 "TextureTag": "UI_Loading_Logo"
               },
               "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
             }
           ],
-          "instanceID": 563583679,
+          "instanceID": 1987036719,
           "name": "LoadingLogo",
           "objectID": 3729526162,
           "parentObjectID": 0,
@@ -396,6 +328,74 @@
             ]
           },
           "typeName": "LoadingLogo"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1920.0,
+                  1920.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.020971249788999557
+                ],
+                "TextureTag": "UI_Loading_Fade"
+              },
+              "typeName": "Texture"
+            }
+          ],
+          "instanceID": 2655579464,
+          "name": "LoadingFade",
+          "objectID": 3109598226,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "LoadingFade",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1920.0,
+              1920.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingFade"
         }
       ]
     }

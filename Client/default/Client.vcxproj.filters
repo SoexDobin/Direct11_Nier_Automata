@@ -76,9 +76,6 @@
     <ClInclude Include="..\public\State2B_Sprint.h">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Body.h">
-      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\LevelTitle.h">
       <Filter>01. Level\Title</Filter>
     </ClInclude>
@@ -93,6 +90,15 @@
     </ClInclude>
     <ClInclude Include="..\public\StaticCamera.h">
       <Filter>02. GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\P10000Body.h">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\P10000</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WP0070Body.h">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0070</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WP0220Body.h">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0220</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -168,9 +174,6 @@
     <ClCompile Include="..\private\State2B_Sprint.cpp">
       <Filter>02. GameObject\Playable\2B\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Body.cpp">
-      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\LevelTitle.cpp">
       <Filter>01. Level\Title</Filter>
     </ClCompile>
@@ -185,6 +188,15 @@
     </ClCompile>
     <ClCompile Include="..\private\StaticCamera.cpp">
       <Filter>02. GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\P10000Body.cpp">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\P10000</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WP0070Body.cpp">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0070</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WP0220Body.cpp">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0220</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -239,9 +251,6 @@
     <Filter Include="02. GameObject\Playable\2B\State">
       <UniqueIdentifier>{58e488f6-9331-4015-979d-3a180ad82f16}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Container">
-      <UniqueIdentifier>{ff7c442c-47a2-4906-bafa-765b42b29c9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Playable\2B\2BPartObject">
       <UniqueIdentifier>{860aeb7a-a17a-405c-af57-46faf234f476}</UniqueIdentifier>
     </Filter>
@@ -256,6 +265,15 @@
     </Filter>
     <Filter Include="02. GameObject\UI\Title">
       <UniqueIdentifier>{896614d3-b3cd-47f2-81e6-34cf1ffd3744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\2BPartObject\P10000">
+      <UniqueIdentifier>{7099d284-19b5-4ec7-85c0-7a5e1e9b45b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\2BPartObject\WP0070">
+      <UniqueIdentifier>{76bad4f2-11f8-4f5d-9074-da2549d47d54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\2BPartObject\WP0220">
+      <UniqueIdentifier>{7aad67ae-f8c0-4d54-a65f-91fd0e40244b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

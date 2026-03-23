@@ -96,20 +96,42 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0)))
         return E_FAIL;
 
-    m_InGameCamera = GAME_INSTANCE->Get_MainCamera();
-
-    if (m_State == EDITOR_STATE::PLAY && m_InGameCamera &&
-        m_InGameCamera->Get_InstanceID() == m_EditorCamera->Get_InstanceID())
+    // [Pass 0] In-Game 카메라 결정 (조건: 메인 우선, 에디터 카메라 제외, 대체 불가)
+    Shared<Camera> pCurrentMain = GAME_INSTANCE->Get_MainCamera();
+    
+    // 만약 엔진의 메인 카메라가 있고, 그게 에디터 카메라가 아니라면 우선적으로 채택
+    if (pCurrentMain && pCurrentMain->Get_InstanceID() != m_EditorCamera->Get_InstanceID())
     {
-        if (!GAME_INSTANCE->Get_Cameras().empty())
-			GAME_INSTANCE->Set_MainCamera(GAME_INSTANCE->Get_Cameras()[0]);
+        m_InGameCamera = pCurrentMain;
+    }
+    else
+    {
+        // 그렇지 않다면 엔진에 등록된 카메라들 중 에디터 카메라가 아닌 첫 번째 실제 게임 카메라를 찾음
+        m_InGameCamera = nullptr;
+        for (auto& pCam : GAME_INSTANCE->Get_Cameras(GAME_INSTANCE->Get_CurrentLevelIndex()))
+        {
+            if (pCam && pCam->Get_InstanceID() != m_EditorCamera->Get_InstanceID())
+            {
+                m_InGameCamera = pCam;
+                break;
+            }
+        }
     }
 
-    if (SUCCEEDED(GAME_INSTANCE->Set_MainCamera(m_InGameCamera)))
+    // 1. In-Game 뷰포트 (OffScreen 0) 바인딩 및 렌더링 준비
+    if (m_InGameCamera)
     {
+        GAME_INSTANCE->Set_MainCamera(m_InGameCamera);
         m_InGameCamera->Bind_CameraTransform();
     }
-    
+    else
+    {
+        // 인게임 카메라가 전혀 없는 경우: 검은 화면 출력을 위해 뷰포트 클리어 및 바인딩 건너뜀
+        Shared<Float4> vBlack = make_shared<Float4>(0.f, 0.f, 0.f, 1.f);
+        GAME_INSTANCE->Clear_BackBufferView(vBlack);
+        // Bind_CameraTransform을 호출하지 않아 렌더링 결과가 나타나지 않음 (검은 화면)
+    }
+
     GAME_INSTANCE->Update_Pipeline();
 
     if (FAILED(GAME_INSTANCE->Draw_NoClearing()))
@@ -130,8 +152,10 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     if (FAILED(GAME_INSTANCE->End_RenderOffScreen()))
         return E_FAIL;
 
-    if (FAILED(GAME_INSTANCE->Set_MainCamera(m_InGameCamera)))
-        return E_FAIL;
+    if (m_InGameCamera)
+        GAME_INSTANCE->Set_MainCamera(m_InGameCamera);
+    else
+        GAME_INSTANCE->Set_MainCamera(m_EditorCamera);
 
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);

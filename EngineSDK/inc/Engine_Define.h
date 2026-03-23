@@ -17,6 +17,7 @@
 #include <unordered_set>
 #include <vector>
 #include <concepts>
+#include <io.h>
 
 
 #include <d3d11.h>
@@ -31,6 +32,8 @@
 #include <directxtk/DDSTextureLoader.h>
 #include <directxtk/SimpleMath.h>
 #include <directxtk/WICTextureLoader.h>
+#include <directxtk/SpriteBatch.h>
+#include <directxtk/SpriteFont.h>
 #include <wrl.h>
 
 #include <Effects11/d3dx11effect.h>

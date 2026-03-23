@@ -32,6 +32,7 @@ public:
     TAG_MASK &Get_TagMask() { return m_TagMask; }
 
 public:
+    virtual GAMEOBJECTTYPE Get_GameObjectType() { return GAMEOBJECTTYPE::GAMEOBJECT; }
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void *arg) override;
     void On_Destroy() override;

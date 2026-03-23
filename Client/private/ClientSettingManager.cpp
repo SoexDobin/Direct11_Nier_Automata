@@ -529,6 +529,114 @@ HRESULT ClientSettingManager::Load_LevelData(LEVEL level) const
 	return S_FALSE;
 }
 
+HRESULT ClientSettingManager::Load_Sound_FromJson() const
+{
+	wstring fullPath = m_ProjectSettingPath + L"SoundSettings.json";
+
+	if (!filesystem::exists(fullPath))
+	{
+		nlohmann::json defaultJson;
+		defaultJson["SoundSettings"] = nlohmann::json::array();
+
+		std::ofstream outFile(fullPath);
+		if (outFile.is_open())
+		{
+			outFile << defaultJson.dump(4);
+			outFile.close();
+		}
+		LOG_INFO(L"Created Default SoundSettings.json: {}", fullPath);
+	}
+
+	if (!filesystem::exists(fullPath))
+	{
+		LOG_WARN(L"Failed To Find Sound Settings : {}", fullPath);
+		return S_OK;
+	}
+
+	ifstream file(fullPath);
+	if (!file.is_open()) return E_FAIL;
+
+	nlohmann::json json;
+	file >> json;
+	file.close();
+
+	auto& settings = json["SoundSettings"];
+	for (auto& item : settings)
+	{
+		auto CleanString = [](string str)
+		{
+			string trimmed = Helper::Trim(str);
+			if (trimmed.size() >= 2 && trimmed.front() == '\"' && trimmed.back() == '\"')
+				trimmed = trimmed.substr(1, trimmed.size() - 2);
+			return Helper::Trim(trimmed);
+		};
+
+		wstring tag = Helper::To_wString(CleanString(item["tag"].get<string>()));
+		wstring relativePath = Helper::To_wString(CleanString(item["path"].get<string>()));
+		wstring fullSoundPath = m_ResourcePath + relativePath;
+
+		if (FAILED(GAME_INSTANCE->Load_Sound(tag, fullSoundPath)))
+		{
+			LOG_ERROR(L"Failed to Load Sound: {}", tag);
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Sync_SoundJson_FromCSV() const
+{
+	wstring csvPath = m_ResourcePath + L"SoundSettings.csv";
+
+	if (!filesystem::exists(csvPath))
+	{
+		std::ofstream outFile(csvPath);
+		if (outFile.is_open())
+		{
+			outFile << "Tag, Path" << std::endl;
+			outFile << "Title_BGM, Sound/Title_BGM.wem" << std::endl;
+			outFile.close();
+		}
+		LOG_INFO(L"Created Template SoundSettings.csv: {}", csvPath);
+	}
+
+	if (!filesystem::exists(csvPath)) return S_OK;
+
+	ifstream csvFile(csvPath);
+	nlohmann::json jsonRoot;
+	string line;
+
+	getline(csvFile, line);
+	while (getline(csvFile, line))
+	{
+		if (line.empty()) continue;
+
+		stringstream stream(line);
+		string tag, path;
+		getline(stream, tag, ',');
+		getline(stream, path);
+
+		auto CleanString = [](string str)
+		{
+			string trimmed = Helper::Trim(str);
+			trimmed.erase(remove(trimmed.begin(), trimmed.end(), '\"'), trimmed.end());
+			trimmed.erase(remove(trimmed.begin(), trimmed.end(), '\r'), trimmed.end());
+			return Helper::Trim(trimmed);
+		};
+
+		jsonRoot["SoundSettings"].push_back({
+			{"tag", CleanString(tag)},
+			{"path", CleanString(path)},
+		});
+	}
+
+	ofstream jsonFile(m_ProjectSettingPath + L"SoundSettings.json");
+	jsonFile << jsonRoot.dump(4);
+
+	return S_OK;
+}
+
 Bool ClientSettingManager::AutoTransitionLevel(LEVEL curLevel, LEVEL nextLev)
 {
 	if (curLevel == LEVEL::LOADING)
@@ -536,3 +644,4 @@ Bool ClientSettingManager::AutoTransitionLevel(LEVEL curLevel, LEVEL nextLev)
 
 	return false;
 }
+

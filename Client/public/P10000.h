@@ -34,19 +34,7 @@ public:
     void Submit_RenderGroup() override;
 
 private:
-    HRESULT Ready_Components();
-    HRESULT Bind_ShaderResources();
-
-public:
-    Shared<StateMachine> Get_StateMachine() const { return m_StateMachine; }
-    Shared<Model> Get_Model() const { return m_Model; }
-
-private:
-    Shared<StateMachine>    m_StateMachine{ nullptr };
-    Shared<Model>           m_Model{ nullptr };
-    Shared<Shader>          m_Shader{ nullptr };
-
-    uint32 m_tempIdx = { 0 };
+    HRESULT Ready_PartObjects();
 
 public:
 	static Shared<P10000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

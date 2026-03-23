@@ -19,8 +19,15 @@ LevelLoading::LevelLoading(const ComPtr<ID3D11Device> &device,
     : Level{device, context}, m_Loader{nullptr}, m_NextLevel{LEVEL::LEVEL_END} {
 }
 
+LevelLoading::~LevelLoading()
+{
+    Destroy(m_StaticCamera);
+}
+
 HRESULT LevelLoading::Initialize(void *arg) {
-    m_NextLevel = *static_cast<LEVEL*>(arg);
+    LEVEL_LOADING_DESC desc = *static_cast<LEVEL_LOADING_DESC*>(arg);
+    m_NextLevel = desc.nextLevelID;
+    m_IsLoadStatic = desc.loadStatic;
 
     if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
         if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::LOADING)))
@@ -44,7 +51,7 @@ HRESULT LevelLoading::Initialize(void *arg) {
 
     Ready_LoadingUI();
 
-    m_Loader = Loader::Create(m_Device, m_Context, m_NextLevel, shared_from_this(), true);
+    m_Loader = Loader::Create(m_Device, m_Context, m_NextLevel, shared_from_this(), m_IsLoadStatic);
     if (nullptr == m_Loader)
         return E_FAIL;
 
@@ -103,12 +110,10 @@ void LevelLoading::Transition_To_NextLevel(Float timeDelta)
 			switch (ETOI(m_NextLevel))
 			{
 			case ETOI(LEVEL::TITLE):
-				GAME_INSTANCE->Clear_Resource(ETOI(LEVEL::LOADING));
-				GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), LevelTitle::Create(m_Device, m_Context, m_NextLevel));
+				GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), LevelTitle::Create(m_Device, m_Context));
 				break;
 			case ETOI(LEVEL::GAMEPLAY):
-				GAME_INSTANCE->Clear_Resource(ETOI(LEVEL::LOADING));
-				GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), LevelGamePlay::Create(m_Device, m_Context, m_NextLevel));
+				GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), LevelGamePlay::Create(m_Device, m_Context));
 				break;
 			default:
 				break;
@@ -147,10 +152,14 @@ void LevelLoading::Ready_LoadingUI()
     m_FadeOut = GAME_INSTANCE->Instantiate<LoadingFade>(L"LoadingFade", ETOI(LEVEL::LOADING), &fadeOut);
 };
 
-Shared<LevelLoading> LevelLoading::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID) {
+Shared<LevelLoading> LevelLoading::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context, LEVEL nextLevelID, Bool loadStatic) {
     auto loadingLevel = make_shared<LevelLoading>(device, context);
 
-    if (FAILED(loadingLevel->Initialize(&nextLevelID))) {
+    LEVEL_LOADING_DESC desc{};
+    desc.nextLevelID = nextLevelID;
+    desc.loadStatic = loadStatic;
+
+    if (FAILED(loadingLevel->Initialize(&desc))) {
 		LOG_ERROR(L"Failed To Create LoadingBackground");
 		return nullptr;
     }

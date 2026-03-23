@@ -21,14 +21,15 @@ public:
 	HRESULT Render_Level() override;
 
 private:
-	void Ready_LoadingUI();
+	void Ready_TitleUI();
 
 private:
+	Bool m_IsIntroPlayed{ false };
 	Shared<LoadingFade>	m_FadeIn{ nullptr };
 	Shared<LoadingFade>	m_FadeOut{ nullptr };
 
 public:
-	static Shared<LevelTitle> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID);
+	static Shared<LevelTitle> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 
 };
 

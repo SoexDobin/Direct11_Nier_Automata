@@ -27,7 +27,7 @@ HRESULT ThirdPersonCamera::Initialize(void* arg)
 	localDesc.nearPlane = 0.1f;
 	localDesc.farPlane = 500.f;
 	
-	localDesc.distance = 10.f;
+	localDesc.distance = 7.f;
 	localDesc.minDistance = 3.f;
 	localDesc.maxDistance = 30.f;
 	localDesc.offset = Vector3{ 0.f, 1.f, 0.f };
@@ -62,6 +62,9 @@ HRESULT ThirdPersonCamera::Initialize(void* arg)
 	m_Friction = 0.8f;
 	m_OrbitVelocityX = 0.f;
 	m_OrbitVelocityY = 0.f;
+
+	if (FAILED(GAME_INSTANCE->Set_MainCamera(static_pointer_cast<Camera>(shared_from_this()))))
+		return E_FAIL;
 
 	return S_OK;
 }

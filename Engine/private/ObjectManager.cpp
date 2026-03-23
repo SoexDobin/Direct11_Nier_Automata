@@ -233,7 +233,7 @@ const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByTypes(uint32 levI
 
 Shared<GameObject> ObjectManager::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) {
     if (!m_ObjectByObject[levIndex].contains(objectID)) {
-        MSG_BOX("Failed To Find GameObject By ObjectID");
+        // LOG_WARN(L"[ObjectManager] Failed To Find GameObject By ObjectID: {} in Level {}", objectID, levIndex);
         return nullptr;
     }
 
@@ -242,7 +242,7 @@ Shared<GameObject> ObjectManager::Find_ObjectByObjectID(uint32 levIndex, uint32 
 
 const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByObjectID(uint32 levIndex, uint32 objectID) {
     if (!m_ObjectByObject[levIndex].contains(objectID)) {
-        MSG_BOX("Failed To Find GameObject By ObjectID");
+        // LOG_WARN(L"[ObjectManager] Failed To Find GameObjects By ObjectID: {} in Level {}", objectID, levIndex);
         return EMPTY_VECTOR<Shared<GameObject>>;
     }
 
@@ -253,7 +253,7 @@ const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByObjectID(uint32 l
 Shared<GameObject> ObjectManager::Find_ByInstanceID(uint32 levIndex, uint32 instanceID)
 {
     if (!m_ObjectByInstance[levIndex].contains(instanceID)) {
-        MSG_BOX("Failed To Find GameObject By InstanceID");
+        // LOG_WARN(L"[ObjectManager] Failed To Find GameObject By InstanceID: {} in Level {}", instanceID, levIndex);
         return nullptr;
     }
 

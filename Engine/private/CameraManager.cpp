@@ -14,10 +14,13 @@ HRESULT CameraManager::Initialize_Prototype()
 
 HRESULT CameraManager::Initialize(void* arg)
 {
+	m_LevCount = *static_cast<uint32*>(arg);
+	m_Cameras.resize(m_LevCount);
+
 	return EngineManager::Initialize(arg);
 }
 
-HRESULT CameraManager::Add_Camera(const Shared<Camera>& camera)
+HRESULT CameraManager::Add_Camera(uint32 levIndex, const Shared<Camera>& camera)
 {
 	if (camera->Get_ObjectID() <= 0)
 	{
@@ -30,20 +33,16 @@ HRESULT CameraManager::Add_Camera(const Shared<Camera>& camera)
 		return E_FAIL;
 	}
 
-	for (Weak<Camera> cameraPtr : m_Cameras)
+	for (auto cameraPtr : m_Cameras[levIndex])
 	{
-		if (!cameraPtr.expired())
+		if (cameraPtr->Get_ObjectID() == camera->Get_ObjectID())
 		{
-			if (cameraPtr.lock()->Get_ObjectID() == 
-				camera->Get_ObjectID())
-			{
-				LOG_ERROR(L"Already Added Camera");
-				return E_FAIL;
-			}
+			LOG_ERROR(L"Already Added Camera");
+			return E_FAIL;
 		}
 	}
 
-	m_Cameras.push_back(camera);
+	m_Cameras[levIndex].push_back(camera);
 
 	if (m_MainCamera.expired())
 		return Set_MainCamera(camera);
@@ -53,7 +52,7 @@ HRESULT CameraManager::Add_Camera(const Shared<Camera>& camera)
 
 Shared<Camera> CameraManager::Get_MainCamera() const
 {
-	if (m_MainCamera.expired())
+	if (m_MainCamera.expired()) 
 	{
 		LOG_ERROR(L"There is no MainCamera");
 		return nullptr;
@@ -62,13 +61,15 @@ Shared<Camera> CameraManager::Get_MainCamera() const
 	return m_MainCamera.lock();
 }
 
-vector<Shared<Camera>> CameraManager::Get_Cameras()
+vector<Shared<Camera>> CameraManager::Get_Cameras(uint32 levIndex)
 {
-	return m_Cameras;
+	return m_Cameras[levIndex];
 }
 
 HRESULT CameraManager::Set_MainCamera(const Shared<Camera>& camera)
 {
+	std::erase_if(m_Cameras[GAME_INSTANCE->Get_CurrentLevelIndex()], [](auto& cam) -> Bool { return cam->Is_Destroy(); });
+
 	if (camera == nullptr)
 	{
 		LOG_WARN("nullptr GameCamera");
@@ -82,7 +83,7 @@ HRESULT CameraManager::Set_MainCamera(const Shared<Camera>& camera)
 
 void CameraManager::Bind_MainCamera_Transform()
 {
-	std::erase_if(m_Cameras, [](const std::weak_ptr<Camera>& cam) -> Bool { return cam.expired(); });
+	std::erase_if(m_Cameras[GAME_INSTANCE->Get_CurrentLevelIndex()], [](auto& cam) -> Bool { return cam->Is_Destroy(); });
 
 	if (auto mainCamera = m_MainCamera.lock())
 	{
@@ -103,20 +104,30 @@ void CameraManager::Bind_MainCamera_Transform()
 		LOG_ERROR(L"There is no MainCamera");
 }
 
-HRESULT CameraManager::Clear_Cameras()
+HRESULT CameraManager::Clear_Cameras(uint32 levIndex)
 {
-	m_Cameras.shrink_to_fit();
-	m_Cameras.clear();
+	m_Cameras[levIndex].shrink_to_fit();
+	m_Cameras[levIndex].clear();
+
+	return S_OK;
+}
+HRESULT CameraManager::Clear_AllCameras()
+{
+	for (auto& camerasInLevel : m_Cameras)
+	{
+		camerasInLevel.clear();
+		camerasInLevel.shrink_to_fit();
+	}
 	m_MainCamera.reset();
 
 	return S_OK;
 }
 
-Unique<CameraManager> CameraManager::Create()
+Unique<CameraManager> CameraManager::Create(uint32 levCount)
 {
 	auto cameraManager = make_unique<CameraManager>();
 
-	if (FAILED(cameraManager->Initialize()))
+	if (FAILED(cameraManager->Initialize(&levCount)))
 	{
 		LOG_ERROR(L"Failed to Create CameraManager");
 		return nullptr;

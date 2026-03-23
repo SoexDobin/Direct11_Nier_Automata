@@ -42,6 +42,7 @@ public:
 	void Set_TargetID(uint32 targetID);
 
 public:
+	GAMEOBJECTTYPE Get_GameObjectType() final { return GAMEOBJECTTYPE::CAMERA; }
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* arg) override;
 	virtual void On_Destroy() override { GameObject::On_Destroy(); }

@@ -29,7 +29,7 @@ public:
 	virtual void Submit_RenderGroup() override {}
 
 public:
-	HRESULT Add_PartObject(uint32 prototypeLevIndex, const wstring& prototypeTag, const wstring& partTag, void* arg); 
+	HRESULT Add_PartObject(uint32 prototypeLevIndex, const wstring& prototypeTag, const wstring& partTag, void* arg = nullptr); 
 	Shared<PartObject> Find_PartObject(const wstring& partTag);
 
 protected:

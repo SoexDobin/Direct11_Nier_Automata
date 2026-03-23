@@ -72,8 +72,6 @@ void StateMachine::Update_State(Float timeDelta)
 	}
 }
 
-
-
 Shared<StateMachine> StateMachine::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
 	auto stateMachine = make_shared<StateMachine>(device, context);

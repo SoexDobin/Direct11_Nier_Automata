@@ -43,7 +43,7 @@ HRESULT Camera::Initialize(void* arg)
 	m_Far = desc.farPlane;
 
 	Update_CameraTransform(0.f);
-	GAME_INSTANCE->Add_Camera(static_pointer_cast<Camera>(shared_from_this()));
+
 	return S_OK;
 }
 
@@ -80,7 +80,23 @@ void Camera::Set_TargetID(uint32 targetID)
 	m_TargetID = targetID;
 	if (m_TargetID != 0)
 	{
-		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(m_TargetID, GAME_INSTANCE->Get_CurrentLevelIndex());
+		// 1. 현재 레벨에서 검색
+		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), m_TargetID);
+		
+		// 2. 못 찾았으면 Static 레벨(0)에서 검색
+		if (m_Target.expired())
+		{
+			m_Target = GAME_INSTANCE->Find_ObjectByObjectID(0, m_TargetID);
+		}
+
+		if (const auto& pObj = m_Target.lock())
+		{
+			LOG_INFO(L"[Camera] TargetID {} assigned to object '{}'", m_TargetID, pObj->Get_Name());
+		}
+		else
+		{
+			LOG_WARN(L"[Camera] Failed to find object for TargetID {}", m_TargetID);
+		}
 	}
 	else
 	{

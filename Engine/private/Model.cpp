@@ -101,10 +101,19 @@ void Model::Set_ModelTag(const wstring& tag)
 	auto prototype = GAME_INSTANCE->Get_Model(levIndex, tag.c_str());
 	if (!prototype) return;
 
-	// ── 핵심 방어 코드: 자기 자신이 복사 대상(프로토타입)일 경우 ──
+	// ── 핵심 방어 코드 ──
+	// 1. 자기 자신이 복사 대상(프로토타입)일 경우
 	if (prototype.get() == this)
 	{
 		m_ModelTag = tag;
+		return;
+	}
+
+	// 2. 스켈레탈(애니메이션) 타입 호환성 체크
+	if (m_IsSkeletal != prototype->m_IsSkeletal)
+	{
+		LOG_WARN(L"[Model] Skeletal mismatch! Prev: {}, New: {}. Assignment aborted.", 
+			m_IsSkeletal ? L"Skeletal" : L"Static", prototype->m_IsSkeletal ? L"Skeletal" : L"Static");
 		return;
 	}
 

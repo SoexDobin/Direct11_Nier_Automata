@@ -37,11 +37,11 @@ HRESULT LevelGamePlay::Render_Level()
 	return Level::Render_Level();
 }
 
-Shared<LevelGamePlay> LevelGamePlay::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID)
+Shared<LevelGamePlay> LevelGamePlay::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
 	auto levGamePlay = make_shared<LevelGamePlay>(device, context);
 
-	if (FAILED(levGamePlay->Initialize(&nextLevelID)))
+	if (FAILED(levGamePlay->Initialize(nullptr)))
 	{
 		LOG_ERROR(L"Failed to Create GamePlay Level");
 		return nullptr;

@@ -1,6 +1,7 @@
 #include "LevelSerializer.h"
 #include <rttr/registration.h>
 #include <nlohmann/json.hpp>
+#include "Engine_RTTR_Metadata.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -250,7 +251,22 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	}
 
 	string version = root.value("version", "1.1");
-	if (FAILED(GAME_INSTANCE->Clear_AllGameObjects())) return E_FAIL;
+	
+	// ── Pass 0: 선택적 클리어 (JSON에 명시된 레벨만 초기화) ───────────────────────
+	if (root.contains("levels"))
+	{
+		for (auto& levelJson : root["levels"])
+		{
+			uint32 levIndex = levelJson.value("levelIndex", 0u);
+			GAME_INSTANCE->Clearing_ObjectManager(levIndex);
+		}
+	}
+	else if (root.contains("objects"))
+	{
+		// 구버전 혹은 단일 레벨 파일의 경우 0번 레벨만 클리어하거나 전체 클리어 선택
+		// 여기서는 안전하게 전체 클리어를 유지하되, 필요 시 levIndex 0만 클리어하도록 수정 가능
+		GAME_INSTANCE->Clear_AllGameObjects();
+	}
 
 	unordered_map<uint32, Shared<GameObject>> instanceMap;
 	struct ObjectData {
@@ -438,7 +454,6 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			}
 		}
 
-		// 4. Transform 명시적 안전장치: 구버전/신버전 모두 지원
 		if (objJson.contains("transform"))
 		{
 			auto& t = objJson["transform"];

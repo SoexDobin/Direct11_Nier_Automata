@@ -87,7 +87,14 @@ void Texture::Set_TextureTag(const wstring& tag)
 {
 	if (tag.empty()) return;
 
+	// 1. 현재 레벨에서 검색
 	const TEXTURE_DESC* pDesc = GAME_INSTANCE->Get_TextureDesc(m_levIndex, tag);
+
+	// 2. 못 찾았으면 Static 레벨(0)에서 검색
+	if (pDesc == nullptr && m_levIndex != 0)
+	{
+		pDesc = GAME_INSTANCE->Get_TextureDesc(0, tag);
+	}
 
 	if (pDesc == nullptr)
 	{
@@ -104,7 +111,9 @@ void Texture::Set_TextureTag(const wstring& tag)
 	{
 		tChar szFullPath[MAX_PATH] = TEXT("");
 		_stprintf_s(szFullPath, m_FilePath.c_str(), i);
-		const ComPtr<ID3D11ShaderResourceView>& srv = GAME_INSTANCE->Get_Texture(m_levIndex, szFullPath);
+		
+		// 레벨 인덱스도 체크하여 가져옴
+		const ComPtr<ID3D11ShaderResourceView>& srv = GAME_INSTANCE->Get_Texture(pDesc->m_levIndex, szFullPath);
 
 		if (srv == nullptr)
 		{
@@ -115,6 +124,11 @@ void Texture::Set_TextureTag(const wstring& tag)
 	}
 
 	m_TextureTag = tag;
+    if (m_levIndex != pDesc->m_levIndex)
+    {
+        m_levIndex = pDesc->m_levIndex; // 실제 리소스가 있는 레벨로 업데이트
+        LOG_INFO(L"[Texture] Tag '{}' assigned from Level {}", tag, m_levIndex);
+    }
 }
 
 void Texture::Set_TextureByIndex(uint32 texIndex)

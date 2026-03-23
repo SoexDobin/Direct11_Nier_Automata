@@ -215,199 +215,223 @@ void Inspector::Render_Properties(rttr::property prop, rttr::instance instance)
 
     /* 메타데이터 파싱 (Widget 형태) */
     std::string widgetStr{};
+    std::string saveDataStr{};
+    
     rttr::variant metaWidget = prop.get_metadata(Meta_Key::Widget);
-    if (metaWidget.is_valid() && metaWidget.can_convert<std::string>())
-    {
-        widgetStr = metaWidget.to_string();
-    }
+    if (metaWidget.is_valid()) widgetStr = metaWidget.to_string();
+
+    rttr::variant metaSave = prop.get_metadata(Meta_Key::SaveData);
+    if (metaSave.is_valid()) saveDataStr = metaSave.to_string();
 
     Bool isReadOnly = prop.is_readonly();
     if (isReadOnly) ImGui::BeginDisabled();
     
-    if (varValue.is_type<Engine::Vector3>())
+    // [Diagnostic] 마우스 오버 시 메타데이터 표시 (Ctrl 키 누를 때만)
+    if (ImGui::IsItemHovered() && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
     {
-        Vector3 vec = varValue.get_value<Engine::Vector3>();
+        ImGui::BeginTooltip();
+        ImGui::Text("Prop: %s", propName.c_str());
+        ImGui::Text("Widget: %s", widgetStr.c_str());
+        ImGui::Text("SaveData: %s", saveDataStr.c_str());
+        ImGui::EndTooltip();
+    }
 
-        Float speed = 0.1f;
-        auto metaSpeed = prop.get_metadata(Meta_Key::Speed);
-        if (metaSpeed.is_valid() && metaSpeed.can_convert<Float>()) speed = metaSpeed.to_float();
-
-        if (ImGui::DragFloat3(propName.c_str(), reinterpret_cast<Float*>(&vec), speed))
-        {
-            if (!prop.set_value(instance, vec))
-                LOG_WARN("Failed to Set : {}", propName);
-        }
-    }
-    else if (widgetStr == Widget_Type::ColorPicker || varValue.is_type<Color>())
+    // --- 1. 우선순위: 위젯 메타데이터 기반 처리 (AssetDrop, GameObject 등) ---
+    
+    // [AssetDrop] 모델, 텍스처 등 에셋 태그 등록용 슬롯
+    if (widgetStr == "AssetDrop" || saveDataStr == "TextureTag" || saveDataStr == "ModelTag" || propName.find("Tag") != string::npos)
     {
-        Color col = varValue.get_value<Color>();
-        if (ImGui::ColorEdit4(propName.c_str(), reinterpret_cast<float*>(&col)))
-        {
-            if (!prop.set_value(instance, col))
-                LOG_WARN("Failed to Set : {}", propName);
-        }
-    }
-    else if (widgetStr == "SliderFloat" && varValue.is_type<Float>())
-    {
-        Float val = varValue.get_value<Float>();
-        Float minVal = 0.f, maxVal = 100.f;
-
-        auto metaMin = prop.get_metadata(Meta_Key::Min);
-        auto metaMax = prop.get_metadata(Meta_Key::Max);
-        if (metaMin.is_valid() && metaMin.can_convert<Float>()) minVal = metaMin.to_float();
-        if (metaMax.is_valid() && metaMax.can_convert<Float>()) maxVal = metaMax.to_float();
-
-        if (ImGui::SliderFloat(propName.c_str(), &val, minVal, maxVal))
-        {
-            if (!prop.set_value(instance, val))
-                LOG_WARN("Failed to Set : {}", propName);
-        }
-    }
-    else if (widgetStr == "SliderInt" && varValue.is_type<int32>())
-    {
-        int32 val = varValue.get_value<int32>();
-        int32 minVal = 0, maxVal = 100;
-
-        auto metaMin = prop.get_metadata(Meta_Key::Min);
-        auto metaMax = prop.get_metadata(Meta_Key::Max);
-        if (metaMin.is_valid() && metaMin.can_convert<int32>()) minVal = metaMin.to_int();
-        if (metaMax.is_valid() && metaMax.can_convert<int32>()) maxVal = metaMax.to_int();
-
-        if (ImGui::SliderInt(propName.c_str(), &val, minVal, maxVal))
-        {
-            if (!prop.set_value(instance, val))
-                LOG_WARN("Failed to Set : {}", propName);
-        }
-    }
-    else if (varValue.is_type<int>())
-    {
-        int val = varValue.get_value<int>();
-        if (ImGui::DragInt(propName.c_str(), &val)) prop.set_value(instance, val);
-    }
-    else if (varValue.is_type<float>())
-    {
-        float val = varValue.get_value<float>();
-        if (ImGui::DragFloat(propName.c_str(), &val, 0.1f)) prop.set_value(instance, val);
-    }
-    else if (varValue.is_type<bool>())
-    {
-        bool val = varValue.get_value<bool>();
-        if (ImGui::Checkbox(propName.c_str(), &val)) prop.set_value(instance, val);
-    }
-    else if (varValue.is_type<std::string>())
-    {
-        std::string valStr = varValue.get_value<std::string>();
-        ImGui::LabelText(propName.c_str(), "%s", valStr.c_str());
-    }
-    else if (widgetStr == "AssetDrop")
-    {
-        // wstring 안전 변환 시도
         wstring wTag{};
-        if (varValue.can_convert<wstring>())
-            wTag = varValue.get_value<wstring>();
-        else if (varValue.can_convert<std::wstring>())
-            wTag = varValue.get_value<std::wstring>();
+        if (varValue.is_type<wstring>()) wTag = varValue.get_value<wstring>();
+        else if (varValue.is_type<string>()) wTag = Helper::To_wString(varValue.get_value<string>());
 
         string sTag = Helper::To_String(wTag);
-        
-        ImVec2 size = ImVec2(ImGui::GetContentRegionAvail().x, 25);
-        ImGui::Button(sTag.empty() ? "(Empty Asset)" : sTag.c_str(), size);
+        string requiredType = prop.get_metadata(Meta_Key::AssetType).to_string();
+        if (requiredType.empty())
+        {
+            if (saveDataStr == "TextureTag" || propName.find("Texture") != string::npos) requiredType = "Texture";
+            else if (saveDataStr == "ModelTag" || propName.find("Model") != string::npos) requiredType = "Model";
+        }
 
+        ImGui::Text(propName.c_str());
+        ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.3f);
+
+        // --- 드롭 슬롯 렌더링 ---
+        ImVec2 slotSize = ImVec2(ImGui::GetContentRegionAvail().x - 5.f, 25.f);
+        
+        ImVec4 slotColor = ImVec4(0.12f, 0.12f, 0.12f, 1.0f);
+        ImVec4 textColor = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
+        
+        if (const ImGuiPayload* payload = ImGui::GetDragDropPayload())
+        {
+            if (string(payload->DataType) == "ASSET_BROWSER_ITEM")
+            {
+                string payloadStr = static_cast<const Char*>(payload->Data);
+                
+                if (payloadStr.find(requiredType + "|") == 0) 
+                {
+                    slotColor = ImVec4(0.1f, 0.4f, 0.1f, 1.0f); // Compatible: Green
+                    textColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+                }
+                else 
+                {
+                    slotColor = ImVec4(0.4f, 0.1f, 0.1f, 1.0f); // Incompatible: Red
+                }
+            }
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Header, slotColor);
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(slotColor.x * 1.2f, slotColor.y * 1.2f, slotColor.z * 1.2f, slotColor.w));
+        ImGui::PushStyleColor(ImGuiCol_Text, textColor);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        
+        string displayText = sTag.empty() ? "(None / Drag " + requiredType + " here)" : sTag;
+        string selectID = displayText + "##" + propName;
+        
+        if (ImGui::Selectable(selectID.c_str(), true, ImGuiSelectableFlags_None, slotSize)) { }
+        
         if (ImGui::BeginDragDropTarget())
         {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_BROWSER_ITEM"))
             {
-                // 페이로드 구조: "Type|Tag"
-                string payloadStr = (const char*)payload->Data;
+                string payloadStr = static_cast<const Char*>(payload->Data);
                 size_t delimPos = payloadStr.find('|');
                 if (delimPos != string::npos)
                 {
                     string droppedType = payloadStr.substr(0, delimPos);
                     string droppedTag = payloadStr.substr(delimPos + 1);
-                    
-                    // RTTR 메타데이터의 AssetType과 일치하는지 확인
-                    rttr::variant metaType = prop.get_metadata(Meta_Key::AssetType);
-                    string requiredType = metaType.is_valid() ? metaType.to_string() : "";
 
-                    if (requiredType == droppedType)
+                    if (requiredType.empty() || requiredType == droppedType)
                     {
-                        prop.set_value(instance, Helper::To_wString(droppedTag));
-                        LOG_INFO("Asset Updated: {} ({})", droppedTag, droppedType);
-                    }
-                    else
-                    {
-                        LOG_WARN("Asset Type Mismatch! Required: {}, Dropped: {}", requiredType, droppedType);
+                        if (varValue.is_type<wstring>()) prop.set_value(instance, Helper::To_wString(droppedTag));
+                        else prop.set_value(instance, droppedTag);
+                        LOG_INFO("Asset Assigned: {} -> {}", propName, droppedTag);
                     }
                 }
             }
             ImGui::EndDragDropTarget();
         }
-        ImGui::SameLine();
-        ImGui::Text(propName.c_str());
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(3);
+        
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Drag & Drop %s from Asset Browser", requiredType.c_str());
+        return;
     }
-    else if (widgetStr == "GameObject" || prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
+    // [GameObject] 객체 참조(Target)용 슬롯
+    if (widgetStr == "GameObject" || saveDataStr == "GameObject" || propName.find("Target") != string::npos)
     {
         uint32 currentID = 0;
-        rttr::variant var = prop.get_value(instance);
-        if (var.is_type<uint32>()) currentID = var.get_value<uint32>();
-        else if (var.is_type<int>()) currentID = static_cast<uint32>(var.get_value<int>());
+        if (varValue.is_type<uint32>()) currentID = varValue.get_value<uint32>();
+        else if (varValue.is_type<int32>()) currentID = static_cast<uint32>(varValue.get_value<int32>());
 
-        // 1. 현재 타겟 정보 확보
         string targetName = "None";
-        bool isLinked = false;
+        Bool isLinked = false;
         if (currentID != 0)
         {
+            // [Engine] Game::Find_ObjectByObjectID가 이제 내부적으로 Level 0과 현재 레벨을 모두 검색함
             Shared<GameObject> targetObj = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), currentID);
-            if (targetObj)
-            {
-                targetName = Helper::To_String(targetObj->Get_Name());
-                isLinked = true;
+            if (targetObj) 
+            { 
+                targetName = Helper::To_String(targetObj->Get_Name()); 
+                isLinked = true; 
             }
-            else targetName = "Missing (" + to_string(currentID) + ")";
+            if (!isLinked) targetName = "Missing (ID:" + to_string(currentID) + ")";
         }
 
-        // 2. 에셋 슬롯 스타일 UI 렌더링
         ImGui::Text(propName.c_str());
-        ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.4f);
+        ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.3f);
 
-        // 슬롯 배경/테두리 스타일
-        ImVec2 slotSize = ImVec2(ImGui::GetContentRegionAvail().x - 30.f, 20.f);
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, isLinked ? ImVec4(0.2f, 0.4f, 0.6f, 1.0f) : ImVec4(0.15f, 0.15f, 0.15f, 1.0f));
+        ImVec2 slotSize = ImVec2(ImGui::GetContentRegionAvail().x - 35.f, 25.f);
         
-        // InputText를 사용하여 이름 표시 (Assertion 방지를 위해 고정 버퍼 사용)
-        char buf[256];
-        strncpy_s(buf, targetName.c_str(), sizeof(buf));
-        ImGui::SetNextItemWidth(slotSize.x);
-        ImGui::InputText(("##" + propName).c_str(), buf, sizeof(buf), ImGuiInputTextFlags_ReadOnly);
+        ImVec4 slotColor = isLinked ? ImVec4(0.1f, 0.25f, 0.35f, 1.0f) : ImVec4(0.12f, 0.12f, 0.12f, 1.0f);
+        ImVec4 textColor = isLinked ? ImVec4(0.6f, 0.9f, 1.0f, 1.0f) : ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+        if (const ImGuiPayload* payload = ImGui::GetDragDropPayload())
+        {
+            if (string(payload->DataType) == ObjectMove_PayLoadKey) 
+            {
+                slotColor = ImVec4(0.2f, 0.5f, 0.6f, 1.0f); // Highlighting on drag
+                textColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Header, slotColor);
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(slotColor.x * 1.2f, slotColor.y * 1.2f, slotColor.z * 1.2f, slotColor.w));
+        ImGui::PushStyleColor(ImGuiCol_Text, textColor);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        
+        string selectID = targetName + "##" + propName;
+        if (ImGui::Selectable(selectID.c_str(), true, ImGuiSelectableFlags_None, slotSize)) {  }
         
         if (ImGui::BeginDragDropTarget())
         {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ObjectMove_PayLoadKey.c_str()))
             {
                 uint32 droppedInstanceID = *(uint32*)payload->Data;
+                // [Engine] Game::Find_ByInstanceID가 이제 내부적으로 Level 0과 현재 레벨을 모두 검색함
                 Shared<GameObject> droppedObj = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_CurrentLevelIndex(), droppedInstanceID);
+                
                 if (droppedObj)
                 {
-                    uint32 droppedObjectID = droppedObj->Get_ObjectID();
-                    prop.set_value(instance, droppedObjectID);
-                    LOG_INFO("GameObject Linked: {} (ObjectID: {})", propName, droppedObjectID);
-                }
-                else
-                {
-                    LOG_WARN("Failed to Link GameObject: Invalid InstanceID.");
+                    prop.set_value(instance, droppedObj->Get_ObjectID());
+                    LOG_INFO("Target Linked: {} -> {} (ObjectID: {})", propName, Helper::To_String(droppedObj->Get_Name()), droppedObj->Get_ObjectID());
                 }
             }
             ImGui::EndDragDropTarget();
         }
-        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(3);
 
-        // 3. 지우기 버튼 (X)
         ImGui::SameLine();
-        if (ImGui::Button(("X##" + propName).c_str(), ImVec2(20, 20)))
+        if (ImGui::Button(("X##" + propName).c_str(), ImVec2(30, 25))) prop.set_value(instance, 0u);
+        return;
+    }
+    // --- 2. 일반 타입별 위젯 처리 ---
+    if (varValue.is_type<Engine::Vector3>())
+    {
+        Vector3 vec = varValue.get_value<Engine::Vector3>();
+        Float speed = 0.1f;
+        auto metaSpeed = prop.get_metadata(Meta_Key::Speed);
+        if (metaSpeed.is_valid() && metaSpeed.can_convert<Float>()) speed = metaSpeed.to_float();
+        if (ImGui::DragFloat3((propName + "##" + propName).c_str(), reinterpret_cast<Float*>(&vec), speed)) prop.set_value(instance, vec);
+    }
+    else if (widgetStr == Widget_Type::ColorPicker || varValue.is_type<Color>())
+    {
+        Color col = varValue.get_value<Color>();
+        if (ImGui::ColorEdit4((propName + "##" + propName).c_str(), reinterpret_cast<Float*>(&col))) prop.set_value(instance, col);
+    }
+    else if (widgetStr == "SliderFloat" || widgetStr == Widget_Type::SliderFloat)
+    {
+        if (varValue.is_type<Float>())
         {
-            prop.set_value(instance, 0u);
+            Float val = varValue.get_value<Float>();
+            Float minVal = 0.f, maxVal = 100.f;
+            auto metaMin = prop.get_metadata(Meta_Key::Min);
+            auto metaMax = prop.get_metadata(Meta_Key::Max);
+            if (metaMin.is_valid() && metaMin.can_convert<Float>()) minVal = metaMin.to_float();
+            if (metaMax.is_valid() && metaMax.can_convert<Float>()) maxVal = metaMax.to_float();
+            if (ImGui::SliderFloat((propName + "##" + propName).c_str(), &val, minVal, maxVal)) prop.set_value(instance, val);
         }
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Clear Reference");
+    }
+    else if (varValue.is_type<float>())
+    {
+        float val = varValue.get_value<float>();
+        if (ImGui::DragFloat((propName + "##" + propName).c_str(), &val, 0.1f)) prop.set_value(instance, val);
+    }
+    else if (varValue.is_type<int>() || varValue.is_type<int32>() || varValue.is_type<uint32>())
+    {
+        int val = varValue.convert<int>();
+        if (ImGui::DragInt((propName + "##" + propName).c_str(), &val)) prop.set_value(instance, val);
+    }
+    else if (varValue.is_type<bool>())
+    {
+        bool val = varValue.get_value<bool>();
+        if (ImGui::Checkbox((propName + "##" + propName).c_str(), &val)) prop.set_value(instance, val);
+    }
+    else if (varValue.is_type<std::string>() || varValue.is_type<std::wstring>())
+    {
+        string sVal = varValue.is_type<string>() ? varValue.get_value<string>() : Helper::To_String(varValue.get_value<wstring>());
+        ImGui::LabelText(propName.c_str(), "%s", sVal.c_str());
     }
 
     // --- 읽기 전용 해제 ---

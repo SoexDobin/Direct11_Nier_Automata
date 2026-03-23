@@ -1,4 +1,5 @@
 #pragma once
+#include "Camera.h"
 #include "Engine_Define.h"
 
 #include "CameraManager.h"
@@ -13,6 +14,8 @@
 #include "ResourceManager.h"
 #include "TimeManager.h"
 #include "LevelSerializer.h"
+#include "FontManager.h"
+#include "SoundManager.h"
 
 #include "GameObject.h"
 #include "Component.h"
@@ -35,7 +38,6 @@ public:
     HRESULT Draw_NoClearing() const;
 
     void Clear_Resource(uint32 levIndex) const;
-    void Clear_LoaderResource() const;
     void Clear_AllResource() const;
 
 public: /* For Editor / Tool */
@@ -52,7 +54,7 @@ public: /* For Input Manager */
     void Set_InputEnabled(Bool isEnabled) const { m_InputDevice->Set_InputEnabled(isEnabled); }
 
 public: /* For GraphicDevice */
-    HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;
+    HRESULT Clear_BackBufferView(const Shared<Float4>& clearColor) const;
     HRESULT Present() const;
     HRESULT OnResize(uint32 width, uint32 height, uint32 offScreenIndex = UINT_MAX);
     HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
@@ -99,9 +101,9 @@ public: /* For ObjectManager */
     void Clearing_ObjectManager(uint32 levIndex) const;
 
 public: /* For CameraManager */
-    HRESULT Add_Camera(const Shared<class Camera> &camera) const;
+    HRESULT Add_Camera(uint32 levIndex, const Shared<class Camera> &camera) const;
+    vector<Shared<class Camera>> Get_Cameras(uint32 levIndex) const;
     HRESULT Set_MainCamera(const Shared<class Camera>& camera) const;
-    vector<Shared<class Camera>> Get_Cameras() const;
     Shared<class Camera> Get_MainCamera() const;
 
 public: /* For ResourceManager */
@@ -144,6 +146,18 @@ public: /* For LevelSerialize */
     HRESULT SerializeLevel(uint32 levIndex, const wstring& path) const;
     HRESULT DeSerializeLevel(const wstring& path) const;
 
+public: /* For FontManager */
+    HRESULT Add_Font(const wstring& fontTag, const tChar* fontFilePath);
+    void Draw_Font(const wstring& fontTag, const tChar* text, const Vector2& position, const Color& color = XMVectorSet(1.f, 1.f, 1.f, 1.f));
+
+public: /* For SoundManager */
+    HRESULT LoadSoundFile(const wstring& path) const;
+    HRESULT Load_Sound(const wstring& soundTag, const wstring& soundFilePath) const;
+    void PlaySoundFX(const wstring& soundKey, SOUNDCHANNEL id, Float volume = -1.f) const;
+    void PlaySoundFXOnce(const wstring& soundKey, SOUNDCHANNEL id, Float volume = -1.f) const;
+    void PlaySoundLoopSection(const wstring& soundKey, SOUNDCHANNEL id, Float volume, uint32 loopStartMs, uint32 loopEndMs, Bool playIntro) const;
+    HRESULT StopSound(SOUNDCHANNEL targetChannel = SOUNDCHANNEL::MAX_CHANNELS) const;
+
 public: /* Prototype & Instantiate Facade */
     template <typename T>
     HRESULT Add_Prototype(uint32 levIndex, const Shared<T>& prototype, const wstring& prototypeTag = L"") {
@@ -156,7 +170,7 @@ public: /* Prototype & Instantiate Facade */
         return std::static_pointer_cast<T>(cloned);
     }
     template <typename T>
-    Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) {
+    Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) {
         PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
         Shared<Object> cloned = Instantiate_Internal(protoType, prototypeTag, levIndex, arg);
         return std::static_pointer_cast<T>(cloned);
@@ -186,6 +200,8 @@ private:
     Unique<Renderer> m_Renderer = {nullptr};
     Unique<LightManager> m_LightManager = {nullptr};
     Unique<LevelSerializer> m_LevelSerializer = {nullptr};
+    Unique<FontManager> m_FontManager = { nullptr };
+    Unique<SoundManager> m_SoundManager = { nullptr };
 };
 
 NS_END

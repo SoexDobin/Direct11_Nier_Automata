@@ -37,7 +37,7 @@ HRESULT ClientApp::Initialize(const ENGINE_DESC& desc)
 
 HRESULT ClientApp::Ready_StartLevel(LEVEL startLevel) 
 {
-	if (FAILED(GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelLoading::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), startLevel)))) {
+	if (FAILED(GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelLoading::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), startLevel, true)))) {
 		return E_FAIL;
     }
 

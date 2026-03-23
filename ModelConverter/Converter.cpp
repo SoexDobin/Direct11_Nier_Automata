@@ -245,13 +245,17 @@ void Tool::Converter::ReadMaterialData()
 				entry.typeIndex = t;
 
 				// 절대경로 혼재 방지: 순수 파일명(ex: "diffuse.dds")만 파싱해서 저장
-				// std::filesystem::path는 인코딩 변환 중 예외(ERROR_NO_UNICODE_TRANSLATION)를 던질 수 있으므로 string 연산 사용
 				string fullPath = texPath.C_Str();
 				size_t lastPos = fullPath.find_last_of("\\/"); // 윈도우/리눅스 구분자 모두 체크
 				if (lastPos != string::npos)
 					entry.path = fullPath.substr(lastPos + 1);
 				else
 					entry.path = fullPath;
+
+				if (entry.path.find(".dds") == string::npos && entry.path.find(".DDS") == string::npos)
+				{
+					entry.path += ".dds";
+				}
 
 				mat->textures.push_back(entry);
 			}
@@ -515,8 +519,9 @@ void Tool::Converter::WriteJsonFile(const wstring& path)
 	}
 
 	// 2. Animations
-	for (auto& anim : m_Animation)
+	for (size_t i = 0; i < m_Animation.size(); ++i)
 	{
+		auto& anim = m_Animation[i];
 		json animJson;
 		animJson["name"] = anim->name;
 		animJson["duration"] = anim->duration;
@@ -526,7 +531,39 @@ void Tool::Converter::WriteJsonFile(const wstring& path)
 		animJson["rootMove"] = { anim->rootTotalTranslation.x, anim->rootTotalTranslation.y, anim->rootTotalTranslation.z };
 		animJson["rootRot"] = { anim->rootTotalRotation.x, anim->rootTotalRotation.y, anim->rootTotalRotation.z, anim->rootTotalRotation.w };
 
+		// Channels
+		json channelsJson = json::array();
+		for (auto& channel : m_Channels[i])
+		{
+			json channelJson;
+			channelJson["name"] = channel->name;
+			channelJson["boneIndex"] = channel->boneIndex;
+			channelJson["numKeyFrames"] = channel->numKeyFrames;
+			channelsJson.push_back(channelJson);
+		}
+		animJson["channels"] = channelsJson;
+
 		root["animations"].push_back(animJson);
+	}
+
+	// 3. Bones
+	for (auto& bone : m_Bones)
+	{
+		json boneJson;
+		boneJson["name"] = bone->name;
+		boneJson["parentIndex"] = bone->parentIndex;
+		root["bones"].push_back(boneJson);
+	}
+
+	// 4. Meshes
+	for (auto& mesh : m_Meshes)
+	{
+		json meshJson;
+		meshJson["name"] = mesh->name;
+		meshJson["materialIndex"] = mesh->materialIndex;
+		meshJson["numVertices"] = m_IsSkeletal ? mesh->animVertices.size() : mesh->vertices.size();
+		meshJson["numIndices"] = mesh->indices.size();
+		root["meshes"].push_back(meshJson);
 	}
 
 	ofstream out(path);

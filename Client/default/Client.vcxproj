@@ -209,6 +209,8 @@
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\ThirdPersonCamera.h" />
     <ClInclude Include="..\public\TitleBackground.h" />
+    <ClInclude Include="..\public\WP0070Body.h" />
+    <ClInclude Include="..\public\WP0220Body.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -241,6 +243,8 @@
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\ThirdPersonCamera.cpp" />
     <ClCompile Include="..\private\TitleBackground.cpp" />
+    <ClCompile Include="..\private\WP0070Body.cpp" />
+    <ClCompile Include="..\private\WP0220Body.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -3,13 +3,16 @@
 
 NS_BEGIN(Client)
 
-class P10000;
+class P10000Body;
 
-class State2B_Attack final : public State2B
+class CLIENT_DLL State2B_Attack final : public State2B
 {
 public:
-	explicit State2B_Attack(const wstring& tag, const Shared<P10000>& owner);
+	explicit State2B_Attack(const wstring& tag, const Shared<P10000Body>& owner);
 	~State2B_Attack() override = default;
+
+private:
+	HRESULT Initialize();
 
 public:
 	Bool StateEnterInvoke() override;
@@ -17,7 +20,8 @@ public:
 	void Late_Update(Float timeDelta) override;
 	void StateExitInvoke() override;
 
-
+public:
+	static Shared<State2B_Attack> Create(const wstring& tag, const Shared<P10000Body>& owner);
 };
 
 NS_END

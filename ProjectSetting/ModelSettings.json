@@ -1,7 +1,7 @@
 {
     "ModelSettings": [
         {
-            "level": "STATIC",
+            "level": "3",
             "path": "Models/p10000/p10000.model",
             "position": {
                 "x": 0.0,
@@ -21,8 +21,48 @@
             "tag": "p10000"
         },
         {
-            "level": "STATIC",
-            "path": "Models\\World\\CityOfRuinsMainField/CityOfRuinsMainField20708.model",
+            "level": "3",
+            "path": "Models/World/CityOfRuinEntry/CityOfRuinEntry.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "CityOfRuinEntry"
+        },
+        {
+            "level": "3",
+            "path": "Models/World/CityOfRuinBridge/CityOfRuinBridge.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "CityOfRuinBridge"
+        },
+        {
+            "level": "3",
+            "path": "Models/wp0070/wp0070.model",
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -34,11 +74,31 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
             },
-            "tag": "CityOfRuinsMainField"
+            "tag": "wp0070"
+        },
+        {
+            "level": "3",
+            "path": "Models/wp0220/wp0220.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "wp0220"
         }
     ]
 }

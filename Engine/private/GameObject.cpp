@@ -177,77 +177,54 @@ HRESULT GameObject::Add_Child(const Shared<GameObject> &child) {
 
 void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap)
 {
-	// 1. 자기 자신(GameObject)의 RTTR 프로퍼티 중 참조 필드 해결
-	rttr::type type = rttr::type::get(*this);
-	for (auto& prop : type.get_properties())
-	{
-		if (prop.get_metadata("SaveData") == "GameObject")
-		{
-			rttr::variant var = prop.get_value(*this);
-			uint32 targetObjectID = 0;
+    rttr::type type = rttr::type::get(*this);
+    for (auto& prop : type.get_properties())
+    {
+        if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
+        {
+            uint32 targetID = prop.get_value(*this).convert<uint32>();
+            if (targetID != 0)
+            {
+                Shared<GameObject> pTarget = nullptr;
+                auto it = instanceMap.find(targetID);
+                if (it != instanceMap.end()) pTarget = it->second;
+                else pTarget = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), targetID);
 
-			// 파일에서 로드된 ObjectID 추출
-			if (var.is_type<uint32>()) targetObjectID = var.get_value<uint32>();
-			else if (var.is_type<int>()) targetObjectID = static_cast<uint32>(var.get_value<int>());
+                if (pTarget)
+                {
+                    if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) prop.set_value(*this, pTarget);
+                    else prop.set_value(*this, targetID);
+                }
+            }
+        }
+    }
 
-			if (targetObjectID != 0)
-			{
-				auto it = instanceMap.find(targetObjectID);
-				if (it != instanceMap.end())
-				{
-					rttr::type propType = prop.get_type();
-					// A. SharedPtr을 기대하는 경우
-					if (propType == rttr::type::get<Shared<GameObject>>())
-					{
-						prop.set_value(*this, it->second);
-					}
-					// B. InstanceID(런타임 ID)를 기대하는 경우 (Camera 타겟 등)
-					else if (propType == rttr::type::get<uint32>() || propType == rttr::type::get<int>())
-					{
-						prop.set_value(*this, targetObjectID);
-					}
-					
-					LOG_INFO(L"Resolved Reference: {} -> {} (ObjectID: {})", Get_Name(), it->second->Get_Name(), targetObjectID);
-				}
-			}
-		}
-	}
-
-	// 2. 소속 컴포넌트들의 참조 필드 해결
+    // 2. 소속 컴포넌트들의 참조 필드 해결
     for (auto& [id, comp] : m_Components)
     {
         if (!comp) continue;
-
         rttr::type compType = rttr::type::get(*comp);
         for (auto& prop : compType.get_properties())
         {
-            if (prop.get_metadata("SaveData") == "GameObject")
+            if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
             {
-                rttr::variant var = prop.get_value(*comp);
-                uint32 targetObjectID = 0;
-
-                if (var.is_type<uint32>()) targetObjectID = var.get_value<uint32>();
-                else if (var.is_type<int>()) targetObjectID = static_cast<uint32>(var.get_value<int>());
-
-                if (targetObjectID != 0)
+                uint32 targetID = prop.get_value(*comp).convert<uint32>();
+                if (targetID != 0)
                 {
-                    auto it = instanceMap.find(targetObjectID);
-                    if (it != instanceMap.end())
-                    {
-                        rttr::type propType = prop.get_type();
-                        if (propType == rttr::type::get<Shared<GameObject>>())
-                        {
-                            prop.set_value(*comp, it->second);
-                        }
-                        else if (propType == rttr::type::get<uint32>() || propType == rttr::type::get<int>())
-                        {
-                            prop.set_value(*comp, targetObjectID);
-                        }
+                    Shared<GameObject> pTarget = nullptr;
+                    auto it = instanceMap.find(targetID);
+                    if (it != instanceMap.end()) pTarget = it->second;
+                    else pTarget = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), targetID);
 
+                    if (pTarget)
+                    {
+                        if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) prop.set_value(*comp, pTarget);
+                        else prop.set_value(*comp, targetID);
                     }
                 }
             }
         }
+        comp->Post_Load(instanceMap);
     }
 }
 

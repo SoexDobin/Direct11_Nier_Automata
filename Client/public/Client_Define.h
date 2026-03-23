@@ -22,6 +22,11 @@ namespace Client
 	constexpr const Char* NormalMap = "g_NormalTexture";
 
 	constexpr const Char* BoneMatrices = "g_BoneMatrices";
+
+	constexpr const Char* DirectionLight = "g_LightDir";
+	constexpr const Char* DiffuseLight = "g_LightDiffuse";
+	constexpr const Char* SpecularLight = "g_LightSpecular";
+	constexpr const Char* AmbientLight = "g_LightAmbient";
 }
 
 using namespace Client;

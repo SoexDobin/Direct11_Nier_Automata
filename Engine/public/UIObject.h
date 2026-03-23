@@ -34,6 +34,7 @@ public:
 public:
     void Update_UITransform() const;
     void Update_UITransform(Float viewportWidth, Float viewportHeight) const;
+    GAMEOBJECTTYPE Get_GameObjectType() final { return GAMEOBJECTTYPE::UI; }
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void *arg) override;
     virtual void On_Destroy() override;

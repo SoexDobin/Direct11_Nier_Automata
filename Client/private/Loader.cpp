@@ -38,6 +38,7 @@ HRESULT Loader::Initialize(void *arg)
 
     m_NextLevelID = desc.nextLevelID;
     m_OwnerLevel = desc.ownerLevel;
+    m_LoadStatic = desc.isLoadStatic;
     InitializeCriticalSection(&m_CriticalSection);
 
 	auto sharedPtrToPass = new Shared<Loader>(static_pointer_cast<Loader>(shared_from_this()));
@@ -174,6 +175,13 @@ HRESULT Loader::Loading_Global_Prototype()
     if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
         if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::STATIC))) {
             LOG_ERROR(L"Failed to Load Model");
+            return E_FAIL;
+        }
+    }
+
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_SoundJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Sound_FromJson())) {
+            LOG_ERROR(L"Failed to Load Sounds");
             return E_FAIL;
         }
     }

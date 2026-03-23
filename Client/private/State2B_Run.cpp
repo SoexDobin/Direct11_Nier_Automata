@@ -1,9 +1,16 @@
 #include "pch.h"
 #include "State2B_Run.h"
 
-State2B_Run::State2B_Run(const wstring& tag, const Shared<P10000>& owner)
+#include <SpdLogger.h>
+
+State2B_Run::State2B_Run(const wstring& tag, const Shared<P10000Body>& owner)
 	: State2B{tag, owner}
 {
+}
+
+HRESULT State2B_Run::Initialize()
+{
+	return S_OK;
 }
 
 Bool State2B_Run::StateEnterInvoke()
@@ -24,4 +31,17 @@ void State2B_Run::Late_Update(Float timeDelta)
 void State2B_Run::StateExitInvoke()
 {
 	State2B::StateExitInvoke();
+}
+
+Shared<State2B_Run> State2B_Run::Create(const wstring& tag, const Shared<P10000Body>& owner)
+{
+	auto instance = make_shared<State2B_Run>(tag, owner);
+
+	if (FAILED(instance->Initialize()))
+	{
+		LOG_ERROR(L"Failed to Create State2B_Run");
+		return nullptr;
+	}
+
+	return instance;
 }

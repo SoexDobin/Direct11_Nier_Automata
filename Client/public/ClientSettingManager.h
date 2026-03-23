@@ -28,6 +28,10 @@ public: /* Model */
 public: /* Shader */
 	HRESULT Load_Shader() const;
 
+public: /* Sound */
+	HRESULT Load_Sound_FromJson() const;
+	HRESULT Sync_SoundJson_FromCSV() const;
+
 public:
 	HRESULT Ready_Client_Prototypes(LEVEL level) const;
 	HRESULT Load_EngineDesc(ENGINE_DESC& outDesc) const;

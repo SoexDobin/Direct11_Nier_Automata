@@ -139,6 +139,21 @@
     <Filter Include="01. Utility\04. GameObject\Container\Part">
       <UniqueIdentifier>{db95d63b-5f9b-4493-84f7-5da3fd5ba944}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. System\03. Serializer">
+      <UniqueIdentifier>{c7b526ea-2148-4f03-b380-fe93f6762b74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\09. Font">
+      <UniqueIdentifier>{9a28766f-59ce-46c5-bcb3-0b87b82df4b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\09. Font\Manager">
+      <UniqueIdentifier>{0c9e37b9-a401-4c89-8894-adbb3f73022a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. GameObject\UIObject\TextUI">
+      <UniqueIdentifier>{e971fe02-1cf5-48ab-9d3f-672d7a560a5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\10. Sound">
+      <UniqueIdentifier>{6c850e5f-1604-4a72-ad43-0be30e4e532d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -242,9 +257,6 @@
     <ClInclude Include="..\public\Texture.h">
       <Filter>01. Utility\05. Component\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\LevelSerializer.h">
-      <Filter>00. System</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Shader.h">
       <Filter>01. Utility\05. Component\Shader</Filter>
     </ClInclude>
@@ -304,6 +316,21 @@
     </ClInclude>
     <ClInclude Include="..\public\Engine_RTTR_Metadata.h">
       <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LevelSerializer.h">
+      <Filter>00. System\03. Serializer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FontManager.h">
+      <Filter>01. Utility\09. Font\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Font.h">
+      <Filter>01. Utility\09. Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TextUI.h">
+      <Filter>01. Utility\04. GameObject\UIObject\TextUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SoundManager.h">
+      <Filter>01. Utility\10. Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -369,9 +396,6 @@
     </ClCompile>
     <ClCompile Include="..\private\Texture.cpp">
       <Filter>01. Utility\05. Component\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\LevelSerializer.cpp">
-      <Filter>00. System</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Shader.cpp">
       <Filter>01. Utility\05. Component\Shader</Filter>
@@ -462,6 +486,24 @@
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Camera_rttr.cpp">
       <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LevelSerializer.cpp">
+      <Filter>00. System\03. Serializer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FontManager.cpp">
+      <Filter>01. Utility\09. Font\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Font.cpp">
+      <Filter>01. Utility\09. Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\TextUI_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TextUI.cpp">
+      <Filter>01. Utility\04. GameObject\UIObject\TextUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SoundManager.cpp">
+      <Filter>01. Utility\10. Sound</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

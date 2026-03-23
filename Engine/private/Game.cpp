@@ -55,49 +55,54 @@ Game::~Game() {
 }
 
 HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
-  LOG_INIT(); /* Debug Helper SpdLogger - 먼저 초기화 */
+    LOG_INIT(); /* Debug Helper SpdLogger - 먼저 초기화 */
 
-  m_LayerRegistry = make_shared<LayerRegistry>();
-  m_TagRegistry = make_shared<TagRegistry>();
+    m_LayerRegistry = make_shared<LayerRegistry>();
+    m_TagRegistry = make_shared<TagRegistry>();
 
-  if (nullptr == (m_GraphicDevice = GraphicDevice::Create(engineDesc)))
-    return E_FAIL;
+    if (nullptr == (m_GraphicDevice = GraphicDevice::Create(engineDesc)))
+		return E_FAIL;
 
-  if (nullptr == (m_TimeManager = TimeManager::Create()))
-    return E_FAIL;
+    if (nullptr == (m_TimeManager = TimeManager::Create()))
+		return E_FAIL;
 
-  if (nullptr ==
-      (m_InputDevice = InputDevice::Create(engineDesc.hWnd, engineDesc.hInst)))
-    return E_FAIL;
+    if (nullptr == (m_InputDevice = InputDevice::Create(engineDesc.hWnd, engineDesc.hInst)))
+		return E_FAIL;
 
-  if (nullptr == (m_Pipeline = Pipeline::Create()))
-    return E_FAIL;
+    if (nullptr == (m_Pipeline = Pipeline::Create()))
+		return E_FAIL;
 
-  if (nullptr == (m_LevelManager = LevelManager::Create()))
-    return E_FAIL;
+    if (nullptr == (m_LevelManager = LevelManager::Create()))
+		return E_FAIL;
 
-  if (nullptr == (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount)))
-    return E_FAIL;
+    if (nullptr == (m_PrototypeManager = PrototypeManager::Create(engineDesc.levelCount)))
+		return E_FAIL;
 
-  if (nullptr == (m_ObjectManager = ObjectManager::Create(engineDesc.levelCount)))
-    return E_FAIL;
+    if (nullptr == (m_ObjectManager = ObjectManager::Create(engineDesc.levelCount)))
+		return E_FAIL;
 
-  if (nullptr == (m_ResourceManager = ResourceManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context(), engineDesc.levelCount)))
-      return E_FAIL;
+    if (nullptr == (m_ResourceManager = ResourceManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context(), engineDesc.levelCount)))
+        return E_FAIL;
 
-  if (nullptr == (m_CameraManager = CameraManager::Create()))
-    return E_FAIL;
+    if (nullptr == (m_CameraManager = CameraManager::Create(engineDesc.levelCount)))
+		return E_FAIL;
 
-  if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),m_GraphicDevice->Get_Context())))
-    return E_FAIL;
+    if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),m_GraphicDevice->Get_Context())))
+		return E_FAIL;
 
-  if (nullptr == (m_LightManager = LightManager::Create()))
-    return E_FAIL;
+    if (nullptr == (m_LightManager = LightManager::Create()))
+		return E_FAIL;
 
-  if (nullptr == (m_LevelSerializer = LevelSerializer::Create()))
-      return E_FAIL;
+    if (nullptr == (m_LevelSerializer = LevelSerializer::Create()))
+        return E_FAIL;
 
-  return S_OK;
+    if (nullptr == (m_FontManager = FontManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
+        return E_FAIL;
+
+    if (nullptr == (m_SoundManager = SoundManager::Create()))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 void Game::Update_Engine() {
@@ -141,15 +146,18 @@ void Game::Clear_AllResource() const {
     m_PrototypeManager->Clear_Prototypes();
     m_ObjectManager->Clear_AllGameObjects();
     m_Renderer->Clear_RenderGroup();
-    m_CameraManager->Clear_Cameras();
+    m_CameraManager->Clear_AllCameras();
     m_LightManager->Clear_Lights();
     m_ResourceManager->Clear_AllResources();
     m_LevelManager->Clear_LevelMembers();
+
+    m_FontManager->Clear_Fonts();
+    m_SoundManager->Clear_SoundSources();
 }
 
 void Game::Clear_Resource(uint32 levIndex) const {
 
-	if (FAILED(m_PrototypeManager->Clear_Prototypes(levIndex))) 
+	if (FAILED(m_PrototypeManager->Clear_Prototypes(levIndex)))
 		LOG_CRITICAL(L"Failed To Clear Level{} Prototypes", levIndex);
   
     if (FAILED(m_ObjectManager->Clear_GameObjects(levIndex)))
@@ -161,26 +169,12 @@ void Game::Clear_Resource(uint32 levIndex) const {
 	if (FAILED(m_Renderer->Clear_RenderGroup()))
       LOG_CRITICAL(L"Failed To Clear RenderGroup");
 
-	if (FAILED(m_CameraManager->Clear_Cameras()))
+	if (FAILED(m_CameraManager->Clear_Cameras(levIndex)))
       LOG_CRITICAL(L"Failed To Clear Cameras");
 
 	if (FAILED(m_LightManager->Clear_Lights())) 
 		LOG_CRITICAL(L"Failed To Clear Lights");
 	
-}
-
-void Game::Clear_LoaderResource() const
-{
-    if (FAILED(m_ObjectManager->Clear_GameObjects(1)))
-        LOG_CRITICAL(L"Failed To Clear GameObjects");
-    if (FAILED(m_ResourceManager->Clear_Resource(1)))
-        LOG_CRITICAL(L"Failed To Clear Resources");
-    if (FAILED(m_Renderer->Clear_RenderGroup()))
-        LOG_CRITICAL(L"Failed To Clear RenderGroup");
-    if (FAILED(m_CameraManager->Clear_Cameras()))
-        LOG_CRITICAL(L"Failed To Clear Cameras");
-    if (FAILED(m_LightManager->Clear_Lights()))
-        LOG_CRITICAL(L"Failed To Clear Lights");
 }
 
 void Game::Update_Input() const { m_InputDevice->Update(); }
@@ -214,7 +208,7 @@ HRESULT Game::OnResize(uint32 width, uint32 height, uint32 offscreenIndex)
 		m_CameraManager->Get_MainCamera()->Bind_Aspect(fAspect);
 	}
 
-	for (auto &camera : m_CameraManager->Get_Cameras())
+	for (auto &camera : m_CameraManager->Get_Cameras(GAME_INSTANCE->Get_CurrentLevelIndex()))
 	{
 		camera->Set_Aspect(fAspect);
 	}
@@ -324,12 +318,22 @@ void Game::Clearing_ObjectManager(uint32 levIndex) const
 
 Shared<GameObject> Game::Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const
 {
-    return m_ObjectManager->Find_ByInstanceID(levIndex, instanceID);
+    Shared<GameObject> pObj = m_ObjectManager->Find_ByInstanceID(levIndex, instanceID);
+    if (!pObj && levIndex != 0)
+    {
+        pObj = m_ObjectManager->Find_ByInstanceID(0, instanceID);
+    }
+    return pObj;
 }
 
 Shared<GameObject> Game::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const
 {
-    return m_ObjectManager->Find_ObjectByObjectID(levIndex, objectID);
+    Shared<GameObject> pObj = m_ObjectManager->Find_ObjectByObjectID(levIndex, objectID);
+    if (!pObj && levIndex != 0)
+    {
+        pObj = m_ObjectManager->Find_ObjectByObjectID(0, objectID);
+    }
+    return pObj;
 }
 
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
@@ -350,15 +354,22 @@ HRESULT Game::Clear_AllGameObjects() const
 		LOG_ERROR(L"[Game] Failed To Clear RenderGroup");
 		return E_FAIL;
 	}
-	m_CameraManager->Clear_Cameras();
+	m_CameraManager->Clear_AllCameras();
 	return S_OK;
 }
 
-HRESULT Game::Add_Camera(const Shared<Camera> &camera) const { return m_CameraManager->Add_Camera(camera); }
-HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const { return m_CameraManager->Set_MainCamera(camera); }
-vector<Shared<Camera>> Game::Get_Cameras() const { return m_CameraManager->Get_Cameras(); }
-
-
+HRESULT Game::Add_Camera(uint32 levIndex, const Shared<Camera> &camera) const
+{
+	return m_CameraManager->Add_Camera(levIndex, camera);
+}
+vector<Shared<Camera>> Game::Get_Cameras(uint32 levIndex) const
+{
+    return m_CameraManager->Get_Cameras(levIndex);
+}
+HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const
+{
+	return m_CameraManager->Set_MainCamera(camera);
+}
 Shared<Camera> Game::Get_MainCamera() const { return m_CameraManager->Get_MainCamera(); }
 
 HRESULT Game::Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const
@@ -484,40 +495,89 @@ HRESULT Game::DeSerializeLevel(const wstring &path) const
     return m_LevelSerializer->DeSerializeLevel(path);
 }
 
+HRESULT Game::Add_Font(const wstring& fontTag, const tChar* fontFilePath)
+{
+    return m_FontManager->Add_Font(fontTag, fontFilePath);
+}
+
+void Game::Draw_Font(const wstring& fontTag, const tChar* text, const Vector2& position, const Color& color)
+{
+    m_FontManager->Draw(fontTag, text, position, color);
+}
+
+HRESULT Game::LoadSoundFile(const wstring& path) const
+{
+    return m_SoundManager->LoadSoundFile(path);
+}
+
+HRESULT Game::Load_Sound(const wstring& soundTag, const wstring& soundFilePath) const
+{
+    return m_SoundManager->Load_Sound(soundTag, soundFilePath);
+}
+
+void Game::PlaySoundFX(const wstring& soundKey, SOUNDCHANNEL id, Float volume) const
+{
+    m_SoundManager->PlaySoundFx(soundKey, id, volume);
+}
+
+void Game::PlaySoundFXOnce(const wstring& soundKey, SOUNDCHANNEL id, Float volume) const
+{
+    m_SoundManager->PlaySoundFxOnce(soundKey, id, volume);
+}
+
+void Game::PlaySoundLoopSection(const wstring& soundKey, SOUNDCHANNEL id, Float volume, uint32 loopStartMs, uint32 loopEndMs, Bool playIntro) const
+{
+    m_SoundManager->PlaySoundLoopSection(soundKey, id, volume, loopStartMs, loopEndMs, playIntro);
+}
+
+HRESULT Game::StopSound(SOUNDCHANNEL targetChannel) const
+{
+    if (targetChannel == SOUNDCHANNEL::MAX_CHANNELS)
+        return m_SoundManager->StopAll();
+    else
+        return m_SoundManager->StopChannel(targetChannel);
+}
+
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
 {
-    Shared<Object> pPrototype = nullptr;
+    Shared<Object> protoObject = nullptr;
 	uint32 targetLevel = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
 
 	// 1. Search in target level
-	pPrototype = m_PrototypeManager->Find_Prototype(protoType, targetLevel, objectID);
+	protoObject = m_PrototypeManager->Find_Prototype(protoType, targetLevel, objectID);
     
 	// 2. Search in Static level (0)
-	if (!pPrototype && targetLevel != 0)
-        pPrototype = m_PrototypeManager->Find_Prototype(protoType, 0, objectID);
+	if (!protoObject && targetLevel != 0)
+        protoObject = m_PrototypeManager->Find_Prototype(protoType, 0, objectID);
 
     // 3. Search in Current level (if targetLevel was something else)
-    if (!pPrototype && targetLevel != m_LevelManager->Get_CurrentLevelIndex())
-        pPrototype = m_PrototypeManager->Find_Prototype(protoType, m_LevelManager->Get_CurrentLevelIndex(), objectID);
+    if (!protoObject && targetLevel != m_LevelManager->Get_CurrentLevelIndex())
+        protoObject = m_PrototypeManager->Find_Prototype(protoType, m_LevelManager->Get_CurrentLevelIndex(), objectID);
 
-    if (!pPrototype) 
+    if (!protoObject) 
         return nullptr;
 
-    Shared<Object> pCloned = nullptr;
+    Shared<Object> cloned = nullptr;
     if (protoType == PROTOTYPE::GAMEOBJECT) {
-        auto pGameObject = std::static_pointer_cast<GameObject>(pPrototype);
-        pCloned = pGameObject->Clone(arg);
-        if (pCloned)
-            m_ObjectManager->Add_GameObject(targetLevel, std::static_pointer_cast<GameObject>(pCloned));
+        auto GameObjectPrototype = std::static_pointer_cast<GameObject>(protoObject);
+        cloned = GameObjectPrototype->Clone(arg);
+        if (cloned)
+        {
+            m_ObjectManager->Add_GameObject(targetLevel, std::static_pointer_cast<GameObject>(cloned));
+
+            if (GameObjectPrototype->Get_GameObjectType() == GAMEOBJECTTYPE::CAMERA)
+                Add_Camera(levIndex, static_pointer_cast<Camera>(cloned));
+        }
     }
     else {
-        auto pComponent = std::static_pointer_cast<Component>(pPrototype);
-        pCloned = pComponent->Clone(arg);
+        auto pComponent = std::static_pointer_cast<Component>(protoObject);
+        cloned = pComponent->Clone(arg);
     }
-    return pCloned;
+
+    return cloned;
 }
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring &prototypeTag, uint32 levIndex, void *arg) const
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& prototypeTag, uint32 levIndex, void *arg) const
 {
 	if (prototypeTag.empty())
 	{

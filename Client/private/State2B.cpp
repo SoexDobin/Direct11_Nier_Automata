@@ -3,7 +3,7 @@
 
 namespace Client
 {
-	State2B::State2B(const wstring& tag, const Shared<P10000>& owner)
+	State2B::State2B(const wstring& tag, const Shared<P10000Body>& owner)
 		: State{ tag }, m_Owner{ owner }
 	{
 	}

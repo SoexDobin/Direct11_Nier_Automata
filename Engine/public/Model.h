@@ -26,6 +26,7 @@ public:
 public:
 	uint32 Get_NumMeshes() const { return m_NumMeshes; }
 	uint32 Get_NumAnimations() const { return m_NumAnimation; }
+	Bool Is_Skeletal() const { return m_IsSkeletal; }
 
 public:
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::MODEL; }
@@ -64,7 +65,6 @@ private:
 	wstring	m_ModelTag{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
-
 
 private:
 	Bool	m_IsAnimLoop{ false };

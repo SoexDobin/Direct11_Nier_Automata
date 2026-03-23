@@ -209,6 +209,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Engine_RTTR_Metadata.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
+    <ClInclude Include="..\public\Font.h" />
+    <ClInclude Include="..\public\FontManager.h" />
     <ClInclude Include="..\public\Game.h" />
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GraphicDevice.h" />
@@ -233,9 +235,11 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\ScriptComponent.h" />
     <ClInclude Include="..\public\LevelSerializer.h" />
     <ClInclude Include="..\public\Shader.h" />
+    <ClInclude Include="..\public\SoundManager.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
     <ClInclude Include="..\public\String_Helper.h" />
     <ClInclude Include="..\public\TagRegistry.h" />
+    <ClInclude Include="..\public\TextUI.h" />
     <ClInclude Include="..\public\Texture.h" />
     <ClInclude Include="..\public\TimeManager.h" />
     <ClInclude Include="..\public\Timer.h" />
@@ -253,6 +257,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Channel.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\ContainerObject.cpp" />
+    <ClCompile Include="..\private\Font.cpp" />
+    <ClCompile Include="..\private\FontManager.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
     <ClCompile Include="..\private\GraphicDevice.cpp" />
@@ -284,6 +290,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\TextUI_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
@@ -294,8 +301,10 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\LevelSerializer.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
+    <ClCompile Include="..\private\SoundManager.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />
     <ClCompile Include="..\private\TagRegistry.cpp" />
+    <ClCompile Include="..\private\TextUI.cpp" />
     <ClCompile Include="..\private\Texture.cpp" />
     <ClCompile Include="..\private\TimeManager.cpp" />
     <ClCompile Include="..\private\Timer.cpp" />

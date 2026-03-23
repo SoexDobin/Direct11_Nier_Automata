@@ -27,9 +27,13 @@ HRESULT ContainerObject::Add_PartObject(uint32 prototypeLevIndex, const wstring&
 		return E_FAIL;
 	}
 
-	auto partObject = static_pointer_cast<PartObject>(GAME_INSTANCE->Instantiate(prototypeTag, prototypeLevIndex, arg));
+	auto partObject = static_pointer_cast<PartObject>(GAME_INSTANCE->Instantiate<PartObject>(prototypeTag, prototypeLevIndex, arg));
 	if (nullptr == partObject)
+	{
+		LOG_ERROR(L"Failed to Add PartObject {} / {}", prototypeTag, partTag);
 		return E_FAIL;
+	}
+		
 
 	m_PartObjects.emplace(partTag, partObject);
 	return S_OK;

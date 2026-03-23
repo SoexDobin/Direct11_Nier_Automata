@@ -25,6 +25,7 @@ public:
 
 public:
 	uint32 Get_NumMeshes() const { return m_NumMeshes; }
+	uint32 Get_Num_Bones() const { return m_NumBones; }
 	uint32 Get_NumAnimations() const { return m_NumAnimation; }
 	Bool Is_Skeletal() const { return m_IsSkeletal; }
 
@@ -46,6 +47,9 @@ public:
 	uint32 Get_AnimationIndex() const { return m_CurrentAnimIndex; }
 	void Set_AnimLoop(Bool isLoop) { m_IsAnimLoop = isLoop; }
 	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
+
+public:
+	const Matrix& Get_BoneTransformByName(const string& boneName);
 
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);

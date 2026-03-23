@@ -100,6 +100,12 @@
     <ClInclude Include="..\public\WP0220Body.h">
       <Filter>02. GameObject\Playable\2B\2BPartObject\WP0220</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SkyBox.h">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SkySphere.h">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -198,6 +204,12 @@
     <ClCompile Include="..\private\WP0220Body.cpp">
       <Filter>02. GameObject\Playable\2B\2BPartObject\WP0220</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\SkyBox.cpp">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SkySphere.cpp">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="99. Default">
@@ -275,6 +287,9 @@
     <Filter Include="02. GameObject\Playable\2B\2BPartObject\WP0220">
       <UniqueIdentifier>{7aad67ae-f8c0-4d54-a65f-91fd0e40244b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Sky">
+      <UniqueIdentifier>{d5aa316f-6060-4485-b596-72e8cffe7af4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl">
@@ -287,6 +302,9 @@
       <Filter>97. Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\shaders\Shader_VtxAnimMesh.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\shaders\Shader_VtxCube.hlsl">
       <Filter>97. Shader</Filter>
     </FxCompile>
   </ItemGroup>

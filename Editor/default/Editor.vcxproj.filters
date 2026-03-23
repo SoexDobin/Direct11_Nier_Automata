@@ -49,6 +49,9 @@
     <Filter Include="01. EditorObject\AssetBrowser">
       <UniqueIdentifier>{7d5e7feb-fea8-4240-a4ea-bc786b988079}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. EditorObject\Inspector\InspectorObject">
+      <UniqueIdentifier>{ecb36892-4de6-4d99-baad-03bc79b2c23d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\EditorApp.h">
@@ -105,8 +108,17 @@
     <ClInclude Include="..\public\AssetBrowser.h">
       <Filter>01. EditorObject\AssetBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\ComponentEditUI.h">
-      <Filter>01. EditorObject\Inspector</Filter>
+    <ClInclude Include="..\public\InspectorTransform.h">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\InspectorTexture.h">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\InspectorModel.h">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\InspectorCamera.h">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -146,8 +158,17 @@
     <ClCompile Include="..\private\AssetBrowser.cpp">
       <Filter>01. EditorObject\AssetBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\ComponentEditUI.cpp">
-      <Filter>01. EditorObject\Inspector</Filter>
+    <ClCompile Include="..\private\InspectorTransform.cpp">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\InspectorTexture.cpp">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\InspectorModel.cpp">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\InspectorCamera.cpp">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

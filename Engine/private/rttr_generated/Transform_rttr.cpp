@@ -1,34 +1,37 @@
 #include "Transform.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
+
+using namespace Meta_Key_Type;
+using namespace Data_Type_Key;
+using namespace Data_Tag;
+using namespace Asset_Type_Key;
+using namespace Save_Data_Key;
 
 RTTR_REGISTRATION_NAMED(Transform_RTTR)
 {
 	registration::class_<Transform>("Transform")
-	.constructor<>()
+		.constructor<>()
+		.method("Clone", &Transform::Clone)
+		.method("Create", &Transform::Create)
+		.method("CreatePrototype", &Transform::CreatePrototype)
 
-	.method("Clone", &Transform::Clone)
-	.method("Create", &Transform::Create)
-	.method("CreatePrototype", &Transform::CreatePrototype)
-
-	.property("Position", &Transform::Get_LocalPosition, &Transform::Set_LocalPositionByValue)
-	(
-		metadata(Meta_Key::DataType, "Vector3"),
-		metadata(Meta_Key::Widget, Widget_Type::DragFloat3),
-		metadata(Meta_Key::SaveData, Serialize_Data_Field::Position)
-	)
-	.property("Rotation", &Transform::Get_LocalEulerAngles, &Transform::Set_LocalEulerAngleByValue)
-		(
-			metadata(Meta_Key::DataType, "Vector3"),
-			metadata(Meta_Key::Widget, Widget_Type::DragFloat3),
-			metadata(Meta_Key::SaveData, Serialize_Data_Field::Rotation)
-		)
-	.property("Scale", &Transform::Get_LocalScale, &Transform::Set_LocalScaleByValue)
-	(
-		metadata(Meta_Key::DataType, "Vector3"),
-		metadata(Meta_Key::Widget, Widget_Type::DragFloat3),
-		metadata(Meta_Key::SaveData, Serialize_Data_Field::Scale)
-	)
+		.property("Position", &Transform::Get_LocalPosition, &Transform::Set_LocalPositionByValue)
+			(rttr::metadata(DataType, Data_Type_Key::Vector3),
+			rttr::metadata(TypeTag, Data_Tag::Position),
+			rttr::metadata(AssetType, NoneAsset),
+			rttr::metadata(SaveData, TransformPos))
+		.property("Rotation", &Transform::Get_LocalEulerAngles, &Transform::Set_LocalEulerAngleByValue)
+			(rttr::metadata(DataType, Data_Type_Key::Vector3),
+			rttr::metadata(TypeTag, Data_Tag::Rotation),
+			rttr::metadata(AssetType, NoneAsset),
+			rttr::metadata(SaveData, TransformRot))
+		.property("Scale", &Transform::Get_LocalScale, &Transform::Set_LocalScaleByValue)
+			(rttr::metadata(DataType, Data_Type_Key::Vector3),
+			rttr::metadata(TypeTag, Data_Tag::Scale),
+			rttr::metadata(AssetType, NoneAsset),
+			rttr::metadata(SaveData, TransformScale))
 		;
 }

@@ -1,13 +1,12 @@
-﻿#include "Game.h"
+#include "Game.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 2143
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Game_RTTR)
 {
-    registration::class_<Game>("Game")
-        .constructor<>()
-        ;
+	registration::class_<Game>("Game")
+		.constructor<>()
+		;
 }
-

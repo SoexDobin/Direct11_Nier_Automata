@@ -19,14 +19,13 @@ def generate_rttr_logic(class_name: str, has_clone: bool, has_create: bool, has_
 	return f'\tregistration::class_<{class_name}>("{class_name}")' + constructor + method_registrations + '\n\t\t;'
 
 def get_full_file_content(class_name: str, rttr_logic: str, namespace: str) -> str:
-	return f'''#include "pch.h"
-#include "{class_name}.h"
+	return f'''#include "{class_name}.h"
 #include <rttr/registration>
 
 using namespace rttr;
 using namespace {namespace};
 
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED({class_name}_RTTR)
 {{
 {rttr_logic}
 }}
@@ -36,7 +35,7 @@ def process_header_file(header_path: Path, output_dir: Path, processed_classes: 
 	try:
 		content = header_path.read_text(encoding='utf-8')
 		# Extract class name and check for abstract keyword (ignore forward declarations by requiring : or {)
-		class_match = re.search(r'\bclass\s+(?:ENGINE_DLL\s+)?(\w+)(?:\s+abstract)?\s*[:{]', content)
+		class_match = re.search(r'\bclass\s+(?:ENGINE_DLL\s+)?(\w+)(?:\s+(?:final|abstract))?\s*[:{]', content)
 		if not class_match:
 			return False
 		

@@ -41,6 +41,8 @@ enum class COMPONENT_TYPE {
 	TEXTURE,
 	VI_RECT_BUFFER,
 	VI_TERRAIN_BUFFER,
+	VI_CUBE_BUFFER,
+	VI_SPHERE_BUFFER,
 	SHADER,
 	MESH,
 	MODEL, 
@@ -50,6 +52,7 @@ enum class COMPONENT_TYPE {
 
 	ANIMATION,
 	CHANNEL,
+	
 };
 
 } // namespace Engine

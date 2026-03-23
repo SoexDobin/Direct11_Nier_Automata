@@ -35,6 +35,18 @@
             "level": "Title",
             "path": "UI/Title/Title_HUD.dds",
             "tag": "UI_Title_HUD"
+        },
+        {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Sky/Skybox_Default0.dds",
+            "tag": "Skybox_Default0"
+        },
+        {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Sky/Skybox_Default1.dds",
+            "tag": "Skybox_Default1"
         }
     ]
 }

@@ -1,232 +1,7 @@
 ﻿{
     "version":  "1.0",
     "classes":  {
-                    "CityOfRuins":  {
-                                        "namespace":  "Engine",
-                                        "base_class":  "GameObject",
-                                        "category":  "gameobject",
-                                        "members":  [
-
-                                                    ],
-                                        "has_create":  true,
-                                        "inherited_members":  [
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "nullptr",
-                                                                      "name":  "m_Device",
-                                                                      "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                  },
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "nullptr",
-                                                                      "name":  "m_Context",
-                                                                      "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                  },
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "",
-                                                                      "name":  "m_LayerMask",
-                                                                      "type":  "LayerMask"
-                                                                  },
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "",
-                                                                      "name":  "m_TagMask",
-                                                                      "type":  "TagMask"
-                                                                  }
-                                                              ],
-                                        "transform_members":  [
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Vector3::One",
-                                                                      "name":  "m_LocalScale",
-                                                                      "type":  "Vector3"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Quaternion::Identity",
-                                                                      "name":  "m_LocalRotation",
-                                                                      "type":  "Quaternion"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Vector3::Zero",
-                                                                      "name":  "m_LocalPosition",
-                                                                      "type":  "Vector3"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Matrix::Identity",
-                                                                      "name":  "m_WorldMatrix",
-                                                                      "type":  "Matrix"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "true",
-                                                                      "name":  "m_IsDirty",
-                                                                      "type":  "Bool"
-                                                                  }
-                                                              ],
-                                        "has_clone":  true
-                                    },
-                    "State2B_Run":  {
-                                        "members":  [
-
-                                                    ],
-                                        "base_class":  "State2B",
-                                        "inherited_members":  {
-
-                                                              },
-                                        "namespace":  "Client",
-                                        "has_create":  true,
-                                        "has_clone":  false,
-                                        "category":  "other"
-                                    },
-                    "State2B_Jump":  {
-                                         "members":  [
-
-                                                     ],
-                                         "base_class":  "State2B",
-                                         "inherited_members":  {
-
-                                                               },
-                                         "namespace":  "Client",
-                                         "has_create":  true,
-                                         "has_clone":  false,
-                                         "category":  "other"
-                                     },
-                    "ThirdPersonCamera":  {
-                                              "members":  [
-
-                                                          ],
-                                              "base_class":  "Camera",
-                                              "inherited_members":  {
-
-                                                                    },
-                                              "namespace":  "Client",
-                                              "has_create":  true,
-                                              "has_clone":  true,
-                                              "category":  "other"
-                                          },
-                    "ClientApp":  {
-                                      "members":  [
-
-                                                  ],
-                                      "base_class":  "",
-                                      "inherited_members":  {
-
-                                                            },
-                                      "namespace":  "Engine",
-                                      "has_create":  true,
-                                      "has_clone":  false,
-                                      "category":  "other"
-                                  },
-                    "Level_GamePlay":  {
-                                           "members":  [
-
-                                                       ],
-                                           "base_class":  "Level",
-                                           "inherited_members":  [
-                                                                     {
-                                                                         "access":  "protected",
-                                                                         "default":  "nullptr",
-                                                                         "name":  "m_Device",
-                                                                         "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                     },
-                                                                     {
-                                                                         "access":  "protected",
-                                                                         "default":  "nullptr",
-                                                                         "name":  "m_Context",
-                                                                         "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                     }
-                                                                 ],
-                                           "namespace":  "Client",
-                                           "has_create":  true,
-                                           "has_clone":  false,
-                                           "category":  "level"
-                                       },
-                    "LoadingLogo":  {
-                                        "namespace":  "Engine",
-                                        "base_class":  "UIObject",
-                                        "category":  "gameobject",
-                                        "members":  [
-
-                                                    ],
-                                        "has_create":  true,
-                                        "inherited_members":  [
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "nullptr",
-                                                                      "name":  "m_Device",
-                                                                      "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                  },
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "nullptr",
-                                                                      "name":  "m_Context",
-                                                                      "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                  },
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "",
-                                                                      "name":  "m_LayerMask",
-                                                                      "type":  "LayerMask"
-                                                                  },
-                                                                  {
-                                                                      "access":  "protected",
-                                                                      "default":  "",
-                                                                      "name":  "m_TagMask",
-                                                                      "type":  "TagMask"
-                                                                  }
-                                                              ],
-                                        "transform_members":  [
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Vector3::One",
-                                                                      "name":  "m_LocalScale",
-                                                                      "type":  "Vector3"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Quaternion::Identity",
-                                                                      "name":  "m_LocalRotation",
-                                                                      "type":  "Quaternion"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Vector3::Zero",
-                                                                      "name":  "m_LocalPosition",
-                                                                      "type":  "Vector3"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "Matrix::Identity",
-                                                                      "name":  "m_WorldMatrix",
-                                                                      "type":  "Matrix"
-                                                                  },
-                                                                  {
-                                                                      "access":  "private",
-                                                                      "default":  "true",
-                                                                      "name":  "m_IsDirty",
-                                                                      "type":  "Bool"
-                                                                  }
-                                                              ],
-                                        "has_clone":  true
-                                    },
-                    "P10000":  {
-                                   "members":  [
-
-                                               ],
-                                   "base_class":  "ContainerObject",
-                                   "inherited_members":  {
-
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
-                    "State2B_Idle":  {
+                    "State2B_Walk":  {
                                          "members":  [
 
                                                      ],
@@ -324,122 +99,336 @@
                                                           ],
                                     "has_clone":  true
                                 },
-                    "LoadingBackground":  {
-                                              "namespace":  "Engine",
-                                              "base_class":  "UIObject",
-                                              "category":  "gameobject",
+                    "LevelGamePlay":  {
+                                          "members":  [
+
+                                                      ],
+                                          "base_class":  "Level",
+                                          "inherited_members":  [
+                                                                    {
+                                                                        "access":  "protected",
+                                                                        "default":  "nullptr",
+                                                                        "name":  "m_Device",
+                                                                        "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                    },
+                                                                    {
+                                                                        "access":  "protected",
+                                                                        "default":  "nullptr",
+                                                                        "name":  "m_Context",
+                                                                        "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                    }
+                                                                ],
+                                          "namespace":  "Client",
+                                          "has_create":  true,
+                                          "has_clone":  false,
+                                          "category":  "level"
+                                      },
+                    "ThirdPersonCamera":  {
                                               "members":  [
 
                                                           ],
+                                              "base_class":  "Camera",
+                                              "inherited_members":  {
+
+                                                                    },
+                                              "namespace":  "Client",
                                               "has_create":  true,
-                                              "inherited_members":  [
-                                                                        {
-                                                                            "access":  "protected",
-                                                                            "default":  "nullptr",
-                                                                            "name":  "m_Device",
-                                                                            "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                        },
-                                                                        {
-                                                                            "access":  "protected",
-                                                                            "default":  "nullptr",
-                                                                            "name":  "m_Context",
-                                                                            "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                        },
-                                                                        {
-                                                                            "access":  "protected",
-                                                                            "default":  "",
-                                                                            "name":  "m_LayerMask",
-                                                                            "type":  "LayerMask"
-                                                                        },
-                                                                        {
-                                                                            "access":  "protected",
-                                                                            "default":  "",
-                                                                            "name":  "m_TagMask",
-                                                                            "type":  "TagMask"
-                                                                        }
-                                                                    ],
-                                              "transform_members":  [
-                                                                        {
-                                                                            "access":  "private",
-                                                                            "default":  "Vector3::One",
-                                                                            "name":  "m_LocalScale",
-                                                                            "type":  "Vector3"
-                                                                        },
-                                                                        {
-                                                                            "access":  "private",
-                                                                            "default":  "Quaternion::Identity",
-                                                                            "name":  "m_LocalRotation",
-                                                                            "type":  "Quaternion"
-                                                                        },
-                                                                        {
-                                                                            "access":  "private",
-                                                                            "default":  "Vector3::Zero",
-                                                                            "name":  "m_LocalPosition",
-                                                                            "type":  "Vector3"
-                                                                        },
-                                                                        {
-                                                                            "access":  "private",
-                                                                            "default":  "Matrix::Identity",
-                                                                            "name":  "m_WorldMatrix",
-                                                                            "type":  "Matrix"
-                                                                        },
-                                                                        {
-                                                                            "access":  "private",
-                                                                            "default":  "true",
-                                                                            "name":  "m_IsDirty",
-                                                                            "type":  "Bool"
-                                                                        }
-                                                                    ],
-                                              "has_clone":  true
+                                              "has_clone":  true,
+                                              "category":  "other"
                                           },
-                    "FreeCamera":  {
+                    "SkySphere":  {
+                                      "namespace":  "Engine",
+                                      "base_class":  "GameObject",
+                                      "category":  "gameobject",
+                                      "members":  [
+
+                                                  ],
+                                      "has_create":  true,
+                                      "inherited_members":  [
+                                                                {
+                                                                    "access":  "protected",
+                                                                    "default":  "nullptr",
+                                                                    "name":  "m_Device",
+                                                                    "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                },
+                                                                {
+                                                                    "access":  "protected",
+                                                                    "default":  "nullptr",
+                                                                    "name":  "m_Context",
+                                                                    "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                },
+                                                                {
+                                                                    "access":  "protected",
+                                                                    "default":  "",
+                                                                    "name":  "m_LayerMask",
+                                                                    "type":  "LayerMask"
+                                                                },
+                                                                {
+                                                                    "access":  "protected",
+                                                                    "default":  "",
+                                                                    "name":  "m_TagMask",
+                                                                    "type":  "TagMask"
+                                                                }
+                                                            ],
+                                      "transform_members":  [
+                                                                {
+                                                                    "access":  "private",
+                                                                    "default":  "Vector3::One",
+                                                                    "name":  "m_LocalScale",
+                                                                    "type":  "Vector3"
+                                                                },
+                                                                {
+                                                                    "access":  "private",
+                                                                    "default":  "Quaternion::Identity",
+                                                                    "name":  "m_LocalRotation",
+                                                                    "type":  "Quaternion"
+                                                                },
+                                                                {
+                                                                    "access":  "private",
+                                                                    "default":  "Vector3::Zero",
+                                                                    "name":  "m_LocalPosition",
+                                                                    "type":  "Vector3"
+                                                                },
+                                                                {
+                                                                    "access":  "private",
+                                                                    "default":  "Matrix::Identity",
+                                                                    "name":  "m_WorldMatrix",
+                                                                    "type":  "Matrix"
+                                                                },
+                                                                {
+                                                                    "access":  "private",
+                                                                    "default":  "true",
+                                                                    "name":  "m_IsDirty",
+                                                                    "type":  "Bool"
+                                                                }
+                                                            ],
+                                      "has_clone":  true
+                                  },
+                    "State2B_Idle":  {
+                                         "members":  [
+
+                                                     ],
+                                         "base_class":  "State2B",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Client",
+                                         "has_create":  true,
+                                         "has_clone":  false,
+                                         "category":  "other"
+                                     },
+                    "LevelTitle":  {
                                        "members":  [
 
                                                    ],
-                                       "base_class":  "Camera",
+                                       "base_class":  "Level",
+                                       "inherited_members":  [
+                                                                 {
+                                                                     "access":  "protected",
+                                                                     "default":  "nullptr",
+                                                                     "name":  "m_Device",
+                                                                     "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                 },
+                                                                 {
+                                                                     "access":  "protected",
+                                                                     "default":  "nullptr",
+                                                                     "name":  "m_Context",
+                                                                     "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                 }
+                                                             ],
+                                       "namespace":  "Client",
+                                       "has_create":  true,
+                                       "has_clone":  false,
+                                       "category":  "level"
+                                   },
+                    "State2B_Jump":  {
+                                         "members":  [
+
+                                                     ],
+                                         "base_class":  "State2B",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Client",
+                                         "has_create":  true,
+                                         "has_clone":  false,
+                                         "category":  "other"
+                                     },
+                    "P10000Body":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "PartObject",
                                        "inherited_members":  {
 
                                                              },
-                                       "namespace":  "Client",
+                                       "namespace":  "Engine",
                                        "has_create":  true,
                                        "has_clone":  true,
                                        "category":  "other"
                                    },
-                    "LevelLoading":  {
-                                         "members":  [
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "",
-                                                             "name":  "m_NextLevel",
-                                                             "type":  "LEVEL"
-                                                         },
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "nullptr",
-                                                             "name":  "m_Loader",
-                                                             "type":  "Shared\u003cLoader\u003e"
-                                                         }
-                                                     ],
-                                         "base_class":  "Level",
-                                         "inherited_members":  [
-                                                                   {
-                                                                       "access":  "protected",
-                                                                       "default":  "nullptr",
-                                                                       "name":  "m_Device",
-                                                                       "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                   },
-                                                                   {
-                                                                       "access":  "protected",
-                                                                       "default":  "nullptr",
-                                                                       "name":  "m_Context",
-                                                                       "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                   }
-                                                               ],
-                                         "namespace":  "Client",
-                                         "has_create":  true,
-                                         "has_clone":  false,
-                                         "category":  "level"
-                                     },
+                    "State2B_Attack":  {
+                                           "members":  [
+
+                                                       ],
+                                           "base_class":  "State2B",
+                                           "inherited_members":  {
+
+                                                                 },
+                                           "namespace":  "Client",
+                                           "has_create":  true,
+                                           "has_clone":  false,
+                                           "category":  "other"
+                                       },
+                    "Monster":  {
+                                    "namespace":  "Engine",
+                                    "base_class":  "GameObject",
+                                    "category":  "gameobject",
+                                    "members":  [
+
+                                                ],
+                                    "has_create":  true,
+                                    "inherited_members":  [
+                                                              {
+                                                                  "access":  "protected",
+                                                                  "default":  "nullptr",
+                                                                  "name":  "m_Device",
+                                                                  "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                              },
+                                                              {
+                                                                  "access":  "protected",
+                                                                  "default":  "nullptr",
+                                                                  "name":  "m_Context",
+                                                                  "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                              },
+                                                              {
+                                                                  "access":  "protected",
+                                                                  "default":  "",
+                                                                  "name":  "m_LayerMask",
+                                                                  "type":  "LayerMask"
+                                                              },
+                                                              {
+                                                                  "access":  "protected",
+                                                                  "default":  "",
+                                                                  "name":  "m_TagMask",
+                                                                  "type":  "TagMask"
+                                                              }
+                                                          ],
+                                    "transform_members":  [
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "Vector3::One",
+                                                                  "name":  "m_LocalScale",
+                                                                  "type":  "Vector3"
+                                                              },
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "Quaternion::Identity",
+                                                                  "name":  "m_LocalRotation",
+                                                                  "type":  "Quaternion"
+                                                              },
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "Vector3::Zero",
+                                                                  "name":  "m_LocalPosition",
+                                                                  "type":  "Vector3"
+                                                              },
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "Matrix::Identity",
+                                                                  "name":  "m_WorldMatrix",
+                                                                  "type":  "Matrix"
+                                                              },
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "true",
+                                                                  "name":  "m_IsDirty",
+                                                                  "type":  "Bool"
+                                                              }
+                                                          ],
+                                    "has_clone":  true
+                                },
+                    "TitleBackground":  {
+                                            "namespace":  "Engine",
+                                            "base_class":  "UIObject",
+                                            "category":  "gameobject",
+                                            "members":  [
+
+                                                        ],
+                                            "has_create":  true,
+                                            "inherited_members":  [
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "nullptr",
+                                                                          "name":  "m_Device",
+                                                                          "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                      },
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "nullptr",
+                                                                          "name":  "m_Context",
+                                                                          "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                      },
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "",
+                                                                          "name":  "m_LayerMask",
+                                                                          "type":  "LayerMask"
+                                                                      },
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "",
+                                                                          "name":  "m_TagMask",
+                                                                          "type":  "TagMask"
+                                                                      }
+                                                                  ],
+                                            "transform_members":  [
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Vector3::One",
+                                                                          "name":  "m_LocalScale",
+                                                                          "type":  "Vector3"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Quaternion::Identity",
+                                                                          "name":  "m_LocalRotation",
+                                                                          "type":  "Quaternion"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Vector3::Zero",
+                                                                          "name":  "m_LocalPosition",
+                                                                          "type":  "Vector3"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Matrix::Identity",
+                                                                          "name":  "m_WorldMatrix",
+                                                                          "type":  "Matrix"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "true",
+                                                                          "name":  "m_IsDirty",
+                                                                          "type":  "Bool"
+                                                                      }
+                                                                  ],
+                                            "has_clone":  true
+                                        },
+                    "State2B_Sprint":  {
+                                           "members":  [
+
+                                                       ],
+                                           "base_class":  "State2B",
+                                           "inherited_members":  {
+
+                                                                 },
+                                           "namespace":  "Client",
+                                           "has_create":  true,
+                                           "has_clone":  false,
+                                           "category":  "other"
+                                       },
                     "LoadingFade":  {
                                         "namespace":  "Engine",
                                         "base_class":  "UIObject",
@@ -513,159 +502,100 @@
                                                               ],
                                         "has_clone":  true
                                     },
-                    "Loader":  {
-                                   "members":  [
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "false",
-                                                       "name":  "m_LoadStatic",
-                                                       "type":  "Bool"
-                                                   },
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "nullptr",
-                                                       "name":  "m_Thread",
-                                                       "type":  "HANDLE"
-                                                   },
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "LEVEL::LEVEL_END",
-                                                       "name":  "m_NextLevelID",
-                                                       "type":  "LEVEL"
-                                                   },
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "",
-                                                       "name":  "m_OwnerLevel",
-                                                       "type":  "Weak\u003cLevel\u003e"
-                                                   },
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "",
-                                                       "name":  "m_CriticalSection",
-                                                       "type":  "CRITICAL_SECTION"
-                                                   },
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "false",
-                                                       "name":  "m_isFinished",
-                                                       "type":  "Bool"
-                                                   }
-                                               ],
-                                   "base_class":  "Level",
-                                   "inherited_members":  [
-                                                             {
-                                                                 "access":  "protected",
-                                                                 "default":  "nullptr",
-                                                                 "name":  "m_Device",
-                                                                 "type":  "ComPtr\u003cID3D11Device\u003e"
+                    "ClientApp":  {
+                                      "members":  [
+
+                                                  ],
+                                      "base_class":  "",
+                                      "inherited_members":  {
+
+                                                            },
+                                      "namespace":  "Engine",
+                                      "has_create":  true,
+                                      "has_clone":  false,
+                                      "category":  "other"
+                                  },
+                    "FreeCamera":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "Camera",
+                                       "inherited_members":  {
+
                                                              },
-                                                             {
-                                                                 "access":  "protected",
-                                                                 "default":  "nullptr",
-                                                                 "name":  "m_Context",
-                                                                 "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                             }
-                                                         ],
-                                   "namespace":  "Client",
-                                   "has_create":  true,
-                                   "has_clone":  false,
-                                   "category":  "level"
-                               },
-                    "Monster":  {
-                                    "namespace":  "Engine",
-                                    "base_class":  "GameObject",
-                                    "category":  "gameobject",
-                                    "members":  [
+                                       "namespace":  "Client",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
+                    "LoadingLogo":  {
+                                        "namespace":  "Engine",
+                                        "base_class":  "UIObject",
+                                        "category":  "gameobject",
+                                        "members":  [
 
-                                                ],
-                                    "has_create":  true,
-                                    "inherited_members":  [
-                                                              {
-                                                                  "access":  "protected",
-                                                                  "default":  "nullptr",
-                                                                  "name":  "m_Device",
-                                                                  "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                              },
-                                                              {
-                                                                  "access":  "protected",
-                                                                  "default":  "nullptr",
-                                                                  "name":  "m_Context",
-                                                                  "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                              },
-                                                              {
-                                                                  "access":  "protected",
-                                                                  "default":  "",
-                                                                  "name":  "m_LayerMask",
-                                                                  "type":  "LayerMask"
-                                                              },
-                                                              {
-                                                                  "access":  "protected",
-                                                                  "default":  "",
-                                                                  "name":  "m_TagMask",
-                                                                  "type":  "TagMask"
-                                                              }
-                                                          ],
-                                    "transform_members":  [
-                                                              {
-                                                                  "access":  "private",
-                                                                  "default":  "Vector3::One",
-                                                                  "name":  "m_LocalScale",
-                                                                  "type":  "Vector3"
-                                                              },
-                                                              {
-                                                                  "access":  "private",
-                                                                  "default":  "Quaternion::Identity",
-                                                                  "name":  "m_LocalRotation",
-                                                                  "type":  "Quaternion"
-                                                              },
-                                                              {
-                                                                  "access":  "private",
-                                                                  "default":  "Vector3::Zero",
-                                                                  "name":  "m_LocalPosition",
-                                                                  "type":  "Vector3"
-                                                              },
-                                                              {
-                                                                  "access":  "private",
-                                                                  "default":  "Matrix::Identity",
-                                                                  "name":  "m_WorldMatrix",
-                                                                  "type":  "Matrix"
-                                                              },
-                                                              {
-                                                                  "access":  "private",
-                                                                  "default":  "true",
-                                                                  "name":  "m_IsDirty",
-                                                                  "type":  "Bool"
-                                                              }
-                                                          ],
-                                    "has_clone":  true
-                                },
-                    "State2B_Attack":  {
-                                           "members":  [
-
-                                                       ],
-                                           "base_class":  "State2B",
-                                           "inherited_members":  {
-
-                                                                 },
-                                           "namespace":  "Client",
-                                           "has_create":  true,
-                                           "has_clone":  false,
-                                           "category":  "other"
-                                       },
-                    "State2B_Sprint":  {
-                                           "members":  [
-
-                                                       ],
-                                           "base_class":  "State2B",
-                                           "inherited_members":  {
-
-                                                                 },
-                                           "namespace":  "Client",
-                                           "has_create":  true,
-                                           "has_clone":  false,
-                                           "category":  "other"
-                                       },
+                                                    ],
+                                        "has_create":  true,
+                                        "inherited_members":  [
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "nullptr",
+                                                                      "name":  "m_Device",
+                                                                      "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                  },
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "nullptr",
+                                                                      "name":  "m_Context",
+                                                                      "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                  },
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "",
+                                                                      "name":  "m_LayerMask",
+                                                                      "type":  "LayerMask"
+                                                                  },
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "",
+                                                                      "name":  "m_TagMask",
+                                                                      "type":  "TagMask"
+                                                                  }
+                                                              ],
+                                        "transform_members":  [
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Vector3::One",
+                                                                      "name":  "m_LocalScale",
+                                                                      "type":  "Vector3"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Quaternion::Identity",
+                                                                      "name":  "m_LocalRotation",
+                                                                      "type":  "Quaternion"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Vector3::Zero",
+                                                                      "name":  "m_LocalPosition",
+                                                                      "type":  "Vector3"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Matrix::Identity",
+                                                                      "name":  "m_WorldMatrix",
+                                                                      "type":  "Matrix"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "true",
+                                                                      "name":  "m_IsDirty",
+                                                                      "type":  "Bool"
+                                                                  }
+                                                              ],
+                                        "has_clone":  true
+                                    },
                     "StaticCamera":  {
                                          "members":  [
 
@@ -679,74 +609,6 @@
                                          "has_clone":  true,
                                          "category":  "other"
                                      },
-                    "TitleBackground":  {
-                                            "namespace":  "Engine",
-                                            "base_class":  "UIObject",
-                                            "category":  "gameobject",
-                                            "members":  [
-
-                                                        ],
-                                            "has_create":  true,
-                                            "inherited_members":  [
-                                                                      {
-                                                                          "access":  "protected",
-                                                                          "default":  "nullptr",
-                                                                          "name":  "m_Device",
-                                                                          "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                      },
-                                                                      {
-                                                                          "access":  "protected",
-                                                                          "default":  "nullptr",
-                                                                          "name":  "m_Context",
-                                                                          "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                      },
-                                                                      {
-                                                                          "access":  "protected",
-                                                                          "default":  "",
-                                                                          "name":  "m_LayerMask",
-                                                                          "type":  "LayerMask"
-                                                                      },
-                                                                      {
-                                                                          "access":  "protected",
-                                                                          "default":  "",
-                                                                          "name":  "m_TagMask",
-                                                                          "type":  "TagMask"
-                                                                      }
-                                                                  ],
-                                            "transform_members":  [
-                                                                      {
-                                                                          "access":  "private",
-                                                                          "default":  "Vector3::One",
-                                                                          "name":  "m_LocalScale",
-                                                                          "type":  "Vector3"
-                                                                      },
-                                                                      {
-                                                                          "access":  "private",
-                                                                          "default":  "Quaternion::Identity",
-                                                                          "name":  "m_LocalRotation",
-                                                                          "type":  "Quaternion"
-                                                                      },
-                                                                      {
-                                                                          "access":  "private",
-                                                                          "default":  "Vector3::Zero",
-                                                                          "name":  "m_LocalPosition",
-                                                                          "type":  "Vector3"
-                                                                      },
-                                                                      {
-                                                                          "access":  "private",
-                                                                          "default":  "Matrix::Identity",
-                                                                          "name":  "m_WorldMatrix",
-                                                                          "type":  "Matrix"
-                                                                      },
-                                                                      {
-                                                                          "access":  "private",
-                                                                          "default":  "true",
-                                                                          "name":  "m_IsDirty",
-                                                                          "type":  "Bool"
-                                                                      }
-                                                                  ],
-                                            "has_clone":  true
-                                        },
                     "LoadingPixelPanel":  {
                                               "namespace":  "Engine",
                                               "base_class":  "UIObject",
@@ -815,6 +677,65 @@
                                                                     ],
                                               "has_clone":  true
                                           },
+                    "Loader":  {
+                                   "members":  [
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "false",
+                                                       "name":  "m_LoadStatic",
+                                                       "type":  "Bool"
+                                                   },
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "nullptr",
+                                                       "name":  "m_Thread",
+                                                       "type":  "HANDLE"
+                                                   },
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "LEVEL::LEVEL_END",
+                                                       "name":  "m_NextLevelID",
+                                                       "type":  "LEVEL"
+                                                   },
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "",
+                                                       "name":  "m_OwnerLevel",
+                                                       "type":  "Weak\u003cLevel\u003e"
+                                                   },
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "",
+                                                       "name":  "m_CriticalSection",
+                                                       "type":  "CRITICAL_SECTION"
+                                                   },
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "false",
+                                                       "name":  "m_isFinished",
+                                                       "type":  "Bool"
+                                                   }
+                                               ],
+                                   "base_class":  "Level",
+                                   "inherited_members":  [
+                                                             {
+                                                                 "access":  "protected",
+                                                                 "default":  "nullptr",
+                                                                 "name":  "m_Device",
+                                                                 "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                             },
+                                                             {
+                                                                 "access":  "protected",
+                                                                 "default":  "nullptr",
+                                                                 "name":  "m_Context",
+                                                                 "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                             }
+                                                         ],
+                                   "namespace":  "Client",
+                                   "has_create":  true,
+                                   "has_clone":  false,
+                                   "category":  "level"
+                               },
                     "StateMachine":  {
                                          "members":  [
 
@@ -828,79 +749,294 @@
                                          "has_clone":  true,
                                          "category":  "other"
                                      },
-                    "State2B_Walk":  {
+                    "CityOfRuins":  {
+                                        "namespace":  "Engine",
+                                        "base_class":  "GameObject",
+                                        "category":  "gameobject",
+                                        "members":  [
+
+                                                    ],
+                                        "has_create":  true,
+                                        "inherited_members":  [
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "nullptr",
+                                                                      "name":  "m_Device",
+                                                                      "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                  },
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "nullptr",
+                                                                      "name":  "m_Context",
+                                                                      "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                  },
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "",
+                                                                      "name":  "m_LayerMask",
+                                                                      "type":  "LayerMask"
+                                                                  },
+                                                                  {
+                                                                      "access":  "protected",
+                                                                      "default":  "",
+                                                                      "name":  "m_TagMask",
+                                                                      "type":  "TagMask"
+                                                                  }
+                                                              ],
+                                        "transform_members":  [
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Vector3::One",
+                                                                      "name":  "m_LocalScale",
+                                                                      "type":  "Vector3"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Quaternion::Identity",
+                                                                      "name":  "m_LocalRotation",
+                                                                      "type":  "Quaternion"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Vector3::Zero",
+                                                                      "name":  "m_LocalPosition",
+                                                                      "type":  "Vector3"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "Matrix::Identity",
+                                                                      "name":  "m_WorldMatrix",
+                                                                      "type":  "Matrix"
+                                                                  },
+                                                                  {
+                                                                      "access":  "private",
+                                                                      "default":  "true",
+                                                                      "name":  "m_IsDirty",
+                                                                      "type":  "Bool"
+                                                                  }
+                                                              ],
+                                        "has_clone":  true
+                                    },
+                    "State2B_Run":  {
+                                        "members":  [
+
+                                                    ],
+                                        "base_class":  "State2B",
+                                        "inherited_members":  {
+
+                                                              },
+                                        "namespace":  "Client",
+                                        "has_create":  true,
+                                        "has_clone":  false,
+                                        "category":  "other"
+                                    },
+                    "LevelLoading":  {
                                          "members":  [
-
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_NextLevel",
+                                                             "type":  "LEVEL"
+                                                         },
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "nullptr",
+                                                             "name":  "m_Loader",
+                                                             "type":  "Shared\u003cLoader\u003e"
+                                                         }
                                                      ],
-                                         "base_class":  "State2B",
-                                         "inherited_members":  {
-
-                                                               },
+                                         "base_class":  "Level",
+                                         "inherited_members":  [
+                                                                   {
+                                                                       "access":  "protected",
+                                                                       "default":  "nullptr",
+                                                                       "name":  "m_Device",
+                                                                       "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                   },
+                                                                   {
+                                                                       "access":  "protected",
+                                                                       "default":  "nullptr",
+                                                                       "name":  "m_Context",
+                                                                       "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                   }
+                                                               ],
                                          "namespace":  "Client",
                                          "has_create":  true,
                                          "has_clone":  false,
-                                         "category":  "other"
+                                         "category":  "level"
                                      },
-                    "P10000Body":  {
-                                       "members":  [
+                    "LoadingBackground":  {
+                                              "namespace":  "Engine",
+                                              "base_class":  "UIObject",
+                                              "category":  "gameobject",
+                                              "members":  [
 
-                                                   ],
-                                       "base_class":  "PartObject",
-                                       "inherited_members":  {
+                                                          ],
+                                              "has_create":  true,
+                                              "inherited_members":  [
+                                                                        {
+                                                                            "access":  "protected",
+                                                                            "default":  "nullptr",
+                                                                            "name":  "m_Device",
+                                                                            "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                        },
+                                                                        {
+                                                                            "access":  "protected",
+                                                                            "default":  "nullptr",
+                                                                            "name":  "m_Context",
+                                                                            "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                        },
+                                                                        {
+                                                                            "access":  "protected",
+                                                                            "default":  "",
+                                                                            "name":  "m_LayerMask",
+                                                                            "type":  "LayerMask"
+                                                                        },
+                                                                        {
+                                                                            "access":  "protected",
+                                                                            "default":  "",
+                                                                            "name":  "m_TagMask",
+                                                                            "type":  "TagMask"
+                                                                        }
+                                                                    ],
+                                              "transform_members":  [
+                                                                        {
+                                                                            "access":  "private",
+                                                                            "default":  "Vector3::One",
+                                                                            "name":  "m_LocalScale",
+                                                                            "type":  "Vector3"
+                                                                        },
+                                                                        {
+                                                                            "access":  "private",
+                                                                            "default":  "Quaternion::Identity",
+                                                                            "name":  "m_LocalRotation",
+                                                                            "type":  "Quaternion"
+                                                                        },
+                                                                        {
+                                                                            "access":  "private",
+                                                                            "default":  "Vector3::Zero",
+                                                                            "name":  "m_LocalPosition",
+                                                                            "type":  "Vector3"
+                                                                        },
+                                                                        {
+                                                                            "access":  "private",
+                                                                            "default":  "Matrix::Identity",
+                                                                            "name":  "m_WorldMatrix",
+                                                                            "type":  "Matrix"
+                                                                        },
+                                                                        {
+                                                                            "access":  "private",
+                                                                            "default":  "true",
+                                                                            "name":  "m_IsDirty",
+                                                                            "type":  "Bool"
+                                                                        }
+                                                                    ],
+                                              "has_clone":  true
+                                          },
+                    "SkyBox":  {
+                                   "namespace":  "Engine",
+                                   "base_class":  "GameObject",
+                                   "category":  "gameobject",
+                                   "members":  [
 
+                                               ],
+                                   "has_create":  true,
+                                   "inherited_members":  [
+                                                             {
+                                                                 "access":  "protected",
+                                                                 "default":  "nullptr",
+                                                                 "name":  "m_Device",
+                                                                 "type":  "ComPtr\u003cID3D11Device\u003e"
                                                              },
-                                       "namespace":  "Engine",
-                                       "has_create":  true,
-                                       "has_clone":  true,
-                                       "category":  "other"
-                                   },
-                    "LevelGamePlay":  {
-                                          "members":  [
+                                                             {
+                                                                 "access":  "protected",
+                                                                 "default":  "nullptr",
+                                                                 "name":  "m_Context",
+                                                                 "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                             },
+                                                             {
+                                                                 "access":  "protected",
+                                                                 "default":  "",
+                                                                 "name":  "m_LayerMask",
+                                                                 "type":  "LayerMask"
+                                                             },
+                                                             {
+                                                                 "access":  "protected",
+                                                                 "default":  "",
+                                                                 "name":  "m_TagMask",
+                                                                 "type":  "TagMask"
+                                                             }
+                                                         ],
+                                   "transform_members":  [
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "Vector3::One",
+                                                                 "name":  "m_LocalScale",
+                                                                 "type":  "Vector3"
+                                                             },
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "Quaternion::Identity",
+                                                                 "name":  "m_LocalRotation",
+                                                                 "type":  "Quaternion"
+                                                             },
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "Vector3::Zero",
+                                                                 "name":  "m_LocalPosition",
+                                                                 "type":  "Vector3"
+                                                             },
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "Matrix::Identity",
+                                                                 "name":  "m_WorldMatrix",
+                                                                 "type":  "Matrix"
+                                                             },
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "true",
+                                                                 "name":  "m_IsDirty",
+                                                                 "type":  "Bool"
+                                                             }
+                                                         ],
+                                   "has_clone":  true
+                               },
+                    "P10000":  {
+                                   "members":  [
 
-                                                      ],
-                                          "base_class":  "Level",
-                                          "inherited_members":  [
-                                                                    {
-                                                                        "access":  "protected",
-                                                                        "default":  "nullptr",
-                                                                        "name":  "m_Device",
-                                                                        "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                    },
-                                                                    {
-                                                                        "access":  "protected",
-                                                                        "default":  "nullptr",
-                                                                        "name":  "m_Context",
-                                                                        "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                    }
-                                                                ],
-                                          "namespace":  "Client",
-                                          "has_create":  true,
-                                          "has_clone":  false,
-                                          "category":  "level"
-                                      },
-                    "LevelTitle":  {
-                                       "members":  [
+                                               ],
+                                   "base_class":  "ContainerObject",
+                                   "inherited_members":  {
 
-                                                   ],
-                                       "base_class":  "Level",
-                                       "inherited_members":  [
-                                                                 {
-                                                                     "access":  "protected",
-                                                                     "default":  "nullptr",
-                                                                     "name":  "m_Device",
-                                                                     "type":  "ComPtr\u003cID3D11Device\u003e"
-                                                                 },
-                                                                 {
-                                                                     "access":  "protected",
-                                                                     "default":  "nullptr",
-                                                                     "name":  "m_Context",
-                                                                     "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
-                                                                 }
-                                                             ],
-                                       "namespace":  "Client",
-                                       "has_create":  true,
-                                       "has_clone":  false,
-                                       "category":  "level"
-                                   }
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
+                    "Level_GamePlay":  {
+                                           "members":  [
+
+                                                       ],
+                                           "base_class":  "Level",
+                                           "inherited_members":  [
+                                                                     {
+                                                                         "access":  "protected",
+                                                                         "default":  "nullptr",
+                                                                         "name":  "m_Device",
+                                                                         "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                     },
+                                                                     {
+                                                                         "access":  "protected",
+                                                                         "default":  "nullptr",
+                                                                         "name":  "m_Context",
+                                                                         "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                     }
+                                                                 ],
+                                           "namespace":  "Client",
+                                           "has_create":  true,
+                                           "has_clone":  false,
+                                           "category":  "level"
+                                       }
                 }
 }

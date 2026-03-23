@@ -10,6 +10,8 @@
 #include "LoadingFade.h"
 #include "SpdLogger.h"
 #include "StaticCamera.h"
+#include "VISphere.h"
+#include "SkySphere.h"
 
 ClientApp::ClientApp() {}
 
@@ -48,6 +50,8 @@ HRESULT ClientApp::Ready_InitialObject()
 {
     GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), StaticCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"StaticCamera");
     GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFade::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFade");
+    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), VISphere::CreatePrototype(), L"VISphere");
+    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), SkySphere::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"SkySphere");
 
     return S_OK;
 }

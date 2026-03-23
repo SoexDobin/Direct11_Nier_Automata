@@ -13,6 +13,7 @@
 #include "ThirdPersonCamera.h"
 #include "StateMachine.h"
 #include "P10000.h"
+#include "P10000Body.h"
 #include "StaticCamera.h"
 #include "TitleBackground.h"
 
@@ -25,7 +26,8 @@ using rttr::registration;
 // <AUTO_GENERATED_INCLUDES>
 #include "FreeCamera.h"
 #include "Monster.h"
-#include "P10000Body.h"
+#include "SkyBox.h"
+#include "SkySphere.h"
 #include "Terrain.h"
 
 // </AUTO_GENERATED_INCLUDES>
@@ -78,6 +80,12 @@ void Register_Client_Reflection() {
         .method("Clone", &P10000::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<P10000Body>("P10000Body")
+        .constructor<>()
+        .method("Clone", &P10000Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000Body::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
     rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
         .constructor<>()
         .method("Clone", &ThirdPersonCamera::Clone)
@@ -113,10 +121,15 @@ void Register_Client_Reflection() {
         .method("Clone", &Monster::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Monster::Create(device, context); })(rttr::metadata("Level", 0));
 
-    rttr::registration::class_<P10000Body>("P10000Body")
+    rttr::registration::class_<SkyBox>("SkyBox")
         .constructor<>()
-        .method("Clone", &P10000Body::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000Body::Create(device, context); })(rttr::metadata("Level", 0));
+        .method("Clone", &SkyBox::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SkyBox::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<SkySphere>("SkySphere")
+        .constructor<>()
+        .method("Clone", &SkySphere::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SkySphere::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<Terrain>("Terrain")
         .constructor<>()

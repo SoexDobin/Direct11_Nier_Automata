@@ -1,14 +1,13 @@
-﻿#include "ObjectManager.h"
+#include "ObjectManager.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 10088
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(ObjectManager_RTTR)
 {
-    registration::class_<ObjectManager>("ObjectManager")
-        .constructor<>()
-        .method("Create", &ObjectManager::Create)
-        ;
+	registration::class_<ObjectManager>("ObjectManager")
+		.constructor<>()
+		.method("Create", &ObjectManager::Create)
+		;
 }
-

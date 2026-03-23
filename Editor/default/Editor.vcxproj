@@ -185,7 +185,6 @@
   <ItemGroup>
     <None Include="..\vcpkg.json" />
     <ClInclude Include="..\public\AssetBrowser.h" />
-    <ClInclude Include="..\public\ComponentEditUI.h" />
     <ClInclude Include="..\public\EditorCamera.h" />
     <ClInclude Include="..\public\EditorManager.h" />
     <ClInclude Include="..\public\EditorObject.h" />
@@ -194,6 +193,10 @@
     <ClInclude Include="..\public\EditorApp.h" />
     <ClInclude Include="..\public\Hierarchy.h" />
     <ClInclude Include="..\public\Inspector.h" />
+    <ClInclude Include="..\public\InspectorCamera.h" />
+    <ClInclude Include="..\public\InspectorModel.h" />
+    <ClInclude Include="..\public\InspectorTexture.h" />
+    <ClInclude Include="..\public\InspectorTransform.h" />
     <ClInclude Include="..\public\LogConsole.h" />
     <ClInclude Include="..\public\MenuBar.h" />
     <ClInclude Include="..\public\ModelViewer.h" />
@@ -208,13 +211,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\AssetBrowser.cpp" />
-    <ClCompile Include="..\private\ComponentEditUI.cpp" />
     <ClCompile Include="..\private\EditorApp.cpp" />
     <ClCompile Include="..\private\EditorCamera.cpp" />
     <ClCompile Include="..\private\EditorManager.cpp" />
     <ClCompile Include="..\private\EditorView.cpp" />
     <ClCompile Include="..\private\Hierarchy.cpp" />
     <ClCompile Include="..\private\Inspector.cpp" />
+    <ClCompile Include="..\private\InspectorCamera.cpp" />
+    <ClCompile Include="..\private\InspectorModel.cpp" />
+    <ClCompile Include="..\private\InspectorTexture.cpp" />
+    <ClCompile Include="..\private\InspectorTransform.cpp" />
     <ClCompile Include="..\private\LogConsole.cpp" />
     <ClCompile Include="..\private\MenuBar.cpp" />
     <ClCompile Include="..\private\ModelViewer.cpp" />

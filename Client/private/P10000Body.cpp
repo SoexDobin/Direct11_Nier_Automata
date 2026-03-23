@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "P10000Body.h"
+
+#include <SpdLogger.h>
+
 #include "Game.h"
 
 #include "Model.h"
@@ -24,7 +27,22 @@ HRESULT P10000Body::Initialize_Prototype()
 
 HRESULT P10000Body::Initialize(void* arg)
 {
-	return PartObject::Initialize(arg);
+	if (FAILED(PartObject::Initialize(arg)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Components()))
+	{
+		LOG_ERROR(L"Failed To Ready_Components : P10000Body");
+		return E_FAIL;
+	}
+
+	if (FAILED(Ready_States()))
+	{
+		LOG_ERROR(L"Failed To Ready_States : P10000Body");
+		return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 void P10000Body::On_Destroy()

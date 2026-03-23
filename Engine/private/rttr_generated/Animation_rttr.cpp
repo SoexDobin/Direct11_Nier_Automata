@@ -1,15 +1,13 @@
-#include "pch.h"
 #include "Animation.h"
 #include <rttr/registration>
 
 using namespace rttr;
 using namespace Engine;
 
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Animation_RTTR)
 {
 	registration::class_<Animation>("Animation")
 		.constructor<>()
-		.parent<Component>()
 		.method("Clone", &Animation::Clone)
 		.method("Create", &Animation::Create)
 		;

@@ -7,7 +7,6 @@ class GameObject;
 
 class ObjectManager final : public EngineManager {
 	NO_COPY(ObjectManager)
-
 public:
 	ObjectManager() = default;
 	~ObjectManager() override = default;

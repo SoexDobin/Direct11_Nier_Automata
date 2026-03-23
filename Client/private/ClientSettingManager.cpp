@@ -350,10 +350,6 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
     rttr::type componentType = rttr::type::get<Component>();
     auto allTypes = rttr::type::get_types();
 
-    // 전역/정적 세트(static unordered_set)를 제거합니다.
-    // 엔진의 PrototypeManager::Add_Prototype이 중복 등록을 안전하게 스킵하도록 수정되었으므로,
-    // 리셋 시마다 새로운 프로토타입 등록 시도를 허용하여 데이터 정합성을 유지합니다.
-
     for (auto& type : allTypes)
     {
         // 1. GameObject 또는 Component를 상속받은(derived_from) 자기자신 제외 클래스만 순회
@@ -460,30 +456,27 @@ HRESULT ClientSettingManager::Load_Shader() const
 				std::wstring normTex = L"vtxnormtex";
 				std::wstring staticMesh = L"vtxmesh";
 				std::wstring animMesh = L"vtxanimmesh";
+				std::wstring cube = L"vtxcube";
 				
-				auto itTex = 
-					std::search(
+				auto itTex = std::search(
 						tagName.begin(), tagName.end(), 
-						tex.begin(), tex.end(),
-						CaseInsensitiveCompare
+						tex.begin(), tex.end(), CaseInsensitiveCompare
 					);
-				auto itNormTex =
-					std::search(
+				auto itNormTex = std::search(
 						tagName.begin(), tagName.end(), 
-						normTex.begin(), normTex.end(),
-						CaseInsensitiveCompare
+						normTex.begin(), normTex.end(), CaseInsensitiveCompare
 					);
-				auto itMeshTex =
-					std::search(
+				auto itMeshTex = std::search(
 						tagName.begin(), tagName.end(),
-						staticMesh.begin(), staticMesh.end(),
-						CaseInsensitiveCompare
+						staticMesh.begin(), staticMesh.end(), CaseInsensitiveCompare
 					);
-				auto itAnimTex =
-					std::search(
+				auto itAnimTex = std::search(
 						tagName.begin(), tagName.end(),
-						animMesh.begin(), animMesh.end(),
-						CaseInsensitiveCompare
+						animMesh.begin(), animMesh.end(), CaseInsensitiveCompare
+					);
+				auto itCubeTex = std::search(
+						tagName.begin(), tagName.end(),
+						cube.begin(), cube.end(), CaseInsensitiveCompare
 					);
 
 				if (itAnimTex != tagName.end())
@@ -505,6 +498,11 @@ HRESULT ClientSettingManager::Load_Shader() const
 				{
 					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXTEX::Elements, VTXTEX::numElements, VTXTEX::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXTEX::Tag);
+				}
+				else if (itCubeTex != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXCUBE::Elements, VTXCUBE::numElements, VTXCUBE::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXCUBE::Tag);
 				}
 				else
 				{

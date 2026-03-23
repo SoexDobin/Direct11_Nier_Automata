@@ -1,13 +1,11 @@
-﻿#include "Level.h"
+#include "Level.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 9635
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Level_RTTR)
 {
-    registration::class_<Level>("Level")
-        .constructor<>()
-        ;
+	registration::class_<Level>("Level")
+		;
 }
-

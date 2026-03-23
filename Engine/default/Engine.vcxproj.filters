@@ -154,6 +154,15 @@
     <Filter Include="01. Utility\10. Sound">
       <UniqueIdentifier>{6c850e5f-1604-4a72-ad43-0be30e4e532d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. ShaderFiles">
+      <UniqueIdentifier>{e1d08835-f83b-4c48-b66b-3741d0d05187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer\Cube">
+      <UniqueIdentifier>{85407e6d-2fea-40b9-9c85-ac1d3153bc54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer\VISphere">
+      <UniqueIdentifier>{48cb1011-75b9-40a6-92f3-4ae9da050cee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -167,6 +176,9 @@
     </None>
     <None Include="RTTRGenerator.py">
       <Filter>99. SystemFiles</Filter>
+    </None>
+    <None Include="..\public\EngineShaderDefine.hlsli">
+      <Filter>02. ShaderFiles</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -331,6 +343,12 @@
     </ClInclude>
     <ClInclude Include="..\public\SoundManager.h">
       <Filter>01. Utility\10. Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VICube.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VISphere.h">
+      <Filter>01. Utility\05. Component\VIBuffer\VISphere</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -504,6 +522,24 @@
     </ClCompile>
     <ClCompile Include="..\private\SoundManager.cpp">
       <Filter>01. Utility\10. Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VICube.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Font_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VICube_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VISphere.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\VISphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VISphere_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Object_rttr.cpp">
+      <Filter>96. RTTR</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

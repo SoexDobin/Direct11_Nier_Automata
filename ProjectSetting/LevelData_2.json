@@ -7,118 +7,35 @@
           "components": [
             {
               "properties": {
-                "Position": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Rotation": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Scale": [
-                  1920.0,
-                  1920.0,
-                  1.0
-                ]
-              },
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "VIBuffer_Rect"
-            },
-            {
-              "properties": {
-                "RGBA": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  0.0
-                ],
-                "TextureTag": "UI_Loading_Fade"
-              },
-              "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            }
-          ],
-          "instanceID": 2535439070,
-          "name": "LoadingFade",
-          "objectID": 3109598226,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "LoadingFade",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1920.0,
-              1920.0,
-              1.0
-            ]
-          },
-          "typeName": "LoadingFade"
-        },
-        {
-          "components": [
-            {
-              "properties": {
-                "Position": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Rotation": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Scale": [
-                  1920.0,
-                  1920.0,
-                  1.0
-                ]
+                "ObjectID": 813221446
               },
               "typeName": "Transform"
             },
             {
               "properties": {
-                "RGBA": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "TextureTag": "UI_Title_BackGround"
+                "ObjectID": 3321706306
               },
               "typeName": "Texture"
             },
             {
-              "properties": null,
+              "properties": {
+                "ObjectID": 1973981106
+              },
               "typeName": "VIBuffer_Rect"
             },
             {
-              "properties": null,
+              "properties": {
+                "ObjectID": 2102095475
+              },
               "typeName": "Shader"
             }
           ],
-          "instanceID": 624242230,
           "name": "TitleBackground",
           "objectID": 3090133586,
           "parentObjectID": 0,
-          "properties": null,
+          "properties": {
+            "ObjectID": 3090133586
+          },
           "prototypeTag": "TitleBackground",
           "transform": {
             "position": [
@@ -143,50 +60,88 @@
           "components": [
             {
               "properties": {
-                "Position": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Rotation": [
-                  0.0,
-                  0.0,
-                  0.0
-                ],
-                "Scale": [
-                  1920.0,
-                  1920.0,
-                  1.0
-                ]
+                "ObjectID": 4074893178
               },
               "typeName": "Transform"
             },
             {
-              "properties": null,
+              "properties": {
+                "ObjectID": 3321706306
+              },
+              "typeName": "Texture"
+            },
+            {
+              "properties": {
+                "ObjectID": 1973981106
+              },
               "typeName": "VIBuffer_Rect"
             },
             {
-              "properties": null,
+              "properties": {
+                "ObjectID": 2102095475
+              },
+              "typeName": "Shader"
+            }
+          ],
+          "name": "LoadingFade",
+          "objectID": 3109598226,
+          "parentObjectID": 0,
+          "properties": {
+            "ObjectID": 3109598226
+          },
+          "prototypeTag": "LoadingFade",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1920.0,
+              1920.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingFade"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "ObjectID": 1478959420
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": {
+                "ObjectID": 2102095475
+              },
               "typeName": "Shader"
             },
             {
               "properties": {
-                "RGBA": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "TextureTag": "UI_Loading_Fade"
+                "ObjectID": 3321706306
               },
               "typeName": "Texture"
+            },
+            {
+              "properties": {
+                "ObjectID": 1973981106
+              },
+              "typeName": "VIBuffer_Rect"
             }
           ],
-          "instanceID": 3476315454,
           "name": "LoadingFade",
           "objectID": 3109598226,
           "parentObjectID": 0,
-          "properties": null,
+          "properties": {
+            "ObjectID": 3109598226
+          },
           "prototypeTag": "LoadingFade",
           "transform": {
             "position": [

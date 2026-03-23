@@ -1,14 +1,13 @@
-﻿#include "Light.h"
+#include "Light.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 7220
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Light_RTTR)
 {
-    registration::class_<Light>("Light")
-        .constructor<>()
-        .method("Create", &Light::Create)
-        ;
+	registration::class_<Light>("Light")
+		.constructor<>()
+		.method("Create", &Light::Create)
+		;
 }
-

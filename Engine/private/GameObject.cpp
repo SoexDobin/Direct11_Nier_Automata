@@ -180,7 +180,7 @@ void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& inst
     rttr::type type = rttr::type::get(*this);
     for (auto& prop : type.get_properties())
     {
-        if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
+        if (prop.get_metadata(Meta_Key_Type::SaveData) == Asset_Type_Key::GameObject)
         {
             uint32 targetID = prop.get_value(*this).convert<uint32>();
             if (targetID != 0)
@@ -192,8 +192,12 @@ void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& inst
 
                 if (pTarget)
                 {
-                    if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) prop.set_value(*this, pTarget);
-                    else prop.set_value(*this, targetID);
+                    if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) {
+                        prop.set_value(*this, pTarget);
+                    }
+                    else {
+                        prop.set_value(*this, targetID);
+                    }
                 }
             }
         }
@@ -206,19 +210,19 @@ void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& inst
         rttr::type compType = rttr::type::get(*comp);
         for (auto& prop : compType.get_properties())
         {
-            if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
+            if (prop.get_metadata(Meta_Key_Type::SaveData) == Save_Data_Key::TargetObjectID)
             {
                 uint32 targetID = prop.get_value(*comp).convert<uint32>();
                 if (targetID != 0)
                 {
-                    Shared<GameObject> pTarget = nullptr;
+                    Shared<GameObject> target = nullptr;
                     auto it = instanceMap.find(targetID);
-                    if (it != instanceMap.end()) pTarget = it->second;
-                    else pTarget = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), targetID);
+                    if (it != instanceMap.end()) target = it->second;
+                    else target = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), targetID);
 
-                    if (pTarget)
+                    if (target)
                     {
-                        if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) prop.set_value(*comp, pTarget);
+                        if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) prop.set_value(*comp, target);
                         else prop.set_value(*comp, targetID);
                     }
                 }

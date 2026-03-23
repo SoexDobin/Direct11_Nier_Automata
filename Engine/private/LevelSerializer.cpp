@@ -7,8 +7,7 @@
 #include <map>
 #include <fstream>
 #include <iostream>
-
-
+#include <iostream>
 #include "Game.h"
 #include "GameObject.h"
 #include "Transform.h"
@@ -17,6 +16,8 @@
 
 using namespace std;
 using namespace Engine;
+using namespace Meta_Key_Type;
+using namespace Save_Data_Key;
 
 string LevelSerializer::ToUtf8(const wstring& ws)
 {
@@ -49,7 +50,7 @@ LevelSerializer::LevelSerializer() : EngineManager{}
 HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath)
 {
 	nlohmann::json root;
-	root["version"] = "2.0"; // RTTR 기반 버전
+	root["version"] = "2.0"; 
 	auto& levelsArray = root["levels"];
 
 	const auto& allObjects = GAME_INSTANCE->Get_GameObjects(levIndex);
@@ -60,6 +61,56 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 		if (!pObj || pObj->Is_Destroy()) continue;
 		levelMap[levIndex].push_back(pObj);
 	}
+
+
+	// 공통 속성 직렬화 헬퍼 람다
+	auto SerializeProperties = [&](rttr::instance objInstance, nlohmann::json& outProps) {
+		rttr::type objType = objInstance.get_type();
+		for (auto& prop : objType.get_properties())
+		{
+			rttr::variant var = prop.get_value(objInstance);
+			string propName = prop.get_name().to_string();
+			
+			rttr::variant saveMeta = prop.get_metadata(Meta_Key_Type::SaveData);
+			if (!saveMeta.is_valid()) continue; // SaveData 메타데이터가 없으면 아예 저장 안 함
+
+			SaveDataKey saveKey = nullptr;
+			if (saveMeta.is_type<SaveDataKey>()) {
+				saveKey = saveMeta.get_value<SaveDataKey>();
+			}
+			
+			if (saveKey == Save_Data_Key::TargetObjectID) // 1. TargetObjectID (다른 오브젝트 참조)
+			{
+				if (var.is_type<Shared<GameObject>>())
+				{
+					Shared<GameObject> pTarget = var.get_value<Shared<GameObject>>();
+					outProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
+				}
+				else if (var.is_type<uint32>() || var.is_type<int32>()) {
+					outProps[propName] = var.convert<uint32>();
+				}
+			}
+			else if (saveKey == Save_Data_Key::TextureTag || saveKey == Save_Data_Key::ModelTag) // 2. ResourceTag
+			{
+				if (var.is_type<wstring>()) outProps[propName] = ToUtf8(var.get_value<wstring>());
+				else if (var.is_type<string>()) outProps[propName] = var.get_value<string>();
+			}
+			else // 3. 그 외 기본 자료형 (SaveData가 붙어있는 float, Vector3, int 등)
+			{
+				if (var.is_type<int>()) outProps[propName] = var.get_value<int>();
+				else if (var.is_type<uint32>()) outProps[propName] = var.get_value<uint32>();
+				else if (var.is_type<float>()) outProps[propName] = var.get_value<float>();
+				else if (var.is_type<bool>()) outProps[propName] = var.get_value<bool>();
+				else if (var.is_type<string>()) outProps[propName] = var.get_value<string>();
+				else if (var.is_type<wstring>()) outProps[propName] = ToUtf8(var.get_value<wstring>());
+				else if (var.is_type<Vector3>()) { Vector3 v = var.get_value<Vector3>(); outProps[propName] = { v.x, v.y, v.z }; }
+				else if (var.is_type<Color>()) { Color c = var.get_value<Color>(); outProps[propName] = { c.R(), c.G(), c.B(), c.A() }; }
+				else if (var.is_type<Float3>()) { Float3 v = var.get_value<Float3>(); outProps[propName] = { v.x, v.y, v.z }; }
+				else if (var.is_type<Float4>()) { Float4 v = var.get_value<Float4>(); outProps[propName] = { v.x, v.y, v.z, v.w }; }
+			}
+		}
+	};
+
 
 	for (auto& [levIndex, objects] : levelMap)
 	{
@@ -74,7 +125,6 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 
 			// 1. 기본 식별 정보
 			objJson["typeName"] = objType.get_name().to_string();
-			objJson["instanceID"] = pObj->Get_InstanceID();
 			objJson["objectID"] = pObj->Get_ObjectID();
 			objJson["name"] = ToUtf8(pObj->Get_Name());
 			
@@ -82,7 +132,6 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 			wstring protoTag = Helper::To_wString(objType.get_name().to_string());
 			if (protoTag.empty()) protoTag = GAME_INSTANCE->Get_PrototypeTagFromObjectID(pObj->Get_ObjectID(), 0);
 			objJson["prototypeTag"] = ToUtf8(protoTag);
-
 			objJson["parentObjectID"] = pObj->Has_Parent() ? pObj->Get_Parent()->Get_ObjectID() : 0u;
 
 			// 트랜스폼 예외 직렬화 (RTTR 누락 방지 안정장치)
@@ -100,55 +149,8 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 			}
 
 			// 2. GameObject의 RTTR 프로퍼티 직렬화
-			nlohmann::json& objProps = objJson["properties"];
-			for (auto& prop : objType.get_properties())
-			{
-				if (prop.get_metadata(Meta_Key::NoSerialize) == true) continue;
-				
-				rttr::variant var = prop.get_value(*pObj);
-				string propName = prop.get_name().to_string();
-
-				// GameObject 참조는 고정 해시 ID(ObjectID)로 저장
-				if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
-				{
-					if (var.is_type<Shared<GameObject>>())
-					{
-						Shared<GameObject> pTarget = var.get_value<Shared<GameObject>>();
-						objProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
-					}
-					else if (var.is_type<uint32>() || var.is_type<int>())
-					{
-						// 이미 고정 ID(ObjectID)를 직접 들고 있는 시스템이므로 그대로 저장
-						objProps[propName] = var.convert<uint32>();
-					}
-				}
-				else
-				{
-					// 기본 타입 지원 (필요 시 확장)
-					if (var.is_type<int>()) objProps[propName] = var.get_value<int>();
-					else if (var.is_type<uint32>()) objProps[propName] = var.get_value<uint32>();
-					else if (var.is_type<float>()) objProps[propName] = var.get_value<float>();
-					else if (var.is_type<bool>()) objProps[propName] = var.get_value<bool>();
-					else if (var.is_type<string>()) objProps[propName] = var.get_value<string>();
-					else if (var.is_type<wstring>()) objProps[propName] = ToUtf8(var.get_value<wstring>());
-					else if (var.is_type<Vector3>()) {
-						Vector3 v = var.get_value<Vector3>();
-						objProps[propName] = { v.x, v.y, v.z };
-					}
-					else if (var.is_type<Color>()) {
-						Color c = var.get_value<Color>();
-						objProps[propName] = { c.R(), c.G(), c.B(), c.A() };
-					}
-					else if (var.is_type<Float3>()) {
-						Float3 v = var.get_value<Float3>();
-						objProps[propName] = { v.x, v.y, v.z };
-					}
-					else if (var.is_type<Float4>()) {
-						Float4 v = var.get_value<Float4>();
-						objProps[propName] = { v.x, v.y, v.z, v.w };
-					}
-				}
-			}
+			nlohmann::json& objProp = objJson["properties"];
+			SerializeProperties(*pObj, objProp);
 
 			// 3. 컴포넌트 직렬화
 			auto& compArray = objJson["components"];
@@ -159,56 +161,12 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 				rttr::type compType = rttr::type::get(*comp);
 				compJson["typeName"] = compType.get_name().to_string();
 
-				nlohmann::json& compProps = compJson["properties"];
-				for (auto& prop : compType.get_properties())
-				{
-					if (prop.get_metadata(Meta_Key::NoSerialize) == true) continue;
+				nlohmann::json& comProps = compJson["properties"];
+				SerializeProperties(*comp, comProps);
+				
 
-					rttr::variant var = prop.get_value(*comp);
-					string propName = prop.get_name().to_string();
-
-					if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::GameObject)
-					{
-						if (var.is_type<Shared<GameObject>>())
-						{
-							Shared<GameObject> pTarget = var.get_value<Shared<GameObject>>();
-							compProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
-						}
-						else
-						{
-							// 이미 고정 ID(ObjectID)를 직접 들고 있는 시스템이므로 그대로 저장
-							compProps[propName] = var.convert<uint32>();
-						}
-					}
-					else
-					{
-						if (var.is_type<int>()) compProps[propName] = var.get_value<int>();
-						else if (var.is_type<uint32>()) compProps[propName] = var.get_value<uint32>();
-						else if (var.is_type<float>()) compProps[propName] = var.get_value<float>();
-						else if (var.is_type<bool>()) compProps[propName] = var.get_value<bool>();
-						else if (var.is_type<string>()) compProps[propName] = var.get_value<string>();
-						else if (var.is_type<wstring>()) compProps[propName] = ToUtf8(var.get_value<wstring>());
-						else if (var.is_type<Vector3>()) {
-							Vector3 v = var.get_value<Vector3>();
-							compProps[propName] = { v.x, v.y, v.z };
-						}
-						else if (var.is_type<Color>()) {
-							Color c = var.get_value<Color>();
-							compProps[propName] = { c.R(), c.G(), c.B(), c.A() };
-						}
-						else if (var.is_type<Float3>()) {
-							Float3 v = var.get_value<Float3>();
-							compProps[propName] = { v.x, v.y, v.z };
-						}
-						else if (var.is_type<Float4>()) {
-							Float4 v = var.get_value<Float4>();
-							compProps[propName] = { v.x, v.y, v.z, v.w };
-						}
-					}
-				}
 				compArray.push_back(compJson);
 			}
-
 			objArray.push_back(objJson);
 		}
 		levelsArray.push_back(levelJson);
@@ -226,7 +184,7 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 	}
 	catch (const std::exception& e)
 	{
-		LOG_ERROR(L"[SceneSerializer] SerializeLevel exception: {}", Helper::To_wString(e.what()));
+		LOG_CRITICAL(L"[SceneSerializer] SerializeLevel exception: {}", Helper::To_wString(e.what()));
 		return E_FAIL;
 	}
 
@@ -246,12 +204,12 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	}
 	catch (const std::exception& e)
 	{
-		LOG_ERROR(L"[SceneSerializer] DeSerializeLevel exception: {}", FromUtf8(e.what()));
+		LOG_CRITICAL(L"[SceneSerializer] DeSerializeLevel exception: {}", FromUtf8(e.what()));
 		return E_FAIL;
 	}
 
 	string version = root.value("version", "1.1");
-	
+
 	// ── Pass 0: 선택적 클리어 (JSON에 명시된 레벨만 초기화) ───────────────────────
 	if (root.contains("levels"))
 	{
@@ -289,11 +247,11 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			if (pObj)
 			{
 				uint32 savedObjectID = objJson.value("objectID", 0u);
-				if (savedObjectID != 0) 
+				if (savedObjectID != 0)
 				{
 					pObj->Set_ObjectID(savedObjectID);
 				}
-				
+
 				wstring savedName = FromUtf8(objJson.value("name", ""));
 				if (!savedName.empty())
 				{
@@ -305,11 +263,12 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 				loadList.push_back({ pObj, &objJson });
 			}
 		}
-	};
+		};
 
 	if (root.contains("levels"))
 	{
-		for (auto& levelJson : root["levels"]) ProcessLevel(levelJson);
+		for (auto& levelJson : root["levels"])
+			ProcessLevel(levelJson);
 	}
 	else if (root.contains("objects"))
 	{
@@ -323,10 +282,52 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 		if (savedParentObjectID != 0)
 		{
 			auto it = instanceMap.find(savedParentObjectID);
-			if (it != instanceMap.end()) 
-                data.pObj->Set_Parent(it->second);
+			if (it != instanceMap.end())
+				data.pObj->Set_Parent(it->second);
 		}
 	}
+
+	// 공통 속성 역직렬화 헬퍼 람다
+	auto DeserializeProperties = [&](rttr::instance objInstance, const nlohmann::json& propsJson) {
+		rttr::type objType = objInstance.get_type();
+		for (auto it = propsJson.begin(); it != propsJson.end(); ++it)
+		{
+			rttr::property prop = objType.get_property(it.key());
+			if (!prop.is_valid()) continue;
+			
+			// 실제 오브젝트에 값 꽂아넣기
+			if (it.value().is_number()) {
+				if (prop.get_type() == rttr::type::get<uint32>()) prop.set_value(objInstance, static_cast<uint32>(it.value().get<double>()));
+				else if (prop.get_type() == rttr::type::get<int32>()) prop.set_value(objInstance, static_cast<int32>(it.value().get<double>()));
+				else if (prop.get_type() == rttr::type::get<Float>()) prop.set_value(objInstance, static_cast<Float>(it.value().get<double>()));
+				else prop.set_value(objInstance, it.value().get<double>());
+			}
+			else if (it.value().is_boolean()) { prop.set_value(objInstance, it.value().get<Bool>()); }
+			else if (it.value().is_string()) { prop.set_value(objInstance, FromUtf8(it.value().get<string>())); }
+			else if (it.value().is_array()) {
+				auto& v = it.value();
+				if (v.size() == 3 && prop.get_type() == rttr::type::get<Vector3>()) prop.set_value(objInstance, Vector3(v[0], v[1], v[2]));
+				else if (v.size() == 3 && prop.get_type() == rttr::type::get<Float3>()) prop.set_value(objInstance, Float3(v[0], v[1], v[2]));
+				else if (v.size() == 4 && prop.get_type() == rttr::type::get<Color>()) prop.set_value(objInstance, Color(v[0], v[1], v[2], v[3]));
+				else if (v.size() == 4 && prop.get_type() == rttr::type::get<Float4>()) prop.set_value(objInstance, Float4(v[0], v[1], v[2], v[3]));
+			}
+
+			// [로깅용] ResourceTag가 세팅되었는지 검사하여 출력
+			rttr::variant saveMeta = prop.get_metadata(Meta_Key_Type::SaveData);
+			if (saveMeta.is_valid() && saveMeta.is_type<SaveDataKey>())
+			{
+				SaveDataKey saveKey = saveMeta.get_value<SaveDataKey>();
+				if (saveKey == Save_Data_Key::TextureTag || saveKey == Save_Data_Key::ModelTag)
+				{
+					LOG_INFO(L"[Serializer] ResourceTag injected into {} : {}",
+						Helper::To_wString(objType.get_name().to_string()),
+						FromUtf8(it.value().get<string>()));
+				}
+			}
+		}
+	};
+
+
 
 	// ── Pass 2: 데이터 주입 (Properties & Components) ─────────────────────
 	for (auto& data : loadList)
@@ -338,44 +339,7 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 		// 2. RTTR 프로퍼티 주입 (GameObject)
 		if (objJson.contains("properties"))
 		{
-			auto& propsJson = objJson["properties"];
-			for (auto it = propsJson.begin(); it != propsJson.end(); ++it)
-			{
-				rttr::property prop = objType.get_property(it.key());
-				if (!prop.is_valid()) continue;
-
-				if (it.value().is_number())
-				{
-					if (prop.get_type() == rttr::type::get<uint32>())
-						prop.set_value(*pObj, static_cast<uint32>(it.value().get<double>()));
-					else if (prop.get_type() == rttr::type::get<int32>())
-						prop.set_value(*pObj, static_cast<int32>(it.value().get<double>()));
-					else if (prop.get_type() == rttr::type::get<Float>())
-						prop.set_value(*pObj, static_cast<Float>(it.value().get<double>()));
-					else
-						prop.set_value(*pObj, it.value().get<double>());
-				}
-				else if (it.value().is_boolean()) 
-				{
-					prop.set_value(*pObj, it.value().get<Bool>());
-				}
-				else if (it.value().is_string()) 
-				{
-					prop.set_value(*pObj, FromUtf8(it.value().get<string>()));
-				}
-				else if (it.value().is_array()) 
-				{
-					auto& v = it.value();
-					if (v.size() == 3 && prop.get_type() == rttr::type::get<Vector3>())
-						prop.set_value(*pObj, Vector3(v[0], v[1], v[2]));
-					else if (v.size() == 3 && prop.get_type() == rttr::type::get<Float3>())
-						prop.set_value(*pObj, Float3(v[0], v[1], v[2]));
-					else if (v.size() == 4 && prop.get_type() == rttr::type::get<Color>())
-						prop.set_value(*pObj, Color(v[0], v[1], v[2], v[3]));
-					else if (v.size() == 4 && prop.get_type() == rttr::type::get<Float4>())
-						prop.set_value(*pObj, Float4(v[0], v[1], v[2], v[3]));
-				}
-			}
+			DeserializeProperties(*pObj, objJson["properties"]);
 		}
 
 		// 3. 컴포넌트 데이터 주입
@@ -385,8 +349,7 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			{
 				string typeName = compJson.value("typeName", "");
 				auto& compPropsJson = compJson["properties"];
-				
-				// 해당 타입을 가진 컴포넌트를 객체에서 찾음
+
 				Shared<Component> targetComp = nullptr;
 				for (auto& pComp : pObj->Get_Components())
 				{
@@ -397,80 +360,38 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 						break;
 					}
 				}
-
-				// 없으면 동적 생성 후 부착 (엔진 로직 활용)
 				if (!targetComp)
 				{
-					targetComp = pObj->Add_Component(FromUtf8(typeName));
+                    targetComp = pObj->Add_Component(FromUtf8(typeName));
 				}
-
 				if (targetComp)
 				{
-					rttr::type compType = rttr::type::get(*targetComp);
-					for (auto it = compPropsJson.begin(); it != compPropsJson.end(); ++it)
-					{
-						rttr::property prop = compType.get_property(it.key());
-						if (!prop.is_valid()) continue;
-
-						if (it.value().is_number())
-						{
-							if (prop.get_type() == rttr::type::get<uint32>())
-								prop.set_value(*targetComp, static_cast<uint32>(it.value().get<double>()));
-							else if (prop.get_type() == rttr::type::get<int>())
-								prop.set_value(*targetComp, static_cast<int>(it.value().get<double>()));
-							else if (prop.get_type() == rttr::type::get<Float>())
-								prop.set_value(*targetComp, static_cast<Float>(it.value().get<double>()));
-							else
-								prop.set_value(*targetComp, it.value().get<double>());
-						}
-						else if (it.value().is_boolean()) 
-						{
-							prop.set_value(*targetComp, it.value().get<bool>());
-						}
-						else if (it.value().is_string()) 
-						{
-							prop.set_value(*targetComp, FromUtf8(it.value().get<string>()));
-						}
-						else if (it.value().is_array()) 
-						{
-							auto& v = it.value();
-							if (v.size() == 3 && prop.get_type() == rttr::type::get<Vector3>())
-								prop.set_value(*targetComp, Vector3(v[0], v[1], v[2]));
-							else if (v.size() == 3 && prop.get_type() == rttr::type::get<Float3>())
-								prop.set_value(*targetComp, Float3(v[0], v[1], v[2]));
-							else if (v.size() == 4 && prop.get_type() == rttr::type::get<Color>())
-								prop.set_value(*targetComp, Color(v[0], v[1], v[2], v[3]));
-							else if (v.size() == 4 && prop.get_type() == rttr::type::get<Float4>())
-								prop.set_value(*targetComp, Float4(v[0], v[1], v[2], v[3]));
-						}
-
-						// [Diagnostic] TextureTag 주입 확인
-						if (prop.get_metadata(Meta_Key::SaveData) == Serialize_Data_Field::TextureTag)
-						{
-							LOG_INFO(L"[Serializer] TextureTag injected into {} : {}", Helper::To_wString(typeName), FromUtf8(it.value().get<string>()));
-						}
-					}
+					DeserializeProperties(*targetComp, compPropsJson);
 				}
 			}
 		}
-
+		
+		// 4. (무조건 등록되었던) Transform 주입
 		if (objJson.contains("transform"))
 		{
 			auto& t = objJson["transform"];
 			auto transform = pObj->Get_Transform();
 			if (transform)
 			{
-				if (t.contains("position")) transform->Set_LocalPositionByValue({ t["position"][0], t["position"][1], t["position"][2] });
-				if (t.contains("rotation")) transform->Set_LocalEulerAngleByValue({ t["rotation"][0], t["rotation"][1], t["rotation"][2] });
-				if (t.contains("scale"))    transform->Set_LocalScaleByValue({ t["scale"][0], t["scale"][1], t["scale"][2] });
+				if (t.contains("position")) 
+					transform->Set_LocalPositionByValue({ t["position"][0], t["position"][1], t["position"][2] });
+				if (t.contains("rotation")) 
+					transform->Set_LocalEulerAngleByValue({ t["rotation"][0], t["rotation"][1], t["rotation"][2] });
+				if (t.contains("scale"))    
+					transform->Set_LocalScaleByValue({ t["scale"][0], t["scale"][1], t["scale"][2] });
 			}
 		}
 	}
 
-	// ── Pass 3: 참조 해결 (Linking) ──────────────────────────────────────
+	// ── Pass 4: 참조 해결 (Linking) ──────────────────────────────────────
 	for (auto& pair : instanceMap)
 	{
-		if (pair.second) 
+		if (pair.second)
 		{
 			pair.second->Post_Load(instanceMap);
 			if (pair.second->Get_Transform()) {
@@ -478,7 +399,6 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			}
 		}
 	}
-
 	LOG_INFO(L"[SceneSerializer] RTTR Scene loaded: {} objects", instanceMap.size());
 	return S_OK;
 }

@@ -188,6 +188,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\public\EngineShaderDefine.hlsli" />
     <None Include="..\vcpkg.json" />
     <None Include="ExportBuildArtifacts.bat" />
     <None Include="GenerateRTTR.bat" />
@@ -248,6 +249,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\VIBuffer.h" />
     <ClInclude Include="..\public\VIBuffer_Rect.h" />
     <ClInclude Include="..\public\VIBuffer_Terrain.h" />
+    <ClInclude Include="..\public\VICube.h" />
+    <ClInclude Include="..\public\VISphere.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Animation.cpp" />
@@ -288,6 +291,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Object_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\TextUI_rttr.cpp" />
@@ -298,7 +302,10 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Font_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\VICube_rttr.cpp" />
     <ClCompile Include="..\private\LevelSerializer.cpp" />
+    <ClCompile Include="..\private\rttr_generated\VISphere_rttr.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SoundManager.cpp" />
@@ -313,6 +320,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\VIBuffer.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
+    <ClCompile Include="..\private\VICube.cpp" />
+    <ClCompile Include="..\private\VISphere.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

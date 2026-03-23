@@ -233,6 +233,11 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 
 }
 
+const Matrix& Model::Get_BoneTransformByName(const string& boneName)
+{
+	return Matrix::Identity;
+}
+
 HRESULT Model::Render(uint32 meshIndex)
 {
 	m_Meshes[meshIndex]->Bind_Resources();

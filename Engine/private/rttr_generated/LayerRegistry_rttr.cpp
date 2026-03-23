@@ -1,12 +1,10 @@
-#include "pch.h"
 #include "LayerRegistry.h"
 #include <rttr/registration>
 
 using namespace rttr;
 using namespace Engine;
 
-#line 5936
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(LayerRegistry_RTTR)
 {
 	registration::class_<LayerRegistry>("LayerRegistry")
 		.constructor<>()

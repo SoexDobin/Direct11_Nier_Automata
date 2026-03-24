@@ -58,6 +58,17 @@ HRESULT Animation::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+const TRANSFORM_FRAME& Animation::Get_TransformDelta(int32 boneIndex) const
+{
+	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
+	for (const auto& channel : m_Channels)
+	{
+		if (channel->Get_BoneIndex() == boneIndex)
+			return channel->Get_TransformDelta();
+	}
+	return emptyFrame;
+}
+
 Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop)
 {
 	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;

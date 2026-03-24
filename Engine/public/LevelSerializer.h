@@ -1,7 +1,10 @@
 #pragma once
 #include "EngineManager.h"
 
+
+
 NS_BEGIN(Engine)
+class GameObject;
 class LevelSerializer : public EngineManager
 {
 	NO_COPY(LevelSerializer)
@@ -16,6 +19,9 @@ private:
 	
 	static string ToUtf8(const wstring& ws);
 	static wstring FromUtf8(const string& s);
+
+private:
+	Bool DoNotSerialize(const Shared<GameObject>& object);
 
 public:
 	HRESULT Initialize_Prototype() override { return EngineManager::Initialize_Prototype(); }

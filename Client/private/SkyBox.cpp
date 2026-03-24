@@ -95,12 +95,12 @@ HRESULT SkyBox::Bind_ShaderResources()
 HRESULT SkyBox::Ready_Components()
 {
 	Shader::SHADER_DESC shaderDesc{ VTXCUBE::Tag, VTXCUBE::Elements, VTXCUBE::numElements };
-	m_Shader = Add_Component<Shader>(&shaderDesc);
+	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 
 	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::STATIC), L"Skybox_Default0" };
-	m_Texture = Add_Component<Texture>(&textureDesc);
+	m_Texture = Add_Component<Texture>(ETOI(LEVEL::STATIC), &textureDesc);
 
-	m_CubeBuffer = Add_Component<VICube>();
+	m_CubeBuffer = Add_Component<VICube>(ETOI(LEVEL::STATIC));
 
 	return S_OK;
 }

@@ -13,6 +13,7 @@
 #include "Transform.h"
 #include "String_Helper.h"
 #include "SpdLogger.h"
+#include "GameObject.h"
 
 using namespace std;
 using namespace Engine;
@@ -59,6 +60,9 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 	for (auto& [instanceID, pObj] : allObjects)
 	{
 		if (!pObj || pObj->Is_Destroy()) continue;
+
+		if (DoNotSerialize(pObj)) continue;
+
 		levelMap[levIndex].push_back(pObj);
 	}
 
@@ -210,12 +214,13 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 
 	string version = root.value("version", "1.1");
 
+	uint32 levIndex{};
 	// ── Pass 0: 선택적 클리어 (JSON에 명시된 레벨만 초기화) ───────────────────────
 	if (root.contains("levels"))
 	{
 		for (auto& levelJson : root["levels"])
 		{
-			uint32 levIndex = levelJson.value("levelIndex", 0u);
+			levIndex = levelJson.value("levelIndex", 0u);
 			GAME_INSTANCE->Clearing_ObjectManager(levIndex);
 		}
 	}
@@ -297,10 +302,10 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			
 			// 실제 오브젝트에 값 꽂아넣기
 			if (it.value().is_number()) {
-				if (prop.get_type() == rttr::type::get<uint32>()) prop.set_value(objInstance, static_cast<uint32>(it.value().get<double>()));
-				else if (prop.get_type() == rttr::type::get<int32>()) prop.set_value(objInstance, static_cast<int32>(it.value().get<double>()));
-				else if (prop.get_type() == rttr::type::get<Float>()) prop.set_value(objInstance, static_cast<Float>(it.value().get<double>()));
-				else prop.set_value(objInstance, it.value().get<double>());
+				if (prop.get_type() == rttr::type::get<uint32>()) prop.set_value(objInstance, static_cast<uint32>(it.value().get<Double>()));
+				else if (prop.get_type() == rttr::type::get<int32>()) prop.set_value(objInstance, static_cast<int32>(it.value().get<Double>()));
+				else if (prop.get_type() == rttr::type::get<Float>()) prop.set_value(objInstance, static_cast<Float>(it.value().get<Double>()));
+				else prop.set_value(objInstance, it.value().get<Double>());
 			}
 			else if (it.value().is_boolean()) { prop.set_value(objInstance, it.value().get<Bool>()); }
 			else if (it.value().is_string()) { prop.set_value(objInstance, FromUtf8(it.value().get<string>())); }
@@ -326,7 +331,6 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			}
 		}
 	};
-
 
 
 	// ── Pass 2: 데이터 주입 (Properties & Components) ─────────────────────
@@ -362,7 +366,7 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 				}
 				if (!targetComp)
 				{
-                    targetComp = pObj->Add_Component(FromUtf8(typeName));
+                    targetComp = pObj->Add_Component(levIndex, FromUtf8(typeName));
 				}
 				if (targetComp)
 				{
@@ -401,6 +405,16 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	}
 	LOG_INFO(L"[SceneSerializer] RTTR Scene loaded: {} objects", instanceMap.size());
 	return S_OK;
+}
+
+Bool LevelSerializer::DoNotSerialize(const Shared<GameObject>& object)
+{
+	if (object->Get_GameObjectType() == GAMEOBJECTTYPE::PART)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 Unique<LevelSerializer> LevelSerializer::Create()

@@ -98,12 +98,12 @@ void Monster::Submit_RenderGroup()
 HRESULT Monster::Ready_Components()
 {
 	Shader::SHADER_DESC shaderDesc{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
-	m_Shader = Add_Component<Shader>(&shaderDesc);
+	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
 	Model::MODEL_DESC modelDesc{ L"CityOfRuinsMainField" };
-	m_Model = Add_Component<Model>(&modelDesc);
+	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;
 

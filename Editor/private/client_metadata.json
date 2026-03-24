@@ -636,6 +636,19 @@
                                        "has_clone":  true,
                                        "category":  "other"
                                    },
+                    "WP0070Body":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "PartObject",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "LoadingLogo":  {
                                         "namespace":  "Engine",
                                         "base_class":  "UIObject",
@@ -1122,9 +1135,27 @@
                                                          ],
                                    "has_clone":  true
                                },
+                    "WP0220Body":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "PartObject",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "P10000":  {
                                    "members":  [
-
+                                                   {
+                                                       "access":  "private",
+                                                       "default":  "",
+                                                       "name":  "m_States",
+                                                       "type":  "uint32"
+                                                   }
                                                ],
                                    "base_class":  "ContainerObject",
                                    "inherited_members":  {

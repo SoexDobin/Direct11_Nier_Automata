@@ -214,11 +214,10 @@ void Hierarchy::Delete_Selected() {
     if (!selected)
       return;
 
-    // Object::Destroy() → ObjectManager가 Update 종료 후 자동 정리
     Object::Destroy(selected);
     EDITOR->Clear_SelectedObject();
-    
-    // Cleanup will happen in the Engine's Update loop.
+
+    GAME_INSTANCE->Clearing_ObjectManager(GAME_INSTANCE->Get_CurrentLevelIndex());
 }
 
 Shared<Hierarchy> Hierarchy::Create() {

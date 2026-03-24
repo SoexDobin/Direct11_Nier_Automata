@@ -21,6 +21,7 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
+	GAMEOBJECTTYPE Get_GameObjectType() final { return GAMEOBJECTTYPE::CONTAINER; }
 	void Priority_Update(Float timeDelta) override {}
 	void Update(Float timeDelta) override {}
 	void Late_Update(Float timeDelta) override {}

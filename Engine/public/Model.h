@@ -49,7 +49,8 @@ public:
 	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
 
 public:
-	const Matrix& Get_BoneTransformByName(const string& boneName);
+	int32 Get_BoneIndexByName(const string& boneName) const;
+	const TRANSFORM_FRAME& Get_BoneTransformDelta(uint32 boneIndex) const;
 
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);

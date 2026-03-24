@@ -267,6 +267,7 @@
     <FxCompile Include="..\bin\shaders\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxNormTex.hlsl" />
+    <FxCompile Include="..\bin\shaders\Shader_VtxSphere.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <ItemGroup>

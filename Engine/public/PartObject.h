@@ -18,6 +18,7 @@ public:
 	virtual ~PartObject() override = default;
 	
 public:
+	GAMEOBJECTTYPE Get_GameObjectType() final { return GAMEOBJECTTYPE::PART; }
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
 	void On_Destroy() override { GameObject::On_Destroy(); }

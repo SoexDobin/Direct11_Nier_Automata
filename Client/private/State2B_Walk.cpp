@@ -9,7 +9,7 @@
 #include "StateMachine.h"
 #include "Camera.h"
 
-State2B_Walk::State2B_Walk(const wstring& tag, const Shared<P10000Body>& owner)
+State2B_Walk::State2B_Walk(const wstring& tag, const Shared<P10000>& owner)
 	: State2B{tag, owner}
 {
 }
@@ -83,7 +83,7 @@ void State2B_Walk::StateExitInvoke()
 {
 }
 
-Shared<State2B_Walk> State2B_Walk::Create(const wstring& tag, const Shared<P10000Body>& owner)
+Shared<State2B_Walk> State2B_Walk::Create(const wstring& tag, const Shared<P10000>& owner)
 {
 	auto instance = make_shared<State2B_Walk>(tag, owner);
 

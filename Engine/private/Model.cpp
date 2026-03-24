@@ -233,9 +233,24 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 
 }
 
-const Matrix& Model::Get_BoneTransformByName(const string& boneName)
+int32 Model::Get_BoneIndexByName(const string& boneName) const
 {
-	return Matrix::Identity;
+	for (size_t i = 0; i < m_Bones.size(); ++i)
+	{
+		if (m_Bones[i]->Is_SameBone(boneName.c_str()))
+			return static_cast<int32>(i);
+	}
+	return -1;
+}
+
+const TRANSFORM_FRAME& Model::Get_BoneTransformDelta(uint32 boneIndex) const
+{
+	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
+	
+	if (m_Animations.empty() || m_CurrentAnimIndex >= m_Animations.size())
+		return emptyFrame;
+
+	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(boneIndex);
 }
 
 HRESULT Model::Render(uint32 meshIndex)

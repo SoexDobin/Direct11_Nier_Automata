@@ -17,6 +17,9 @@ public:
 	Bool IsSameTag(const wstring& tag) const { return tag == m_StateTag; }
 
 public:
+	Bool Is_Active() const { return m_IsActive; }
+
+public:
 	virtual Bool StateEnterInvoke() { return true; }
 	virtual void Update(Float timeDelta) {}
 	virtual void Late_Update(Float timeDelta) {}
@@ -24,6 +27,7 @@ public:
 
 protected:
 	wstring m_StateTag{};
+	Bool m_IsActive;
 };
 
 NS_END

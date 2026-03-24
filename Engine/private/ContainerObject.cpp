@@ -46,7 +46,5 @@ Shared<PartObject> ContainerObject::Find_PartObject(const wstring& partTag)
 		return m_PartObjects[partTag];
 	}
 
-	LOG_ERROR(L"Failed to find PartObject {}", partTag);
-
 	return nullptr;
 }

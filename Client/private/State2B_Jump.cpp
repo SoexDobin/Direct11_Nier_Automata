@@ -3,7 +3,7 @@
 
 #include <SpdLogger.h>
 
-State2B_Jump::State2B_Jump(const wstring& tag, const Shared<P10000Body>& owner)
+State2B_Jump::State2B_Jump(const wstring& tag, const Shared<P10000>& owner)
 	: State2B{tag, owner}
 {
 }
@@ -34,7 +34,7 @@ void State2B_Jump::StateExitInvoke()
 	State2B::StateExitInvoke();
 }
 
-Shared<State2B_Jump> State2B_Jump::Create(const wstring& tag, const Shared<P10000Body>& owner)
+Shared<State2B_Jump> State2B_Jump::Create(const wstring& tag, const Shared<P10000>& owner)
 {
 	auto instance = make_shared<State2B_Jump>(tag, owner);
 

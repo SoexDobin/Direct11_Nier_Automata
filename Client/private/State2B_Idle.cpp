@@ -7,7 +7,7 @@
 #include "Model.h"
 #include "StateMachine.h"
 
-State2B_Idle::State2B_Idle(const wstring& tag, const Shared<P10000Body>& owner)
+State2B_Idle::State2B_Idle(const wstring& tag, const Shared<P10000>& owner)
 	: State2B{tag, owner}
 {
 }
@@ -56,7 +56,7 @@ void State2B_Idle::StateExitInvoke()
 {
 }
 
-Shared<State2B_Idle> State2B_Idle::Create(const wstring& tag, const Shared<P10000Body>& owner)
+Shared<State2B_Idle> State2B_Idle::Create(const wstring& tag, const Shared<P10000>& owner)
 {
 	auto instance = make_shared<State2B_Idle>(tag, owner);
 

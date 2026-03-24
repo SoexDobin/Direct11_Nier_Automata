@@ -10,6 +10,7 @@ HRESULT LevelManager::Initialize(void *arg) {
 void LevelManager::On_Destroy() { m_CurrentLevel.reset(); }
 
 HRESULT LevelManager::Change_Level(uint32 levIndex,const Shared<Level>& level) {
+
     if (nullptr != m_CurrentLevel)
     {
         Game::GetInstance()->Clear_Resource(m_CurrentLevelIndex);

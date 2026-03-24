@@ -14,6 +14,8 @@
 #include "StateMachine.h"
 #include "P10000.h"
 #include "P10000Body.h"
+#include "WP0070Body.h"
+#include "WP0220Body.h"
 #include "StaticCamera.h"
 #include "TitleBackground.h"
 
@@ -90,6 +92,17 @@ void Register_Client_Reflection() {
         .method("Clone", &P10000Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000Body::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<WP0070Body>("WP0070Body")
+        .constructor<>()
+        .method("Clone", &WP0070Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP0070Body::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<WP0220Body>("WP0220Body")
+        .constructor<>()
+        .method("Clone", &WP0220Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP0220Body::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
 
     rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
         .constructor<>()

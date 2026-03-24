@@ -457,6 +457,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 				std::wstring staticMesh = L"vtxmesh";
 				std::wstring animMesh = L"vtxanimmesh";
 				std::wstring cube = L"vtxcube";
+				std::wstring sphere = L"vtxsphere";
 				
 				auto itTex = std::search(
 						tagName.begin(), tagName.end(), 
@@ -478,6 +479,10 @@ HRESULT ClientSettingManager::Load_Shader() const
 						tagName.begin(), tagName.end(),
 						cube.begin(), cube.end(), CaseInsensitiveCompare
 					);
+				auto itSphereTex = std::search(
+					tagName.begin(), tagName.end(),
+					sphere.begin(), sphere.end(), CaseInsensitiveCompare
+				);
 
 				if (itAnimTex != tagName.end())
 				{
@@ -502,6 +507,11 @@ HRESULT ClientSettingManager::Load_Shader() const
 				else if (itCubeTex != tagName.end())
 				{
 					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXCUBE::Elements, VTXCUBE::numElements, VTXCUBE::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXCUBE::Tag);
+				}
+				else if (itSphereTex != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXSPHERE::Elements, VTXSPHERE::numElements, VTXSPHERE::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXCUBE::Tag);
 				}
 				else

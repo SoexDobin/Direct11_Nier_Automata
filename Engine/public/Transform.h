@@ -43,6 +43,7 @@ public: /* World Getter */
     Quaternion Get_Quaternion() const;
     Vector3 Get_Position() const;
     Matrix Get_WorldMatrix() const;
+    Matrix* Get_WorldMatrixPtr();
     Vector3 Get_Right() const;
     Vector3 Get_Up() const;
     Vector3 Get_Look() const;

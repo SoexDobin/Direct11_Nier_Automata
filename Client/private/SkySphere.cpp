@@ -87,10 +87,10 @@ HRESULT SkySphere::Bind_ShaderResources()
 HRESULT SkySphere::Ready_Components()
 {
 	Shader::SHADER_DESC shaderDesc{ VTXCUBE::Tag, VTXCUBE::Elements, VTXCUBE::numElements };
-	m_Shader = Add_Component<Shader>(&shaderDesc);
+	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::STATIC), L"Skybox_Default0" };
-	m_Texture = Add_Component<Texture>(&textureDesc);
-	m_SphereBuffer = Add_Component<VISphere>();
+	m_Texture = Add_Component<Texture>(ETOI(LEVEL::STATIC), &textureDesc);
+	m_SphereBuffer = Add_Component<VISphere>(ETOI(LEVEL::STATIC));
 	return S_OK;
 }
 

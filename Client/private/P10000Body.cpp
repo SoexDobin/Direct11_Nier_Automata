@@ -6,6 +6,7 @@
 #include "Game.h"
 
 #include "Model.h"
+#include "P10000.h"
 #include "StateMachine.h"
 
 #include "State2B_Idle.h"
@@ -36,11 +37,7 @@ HRESULT P10000Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_States()))
-	{
-		LOG_ERROR(L"Failed To Ready_States : P10000Body");
-		return E_FAIL;
-	}
+	rootBoneIndex = m_Model->Get_BoneIndexByName("RootNode");
 
 	return S_OK;
 }
@@ -48,26 +45,56 @@ HRESULT P10000Body::Initialize(void* arg)
 void P10000Body::On_Destroy()
 {
 	PartObject::On_Destroy();
+	states = nullptr;
 }
 
 void P10000Body::Priority_Update(Float timeDelta)
 {
-	
+	if (!states) return;
+
 }
 
 void P10000Body::Update(Float timeDelta)
 {
+	if (!states) return;
+
+	// Attack > Jump > Move > IDle
+	// Dash, Evade 
+
+	const TRANSFORM_FRAME& transformDelta = m_Model->Get_BoneTransformDelta(rootBoneIndex);
+
+	if (*states & P10000::P10000_STATE::RUN_2B)
+	{
+		m_Model->Set_Animation(2, 0.25);
+		m_Model->Set_AnimLoop(false);
+
+		m_Transform->Set_LocalPosition(m_Transform->Get_LocalPosition() + transformDelta.position);
+		m_Transform->Set_LocalRotation(m_Transform->Get_Quaternion() + transformDelta.rotation);
+	}
+
+	if (*states & P10000::P10000_STATE::IDLE_2B)
+	{
+		m_Model->Set_Animation(49, 0.25);
+		m_Model->Set_AnimLoop(true);
+	}
+
+	
 	
 }
 
 void P10000Body::Late_Update(Float timeDelta)
 {
-	
+	if (!states) return;
+
+	m_Model->Update_ModelAnimation(timeDelta);
+
+	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 }
 
 void P10000Body::Fixed_Update(Float fixedDelta)
 {
-	
+	if (!states) return;
+
 }
 
 HRESULT P10000Body::Render()
@@ -126,36 +153,14 @@ HRESULT P10000Body::Bind_ShaderResources()
 HRESULT P10000Body::Ready_Components()
 {
 	Shader::SHADER_DESC shaderDesc{ VTXANIMMESH::Tag,  VTXANIMMESH::Elements, VTXANIMMESH::numElements };
-	m_Shader = Add_Component<Shader>(&shaderDesc);
+	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
 	Model::MODEL_DESC modelDesc{ L"p10000" };
-	m_Model = Add_Component<Model>(&modelDesc);
+	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;
-
-	m_StateMachine = Add_Component<StateMachine>();
-	if (nullptr == m_StateMachine)
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT P10000Body::Ready_States()
-{
-	if (m_StateMachine)
-	{
-		auto this_2B = static_pointer_cast<P10000Body>(shared_from_this());
-
-		m_StateMachine->Add_State(State2B_Idle::Create(L"State2B_Idle", this_2B));
-		m_StateMachine->Add_State(State2B_Walk::Create(L"State2B_Walk", this_2B));
-		m_StateMachine->Add_State(State2B_Idle::Create(L"State2B_Run", this_2B));
-		m_StateMachine->Add_State(State2B_Sprint::Create(L"State2B_Sprint", this_2B));
-		m_StateMachine->Add_State(State2B_Jump::Create(L"State2B_Jump", this_2B));
-
-		m_StateMachine->Change_State(L"State2B_Idle");
-	}
 
 	return S_OK;
 }

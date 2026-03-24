@@ -1,0 +1,127 @@
+{
+  "levels": [
+    {
+      "levelIndex": 3,
+      "objects": [
+        {
+          "components": [
+            {
+              "properties": {
+                "ObjectID": 2406534623
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": {
+                "ObjectID": 3036997248
+              },
+              "typeName": "Model"
+            },
+            {
+              "properties": {
+                "ObjectID": 2791204719
+              },
+              "typeName": "Shader"
+            }
+          ],
+          "name": "CityOfRuins",
+          "objectID": 1208553506,
+          "parentObjectID": 0,
+          "properties": {
+            "ObjectID": 1208553506
+          },
+          "prototypeTag": "CityOfRuins",
+          "transform": {
+            "position": [
+              50.0,
+              0.0,
+              100.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuins"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "ObjectID": 1186799141
+              },
+              "typeName": "Transform"
+            }
+          ],
+          "name": "ThirdPersonCamera",
+          "objectID": 4249569602,
+          "parentObjectID": 0,
+          "properties": {
+            "ObjectID": 4249569602
+          },
+          "prototypeTag": "ThirdPersonCamera",
+          "transform": {
+            "position": [
+              0.0,
+              10.0,
+              -10.0
+            ],
+            "rotation": [
+              44.99999237060547,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "ThirdPersonCamera"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "ObjectID": 1723698101
+              },
+              "typeName": "Transform"
+            }
+          ],
+          "name": "P10000",
+          "objectID": 304936146,
+          "parentObjectID": 0,
+          "properties": {
+            "ObjectID": 304936146
+          },
+          "prototypeTag": "P10000",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "P10000"
+        }
+      ]
+    }
+  ],
+  "version": "2.0"
+}

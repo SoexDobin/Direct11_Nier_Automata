@@ -7,11 +7,14 @@ NS_END
 
 NS_BEGIN(Client)
 
-class StateMachine;
-
 class CLIENT_DLL P10000Body final : public PartObject
 {
 	RTTR_ENABLE(PartObject)
+public:
+	typedef struct tagP10000BodyDesc : public PARTOBJECT_DESC
+	{
+		uint32* states{nullptr};
+	} P10000BODY_DESC ;
 public:
 	explicit P10000Body();
 	explicit P10000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -22,8 +25,6 @@ public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
 	void On_Destroy() override;
-
-
 
 public:
 	void Priority_Update(Float timeDelta) override;
@@ -36,10 +37,10 @@ public:
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
-	HRESULT Ready_States();
 
 private:
-	Shared<StateMachine> m_StateMachine{nullptr};
+	uint32 rootBoneIndex{};
+	uint32* states{ nullptr };
 	Shared<Shader> m_Shader{ nullptr };
 	Shared<Model> m_Model{ nullptr };
 

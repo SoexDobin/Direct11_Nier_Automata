@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 class CLIENT_DLL State2B_Run final : public State2B
 {
 public:
-	explicit State2B_Run(const wstring& tag, const Shared<P10000Body>& owner);
+	explicit State2B_Run(const wstring& tag, const Shared<P10000>& owner);
 	~State2B_Run() override = default;
 
 private:
@@ -19,7 +19,7 @@ public:
 	void StateExitInvoke() override;
 
 public:
-	static Shared<State2B_Run> Create(const wstring& tag, const Shared<P10000Body>& owner);
+	static Shared<State2B_Run> Create(const wstring& tag, const Shared<P10000>& owner);
 };
 
 NS_END

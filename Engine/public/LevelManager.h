@@ -33,7 +33,7 @@ public:
 
 private:
 	Shared<Level> m_CurrentLevel = {nullptr};
-	uint32 m_CurrentLevelIndex = {};
+	uint32 m_CurrentLevelIndex{};
 
 public:
 	static Unique<LevelManager> Create();

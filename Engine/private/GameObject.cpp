@@ -346,10 +346,8 @@ HRESULT GameObject::Add_Component(const Shared<Component>& component) {
 }
 
 
-Shared<Component> GameObject::Add_Component(uint32 objectID, void* arg)
+Shared<Component> GameObject::Add_Component(uint32 levIndex, uint32 objectID, void* arg)
 {
-    uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
-
     Shared<Component> newComponent = GAME_INSTANCE->Instantiate<Component>(objectID, levIndex, arg);
     if (newComponent) 
         Add_Component(newComponent);
@@ -359,10 +357,8 @@ Shared<Component> GameObject::Add_Component(uint32 objectID, void* arg)
     return newComponent;
 }
 
-Shared<Component> GameObject::Add_Component(const wstring& prototypeTag, void* arg)
+Shared<Component> GameObject::Add_Component(uint32 levIndex, const wstring& prototypeTag, void* arg)
 {
-    uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
-
     Shared<Component> newComponent = static_pointer_cast<Component>(GAME_INSTANCE->Instantiate(prototypeTag, levIndex, arg));
     if (newComponent)
         Add_Component(newComponent);

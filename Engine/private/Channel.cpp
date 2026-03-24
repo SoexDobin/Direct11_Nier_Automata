@@ -84,11 +84,32 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 
 void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones)
 {
-	TRANSFORM_FRAME frame{};
-	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, frame);
-	
+	TRANSFORM_FRAME currentFrame{};
+	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
+
+	if (m_IsFirstUpdate)
+	{
+		m_PrevTransform = currentFrame;
+		m_TransformationDelta = { Vector3::One, Vector4(0,0,0,1), Vector3::Zero };
+		m_IsFirstUpdate = false;
+	}
+	else
+	{
+		// 1. 위치 델타 계산
+		m_TransformationDelta.position = currentFrame.position - m_PrevTransform.position;
+		// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
+		Quaternion qtCurr(currentFrame.rotation);
+		Quaternion qtPrev(m_PrevTransform.rotation);
+		Quaternion qtInvPrev; qtPrev.Inverse(qtInvPrev);
+
+		Quaternion qtDelta = qtCurr * qtInvPrev;
+		m_TransformationDelta.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
+
+		m_PrevTransform = currentFrame;
+	}
+
 	Matrix boneTransformationMatrix =
-		XMMatrixAffineTransformation(frame.scale, Quaternion::Identity, frame.rotation, frame.position);
+		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, currentFrame.position);
 
 	bones[m_BoneIndex]->Update_TransformationMatrix(boneTransformationMatrix);
 }

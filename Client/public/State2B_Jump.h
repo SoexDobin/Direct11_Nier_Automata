@@ -3,12 +3,12 @@
 
 NS_BEGIN(Client)
 
-class P10000Body;
+class P10000;
 
 class CLIENT_DLL State2B_Jump final : public State2B
 {
 public:
-	explicit State2B_Jump(const wstring& tag, const Shared<P10000Body>& owner);
+	explicit State2B_Jump(const wstring& tag, const Shared<P10000>& owner);
 	~State2B_Jump() override = default;
 
 private:
@@ -23,7 +23,7 @@ public:
 private:
 
 public:
-	static Shared<State2B_Jump> Create(const wstring& tag, const Shared<P10000Body>& owner);
+	static Shared<State2B_Jump> Create(const wstring& tag, const Shared<P10000>& owner);
 };
 
 NS_END

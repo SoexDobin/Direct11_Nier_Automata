@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "InspectorCamera.h"
+#include "Editor_Define.h"
 #include "EditorManager.h"
 #include "Camera.h"
 #include "Game.h"
@@ -70,7 +71,7 @@ void InspectorCamera::RenderCamera(const Shared<GameObject>& pObj)
 
         if (const ImGuiPayload* payload = ImGui::GetDragDropPayload())
         {
-            if (string(payload->DataType) == "GAMEOBJECT_ITEM") // Adjust payload key if needed
+            if (string(payload->DataType) == ObjectMove_PayLoadKey) 
             {
                 slotColor = ImVec4(0.2f, 0.5f, 0.6f, 1.0f);
                 textColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -87,7 +88,7 @@ void InspectorCamera::RenderCamera(const Shared<GameObject>& pObj)
         
         if (ImGui::BeginDragDropTarget())
         {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GAMEOBJECT_ITEM"))
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(ObjectMove_PayLoadKey.c_str()))
             {
                 uint32 droppedInstanceID = *(uint32*)payload->Data;
                 Shared<GameObject> droppedObj = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_CurrentLevelIndex(), droppedInstanceID);

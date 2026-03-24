@@ -5,9 +5,8 @@ NS_BEGIN(Engine)
 NS_END
 
 NS_BEGIN(Client)
-	class CLIENT_DLL State abstract
+class CLIENT_DLL State abstract
 {
-	RTTR_ENABLE()
 public:
 	explicit State(const wstring& tag);
 	virtual ~State() = default;
@@ -26,7 +25,7 @@ public:
 	virtual void StateExitInvoke() {}
 
 protected:
-	wstring m_StateTag{};
+	wstring m_StateTag{};  
 	Bool m_IsActive;
 };
 

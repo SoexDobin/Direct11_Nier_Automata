@@ -45,7 +45,7 @@ namespace Engine
 	typedef struct tagTransformFrame
 	{
 		Vector3 scale;
-		Vector4 rotation;
+		Quaternion rotation;
 		Vector3 position;
 	} TRANSFORM_FRAME;
 

@@ -52,6 +52,7 @@ public: /* For Input Manager */
     Bool Get_MouseLock() const { return m_InputDevice->Get_MouseLock(); }
     void Set_MouseLock(Bool isLock) const { return m_InputDevice->Set_MouseLock(isLock); }
     void Set_InputEnabled(Bool isEnabled) const { m_InputDevice->Set_InputEnabled(isEnabled); }
+    Bool Get_InputEnabled() const { return m_InputDevice->Get_InputEnabled(); }
 
 public: /* For GraphicDevice */
     HRESULT Clear_BackBufferView(const Shared<Float4>& clearColor) const;

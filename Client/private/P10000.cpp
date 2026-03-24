@@ -61,18 +61,13 @@ void P10000::Priority_Update(Float timeDelta)
 
 void P10000::Update(Float timeDelta)
 {
-	
-
-
 	m_P10000States->Update_State(timeDelta);
+
+	m_P10000States->Get_CurrentState();
 }
 
 void P10000::Late_Update(Float timeDelta)
 {
-	/*
-	 키 입력 IDLE -> RUN 
-	 
-	 */
 	
 }
 
@@ -96,20 +91,7 @@ void P10000::Submit_RenderGroup()
 
 void P10000::Update_KeyInput(Float timeDelta)
 {
-	if (GetKeyState(VK_UP) & 0x8000)
-	{
-		if (m_States & P10000_STATE::IDLE_2B)
-			m_States ^= P10000_STATE::IDLE_2B;
-
-		m_States |= P10000_STATE::RUN_2B;
-	}
-	else
-	{
-		if (m_States & P10000_STATE::RUN_2B)
-			m_States ^= P10000_STATE::RUN_2B;
-
-		m_States |= P10000_STATE::IDLE_2B;
-	}
+	
 }
 
 HRESULT P10000::Ready_PartObjects()
@@ -130,7 +112,6 @@ HRESULT P10000::Ready_Components()
 {
 	if ((m_P10000States = Add_Component<StateMachine>(ETOI(LEVEL::GAMEPLAY))))
 	{
-		
 		auto p10000 = static_pointer_cast<P10000>(shared_from_this());
 		m_P10000States->Add_State(State2B_Idle::Create(
 			Helper::To_wString(magic_enum::enum_name(IDLE_2B)), p10000));
@@ -143,11 +124,16 @@ HRESULT P10000::Ready_Components()
 		m_P10000States->Add_State(State2B_Jump::Create(
 			Helper::To_wString(magic_enum::enum_name(JUMP_2B)), p10000));
 
-
 		m_P10000States->Change_State(Helper::To_wString(magic_enum::enum_name(IDLE_2B)));
 	}
 	else
 		return E_FAIL;
+
+	m_P10000Input = Add_Component<P10000Input>(ETOI(LEVEL::GAMEPLAY));
+	if (nullptr == m_P10000Input)
+		return E_FAIL;
+
+
 
 	return S_OK;
 }

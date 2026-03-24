@@ -352,6 +352,24 @@
                                            "has_clone":  false,
                                            "category":  "other"
                                        },
+                    "P10000Input":  {
+                                        "members":  [
+                                                        {
+                                                            "access":  "private",
+                                                            "default":  "0.25f",
+                                                            "name":  "m_DoubleClickThreshold",
+                                                            "type":  "Float"
+                                                        }
+                                                    ],
+                                        "base_class":  "ScriptComponent",
+                                        "inherited_members":  {
+
+                                                              },
+                                        "namespace":  "Client",
+                                        "has_create":  true,
+                                        "has_clone":  true,
+                                        "category":  "other"
+                                    },
                     "Monster":  {
                                     "namespace":  "Engine",
                                     "base_class":  "GameObject",
@@ -1150,12 +1168,7 @@
                                    },
                     "P10000":  {
                                    "members":  [
-                                                   {
-                                                       "access":  "private",
-                                                       "default":  "",
-                                                       "name":  "m_States",
-                                                       "type":  "uint32"
-                                                   }
+
                                                ],
                                    "base_class":  "ContainerObject",
                                    "inherited_members":  {

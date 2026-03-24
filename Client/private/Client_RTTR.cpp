@@ -28,6 +28,8 @@ using rttr::registration;
 // <AUTO_GENERATED_INCLUDES>
 #include "FreeCamera.h"
 #include "Monster.h"
+#include "P10000Input.h"
+#include "P10000StateMachine.h"
 #include "SkyBox.h"
 #include "SkySphere.h"
 #include "Terrain.h"
@@ -138,6 +140,16 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Monster::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Monster::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<P10000Input>("P10000Input")
+        .constructor<>()
+        .method("Clone", &P10000Input::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return P10000Input::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<P10000StateMachine>("P10000StateMachine")
+        .constructor<>()
+        .method("Clone", &P10000StateMachine::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return P10000StateMachine::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<SkyBox>("SkyBox")
         .constructor<>()

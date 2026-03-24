@@ -44,6 +44,17 @@ Bool StateMachine::Change_State(const wstring& stateTag)
 	return false;
 }
 
+Shared<State> StateMachine::Find_State(const wstring& stateTag)
+{
+	if (m_States.contains(stateTag))
+	{
+		return m_States[stateTag];
+	}
+
+	LOG_ERROR(L"Failed to Find State {}", stateTag);
+	return nullptr;
+}
+
 HRESULT StateMachine::Initialize_Prototype()
 {
 	return ScriptComponent::Initialize_Prototype();
@@ -70,26 +81,4 @@ void StateMachine::Update_State(Float timeDelta)
 	{
 		state->Late_Update(timeDelta);
 	}
-}
-
-Shared<StateMachine> StateMachine::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-{
-	auto stateMachine = make_shared<StateMachine>(device, context);
-	if (FAILED(stateMachine->Initialize_Prototype()))
-	{
-		LOG_ERROR("Failed to Create StateMachine");
-		return nullptr;
-	}
-	return stateMachine;
-}
-
-Shared<Component> StateMachine::Clone(void* arg)
-{
-	auto stateMachine = make_shared<StateMachine>();
-	if (FAILED(stateMachine->Initialize(arg)))
-	{
-		LOG_ERROR("Failed to Cloned StateMachine");
-		return nullptr;
-	}
-	return stateMachine;
 }

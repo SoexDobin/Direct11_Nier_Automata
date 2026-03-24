@@ -17,6 +17,7 @@ public:
 	Shared<State> Get_CurrentState();
 	HRESULT Add_State(const Shared<State>& state);
 	Bool Change_State(const wstring& stateTag);
+	Shared<State> Find_State(const wstring& stateTag);
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -33,8 +34,7 @@ public:
 	unordered_map<wstring, Shared<State>> m_States;
 
 public:
-	static Shared<StateMachine> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	Shared<Component> Clone(void* arg = nullptr) override;
+	virtual Shared<Component> Clone(void* arg = nullptr) PURE;
 };
 
 NS_END

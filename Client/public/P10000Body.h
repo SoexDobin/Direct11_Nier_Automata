@@ -7,6 +7,9 @@ NS_END
 
 NS_BEGIN(Client)
 
+class WP0220Body;
+class WP0070Body;
+
 class CLIENT_DLL P10000Body final : public PartObject
 {
 	RTTR_ENABLE(PartObject)
@@ -39,10 +42,12 @@ private:
 	HRESULT Ready_Components();
 
 private:
-	uint32 rootBoneIndex{};
-	uint32* states{ nullptr };
+	int32 rootBoneIndex{};
 	Shared<Shader> m_Shader{ nullptr };
 	Shared<Model> m_Model{ nullptr };
+
+	Shared<WP0070Body> m_Sword{ nullptr };
+	Shared<WP0220Body> m_GreaterSword{ nullptr };
 
 public:
 	static Shared<P10000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

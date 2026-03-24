@@ -22,16 +22,6 @@ Bool State2B_Idle::StateEnterInvoke()
 	if (m_Owner.expired())
 		return false;
 
-	//Shared<Model> model = m_Owner.lock()->Get_Model();
-	//if (model)
-	//{
-	//	int32 animIndex = model->Get_AnimationIndexByName(L"pl0000|pl0000_0000");
-	//	if (animIndex != -1)
-	//	{
-	//		model->Set_AnimationIndex(animIndex);
-	//		model->Set_AnimLoop(true);
-	//	}
-	//}
 
 	return true;
 }

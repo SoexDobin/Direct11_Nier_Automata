@@ -38,6 +38,11 @@ HRESULT P10000Body::Initialize(void* arg)
 	}
 
 	rootBoneIndex = m_Model->Get_BoneIndexByName("RootNode");
+	if (rootBoneIndex == -1)
+	{
+		LOG_ERROR(L"Failed to Find 2B Root Bone");
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -45,47 +50,25 @@ HRESULT P10000Body::Initialize(void* arg)
 void P10000Body::On_Destroy()
 {
 	PartObject::On_Destroy();
-	states = nullptr;
+	
+	m_Sword = nullptr;
+	m_GreaterSword = nullptr;
 }
 
 void P10000Body::Priority_Update(Float timeDelta)
 {
-	if (!states) return;
 
 }
 
 void P10000Body::Update(Float timeDelta)
 {
-	if (!states) return;
 
-	// Attack > Jump > Move > IDle
-	// Dash, Evade 
 
 	const TRANSFORM_FRAME& transformDelta = m_Model->Get_BoneTransformDelta(rootBoneIndex);
-
-	if (*states & P10000::P10000_STATE::RUN_2B)
-	{
-		m_Model->Set_Animation(2, 0.25);
-		m_Model->Set_AnimLoop(false);
-
-		m_Transform->Set_LocalPosition(m_Transform->Get_LocalPosition() + transformDelta.position);
-		m_Transform->Set_LocalRotation(m_Transform->Get_Quaternion() + transformDelta.rotation);
-	}
-
-	if (*states & P10000::P10000_STATE::IDLE_2B)
-	{
-		m_Model->Set_Animation(49, 0.25);
-		m_Model->Set_AnimLoop(true);
-	}
-
-	
-	
 }
 
 void P10000Body::Late_Update(Float timeDelta)
 {
-	if (!states) return;
-
 	m_Model->Update_ModelAnimation(timeDelta);
 
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
@@ -93,7 +76,7 @@ void P10000Body::Late_Update(Float timeDelta)
 
 void P10000Body::Fixed_Update(Float fixedDelta)
 {
-	if (!states) return;
+	
 
 }
 

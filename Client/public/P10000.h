@@ -1,9 +1,10 @@
 #pragma once
 #include "ContainerObject.h"
+#include "P10000Input.h"
 
 
 NS_BEGIN(Engine)
-    class Shader;
+	class Shader;
     class Model;
 }
 
@@ -36,16 +37,13 @@ public:
 private:
     void Update_KeyInput(Float timeDelta);
 
-public:
-    uint32* Get_StateBits() { return &m_States; }
-
 private:
     HRESULT Ready_PartObjects();
     HRESULT Ready_Components();
 
 private:
-    uint32 m_States{};
     Shared<StateMachine> m_P10000States{ nullptr };
+    Shared<P10000Input> m_P10000Input{ nullptr };
 
 public:
 	static Shared<P10000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -58,8 +56,10 @@ public:
         RUN_2B              = 0x00000004,
         SPRINT_2B           = 0x00000008,
         JUMP_2B             = 0x00000010,
+
         MAIN_ATTACK_2B      = 0x00000020,
         SUB_ATTACK_2B       = 0x00000040,
+
     };
 };
 

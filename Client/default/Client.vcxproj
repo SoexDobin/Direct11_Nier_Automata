@@ -200,6 +200,7 @@
     <ClInclude Include="..\public\P10000.h" />
     <ClInclude Include="..\public\P10000Body.h" />
     <ClInclude Include="..\public\P10000Input.h" />
+    <ClInclude Include="..\public\P10000Parts.h" />
     <ClInclude Include="..\public\P10000StateMachine.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\SkySphere.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\private\P10000.cpp" />
     <ClCompile Include="..\private\P10000Body.cpp" />
     <ClCompile Include="..\private\P10000Input.cpp" />
+    <ClCompile Include="..\private\P10000Parts.cpp" />
     <ClCompile Include="..\private\P10000StateMachine.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />

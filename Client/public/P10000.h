@@ -10,7 +10,9 @@ NS_BEGIN(Engine)
 
 NS_BEGIN(Client)
 
-class StateMachine;
+class P10000StateMachine;
+class WP0070Body;
+class WP0220Body;
 
 class CLIENT_DLL P10000 final : public ContainerObject
 {
@@ -26,6 +28,7 @@ public:
     HRESULT Initialize(void* arg) override;
     void On_Destroy() override;
 
+
 public:
     void Priority_Update(Float timeDelta) override;
     void Update(Float timeDelta) override;
@@ -35,14 +38,13 @@ public:
     void Submit_RenderGroup() override;
 
 private:
-    void Update_KeyInput(Float timeDelta);
 
 private:
     HRESULT Ready_PartObjects();
     HRESULT Ready_Components();
 
 private:
-    Shared<StateMachine> m_P10000States{ nullptr };
+    Shared<P10000StateMachine> m_P10000States{ nullptr };
     Shared<P10000Input> m_P10000Input{ nullptr };
 
 public:

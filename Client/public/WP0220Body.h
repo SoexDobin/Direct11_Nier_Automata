@@ -1,13 +1,9 @@
 #pragma once
-#include "PartObject.h"
-
-NS_BEGIN(Engine)
-class Model;
-NS_END
+#include "P10000Parts.h"
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL WP0220Body final : public PartObject
+class CLIENT_DLL WP0220Body final : public P10000Parts
 {
 	RTTR_ENABLE(PartObject)
 public:
@@ -32,10 +28,6 @@ public:
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
-
-private:
-	Shared<Shader> m_Shader{ nullptr };
-	Shared<Model> m_Model{ nullptr };
 
 public:
 	static Shared<WP0220Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

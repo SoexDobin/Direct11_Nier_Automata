@@ -7,19 +7,12 @@
 
 #include "Model.h"
 #include "P10000.h"
-#include "StateMachine.h"
 
-#include "State2B_Idle.h"
-#include "State2B_Walk.h"
-#include "State2B_Run.h"
-#include "State2B_Sprint.h"
-#include "State2B_Jump.h"
-
-P10000Body::P10000Body() : PartObject{} {}
+P10000Body::P10000Body() : P10000Parts{} {}
 P10000Body::P10000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: PartObject{device, context} {}
+	: P10000Parts{device, context} {}
 P10000Body::P10000Body(const P10000Body& rhs)
-	: PartObject{rhs} {}
+	: P10000Parts{rhs} {}
 
 HRESULT P10000Body::Initialize_Prototype()
 {
@@ -65,6 +58,8 @@ void P10000Body::Update(Float timeDelta)
 
 
 	const TRANSFORM_FRAME& transformDelta = m_Model->Get_BoneTransformDelta(rootBoneIndex);
+
+	transformDelta
 }
 
 void P10000Body::Late_Update(Float timeDelta)

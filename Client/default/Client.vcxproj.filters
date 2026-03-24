@@ -49,9 +49,6 @@
     <ClInclude Include="..\public\State.h">
       <Filter>02. GameObject\Playable\StateMachine\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\State2B.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\State2B_Attack.h">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
     </ClInclude>
@@ -112,7 +109,13 @@
     <ClInclude Include="..\public\P10000Input.h">
       <Filter>02. GameObject\Playable\P10000Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000StateMachine.h" />
+    <ClInclude Include="..\public\State2B.h">
+      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\P10000StateMachine.h">
+      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\P10000Parts.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -159,9 +162,6 @@
     </ClCompile>
     <ClCompile Include="..\private\State.cpp">
       <Filter>02. GameObject\Playable\StateMachine\State</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\State2B.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Attack.cpp">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
@@ -223,7 +223,13 @@
     <ClCompile Include="..\private\P10000Input.cpp">
       <Filter>02. GameObject\Playable\P10000Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000StateMachine.cpp" />
+    <ClCompile Include="..\private\State2B.cpp">
+      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\P10000StateMachine.cpp">
+      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\P10000Parts.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="99. Default">

@@ -22,6 +22,7 @@ public:
 
 private:
 	const Char* Neutral_Idle_Cycle = "p10000|pl0000_003f";
+	
 
 public:
 	static Shared<State2B_Idle> Create(const wstring& tag, const Shared<P10000>& owner);

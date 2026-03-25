@@ -16,16 +16,24 @@ HRESULT Camera::Initialize_Prototype()
 
 HRESULT Camera::Initialize(void* arg)
 {
+	CAMERA_DESC localDesc{};
 	if (nullptr == arg)
 	{
-		LOG_ERROR(L"Need Camera_Desc to Clone Camera");
-		return E_FAIL;
+		localDesc.eye = Vector4{ 0.f, 5.f, -10.f, 1.f };
+		localDesc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
+		localDesc.up = Vector4{ 0.f, 1.f, 0.f, 0.f };
+		localDesc.fovY = XMConvertToRadians(60.0f);
+		localDesc.aspect = 1.6f;
+		localDesc.nearPlane = 0.1f;
+		localDesc.farPlane = 1000.f;
+		arg = &localDesc;
 	}
+
 	if (FAILED(GameObject::Initialize(arg)))
 		return E_FAIL;
 
-	m_ObjectDesc = static_cast<OBJECT_DESC*>(arg);
-	CAMERA_DESC& desc = *static_cast<CAMERA_DESC*>(m_ObjectDesc);
+	m_ObjectDesc = static_pointer_cast<OBJECT_DESC>(make_shared<CAMERA_DESC>(*static_cast<CAMERA_DESC*>(arg))).get();
+	CAMERA_DESC& desc = *static_cast<CAMERA_DESC*>(arg);
 	m_Transform->Set_Position(Vector3{ desc.eye });
 	m_Transform->LookAt(Vector3{ desc.at });
 
@@ -35,7 +43,7 @@ HRESULT Camera::Initialize(void* arg)
 	m_Far = desc.farPlane;
 
 	Update_CameraTransform(0.f);
-	GAME_INSTANCE->Add_Camera(static_pointer_cast<Camera>(shared_from_this()));
+
 	return S_OK;
 }
 
@@ -48,6 +56,48 @@ void Camera::Bind_Aspect(Float aspect)
 {
 	m_Aspect = aspect;
 	Bind_CameraTransform();
+}
+
+void Camera::Set_Target(const Shared<GameObject>& target)
+{
+	m_Target = target;
+	m_TargetID = m_Target.lock() ? m_Target.lock()->Get_ObjectID() : 0;
+	Update_CameraTransform(0.f);
+}
+
+Shared<GameObject> Camera::Get_Target() const
+{
+	if (!m_Target.expired())
+	{
+		return m_Target.lock();
+	}
+
+	return nullptr;
+}
+
+void Camera::Set_TargetID(uint32 targetID)
+{
+	m_TargetID = targetID;
+	if (m_TargetID != 0)
+	{
+		// 1. 현재 레벨에서 검색
+		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), m_TargetID);
+
+
+		if (const auto& pObj = m_Target.lock())
+		{
+			LOG_INFO(L"[Camera] TargetID {} assigned to object '{}'", m_TargetID, pObj->Get_Name());
+		}
+		else
+		{
+			LOG_WARN(L"[Camera] Failed to find object for TargetID {}", m_TargetID);
+		}
+	}
+	else
+	{
+		m_Target.reset();
+	}
+	Update_CameraTransform(0.f);
 }
 
 void Camera::Priority_Update(Float timeDelta)
@@ -66,9 +116,16 @@ void Camera::Bind_CameraTransform() const
 	const auto& worldMatrix = m_Transform->Get_WorldMatrix();
 
 	Matrix viewMat = worldMatrix.Invert();
+
+	Float fAspect = m_Aspect;
+	if (XMScalarNearEqual(fAspect, 0.0f, 0.00001f))
+	{
+		fAspect = 0.001f;
+	}
+
 	Matrix projMat = XMMatrixPerspectiveFovLH(
 		m_FovY,
-		m_Aspect,
+		fAspect,
 		m_Near,
 		m_Far
 	);

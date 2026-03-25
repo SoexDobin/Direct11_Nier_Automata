@@ -11,6 +11,8 @@ public:
 public:
     Bool Get_MouseLock() const { return m_IsMouseLocked; }
     void Set_MouseLock(Bool isLock) { m_IsMouseLocked = isLock; }
+    Bool Get_InputEnabled() const { return m_IsInputEnabled; }
+    void Set_InputEnabled(Bool isEnabled) { m_IsInputEnabled = isEnabled; }
 
     Byte Get_DIKeyState(uByte keyID) const { return m_ByKeyStates[keyID]; }
     Byte Get_DIMouseState(DIMB buttonID) const {
@@ -36,6 +38,7 @@ private:
 
 private:
     Bool m_IsMouseLocked{ false };
+    Bool m_IsInputEnabled{ true };
 
 public:
   static Unique<InputDevice> Create(HWND hWnd, HINSTANCE hInst);

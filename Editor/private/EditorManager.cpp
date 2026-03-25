@@ -10,13 +10,16 @@
 #include "LogConsole.h"
 #include "MenuBar.h"
 #include "Hierarchy.h"
+#include "ModelViewer.h"
+#include "AssetBrowser.h"
 #include "Transform.h"
 
 IMPLEMENT_SINGLETON(EditorManager)
 
 EditorManager::EditorManager()
     : m_Inspector{nullptr}, m_EditorView{nullptr}, m_MenuBar{nullptr},
-      m_PrefabTab{nullptr}, m_LogConsole{nullptr}, m_Hierarchy{nullptr}
+      m_AssetBrowser{nullptr}, m_LogConsole{nullptr}, m_Hierarchy{nullptr},
+	  m_ModelViewer{nullptr}
 {}
 
 EditorManager::~EditorManager() {}
@@ -51,6 +54,10 @@ HRESULT EditorManager::Initialize()
 		return E_FAIL;
     if (nullptr == (m_Hierarchy = Hierarchy::Create()))
         return E_FAIL;
+    if (nullptr == (m_ModelViewer = ModelViewer::Create()))
+        return E_FAIL;
+    if (nullptr == (m_AssetBrowser = AssetBrowser::Create()))
+        return E_FAIL;
 
 	return S_OK;
 }
@@ -69,6 +76,8 @@ void EditorManager::Update(Bool IsResetView) {
             m_EditorCamera->Update(timeDelta);
             GAME_INSTANCE->Submit_RenderGroup();
         }
+        if (GAME_INSTANCE->Get_CurrentLevel())
+			GAME_INSTANCE->Get_CurrentLevel()->Update_LoadLevel(0.016777f);
     }
 
     m_Inspector->Update(IsResetView);
@@ -76,6 +85,8 @@ void EditorManager::Update(Bool IsResetView) {
     m_MenuBar->Update(IsResetView);
     m_LogConsole->Update(IsResetView);
     m_Hierarchy->Update(IsResetView);
+    m_ModelViewer->Update(IsResetView);
+    m_AssetBrowser->Update(IsResetView);
 }
 
 HRESULT EditorManager::Render(Bool IsResetView) {
@@ -85,10 +96,42 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0)))
         return E_FAIL;
 
-    m_InGameCamera = GAME_INSTANCE->Get_MainCamera();
-    if (FAILED(GAME_INSTANCE->Set_MainCamera(m_InGameCamera)))
-        return E_FAIL;
-    m_InGameCamera->Bind_CameraTransform();
+    // [Pass 0] In-Game 카메라 결정 (조건: 메인 우선, 에디터 카메라 제외, 대체 불가)
+    Shared<Camera> pCurrentMain = GAME_INSTANCE->Get_MainCamera();
+    
+    // 만약 엔진의 메인 카메라가 있고, 그게 에디터 카메라가 아니라면 우선적으로 채택
+    if (pCurrentMain && pCurrentMain->Get_InstanceID() != m_EditorCamera->Get_InstanceID())
+    {
+        m_InGameCamera = pCurrentMain;
+    }
+    else
+    {
+        // 그렇지 않다면 엔진에 등록된 카메라들 중 에디터 카메라가 아닌 첫 번째 실제 게임 카메라를 찾음
+        m_InGameCamera = nullptr;
+        for (auto& pCam : GAME_INSTANCE->Get_Cameras(GAME_INSTANCE->Get_CurrentLevelIndex()))
+        {
+            if (pCam && pCam->Get_InstanceID() != m_EditorCamera->Get_InstanceID())
+            {
+                m_InGameCamera = pCam;
+                break;
+            }
+        }
+    }
+
+    // 1. In-Game 뷰포트 (OffScreen 0) 바인딩 및 렌더링 준비
+    if (m_InGameCamera)
+    {
+        GAME_INSTANCE->Set_MainCamera(m_InGameCamera);
+        m_InGameCamera->Bind_CameraTransform();
+    }
+    else
+    {
+        // 인게임 카메라가 전혀 없는 경우: 검은 화면 출력을 위해 뷰포트 클리어 및 바인딩 건너뜀
+        Shared<Float4> vBlack = make_shared<Float4>(0.f, 0.f, 0.f, 1.f);
+        GAME_INSTANCE->Clear_BackBufferView(vBlack);
+        // Bind_CameraTransform을 호출하지 않아 렌더링 결과가 나타나지 않음 (검은 화면)
+    }
+
     GAME_INSTANCE->Update_Pipeline();
 
     if (FAILED(GAME_INSTANCE->Draw_NoClearing()))
@@ -109,8 +152,10 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     if (FAILED(GAME_INSTANCE->End_RenderOffScreen()))
         return E_FAIL;
 
-    if (FAILED(GAME_INSTANCE->Set_MainCamera(m_InGameCamera)))
-        return E_FAIL;
+    if (m_InGameCamera)
+        GAME_INSTANCE->Set_MainCamera(m_InGameCamera);
+    else
+        GAME_INSTANCE->Set_MainCamera(m_EditorCamera);
 
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -145,6 +190,8 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     m_MenuBar->Render(IsResetView);
     m_LogConsole->Render(IsResetView);
     m_Hierarchy->Render(IsResetView);
+    m_ModelViewer->Render(IsResetView);
+    m_AssetBrowser->Render(IsResetView);
 
     return S_OK;
 }

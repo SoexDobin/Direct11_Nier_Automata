@@ -2,9 +2,12 @@
 
 #ifdef _DEBUG
 #include "String_Helper.h"
+#pragma warning(push)
+#pragma warning(disable: 26498)
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
+#pragma warning(pop)
 #include <Windows.h>
 #include <format>
 

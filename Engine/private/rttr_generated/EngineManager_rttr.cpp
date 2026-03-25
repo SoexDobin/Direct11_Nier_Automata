@@ -1,13 +1,11 @@
-﻿#include "EngineManager.h"
+#include "EngineManager.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 3516
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(EngineManager_RTTR)
 {
-    registration::class_<EngineManager>("EngineManager")
-        .constructor<>()
-        ;
+	registration::class_<EngineManager>("EngineManager")
+		;
 }
-

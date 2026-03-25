@@ -118,7 +118,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -131,6 +131,7 @@
       <ShaderModel>5.0</ShaderModel>
       <ShaderType>Effect</ShaderType>
       <EntryPointName>main</EntryPointName>
+      <AdditionalIncludeDirectories>..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </FxCompile>
     <PreBuildEvent>
       <Command>call "$(ProjectDir)GenerateRTTR_Client.bat"</Command>
@@ -156,7 +157,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(Projectdir);..\public\;..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -169,6 +170,7 @@
       <ShaderModel>5.0</ShaderModel>
       <ShaderType>Effect</ShaderType>
       <EntryPointName>main</EntryPointName>
+      <AdditionalIncludeDirectories>..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </FxCompile>
     <PreLinkEvent>
       <Command>
@@ -179,45 +181,101 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\CityOfRuins.h" />
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
     <ClInclude Include="..\public\FreeCamera.h" />
+    <ClInclude Include="..\public\LevelGamePlay.h" />
     <ClInclude Include="..\public\LevelLoading.h" />
+    <ClInclude Include="..\public\LevelTitle.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\LoadingBackground.h" />
+    <ClInclude Include="..\public\LoadingFadeIn.h" />
+    <ClInclude Include="..\public\LoadingFadeOut.h" />
     <ClInclude Include="..\public\LoadingLogo.h" />
     <ClInclude Include="..\public\ClientApp.h" />
+    <ClInclude Include="..\public\LoadingPixelPanel.h" />
     <ClInclude Include="..\public\Monster.h" />
-    <ClInclude Include="..\public\Playable.h" />
+    <ClInclude Include="..\public\P10000.h" />
+    <ClInclude Include="..\public\P10000Body.h" />
+    <ClInclude Include="..\public\P10000Input.h" />
+    <ClInclude Include="..\public\P10000Parts.h" />
+    <ClInclude Include="..\public\P10000StateMachine.h" />
+    <ClInclude Include="..\public\SkyBox.h" />
+    <ClInclude Include="..\public\SkySphere.h" />
+    <ClInclude Include="..\public\State.h" />
+    <ClInclude Include="..\public\State2B.h" />
+    <ClInclude Include="..\public\State2B_Attack.h" />
+    <ClInclude Include="..\public\State2B_Dash.h" />
+    <ClInclude Include="..\public\State2B_Idle.h" />
+    <ClInclude Include="..\public\State2B_Jump.h" />
+    <ClInclude Include="..\public\State2B_Run.h" />
+    <ClInclude Include="..\public\State2B_Sprint.h" />
+    <ClInclude Include="..\public\State2B_Walk.h" />
+    <ClInclude Include="..\public\StateMachine.h" />
+    <ClInclude Include="..\public\StaticCamera.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\ThirdPersonCamera.h" />
+    <ClInclude Include="..\public\TitleBackground.h" />
+    <ClInclude Include="..\public\WP0070Body.h" />
+    <ClInclude Include="..\public\WP0220Body.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\CityOfRuins.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
     <ClCompile Include="..\private\FreeCamera.cpp" />
+    <ClCompile Include="..\private\LevelGamePlay.cpp" />
     <ClCompile Include="..\private\LevelLoading.cpp" />
+    <ClCompile Include="..\private\LevelTitle.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\LoadingBackground.cpp" />
+    <ClCompile Include="..\private\LoadingFadeIn.cpp" />
+    <ClCompile Include="..\private\LoadingFadeOut.cpp" />
     <ClCompile Include="..\private\LoadingLogo.cpp" />
     <ClCompile Include="..\private\ClientApp.cpp" />
+    <ClCompile Include="..\private\LoadingPixelPanel.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
-    <ClCompile Include="..\private\Playable.cpp" />
+    <ClCompile Include="..\private\P10000.cpp" />
+    <ClCompile Include="..\private\P10000Body.cpp" />
+    <ClCompile Include="..\private\P10000Input.cpp" />
+    <ClCompile Include="..\private\P10000Parts.cpp" />
+    <ClCompile Include="..\private\P10000StateMachine.cpp" />
+    <ClCompile Include="..\private\SkyBox.cpp" />
+    <ClCompile Include="..\private\SkySphere.cpp" />
+    <ClCompile Include="..\private\State.cpp" />
+    <ClCompile Include="..\private\State2B.cpp" />
+    <ClCompile Include="..\private\State2B_Attack.cpp" />
+    <ClCompile Include="..\private\State2B_Dash.cpp" />
+    <ClCompile Include="..\private\State2B_Idle.cpp" />
+    <ClCompile Include="..\private\State2B_Jump.cpp" />
+    <ClCompile Include="..\private\State2B_Run.cpp" />
+    <ClCompile Include="..\private\State2B_Sprint.cpp" />
+    <ClCompile Include="..\private\State2B_Walk.cpp" />
+    <ClCompile Include="..\private\StateMachine.cpp" />
+    <ClCompile Include="..\private\StaticCamera.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\ThirdPersonCamera.cpp" />
+    <ClCompile Include="..\private\TitleBackground.cpp" />
+    <ClCompile Include="..\private\WP0070Body.cpp" />
+    <ClCompile Include="..\private\WP0220Body.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</IncludeInUnityFile>
+      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</IncludeInUnityFile>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxAnimMesh.hlsl" />
+    <FxCompile Include="..\bin\shaders\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxNormTex.hlsl" />
+    <FxCompile Include="..\bin\shaders\Shader_VtxSphere.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <ItemGroup>

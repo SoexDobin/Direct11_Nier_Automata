@@ -7,6 +7,7 @@
 #include "EditorManager.h"
 
 #include "LayerRegistry.h"
+#include "MenuBar.h"
 #include "PathManager.h"
 #include "TagRegistry.h"
 
@@ -17,51 +18,47 @@ EditorApp::~EditorApp()
 }
 
 HRESULT EditorApp::Initialize() {
-  m_Game = GAME_INSTANCE;
-
-  ENGINE_DESC desc = {};
-  {
+    ENGINE_DESC desc = {};
     desc.hWnd = g_hWnd;
     desc.hInst = g_hInst;
     desc.winMode = WINMODE::WIN;
-    desc.viewportWidth = g_projectSettings.viewportWidth;
-    desc.viewportHeight = g_projectSettings.viewportHeight;
-    desc.windowTitle = g_projectSettings.windowTitle;
     desc.levelCount = ClientSettingManager::GetInstance()->Get_LevelCount();
-    desc.startLevel = 1;
+    desc.startLevel = 3;
+    desc.viewportWidth = 1920;
+    desc.viewportHeight = 1080;
     desc.useOffscreenRendering = true;
     desc.renderTargetCount = 2;
-  }
+    m_StartLevelIndex = desc.startLevel;
 
-  /* 엔진 Core 설정 1순위 그래야만 하고 그래야하게 만들어야 함. 여기서
-   * PrototypeManager가 호출됩니다. */
-  if (FAILED(GAME_INSTANCE->Initialize_Engine(desc)))
-    return E_FAIL;
+    EDITOR->Set_EngineDesc(desc);
+    desc = EDITOR->Get_EngineDesc();
 
-  ClientSettingManager::GetInstance()->Set_ResourcePath(
-      L"../../Client/bin/resources/");
-  ClientSettingManager::GetInstance()->Set_ShaderPath(
-      L"../../Client/bin/shaders/");
-
-  m_EngineDesc = desc;
-
-  if ((m_ClientApp = ClientApp::Create(desc))) {
-
-  } else {
-    MSG_BOX("Failed To Create : ClientApp");
-    return E_FAIL;
-  }
-
-  if (FAILED(Initialize_IMGUI(desc)))
+    /* 엔진 Core 설정 1순위 그래야만 하고 그래야하게 만들어야 함.*/
+    if (FAILED(GAME_INSTANCE->Initialize_Engine(desc)))
       return E_FAIL;
 
-  if (FAILED(EDITOR->Initialize()))
-    return E_FAIL;
-  
-  GAME_INSTANCE->OnResize(desc.viewportWidth, desc.viewportHeight, 0);
-  GAME_INSTANCE->OnResize(desc.viewportWidth, desc.viewportHeight, 1);
+    if (FAILED(EDITOR->Initialize()))
+        return E_FAIL;
 
-  return S_OK;
+    ClientSettingManager::GetInstance()->Set_ResourcePath(
+        L"../../Client/bin/resources/");
+    ClientSettingManager::GetInstance()->Set_ShaderPath(
+        L"../../Client/bin/shaders/");
+
+    if ((m_ClientApp = ClientApp::Create(desc))) {
+
+    } else {
+      MSG_BOX("Failed To Create : ClientApp");
+      return E_FAIL;
+    }
+
+    if (FAILED(Initialize_IMGUI(desc)))
+        return E_FAIL;
+    
+    GAME_INSTANCE->OnResize(desc.viewportWidth, desc.viewportHeight, 0);
+    GAME_INSTANCE->OnResize(desc.viewportWidth, desc.viewportHeight, 1);
+
+	return S_OK;
 }
 
 void EditorApp::Update() {
@@ -72,7 +69,14 @@ void EditorApp::Update() {
         m_IsReset = true;
     }
     prevState = curState;
-    
+
+    if (EDITOR->Is_ResetRequested()) {
+        ENGINE_DESC& desc = EDITOR->Get_EngineDesc();
+        uint32 oldLevel = desc.startLevel;
+        Change_ClientLevel(oldLevel);
+        EDITOR->Clear_ResetRequest();
+    }
+
     if (m_IsReset) {
         Reset_ClientApp();
     }
@@ -80,6 +84,7 @@ void EditorApp::Update() {
     if (EDITOR->Is_ResizeRequest()) {
         EditorManager::RESIZE_INFO info = EDITOR->Get_ResizeInfo();
         GAME_INSTANCE->OnResize(static_cast<uint32>(info.width), static_cast<uint32>(info.height), info.screenIndex);
+        EDITOR->Clear_ResizeRequest();
     }
     
     ImGui_ImplDX11_NewFrame();
@@ -109,14 +114,14 @@ HRESULT EditorApp::Render() {
 }
 
 Unique<EditorApp> EditorApp::Create() {
-  Unique<EditorApp> editorApp = make_unique<EditorApp>();
+    Unique<EditorApp> editorApp = make_unique<EditorApp>();
 
-  if (FAILED(editorApp->Initialize())) {
-    MSG_BOX("Failed to Create : EditorApp");
-    return nullptr;
-  }
+    if (FAILED(editorApp->Initialize())) {
+      MSG_BOX("Failed to Create : EditorApp");
+      return nullptr;
+    }
 
-  return editorApp;
+    return editorApp;
 }
 
 HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC &desc) {
@@ -166,7 +171,6 @@ HRESULT EditorApp::Destruct_IMGUI() {
     ImGui::DestroyContext();
     
     m_ClientApp.reset();
-    m_Game.reset();
     GAME_INSTANCE->DestroyInstance();
 
 	return S_OK;
@@ -175,5 +179,16 @@ HRESULT EditorApp::Destruct_IMGUI() {
 void EditorApp::Reset_ClientApp() {
   m_ClientApp.reset();
   GAME_INSTANCE->Clear_AllResource();
-  m_ClientApp = ClientApp::Create(m_EngineDesc);
+  m_ClientApp = ClientApp::Create(EDITOR->Get_EngineDesc());
+  m_StartLevelIndex = m_StartLevel;
+}
+
+void EditorApp::Change_ClientLevel(uint32 levIndex) {
+    Bool isPassing = levIndex != 1;
+
+    m_ClientApp.reset();
+    GAME_INSTANCE->Clear_Resource(levIndex);
+    m_ClientApp = ClientApp::Create(EDITOR->Get_EngineDesc());
+    EDITOR->Get_EngineDesc().startLevel = levIndex;
+    m_StartLevelIndex = m_StartLevel = levIndex;
 }

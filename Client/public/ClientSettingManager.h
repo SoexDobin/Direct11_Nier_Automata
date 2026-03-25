@@ -28,15 +28,20 @@ public: /* Model */
 public: /* Shader */
 	HRESULT Load_Shader() const;
 
+public: /* Sound */
+	HRESULT Load_Sound_FromJson() const;
+	HRESULT Sync_SoundJson_FromCSV() const;
+
 public:
 	HRESULT Ready_Client_Prototypes(LEVEL level) const;
 	HRESULT Load_EngineDesc(ENGINE_DESC& outDesc) const;
 	HRESULT Apply_LayerAndTagSettings() const;
-	HRESULT Load_Texture(LEVEL level) const;
+	HRESULT Load_LevelData(LEVEL level) const;
 	
-
+public:
+	Bool AutoTransitionLevel(LEVEL curLevel, LEVEL nextLev);
+	
 private:
-
 	wstring m_ResourcePath = L"../../Client/bin/resources/";
 	wstring m_ShaderPath = L"../../Client/bin/shaders/";
 	wstring m_ProjectSettingPath = L"../../ProjectSetting/";

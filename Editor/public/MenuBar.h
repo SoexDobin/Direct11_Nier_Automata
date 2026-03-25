@@ -14,15 +14,10 @@ public:
 	void Update(Bool isResize) override;
 	void Render(Bool isResize) override;
 
-private:
-	void ViewEngineDesc();
-	HRESULT Load_EngineDesc();
-	HRESULT Save_EngineDesc();
-
 	// Client 해상도 설정 메뉴 Json으로 저장해 두고 클라에서 ProjectSetting 파일 구성
 private:
-	ENGINE_DESC m_EngineDesc {};
-	Char m_Title[MAXCHAR];
+	Shared<Game> m_Game = { nullptr };
+	char m_Title[MAX_PATH] = "client";
 	
 	
 public:

@@ -15,10 +15,13 @@ public:
 	uint32 Get_TypeID() const { return m_DescID.m_typeID; }
 	uint32 Get_ObjectID() const { return m_DescID.m_objectID; }
 	uint32 Get_InstanceID() const { return m_DescID.m_instanceID; }
+	void Set_ObjectID(uint32 objectID) { m_DescID.m_objectID = objectID; }
 	const wstring &Get_Name() const { return m_ObjectName; }
+	void Set_Name(const wstring& name) { m_ObjectName = name; }
 
 public:
 	virtual HRESULT Initialize_Prototype();
+	HRESULT Initialize_Prototype(const wstring& prototypeTag);
 	virtual HRESULT Initialize(void *arg) { return S_OK; }
 
 	Bool Is_Destroy() const { return m_IsDestroy; }

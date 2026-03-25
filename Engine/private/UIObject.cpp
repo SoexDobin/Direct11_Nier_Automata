@@ -80,13 +80,6 @@ void UIObject::Update_UITransform(Float viewportWidth, Float viewportHeight) con
     Float anchorPosY = anchorPos.y;
 
     auto parent = Get_Parent();
-    if (parent) {
-        auto uiParent = std::dynamic_pointer_cast<UIObject>(parent);
-        if (uiParent) {
-            // 부모가 있으면 부모 사이즈 기준으로 앵커 재계산이 필요할 수 있으나 
-            // 현재 Get_AnchorPos 내부에서 이미 처리하고 있으므로 로직 일관성을 유지합니다.
-        }
-    }
 
     Vector3 offset = m_Transform->Get_LocalPosition();
     Vector3 size = m_Transform->Get_LocalScale();

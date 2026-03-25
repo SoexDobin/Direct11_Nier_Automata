@@ -8,30 +8,34 @@ NS_END
 
 NS_BEGIN(Editor)
 
-class PrefabRegistry;
+class InspectorTransform;
+class InspectorModel;
+class InspectorTexture;
+class InspectorCamera;
 
-class Inspector final : public EditorObject {
-  NO_COPY(Inspector)
+class Inspector : public EditorObject
+{
 public:
-  Inspector();
-  ~Inspector() override;
+	Inspector();
+	~Inspector() override;
 
 public:
-  HRESULT Initialize() override;
-  void Update(Bool isResize) override {}
-  void Render(Bool isResize) override;
+	HRESULT Initialize() override;
+	void Render(Bool isResize) override;
 
 private:
-	void Render_Properties(rttr::property prop, const Shared<Component>& component);
+	void GameObjectGUI(const Shared<Engine::GameObject>& obj);
+	void Draw_GameObjectHeader(const Shared<Engine::GameObject>& obj);
 
 private:
-	void GameObjectGUI(const Shared<Engine::GameObject> &pObj);
-	void GameObjectPropertiesGUI(const Shared<GameObject> &pObj);
-	void ComponentGUI(const string &label,
-                    const Shared<Engine::Component> &pComp);
+    Shared<InspectorTransform> m_InspectorTransform{ nullptr };
+    Shared<InspectorModel> m_InspectorModel{ nullptr };
+    Shared<InspectorTexture> m_InspectorTexture{ nullptr };
+    Shared<InspectorCamera> m_InspectorCamera{ nullptr };
+    uint32 m_iPrevSelectedID{ 0 };
 
 public:
-  static Shared<Inspector> Create();
+	static Shared<Inspector> Create();
 };
 
 NS_END

@@ -24,6 +24,7 @@ public:
 public:
 	HRESULT Load_Texture(uint32 levIndex, const tChar* texturePath, uint32 numSRVs, const wstring& descriptionTag);
 	const Texture::TEXTURE_DESC* Get_TextureDescByTag(uint32 levIndex, const wstring& descriptionTag);
+	vector<wstring> Get_TextureTags(uint32 levIndex);
 	const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar* texturePath);
 
 public:
@@ -34,6 +35,7 @@ public:
 	HRESULT Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag, const Matrix& preTransformMatrix);
 	Shared<Model> Get_Model(uint32 levIndex, const tChar* modelTag);
 	int32 Get_ContainLevelByModelTag(const wstring& tag);
+	vector<Shared<Model>> Get_Models(uint32 levIndex);
 
 public:
 	HRESULT Clear_AllResources();

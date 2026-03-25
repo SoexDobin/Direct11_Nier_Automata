@@ -1,6 +1,11 @@
 #ifndef Engine_Struct_h__
 #define Engine_Struct_h__
 
+#include <string>
+#include <cstdint>
+#include <d3d11.h>
+#include <DirectXMath.h>
+
 using namespace DirectX;
 
 namespace Engine
@@ -36,6 +41,13 @@ namespace Engine
 		Vector4 ambient = {};
 		Vector4 specular = {};
 	} LIGHT_DESC;
+
+	typedef struct tagTransformFrame
+	{
+		Vector3 scale;
+		Quaternion rotation;
+		Vector3 position;
+	} TRANSFORM_FRAME;
 
 	typedef struct tagKeyFrame
 	{
@@ -112,6 +124,32 @@ namespace Engine
 		};
 
 	} VTXANIMMESH;
+
+	typedef struct tagVertexCube
+	{
+		XMFLOAT3			position;
+		XMFLOAT3			texcoord;
+
+		inline static const std::wstring Tag = { L"VTX_Cube" };
+		static const uint32_t numElements = { 2 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA,0 }
+		};
+	} VTXCUBE;
+
+	typedef struct tagVertexSphere
+	{
+		XMFLOAT3			position;
+		XMFLOAT3			texcoord;
+
+		inline static const std::wstring Tag = { L"VTX_Sphere" };
+		static const uint32_t numElements = { 2 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA,0 }
+		};
+	} VTXSPHERE;
 
 }
 

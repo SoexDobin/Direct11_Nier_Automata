@@ -5,6 +5,8 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL Level abstract : public Object, public enable_shared_from_this<Level> {
 public:
+    typedef struct tagLevelDesc{} LEVEL_DESC;
+public:
   explicit Level(const ComPtr<ID3D11Device> &device,
                  const ComPtr<ID3D11DeviceContext> &context);
   virtual ~Level() override = default;
@@ -27,8 +29,9 @@ public:
   PROTOTYPE Get_Prototype() const final { return PROTOTYPE::LEVEL; }
 
 public:
-  virtual void Update_Level(Float timeDelta);
-  virtual HRESULT Render_Level();
+	virtual void Update_Level(Float timeDelta);
+	virtual HRESULT Render_Level();
+    virtual void Update_LoadLevel(Float timeDelta) {};
 
 protected:
 	ComPtr<ID3D11Device> m_Device{nullptr};

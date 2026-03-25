@@ -1,14 +1,13 @@
-﻿#include "PrototypeManager.h"
+#include "PrototypeManager.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 5747
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(PrototypeManager_RTTR)
 {
-    registration::class_<PrototypeManager>("PrototypeManager")
-        .constructor<>()
-        .method("Create", &PrototypeManager::Create)
-        ;
+	registration::class_<PrototypeManager>("PrototypeManager")
+		.constructor<>()
+		.method("Create", &PrototypeManager::Create)
+		;
 }
-

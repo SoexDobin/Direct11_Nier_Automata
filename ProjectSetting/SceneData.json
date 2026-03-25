@@ -1,0 +1,214 @@
+{
+  "levels": [
+    {
+      "levelIndex": 1,
+      "objects": [
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1980.0,
+                  1080.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "TextureTag": "UI_Loading_BackGround"
+              },
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "instanceID": 3092773901,
+          "name": "LoadingBackground",
+          "objectID": 2031777346,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "LoadingBackground",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1980.0,
+              1080.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingBackground"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1920.0,
+                  1080.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.1725490242242813
+                ],
+                "TextureTag": "UI_Loading_Pixel"
+              },
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            }
+          ],
+          "instanceID": 842042074,
+          "name": "LoadingPixelPanel",
+          "objectID": 2233491490,
+          "parentObjectID": 2031777346,
+          "properties": null,
+          "prototypeTag": "LoadingPixelPanel",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1920.0,
+              1080.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingPixelPanel"
+        },
+        {
+          "components": [
+            {
+              "properties": {
+                "Position": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Rotation": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "Scale": [
+                  1600.0,
+                  512.0,
+                  1.0
+                ]
+              },
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": {
+                "RGBA": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.13333334028720856
+                ],
+                "TextureTag": "UI_Loading_Logo"
+              },
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            }
+          ],
+          "instanceID": 1379615757,
+          "name": "LoadingLogo",
+          "objectID": 3729526162,
+          "parentObjectID": 2233491490,
+          "properties": null,
+          "prototypeTag": "LoadingLogo",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1600.0,
+              512.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingLogo"
+        }
+      ]
+    }
+  ],
+  "version": "2.0"
+}

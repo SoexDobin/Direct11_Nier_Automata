@@ -3,6 +3,7 @@
 #include "Game.h"
 #include <SpdLogger.h>
 #include <Transform.h>
+#include "ClientSettingManager.h"
 
 FreeCamera::FreeCamera() : Camera() {}
 FreeCamera::FreeCamera(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -17,13 +18,17 @@ HRESULT FreeCamera::Initialize_Prototype()
 
 HRESULT FreeCamera::Initialize(void* arg)
 {
-	if (arg == nullptr)
-		LOG_ERROR(L"Failed to Init FreeCamera No CameraDesc");
-
-	FREE_CAMERA_DESC& desc = *static_cast<FREE_CAMERA_DESC*>(arg);
+	FREE_CAMERA_DESC desc{};
+	desc.eye = Vector4{ 0.f, 5.f, -10.f, 1.f };
+	desc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
+	desc.up = Vector4{ 0.f, 1.f, 0.f, 0.f };
+	desc.fovY = XMConvertToRadians(60.0f);
+	desc.aspect = static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportWidth / ClientSettingManager::g_EngineDesc.viewportHeight);
+	desc.nearPlane = 0.1f;
+	desc.farPlane = 500.f;
 	m_MouseSensitive = desc.mouseSensitive;
 
-	return Camera::Initialize(arg);
+	return Camera::Initialize(&desc);
 }
 
 void FreeCamera::Priority_Update(Float timeDelta)

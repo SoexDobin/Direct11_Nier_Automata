@@ -110,6 +110,14 @@ const Texture::TEXTURE_DESC* ResourceManager::Get_TextureDescByTag(uint32 levInd
     return &m_TextureDescTags[levIndex][descriptionTag];
 }
 
+vector<wstring> ResourceManager::Get_TextureTags(uint32 levIndex)
+{
+    vector<wstring> tags;
+    for (auto& [tag, desc] : m_TextureDescTags[levIndex])
+        tags.push_back(tag);
+    return tags;
+}
+
 
 const ComPtr<ID3D11ShaderResourceView>& ResourceManager::Get_Texture(uint32 levIndex, const tChar* texturePath)
 {
@@ -158,13 +166,16 @@ HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, con
     if (nullptr == model)
     {
         LOG_ERROR(L"Failed to Create Shader Resource. Path : {}", modelPath);
+        return E_FAIL;
     }
 
-    m_Models[levIndex].emplace(descriptionTag, model);
     if (levIndex == 0)
         m_StaticModelContainLev.emplace(descriptionTag, levIndex);
     else
         m_ModelContainLev.emplace(descriptionTag, levIndex);
+
+    m_Models[levIndex].emplace(descriptionTag, model);
+    model->Set_ModelTag(descriptionTag); 
 
     return S_OK;
 }
@@ -195,32 +206,59 @@ int32 ResourceManager::Get_ContainLevelByModelTag(const wstring& tag)
     return m_ModelContainLev[tag];
 }
 
+vector<Shared<Model>> ResourceManager::Get_Models(uint32 levIndex)
+{
+    vector<Shared<Model>> vector;
+    
+    if (levIndex >= m_Models.size())
+        return vector;
+
+    for (auto [tag, model] : m_Models[levIndex])
+    {
+        vector.push_back(model);
+    }
+
+    return vector;
+}
+
 HRESULT ResourceManager::Clear_AllResources() {
-    m_Shaders.clear();
-    m_TextureDescTags.clear();
-    m_SRVs.clear();
+    // 레벨 0 (Static)에 로드된 엔진 기본 리소스 및 모델들은 보존합니다.
+    // 레벨 1 이상의 게임 레벨 리소스들만 삭제하여 메모리 효율과 안정성을 확보합니다.
+    for (uint32 i = 1; i < m_LevelCount; ++i) {
+        m_Shaders[i].clear();
+        m_TextureDescTags[i].clear();
+        m_SRVs[i].clear();
+        m_Models[i].clear();
+    }
 
-    m_Models.clear();
-    m_StaticModelContainLev.clear();
     m_ModelContainLev.clear();
-
-    m_Shaders.resize(m_LevelCount);
-    m_TextureDescTags.resize(m_LevelCount);
-    m_SRVs.resize(m_LevelCount);
-    m_Models.resize(m_LevelCount);
 
 	return S_OK;
 }
 
 HRESULT ResourceManager::Clear_Resource(uint32 levIndex)
 {
+    if (levIndex >= m_LevelCount)
+        return E_FAIL;
+
     m_Shaders[levIndex].clear();
     m_TextureDescTags[levIndex].clear();
     m_SRVs[levIndex].clear();
 
-    m_Models.clear();
-    m_StaticModelContainLev.clear();
-    m_ModelContainLev.clear();
+    m_Models[levIndex].clear();
+    
+    for (auto it = m_ModelContainLev.begin(); it != m_ModelContainLev.end();)
+    {
+        if (it->second == levIndex)
+            it = m_ModelContainLev.erase(it);
+        else
+            ++it;
+    }
+    
+    if (levIndex == 0)
+    {
+        m_StaticModelContainLev.clear();
+    }
 
     return S_OK;
 }

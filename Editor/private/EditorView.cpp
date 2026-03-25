@@ -3,8 +3,10 @@
 #include "ImGuizmo.h"
 #include <Transform.h>
 #include "UIObject.h"
-
+#include "Game.h"
+#include "ID_Helper.h"
 #include "EditorManager.h"
+#include "PathManager.h"
 
 static ImGuizmo::OPERATION m_CurrentGizmoMode = ImGuizmo::TRANSLATE;
 
@@ -29,8 +31,11 @@ void EditorView::RenderView(Bool isResize) {
 	auto srvScene = GAME_INSTANCE->Get_OffScreenSRV(1);
 	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
 
+	Bool isSceneViewHovered = false;
+
 	ImGui::Begin("Scene View");
 	{
+		isSceneViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
 		auto selected = EDITOR->Get_SelectedObject();
 		if (selected)
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected: %S", selected->Get_Name().c_str());
@@ -47,7 +52,90 @@ void EditorView::RenderView(Bool isResize) {
 
 			ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), prevSceneViewportSize);
 			
-			// 이미지 바로 아래에서 좌표 캡처
+			// ── Scene View 드래그 앤 드롭 수신 ──────────────────────────────────
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(Drag_PayLoadKey.c_str()))
+				{
+					const wchar_t *rawTag = static_cast<const wchar_t *>(payload->Data);
+					wstring prototypeTag(rawTag);
+
+					// 드롭된 마우스 위치 계산 (Viewport NDC 변환)
+					ImVec2 mousePos = ImGui::GetMousePos();
+					ImVec2 imageRectMin = ImGui::GetItemRectMin();
+					ImVec2 imageRectSize = ImGui::GetItemRectSize();
+
+					Float localX = mousePos.x - imageRectMin.x;
+					Float localY = mousePos.y - imageRectMin.y;
+					Float ndcX = (localX / imageRectSize.x) * 2.f - 1.f;
+					Float ndcY = 1.f - (localY / imageRectSize.y) * 2.f;
+
+					// 레이 생성
+					Matrix invView = GAME_INSTANCE->Get_InvTransform(D3DTS::VIEW);
+					Matrix invProj = GAME_INSTANCE->Get_InvTransform(D3DTS::PROJ);
+
+					Vector4 vNear = Vector4(ndcX, ndcY, 0.f, 1.f);
+					Vector4 vFar = Vector4(ndcX, ndcY, 1.f, 1.f);
+					vNear = Vector4::Transform(vNear, invProj); 
+					vNear /= vNear.w; 
+					vNear = Vector4::Transform(vNear, invView);
+
+					vFar = Vector4::Transform(vFar, invProj);   
+					vFar /= vFar.w;   
+					vFar = Vector4::Transform(vFar, invView);
+
+					Vector3 rayOrigin = Vector3(vNear.x, vNear.y, vNear.z);
+					Vector3 rayTarget = Vector3(vFar.x, vFar.y, vFar.z);
+					Vector3 rayDir = rayTarget - rayOrigin;
+					rayDir.Normalize();
+
+					// 스폰 위치 결정: 지면(Y=0)과의 교점 또는 특정 거리 앞
+					Vector3 spawnPos{};
+					if (abs(rayDir.y) > 0.0001f)
+					{
+						Float t = -rayOrigin.y / rayDir.y;
+						if (t > 0)
+						{
+							spawnPos = rayOrigin + rayDir * t;
+						}
+						else
+						{
+							spawnPos = rayOrigin + rayDir * 5.f;
+						}
+					}
+					else
+					{
+						spawnPos = rayOrigin + rayDir * 5.f;
+					}
+
+					// 객체 생성 및 배치
+					Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, GAME_INSTANCE->Get_CurrentLevelIndex());
+					if (cloned)
+					{
+						auto allObjs = GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
+						int suffix = 0;
+						wstring baseName = cloned->Get_Name();
+						wstring uniqueName = baseName;
+						while (true) {
+							uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
+							bool overlap = false;
+							for (auto& [id, obj] : allObjs) {
+								if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
+							}
+							if (!overlap) break;
+							suffix++;
+						}
+						cloned->Set_Name(uniqueName);
+						cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
+
+						cloned->Get_Transform()->Set_LocalPositionByValue(spawnPos);
+						LOG_INFO(L"[SceneView] Dropped {} at ({}, {}, {})", prototypeTag, spawnPos.x, spawnPos.y, spawnPos.z);
+						EDITOR->Set_SelectedObject(cloned);
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+
 			ImVec2 imageRectMin = ImGui::GetItemRectMin();
 			ImVec2 imageRectSize = ImGui::GetItemRectSize();
 
@@ -58,12 +146,28 @@ void EditorView::RenderView(Bool isResize) {
 	ImGui::End();
 
 	ImGui::Begin("Game View");
+
+	// 마우스가 GameView 컨텐츠 영역 내에 있거나, 카메라 등으로 마우스가 락(Lock)되어 있으면 입력 허용
+	EDITOR_STATE state = EDITOR->Get_State();
+	Bool isGameViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+
+	Bool inputEnabled = false;
+	if (state == EDITOR_STATE::PLAY)
+		inputEnabled = isGameViewHovered || GAME_INSTANCE->Get_MouseLock();
+	else
+		inputEnabled = isSceneViewHovered || isGameViewHovered;
+
+	GAME_INSTANCE->Set_InputEnabled(inputEnabled);
+
 	Bool loadFinished = GAME_INSTANCE->LevelLoad_Finished();
 	Bool canPlay = (EDITOR->Get_State() != EDITOR_STATE::PLAY);
 	Bool isPlayDisabled = canPlay && loadFinished;
 	if (!isPlayDisabled) ImGui::BeginDisabled();
 	if (ImGui::Button("Play")) {
-		EDITOR->Set_State(EDITOR_STATE::PLAY);
+		if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(GAME_INSTANCE->Get_CurrentLevelIndex(), PATH.GetLevelDataPath(GAME_INSTANCE->Get_CurrentLevelIndex()))))
+			EDITOR->Set_State(EDITOR_STATE::PLAY);
+		else
+			LOG_CRITICAL("Failed to Save Level Data");
 	}
 	if (!isPlayDisabled) ImGui::EndDisabled();
 	ImGui::SameLine();
@@ -170,7 +274,7 @@ void EditorView::MousePicking(ImVec2 viewport, ImVec2 imageStartPos)
 		Float minDistance = FLT_MAX;
 		
 		// 모든 객체를 순회하며 피킹 검사
-		for (auto& pair : GAME_INSTANCE->Get_GameObjects()) {
+		for (auto& pair : GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex())) {
 			auto obj = pair.second;
 
 			if (obj == EDITOR->Get_EditorCamera()) continue;

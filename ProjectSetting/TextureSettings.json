@@ -3,32 +3,50 @@
         {
             "count": 1,
             "level": "STATIC",
-            "path": "Default/Default.dds",
-            "tag": "Prototype_Component_Texture_Default"
+            "path": "UI/Loading/Loading_Fade.dds",
+            "tag": "UI_Loading_Fade"
         },
         {
             "count": 1,
-            "level": "STATIC",
-            "path": "Default/Tile_0.dds",
-            "tag": "Tile_0"
-        },
-        {
-            "count": 1,
-            "level": "STATIC",
-            "path": "Default/UI/Loading/Loading_BackGround.dds",
+            "level": "LOADING",
+            "path": "UI/Loading/Loading_BackGround.dds",
             "tag": "UI_Loading_BackGround"
         },
         {
             "count": 1,
-            "level": "STATIC",
-            "path": "Default/UI/Loading/Loading_Pixel.dds",
+            "level": "LOADING",
+            "path": "UI/Loading/Loading_Pixel.dds",
             "tag": "UI_Loading_Pixel"
         },
         {
             "count": 1,
-            "level": "STATIC",
-            "path": "Default/UI/Loading/Loading_Logo.dds",
+            "level": "LOADING",
+            "path": "UI/Loading/Loading_Logo.dds",
             "tag": "UI_Loading_Logo"
+        },
+        {
+            "count": 1,
+            "level": "Title",
+            "path": "UI/Title/Title_BackGround.dds",
+            "tag": "UI_Title_BackGround"
+        },
+        {
+            "count": 1,
+            "level": "Title",
+            "path": "UI/Title/Title_HUD.dds",
+            "tag": "UI_Title_HUD"
+        },
+        {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Sky/Skybox_Default0.dds",
+            "tag": "Skybox_Default0"
+        },
+        {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Sky/Skybox_Default1.dds",
+            "tag": "Skybox_Default1"
         }
     ]
 }

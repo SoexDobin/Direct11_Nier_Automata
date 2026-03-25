@@ -25,9 +25,19 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
-	Bool  Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop);
+	const TRANSFORM_FRAME& Get_TransformDelta(int32 boneIndex) const;
+	const wstring& Get_AnimationName() { return m_Name; }
+	Float Get_Progress() const { return m_CurrentTrackPosition / m_Duration; }
+	void Set_Progress(Float progress) { m_CurrentTrackPosition = m_Duration * progress; }
+
+	
+
+public:
+	Bool Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop);
+	void Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones);
 
 private:
+	wstring m_Name;
 	Float m_Duration{}; // 애니메이션의 길이 절대 값
 	Float m_TickPerSecond{};
 	Float m_CurrentTrackPosition{};

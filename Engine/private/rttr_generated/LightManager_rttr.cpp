@@ -1,14 +1,13 @@
-﻿#include "LightManager.h"
+#include "LightManager.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 4981
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(LightManager_RTTR)
 {
-    registration::class_<LightManager>("LightManager")
-        .constructor<>()
-        .method("Create", &LightManager::Create)
-        ;
+	registration::class_<LightManager>("LightManager")
+		.constructor<>()
+		.method("Create", &LightManager::Create)
+		;
 }
-

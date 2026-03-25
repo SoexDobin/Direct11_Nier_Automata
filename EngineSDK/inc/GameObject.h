@@ -19,8 +19,7 @@ public:
 
 public:
     explicit GameObject();
-    explicit GameObject(const ComPtr<ID3D11Device> &pDevice,
-                        const ComPtr<ID3D11DeviceContext> &context);
+    explicit GameObject(const ComPtr<ID3D11Device> &pDevice, const ComPtr<ID3D11DeviceContext> &context);
     explicit GameObject(const GameObject &prototype);
     virtual ~GameObject() override = default;
 
@@ -32,13 +31,14 @@ public:
     TAG_MASK &Get_TagMask() { return m_TagMask; }
 
 public:
+    virtual GAMEOBJECTTYPE Get_GameObjectType() { return GAMEOBJECTTYPE::GAMEOBJECT; }
+    PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void *arg) override;
     void On_Destroy() override;
     void On_Enable() override;
     virtual void On_Disable() override;
     void Set_Active(Bool isActive) final;
-    PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
 
 public:
     virtual void Priority_Update(Float timeDelta);
@@ -47,14 +47,15 @@ public:
     virtual void Fixed_Update(Float fixedDelta);
     virtual HRESULT Render();
     virtual void Submit_RenderGroup();
+    virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) final;
 
 public: // 충돌 함수
 protected:
     ComPtr<ID3D11Device> m_Device = {nullptr};
     ComPtr<ID3D11DeviceContext> m_Context = {nullptr};
     Shared<Transform> m_Transform = {nullptr};
-    LayerMask m_LayerMask = {};
-    TagMask m_TagMask = {};
+    LayerMask m_LayerMask{};
+    TagMask m_TagMask{};
 
 protected: /* Parent Child */
     Weak<GameObject> m_Parent = {};
@@ -75,21 +76,20 @@ protected: /* Component */
 
 public:
     inline Shared<Component> Get_Component(uint32 objectID);
-    const vector<Shared<Component>> Get_Components();
-    const vector<Shared<ScriptComponent>> Get_Scripts();
+    vector<Shared<Component>> Get_Components();
+    vector<Shared<ScriptComponent>> Get_Scripts();
     HRESULT Add_Component(const Shared<Component> &component);
-    Shared<Component> Add_Component(uint32 objectID, void* arg = nullptr);
-    Shared<Component> Add_Component(const wstring& prototypeTag, void* arg = nullptr);
+    Shared<Component> Add_Component(uint32 levIndex, uint32 objectID, void* arg = nullptr);
+    Shared<Component> Add_Component(uint32 levIndex, const wstring& prototypeTag, void* arg = nullptr);
 
     template <typename T>
-    Shared<T> Add_Component(void* arg = nullptr)
+    Shared<T> Add_Component(uint32 levIndex = 0, void* arg = nullptr)
     {
-        return static_pointer_cast<T>(Add_Component(Helper::To_wString(rttr::type::get<T>().get_name()), arg));
+        return static_pointer_cast<T>(Add_Component(levIndex, Helper::To_wString(rttr::type::get<T>().get_name()), arg));
     }
 
-protected:
-     template <typename T>
-     requires is_base_of_v<Component, T>
+public:
+     template <typename T> requires is_base_of_v<Component, T>
       	Shared<T> Get_Component() {
         uint32 typeID = rttr::type::get<T>().get_id();
 

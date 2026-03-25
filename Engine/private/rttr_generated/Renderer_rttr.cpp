@@ -1,14 +1,13 @@
-﻿#include "Renderer.h"
+#include "Renderer.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 7365
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Renderer_RTTR)
 {
-    registration::class_<Renderer>("Renderer")
-        .constructor<>()
-        .method("Create", &Renderer::Create)
-        ;
+	registration::class_<Renderer>("Renderer")
+		.constructor<>()
+		.method("Create", &Renderer::Create)
+		;
 }
-

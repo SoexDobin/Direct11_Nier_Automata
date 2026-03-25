@@ -1,0 +1,12 @@
+{
+    "SoundSettings": [
+        {
+            "path": "Sound/Core_GameTitle_Tap.wav",
+            "tag": "Title_Tap"
+        },
+        {
+            "path": "Sound/Core_GameTitle_Intro.wav",
+            "tag": "Title_Intro"
+        }
+    ]
+}

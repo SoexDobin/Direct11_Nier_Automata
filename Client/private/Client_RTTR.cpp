@@ -1,9 +1,26 @@
 ﻿#include "pch.h"
 #include "Client_Function.h"
-#include <rttr/registration>|
+#include <rttr/registration>
 
-#include "FreeCamera.h"
+#include "CityOfRuins.h"
+#include "LoadingBackground.h"
+#include "LoadingLogo.h"
+#include "LoadingPixelPanel.h"
+
+
+#include "LoadingFadeIn.h"
+#include "LoadingFadeOut.h"
 #include "ThirdPersonCamera.h"
+#include "StateMachine.h"
+#include "P10000.h"
+#include "P10000Body.h"
+#include "WP0070Body.h"
+#include "WP0220Body.h"
+#include "StaticCamera.h"
+#include "TitleBackground.h"
+#include "P10000StateMachine.h"
+#include "P10000Input.h"
+
 using rttr::registration;
 
 // ==============================================================
@@ -11,9 +28,10 @@ using rttr::registration;
 // 자동으로 Client/public 내부의 헤더를 스캔하여 포함시킵니다.
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
-#include "LoadingBackground.h"
-#include "LoadingLogo.h"
+#include "FreeCamera.h"
 #include "Monster.h"
+#include "SkyBox.h"
+#include "SkySphere.h"
 #include "Terrain.h"
 
 // </AUTO_GENERATED_INCLUDES>
@@ -24,48 +42,119 @@ void Register_Client_Reflection() {
   if (bRegistered) return;
   bRegistered = true;
   // ==============================================================
-  // [수동 등록 구역 예제]
-  // 파이썬 자동화 스크립트는 이 주석 바깥의 코드를 절대 삭제하거나 수정하지
-  // 않습니다! 특별한 메타데이터나 수동 설정이 필요한 객체의 경우, 이곳에
-  // 작성하세요.
+  // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
+  // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
-  /*
-  rttr::registration::class_<SpecialTerrain>(L"SpecialTerrain")
+	rttr::registration::class_<LoadingFadeIn>("LoadingFadeIn")
       .constructor<>()
-      .property("HiddenHeight", &SpecialTerrain::m_Height)
-      .method("Clone", &SpecialTerrain::Clone)
-      .method("Create", &SpecialTerrain::Create);
-  */
-    rttr::registration::class_<FreeCamera>("FreeCamera")
+      .method("Clone", &LoadingFadeIn::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingFadeIn::Create(device, context); })
+      (rttr::metadata("Level", ETOI(LEVEL::STATIC)));
+	rttr::registration::class_<LoadingFadeOut>("LoadingFadeOut")
+      .constructor<>()
+      .method("Clone", &LoadingFadeOut::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingFadeOut::Create(device, context); })
+      (rttr::metadata("Level", ETOI(LEVEL::STATIC)));
+
+	rttr::registration::class_<LoadingBackground>("LoadingBackground")
+      .constructor<>()
+      .method("Clone", &LoadingBackground::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingBackground::Create(device, context); })
+      (rttr::metadata("Level", ETOI(LEVEL::LOADING)));
+	rttr::registration::class_<LoadingLogo>("LoadingLogo")
+      .constructor<>()
+      .method("Clone", &LoadingLogo::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingLogo::Create(device, context); })
+      (rttr::metadata("Level", ETOI(LEVEL::LOADING)));
+	rttr::registration::class_<LoadingPixelPanel>("LoadingPixelPanel")
+      .constructor<>()
+      .method("Clone", &LoadingPixelPanel::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingPixelPanel::Create(device, context); })
+      (rttr::metadata("Level", ETOI(LEVEL::LOADING)));
+	rttr::registration::class_<TitleBackground>("TitleBackground")
+      .constructor<>()
+      .method("Clone", &TitleBackground::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return TitleBackground::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::TITLE)));
+	rttr::registration::class_<StaticCamera>("StaticCamera")
+      .constructor<>()
+      .method("Clone", &StaticCamera::Clone)
+      .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return StaticCamera::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::STATIC)));
+
+
+
+	rttr::registration::class_<P10000>("P10000")
+		.constructor<>()
+        .method("Clone", &P10000::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<P10000Body>("P10000Body")
         .constructor<>()
-        .method("Clone", &FreeCamera::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return FreeCamera::Create(device, context); })
-			(rttr::metadata("Level", 0));
+        .method("Clone", &P10000Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000Body::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<WP0070Body>("WP0070Body")
+        .constructor<>()
+        .method("Clone", &WP0070Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP0070Body::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<WP0220Body>("WP0220Body")
+        .constructor<>()
+        .method("Clone", &WP0220Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP0220Body::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+
     rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
         .constructor<>()
         .method("Clone", &ThirdPersonCamera::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return ThirdPersonCamera::Create(device, context); })
-			(rttr::metadata("Level", 0));
+        .property("TargetID", &ThirdPersonCamera::Get_TargetID, &ThirdPersonCamera::Set_TargetID)
+        (rttr::metadata(Meta_Key_Type::DataType, Data_Type_Key::uint32),
+        rttr::metadata(Meta_Key_Type::TypeTag, Data_Tag::ObjectID),
+        rttr::metadata(Meta_Key_Type::SaveData, Save_Data_Key::TargetObjectID))
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<P10000StateMachine>("P10000StateMachine")
+        .constructor<>()
+        .method("Clone", &P10000StateMachine::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return P10000StateMachine::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<P10000Input>("P10000Input")
+        .constructor<>()
+        .method("Clone", &P10000Input::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return P10000Input::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<CityOfRuins>("CityOfRuins")
+        .constructor<>()
+        .method("Clone", &CityOfRuins::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuins::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
   // <AUTO_GENERATED_RTTR>
-    rttr::registration::class_<LoadingBackground>("LoadingBackground")
+    rttr::registration::class_<FreeCamera>("FreeCamera")
         .constructor<>()
-        .method("Clone", &LoadingBackground::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingBackground::Create(device, context); })(rttr::metadata("Level", 0));
-
-    rttr::registration::class_<LoadingLogo>("LoadingLogo")
-        .constructor<>()
-        .method("Clone", &LoadingLogo::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return LoadingLogo::Create(device, context); })(rttr::metadata("Level", 0));
+        .method("Clone", &FreeCamera::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return FreeCamera::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<Monster>("Monster")
         .constructor<>()
         .method("Clone", &Monster::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Monster::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<SkyBox>("SkyBox")
+        .constructor<>()
+        .method("Clone", &SkyBox::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SkyBox::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<SkySphere>("SkySphere")
+        .constructor<>()
+        .method("Clone", &SkySphere::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SkySphere::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<Terrain>("Terrain")
         .constructor<>()
@@ -75,4 +164,4 @@ void Register_Client_Reflection() {
 
 // </AUTO_GENERATED_RTTR>
 }
-} // namespace Client
+NS_END

@@ -25,12 +25,13 @@ private:
 
 private:
   void Reset_ClientApp();
+  void Change_ClientLevel(uint32 levIndex);
 
 private:
+	uint32 m_StartLevel{};
+	uint32 m_StartLevelIndex{};
 	Bool m_IsReset = { false };
-	Shared<Game> m_Game = { nullptr };
 	Unique<ClientApp> m_ClientApp = {nullptr};
-	ENGINE_DESC m_EngineDesc = {};
 
 public:
   static Unique<EditorApp> Create();

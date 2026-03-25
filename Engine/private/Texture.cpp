@@ -12,8 +12,8 @@ Texture::Texture(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceCo
 }
 
 Texture::Texture(const Texture& rhs)
-    : Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs }, 
-    m_FilePath{ rhs.m_FilePath }, m_RGBA{ rhs.m_RGBA } {
+	: Component{ rhs }, m_NumSRVs{ rhs.m_NumSRVs }, m_SRVs{ rhs.m_SRVs },
+	m_FilePath{ rhs.m_FilePath }, m_RGBA{ rhs.m_RGBA }, m_TextureTag{ rhs.m_TextureTag }, m_levIndex{ rhs.m_levIndex } {
 }
 
 HRESULT Texture::Initialize_Prototype(const tChar* textureFilePath, uint32 numSRVs, const wstring& textureTag)
@@ -41,35 +41,35 @@ HRESULT Texture::Initialize(void* arg)
 
     if (!desc.m_TextureTag.empty())
     {
-        // 1. 태그로 메타데이터 우선 획득
         const TEXTURE_DESC& registDesc = *GAME_INSTANCE->Get_TextureDesc(desc.m_levIndex, desc.m_TextureTag);
 
         m_NumSRVs = registDesc.m_NumSRVs;
         m_FilePath = registDesc.m_FilePath;
         m_SRVs.clear();
         m_SRVs.reserve(m_NumSRVs);
-        // 2. 메타데이터에 기록된 정확한 개수만큼 리소스 요청
+        
         for (uint32 i = 0; i < m_NumSRVs; ++i)
         {
             tChar szFullPath[MAX_PATH] = TEXT("");
             _stprintf_s(szFullPath, m_FilePath.c_str(), i);
-            const ComPtr<ID3D11ShaderResourceView>& pSRV = GAME_INSTANCE->Get_Texture(desc.m_levIndex, szFullPath);
+            const ComPtr<ID3D11ShaderResourceView>& srv = GAME_INSTANCE->Get_Texture(desc.m_levIndex, szFullPath);
 
-            if (pSRV == nullptr) {
+            if (srv == nullptr) {
                 LOG_ERROR(L"[Texture] : Failed to find Tag '{}' Texture At '{}'", desc.m_TextureTag, szFullPath);
                 return E_FAIL;
             }
-            m_SRVs.push_back(pSRV);
+            m_SRVs.push_back(srv);
         }
+        m_TextureTag = desc.m_TextureTag;
     }
    
     return Component::Initialize(arg);
 }
 
 void Texture::On_Destroy() {
-  m_SRVs.clear();
+	m_SRVs.clear();
 
-  Component::On_Destroy();
+	Component::On_Destroy();
 }
 
 HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader>& shader,
@@ -82,40 +82,53 @@ HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader>& shader,
 	return shader->Bind_SRV(constantName, m_SRVs[index]);
 }
 
-HRESULT Texture::Bind_Texture(const wstring& texturefilePath)
+
+void Texture::Set_TextureTag(const wstring& tag)
 {
-    // 게임 시작시 리소스 경로의 레벨별 텍스쳐, fpx 파일 전부 읽어오기
-	// AddPrototype하면서 해당 경로의 path / typeid 를 ResourceManager에 등록
-    // AddComponent할때 path를 주면서 Texture, shader, fbx등 Rescource일 경우 중복 검사는 패스
-    // ResourceManager에게 typeid를 받아 해당 typeid이 리소스 컴포넌트 찾아서 Clone
+	if (tag.empty()) return;
 
-    // rttr을 통해서 Editor쪽에는 해당 리소스 파일들을 레벨별로 분리해서 뷰어로 보여주기
-    // 뷰어에 있는 Texture -> Texture, Shader -> Shader 드래그 드랍을 통해서 적용하면 적용되도록 
-    // Set Path()이후 Bind_Res
+	// 1. 현재 레벨에서 검색
+	const TEXTURE_DESC* pDesc = GAME_INSTANCE->Get_TextureDesc(m_levIndex, tag);
 
-    // Editor는 SaveData 라는 MetaData칸을 따로 할당해서
-    // Editor가 Stop상태일때 Ctrl+s, or Exit하면 (만약 Pause나 Play상태에서 하면 Ctrl+s는 무시, Exit는 강제 Stop하고나서 아래꺼 다하고 종료)
-    // Hierarchy 의 오브젝트들의 trans, layer, tag, texture, shader등의 데이터를 (GameObject는 부모 자식도)
+	// 2. 못 찾았으면 Static 레벨(0)에서 검색
+	if (pDesc == nullptr && m_levIndex != 0)
+	{
+		pDesc = GAME_INSTANCE->Get_TextureDesc(0, tag);
+	}
 
-    // 객체 1개당 rttr 저장 > json에 수기
+	if (pDesc == nullptr)
+	{
+		LOG_ERROR(L"[Texture] Failed to find TextureDesc for Tag: {}", tag);
+		return;
+	}
 
-    
-    // 여기 까지되면 AssetManager를 통해서 Clone Scene
-    // Create 시트도 만들어야함
-    // TODO : Resource Manager 한테 해당 path를 가진 typeid 부탁해서 Clone
+	m_NumSRVs = pDesc->m_NumSRVs;
+	m_FilePath = pDesc->m_FilePath;
+	m_SRVs.clear();
+	m_SRVs.reserve(m_NumSRVs);
 
-    return S_OK;
-}
+	for (uint32 i = 0; i < m_NumSRVs; ++i)
+	{
+		tChar szFullPath[MAX_PATH] = TEXT("");
+		_stprintf_s(szFullPath, m_FilePath.c_str(), i);
+		
+		// 레벨 인덱스도 체크하여 가져옴
+		const ComPtr<ID3D11ShaderResourceView>& srv = GAME_INSTANCE->Get_Texture(pDesc->m_levIndex, szFullPath);
 
-void Texture::Set_TextureByIndex(uint32 texIndex)
-{
-    if (texIndex >= m_SRVs.size() || m_SRVs.empty())
+		if (srv == nullptr)
+		{
+			LOG_ERROR(L"[Texture] : Failed to find Texture SRV At '{}'", szFullPath);
+			continue;
+		}
+		m_SRVs.push_back(srv);
+	}
+
+	m_TextureTag = tag;
+    if (m_levIndex != pDesc->m_levIndex)
     {
-        LOG_ERROR(L"Texture Out of Bounds");
-        return;
+        m_levIndex = pDesc->m_levIndex; // 실제 리소스가 있는 레벨로 업데이트
+        LOG_INFO(L"[Texture] Tag '{}' assigned from Level {}", tag, m_levIndex);
     }
-
-    m_SRVs[texIndex];
 }
 
 Shared<Texture> Texture::CreatePrototype()
@@ -126,6 +139,7 @@ Shared<Texture> Texture::CreatePrototype()
     if (FAILED(texture->Initialize_Prototype()))
     {
         MSG_BOX("Failed to Created : Texture");
+        return nullptr;
     }
 
     return texture;

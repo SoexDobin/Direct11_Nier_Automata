@@ -1,7 +1,10 @@
 #pragma once
 #include "Engine_Define.h"
 #include <functional>
+#pragma warning(push)
+#pragma warning(disable: 26498)
 #include <spdlog/common.h> // source_loc를 위해 필요
+#pragma warning(pop)
 
 NS_BEGIN(Engine)
 

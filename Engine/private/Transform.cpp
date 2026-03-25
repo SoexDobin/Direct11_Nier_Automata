@@ -108,6 +108,10 @@ Quaternion Transform::Get_Quaternion() const {
 
 Vector3 Transform::Get_Position() const { return m_WorldMatrix.Translation(); }
 Matrix Transform::Get_WorldMatrix() const { return m_WorldMatrix; }
+Matrix* Transform::Get_WorldMatrixPtr()
+{
+    return &m_WorldMatrix;
+}
 
 Vector3 Transform::Get_Right() const
 {

@@ -88,16 +88,18 @@ void LoadingLogo::Submit_RenderGroup()
 HRESULT LoadingLogo::Ready_Components()
 {
     auto shaderDesc = Shader::SHADER_DESC{ VTXTEX::Tag, VTXTEX::Elements, VTXTEX::numElements };
-    m_Shader = Add_Component<Shader>(&shaderDesc);
+    m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
     if (nullptr == m_Shader)
         return E_FAIL;
 
-    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::STATIC), L"UI_Loading_Logo" };
-    m_Texture = Add_Component<Texture>(&textureDesc);
+    auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::LOADING), L"UI_Loading_Logo" };
+    m_Texture = Add_Component<Texture>(ETOI(LEVEL::STATIC), &textureDesc);
     if (nullptr == m_Texture)
         return E_FAIL;
 
-    m_BufferRect = Add_Component<VIBuffer_Rect>();
+    m_Texture->Set_RGBA(Color{1.f, 1.f, 1.f, 0.2f});
+
+    m_BufferRect = Add_Component<VIBuffer_Rect>(ETOI(LEVEL::STATIC));
     if (nullptr == m_BufferRect)
         return E_FAIL;
 

@@ -24,10 +24,6 @@ public:
 	~ThirdPersonCamera() override = default;
 
 public:
-	void Set_Target(const Shared<GameObject>& target);
-	Shared<GameObject> Get_Target() const;
-
-public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
 	void On_Destroy() override;
@@ -39,8 +35,6 @@ public:
 	void Fixed_Update(Float fixedDelta) override;
 
 protected:
-	Weak<GameObject> m_Target{};
-
 	Float		m_Distance{};			// 현재 카메라와 타겟 사이의 거리
 	Float		m_TargetDistance{};		// 목표로 하는 카메라 거리 (줌 입력 시 변함)
 	Float		m_MinDistance{};		// 줌 인 최소 제한 거리

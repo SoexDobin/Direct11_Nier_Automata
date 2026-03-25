@@ -9,7 +9,7 @@ class GameObject;
 class Component;
 
 class PrototypeManager final : public EngineManager {
-  NO_COPY(PrototypeManager)
+	NO_COPY(PrototypeManager)
 public:
 	explicit PrototypeManager() = default;
 	~PrototypeManager() override = default;
@@ -20,7 +20,7 @@ public:
 
 public:
     uint32 Get_ObjectIDFromPrototypeTag(const wstring &prototypeTag, uint32 levIndex) const;
-    const tChar* Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
+    wstring Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
     HRESULT Add_Prototype(uint32 levIndex, const Shared<Object> &object, const wstring &prototypeTag);
     Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex, uint32 objectID) const;
     Shared<Object> Find_Prototype(PROTOTYPE prototype, uint32 levIndex, const wstring &prototypeTag) const;
@@ -28,9 +28,9 @@ public:
     HRESULT Clear_Prototypes(uint32 levIndex);
 
 public: /* Read Only */
-    const vector<unordered_map<uint32, Shared<GameObject>>> &
+    const vector<unordered_map<uint32, Shared<GameObject>>>&
     Get_GameObjects() const { return m_GameObjects; }
-    const vector<unordered_map<uint32, Shared<Component>>> &
+    const vector<unordered_map<uint32, Shared<Component>>>&
     Get_Components() const { return m_Components; }
 
 private:
@@ -44,10 +44,10 @@ private:
     mutable std::recursive_mutex m_PrototypeMutex;
 
 public:
-  static Unique<PrototypeManager> Create(uint32 levCount);
+	static Unique<PrototypeManager> Create(uint32 levCount);
 
 private: /* validation method*/
-  Bool Validate_Level(uint32 levIndex) const;
+	Bool Validate_Level(uint32 levIndex) const;
 };
 
 NS_END

@@ -7,8 +7,6 @@
 #include "Game.h"
 #include "TagRegistry.h"
 #include "LayerRegistry.h"
-#include "Texture.h"
-#include "Shader.h"
 #include "GameObject.h"
 #include <regex>
 
@@ -54,13 +52,14 @@ HRESULT ClientSettingManager::Load_Textures_FromJson(LEVEL baseLevel) const
 		LEVEL level = LEVEL::STATIC;
 		if (levelStr == "1" || levelStr == "Loading" || levelStr == "LOADING")
 			level = LEVEL::LOADING;
-		else if (levelStr == "2" || levelStr == "Logo" || levelStr == "LOGO")
-			level = LEVEL::LOGO;
+		else if (levelStr == "2" || levelStr == "Title" || levelStr == "TITLE")
+			level = LEVEL::TITLE;
 		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
 			level = LEVEL::GAMEPLAY;
 		
         if (level != baseLevel)
-            continue;
+			if (level != LEVEL::LOADING)
+				continue;
 		
 		wstring tag = Helper::To_wString(item["tag"].get<string>());
 		wstring relativePath = Helper::To_wString(item["path"].get<string>());
@@ -168,8 +167,8 @@ HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 		LEVEL level = LEVEL::STATIC;
 		if (levelStr == "1" || levelStr == "Loading" || levelStr == "LOADING")
 			level = LEVEL::LOADING;
-		else if (levelStr == "2" || levelStr == "Logo" || levelStr == "LOGO")
-			level = LEVEL::LOGO;
+		else if (levelStr == "2" || levelStr == "Title" || levelStr == "TITLE")
+			level = LEVEL::TITLE;
 		else if (levelStr == "3" || levelStr == "GamePlay" || levelStr == "GAMEPLAY")
 			level = LEVEL::GAMEPLAY;
 		
@@ -281,9 +280,9 @@ HRESULT ClientSettingManager::Sync_ModelJson_FromCSV() const
 		string cleanTag = CleanString(tag);
 		string cleanPath = CleanString(path);
 
-		float fPx = GetFloat(px, 0.f); float fPy = GetFloat(py, 0.f); float fPz = GetFloat(pz, 0.f);
-		float fRx = GetFloat(rx, 0.f); float fRy = GetFloat(ry, 0.f); float fRz = GetFloat(rz, 0.f);
-		float fSx = GetFloat(sx, 1.f); float fSy = GetFloat(sy, 1.f); float fSz = GetFloat(sz, 1.f);
+		Float fPx = GetFloat(px, 0.f); Float fPy = GetFloat(py, 0.f); Float fPz = GetFloat(pz, 0.f);
+		Float fRx = GetFloat(rx, 0.f); Float fRy = GetFloat(ry, 0.f); Float fRz = GetFloat(rz, 0.f);
+		Float fSx = GetFloat(sx, 1.f); Float fSy = GetFloat(sy, 1.f); Float fSz = GetFloat(sz, 1.f);
 
 		jsonRoot["ModelSettings"].push_back({
 			{"level", cleanLevel},
@@ -319,7 +318,7 @@ HRESULT ClientSettingManager::Load_EngineDesc(ENGINE_DESC& outDesc) const
 	file.close();
 
 	outDesc.levelCount = ETOI(LEVEL::LEVEL_END);
-	outDesc.startLevel = json.value("startLevel", ETOI(LEVEL::LOGO));
+	outDesc.startLevel = json.value("startLevel", ETOI(LEVEL::TITLE));
 	outDesc.viewportWidth = json.value("viewportWidth", 1920);
 	outDesc.viewportHeight = json.value("viewportHeight", 1080);
 	outDesc.windowTitle = Helper::To_wString(json.value("windowTitle", "NieRAutomata"));
@@ -348,21 +347,19 @@ HRESULT ClientSettingManager::Apply_LayerAndTagSettings() const
 HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
 {
     rttr::type gameObjectType = rttr::type::get<GameObject>();
+    rttr::type componentType = rttr::type::get<Component>();
     auto allTypes = rttr::type::get_types();
-
-    // 전역/정적 세트를 사용하여 여러 번 호출(STATIC, LOGO 등)되더라도 
-    // 동일 타입의 프로토타입은 전 생명주기 동안 단 한 번만 등록되도록 보장합니다.
-    static unordered_set<string> globalProcessedTypes;
 
     for (auto& type : allTypes)
     {
-        // 1. GameObject를 상속받은(derived_from) 자기자신 제외 클래스만 순회
-        if (type.is_derived_from(gameObjectType) && type != gameObjectType && !type.is_pointer())
+        // 1. GameObject 또는 Component를 상속받은(derived_from) 자기자신 제외 클래스만 순회
+        bool isGameObject = type.is_derived_from(gameObjectType) && type != gameObjectType;
+        bool isComponent = type.is_derived_from(componentType) && type != componentType;
+
+        if ((isGameObject || isComponent) && !type.is_pointer())
         {
-            // 중복 처리 방지: 동일한 타입 이름이 이미 등록되었다면 건너뜀
+            // 중복 처리 방지 로직은 엔진의 Add_Prototype 단계에 맡깁니다.
             string typeName = type.get_name().to_string();
-            if (globalProcessedTypes.contains(typeName))
-                continue;
 
             // 2. 파이썬이 통일해준 Create 메서드 가져오기
             rttr::method createMethod = type.get_method("Create");
@@ -387,8 +384,6 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
                 if (targetLevel != ETOI(baseLevel))
                     continue;
 
-                // 해당 레벨에 등록하기로 결정된 타입만 마킹 (실제 등록 직전)
-                globalProcessedTypes.insert(typeName);
 
                 LOG_INFO(L"[RTTR-Debug] Try Reg: {}, Target: {}, Current: {}", Helper::To_wString(typeName), targetLevel, ETOI(baseLevel));
 
@@ -398,8 +393,22 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
                 // 5. 엔진 PrototypeManager에 삽입
                 if (result.is_valid())
                 {
-                    auto prototype = result.get_value<Shared<GameObject>>();
+                    Shared<Object> prototype = nullptr;
+                    if (isGameObject)
+                    {
+                        prototype = result.get_value<Shared<GameObject>>();
+                    }
+                    else if (isComponent)
+                    {
+                        prototype = result.get_value<Shared<Component>>();
+                    }
                     
+                    if (prototype == nullptr)
+                    {
+                        LOG_ERROR(L"Failed to cast prototype to GameObject or Component: {}", Helper::To_wString(typeName));
+                        continue;
+                    }
+
                     // 태그는 RTTR 클래스 이름(std::string)을 wstring으로 변환하여 사용
                     wstring tag = Helper::To_wString(type.get_name().to_string());
                     
@@ -418,80 +427,6 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
     }
 
     return S_OK;
-}
-
-HRESULT ClientSettingManager::Load_Texture(LEVEL level) const
-{
-	//if (!filesystem::exists(m_ResourcePath))
-	//{
-	//	SpdLogger::Warn(L"Failed To Find Resource Folder " + m_ResourcePath);
-	//	return E_FAIL; 
-	//}
-	//
-	//std::wregex levelRegEx(L"lev(\\d+)_.*", std::regex_constants::icase);
-	//std::wregex fileRegEx(L"(.+?)(_*)(\\d+)\\.(dds|png|tga|jpg)", std::regex_constants::icase);
-	//for (const auto& entry : filesystem::recursive_directory_iterator(m_ResourcePath))
-	//{
-	//	if (entry.is_regular_file()) // 파일일 경우에만 처리
-	//	{
-	//		std::wstring FilePath = entry.path().wstring();
-	//		std::replace(FilePath.begin(), FilePath.end(), L'\\', L'/');
-	//		
-	//		uint32 levIndex = { 0 };
-	//		std::wsmatch levelMatch;
-	//		if (std::regex_search(FilePath, levelMatch, levelRegEx))
-	//		{
-	//			levIndex = std::stoul(levelMatch[1].str());
-	//		}
-	//		
-	//		std::wsmatch fileMatch;
-	//		std::wstring entryFileName = entry.path().filename().wstring();
-	//		if (std::regex_match(entryFileName, fileMatch, fileRegEx))
-	//		{
-	//			std::wstring baseName = fileMatch[1].str();
-	//			std::wstring separator = fileMatch[2].str();
-	//			std::wstring extension = fileMatch[4].str();
-	//
-	//			// 상위 폴더 경로까지 합쳐서 L"../bin/resources/lev0_static/Textures/p10000_%d.dds" 포맷 만들기
-	//			std::wstring parentPath = entry.path().parent_path().wstring();
-	//			std::replace(parentPath.begin(), parentPath.end(), L'\\', L'/');
-	//			std::wstring formatPath = parentPath + L"/" + baseName + separator + L"%d." + extension;
-	//
-	//
-	//			std::wstring tagName = baseName;
-	//			uint32 sequenceCount = 0;
-	//			for (const auto& peerEntry : filesystem::directory_iterator(entry.path().parent_path()))
-	//			{
-	//				std::wsmatch peerMatch;
-	//				std::wstring peerFileName = peerEntry.path().filename().wstring();
-	//				if (std::regex_match(peerFileName, peerMatch, fileRegEx))
-	//				{
-	//					// 같은 시퀀스(BaseName 일치)라면 카운트 증가
-	//					if (peerMatch[1].str() == baseName)
-	//					{
-	//						sequenceCount++;
-	//					}
-	//				}
-	//			}
-	//
-	//			GAME_INSTANCE->Add_Prototype(levIndex,
-	//				Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-	//					formatPath.c_str(), sequenceCount)
-	//			);
-	//		}
-	//		else
-	//		{
-	//			std::wstring formatPath = FilePath;
-	//			std::wstring tagName = entry.path().stem().wstring();
-	//			GAME_INSTANCE->Add_Prototype(levIndex,
-	//				Texture::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),
-	//					formatPath.c_str(), 1)
-	//			);
-	//		}
-	//	}
-	//}
-
-	return S_OK;
 }
 
 HRESULT ClientSettingManager::Load_Shader() const
@@ -521,31 +456,33 @@ HRESULT ClientSettingManager::Load_Shader() const
 				std::wstring normTex = L"vtxnormtex";
 				std::wstring staticMesh = L"vtxmesh";
 				std::wstring animMesh = L"vtxanimmesh";
+				std::wstring cube = L"vtxcube";
+				std::wstring sphere = L"vtxsphere";
 				
-				auto itTex = 
-					std::search(
+				auto itTex = std::search(
 						tagName.begin(), tagName.end(), 
-						tex.begin(), tex.end(),
-						CaseInsensitiveCompare
+						tex.begin(), tex.end(), CaseInsensitiveCompare
 					);
-				auto itNormTex =
-					std::search(
+				auto itNormTex = std::search(
 						tagName.begin(), tagName.end(), 
-						normTex.begin(), normTex.end(),
-						CaseInsensitiveCompare
+						normTex.begin(), normTex.end(), CaseInsensitiveCompare
 					);
-				auto itMeshTex =
-					std::search(
+				auto itMeshTex = std::search(
 						tagName.begin(), tagName.end(),
-						staticMesh.begin(), staticMesh.end(),
-						CaseInsensitiveCompare
+						staticMesh.begin(), staticMesh.end(), CaseInsensitiveCompare
 					);
-				auto itAnimTex =
-					std::search(
+				auto itAnimTex = std::search(
 						tagName.begin(), tagName.end(),
-						animMesh.begin(), animMesh.end(),
-						CaseInsensitiveCompare
+						animMesh.begin(), animMesh.end(), CaseInsensitiveCompare
 					);
+				auto itCubeTex = std::search(
+						tagName.begin(), tagName.end(),
+						cube.begin(), cube.end(), CaseInsensitiveCompare
+					);
+				auto itSphereTex = std::search(
+					tagName.begin(), tagName.end(),
+					sphere.begin(), sphere.end(), CaseInsensitiveCompare
+				);
 
 				if (itAnimTex != tagName.end())
 				{
@@ -567,6 +504,16 @@ HRESULT ClientSettingManager::Load_Shader() const
 					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXTEX::Elements, VTXTEX::numElements, VTXTEX::Tag)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXTEX::Tag);
 				}
+				else if (itCubeTex != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXCUBE::Elements, VTXCUBE::numElements, VTXCUBE::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXCUBE::Tag);
+				}
+				else if (itSphereTex != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXSPHERE::Elements, VTXSPHERE::numElements, VTXSPHERE::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXCUBE::Tag);
+				}
 				else
 				{
 					LOG_WARN(L"Shader File {} Does Not Follow Naming Convention", entry.path().filename().wstring());
@@ -577,3 +524,132 @@ HRESULT ClientSettingManager::Load_Shader() const
 	
 	return S_OK;
 }
+
+HRESULT ClientSettingManager::Load_LevelData(LEVEL level) const
+{
+	wstring fullPath = m_ProjectSettingPath + L"LevelData_" + std::to_wstring(ETOI(level)) + L".json";
+
+	if (filesystem::exists(fullPath))
+	{
+		return GAME_INSTANCE->DeSerializeLevel(fullPath);
+	}
+
+	return S_FALSE;
+}
+
+HRESULT ClientSettingManager::Load_Sound_FromJson() const
+{
+	wstring fullPath = m_ProjectSettingPath + L"SoundSettings.json";
+
+	if (!filesystem::exists(fullPath))
+	{
+		nlohmann::json defaultJson;
+		defaultJson["SoundSettings"] = nlohmann::json::array();
+
+		std::ofstream outFile(fullPath);
+		if (outFile.is_open())
+		{
+			outFile << defaultJson.dump(4);
+			outFile.close();
+		}
+		LOG_INFO(L"Created Default SoundSettings.json: {}", fullPath);
+	}
+
+	if (!filesystem::exists(fullPath))
+	{
+		LOG_WARN(L"Failed To Find Sound Settings : {}", fullPath);
+		return S_OK;
+	}
+
+	ifstream file(fullPath);
+	if (!file.is_open()) return E_FAIL;
+
+	nlohmann::json json;
+	file >> json;
+	file.close();
+
+	auto& settings = json["SoundSettings"];
+	for (auto& item : settings)
+	{
+		auto CleanString = [](string str)
+		{
+			string trimmed = Helper::Trim(str);
+			if (trimmed.size() >= 2 && trimmed.front() == '\"' && trimmed.back() == '\"')
+				trimmed = trimmed.substr(1, trimmed.size() - 2);
+			return Helper::Trim(trimmed);
+		};
+
+		wstring tag = Helper::To_wString(CleanString(item["tag"].get<string>()));
+		wstring relativePath = Helper::To_wString(CleanString(item["path"].get<string>()));
+		wstring fullSoundPath = m_ResourcePath + relativePath;
+
+		if (FAILED(GAME_INSTANCE->Load_Sound(tag, fullSoundPath)))
+		{
+			LOG_ERROR(L"Failed to Load Sound: {}", tag);
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Sync_SoundJson_FromCSV() const
+{
+	wstring csvPath = m_ResourcePath + L"SoundSettings.csv";
+
+	if (!filesystem::exists(csvPath))
+	{
+		std::ofstream outFile(csvPath);
+		if (outFile.is_open())
+		{
+			outFile << "Tag, Path" << std::endl;
+			outFile << "Title_BGM, Sound/Title_BGM.wem" << std::endl;
+			outFile.close();
+		}
+		LOG_INFO(L"Created Template SoundSettings.csv: {}", csvPath);
+	}
+
+	if (!filesystem::exists(csvPath)) return S_OK;
+
+	ifstream csvFile(csvPath);
+	nlohmann::json jsonRoot;
+	string line;
+
+	getline(csvFile, line);
+	while (getline(csvFile, line))
+	{
+		if (line.empty()) continue;
+
+		stringstream stream(line);
+		string tag, path;
+		getline(stream, tag, ',');
+		getline(stream, path);
+
+		auto CleanString = [](string str)
+		{
+			string trimmed = Helper::Trim(str);
+			trimmed.erase(remove(trimmed.begin(), trimmed.end(), '\"'), trimmed.end());
+			trimmed.erase(remove(trimmed.begin(), trimmed.end(), '\r'), trimmed.end());
+			return Helper::Trim(trimmed);
+		};
+
+		jsonRoot["SoundSettings"].push_back({
+			{"tag", CleanString(tag)},
+			{"path", CleanString(path)},
+		});
+	}
+
+	ofstream jsonFile(m_ProjectSettingPath + L"SoundSettings.json");
+	jsonFile << jsonRoot.dump(4);
+
+	return S_OK;
+}
+
+Bool ClientSettingManager::AutoTransitionLevel(LEVEL curLevel, LEVEL nextLev)
+{
+	if (curLevel == LEVEL::LOADING)
+		return ETOI(nextLev) != 1;
+
+	return false;
+}
+

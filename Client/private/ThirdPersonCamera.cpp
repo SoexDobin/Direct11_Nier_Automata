@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "ThirdPersonCamera.h"
 #include <SpdLogger.h>
+
+#include "ClientSettingManager.h"
 #include "Game.h"
 
 ThirdPersonCamera::ThirdPersonCamera() : Camera{} {}
@@ -9,23 +11,6 @@ ThirdPersonCamera::ThirdPersonCamera(const ComPtr<ID3D11Device>& device, const C
 ThirdPersonCamera::ThirdPersonCamera(const ThirdPersonCamera& rhs)
 	: Camera{rhs} {}
 
-void ThirdPersonCamera::Set_Target(const Shared<GameObject>& target)
-{
-	m_Target = target;
-	Update_CameraTransform(0.f);
-}
-
-Shared<GameObject> ThirdPersonCamera::Get_Target() const
-{
-	if (m_Target.expired())
-	{
-		return m_Target.lock();
-	}
-		
-	LOG_ERROR(L"{} No Target", Get_Name());
-	return nullptr;
-}
-
 HRESULT ThirdPersonCamera::Initialize_Prototype()
 {
 	return Camera::Initialize_Prototype();
@@ -33,40 +18,53 @@ HRESULT ThirdPersonCamera::Initialize_Prototype()
 
 HRESULT ThirdPersonCamera::Initialize(void* arg)
 {
-	if (nullptr == arg)
-	{
-		LOG_ERROR(L"Need Third_Person_Camera_Desc to Clone Camera");
-		return E_FAIL;
-	}
-	if (FAILED(Camera::Initialize(arg)))
+	THIRD_PERSON_CAMERA_DESC localDesc{};
+	localDesc.eye = Vector4{ 0.f, 10.f, -10.f, 1.f };
+	localDesc.at = Vector4{ 0.f, 0.f, 0.f, 1.f };
+	localDesc.up = Vector4{ 0.f, 1.f, 0.f, 1.f };
+	localDesc.fovY = XMConvertToRadians(60.f);
+	localDesc.aspect = static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportWidth) / static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportHeight);
+	localDesc.nearPlane = 0.1f;
+	localDesc.farPlane = 500.f;
+	
+	localDesc.distance = 7.f;
+	localDesc.minDistance = 3.f;
+	localDesc.maxDistance = 30.f;
+	localDesc.offset = Vector3{ 0.f, 1.f, 0.f };
+	localDesc.mouseSensitive = 0.1f;
+	localDesc.wheelSensitive = 0.01f;
+
+	if (FAILED(Camera::Initialize(&localDesc)))
 		return E_FAIL;
 
 	m_ObjectDesc = static_cast<OBJECT_DESC*>(arg);
-	THIRD_PERSON_CAMERA_DESC& desc = *static_cast<THIRD_PERSON_CAMERA_DESC*>(m_ObjectDesc);
 
-	m_Distance = desc.distance;
-	m_TargetDistance = desc.distance;
+	m_Distance = localDesc.distance;
+	m_TargetDistance = localDesc.distance;
 
-	if (desc.minDistance == 0.f)
+	if (localDesc.minDistance == 0.f)
 		m_MinDistance = m_TargetDistance;
 	else
-		m_MinDistance = desc.minDistance;
-	if (desc.maxDistance == 0.f)
+		m_MinDistance = localDesc.minDistance;
+	if (localDesc.maxDistance == 0.f)
 		m_MaxDistance = m_TargetDistance;
 	else
-		m_MaxDistance = desc.maxDistance;
-	m_Offset = desc.offset;
+		m_MaxDistance = localDesc.maxDistance;
+	m_Offset = localDesc.offset;
 
 	Vector3 angles = m_Transform->Get_Rotation();
 	m_OrbitX = XMConvertToDegrees(angles.y);
 	m_OrbitY = XMConvertToDegrees(angles.x);
 
-	m_MouseSensitive = desc.mouseSensitive;
-	m_WheelSensitive = desc.wheelSensitive;
+	m_MouseSensitive = localDesc.mouseSensitive;
+	m_WheelSensitive = localDesc.wheelSensitive;
 
-	m_Friction = 0.9f;
+	m_Friction = 0.8f;
 	m_OrbitVelocityX = 0.f;
 	m_OrbitVelocityY = 0.f;
+
+	if (FAILED(GAME_INSTANCE->Set_MainCamera(static_pointer_cast<Camera>(shared_from_this()))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -82,7 +80,7 @@ void ThirdPersonCamera::Priority_Update(Float timeDelta)
 	{
 		auto targetTransform = m_Target.lock()->Get_Transform();
 
-		if (GAME_INSTANCE->Get_DIKeyState(DIKEYBOARD_ESCAPE) & 0x80)
+		if (GAME_INSTANCE->Get_DIKeyState(static_cast<uByte>(DIKEYBOARD_ESCAPE)) & 0x80)
 			GAME_INSTANCE->Set_MouseLock(false);
 
 		if (GAME_INSTANCE->Get_DIMouseState(DIMB::LBUTTON) & 0x80)

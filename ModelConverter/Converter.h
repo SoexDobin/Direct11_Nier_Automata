@@ -37,6 +37,7 @@ private:
 
 private:
 	void WriteModelFile(const wstring& path);
+	void WriteJsonFile(const wstring& path);
 
 private:
 	int32 Get_BoneIndex(const Char* boneName);

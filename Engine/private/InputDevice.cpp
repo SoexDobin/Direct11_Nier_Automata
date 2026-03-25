@@ -37,6 +37,11 @@ void InputDevice::Update() {
 		m_Mouse->Acquire();
 	}
 
+    if (!m_IsInputEnabled) {
+        ZeroMemory(m_ByKeyStates, sizeof(m_ByKeyStates));
+        ZeroMemory(&m_MouseState, sizeof(m_MouseState));
+    }
+
     if (nullptr == m_hWnd) return;
     if (m_IsMouseLocked && GetFocus() == m_hWnd) {
         // 커서 숨기기

@@ -8,25 +8,33 @@ EditorCamera::EditorCamera(const ComPtr<ID3D11Device> &device,
     : Camera{device, context} {}
 
 HRESULT EditorCamera::Initialize(void *arg) {
-  if (nullptr == arg) {
-    LOG_ERROR(L"Need EDITOR_CAMERA_DESC to Create Camera");
-    return E_FAIL;
-  }
-  if (FAILED(Camera::Initialize_Prototype())) {
-    LOG_ERROR(L"Failed to Initialize Prototype");
-    return E_FAIL;
-  }
+	if (nullptr == arg) {
+		LOG_ERROR(L"Need EDITOR_CAMERA_DESC to Create Camera");
+		return E_FAIL;
+	}
+	if (FAILED(Camera::Initialize_Prototype())) {
+		LOG_ERROR(L"Failed to Initialize Prototype");
+		return E_FAIL;
+	}
 
-  const EDITOR_CAMERA_DESC &desc = *static_cast<EDITOR_CAMERA_DESC *>(arg);
-  m_CameraSpeed = desc.cameraSpeed;
-  m_MouseSensitive = desc.mouseSensitive;
+	const EDITOR_CAMERA_DESC &desc = *static_cast<EDITOR_CAMERA_DESC *>(arg);
+	m_CameraSpeed = desc.cameraSpeed;
+	m_MouseSensitive = desc.mouseSensitive;
 
-  if (FAILED(Camera::Initialize(arg))) {
-    LOG_ERROR(L"Failed to Initialize");
-    return E_FAIL;
-  }
+	if (FAILED(GameObject::Initialize(arg)))
+		return E_FAIL;
 
-  return S_OK;
+	m_ObjectDesc = static_pointer_cast<OBJECT_DESC>(make_shared<CAMERA_DESC>(*static_cast<CAMERA_DESC*>(arg))).get();
+	m_Transform->Set_Position(Vector3{ desc.eye });
+	m_Transform->LookAt(Vector3{ desc.at });
+	m_FovY = desc.fovY;
+	m_Aspect = desc.aspect;
+	m_Near = desc.nearPlane;
+	m_Far = desc.farPlane;
+
+	Update_CameraTransform(0.f);
+
+	return S_OK;
 }
 
 void EditorCamera::Priority_Update(Float timeDelta) {
@@ -56,7 +64,6 @@ void EditorCamera::Update(Float timeDelta) {
 	Long mouseWheel = GAME_INSTANCE->Get_DIMouseMove(DIMM::WHEEL);
 	if (mouseWheel != 0)
 	{
-		// 휠은 Y축 제약 없이 부드럽게 시선 방향으로 빨려 들어가야 줌 효과가 납니다.
 		Vector3 zoomDir = m_Transform->Get_WorldMatrix().Backward();
 		zoomDir.Normalize();
 		m_Transform->Set_Position(m_Transform->Get_Position() + zoomDir * static_cast<Float>(mouseWheel) * timeDelta * 0.5f);

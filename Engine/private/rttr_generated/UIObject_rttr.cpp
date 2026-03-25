@@ -4,9 +4,9 @@
 using namespace rttr;
 using namespace Engine;
 
-#line 10781
-RTTR_REGISTRATION {
-  registration::class_<UIObject>("UIObject")
-      .method("Clone", &UIObject::Clone);
+RTTR_REGISTRATION_NAMED(UIObject_RTTR)
+{
+	registration::class_<UIObject>("UIObject")
+		.method("Clone", &UIObject::Clone)
+		;
 }
-

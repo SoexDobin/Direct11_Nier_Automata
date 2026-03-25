@@ -1,0 +1,111 @@
+{
+  "levels": [
+    {
+      "levelIndex": 3,
+      "objects": [
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "name": "CityOfRuins",
+          "objectID": 1208553506,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuins",
+          "transform": {
+            "position": [
+              50.0,
+              0.0,
+              100.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuins"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            }
+          ],
+          "name": "ThirdPersonCamera",
+          "objectID": 4249569602,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "ThirdPersonCamera",
+          "transform": {
+            "position": [
+              7.376703262329102,
+              2.8175606727600098,
+              1.7651050090789795
+            ],
+            "rotation": [
+              13.418737411499023,
+              -103.13771057128906,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "ThirdPersonCamera"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            }
+          ],
+          "name": "P10000",
+          "objectID": 304936146,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "P10000",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "P10000"
+        }
+      ]
+    }
+  ],
+  "version": "2.0"
+}

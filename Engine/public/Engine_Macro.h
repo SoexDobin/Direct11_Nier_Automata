@@ -7,6 +7,8 @@ namespace Engine
 #define GAME_INSTANCE                    Engine::Game::GetInstance()
 
 
+#define KEY_MAX                 256
+
 #define RTTR_REGISTRATION_NAMED(NAME)                                          \
 static void rttr_auto_register_##NAME();                                       \
 namespace {                                                                    \

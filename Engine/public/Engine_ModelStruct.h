@@ -63,6 +63,8 @@ namespace Engine
 		Float duration;
 		Float tickPerSecond;
 		uint32 numChannel;
+		Vector3 rootTotalTranslation;
+		Vector4 rootTotalRotation;
 		std::vector<MODEL_CHANNEL> channels;
 	} MODEL_ANIMATION;
 

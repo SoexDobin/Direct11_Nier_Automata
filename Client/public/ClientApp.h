@@ -22,6 +22,7 @@ public:
 
 private:
 	HRESULT Ready_StartLevel(LEVEL startLevel);
+	HRESULT Ready_InitialObject(); 
 
 public:
 	static Unique<ClientApp> Create(const ENGINE_DESC& desc);

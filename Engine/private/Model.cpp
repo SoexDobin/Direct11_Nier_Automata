@@ -23,7 +23,9 @@ Model::Model(const Model& rhs)
 	m_Meshes{ rhs.m_Meshes },
 	m_NumMaterials{ rhs.m_NumMaterials },
 	m_Materials{ rhs.m_Materials },
-	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation}
+	m_AnimationNames{ rhs.m_AnimationNames },
+	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation},
+	m_ModelTag { rhs.m_ModelTag }
 {
 	for (auto& prototypeAnim : rhs.m_Animations)
 		m_Animations.push_back(static_pointer_cast<Animation>(prototypeAnim->Clone()));
@@ -84,25 +86,171 @@ HRESULT Model::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+void Model::Set_ModelTag(const wstring& tag)
+{
+	if (m_ModelTag == tag) return;
+
+	// 1. 새로운 프로토타입 검색
+	int32 levIndex = GAME_INSTANCE->Get_ContainLevelByModelTag(tag);
+	if (levIndex == -1)
+	{
+		LOG_ERROR(L"Failed to find Model {} in levels", tag);
+		return;
+	}
+
+	auto prototype = GAME_INSTANCE->Get_Model(levIndex, tag.c_str());
+	if (!prototype) return;
+
+	// ── 핵심 방어 코드 ──
+	// 1. 자기 자신이 복사 대상(프로토타입)일 경우
+	if (prototype.get() == this)
+	{
+		m_ModelTag = tag;
+		return;
+	}
+
+	// 2. 스켈레탈(애니메이션) 타입 호환성 체크
+	if (m_IsSkeletal != prototype->m_IsSkeletal)
+	{
+		LOG_WARN(L"[Model] Skeletal mismatch! Prev: {}, New: {}. Assignment aborted.", 
+			m_IsSkeletal ? L"Skeletal" : L"Static", prototype->m_IsSkeletal ? L"Skeletal" : L"Static");
+		return;
+	}
+
+	// 2. 기존 리소스 정리
+	On_Destroy();
+
+	// 3. 데이터 깊은 복사 (프로토타입으로부터)
+	m_ModelTag = tag;
+	m_PreLocalTransformMatrix = prototype->m_PreLocalTransformMatrix;
+	m_IsSkeletal = prototype->m_IsSkeletal;
+	m_NumMeshes = prototype->m_NumMeshes;
+	m_Meshes = prototype->m_Meshes; // Mesh는 공유
+	m_NumMaterials = prototype->m_NumMaterials;
+	m_Materials = prototype->m_Materials; // Material은 공유
+	m_AnimationNames = prototype->m_AnimationNames;
+	m_NumBones = prototype->m_NumBones;
+	m_NumAnimation = prototype->m_NumAnimation;
+
+	// 본과 애니메이션은 상태를 가지므로 클론(Clone) 필수
+	m_Bones.clear();
+	for (auto& pBone : prototype->m_Bones)
+		m_Bones.push_back(static_pointer_cast<Bone>(pBone->Clone()));
+
+	m_Animations.clear();
+	for (auto& pAnim : prototype->m_Animations)
+		m_Animations.push_back(static_pointer_cast<Animation>(pAnim->Clone()));
+
+	// 애니메이션 초기 바인딩 업데이트
+	Update_ModelAnimation(0.f);
+}
+
 void Model::On_Destroy()
 {
 	m_Meshes.clear();
 	m_Materials.clear();
 	m_Bones.clear();
 	m_Animations.clear();
+	m_AnimationNames.clear();
 	Component::On_Destroy();
+}
+
+int32 Model::Get_AnimationIndexByName(const wstring& name)
+{
+	if (!m_AnimationNames.contains(name))
+	{
+		LOG_ERROR(L"Failed to Get Animation Index by Name {}", name); 
+		return - 1;
+	}
+
+
+	return m_AnimationNames[name];
+}
+
+const wstring& Model::Get_AnimationNameByIndex(uint32 index)
+{
+	static wstring s_EmptyString = L"";
+	if (index >= m_Animations.size())
+	{
+		LOG_ERROR(L"Failed to Get Animation Name by Index {}", index);
+		return s_EmptyString;
+	}
+
+	return m_Animations[index]->Get_Name();
 }
 
 void Model::Update_ModelAnimation(Float timeDelta)
 {
 	if (!m_IsActive || !m_IsSkeletal) return;
 
-	m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+	if (m_IsBlending)
+	{
+		m_BlendingElapsed += timeDelta;
+		Float ratio = m_BlendingElapsed / m_BlendingDuration;
+
+		if (ratio >= 1.f)
+		{
+			m_IsBlending = false;
+			m_CurrentAnimIndex = m_NextAnimIndex;
+			m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+		}
+		else
+		{
+			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones);
+		}
+	}
+	else
+	{
+		m_IsAnimEnd = m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+
+		if (m_IsAnimEnd && m_IsAnimLoop)
+		{
+		}
+	}
 
 	for (auto& bone : m_Bones)
 	{
 		bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
 	}
+}
+
+void Model::Set_Animation(uint32 index, Float blendDuration)
+{
+	if (m_CurrentAnimIndex == index) return;
+
+	if (m_IsBlending)
+	{
+		m_CurrentAnimIndex = m_NextAnimIndex;
+	}
+
+	m_NextAnimIndex = index;
+	m_IsBlending = true;
+	m_BlendingElapsed = 0.f;
+	m_BlendingDuration = blendDuration;
+
+	Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
+	m_Animations[m_NextAnimIndex]->Set_Progress(progress);
+
+}
+
+int32 Model::Get_BoneIndexByName(const string& boneName) const
+{
+	for (size_t i = 0; i < m_Bones.size(); ++i)
+	{
+		if (m_Bones[i]->Is_SameBone(boneName.c_str()))
+			return static_cast<int32>(i);
+	}
+	return -1;
+}
+
+const TRANSFORM_FRAME& Model::Get_BoneTransformDelta(uint32 boneIndex) const
+{
+	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
+	
+	if (m_Animations.empty() || m_CurrentAnimIndex >= m_Animations.size())
+		return emptyFrame;
+
+	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(boneIndex);
 }
 
 HRESULT Model::Render(uint32 meshIndex)
@@ -222,6 +370,9 @@ HRESULT Model::Ready_Animation(ifstream& in)
 		in.read(reinterpret_cast<Char*>(&animationData.tickPerSecond), sizeof(Float));
 		in.read(reinterpret_cast<Char*>(&animationData.numChannel), sizeof(uint32));
 
+		in.read(reinterpret_cast<Char*>(&animationData.rootTotalTranslation), sizeof(Vector3));
+		in.read(reinterpret_cast<Char*>(&animationData.rootTotalRotation), sizeof(Vector4));
+
 		animationData.channels.reserve(animationData.numChannel);
 		for (uint32 j = 0; j < animationData.numChannel; ++j)
 		{
@@ -239,10 +390,12 @@ HRESULT Model::Ready_Animation(ifstream& in)
 			animationData.channels.push_back(channelData);
 		}
 
+		
 		auto animation = Animation::Create(m_Device, m_Context, animationData);
 		if (animation == nullptr)
 			return E_FAIL;
 
+		m_AnimationNames.emplace(Helper::To_wString(animationData.name), i);
 		m_Animations.push_back(animation);
 	}
 

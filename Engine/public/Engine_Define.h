@@ -17,6 +17,7 @@
 #include <unordered_set>
 #include <vector>
 #include <concepts>
+#include <io.h>
 
 
 #include <d3d11.h>
@@ -31,6 +32,8 @@
 #include <directxtk/DDSTextureLoader.h>
 #include <directxtk/SimpleMath.h>
 #include <directxtk/WICTextureLoader.h>
+#include <directxtk/SpriteBatch.h>
+#include <directxtk/SpriteFont.h>
 #include <wrl.h>
 
 #include <Effects11/d3dx11effect.h>
@@ -45,6 +48,8 @@
 #ifdef max
 #undef max
 #endif
+
+#define MAGIC_ENUM_RANGE_MAX 900 // 512개로 늘림
 
 #include "magic_enum/magic_enum.hpp"
 
@@ -65,6 +70,7 @@
 #include "Engine_Function.h"
 #include "Engine_Macro.h"
 #include "Engine_Struct.h"
+#include "Engine_RTTR_Metadata.h"
 #include "Engine_Typedef.h"
 #include "Engine_ModelStruct.h"
 
@@ -76,6 +82,7 @@ using namespace std;
 using namespace Engine;
 
 #pragma warning(disable : 4251)
+#pragma warning(disable : 26498)
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC

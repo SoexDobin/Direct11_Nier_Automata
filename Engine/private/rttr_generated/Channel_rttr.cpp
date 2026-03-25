@@ -1,11 +1,10 @@
-#include "pch.h"
 #include "Channel.h"
 #include <rttr/registration>
 
 using namespace rttr;
 using namespace Engine;
 
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(Channel_RTTR)
 {
 	registration::class_<Channel>("Channel")
 		.constructor<>()

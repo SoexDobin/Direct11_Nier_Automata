@@ -1,8 +1,8 @@
 {
     "ModelSettings": [
         {
-            "level": "STATIC",
-            "path": "Models/Test2B/Test2B.model",
+            "level": "3",
+            "path": "Models/p10000/p10000.model",
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -11,6 +11,26 @@
             "rotation": {
                 "x": 0.0,
                 "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "p10000"
+        },
+        {
+            "level": "3",
+            "path": "Models/World/CityOfRuinEntry/CityOfRuinEntry.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
                 "z": 0.0
             },
             "scale": {
@@ -18,11 +38,31 @@
                 "y": 1.0,
                 "z": 1.0
             },
-            "tag": "Test2B"
+            "tag": "CityOfRuinEntry"
         },
         {
-            "level": "STATIC",
-            "path": "Models/Test2B/Test2BAnim2.model",
+            "level": "3",
+            "path": "Models/World/CityOfRuinBridge/CityOfRuinBridge.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "CityOfRuinBridge"
+        },
+        {
+            "level": "3",
+            "path": "Models/wp0070/wp0070.model",
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -38,11 +78,11 @@
                 "y": 0.009999999776482582,
                 "z": 0.009999999776482582
             },
-            "tag": "Test2BAnim"
+            "tag": "wp0070"
         },
         {
-            "level": "STATIC",
-            "path": "Models/Test2B/p10000.model",
+            "level": "3",
+            "path": "Models/wp0220/wp0220.model",
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -58,7 +98,7 @@
                 "y": 0.009999999776482582,
                 "z": 0.009999999776482582
             },
-            "tag": "Test2BAnim2"
+            "tag": "wp0220"
         }
     ]
 }

@@ -66,13 +66,13 @@ HRESULT Terrain::Render() {
 
 HRESULT Terrain::Ready_Components() {
     Shader::SHADER_DESC shaderDesc = Shader::SHADER_DESC{ VTXNORMTEX::Tag,VTXNORMTEX::Elements, VTXNORMTEX::numElements };
-    m_Shader = Add_Component<Shader>(&shaderDesc);
+    m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (!m_Shader) {
 		LOG_ERROR(L"Failed To Add Component Shader To Terrain");
 		return E_FAIL;
 	}
     Texture::TEXTURE_DESC textureDesc = Texture::TEXTURE_DESC{ 0, L"Tile_0" };
-	m_Texture = Add_Component<Texture>(&textureDesc);
+	m_Texture = Add_Component<Texture>(ETOI(LEVEL::STATIC), &textureDesc);
 	if (!m_Texture) {
 		LOG_ERROR(L"Failed To Add Component Texture To Terrain");
 		return E_FAIL;

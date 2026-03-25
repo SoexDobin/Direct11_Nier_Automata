@@ -3,7 +3,10 @@
   "version-string": "1.0.0",
   "dependencies": [
     "magic-enum",
-    "directxtk",
+    {
+      "name": "directxtk",
+      "features": [ "tools" ]
+    },
     "nlohmann-json",
     "spdlog",
     "python3",

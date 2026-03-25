@@ -25,11 +25,23 @@ HRESULT Object::Initialize_Prototype()
         MSG_BOX("GameObject Initialize Failed By Set Object Name");
         return E_FAIL;
     }
-	
-    Helper::CreateID(Helper::OBJECT_ID_UNIQUE, m_DescID);
+
+    m_DescID.m_objectID = Helper::CreateInstanceID();
     if (m_DescID.m_objectID == 0) {
-        LOG_ERROR(L"GameObject {} Initialize Failed By ObjectID", m_ObjectName);
-        MSG_BOX("GameObject Initialize Failed By ObjectID");
+        LOG_ERROR(L"GameObject Initialize Failed By Set ObjectID");
+        MSG_BOX("GameObject Initialize Failed By Set ObjectID");
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+HRESULT Object::Initialize_Prototype(const wstring& prototypeTag)
+{
+    m_DescID.m_objectID = Helper::Create_FixedObjectID(prototypeTag, m_ObjectName);
+    if (m_DescID.m_objectID == 0) {
+        LOG_ERROR(L"GameObject Initialize Failed By Set ObjectID");
+        MSG_BOX("GameObject Initialize Failed By Set ObjectID");
         return E_FAIL;
     }
 

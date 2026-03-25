@@ -22,6 +22,9 @@ namespace Editor
 {
 	#define EDITOR		Editor::EditorManager::GetInstance()
 	enum class EDITOR_STATE { PLAY, PAUSE, STOP };
+
+	const string Drag_PayLoadKey = "PROTOTYPE_DRAG";
+	const string ObjectMove_PayLoadKey = "OBJECT_MOVE_DRAG";
 }
 
 using namespace Editor;

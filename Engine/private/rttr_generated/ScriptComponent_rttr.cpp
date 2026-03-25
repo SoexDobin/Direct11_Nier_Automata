@@ -1,14 +1,12 @@
-﻿#include "ScriptComponent.h"
+#include "ScriptComponent.h"
 #include <rttr/registration>
+
 using namespace rttr;
 using namespace Engine;
 
-#line 5505
-RTTR_REGISTRATION
+RTTR_REGISTRATION_NAMED(ScriptComponent_RTTR)
 {
-    registration::class_<ScriptComponent>("ScriptComponent")
-        .constructor<>()
-        .method("Clone", &ScriptComponent::Clone)
-        ;
+	registration::class_<ScriptComponent>("ScriptComponent")
+		.method("Clone", &ScriptComponent::Clone)
+		;
 }
-

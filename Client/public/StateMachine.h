@@ -8,6 +8,9 @@ class CLIENT_DLL StateMachine : public ScriptComponent
 {
 	RTTR_ENABLE(ScriptComponent)
 public:
+	typedef struct tagStateMachine : public COMPONENT_DESC
+	{} STATEMACHINE_DESC;
+public:
 	explicit StateMachine();
 	explicit StateMachine(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit StateMachine(const StateMachine& rhs);
@@ -16,7 +19,7 @@ public:
 public:
 	Shared<State> Get_CurrentState();
 	HRESULT Add_State(const Shared<State>& state);
-	Bool Change_State(const wstring& stateTag);
+	Bool Change_StateByTag(const wstring& stateTag);
 	Shared<State> Find_State(const wstring& stateTag);
 
 public:
@@ -27,7 +30,7 @@ public:
 	void On_Enable() override { ScriptComponent::On_Enable(); }
 
 public:
-	void Update_State(Float timeDelta);
+	virtual void Update_State(Float timeDelta);
 
 public:
 	Shared<State> m_CurrentState{nullptr};

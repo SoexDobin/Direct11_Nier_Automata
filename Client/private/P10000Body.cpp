@@ -21,7 +21,7 @@ HRESULT P10000Body::Initialize_Prototype()
 
 HRESULT P10000Body::Initialize(void* arg)
 {
-	if (FAILED(PartObject::Initialize(arg)))
+	if (FAILED(P10000Parts::Initialize(arg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
@@ -30,12 +30,14 @@ HRESULT P10000Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	rootBoneIndex = m_Model->Get_BoneIndexByName("RootNode");
-	if (rootBoneIndex == -1)
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName("bone0");
+	if (m_RootBoneIndex == -1)
 	{
 		LOG_ERROR(L"Failed to Find 2B Root Bone");
 		return E_FAIL;
 	}
+
+	GAME_INSTANCE->Get_MainCamera()->Set_Target(shared_from_this());
 
 	return S_OK;
 }
@@ -55,18 +57,42 @@ void P10000Body::Priority_Update(Float timeDelta)
 
 void P10000Body::Update(Float timeDelta)
 {
+	m_Model->Update_ModelAnimation(timeDelta);
 
+	Vector3 pos = m_Transform->Get_Position();
+	Quaternion quat = m_Transform->Get_LocalRotation();
 
-	const TRANSFORM_FRAME& transformDelta = m_Model->Get_BoneTransformDelta(rootBoneIndex);
+	TRANSFORM_FRAME transformFrame = m_Model->Get_BoneTransformDelta(m_RootBoneIndex);
+	
+	LOG_INFO(L"{}, {}, {}", transformFrame.position.x, transformFrame.position.y, transformFrame.position.z);
 
-	transformDelta
+	/*
+	                 }
+            ],
+            "duration": 34.0,
+            "name": "pl0000|pl0000_0002",
+            "rootMove": [
+                0.0,
+                0.0,
+                -362.3771057128906
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+	 */
+
+	m_Transform->Set_Position(pos + transformFrame.position);
+	m_Transform->Set_Rotation(quat + transformFrame.rotation);
 }
 
 void P10000Body::Late_Update(Float timeDelta)
 {
-	m_Model->Update_ModelAnimation(timeDelta);
 
-	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
+	Update_CombineWorldMatrix(*m_ParentMatrix);
 }
 
 void P10000Body::Fixed_Update(Float fixedDelta)

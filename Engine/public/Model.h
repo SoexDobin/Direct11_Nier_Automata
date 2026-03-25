@@ -47,6 +47,7 @@ public:
 	uint32 Get_AnimationIndex() const { return m_CurrentAnimIndex; }
 	void Set_AnimLoop(Bool isLoop) { m_IsAnimLoop = isLoop; }
 	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
+	Bool Is_AnimationFinished() const { return m_IsAnimEnd; }
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;

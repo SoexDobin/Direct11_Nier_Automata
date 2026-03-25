@@ -1,4 +1,6 @@
 #pragma once
+#include <Model.h>
+
 #include "PartObject.h"
 
 NS_BEGIN(Engine)
@@ -22,7 +24,8 @@ public:
 
 public:
 	Shared<Model> Get_ModelComponent() { return m_Model; }
-	void Set_Animation(uint32 animIndex, Float blendDuration = 0.25, Bool isLoop);
+	void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop);
+	uint32 Get_CurrentAnimationIndex() const { return m_Model->Get_AnimationIndex(); }
 
 protected:
 	Shared<Shader> m_Shader{ nullptr };

@@ -18,7 +18,7 @@ HRESULT StateMachine::Add_State(const Shared<State>& state)
 {
 	if (state == nullptr || m_States.contains(state->Get_StateTag()))
 	{
-		LOG_ERROR(L"Failed to Add State");
+		LOG_ERROR(L"Failed to Add State {}", state->Get_StateTag());
 		return E_FAIL;
 	}
 
@@ -26,13 +26,15 @@ HRESULT StateMachine::Add_State(const Shared<State>& state)
 	return S_OK;
 }
 
-Bool StateMachine::Change_State(const wstring& stateTag)
+Bool StateMachine::Change_StateByTag(const wstring& stateTag)
 {
 	if (!m_States.contains(stateTag)) 
 	{
 		LOG_ERROR(L"Failed to Change State");
 		return false;
 	}
+
+	// TODO : 아직 State 변환 못함 제어 가 필요할까
 
 	if (m_States[stateTag]->StateEnterInvoke())
 	{
@@ -73,12 +75,9 @@ void StateMachine::On_Destroy()
 
 void StateMachine::Update_State(Float timeDelta)
 {
-	for (auto& [tag, state] : m_States)
-	{
-		state->Update(timeDelta);
-	}
-	for (auto& [tag, state] : m_States)
-	{
-		state->Late_Update(timeDelta);
-	}
+
+
+	m_CurrentState->Update(timeDelta);
+
+	m_CurrentState->Late_Update(timeDelta);
 }

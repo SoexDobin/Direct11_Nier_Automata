@@ -82,12 +82,7 @@ void Camera::Set_TargetID(uint32 targetID)
 	{
 		// 1. 현재 레벨에서 검색
 		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), m_TargetID);
-		
-		// 2. 못 찾았으면 Static 레벨(0)에서 검색
-		if (m_Target.expired())
-		{
-			m_Target = GAME_INSTANCE->Find_ObjectByObjectID(0, m_TargetID);
-		}
+
 
 		if (const auto& pObj = m_Target.lock())
 		{

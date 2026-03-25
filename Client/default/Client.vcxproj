@@ -207,6 +207,7 @@
     <ClInclude Include="..\public\State.h" />
     <ClInclude Include="..\public\State2B.h" />
     <ClInclude Include="..\public\State2B_Attack.h" />
+    <ClInclude Include="..\public\State2B_Dash.h" />
     <ClInclude Include="..\public\State2B_Idle.h" />
     <ClInclude Include="..\public\State2B_Jump.h" />
     <ClInclude Include="..\public\State2B_Run.h" />
@@ -247,6 +248,7 @@
     <ClCompile Include="..\private\State.cpp" />
     <ClCompile Include="..\private\State2B.cpp" />
     <ClCompile Include="..\private\State2B_Attack.cpp" />
+    <ClCompile Include="..\private\State2B_Dash.cpp" />
     <ClCompile Include="..\private\State2B_Idle.cpp" />
     <ClCompile Include="..\private\State2B_Jump.cpp" />
     <ClCompile Include="..\private\State2B_Run.cpp" />

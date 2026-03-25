@@ -6,30 +6,22 @@
         {
           "components": [
             {
-              "properties": {
-                "ObjectID": 2406534623
-              },
+              "properties": null,
               "typeName": "Transform"
             },
             {
-              "properties": {
-                "ObjectID": 3036997248
-              },
+              "properties": null,
               "typeName": "Model"
             },
             {
-              "properties": {
-                "ObjectID": 2791204719
-              },
+              "properties": null,
               "typeName": "Shader"
             }
           ],
           "name": "CityOfRuins",
           "objectID": 1208553506,
           "parentObjectID": 0,
-          "properties": {
-            "ObjectID": 1208553506
-          },
+          "properties": null,
           "prototypeTag": "CityOfRuins",
           "transform": {
             "position": [
@@ -53,28 +45,24 @@
         {
           "components": [
             {
-              "properties": {
-                "ObjectID": 1186799141
-              },
+              "properties": null,
               "typeName": "Transform"
             }
           ],
           "name": "ThirdPersonCamera",
           "objectID": 4249569602,
           "parentObjectID": 0,
-          "properties": {
-            "ObjectID": 4249569602
-          },
+          "properties": null,
           "prototypeTag": "ThirdPersonCamera",
           "transform": {
             "position": [
-              0.0,
-              10.0,
-              -10.0
+              7.376703262329102,
+              2.8175606727600098,
+              1.7651050090789795
             ],
             "rotation": [
-              44.99999237060547,
-              0.0,
+              13.418737411499023,
+              -103.13771057128906,
               0.0
             ],
             "scale": [
@@ -88,18 +76,14 @@
         {
           "components": [
             {
-              "properties": {
-                "ObjectID": 1723698101
-              },
+              "properties": null,
               "typeName": "Transform"
             }
           ],
           "name": "P10000",
           "objectID": 304936146,
           "parentObjectID": 0,
-          "properties": {
-            "ObjectID": 304936146
-          },
+          "properties": null,
           "prototypeTag": "P10000",
           "transform": {
             "position": [

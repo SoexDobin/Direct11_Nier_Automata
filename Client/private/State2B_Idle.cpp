@@ -5,8 +5,8 @@
 #include <SpdLogger.h>
 
 #include "Model.h"
-#include "StateMachine.h"
 #include "P10000.h"
+#include "P10000StateMachine.h"
 #include "WP0070Body.h"
 #include "WP0220Body.h"
 
@@ -17,7 +17,7 @@ State2B_Idle::State2B_Idle(const wstring& tag, const Shared<P10000>& owner)
 
 HRESULT State2B_Idle::Initialize()
 {
-	return S_OK;
+	return State2B::Initialize();
 }
 
 Bool State2B_Idle::StateEnterInvoke()
@@ -25,39 +25,79 @@ Bool State2B_Idle::StateEnterInvoke()
 	if (m_Owner.expired())
 		return false;
 	
-	auto body = static_pointer_cast<P10000Body>(m_Owner.lock()->Find_PartObject(L"P10000Body"));
-	if (body) {
-		
-		body->Set_Animation(46, 0.25f, true);
+	/*
+	이전 애니메이션이 Dash 
+	이전 애니메이션이 Run
+	이전 애니메이션이 Sprint
+	 */	
+
+	uint32 prevIndex = m_Body.lock()->Get_CurrentAnimationIndex();
+	if (P10000::P10000_STATE::RUN_CYCLE == prevIndex)
+	{
+		m_Body.lock()->Set_Animation( ETOI(P10000::P10000_STATE::RUN_STOP_L), 0.2f,false);
+	}
+	else if (P10000::P10000_STATE::SPRINT_CYCLE == prevIndex)
+	{
+		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::SPRINT_STOP_R), 0.2f, false);
+	}
+	else if (P10000::P10000_STATE::DASH_F == prevIndex)
+	{
+		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_F), 0.2f, false);
+	}
+	else if (P10000::P10000_STATE::DASH_B == prevIndex)
+	{
+		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_B), 0.2f, false);
+	}
+	else if (P10000::P10000_STATE::DASH_R == prevIndex)
+	{
+		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_R), 0.2f, false);
+	}
+	else if (P10000::P10000_STATE::DASH_L == prevIndex)
+	{
+		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_L), 0.2f, false);
 	}
 
-	// 2. 무기들도 Idle 상태에 맞는 애니메이션으로 동기화
-	//auto lightWeapon = static_pointer_cast<WP0070Body>(m_Owner.lock()->Find_PartObject(L"WP0070Body"));
-	//if (lightWeapon) {
-	//	lightWeapon->Get_Model()->Set_Animation(0, 0.2f); // 무기 Idle 애니메이션
-	//	lightWeapon->Get_Model()->Set_AnimLoop(true);
-	//}
-	//
-	//auto heavyWeapon = static_pointer_cast<WP0220Body>(m_Owner.lock()->Find_PartObject(L"WP0220Body"));
-	//if (heavyWeapon) {
-	//	heavyWeapon->Get_Model()->Set_Animation(0, 0.2f); // 무기 Idle 애니메이션
-	//	heavyWeapon->Get_Model()->Set_AnimLoop(true);
-	//}
+	if (nullptr == m_States.lock()->Get_CurrentState())
+		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::IDLE_Neutral), 0.2f, true);
 
 	return true;
 }
 
 void State2B_Idle::Update(Float timeDelta)
 {
+	uint32 curIndex = m_Body.lock()->Get_CurrentAnimationIndex();
+	
 
+	if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON))
+	{
+
+		return;
+	}
+	if (m_Input.lock()->Is_MousePress(DIMB::RBUTTON))
+	{
+		
+		return;
+	}
+	if (m_Input.lock()->Is_WASD_Press())
+	{
+		if (m_States.lock()->Change_State(P10000::P10000_STATE::RUN))
+			return;
+	}
+
+	if (curIndex != P10000::P10000_STATE::IDLE_Neutral && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished() )
+	{
+		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::IDLE_Neutral), 0.2f, true);
+	}
 }
 
 void State2B_Idle::Late_Update(Float timeDelta)
 {
+
 }
 
 void State2B_Idle::StateExitInvoke()
 {
+
 }
 
 Shared<State2B_Idle> State2B_Idle::Create(const wstring& tag, const Shared<P10000>& owner)

@@ -12,7 +12,7 @@ class WP0070Body;
 
 class CLIENT_DLL P10000Body final : public P10000Parts
 {
-	RTTR_ENABLE(PartObject)
+	RTTR_ENABLE(P10000Parts)
 public:
 	typedef struct tagP10000BodyDesc : public PARTOBJECT_DESC
 	{} P10000BODY_DESC ;
@@ -41,10 +41,11 @@ private:
 	HRESULT Ready_Components();
 
 private:
-	int32 rootBoneIndex{};
+	int32 m_RootBoneIndex{};
 
 	Shared<WP0070Body> m_Sword{ nullptr };
 	Shared<WP0220Body> m_GreaterSword{ nullptr };
+
 
 public:
 	static Shared<P10000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

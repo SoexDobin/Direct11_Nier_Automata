@@ -115,7 +115,12 @@
     <ClInclude Include="..\public\P10000StateMachine.h">
       <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Parts.h" />
+    <ClInclude Include="..\public\P10000Parts.h">
+      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Dash.h">
+      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -229,12 +234,14 @@
     <ClCompile Include="..\private\P10000StateMachine.cpp">
       <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Parts.cpp" />
+    <ClCompile Include="..\private\P10000Parts.cpp">
+      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Dash.cpp">
+      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="99. Default">
-      <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. MainApp">
       <UniqueIdentifier>{f01147ca-57a3-4889-b167-1759cfd39a21}</UniqueIdentifier>
     </Filter>
@@ -315,6 +322,9 @@
     </Filter>
     <Filter Include="02. GameObject\Playable\2B\2BStates\StateMachine">
       <UniqueIdentifier>{f0281ab7-68cb-4a1f-9c19-3e73441f06a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Default">
+      <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

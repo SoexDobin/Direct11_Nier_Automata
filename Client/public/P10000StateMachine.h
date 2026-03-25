@@ -1,14 +1,22 @@
 #pragma once
 #include "StateMachine.h"
+#include "P10000.h"
 
 NS_BEGIN(Client)
 
 class State2B;
-class P10000;
+
+class P10000Input;
 
 class CLIENT_DLL P10000StateMachine final : public StateMachine
 {
 	RTTR_ENABLE(StateMachine)
+public:
+	typedef struct tagP10000StateMachine : public STATEMACHINE_DESC
+	{
+			
+	} P10000_STATEMACHINE_DESC;
+
 public:
 	explicit P10000StateMachine();
 	explicit P10000StateMachine(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -16,9 +24,10 @@ public:
 	~P10000StateMachine() override = default;
 
 public:
-	Bool ChangeState(P10000::P10000_STATE state);
+	Bool Change_State(P10000::P10000_STATE state);
 	Shared<State2B> Find_2BState(P10000::P10000_STATE state);
 	wstring Get_StateTag(P10000::P10000_STATE state);
+	P10000::P10000_STATE Get_CurP10000State();
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -28,7 +37,7 @@ public:
 	void On_Enable() override { StateMachine::On_Enable(); }
 
 public:
-	unordered_map<P10000::P10000_STATE, wstring> m_StateTag;
+	void Update_State(Float timeDelta) override;
 
 public:
 	static Shared<P10000StateMachine> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

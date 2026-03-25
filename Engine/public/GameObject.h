@@ -88,9 +88,8 @@ public:
         return static_pointer_cast<T>(Add_Component(levIndex, Helper::To_wString(rttr::type::get<T>().get_name()), arg));
     }
 
-protected:
-     template <typename T>
-     requires is_base_of_v<Component, T>
+public:
+     template <typename T> requires is_base_of_v<Component, T>
       	Shared<T> Get_Component() {
         uint32 typeID = rttr::type::get<T>().get_id();
 

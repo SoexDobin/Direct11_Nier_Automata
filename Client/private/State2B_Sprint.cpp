@@ -20,12 +20,12 @@ Bool State2B_Sprint::StateEnterInvoke()
 
 void State2B_Sprint::Update(Float timeDelta)
 {
-	State2B::Update(timeDelta);
+	
 }
 
 void State2B_Sprint::Late_Update(Float timeDelta)
 {
-	State2B::Late_Update(timeDelta);
+	
 }
 
 void State2B_Sprint::StateExitInvoke()

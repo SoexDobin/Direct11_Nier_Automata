@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "P10000Body.h"
+#include "P10000StateMachine.h"
 
 #include "StateMachine.h"
 #include "State2B_Idle.h"
@@ -14,6 +15,7 @@
 #include "State2B_Run.h"
 #include "State2B_Sprint.h"
 #include "State2B_Walk.h"
+#include "State2B_Dash.h"
 
 namespace Client {
 
@@ -55,20 +57,25 @@ void P10000::On_Destroy()
 
 void P10000::Priority_Update(Float timeDelta)
 {
-	Update_KeyInput(timeDelta);
-	
+	m_P10000Input->Update_P10000_InputState(timeDelta);
 }
 
 void P10000::Update(Float timeDelta)
 {
-	m_P10000States->Update_State(timeDelta);
+	auto curEnum = m_P10000States->Get_CurP10000State();
 
-	m_P10000States->Get_CurrentState();
+	// --- 이동 입력 판별 ---
+	Bool isMoveInput = m_P10000Input->Is_WASD_Press();
+	Bool isSprintHold = m_P10000Input->Is_WASD_Hold(0.5f);
+	Bool isDash = m_P10000Input->Is_WASD_DoubleClick();
+
 }
 
 void P10000::Late_Update(Float timeDelta)
 {
-	
+	m_P10000States->Update_State(timeDelta);
+
+
 }
 
 void P10000::Fixed_Update(Float fixedDelta)
@@ -89,48 +96,53 @@ void P10000::Submit_RenderGroup()
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
-void P10000::Update_KeyInput(Float timeDelta)
-{
-	
-}
-
 HRESULT P10000::Ready_PartObjects()
 {
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"P10000Body", L"P10000Body")))
-		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0070Body", L"WP0070Body")))
-		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body")))
-		return E_FAIL;
+	P10000Body::P10000BODY_DESC desc{};
+	desc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 
-	// POD
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"P10000Body", L"P10000Body", &desc)))
+		return E_FAIL;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0070Body", L"WP0070Body", &desc)))
+		return E_FAIL;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body", &desc)))
+		return E_FAIL;
+	// TODO : POD
 
 	return S_OK;
 }
 
 HRESULT P10000::Ready_Components()
 {
-	if ((m_P10000States = Add_Component<StateMachine>(ETOI(LEVEL::GAMEPLAY))))
-	{
-		auto p10000 = static_pointer_cast<P10000>(shared_from_this());
-		m_P10000States->Add_State(State2B_Idle::Create(
-			Helper::To_wString(magic_enum::enum_name(IDLE_2B)), p10000));
-		m_P10000States->Add_State(State2B_Walk::Create(
-			Helper::To_wString(magic_enum::enum_name(WALK_2B)), p10000));
-		m_P10000States->Add_State(State2B_Run::Create(
-			Helper::To_wString(magic_enum::enum_name(RUN_2B)), p10000));
-		m_P10000States->Add_State(State2B_Sprint::Create(
-			Helper::To_wString(magic_enum::enum_name(SPRINT_2B)), p10000));
-		m_P10000States->Add_State(State2B_Jump::Create(
-			Helper::To_wString(magic_enum::enum_name(JUMP_2B)), p10000));
-
-		m_P10000States->Change_State(Helper::To_wString(magic_enum::enum_name(IDLE_2B)));
-	}
-	else
-		return E_FAIL;
-
 	m_P10000Input = Add_Component<P10000Input>(ETOI(LEVEL::GAMEPLAY));
 	if (nullptr == m_P10000Input)
+		return E_FAIL;
+
+
+	// StateMachine은 마지막에 처리
+	if ((m_P10000States = Add_Component<P10000StateMachine>(ETOI(LEVEL::GAMEPLAY))))
+	{
+		auto p10000 = static_pointer_cast<P10000>(shared_from_this());
+
+		if (FAILED(m_P10000States->Add_State(State2B_Idle::Create(
+			Helper::To_wString(magic_enum::enum_name(IDLE)), p10000))))
+			return E_FAIL;
+		if (FAILED(m_P10000States->Add_State(State2B_Run::Create(
+			Helper::To_wString(magic_enum::enum_name(RUN)), p10000))))
+			return E_FAIL;
+		if (FAILED(m_P10000States->Add_State(State2B_Sprint::Create(
+			Helper::To_wString(magic_enum::enum_name(SPRINT)), p10000))))
+			return E_FAIL;
+		if (FAILED(m_P10000States->Add_State(State2B_Jump::Create(
+			Helper::To_wString(magic_enum::enum_name(JUMP)), p10000))))
+			return E_FAIL;
+		if (FAILED(m_P10000States->Add_State(State2B_Dash::Create(
+			Helper::To_wString(magic_enum::enum_name(DASH)), p10000))))
+			return E_FAIL;
+
+		m_P10000States->Change_State(IDLE);
+	}
+	else
 		return E_FAIL;
 
 

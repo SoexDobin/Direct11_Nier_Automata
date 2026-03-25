@@ -95,21 +95,21 @@ void GameObject::On_Enable() {
 }
 
 void GameObject::On_Disable() {
-  if (!m_IsActive)
-    return;
+    if (!m_IsActive)
+      return;
 
-  for (auto &component : m_Components)
-    component.second->Set_Active(false);
+    for (auto &component : m_Components)
+		component.second->Set_Active(false);
 
-  for (auto &component : m_Scripts)
-    component.second->Set_Active(false);
+    for (auto &component : m_Scripts)
+		component.second->Set_Active(false);
 
-  m_Transform->Set_Active(false);
+    m_Transform->Set_Active(false);
 
-  for (auto &child : m_Children)
-    child->Set_Active(false);
+    for (auto &child : m_Children)
+		child->Set_Active(false);
 
-  Object::On_Disable();
+    Object::On_Disable();
 }
 
 void GameObject::Set_Active(Bool isActive)
@@ -180,7 +180,8 @@ void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& inst
     rttr::type type = rttr::type::get(*this);
     for (auto& prop : type.get_properties())
     {
-        if (prop.get_metadata(Meta_Key_Type::SaveData) == Asset_Type_Key::GameObject)
+        auto saveDataMeta = prop.get_metadata(Meta_Key_Type::SaveData);
+        if (saveDataMeta == Asset_Type_Key::GameObject || saveDataMeta == Save_Data_Key::TargetObjectID)
         {
             uint32 targetID = prop.get_value(*this).convert<uint32>();
             if (targetID != 0)
@@ -342,6 +343,7 @@ HRESULT GameObject::Add_Component(const Shared<Component>& component) {
     }
 
     component->Set_Owner(shared_from_this());
+
     return S_OK;
 }
 

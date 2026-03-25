@@ -17,6 +17,13 @@ class WP0220Body;
 class CLIENT_DLL P10000 final : public ContainerObject
 {
 	RTTR_ENABLE(ContainerObject)
+
+public:
+    typedef struct tagStateContainer {
+
+        Bool IsInput{};
+    } STATE_CONTAINER;
+
 public:
 	explicit P10000();
 	explicit P10000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -53,11 +60,47 @@ public:
 
 public:
     enum P10000_STATE {
-        IDLE_2B             = 0x00000001,
-        WALK_2B             = 0x00000002,
-        RUN_2B              = 0x00000004,
-        SPRINT_2B           = 0x00000008,
-        JUMP_2B             = 0x00000010,
+        IDLE                = 899,
+        RUN                 = 898,
+        SPRINT              = 897,
+        DASH                = 896,
+        JUMP                = 895,
+
+        // IDLE
+        IDLE_Neutral        = 46,
+
+        // RUN
+        RUN_CYCLE           = 2,
+        RUN_STOP_L          = 3,
+        RUN_STOP_R          = 4,
+        
+        // SPRINT
+        SPRINT_CYCLE        = 5,
+        SPRINT_STOP_R       = 6,
+        
+        // DASH
+        STAND_TO_DASH_F     = 61,
+        DASH_F              = 62,
+        DASH_TO_STAND_F     = 63,
+        STAND_TO_DASH_B     = 64,
+        DASH_B              = 65,
+        DASH_TO_STAND_B     = 66,
+        STAND_TO_DASH_R     = 67,
+        DASH_R              = 68,
+        DASH_TO_STAND_R     = 69,
+        STAND_TO_DASH_L     = 70,
+        DASH_L              = 71,
+        DASH_TO_STAND_L     = 72,
+        DASH_F_TO_SPRINT    = 73,
+        DASH_B_TO_SPRINT    = 74,
+        DASH_R_TO_SPRINT    = 75,
+        DASH_L_TO_SPRINT    = 76,
+        
+        // JUMP
+        STAND_TO_JUMP       = 23,
+        RUN_TO_JUMP         = 24,
+        SPRINT_TO_JUMP      = 25,
+
 
         MAIN_ATTACK_2B      = 0x00000020,
         SUB_ATTACK_2B       = 0x00000040,

@@ -571,6 +571,7 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, 
     }
     else {
         auto pComponent = std::static_pointer_cast<Component>(protoObject);
+        
         cloned = pComponent->Clone(arg);
     }
 

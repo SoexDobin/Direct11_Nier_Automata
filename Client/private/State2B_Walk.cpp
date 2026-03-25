@@ -71,7 +71,7 @@ void State2B_Walk::Update(Float timeDelta)
 	}
 	else
 	{
-		//m_Owner.lock()->Get_StateMachine()->Change_State(L"State2B_Idle");
+		//m_Owner.lock()->Get_StateMachine()->Change_StateByTag(L"State2B_Idle");
 	}
 }
 

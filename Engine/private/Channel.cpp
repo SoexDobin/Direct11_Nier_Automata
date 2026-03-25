@@ -90,7 +90,7 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 	if (m_IsFirstUpdate)
 	{
 		m_PrevTransform = currentFrame;
-		m_TransformationDelta = { Vector3::One, Vector4(0,0,0,1), Vector3::Zero };
+		m_TransformationDelta = { Vector3::One, Vector4{0,0,0,1}, Vector3::Zero };
 		m_IsFirstUpdate = false;
 	}
 	else

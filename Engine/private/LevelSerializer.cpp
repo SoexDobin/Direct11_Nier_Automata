@@ -69,48 +69,102 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 
 	// 공통 속성 직렬화 헬퍼 람다
 	auto SerializeProperties = [&](rttr::instance objInstance, nlohmann::json& outProps) {
+		//rttr::type objType = objInstance.get_type();
+		//for (auto& prop : objType.get_properties())
+		//{
+		//	rttr::variant var = prop.get_value(objInstance);
+		//	string propName = prop.get_name().to_string();
+		//	
+		//	rttr::variant saveMeta = prop.get_metadata(Meta_Key_Type::SaveData);
+
+		//	if (!saveMeta.is_valid() && propName == "TargetID")
+		//	{
+		//		saveMeta = Save_Data_Key::TargetObjectID;
+		//	}
+		//	if (!saveMeta.is_valid()) continue; // SaveData 메타데이터가 없으면 아예 저장 안 함
+
+		//	SaveDataKey saveKey = nullptr;
+		//	if (saveMeta.is_type<SaveDataKey>()) {
+		//		saveKey = saveMeta.get_value<SaveDataKey>();
+		//	}
+
+		//	if (saveKey == Save_Data_Key::TargetObjectID) // 1. TargetObjectID (다른 오브젝트 참조)
+		//	{
+		//		if (var.is_type<Shared<GameObject>>())
+		//		{
+		//			Shared<GameObject> pTarget = var.get_value<Shared<GameObject>>();
+		//			outProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
+		//		}
+		//		else if (var.is_type<uint32>() || var.is_type<int32>()) {
+		//			outProps[propName] = var.convert<uint32>();
+		//		}
+		//	}
+		//	else if (saveKey == Save_Data_Key::TextureTag || saveKey == Save_Data_Key::ModelTag) // 2. ResourceTag
+		//	{
+		//		if (var.is_type<wstring>()) outProps[propName] = ToUtf8(var.get_value<wstring>());
+		//		else if (var.is_type<string>()) outProps[propName] = var.get_value<string>();
+		//	}
+		//	else // 3. 그 외 기본 자료형 (SaveData가 붙어있는 float, Vector3, int 등)
+		//	{
+		//		if (var.is_type<int>()) outProps[propName] = var.get_value<int>();
+		//		else if (var.is_type<uint32>()) outProps[propName] = var.get_value<uint32>();
+		//		else if (var.is_type<float>()) outProps[propName] = var.get_value<float>();
+		//		else if (var.is_type<bool>()) outProps[propName] = var.get_value<bool>();
+		//		else if (var.is_type<string>()) outProps[propName] = var.get_value<string>();
+		//		else if (var.is_type<wstring>()) outProps[propName] = ToUtf8(var.get_value<wstring>());
+		//		else if (var.is_type<Vector3>()) { Vector3 v = var.get_value<Vector3>(); outProps[propName] = { v.x, v.y, v.z }; }
+		//		else if (var.is_type<Color>()) { Color c = var.get_value<Color>(); outProps[propName] = { c.R(), c.G(), c.B(), c.A() }; }
+		//		else if (var.is_type<Float3>()) { Float3 v = var.get_value<Float3>(); outProps[propName] = { v.x, v.y, v.z }; }
+		//		else if (var.is_type<Float4>()) { Float4 v = var.get_value<Float4>(); outProps[propName] = { v.x, v.y, v.z, v.w }; }
+		//	}
+		//}
+	
 		rttr::type objType = objInstance.get_type();
 		for (auto& prop : objType.get_properties())
 		{
-			rttr::variant var = prop.get_value(objInstance);
 			string propName = prop.get_name().to_string();
-			
-			rttr::variant saveMeta = prop.get_metadata(Meta_Key_Type::SaveData);
-			if (!saveMeta.is_valid()) continue; // SaveData 메타데이터가 없으면 아예 저장 안 함
+			rttr::variant var = prop.get_value(objInstance);
 
-			SaveDataKey saveKey = nullptr;
-			if (saveMeta.is_type<SaveDataKey>()) {
-				saveKey = saveMeta.get_value<SaveDataKey>();
-			}
-			
-			if (saveKey == Save_Data_Key::TargetObjectID) // 1. TargetObjectID (다른 오브젝트 참조)
+			rttr::variant saveMeta = prop.get_metadata(Meta_Key_Type::SaveData);
+			// 1. [강력 범주] TargetID 예외 처리: 이름이 "TargetID"라면 무조건 처리 대상에 포함
+			bool isTargetID = (propName == "TargetID");
+			if (isTargetID)
 			{
-				if (var.is_type<Shared<GameObject>>())
+				saveMeta = Save_Data_Key::TargetObjectID; // 메타데이터 강제 주입
+			}
+			if (!saveMeta.is_valid()) continue;
+			// 2. 메타데이터 값 비교 (문자열 내용 비교)
+			string saveKeyStr = saveMeta.to_string();
+			if (!saveKeyStr.empty())
+			{
+				// "TargetObjectID"라는 글자가 포함되어 있거나 isTargetID가 참인 경우
+				if (saveKeyStr == "TargetObjectID" || isTargetID)
 				{
-					Shared<GameObject> pTarget = var.get_value<Shared<GameObject>>();
-					outProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
+					if (var.is_type<Shared<GameObject>>())
+					{
+						Shared<GameObject> pTarget = var.get_value<Shared<GameObject>>();
+						outProps[propName] = pTarget ? pTarget->Get_ObjectID() : 0u;
+					}
+					// ⬇️ 타입 인지에 실패하더라도 유효한 값만 있다면 강제로 숫자로 변환합니다.
+					else if (var.is_valid())
+					{
+						outProps[propName] = var.convert<uint32>();
+					}
 				}
-				else if (var.is_type<uint32>() || var.is_type<int32>()) {
-					outProps[propName] = var.convert<uint32>();
+				else if (saveKeyStr == "TextureTag" || saveKeyStr == "ModelTag")
+				{
+					if (var.is_type<wstring>()) outProps[propName] = ToUtf8(var.get_value<wstring>());
+					else outProps[propName] = var.to_string();
 				}
-			}
-			else if (saveKey == Save_Data_Key::TextureTag || saveKey == Save_Data_Key::ModelTag) // 2. ResourceTag
-			{
-				if (var.is_type<wstring>()) outProps[propName] = ToUtf8(var.get_value<wstring>());
-				else if (var.is_type<string>()) outProps[propName] = var.get_value<string>();
-			}
-			else // 3. 그 외 기본 자료형 (SaveData가 붙어있는 float, Vector3, int 등)
-			{
-				if (var.is_type<int>()) outProps[propName] = var.get_value<int>();
-				else if (var.is_type<uint32>()) outProps[propName] = var.get_value<uint32>();
-				else if (var.is_type<float>()) outProps[propName] = var.get_value<float>();
-				else if (var.is_type<bool>()) outProps[propName] = var.get_value<bool>();
-				else if (var.is_type<string>()) outProps[propName] = var.get_value<string>();
-				else if (var.is_type<wstring>()) outProps[propName] = ToUtf8(var.get_value<wstring>());
-				else if (var.is_type<Vector3>()) { Vector3 v = var.get_value<Vector3>(); outProps[propName] = { v.x, v.y, v.z }; }
-				else if (var.is_type<Color>()) { Color c = var.get_value<Color>(); outProps[propName] = { c.R(), c.G(), c.B(), c.A() }; }
-				else if (var.is_type<Float3>()) { Float3 v = var.get_value<Float3>(); outProps[propName] = { v.x, v.y, v.z }; }
-				else if (var.is_type<Float4>()) { Float4 v = var.get_value<Float4>(); outProps[propName] = { v.x, v.y, v.z, v.w }; }
+				else // 3. MyObjectID 포함 일반 영속 데이터
+				{
+					if (var.is_type<int>()) outProps[propName] = var.get_value<int>();
+					else if (var.is_type<uint32>()) outProps[propName] = var.get_value<uint32>();
+					else if (var.is_type<float>()) outProps[propName] = var.get_value<float>();
+					else if (var.is_type<bool>()) outProps[propName] = var.get_value<bool>();
+					// ⬇️ 마지막 수단으로 문자열 변환 후 기록
+					else if (var.is_valid()) outProps[propName] = var.to_string();
+				}
 			}
 		}
 	};

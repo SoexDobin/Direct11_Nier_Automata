@@ -245,10 +245,19 @@ int32 Model::Get_BoneIndexByName(const string& boneName) const
 
 const TRANSFORM_FRAME& Model::Get_RootTransformDelta(uint32 nodeIndex) const
 {
-	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
-	
-	if (m_Animations.empty() || m_CurrentAnimIndex >= m_Animations.size())
-		return emptyFrame;
+	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())
+	{
+		Float ratio = m_BlendingElapsed / m_BlendingDuration;
+
+		const TRANSFORM_FRAME& curDelta = m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(nodeIndex);
+		const TRANSFORM_FRAME& nextDelta = m_Animations[m_NextAnimIndex]->Get_TransformDelta(nodeIndex);
+
+		TRANSFORM_FRAME blendedDelta{};
+		blendedDelta.position = Vector3::Lerp(curDelta.position, nextDelta.position, ratio);
+		blendedDelta.rotation = Quaternion::Slerp(curDelta.rotation, nextDelta.rotation, ratio);
+		blendedDelta.scale = Vector3::One;
+		return blendedDelta;
+	}
 
 	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(nodeIndex);
 }

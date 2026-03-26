@@ -99,6 +99,11 @@ Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared
 
 void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
 {
+	for (uint32 i = 0; i < m_NumChannels; ++i)
+		m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, rootNodeIndex);
+	for (uint32 i = 0; i < nextAnim->m_NumChannels; ++i)
+		nextAnim->m_Channels[i]->Update_TransformationMatrix(nextAnim->m_CurrentKeyFrameIndices[i], nextAnim->m_CurrentTrackPosition, nextAnim->m_Duration, bones, rootNodeIndex);
+
 	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;
 	if (m_CurrentTrackPosition >= m_Duration)
 		m_CurrentTrackPosition = 0;
@@ -120,7 +125,11 @@ void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animati
 		Vector4 targetRot = Quaternion::Slerp(curTrans.rotation, nextTrans.rotation, blendRatio);
 		Vector3 targetPos = Vector3::Lerp(curTrans.position, nextTrans.position, blendRatio);
 
-		Matrix targetMatrix = XMMatrixAffineTransformation(targetScale, Quaternion::Identity, targetRot, targetPos);
+		Matrix targetMatrix{};
+		if (m_Channels[i]->Get_BoneIndex() == rootNodeIndex)
+			targetMatrix = XMMatrixAffineTransformation(targetScale, Quaternion::Identity, targetRot, Vector3::Zero);
+		else
+			targetMatrix = XMMatrixAffineTransformation(targetScale, Quaternion::Identity, targetRot, targetPos);
 
 		bones[m_Channels[i]->Get_BoneIndex()]->Update_TransformationMatrix(targetMatrix);
 	}

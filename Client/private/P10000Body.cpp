@@ -67,25 +67,6 @@ void P10000Body::Update(Float timeDelta)
 	
 	LOG_INFO(L"{}, {}, {}", transformFrame.position.x, transformFrame.position.y, transformFrame.position.z);
 
-	/*
-	                 }
-            ],
-            "duration": 34.0,
-            "name": "pl0000|pl0000_0002",
-            "rootMove": [
-                0.0,
-                0.0,
-                -362.3771057128906
-            ],
-            "rootRot": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "tickPerSecond": 60.0
-	 */
-
 	m_Transform->Set_Position(pos + transformFrame.position);
 	m_Transform->Set_Rotation(quat + transformFrame.rotation);
 }

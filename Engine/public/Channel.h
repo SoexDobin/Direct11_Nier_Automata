@@ -24,7 +24,6 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
-	const Matrix& Get_NodeMatrix() const { return m_NodeMatrix; }
 	const TRANSFORM_FRAME& Get_TransformDelta() const { return m_TransformationDelta; }
 	int32 Get_BoneIndex() const { return m_BoneIndex; }
 	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, _Out_ TRANSFORM_FRAME& outTransform);
@@ -40,8 +39,6 @@ private:
 	Float				m_PrevTrackPosition{ -1.f };
 	Bool				m_IsFirstUpdate{ true };
 	Bool				m_IsFirstFrame{ true };
-
-	Matrix				m_NodeMatrix{};
 
 public:
 	static Shared<Channel> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_CHANNEL& keyFrame);

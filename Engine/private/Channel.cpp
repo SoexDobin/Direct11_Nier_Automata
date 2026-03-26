@@ -10,7 +10,11 @@ Channel::Channel(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCo
 	: Component{ device, context } {}
 
 Channel::Channel(const Channel& rhs)
-	: Component{ rhs }, m_NumKeyFrames{ rhs.m_NumKeyFrames }, m_KeyFrames{ rhs.m_KeyFrames }, m_BoneIndex{rhs.m_BoneIndex} {
+	: Component{ rhs }, m_NumKeyFrames{ rhs.m_NumKeyFrames }, m_KeyFrames{ rhs.m_KeyFrames }, m_BoneIndex{rhs.m_BoneIndex} 
+{
+	m_IsFirstUpdate = true; // 클론된 인스턴스는 새로운 상태로 시작해야 함
+	m_PrevTrackPosition = -1.f;
+	m_TransformationDelta = { Vector3::One, Vector4::UnitW, Vector3::Zero };
 }
 
 void Channel::On_Destroy()
@@ -116,17 +120,15 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 		m_PrevTransform = currentFrame;
 	}
 
-
-	if (rootNodeIndex != -1)
-		m_NodeMatrix =
+	Matrix boneMatrix{};
+	if (m_BoneIndex == rootNodeIndex)
+		boneMatrix =
 		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, Vector3::Zero);
 	else 
-		m_NodeMatrix =
+		boneMatrix =
 		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, currentFrame.position);
 
-	
-
-	bones[m_BoneIndex]->Update_TransformationMatrix(m_NodeMatrix);
+	bones[m_BoneIndex]->Update_TransformationMatrix(boneMatrix);
 }
 
 Shared<Channel> Channel::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_CHANNEL& keyFrame)

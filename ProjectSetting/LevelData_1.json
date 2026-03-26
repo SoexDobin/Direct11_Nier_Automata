@@ -11,22 +11,22 @@
             },
             {
               "properties": null,
-              "typeName": "Texture"
+              "typeName": "VIBuffer_Rect"
             },
             {
               "properties": null,
-              "typeName": "VIBuffer_Rect"
+              "typeName": "Texture"
             },
             {
               "properties": null,
               "typeName": "Shader"
             }
           ],
-          "name": "LoadingBackground",
-          "objectID": 2031777346,
+          "name": "LoadingPixelPanel",
+          "objectID": 2233491490,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "LoadingBackground",
+          "prototypeTag": "LoadingPixelPanel",
           "transform": {
             "position": [
               0.0,
@@ -39,12 +39,12 @@
               0.0
             ],
             "scale": [
-              1980.0,
+              2240.0,
               1080.0,
               1.0
             ]
           },
-          "typeName": "LoadingBackground"
+          "typeName": "LoadingPixelPanel"
         },
         {
           "components": [
@@ -96,11 +96,11 @@
               "typeName": "Shader"
             }
           ],
-          "name": "LoadingPixelPanel",
-          "objectID": 2233491490,
+          "name": "LoadingBackground",
+          "objectID": 2031777346,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "LoadingPixelPanel",
+          "prototypeTag": "LoadingBackground",
           "transform": {
             "position": [
               0.0,
@@ -113,12 +113,12 @@
               0.0
             ],
             "scale": [
-              2240.0,
+              1980.0,
               1080.0,
               1.0
             ]
           },
-          "typeName": "LoadingPixelPanel"
+          "typeName": "LoadingBackground"
         },
         {
           "components": [
@@ -128,7 +128,7 @@
             },
             {
               "properties": null,
-              "typeName": "Texture"
+              "typeName": "Shader"
             },
             {
               "properties": null,
@@ -136,7 +136,7 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Texture"
             }
           ],
           "name": "LoadingLogo",
@@ -171,15 +171,15 @@
             },
             {
               "properties": null,
+              "typeName": "VIBuffer_Rect"
+            },
+            {
+              "properties": null,
               "typeName": "Shader"
             },
             {
               "properties": null,
               "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "VIBuffer_Rect"
             }
           ],
           "name": "LoadingFadeIn",
@@ -214,15 +214,15 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
               "typeName": "VIBuffer_Rect"
             },
             {
               "properties": null,
               "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
             }
           ],
           "name": "LoadingFadeOut",

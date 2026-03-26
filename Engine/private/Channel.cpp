@@ -10,7 +10,9 @@ Channel::Channel(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCo
 	: Component{ device, context } {}
 
 Channel::Channel(const Channel& rhs)
-	: Component{rhs}, m_NumKeyFrames{rhs.m_NumKeyFrames}, m_KeyFrames{rhs.m_KeyFrames} {}
+	: Component{ rhs }, m_NumKeyFrames{ rhs.m_NumKeyFrames }, m_KeyFrames{ rhs.m_KeyFrames }, m_BoneIndex{ rhs.m_BoneIndex },
+	m_FirstFramePosition{ rhs.m_FirstFramePosition } {
+}
 
 void Channel::On_Destroy()
 {
@@ -26,12 +28,21 @@ HRESULT Channel::Initialize_Prototype(const MODEL_CHANNEL& modelChannel)
 	m_KeyFrames.clear();
 	m_KeyFrames = modelChannel.keyFrames;
 
+	m_FirstFramePosition = modelChannel.keyFrames[0].position;
+
 	return Component::Initialize_Prototype();
 }
 
 HRESULT Channel::Initialize_Prototype()
 {
 	return Component::Initialize_Prototype();
+}
+
+void Channel::Reset_DeltaState()
+{
+	m_IsFirstUpdate = true;
+	m_TransformationDelta = { Vector3::One, Vector4::UnitW, Vector3::Zero };
+	m_PrevTrackPosition = -1.f;
 }
 
 HRESULT Channel::Initialize(void* arg)
@@ -95,21 +106,31 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 	}
 	else
 	{
-		// 1. 위치 델타 계산
+		if (currentTrackPosition < m_PrevTrackPosition)
+		{
+			m_PrevTransform = currentFrame;
+		}
 		m_TransformationDelta.position = currentFrame.position - m_PrevTransform.position;
 		// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
 		Quaternion qtCurr(currentFrame.rotation);
 		Quaternion qtPrev(m_PrevTransform.rotation);
-		Quaternion qtInvPrev; qtPrev.Inverse(qtInvPrev);
+		Quaternion qtInvPrev; 
+		qtPrev.Inverse(qtInvPrev);
 
 		Quaternion qtDelta = qtCurr * qtInvPrev;
 		m_TransformationDelta.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
 
 		m_PrevTransform = currentFrame;
 	}
+	m_PrevTrackPosition = currentTrackPosition;
 
-	Matrix boneTransformationMatrix =
-		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, currentFrame.position);
+	Vector3 bonePosition = m_NeutralizeTranslation ? m_FirstFramePosition : currentFrame.position;
+
+	Matrix boneTransformationMatrix = XMMatrixAffineTransformation(
+			currentFrame.scale, 
+			Quaternion::Identity, 
+			currentFrame.rotation, 
+			bonePosition);
 
 	bones[m_BoneIndex]->Update_TransformationMatrix(boneTransformationMatrix);
 }
@@ -126,3 +147,18 @@ Shared<Channel> Channel::Create(const ComPtr<ID3D11Device>& device, const ComPtr
 
 	return channel;
 }
+
+Shared<Component> Channel::Clone(void* arg)
+{
+	auto instance = make_shared<Channel>(*this);
+
+	if (FAILED(instance->Initialize(arg)))
+	{
+		MSG_BOX("Failed to Clone : Channel");
+		return nullptr;
+	}
+
+	return instance;
+}
+
+

@@ -25,6 +25,8 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
+	void Enable_RootMotionChannel(int32 boneIndex);
+	void Reset_RootMotionState();
 	const TRANSFORM_FRAME& Get_TransformDelta(int32 boneIndex) const;
 	const wstring& Get_AnimationName() { return m_Name; }
 	Float Get_Progress() const { return m_CurrentTrackPosition / m_Duration; }
@@ -45,6 +47,12 @@ private:
 	uint32 m_NumChannels{};
 	vector<Shared<Channel>>	m_Channels;
 	vector<uint32>			m_CurrentKeyFrameIndices;
+
+	Vector3 m_RootTotalTranslation{};
+	Quaternion m_RootTotalRotation{};
+	Vector3 m_PrevTrackAccTranslation{};
+	Vector3 m_LastFrameDelta{};
+
 
 public:
 	static Shared<Animation> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_ANIMATION& animationData);

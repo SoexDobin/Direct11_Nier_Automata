@@ -30,12 +30,13 @@ HRESULT P10000Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	m_RootBoneIndex = m_Model->Get_BoneIndexByName("bone0");
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName("pl0000");
 	if (m_RootBoneIndex == -1)
 	{
 		LOG_ERROR(L"Failed to Find 2B Root Bone");
 		return E_FAIL;
 	}
+	m_Model->Enable_RootMotion(m_RootBoneIndex);
 
 	GAME_INSTANCE->Get_MainCamera()->Set_Target(shared_from_this());
 
@@ -59,13 +60,6 @@ void P10000Body::Update(Float timeDelta)
 {
 	m_Model->Update_ModelAnimation(timeDelta);
 
-	Vector3 pos = m_Transform->Get_Position();
-	Quaternion quat = m_Transform->Get_LocalRotation();
-
-	TRANSFORM_FRAME transformFrame = m_Model->Get_BoneTransformDelta(m_RootBoneIndex);
-	
-	LOG_INFO(L"{}, {}, {}", transformFrame.position.x, transformFrame.position.y, transformFrame.position.z);
-
 	/*
 	                 }
             ],
@@ -84,9 +78,22 @@ void P10000Body::Update(Float timeDelta)
             ],
             "tickPerSecond": 60.0
 	 */
+	Vector3 pos = m_Transform->Get_Position();
+	Quaternion quat = m_Transform->Get_LocalRotation();
 
-	m_Transform->Set_Position(pos + transformFrame.position);
-	m_Transform->Set_Rotation(quat + transformFrame.rotation);
+	Vector3 transPos = m_Model->Get_BoneTransformDelta(m_RootBoneIndex).position;
+	Quaternion transQuat = m_Model->Get_BoneTransformDelta(m_RootBoneIndex).rotation;
+
+	Vector3 nextPos = pos + transPos;
+	Quaternion nextQuat = quat * transQuat;
+
+	LOG_INFO(L"{}, {}, {}", nextPos.x, nextPos.y, nextPos.z);
+	//LOG_INFO(L"{}, {}, {}", nextQuat.x, nextQuat.y, nextQuat.z);
+	//LOG_INFO(L"\n");
+
+	m_Transform->Set_LocalPosition(nextPos);
+	m_Transform->Set_LocalRotation(nextQuat);
+	m_Transform->Update_WorldMatrix();
 }
 
 void P10000Body::Late_Update(Float timeDelta)

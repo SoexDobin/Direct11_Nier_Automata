@@ -43,6 +43,9 @@ public:
 public:
 	int32 Get_AnimationIndexByName(const wstring& name);
 	const wstring& Get_AnimationNameByIndex(uint32 index);
+
+
+public:
 	void Set_AnimationIndex(uint32 index) { m_CurrentAnimIndex = index; }
 	uint32 Get_AnimationIndex() const { return m_CurrentAnimIndex; }
 	void Set_AnimLoop(Bool isLoop) { m_IsAnimLoop = isLoop; }
@@ -50,8 +53,9 @@ public:
 	Bool Is_AnimationFinished() const { return m_IsAnimEnd; }
 
 public:
+	void Enable_RootMotion(int32 rootBoneIndex);
 	int32 Get_BoneIndexByName(const string& boneName) const;
-	const TRANSFORM_FRAME& Get_BoneTransformDelta(uint32 boneIndex) const;
+	TRANSFORM_FRAME Get_BoneTransformDelta(uint32 boneIndex) const;
 
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);
@@ -76,6 +80,7 @@ private:
 	Bool	m_IsAnimLoop{ false };
 	Bool	m_IsAnimEnd{ false };
 	uint32	m_CurrentAnimIndex{};
+	int32	m_RootMotionBoneIndex{ -1 };
 
 private:
 	Bool	m_IsBlending{ false };

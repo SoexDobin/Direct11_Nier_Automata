@@ -46,6 +46,8 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 	ReadMaterialData();
 	ReadAnimation();
 
+	
+
 	return true;
 }
 
@@ -269,6 +271,8 @@ void Converter::ReadAnimation()
 {
 	if (false == m_IsSkeletal) return;
 
+	
+
 	m_Channels.resize(m_AiScene->mNumAnimations);
 	for (uint32 i = 0; i < m_AiScene->mNumAnimations; ++i)
 	{
@@ -279,7 +283,6 @@ void Converter::ReadAnimation()
 		anim->duration = static_cast<Float>(aiAnim->mDuration);
 		anim->tickPerSecond = static_cast<Float>(aiAnim->mTicksPerSecond);
 		anim->numChannel = static_cast<uint32>(aiAnim->mNumChannels);
-		
 
 		// --- 루트 모션 추출 로직 수정 ---
 		// 1. 애니메이션 채널들 중 계층 구조상 가장 최상위에 있는 본을 '루트 모션 본'으로 간주합니다.
@@ -501,76 +504,103 @@ void Tool::Converter::WriteJsonFile(const wstring& path)
 	json root;
 
 	// 1. Materials
-	for (auto& mat : m_Material)
-	{
-		json matJson;
-		matJson["name"] = mat->name;
-		
-		json textures = json::array();
-		for (auto& tex : mat->textures)
+	// for (auto& mat : m_Material)
+	// {
+	// 	json matJson;
+	// 	matJson["name"] = mat->name;
+	// 	
+	// 	json textures = json::array();
+	// 	for (auto& tex : mat->textures)
+	// 	{
+	// 		json texEntry;
+	// 		texEntry["type"] = tex.typeIndex;
+	// 		texEntry["path"] = tex.path;
+	// 		textures.push_back(texEntry);
+	// 	}
+	// 	matJson["textures"] = textures;
+	// 	root["materials"].push_back(matJson);
+	// }
+
+	// --- 파일 분할 로직 세팅 ---
+	const size_t MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB 제한 (바이트 단위)
+	size_t fileIndex = 1;
+
+	json currentRoot = root;
+	currentRoot["animations"] = json::array(); // 빈 애니메이션 배열 초기화
+
+	// 저장을 담당할 람다 함수 (경로에 _1, _2 등을 붙여서 저장)
+	auto SaveToFile = [&](const json& j, size_t index) {
+		std::filesystem::path p(path);
+		// 확장자를 제외한 파일명에 "_1" 형태를 붙임 (예: Model_1.json)
+		std::wstring newName = p.stem().wstring() + L"_" + std::to_wstring(index) + L".json";
+		std::filesystem::path newPath = p.parent_path() / newName;
+
+		ofstream out(newPath);
+		if (out.is_open())
 		{
-			json texEntry;
-			texEntry["type"] = tex.typeIndex;
-			texEntry["path"] = tex.path;
-			textures.push_back(texEntry);
+			out << j.dump(4);
+			out.close();
+			std::cout << "  [JSON] Export Success (Split " << index << "): "
+				<< newPath.string() << "\n"; // 아주 간단하게 해결됩니다!
 		}
-		matJson["textures"] = textures;
-		root["materials"].push_back(matJson);
-	}
-
-	// 2. Animations
-	for (size_t i = 0; i < m_Animation.size(); ++i)
-	{
-		auto& anim = m_Animation[i];
-		json animJson;
-		animJson["name"] = anim->name;
-		animJson["duration"] = anim->duration;
-		animJson["tickPerSecond"] = anim->tickPerSecond;
-		
-		// Root Motion
-		animJson["rootMove"] = { anim->rootTotalTranslation.x, anim->rootTotalTranslation.y, anim->rootTotalTranslation.z };
-		animJson["rootRot"] = { anim->rootTotalRotation.x, anim->rootTotalRotation.y, anim->rootTotalRotation.z, anim->rootTotalRotation.w };
-
-		// Channels
-		json channelsJson = json::array();
-		for (auto& channel : m_Channels[i])
+	};
+		// 2. Animations (배열에 추가하면서 용량 체크)
+		for (size_t i = 0; i < m_Animation.size(); ++i)
 		{
-			json channelJson;
-			channelJson["name"] = channel->name;
-			channelJson["boneIndex"] = channel->boneIndex;
-			channelJson["numKeyFrames"] = channel->numKeyFrames;
-			channelsJson.push_back(channelJson);
+			auto& anim = m_Animation[i];
+			json animJson;
+			animJson["name"] = anim->name;
+			animJson["duration"] = anim->duration;
+			animJson["tickPerSecond"] = anim->tickPerSecond;
+
+			// Root Motion
+			animJson["rootMove"] = { anim->rootTotalTranslation.x, anim->rootTotalTranslation.y, anim->rootTotalTranslation.z };
+			animJson["rootRot"] = { anim->rootTotalRotation.x, anim->rootTotalRotation.y, anim->rootTotalRotation.z, anim->rootTotalRotation.w };
+
+			// Channels
+			json channelsJson = json::array();
+			for (auto& channel : m_Channels[i])
+			{
+				json channelJson;
+				channelJson["name"] = channel->name;
+				channelJson["boneIndex"] = channel->boneIndex;
+				channelJson["numKeyFrames"] = channel->numKeyFrames;
+
+				// Transform_Frame (코드상 keyFrames) 정보 추가
+				json keyFramesJson = json::array();
+				for (const auto& frame : channel->keyFrames)
+				{
+					json frameJson;
+					frameJson["position"] = { frame.position.x, frame.position.y, frame.position.z };
+					frameJson["rotation"] = { frame.rotation.x, frame.rotation.y, frame.rotation.z, frame.rotation.w };
+					keyFramesJson.push_back(frameJson);
+				}
+				channelJson["keyFrames"] = keyFramesJson;
+				channelsJson.push_back(channelJson);
+			}
+			animJson["channels"] = channelsJson;
+
+			// 만들어진 1개의 애니메이션을 현재 JSON 루트에 추가
+			currentRoot["animations"].push_back(animJson);
+
+			// 현재까지의 JSON 텍스트 크기 확인
+			std::string dumpStr = currentRoot.dump(4);
+			if (dumpStr.size() >= MAX_FILE_SIZE)
+			{
+				// 4MB를 초과했다면 현재까지 쌓인 데이터를 파일로 출력
+				SaveToFile(currentRoot, fileIndex);
+				fileIndex++;
+
+				// 다음 파일을 위해 baseRoot로 덮어씌워 애니메이션 배열을 초기화
+				currentRoot = root;
+				currentRoot["animations"] = json::array();
+			}
 		}
-		animJson["channels"] = channelsJson;
 
-		root["animations"].push_back(animJson);
-	}
-
-	// 3. Bones
-	for (auto& bone : m_Bones)
-	{
-		json boneJson;
-		boneJson["name"] = bone->name;
-		boneJson["parentIndex"] = bone->parentIndex;
-		root["bones"].push_back(boneJson);
-	}
-
-	// 4. Meshes
-	for (auto& mesh : m_Meshes)
-	{
-		json meshJson;
-		meshJson["name"] = mesh->name;
-		meshJson["materialIndex"] = mesh->materialIndex;
-		meshJson["numVertices"] = m_IsSkeletal ? mesh->animVertices.size() : mesh->vertices.size();
-		meshJson["numIndices"] = mesh->indices.size();
-		root["meshes"].push_back(meshJson);
-	}
-
-	ofstream out(path);
-	if (out.is_open())
-	{
-		out << root.dump(4);
-		out.close();
-		std::cout << "  [JSON] Export Success: " << string(path.begin(), path.end()) << "\n";
-	}
+		// 루프가 끝난 뒤 미처 저장되지 못한 나머지 애니메이션이 있거나, 
+		// 아예 애니메이션이 없어서 기본 정보만 출력해야 할 경우 마지막으로 저장
+		if (!currentRoot["animations"].empty() || m_Animation.empty())
+		{
+			SaveToFile(currentRoot, fileIndex);
+		}
 }

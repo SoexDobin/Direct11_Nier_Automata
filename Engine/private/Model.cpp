@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "Animation.h"
 
+#include <algorithm>
 #include <fstream>
 #include <istream>
 #include <filesystem>
@@ -228,9 +229,22 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 	m_BlendingElapsed = 0.f;
 	m_BlendingDuration = blendDuration;
 
+	// 전환 대상 애니메이션의 루트 모션 상태 초기화
+	m_Animations[m_NextAnimIndex]->Reset_RootMotionState();
+
 	Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
 	m_Animations[m_NextAnimIndex]->Set_Progress(progress);
 
+}
+
+void Model::Enable_RootMotion(int32 rootBoneIndex)
+{
+	m_RootMotionBoneIndex = rootBoneIndex;
+	for (auto& anim : m_Animations)
+	{
+		// Animation에 접근해서 channel에 플래그 설정하는 함수 필요
+		anim->Enable_RootMotionChannel(rootBoneIndex);
+	}
 }
 
 int32 Model::Get_BoneIndexByName(const string& boneName) const
@@ -243,12 +257,28 @@ int32 Model::Get_BoneIndexByName(const string& boneName) const
 	return -1;
 }
 
-const TRANSFORM_FRAME& Model::Get_BoneTransformDelta(uint32 boneIndex) const
+TRANSFORM_FRAME Model::Get_BoneTransformDelta(uint32 boneIndex) const
 {
-	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
+	TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
 	
 	if (m_Animations.empty() || m_CurrentAnimIndex >= m_Animations.size())
 		return emptyFrame;
+
+	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())
+	{
+		Float ratio = m_BlendingElapsed / m_BlendingDuration;
+		ratio = std::min(ratio, 1.f);
+
+		const TRANSFORM_FRAME& curDelta = m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(boneIndex);
+		const TRANSFORM_FRAME& nextDelta = m_Animations[m_NextAnimIndex]->Get_TransformDelta(boneIndex);
+
+		TRANSFORM_FRAME blendedDelta{};
+		blendedDelta.scale = Vector3::One;
+		blendedDelta.position = Vector3::Lerp(curDelta.position, nextDelta.position, ratio);
+		blendedDelta.rotation = Quaternion::Slerp(curDelta.rotation, nextDelta.rotation, ratio);
+
+		return blendedDelta;
+	}
 
 	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(boneIndex);
 }

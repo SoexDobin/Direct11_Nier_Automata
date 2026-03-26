@@ -75,7 +75,7 @@ void P10000::Late_Update(Float timeDelta)
 {
 	m_P10000States->Update_State(timeDelta);
 
-
+	m_Transform->Update_WorldMatrix();
 }
 
 void P10000::Fixed_Update(Float fixedDelta)

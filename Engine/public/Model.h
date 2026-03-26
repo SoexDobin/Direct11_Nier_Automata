@@ -51,8 +51,8 @@ public:
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
-	const TRANSFORM_FRAME& Get_RootTransformDelta(uint32 boneIndex) const;
-	void Set_LocalRoot(uint32 boneIndex);
+	const TRANSFORM_FRAME& Get_RootTransformDelta(uint32 nodeIndex) const;
+	void Set_LocalRootNode(uint32 nodeIndex);
 
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);

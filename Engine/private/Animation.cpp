@@ -1,4 +1,6 @@
 #include "Animation.h"
+
+#include <utility>
 #include "Channel.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
@@ -13,10 +15,12 @@ Animation::Animation(const Animation& rhs)
 	m_Duration{ rhs.m_Duration }, 
 	m_TickPerSecond{ rhs.m_TickPerSecond },
 	m_NumChannels{rhs.m_NumChannels}, 
-	m_Channels{rhs.m_Channels}, 
 	m_CurrentKeyFrameIndices{rhs.m_CurrentKeyFrameIndices}
 {
-	
+	for (uint32 i = 0; i < m_NumChannels; ++i)
+	{
+		m_Channels.push_back(static_pointer_cast<Channel>(rhs.m_Channels[i]->Clone()));
+	}
 }
 
 void Animation::On_Destroy()
@@ -76,17 +80,18 @@ Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared
 	if (m_CurrentTrackPosition >= m_Duration) //  현재 트랙이 애니메이션 길이를 넘으면 
 	{
 		if (false == isLoop) 
-			return true;
+			return true; // 그만
 
-		m_CurrentTrackPosition = 0;
+		m_CurrentTrackPosition = 0; // 트랙 초기화 반복
 	}
 
+	
 	for (uint32 i = 0; i < m_NumChannels; ++i)
 	{
-		if (m_IsLocalTransformationPresent)
+		if (m_IsLocalTransformationPresent) // 루트 노드의 영향을 받으면
 			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, rootNodeIndex);
 		else 
-			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones);
+			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, -1);
 	}
 
 	return false;

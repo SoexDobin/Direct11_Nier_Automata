@@ -71,7 +71,7 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	if (FAILED(Ready_Animation(in)))
 		return E_FAIL;
 	
-	//Update_ModelAnimation(0.f);
+	Update_ModelAnimation(0.f);
 
 	return Component::Initialize_Prototype();
 }

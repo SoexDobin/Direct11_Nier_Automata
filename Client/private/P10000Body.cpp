@@ -31,6 +31,7 @@ HRESULT P10000Body::Initialize(void* arg)
 	}
 
 	m_RootBoneIndex = m_Model->Get_BoneIndexByName("pl0000");
+	m_Model->Set_LocalRootNode(m_RootBoneIndex);
 	if (m_RootBoneIndex == -1)
 	{
 		LOG_ERROR(L"Failed to Find 2B Root Bone");
@@ -62,7 +63,7 @@ void P10000Body::Update(Float timeDelta)
 	Vector3 pos = m_Transform->Get_Position();
 	Quaternion quat = m_Transform->Get_LocalRotation();
 
-	TRANSFORM_FRAME transformFrame = m_Model->Get_BoneTransformDelta(m_RootBoneIndex);
+	TRANSFORM_FRAME transformFrame = m_Model->Get_RootTransformDelta(m_RootBoneIndex);
 	
 	LOG_INFO(L"{}, {}, {}", transformFrame.position.x, transformFrame.position.y, transformFrame.position.z);
 

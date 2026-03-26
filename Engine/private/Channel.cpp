@@ -10,7 +10,8 @@ Channel::Channel(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCo
 	: Component{ device, context } {}
 
 Channel::Channel(const Channel& rhs)
-	: Component{rhs}, m_NumKeyFrames{rhs.m_NumKeyFrames}, m_KeyFrames{rhs.m_KeyFrames} {}
+	: Component{ rhs }, m_NumKeyFrames{ rhs.m_NumKeyFrames }, m_KeyFrames{ rhs.m_KeyFrames }, m_BoneIndex{rhs.m_BoneIndex} {
+}
 
 void Channel::On_Destroy()
 {
@@ -84,13 +85,20 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 
 void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
 {
+	// rootNodeIndex 가 존재한다면
+	// 해당 Channel이 가진 KeyFrame을 가지고 Matrix를 구성하고 이게 pl0000 이면 최상위 노드이니 
+	// 해당 노드의 역행렬을 모두 곱해주어서 애니메이션이 더이상 rootNode의 이동량을 따라가지 않도록 하기
+
+	// 위 연산을 이루는 동안 Channel은 이전 KeyFrame 데이터 - 현재 KeyFrame 데이터 을 통해 Get_ChannelTransform시 넘겨줄 변화량 제공
+	// 물론 사용은 어차피 거의 실제 Client 쪽에 사용할 rootNode만 사용할거임
+
 	TRANSFORM_FRAME currentFrame{};
 	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
 
 	if (m_IsFirstUpdate)
 	{
 		m_PrevTransform = currentFrame;
-		m_TransformationDelta = { Vector3::One, Vector4{0,0,0,1}, Vector3::Zero };
+		m_TransformationDelta = TRANSFORM_FRAME{ Vector3::One, Quaternion::Identity, Vector3::Zero };
 		m_IsFirstUpdate = false;
 	}
 	else
@@ -108,10 +116,17 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 		m_PrevTransform = currentFrame;
 	}
 
-	Matrix boneTransformationMatrix =
+
+	if (rootNodeIndex != -1)
+		m_NodeMatrix =
+		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, Vector3::Zero);
+	else 
+		m_NodeMatrix =
 		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, currentFrame.position);
 
-	bones[m_BoneIndex]->Update_TransformationMatrix(boneTransformationMatrix);
+	
+
+	bones[m_BoneIndex]->Update_TransformationMatrix(m_NodeMatrix);
 }
 
 Shared<Channel> Channel::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_CHANNEL& keyFrame)
@@ -126,3 +141,18 @@ Shared<Channel> Channel::Create(const ComPtr<ID3D11Device>& device, const ComPtr
 
 	return channel;
 }
+
+Shared<Component> Channel::Clone(void* arg)
+{
+	auto instance = make_shared<Channel>(*this);
+
+	if (FAILED(instance->Initialize(arg)))
+	{
+		MSG_BOX("Failed to Clone : Channel");
+		return nullptr;
+	}
+
+	return instance;
+}
+
+

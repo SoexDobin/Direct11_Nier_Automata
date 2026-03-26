@@ -30,7 +30,7 @@ HRESULT P10000Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	m_RootBoneIndex = m_Model->Get_BoneIndexByName("bone0");
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName("pl0000");
 	if (m_RootBoneIndex == -1)
 	{
 		LOG_ERROR(L"Failed to Find 2B Root Bone");

@@ -82,7 +82,7 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 	}
 }
 
-void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones)
+void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
 {
 	TRANSFORM_FRAME currentFrame{};
 	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);

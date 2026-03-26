@@ -71,7 +71,7 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	if (FAILED(Ready_Animation(in)))
 		return E_FAIL;
 	
-	Update_ModelAnimation(0.f);
+	//Update_ModelAnimation(0.f);
 
 	return Component::Initialize_Prototype();
 }
@@ -192,16 +192,16 @@ void Model::Update_ModelAnimation(Float timeDelta)
 		{
 			m_IsBlending = false;
 			m_CurrentAnimIndex = m_NextAnimIndex;
-			m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+			m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop, m_RootLocalNode);
 		}
 		else
 		{
-			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones);
+			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones, m_RootLocalNode);
 		}
 	}
 	else
 	{
-		m_IsAnimEnd = m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+		m_IsAnimEnd = m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop, m_RootLocalNode);
 
 		if (m_IsAnimEnd && m_IsAnimLoop)
 		{
@@ -243,14 +243,24 @@ int32 Model::Get_BoneIndexByName(const string& boneName) const
 	return -1;
 }
 
-const TRANSFORM_FRAME& Model::Get_BoneTransformDelta(uint32 boneIndex) const
+const TRANSFORM_FRAME& Model::Get_RootTransformDelta(uint32 nodeIndex) const
 {
 	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
 	
 	if (m_Animations.empty() || m_CurrentAnimIndex >= m_Animations.size())
 		return emptyFrame;
 
-	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(boneIndex);
+	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(nodeIndex);
+}
+
+void Model::Set_LocalRootNode(uint32 nodeIndex)
+{
+	m_RootLocalNode = static_cast<int32>(nodeIndex);
+	for (uint32 i = 0; i < m_NumAnimation; ++i)
+	{
+		m_Animations[i]->Set_LocalTransformationPresent(true);
+		// 모든 animation의 순회로 루트에 영향을 받는 걸 명시
+	}
 }
 
 HRESULT Model::Render(uint32 meshIndex)

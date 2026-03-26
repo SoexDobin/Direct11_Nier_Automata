@@ -11,11 +11,11 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Shader"
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Model"
             }
           ],
           "name": "CityOfRuins",

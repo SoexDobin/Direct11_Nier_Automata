@@ -51,7 +51,8 @@ public:
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
-	const TRANSFORM_FRAME& Get_BoneTransformDelta(uint32 boneIndex) const;
+	const TRANSFORM_FRAME& Get_RootTransformDelta(uint32 boneIndex) const;
+	void Set_LocalRoot(uint32 boneIndex);
 
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);
@@ -71,6 +72,7 @@ private:
 	wstring	m_ModelTag{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
+	int32	m_RootLocalNode{ -1 };
 
 private:
 	Bool	m_IsAnimLoop{ false };

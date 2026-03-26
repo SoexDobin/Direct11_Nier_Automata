@@ -69,13 +69,13 @@ const TRANSFORM_FRAME& Animation::Get_TransformDelta(int32 boneIndex) const
 	return emptyFrame;
 }
 
-Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop)
+Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop, int32 rootNodeIndex)
 {
-	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;
+	m_CurrentTrackPosition += m_TickPerSecond * timeDelta; // 트랙의 시간 비율 * timedelta 을 누적하여 현재 트랙 지점을 업데이트
 
-	if (m_CurrentTrackPosition >= m_Duration)
+	if (m_CurrentTrackPosition >= m_Duration) //  현재 트랙이 애니메이션 길이를 넘으면 
 	{
-		if (false == isLoop)
+		if (false == isLoop) 
 			return true;
 
 		m_CurrentTrackPosition = 0;
@@ -83,13 +83,16 @@ Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared
 
 	for (uint32 i = 0; i < m_NumChannels; ++i)
 	{
-		m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones);
+		if (m_IsLocalTransformationPresent)
+			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, rootNodeIndex);
+		else 
+			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones);
 	}
 
 	return false;
 }
 
-void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones)
+void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
 {
 	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;
 	if (m_CurrentTrackPosition >= m_Duration)

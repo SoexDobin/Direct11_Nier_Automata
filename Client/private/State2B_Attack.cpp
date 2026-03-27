@@ -3,7 +3,7 @@
 
 #include <SpdLogger.h>
 
-State2B_Attack::State2B_Attack(const wstring& tag, const Shared<P10000>& owner)
+State2B_Attack::State2B_Attack(const wstring& tag, const Shared<Pl0000>& owner)
 	: State2B{tag, owner}
 {
 }
@@ -33,7 +33,7 @@ void State2B_Attack::StateExitInvoke()
 	State2B::StateExitInvoke();
 }
 
-Shared<State2B_Attack> State2B_Attack::Create(const wstring& tag, const Shared<P10000>& owner)
+Shared<State2B_Attack> State2B_Attack::Create(const wstring& tag, const Shared<Pl0000>& owner)
 {
 	auto instance = make_shared<State2B_Attack>(tag, owner);
 

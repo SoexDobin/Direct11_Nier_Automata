@@ -64,7 +64,7 @@
     <ClInclude Include="..\public\CityOfRuins.h">
       <Filter>02. GameObject\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000.h">
+    <ClInclude Include="..\public\Pl0000.h">
       <Filter>02. GameObject\Playable\2B</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Run.h">
@@ -85,7 +85,7 @@
     <ClInclude Include="..\public\StaticCamera.h">
       <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Body.h">
+    <ClInclude Include="..\public\Pl0000Body.h">
       <Filter>02. GameObject\Playable\2B\2BPartObject\P10000</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WP0070Body.h">
@@ -106,16 +106,16 @@
     <ClInclude Include="..\public\LoadingFadeOut.h">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Input.h">
+    <ClInclude Include="..\public\Pl0000Input.h">
       <Filter>02. GameObject\Playable\P10000Input</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B.h">
       <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000StateMachine.h">
+    <ClInclude Include="..\public\Pl0000StateMachine.h">
       <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Parts.h">
+    <ClInclude Include="..\public\Pl0000Parts.h">
       <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Dash.h">
@@ -183,7 +183,7 @@
     <ClCompile Include="..\private\CityOfRuins.cpp">
       <Filter>02. GameObject\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000.cpp">
+    <ClCompile Include="..\private\Pl0000.cpp">
       <Filter>02. GameObject\Playable\2B</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Run.cpp">
@@ -204,7 +204,7 @@
     <ClCompile Include="..\private\StaticCamera.cpp">
       <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Body.cpp">
+    <ClCompile Include="..\private\Pl0000Body.cpp">
       <Filter>02. GameObject\Playable\2B\2BPartObject\P10000</Filter>
     </ClCompile>
     <ClCompile Include="..\private\WP0070Body.cpp">
@@ -225,7 +225,7 @@
     <ClCompile Include="..\private\LoadingFadeOut.cpp">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Input.cpp">
+    <ClCompile Include="..\private\Pl0000Input.cpp">
       <Filter>02. GameObject\Playable\P10000Input</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B.cpp">
@@ -234,7 +234,7 @@
     <ClCompile Include="..\private\P10000StateMachine.cpp">
       <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Parts.cpp">
+    <ClCompile Include="..\private\Pl0000Parts.cpp">
       <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Dash.cpp">

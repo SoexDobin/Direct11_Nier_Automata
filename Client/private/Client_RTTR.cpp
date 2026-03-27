@@ -12,14 +12,14 @@
 #include "LoadingFadeOut.h"
 #include "ThirdPersonCamera.h"
 #include "StateMachine.h"
-#include "P10000.h"
-#include "P10000Body.h"
+#include "Pl0000.h"
+#include "Pl0000Body.h"
 #include "WP0070Body.h"
 #include "WP0220Body.h"
 #include "StaticCamera.h"
 #include "TitleBackground.h"
-#include "P10000StateMachine.h"
-#include "P10000Input.h"
+#include "Pl0000StateMachine.h"
+#include "Pl0000Input.h"
 
 using rttr::registration;
 
@@ -84,15 +84,15 @@ void Register_Client_Reflection() {
 
 
 
-	rttr::registration::class_<P10000>("P10000")
+	rttr::registration::class_<Pl0000>("Pl0000")
 		.constructor<>()
-        .method("Clone", &P10000::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000::Create(device, context); })
+        .method("Clone", &Pl0000::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
-    rttr::registration::class_<P10000Body>("P10000Body")
+    rttr::registration::class_<Pl0000Body>("Pl0000Body")
         .constructor<>()
-        .method("Clone", &P10000Body::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return P10000Body::Create(device, context); })
+        .method("Clone", &Pl0000Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000Body::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
     rttr::registration::class_<WP0070Body>("WP0070Body")
         .constructor<>()
@@ -115,15 +115,15 @@ void Register_Client_Reflection() {
         rttr::metadata(Meta_Key_Type::TypeTag, Data_Tag::ObjectID),
         rttr::metadata(Meta_Key_Type::SaveData, Save_Data_Key::TargetObjectID))
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
-    rttr::registration::class_<P10000StateMachine>("P10000StateMachine")
+    rttr::registration::class_<Pl0000StateMachine>("Pl0000StateMachine")
         .constructor<>()
-        .method("Clone", &P10000StateMachine::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return P10000StateMachine::Create(device, context); })
+        .method("Clone", &Pl0000StateMachine::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000StateMachine::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
-    rttr::registration::class_<P10000Input>("P10000Input")
+    rttr::registration::class_<Pl0000Input>("Pl0000Input")
         .constructor<>()
-        .method("Clone", &P10000Input::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return P10000Input::Create(device, context); })
+        .method("Clone", &Pl0000Input::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000Input::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
     rttr::registration::class_<CityOfRuins>("CityOfRuins")
         .constructor<>()

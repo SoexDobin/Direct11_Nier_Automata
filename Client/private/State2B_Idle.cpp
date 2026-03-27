@@ -1,16 +1,16 @@
 #include "pch.h"
 #include "State2B_Idle.h"
-#include "P10000Body.h"
+#include "Pl0000Body.h"
 #include <Game.h>
 #include <SpdLogger.h>
 
 #include "Model.h"
-#include "P10000.h"
-#include "P10000StateMachine.h"
+#include "Pl0000.h"
+#include "Pl0000StateMachine.h"
 #include "WP0070Body.h"
 #include "WP0220Body.h"
 
-State2B_Idle::State2B_Idle(const wstring& tag, const Shared<P10000>& owner)
+State2B_Idle::State2B_Idle(const wstring& tag, const Shared<Pl0000>& owner)
 	: State2B{tag, owner}
 {
 }
@@ -32,33 +32,36 @@ Bool State2B_Idle::StateEnterInvoke()
 	 */	
 
 	uint32 prevIndex = m_Body.lock()->Get_CurrentAnimationIndex();
-	if (P10000::P10000_STATE::RUN_CYCLE == prevIndex)
+	if (Pl0000::P10000_STATE::RUN_CYCLE == prevIndex)
 	{
-		m_Body.lock()->Set_Animation( ETOI(P10000::P10000_STATE::RUN_STOP_L), 0.2f,false);
+		m_Body.lock()->Set_Animation( ETOI(Pl0000::P10000_STATE::RUN_STOP_L), 0.2f,false);
 	}
-	else if (P10000::P10000_STATE::SPRINT_CYCLE == prevIndex)
+	else if (Pl0000::P10000_STATE::SPRINT_CYCLE == prevIndex)
 	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::SPRINT_STOP_R), 0.2f, false);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::SPRINT_STOP_R), 0.2f, false);
 	}
-	else if (P10000::P10000_STATE::DASH_F == prevIndex)
+	else if (Pl0000::P10000_STATE::DASH_F == prevIndex)
 	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_F), 0.2f, false);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_F), 0.2f, false);
 	}
-	else if (P10000::P10000_STATE::DASH_B == prevIndex)
+	else if (Pl0000::P10000_STATE::DASH_B == prevIndex)
 	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_B), 0.2f, false);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_B), 0.2f, false);
 	}
-	else if (P10000::P10000_STATE::DASH_R == prevIndex)
+	else if (Pl0000::P10000_STATE::DASH_R == prevIndex)
 	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_R), 0.2f, false);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_R), 0.2f, false);
 	}
-	else if (P10000::P10000_STATE::DASH_L == prevIndex)
+	else if (Pl0000::P10000_STATE::DASH_L == prevIndex)
 	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_L), 0.2f, false);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_L), 0.2f, false);
 	}
 
-	if (nullptr == m_States.lock()->Get_CurrentState())
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::IDLE_Neutral), 0.2f, true);
+	if (m_InitializeState)
+	{
+		m_InitializeState = true;
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::IDLE_Neutral), 0.f, true);
+	}
 
 	return true;
 }
@@ -66,6 +69,7 @@ Bool State2B_Idle::StateEnterInvoke()
 void State2B_Idle::Update(Float timeDelta)
 {
 	uint32 curIndex = m_Body.lock()->Get_CurrentAnimationIndex();
+	uint32 nextIndex = m_Body.lock()->Get_NextAnimationIndex();
 	
 
 	if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON))
@@ -80,13 +84,15 @@ void State2B_Idle::Update(Float timeDelta)
 	}
 	if (m_Input.lock()->Is_WASD_Press())
 	{
-		if (m_States.lock()->Change_State(P10000::P10000_STATE::RUN))
+		if (m_States.lock()->Change_State(Pl0000::P10000_STATE::RUN))
 			return;
 	}
 
-	if (curIndex != P10000::P10000_STATE::IDLE_Neutral && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished() )
+	if (curIndex != Pl0000::P10000_STATE::IDLE_Neutral 
+		&& nextIndex != Pl0000::P10000_STATE::IDLE_Neutral 
+		&&m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished() )
 	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::IDLE_Neutral), 0.2f, true);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::IDLE_Neutral), 1.f, true);
 	}
 }
 
@@ -100,7 +106,7 @@ void State2B_Idle::StateExitInvoke()
 
 }
 
-Shared<State2B_Idle> State2B_Idle::Create(const wstring& tag, const Shared<P10000>& owner)
+Shared<State2B_Idle> State2B_Idle::Create(const wstring& tag, const Shared<Pl0000>& owner)
 {
 	auto instance = make_shared<State2B_Idle>(tag, owner);
 

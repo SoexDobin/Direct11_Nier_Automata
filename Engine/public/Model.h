@@ -38,20 +38,21 @@ public:
 
 public:
 	void Update_ModelAnimation(Float timeDelta);
-	void Set_Animation(uint32 index, Float blendDuration = 0.5f);
+	void Set_Animation(uint32 index, Float blendDuration = 0.5f, Bool isSync = false);
 
 public:
 	int32 Get_AnimationIndexByName(const wstring& name);
 	const wstring& Get_AnimationNameByIndex(uint32 index);
 	void Set_AnimationIndex(uint32 index) { m_CurrentAnimIndex = index; }
 	uint32 Get_AnimationIndex() const { return m_CurrentAnimIndex; }
+	uint32 Get_NextAnimationIndex() const { return m_NextAnimIndex; }
 	void Set_AnimLoop(Bool isLoop) { m_IsAnimLoop = isLoop; }
 	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
 	Bool Is_AnimationFinished() const { return m_IsAnimEnd; }
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
-	const TRANSFORM_FRAME& Get_RootTransformDelta(uint32 nodeIndex) const;
+	TRANSFORM_FRAME Get_RootTransformDelta(uint32 nodeIndex) const;
 	void Set_LocalRootNode(uint32 nodeIndex);
 
 	HRESULT Render(uint32 meshIndex);

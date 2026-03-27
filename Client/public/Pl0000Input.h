@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL P10000Input final : public ScriptComponent
+class CLIENT_DLL Pl0000Input final : public ScriptComponent
 {
 	RTTR_ENABLE(Component)
 public:
@@ -20,10 +20,10 @@ public:
 	} INPUT_INFO;
 
 public:
-	explicit P10000Input();
-	explicit P10000Input(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
-	explicit P10000Input(const P10000Input &rhs);
-	virtual ~P10000Input() override = default;
+	explicit Pl0000Input();
+	explicit Pl0000Input(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
+	explicit Pl0000Input(const Pl0000Input &rhs);
+	virtual ~Pl0000Input() override = default;
 
 	// ===================================================================
 	// 키보드 단일 키 상태 판별
@@ -52,6 +52,7 @@ public:
 	// WASD 통합 제어 (Bool 반환 / vector 반환)
 	// ===================================================================
 public:
+	Bool Is_WASD_UP() const;
 	Bool Is_WASD_Down() const;
 	Bool Is_WASD_Press() const;
 	Bool Is_WASD_DoubleClick() const;
@@ -148,7 +149,7 @@ private:
 	Float m_ComboTimeout{ 0.8f };
 
 public:
-	static Shared<P10000Input> Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
+	static Shared<Pl0000Input> Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
 	Shared<Component> Clone(void *arg = nullptr) override;
 };
 

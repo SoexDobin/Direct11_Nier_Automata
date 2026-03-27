@@ -214,9 +214,9 @@ void Model::Update_ModelAnimation(Float timeDelta)
 	}
 }
 
-void Model::Set_Animation(uint32 index, Float blendDuration)
+void Model::Set_Animation(uint32 index, Float blendDuration, Bool isSync)
 {
-	if (m_CurrentAnimIndex == index) return;
+	if (m_CurrentAnimIndex == index || (m_IsBlending && m_NextAnimIndex == index)) return;
 
 	if (m_IsBlending)
 	{
@@ -228,8 +228,15 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 	m_BlendingElapsed = 0.f;
 	m_BlendingDuration = blendDuration;
 
-	Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
-	m_Animations[m_NextAnimIndex]->Set_Progress(progress);
+	if (isSync)
+	{
+		Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
+		m_Animations[m_NextAnimIndex]->Set_Progress(progress);
+	}
+	else
+	{
+		m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
+	}
 
 }
 
@@ -243,7 +250,7 @@ int32 Model::Get_BoneIndexByName(const string& boneName) const
 	return -1;
 }
 
-const TRANSFORM_FRAME& Model::Get_RootTransformDelta(uint32 nodeIndex) const
+TRANSFORM_FRAME Model::Get_RootTransformDelta(uint32 nodeIndex) const
 {
 	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())
 	{

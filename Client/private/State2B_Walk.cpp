@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "State2B_Walk.h"
-#include "P10000Body.h"
+#include "Pl0000Body.h"
 #include <Game.h>
 #include <SpdLogger.h>
 
@@ -9,7 +9,7 @@
 #include "StateMachine.h"
 #include "Camera.h"
 
-State2B_Walk::State2B_Walk(const wstring& tag, const Shared<P10000>& owner)
+State2B_Walk::State2B_Walk(const wstring& tag, const Shared<Pl0000>& owner)
 	: State2B{tag, owner}
 {
 }
@@ -83,7 +83,7 @@ void State2B_Walk::StateExitInvoke()
 {
 }
 
-Shared<State2B_Walk> State2B_Walk::Create(const wstring& tag, const Shared<P10000>& owner)
+Shared<State2B_Walk> State2B_Walk::Create(const wstring& tag, const Shared<Pl0000>& owner)
 {
 	auto instance = make_shared<State2B_Walk>(tag, owner);
 

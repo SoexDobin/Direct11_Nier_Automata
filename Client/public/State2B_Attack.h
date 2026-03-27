@@ -3,12 +3,12 @@
 
 NS_BEGIN(Client)
 
-class P10000;
+class Pl0000;
 
 class CLIENT_DLL State2B_Attack final : public State2B
 {
 public:
-	explicit State2B_Attack(const wstring& tag, const Shared<P10000>& owner);
+	explicit State2B_Attack(const wstring& tag, const Shared<Pl0000>& owner);
 	~State2B_Attack() override = default;
 
 private:
@@ -21,7 +21,7 @@ public:
 	void StateExitInvoke() override;
 
 public:
-	static Shared<State2B_Attack> Create(const wstring& tag, const Shared<P10000>& owner);
+	static Shared<State2B_Attack> Create(const wstring& tag, const Shared<Pl0000>& owner);
 };
 
 NS_END

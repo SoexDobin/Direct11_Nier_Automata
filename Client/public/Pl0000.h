@@ -1,6 +1,6 @@
 #pragma once
 #include "ContainerObject.h"
-#include "P10000Input.h"
+#include "Pl0000Input.h"
 
 
 NS_BEGIN(Engine)
@@ -10,11 +10,11 @@ NS_BEGIN(Engine)
 
 NS_BEGIN(Client)
 
-class P10000StateMachine;
+class Pl0000StateMachine;
 class WP0070Body;
 class WP0220Body;
 
-class CLIENT_DLL P10000 final : public ContainerObject
+class CLIENT_DLL Pl0000 final : public ContainerObject
 {
 	RTTR_ENABLE(ContainerObject)
 
@@ -25,10 +25,10 @@ public:
     } STATE_CONTAINER;
 
 public:
-	explicit P10000();
-	explicit P10000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	explicit P10000(const P10000& rhs);
-	~P10000() override = default;
+	explicit Pl0000();
+	explicit Pl0000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit Pl0000(const Pl0000& rhs);
+	~Pl0000() override = default;
 
 public:
     HRESULT Initialize_Prototype() override;
@@ -51,11 +51,11 @@ private:
     HRESULT Ready_Components();
 
 private:
-    Shared<P10000StateMachine> m_P10000States{ nullptr };
-    Shared<P10000Input> m_P10000Input{ nullptr };
+    Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
+    Shared<Pl0000Input> m_Pl0000Input{ nullptr };
 
 public:
-	static Shared<P10000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	static Shared<Pl0000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
 
 public:
@@ -97,6 +97,10 @@ public:
         DASH_L_TO_SPRINT    = 76,
         
         // JUMP
+        JUMP_ENTER          = 13, // 20
+        JUMP_HOLD           = 14, // 21
+        JUMP_EXIT           = 15, // 22
+
         STAND_TO_JUMP       = 23,
         RUN_TO_JUMP         = 24,
         SPRINT_TO_JUMP      = 25,

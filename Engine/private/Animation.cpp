@@ -5,6 +5,7 @@
 #include "SpdLogger.h"
 #include "String_Helper.h"
 #include "Bone.h"
+#include <cmath>
 
 Animation::Animation() : Component{} {}
 Animation::Animation(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -80,9 +81,13 @@ Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared
 	if (m_CurrentTrackPosition >= m_Duration) //  현재 트랙이 애니메이션 길이를 넘으면 
 	{
 		if (false == isLoop) 
+		{
+			m_CurrentTrackPosition = m_Duration; // 마지막 프레임 고정
 			return true; // 그만
+		}
 
-		m_CurrentTrackPosition = 0; // 트랙 초기화 반복
+
+		m_CurrentTrackPosition = fmod(m_CurrentTrackPosition, m_Duration); // 나머지 시간 보존 (Aliasing 방지)
 	}
 
 	
@@ -99,27 +104,27 @@ Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared
 
 void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
 {
-	for (uint32 i = 0; i < m_NumChannels; ++i)
-		m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, rootNodeIndex);
-	for (uint32 i = 0; i < nextAnim->m_NumChannels; ++i)
-		nextAnim->m_Channels[i]->Update_TransformationMatrix(nextAnim->m_CurrentKeyFrameIndices[i], nextAnim->m_CurrentTrackPosition, nextAnim->m_Duration, bones, rootNodeIndex);
-
+	// 1. 각 애니메이션의 시간 업데이트 (나머지 보존)
 	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;
 	if (m_CurrentTrackPosition >= m_Duration)
-		m_CurrentTrackPosition = 0;
+		m_CurrentTrackPosition = fmod(m_CurrentTrackPosition, m_Duration);
 
 	nextAnim->m_CurrentTrackPosition += nextAnim->m_TickPerSecond * timeDelta;
 	if (nextAnim->m_CurrentTrackPosition >= nextAnim->m_Duration)
-	{
-		nextAnim->m_CurrentTrackPosition = 0.f;
-	}
+		nextAnim->m_CurrentTrackPosition = fmod(nextAnim->m_CurrentTrackPosition, nextAnim->m_Duration);
 
+	// 2. 블렌딩 수행
 	for (uint32 i = 0; i < m_NumChannels; ++i)
 	{
 		TRANSFORM_FRAME curTrans{}, nextTrans{};
 
+		// 각 채널로부터 보간된 Transform 획득
 		m_Channels[i]->Get_ChannelTransform(m_CurrentTrackPosition, m_CurrentKeyFrameIndices[i], m_Duration, curTrans);
+		m_Channels[i]->Update_Deltas(curTrans, m_CurrentTrackPosition);
+		
+		// 다음 애니메이션에서 동일한 뼈의 채널 찾기 (일반적으로 인덱스가 같음)
 		nextAnim->m_Channels[i]->Get_ChannelTransform(nextAnim->m_CurrentTrackPosition, nextAnim->m_CurrentKeyFrameIndices[i], nextAnim->m_Duration, nextTrans);
+		nextAnim->m_Channels[i]->Update_Deltas(nextTrans, nextAnim->m_CurrentTrackPosition);
 
 		Vector3 targetScale = Vector3::Lerp(curTrans.scale, nextTrans.scale, blendRatio);
 		Vector4 targetRot = Quaternion::Slerp(curTrans.rotation, nextTrans.rotation, blendRatio);

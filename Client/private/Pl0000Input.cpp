@@ -1,35 +1,41 @@
 #include "pch.h"
-#include "P10000Input.h"
+#include "Pl0000Input.h"
 
 #include <Game.h>
 
-P10000Input::P10000Input() : ScriptComponent{} {}
-P10000Input::P10000Input(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
+Pl0000Input::Pl0000Input() : ScriptComponent{}
+{
+	ZeroMemory(&m_MouseMovement, sizeof(LONG) * ETOI(DIMB::END));
+}
+Pl0000Input::Pl0000Input(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
 	: ScriptComponent{device, context}
 {
 	ZeroMemory(&m_KeyInfos, sizeof(INPUT_INFO) * KEY_MAX);
 	ZeroMemory(&m_MouseInfos, sizeof(INPUT_INFO) * ETOI(DIMB::END));
 	ZeroMemory(&m_MouseMovement, sizeof(LONG) * ETOI(DIMB::END));
 }
-P10000Input::P10000Input(const P10000Input &rhs)
-	: ScriptComponent{rhs} {}
+Pl0000Input::Pl0000Input(const Pl0000Input &rhs)
+	: ScriptComponent{rhs}
+{
+	ZeroMemory(&m_MouseMovement, sizeof(LONG) * ETOI(DIMB::END));
+}
 
-HRESULT P10000Input::Initialize_Prototype()
+HRESULT Pl0000Input::Initialize_Prototype()
 {
 	return ScriptComponent::Initialize_Prototype();
 }
 
-HRESULT P10000Input::Initialize(void *arg)
+HRESULT Pl0000Input::Initialize(void *arg)
 {
 	return ScriptComponent::Initialize(arg);
 }
 
-void P10000Input::On_Disable()
+void Pl0000Input::On_Disable()
 {
 	ScriptComponent::On_Disable();
 }
 
-void P10000Input::On_Enable()
+void Pl0000Input::On_Enable()
 {
 	ScriptComponent::On_Enable();
 }
@@ -37,7 +43,7 @@ void P10000Input::On_Enable()
 // ===================================================================
 // 매 프레임 갱신
 // ===================================================================
-void P10000Input::Update_P10000_InputState(Float timeDelta)
+void Pl0000Input::Update_P10000_InputState(Float timeDelta)
 {
 	if (!Is_Active() || !GAME_INSTANCE->Get_InputEnabled()) return;
 
@@ -84,7 +90,7 @@ void P10000Input::Update_P10000_InputState(Float timeDelta)
 // ===================================================================
 // 키 상태 전이 (DOWN → PRESSED → UP → NONE)
 // ===================================================================
-void P10000Input::Update_P10000_KeyState(Byte rawState, INPUT_INFO &outInfo, Float timeDelta)
+void Pl0000Input::Update_P10000_KeyState(Byte rawState, INPUT_INFO &outInfo, Float timeDelta)
 {
 	Bool isPressed = (rawState & 0x80) != 0;
 
@@ -132,31 +138,37 @@ void P10000Input::Update_P10000_KeyState(Byte rawState, INPUT_INFO &outInfo, Flo
 // ===================================================================
 // WASD 통합 제어 (Bool)
 // ===================================================================
-Bool P10000Input::Is_WASD_Down() const
+Bool Pl0000Input::Is_WASD_UP() const
+{
+	return Is_KeyUp(DIKEYBOARD_W) || Is_KeyUp(DIKEYBOARD_A) ||
+		Is_KeyUp(DIKEYBOARD_S) || Is_KeyDown(DIKEYBOARD_D);
+}
+
+Bool Pl0000Input::Is_WASD_Down() const
 {
 	return Is_KeyDown(DIKEYBOARD_W) || Is_KeyDown(DIKEYBOARD_A) ||
 		   Is_KeyDown(DIKEYBOARD_S) || Is_KeyDown(DIKEYBOARD_D);
 }
 
-Bool P10000Input::Is_WASD_Press() const
+Bool Pl0000Input::Is_WASD_Press() const
 {
 	return Is_KeyPress(DIKEYBOARD_W) || Is_KeyPress(DIKEYBOARD_A) ||
 		   Is_KeyPress(DIKEYBOARD_S) || Is_KeyPress(DIKEYBOARD_D);
 }
 
-Bool P10000Input::Is_WASD_DoubleClick() const
+Bool Pl0000Input::Is_WASD_DoubleClick() const
 {
 	return Is_KeyMultiClick(DIKEYBOARD_W) || Is_KeyMultiClick(DIKEYBOARD_A) ||
 		   Is_KeyMultiClick(DIKEYBOARD_S) || Is_KeyMultiClick(DIKEYBOARD_D);
 }
 
-Bool P10000Input::Is_WASD_Hold(Float holdThreshold) const
+Bool Pl0000Input::Is_WASD_Hold(Float holdThreshold) const
 {
 	return Is_KeyHold(DIKEYBOARD_W, holdThreshold) || Is_KeyHold(DIKEYBOARD_A, holdThreshold) ||
 		   Is_KeyHold(DIKEYBOARD_S, holdThreshold) || Is_KeyHold(DIKEYBOARD_D, holdThreshold);
 }
 
-Bool P10000Input::Is_WASD_Diagonal() const
+Bool Pl0000Input::Is_WASD_Diagonal() const
 {
 	Bool w = Is_KeyPress(DIKEYBOARD_W);
 	Bool s = Is_KeyPress(DIKEYBOARD_S);
@@ -170,12 +182,12 @@ Bool P10000Input::Is_WASD_Diagonal() const
 	return (w || s) && (a || d);
 }
 
-Bool P10000Input::Is_WA_Press() const
+Bool Pl0000Input::Is_WA_Press() const
 {
 	return Is_KeyPress(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_A);
 }
 
-Bool P10000Input::Is_WA_DoubleClick() const
+Bool Pl0000Input::Is_WA_DoubleClick() const
 {
 	if (Is_KeyMultiClick(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_A))
 		return true;
@@ -185,7 +197,7 @@ Bool P10000Input::Is_WA_DoubleClick() const
 	return false;
 }
 
-Bool P10000Input::Is_WA_Hold(Float holdThreshold) const
+Bool Pl0000Input::Is_WA_Hold(Float holdThreshold) const
 {
 	if (Is_KeyHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
 		return true;
@@ -195,7 +207,7 @@ Bool P10000Input::Is_WA_Hold(Float holdThreshold) const
 	return false;
 }
 
-Bool P10000Input::Is_WA_DoubleClickedHold(Float holdThreshold) const
+Bool Pl0000Input::Is_WA_DoubleClickedHold(Float holdThreshold) const
 {
 	if (Is_KeyMultiClickHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
 		return true;
@@ -205,12 +217,12 @@ Bool P10000Input::Is_WA_DoubleClickedHold(Float holdThreshold) const
 	return false;
 }
 
-Bool P10000Input::Is_WD_Press() const
+Bool Pl0000Input::Is_WD_Press() const
 {
 	return Is_KeyPress(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_D);
 }
 
-Bool P10000Input::Is_WD_DoubleClick() const
+Bool Pl0000Input::Is_WD_DoubleClick() const
 {
 	if (Is_KeyMultiClick(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_D))
 		return true;
@@ -220,7 +232,7 @@ Bool P10000Input::Is_WD_DoubleClick() const
 	return false;
 }
 
-Bool P10000Input::Is_WD_Hold(Float holdThreshold) const
+Bool Pl0000Input::Is_WD_Hold(Float holdThreshold) const
 {
 	if (Is_KeyHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
 		return true;
@@ -230,7 +242,7 @@ Bool P10000Input::Is_WD_Hold(Float holdThreshold) const
 	return false;
 }
 
-Bool P10000Input::Is_WD_DoubleClickedHold(Float holdThreshold) const
+Bool Pl0000Input::Is_WD_DoubleClickedHold(Float holdThreshold) const
 {
 	if (Is_KeyMultiClickHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
 		return true;
@@ -240,12 +252,12 @@ Bool P10000Input::Is_WD_DoubleClickedHold(Float holdThreshold) const
 	return false;
 }
 
-Bool P10000Input::Is_SA_Press() const
+Bool Pl0000Input::Is_SA_Press() const
 {
 	return Is_KeyPress(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_A);
 }
 
-Bool P10000Input::Is_SA_DoubleClick() const
+Bool Pl0000Input::Is_SA_DoubleClick() const
 {
 	if (Is_KeyMultiClick(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_A))
 		return true;
@@ -255,7 +267,7 @@ Bool P10000Input::Is_SA_DoubleClick() const
 	return false;
 }
 
-Bool P10000Input::Is_SA_Hold(Float holdThreshold) const
+Bool Pl0000Input::Is_SA_Hold(Float holdThreshold) const
 {
 	if (Is_KeyHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
 		return true;
@@ -265,7 +277,7 @@ Bool P10000Input::Is_SA_Hold(Float holdThreshold) const
 	return false;
 }
 
-Bool P10000Input::Is_SA_DoubleClickedHold(Float holdThreshold) const
+Bool Pl0000Input::Is_SA_DoubleClickedHold(Float holdThreshold) const
 {
 	if (Is_KeyMultiClickHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
 		return true;
@@ -275,12 +287,12 @@ Bool P10000Input::Is_SA_DoubleClickedHold(Float holdThreshold) const
 	return false;
 }
 
-Bool P10000Input::Is_SD_Press() const
+Bool Pl0000Input::Is_SD_Press() const
 {
 	return Is_KeyPress(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_D);
 }
 
-Bool P10000Input::Is_SD_DoubleClick() const
+Bool Pl0000Input::Is_SD_DoubleClick() const
 {
 	if (Is_KeyMultiClick(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_D))
 		return true;
@@ -290,7 +302,7 @@ Bool P10000Input::Is_SD_DoubleClick() const
 	return false;
 }
 
-Bool P10000Input::Is_SD_Hold(Float holdThreshold) const
+Bool Pl0000Input::Is_SD_Hold(Float holdThreshold) const
 {
 	if (Is_KeyHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
 		return true;
@@ -300,7 +312,7 @@ Bool P10000Input::Is_SD_Hold(Float holdThreshold) const
 	return false;
 }
 
-Bool P10000Input::Is_SD_DoubleClickedHold(Float holdThreshold) const
+Bool Pl0000Input::Is_SD_DoubleClickedHold(Float holdThreshold) const
 {
 	if (Is_KeyMultiClickHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
 		return true;
@@ -313,7 +325,7 @@ Bool P10000Input::Is_SD_DoubleClickedHold(Float holdThreshold) const
 // ===================================================================
 // 마우스 콤보 큐 판별
 // ===================================================================
-Bool P10000Input::Is_MouseComboMatch(const vector<Engine::DIMB> &pattern) const
+Bool Pl0000Input::Is_MouseComboMatch(const vector<Engine::DIMB> &pattern) const
 {
 	if (m_MouseComboQueue.size() != pattern.size())
 		return false;
@@ -326,7 +338,7 @@ Bool P10000Input::Is_MouseComboMatch(const vector<Engine::DIMB> &pattern) const
 	return true;
 }
 
-Bool P10000Input::Is_MouseComboStartsWith(const vector<Engine::DIMB> &pattern) const
+Bool Pl0000Input::Is_MouseComboStartsWith(const vector<Engine::DIMB> &pattern) const
 {
 	if (m_MouseComboQueue.size() < pattern.size())
 		return false;
@@ -339,7 +351,7 @@ Bool P10000Input::Is_MouseComboStartsWith(const vector<Engine::DIMB> &pattern) c
 	return true;
 }
 
-Engine::DIMB P10000Input::Get_MouseComboLast() const
+Engine::DIMB Pl0000Input::Get_MouseComboLast() const
 {
 	if (m_MouseComboQueue.empty())
 		return Engine::DIMB::END;
@@ -350,26 +362,26 @@ Engine::DIMB P10000Input::Get_MouseComboLast() const
 // ===================================================================
 // 팩토리
 // ===================================================================
-Shared<P10000Input> P10000Input::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
+Shared<Pl0000Input> Pl0000Input::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
 {
-	auto prototype = make_shared<P10000Input>(device, context);
+	auto prototype = make_shared<Pl0000Input>(device, context);
 
 	if (FAILED(prototype->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : P10000Input");
+		MSG_BOX("Failed to Created : Pl0000Input");
 		return nullptr;
 	}
 
 	return prototype;
 }
 
-Shared<Component> P10000Input::Clone(void *arg)
+Shared<Component> Pl0000Input::Clone(void *arg)
 {
-	auto instance = make_shared<P10000Input>(*this);
+	auto instance = make_shared<Pl0000Input>(*this);
 
 	if (FAILED(instance->Initialize(arg)))
 	{
-		MSG_BOX("Failed to Clone : P10000Input");
+		MSG_BOX("Failed to Clone : Pl0000Input");
 		return nullptr;
 	}
 

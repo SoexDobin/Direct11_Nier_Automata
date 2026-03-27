@@ -3,12 +3,12 @@
 
 NS_BEGIN(Client)
 
-class P10000;
+class Pl0000;
 
 class CLIENT_DLL State2B_Idle final : public State2B
 {
 public:
-	explicit State2B_Idle(const wstring& tag, const Shared<P10000>& owner);
+	explicit State2B_Idle(const wstring& tag, const Shared<Pl0000>& owner);
 	~State2B_Idle() override = default;
 
 private:
@@ -20,8 +20,12 @@ public:
 	void Late_Update(Float timeDelta) override;
 	void StateExitInvoke() override;
 
+
+private:
+	Bool m_InitializeState{ true };
+
 public:
-	static Shared<State2B_Idle> Create(const wstring& tag, const Shared<P10000>& owner);
+	static Shared<State2B_Idle> Create(const wstring& tag, const Shared<Pl0000>& owner);
 };
 
 NS_END

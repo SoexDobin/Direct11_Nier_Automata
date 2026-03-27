@@ -7,22 +7,22 @@
 #include "Model.h"
 
 
-WP0220Body::WP0220Body() : P10000Parts{} {}
+WP0220Body::WP0220Body() : Pl0000Parts{} {}
 WP0220Body::WP0220Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: P10000Parts{ device, context } {
+	: Pl0000Parts{ device, context } {
 }
 WP0220Body::WP0220Body(const WP0220Body& rhs)
-	: P10000Parts{ rhs } {
+	: Pl0000Parts{ rhs } {
 }
 
 HRESULT WP0220Body::Initialize_Prototype()
 {
-	return P10000Parts::Initialize_Prototype();
+	return Pl0000Parts::Initialize_Prototype();
 }
 
 HRESULT WP0220Body::Initialize(void* arg)
 {
-	if (FAILED(P10000Parts::Initialize(arg)))
+	if (FAILED(Pl0000Parts::Initialize(arg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))

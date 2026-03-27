@@ -87,18 +87,8 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 	}
 }
 
-void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
+void Channel::Update_Deltas(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition)
 {
-	// rootNodeIndex 가 존재한다면
-	// 해당 Channel이 가진 KeyFrame을 가지고 Matrix를 구성하고 이게 pl0000 이면 최상위 노드이니 
-	// 해당 노드의 역행렬을 모두 곱해주어서 애니메이션이 더이상 rootNode의 이동량을 따라가지 않도록 하기
-
-	// 위 연산을 이루는 동안 Channel은 이전 KeyFrame 데이터 - 현재 KeyFrame 데이터 을 통해 Get_ChannelTransform시 넘겨줄 변화량 제공
-	// 물론 사용은 어차피 거의 실제 Client 쪽에 사용할 rootNode만 사용할거임
-
-	TRANSFORM_FRAME currentFrame{};
-	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
-
 	if (m_IsFirstUpdate)
 	{
 		m_PrevTransform = currentFrame;
@@ -107,8 +97,14 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 	}
 	else
 	{
+		if (currentTrackPosition < m_PrevTrackPosition)
+		{
+			m_PrevTransform = currentFrame;
+		}
+
 		// 1. 위치 델타 계산
 		m_TransformationDelta.position = currentFrame.position - m_PrevTransform.position;
+
 		// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
 		Quaternion qtCurr(currentFrame.rotation);
 		Quaternion qtPrev(m_PrevTransform.rotation);
@@ -119,6 +115,15 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 
 		m_PrevTransform = currentFrame;
 	}
+	m_PrevTrackPosition = currentTrackPosition;
+}
+
+void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
+{
+	TRANSFORM_FRAME currentFrame{};
+	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
+
+	Update_Deltas(currentFrame, currentTrackPosition);
 
 	Matrix boneMatrix{};
 	if (m_BoneIndex == rootNodeIndex)

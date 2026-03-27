@@ -80,11 +80,11 @@
               "typeName": "Transform"
             }
           ],
-          "name": "P10000",
-          "objectID": 304936146,
+          "name": "Pl0000",
+          "objectID": 4267756554,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "P10000",
+          "prototypeTag": "Pl0000",
           "transform": {
             "position": [
               0.0,
@@ -102,7 +102,7 @@
               1.0
             ]
           },
-          "typeName": "P10000"
+          "typeName": "Pl0000"
         }
       ]
     }

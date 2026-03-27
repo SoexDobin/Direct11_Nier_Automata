@@ -21,26 +21,26 @@ HRESULT State2B_Dash::Initialize()
 
 Bool State2B_Dash::StateEnterInvoke()
 {
-	if (m_Input.lock()->Is_WA_DoubleClick())
-	{
-
-	}
 
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_W))
 	{
 		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_F), 0.2f, true);
+		return true;
 	}
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_S))
 	{
 		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_B), 0.2f, true);
+		return true;
 	}
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_D))
 	{
 		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_R), 0.2f, true);
+		return true;
 	}
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_A))
 	{
 		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_L), 0.2f, true);
+		return true;
 	}
 
 	return true;
@@ -48,7 +48,8 @@ Bool State2B_Dash::StateEnterInvoke()
 
 void State2B_Dash::Update(Float timeDelta)
 {
-
+	Bool isDashing = m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished();
+	
 }
 
 void State2B_Dash::Late_Update(Float timeDelta)

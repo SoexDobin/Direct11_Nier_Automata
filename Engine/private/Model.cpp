@@ -250,14 +250,14 @@ int32 Model::Get_BoneIndexByName(const string& boneName) const
 	return -1;
 }
 
-TRANSFORM_FRAME Model::Get_RootTransformDelta(uint32 nodeIndex) const
+TRANSFORM_FRAME Model::Get_RootTransformVelocity(uint32 nodeIndex) const
 {
 	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())
 	{
 		Float ratio = m_BlendingElapsed / m_BlendingDuration;
 
-		const TRANSFORM_FRAME& curDelta = m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(nodeIndex);
-		const TRANSFORM_FRAME& nextDelta = m_Animations[m_NextAnimIndex]->Get_TransformDelta(nodeIndex);
+		const TRANSFORM_FRAME& curDelta = m_Animations[m_CurrentAnimIndex]->Get_TransformVelocity(nodeIndex);
+		const TRANSFORM_FRAME& nextDelta = m_Animations[m_NextAnimIndex]->Get_TransformVelocity(nodeIndex);
 
 		TRANSFORM_FRAME blendedDelta{};
 		blendedDelta.position = Vector3::Lerp(curDelta.position, nextDelta.position, ratio);
@@ -266,7 +266,7 @@ TRANSFORM_FRAME Model::Get_RootTransformDelta(uint32 nodeIndex) const
 		return blendedDelta;
 	}
 
-	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(nodeIndex);
+	return m_Animations[m_CurrentAnimIndex]->Get_TransformVelocity(nodeIndex);
 }
 
 void Model::Set_LocalRootNode(uint32 nodeIndex)

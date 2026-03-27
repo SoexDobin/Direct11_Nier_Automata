@@ -138,7 +138,7 @@ void Pl0000Body::Update_Movement(Float timeDelta)
 		m_LastDirection = currentLook;
 
 		// (옵션) 기존 루트 모션 방식 사용 시
-		TRANSFORM_FRAME transformFrame = m_Model->Get_RootTransformDelta(m_RootBoneIndex);
+		TRANSFORM_FRAME transformFrame = m_Model->Get_RootTransformVelocity(m_RootBoneIndex);
 		Vector3 worldMoveDelta = Vector3::Transform(transformFrame.position * -1.f, nextQuat);
 		m_Transform->Set_Position(m_Transform->Get_Position() + worldMoveDelta * timeDelta);
 	}

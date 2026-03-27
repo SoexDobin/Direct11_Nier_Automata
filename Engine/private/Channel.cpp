@@ -14,7 +14,7 @@ Channel::Channel(const Channel& rhs)
 {
 	m_IsFirstUpdate = true; // 클론된 인스턴스는 새로운 상태로 시작해야 함
 	m_PrevTrackPosition = -1.f;
-	m_TransformationDelta = { Vector3::One, Vector4::UnitW, Vector3::Zero };
+	m_Transformation = { Vector3::One, Vector4::UnitW, Vector3::Zero };
 }
 
 void Channel::On_Destroy()
@@ -87,12 +87,12 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 	}
 }
 
-void Channel::Update_Deltas(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition)
+void Channel::Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition)
 {
 	if (m_IsFirstUpdate)
 	{
 		m_PrevTransform = currentFrame;
-		m_TransformationDelta = TRANSFORM_FRAME{ Vector3::One, Quaternion::Identity, Vector3::Zero };
+		m_Transformation = TRANSFORM_FRAME{ Vector3::One, Quaternion::Identity, Vector3::Zero };
 		m_IsFirstUpdate = false;
 	}
 	else
@@ -103,7 +103,7 @@ void Channel::Update_Deltas(const TRANSFORM_FRAME& currentFrame, Float currentTr
 		}
 
 		// 1. 위치 델타 계산
-		m_TransformationDelta.position = currentFrame.position - m_PrevTransform.position;
+		m_Transformation.position = currentFrame.position - m_PrevTransform.position;
 
 		// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
 		Quaternion qtCurr(currentFrame.rotation);
@@ -111,7 +111,7 @@ void Channel::Update_Deltas(const TRANSFORM_FRAME& currentFrame, Float currentTr
 		Quaternion qtInvPrev; qtPrev.Inverse(qtInvPrev);
 
 		Quaternion qtDelta = qtCurr * qtInvPrev;
-		m_TransformationDelta.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
+		m_Transformation.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
 
 		m_PrevTransform = currentFrame;
 	}
@@ -122,7 +122,7 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 {
 	TRANSFORM_FRAME currentFrame{};
 	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
-	Update_Deltas(currentFrame, currentTrackPosition);
+	Update_Velocity(currentFrame, currentTrackPosition);
 
 	Matrix boneMatrix{};
 	if (m_BoneIndex == rootNodeIndex)

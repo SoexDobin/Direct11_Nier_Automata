@@ -24,10 +24,10 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
-	const TRANSFORM_FRAME& Get_TransformDelta() const { return m_TransformationDelta; }
+	const TRANSFORM_FRAME& Get_TransformDelta() const { return m_Transformation; }
 	int32 Get_BoneIndex() const { return m_BoneIndex; }
 	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, _Out_ TRANSFORM_FRAME& outTransform);
-	void Update_Deltas(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition);
+	void Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition);
 	void Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex);
 
 private:
@@ -35,7 +35,7 @@ private:
 	vector<KEYFRAME>	m_KeyFrames;
 	int32				m_BoneIndex{ -1 };
 
-	TRANSFORM_FRAME		m_TransformationDelta{};
+	TRANSFORM_FRAME		m_Transformation{};
 	TRANSFORM_FRAME		m_PrevTransform{};
 	Float				m_PrevTrackPosition{ -1.f };
 	Bool				m_IsFirstUpdate{ true };

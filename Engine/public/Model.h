@@ -54,7 +54,7 @@ public:
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
-	TRANSFORM_FRAME Get_RootTransformDelta(uint32 nodeIndex) const;
+	TRANSFORM_FRAME Get_RootTransformVelocity(uint32 nodeIndex) const;
 	void Set_LocalRootNode(uint32 nodeIndex);
 
 	HRESULT Render(uint32 meshIndex);

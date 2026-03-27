@@ -25,7 +25,7 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
-	const TRANSFORM_FRAME& Get_TransformDelta(int32 boneIndex) const;
+	const TRANSFORM_FRAME& Get_TransformVelocity(int32 boneIndex) const;
 	const wstring& Get_AnimationName() { return m_Name; }
 	Float Get_Progress() const { return m_CurrentTrackPosition / m_Duration; }
 	void Set_Progress(Float progress) { m_CurrentTrackPosition = m_Duration * progress; }

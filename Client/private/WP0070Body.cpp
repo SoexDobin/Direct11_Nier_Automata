@@ -51,7 +51,7 @@ void WP0070Body::Update(Float timeDelta)
 
 void WP0070Body::Late_Update(Float timeDelta)
 {
-
+	m_Transform->Update_WorldMatrix();
 }
 
 void WP0070Body::Fixed_Update(Float fixedDelta)
@@ -87,7 +87,10 @@ void WP0070Body::Submit_RenderGroup()
 
 HRESULT WP0070Body::Bind_ShaderResources()
 {
-	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
+	//if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
+	//	return E_FAIL;
+
+	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
 		return E_FAIL;

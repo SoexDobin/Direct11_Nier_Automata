@@ -216,7 +216,7 @@ void Model::Update_ModelAnimation(Float timeDelta)
 
 void Model::Set_Animation(uint32 index, Float blendDuration, Bool isSync)
 {
-	if (m_CurrentAnimIndex == index || (m_IsBlending && m_NextAnimIndex == index)) return;
+	if (m_CurrentAnimIndex == index) return;
 
 	if (m_IsBlending)
 	{

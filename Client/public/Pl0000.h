@@ -51,6 +51,7 @@ private:
     HRESULT Ready_Components();
 
 private:
+    Shared<Transform> m_MainBodyTransform{ nullptr };
     Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
 

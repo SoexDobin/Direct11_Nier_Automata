@@ -36,14 +36,10 @@ private:
 	int32				m_BoneIndex{ -1 };
 
 	TRANSFORM_FRAME		m_TransformationDelta{};
-
 	TRANSFORM_FRAME		m_PrevTransform{};
 	Float				m_PrevTrackPosition{ -1.f };
-
 	Bool				m_IsFirstUpdate{ true };
 	Bool				m_IsFirstFrame{ true };
-	
-	
 
 public:
 	static Shared<Channel> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_CHANNEL& keyFrame);

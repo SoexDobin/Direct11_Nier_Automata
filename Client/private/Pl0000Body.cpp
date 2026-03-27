@@ -63,12 +63,11 @@ void Pl0000Body::Update(Float timeDelta)
 
 void Pl0000Body::Late_Update(Float timeDelta)
 {
-	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 }
 
 void Pl0000Body::Fixed_Update(Float fixedDelta)
 {
-
+	
 }
 
 HRESULT Pl0000Body::Render()
@@ -124,7 +123,7 @@ void Pl0000Body::Update_Movement(Float timeDelta)
 		Quaternion targetQuat = Quaternion::CreateFromYawPitchRoll(targetYaw, 0.f, 0.f);
 
 		// turnSpeed가 작을수록 크게 둥글게 돌고, 클수록 좁게 휙 돕니다. (원하는 조작감에 맞춰 수정)
-		float turnSpeed = 10.0f * timeDelta;
+		float turnSpeed = 8.0f * timeDelta;
 		Quaternion currentQuat = m_Transform->Get_Quaternion();
 		Quaternion nextQuat = Quaternion::Slerp(currentQuat, targetQuat, turnSpeed);
 
@@ -174,6 +173,7 @@ HRESULT Pl0000Body::Bind_ShaderResources()
 
 HRESULT Pl0000Body::Ready_Components()
 {
+
 	Shader::SHADER_DESC shaderDesc{ VTXANIMMESH::Tag,  VTXANIMMESH::Elements, VTXANIMMESH::numElements };
 	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)

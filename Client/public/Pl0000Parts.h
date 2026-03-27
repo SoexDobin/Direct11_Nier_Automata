@@ -13,6 +13,11 @@ class CLIENT_DLL Pl0000Parts abstract :public PartObject
 {
 	RTTR_ENABLE(PartObject)
 public:
+	typedef struct tagPl0000PartsDesc : public PARTOBJECT_DESC
+	{
+		
+	} PL0000PART_DESC;
+public:
 	explicit Pl0000Parts();
 	explicit Pl0000Parts(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Pl0000Parts(const Pl0000Parts& rhs);

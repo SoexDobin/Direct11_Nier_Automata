@@ -38,12 +38,8 @@ void State2B_Run::Update(Float timeDelta)
 		return;
 	}
 
-	if (m_Input.lock()->Is_WASD_Hold(0.5f))
-	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::RUN_CYCLE), 0.2f, true);
+	if (m_Input.lock()->Is_WASD_Hold(0.5f) || m_Input.lock()->Is_WASD_Down() || m_Input.lock()->Is_WASD_Press())
 		return;
-	}
-
 
 	m_States.lock()->Change_State(Pl0000::P10000_STATE::IDLE);
 }

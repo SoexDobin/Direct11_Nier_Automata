@@ -63,11 +63,11 @@ void Pl0000::Priority_Update(Float timeDelta)
 void Pl0000::Update(Float timeDelta)
 {
 	m_Pl0000States->Update_State(timeDelta);
+	m_Transform->Set_WorldMatrix(m_MainBodyTransform->Get_WorldMatrix());
 }
 
 void Pl0000::Late_Update(Float timeDelta)
 {
-	
 
 
 }
@@ -99,6 +99,8 @@ HRESULT Pl0000::Ready_PartObjects()
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body", &desc)))
 		return E_FAIL;
 	// TODO : POD
+
+	m_MainBodyTransform = Find_PartObject(L"Pl0000Body")->Get_Component<Transform>();
 
 	return S_OK;
 }

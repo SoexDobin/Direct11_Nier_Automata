@@ -122,7 +122,6 @@ void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float cu
 {
 	TRANSFORM_FRAME currentFrame{};
 	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
-
 	Update_Deltas(currentFrame, currentTrackPosition);
 
 	Matrix boneMatrix{};

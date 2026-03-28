@@ -196,7 +196,7 @@ void Model::Update_ModelAnimation(Float timeDelta)
 		}
 		else
 		{
-			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones, m_RootLocalNode);
+			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones, m_IsPrevAnimLoop, m_IsAnimLoop, m_RootLocalNode);
 		}
 	}
 	else
@@ -219,6 +219,7 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 		m_CurrentAnimIndex = m_NextAnimIndex;
 	}
 
+	m_IsPrevAnimLoop = m_IsAnimLoop;
  	m_NextAnimIndex = index;
 	m_IsBlending = true;
 	m_BlendingElapsed = 0.f;
@@ -251,6 +252,7 @@ TRANSFORM_FRAME Model::Get_RootTransformVelocity(uint32 nodeIndex) const
 		blendedDelta.position = Vector3::Lerp(curDelta.position, nextDelta.position, ratio);
 		blendedDelta.rotation = Quaternion::Slerp(curDelta.rotation, nextDelta.rotation, ratio);
 		blendedDelta.scale = Vector3::One;
+
 		return blendedDelta;
 	}
 

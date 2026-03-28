@@ -26,9 +26,9 @@ public:
 public:
 	const TRANSFORM_FRAME& Get_TransformDelta() const { return m_Transformation; }
 	int32 Get_BoneIndex() const { return m_BoneIndex; }
-	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, _Out_ TRANSFORM_FRAME& outTransform);
+	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, Bool isLoop, _Out_ TRANSFORM_FRAME& outTransform);
 	void Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition);
-	void Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex);
+	void Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex, Bool isLoop);
 
 private:
 	uint32				m_NumKeyFrames{};

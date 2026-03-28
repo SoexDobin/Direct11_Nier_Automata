@@ -687,6 +687,19 @@
                                          "has_clone":  true,
                                          "category":  "other"
                                      },
+                    "Pl0000Movement":  {
+                                           "members":  [
+
+                                                       ],
+                                           "base_class":  "Movement",
+                                           "inherited_members":  {
+
+                                                                 },
+                                           "namespace":  "Engine",
+                                           "has_create":  true,
+                                           "has_clone":  true,
+                                           "category":  "other"
+                                       },
                     "State2B_Idle":  {
                                          "members":  [
                                                          {

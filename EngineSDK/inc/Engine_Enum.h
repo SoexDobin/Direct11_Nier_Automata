@@ -10,6 +10,7 @@ enum class D3DTS { VIEW, PROJ, END };
 enum class DIMB { LBUTTON, RBUTTON, WHEEL, END };
 enum class DIMM { X, Y, WHEEL, END };
 enum class LIGHT { DIRECTIONAL, POINT, END };
+enum class EVENT_TYPE { ONCE, PERMANENT };
 
 enum class SOUNDCHANNEL
 {

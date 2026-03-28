@@ -24,7 +24,7 @@ HRESULT State2B_Jump::Initialize()
 Bool State2B_Jump::StateEnterInvoke()
 {
 	auto pl0000 = m_Body.lock();
-
+	// 
 	switch (auto prevState = m_States.lock()->Get_CurP10000State())
 	{
 	case Pl0000::PL0000_STATE::IDLE:

@@ -210,6 +210,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Engine_RTTR_Metadata.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
+    <ClInclude Include="..\public\EventManager.h" />
     <ClInclude Include="..\public\Font.h" />
     <ClInclude Include="..\public\FontManager.h" />
     <ClInclude Include="..\public\Game.h" />
@@ -260,6 +261,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Channel.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\ContainerObject.cpp" />
+    <ClCompile Include="..\private\EventManager.cpp" />
     <ClCompile Include="..\private\Font.cpp" />
     <ClCompile Include="..\private\FontManager.cpp" />
     <ClCompile Include="..\private\Game.cpp" />

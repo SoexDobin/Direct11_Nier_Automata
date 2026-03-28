@@ -79,6 +79,7 @@ private:
 
 private:
 	Bool	m_IsAnimLoop{ false };
+	Bool	m_IsPrevAnimLoop{ false };
 	Bool	m_IsAnimEnd{ false };
 	uint32	m_CurrentAnimIndex{};
 

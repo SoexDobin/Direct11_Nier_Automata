@@ -89,28 +89,39 @@ Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared
 		m_CurrentTrackPosition = fmod(m_CurrentTrackPosition, m_Duration); // 나머지 시간 보존 (Aliasing 방지)
 	}
 
-	
 	for (uint32 i = 0; i < m_NumChannels; ++i)
 	{
 		if (m_IsLocalTransformationPresent) // 루트 노드의 영향을 받으면
-			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, rootNodeIndex);
+			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, rootNodeIndex, isLoop);
 		else 
-			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, -1);
+			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], m_CurrentTrackPosition, m_Duration, bones, -1, isLoop);
 	}
 
 	return false;
 }
 
-void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
+void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones, Bool isCurLoop, Bool isNextLoop, int32 rootNodeIndex)
 {
 	// 1. 각 애니메이션의 시간 업데이트 (나머지 보존)
 	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;
 	if (m_CurrentTrackPosition >= m_Duration)
-		m_CurrentTrackPosition = fmod(m_CurrentTrackPosition, m_Duration);
-
+	{
+		if (isCurLoop)
+			m_CurrentTrackPosition = fmod(m_CurrentTrackPosition, m_Duration);
+		else
+			m_CurrentTrackPosition = m_Duration;
+	}
+		
+	
 	nextAnim->m_CurrentTrackPosition += nextAnim->m_TickPerSecond * timeDelta;
 	if (nextAnim->m_CurrentTrackPosition >= nextAnim->m_Duration)
-		nextAnim->m_CurrentTrackPosition = fmod(nextAnim->m_CurrentTrackPosition, nextAnim->m_Duration);
+	{
+		if (isNextLoop)
+			nextAnim->m_CurrentTrackPosition = fmod(nextAnim->m_CurrentTrackPosition, nextAnim->m_Duration);
+		else
+			nextAnim->m_CurrentTrackPosition = nextAnim->m_Duration;
+	}
+		
 
 	// 2. 블렌딩 수행
 	for (uint32 i = 0; i < m_NumChannels; ++i)
@@ -118,11 +129,10 @@ void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animati
 		TRANSFORM_FRAME curTrans{}, nextTrans{};
 
 		// 각 채널로부터 보간된 Transform 획득
-		m_Channels[i]->Get_ChannelTransform(m_CurrentTrackPosition, m_CurrentKeyFrameIndices[i], m_Duration, curTrans);
+		m_Channels[i]->Get_ChannelTransform(m_CurrentTrackPosition, m_CurrentKeyFrameIndices[i], m_Duration, true, curTrans);
 		m_Channels[i]->Update_Velocity(curTrans, m_CurrentTrackPosition);
-		
-		// 다음 애니메이션에서 동일한 뼈의 채널 찾기 (일반적으로 인덱스가 같음)
-		nextAnim->m_Channels[i]->Get_ChannelTransform(nextAnim->m_CurrentTrackPosition, nextAnim->m_CurrentKeyFrameIndices[i], nextAnim->m_Duration, nextTrans);
+
+		nextAnim->m_Channels[i]->Get_ChannelTransform(nextAnim->m_CurrentTrackPosition, nextAnim->m_CurrentKeyFrameIndices[i], nextAnim->m_Duration, isNextLoop, nextTrans);
 		nextAnim->m_Channels[i]->Update_Velocity(nextTrans, nextAnim->m_CurrentTrackPosition);
 
 		Vector3 targetScale = Vector3::Lerp(curTrans.scale, nextTrans.scale, blendRatio);

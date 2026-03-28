@@ -197,11 +197,13 @@
     <ClInclude Include="..\public\ClientApp.h" />
     <ClInclude Include="..\public\LoadingPixelPanel.h" />
     <ClInclude Include="..\public\Monster.h" />
+    <ClInclude Include="..\public\Movement.h" />
     <ClInclude Include="..\public\Pl0000.h" />
     <ClInclude Include="..\public\Pl0000Body.h" />
     <ClInclude Include="..\public\Pl0000Input.h" />
     <ClInclude Include="..\public\Pl0000Parts.h" />
     <ClInclude Include="..\public\Pl0000StateMachine.h" />
+    <ClInclude Include="..\public\Pl0000Movement.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\public\State.h" />
@@ -238,11 +240,13 @@
     <ClCompile Include="..\private\ClientApp.cpp" />
     <ClCompile Include="..\private\LoadingPixelPanel.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\private\Movement.cpp" />
     <ClCompile Include="..\private\Pl0000.cpp" />
     <ClCompile Include="..\private\Pl0000Body.cpp" />
     <ClCompile Include="..\private\Pl0000Input.cpp" />
     <ClCompile Include="..\private\Pl0000Parts.cpp" />
     <ClCompile Include="..\private\P10000StateMachine.cpp" />
+    <ClCompile Include="..\private\Pl0000Movement.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\private\State.cpp" />

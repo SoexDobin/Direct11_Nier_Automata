@@ -96,91 +96,88 @@ HRESULT GraphicDevice::Present() const {
 }
 
 HRESULT GraphicDevice::OnResize(uint32 width, uint32 height, uint32 screenIndex) {
-  if (nullptr == m_SwapChain || nullptr == m_Device)
-    return E_FAIL;
+	if (nullptr == m_SwapChain || nullptr == m_Device)
+		return E_FAIL;
 
-  if (width == 0 || height == 0)
-    return S_OK;
+	if (width == 0 || height == 0)
+		return S_OK;
 
-  if (screenIndex != UINT_MAX &&
-      screenIndex < static_cast<uint32>(m_Offscreens.size())) {
-    auto &renderTarget = m_Offscreens[screenIndex];
+	if (screenIndex != UINT_MAX && screenIndex < static_cast<uint32>(m_Offscreens.size())) {
+        auto &renderTarget = m_Offscreens[screenIndex];
 
-    renderTarget.texture.Reset();
-    renderTarget.RTV.Reset();
-    renderTarget.SRV.Reset();
-    renderTarget.DSV.Reset();
+        renderTarget.texture.Reset();
+        renderTarget.RTV.Reset();
+        renderTarget.SRV.Reset();
+        renderTarget.DSV.Reset();
 
-    D3D11_TEXTURE2D_DESC textureDesc{};
-    textureDesc.Width = width;
-    textureDesc.Height = height;
-    textureDesc.MipLevels = 1;
-    textureDesc.ArraySize = 1;
-    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    textureDesc.SampleDesc.Count = 1;
-    textureDesc.Usage = D3D11_USAGE_DEFAULT;
-    textureDesc.BindFlags =
-        D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        D3D11_TEXTURE2D_DESC textureDesc{};
+        textureDesc.Width = width;
+        textureDesc.Height = height;
+        textureDesc.MipLevels = 1;
+        textureDesc.ArraySize = 1;
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.Usage = D3D11_USAGE_DEFAULT;
+        textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
-    m_Device->CreateTexture2D(&textureDesc, nullptr,
-                              renderTarget.texture.GetAddressOf());
-    m_Device->CreateRenderTargetView(renderTarget.texture.Get(), nullptr,
-                                     renderTarget.RTV.GetAddressOf());
-    m_Device->CreateShaderResourceView(renderTarget.texture.Get(), nullptr,
-                                       renderTarget.SRV.GetAddressOf());
+        m_Device->CreateTexture2D(&textureDesc, nullptr,
+                                  renderTarget.texture.GetAddressOf());
+        m_Device->CreateRenderTargetView(renderTarget.texture.Get(), nullptr,
+                                         renderTarget.RTV.GetAddressOf());
+        m_Device->CreateShaderResourceView(renderTarget.texture.Get(), nullptr,
+                                           renderTarget.SRV.GetAddressOf());
 
-    D3D11_TEXTURE2D_DESC depthStencilDesc{};
-    depthStencilDesc.Width = width;
-    depthStencilDesc.Height = height;
-    depthStencilDesc.MipLevels = 1;
-    depthStencilDesc.ArraySize = 1;
-    depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthStencilDesc.SampleDesc.Count = 1;
-    depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+        D3D11_TEXTURE2D_DESC depthStencilDesc{};
+        depthStencilDesc.Width = width;
+        depthStencilDesc.Height = height;
+        depthStencilDesc.MipLevels = 1;
+        depthStencilDesc.ArraySize = 1;
+        depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        depthStencilDesc.SampleDesc.Count = 1;
+        depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-    ComPtr<ID3D11Texture2D> depthStencilTex;
-    m_Device->CreateTexture2D(&depthStencilDesc, nullptr,
-                              depthStencilTex.GetAddressOf());
-    m_Device->CreateDepthStencilView(depthStencilTex.Get(), nullptr,
-                                     renderTarget.DSV.GetAddressOf());
+        ComPtr<ID3D11Texture2D> depthStencilTex;
+        m_Device->CreateTexture2D(&depthStencilDesc, nullptr,
+                                  depthStencilTex.GetAddressOf());
+        m_Device->CreateDepthStencilView(depthStencilTex.Get(), nullptr,
+                                         renderTarget.DSV.GetAddressOf());
 
-    renderTarget.viewport.Width = static_cast<Float>(width);
-    renderTarget.viewport.Height = static_cast<Float>(height);
-    return S_OK;
-  }
+        renderTarget.viewport.Width = static_cast<Float>(width);
+        renderTarget.viewport.Height = static_cast<Float>(height);
+        return S_OK;
+	}
 
-  m_Context->OMSetRenderTargets(0, nullptr, nullptr);
-  m_RTV.Reset();
-  m_DSV.Reset();
-  m_Context->ClearState();
-  m_Context->Flush();
+    m_Context->OMSetRenderTargets(0, nullptr, nullptr);
+    m_RTV.Reset();
+    m_DSV.Reset();
+    m_Context->ClearState();
+    m_Context->Flush();
 
-  if (FAILED(
-          m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0)))
-    return E_FAIL;
-
-  if (FAILED(Ready_BackBufferRenderTargetView()))
-    return E_FAIL;
-
-  if (FAILED(Ready_DepthStencilView(width, height)))
-    return E_FAIL;
-
-  m_ViewPort.Width = static_cast<Float>(width);
-  m_ViewPort.Height = static_cast<Float>(height);
-
-  uint32 size = m_Offscreens.size();
-  m_Offscreens.clear();
-
-  for (uint32 i = 0; i < size; ++i) {
-    if (FAILED(Create_OffScreenTarget(width, height)))
+    if (FAILED( m_SwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0)))
       return E_FAIL;
-  }
 
-  ID3D11RenderTargetView *rtvs[] = {m_RTV.Get()};
-  m_Context->OMSetRenderTargets(1, rtvs, m_DSV.Get());
-  m_Context->RSSetViewports(1, &m_ViewPort);
+    if (FAILED(Ready_BackBufferRenderTargetView()))
+      return E_FAIL;
 
-  return S_OK;
+    if (FAILED(Ready_DepthStencilView(width, height)))
+      return E_FAIL;
+
+    m_ViewPort.Width = static_cast<Float>(width);
+    m_ViewPort.Height = static_cast<Float>(height);
+
+    uint32 size = m_Offscreens.size();
+    m_Offscreens.clear();
+
+    for (uint32 i = 0; i < size; ++i) {
+      if (FAILED(Create_OffScreenTarget(width, height)))
+        return E_FAIL;
+    }
+
+    ID3D11RenderTargetView *rtvs[] = {m_RTV.Get()};
+    m_Context->OMSetRenderTargets(1, rtvs, m_DSV.Get());
+    m_Context->RSSetViewports(1, &m_ViewPort);
+
+    return S_OK;
 }
 
 HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {

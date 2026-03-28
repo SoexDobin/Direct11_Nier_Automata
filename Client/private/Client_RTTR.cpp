@@ -20,6 +20,7 @@
 #include "TitleBackground.h"
 #include "Pl0000StateMachine.h"
 #include "Pl0000Input.h"
+#include "Pl0000Movement.h"
 
 using rttr::registration;
 
@@ -125,6 +126,11 @@ void Register_Client_Reflection() {
         .method("Clone", &Pl0000Input::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000Input::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<Pl0000Movement>("Pl0000Movement")
+        .constructor<>()
+        .method("Clone", &Pl0000Movement::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000Movement::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
     rttr::registration::class_<CityOfRuins>("CityOfRuins")
         .constructor<>()
         .method("Clone", &CityOfRuins::Clone)

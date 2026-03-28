@@ -1,7 +1,7 @@
 #pragma once
 #include "ContainerObject.h"
 #include "Pl0000Input.h"
-
+#include "Pl0000Body.h"
 
 NS_BEGIN(Engine)
 	class Shader;
@@ -10,9 +10,12 @@ NS_BEGIN(Engine)
 
 NS_BEGIN(Client)
 
+class Pl0000Movement;
 class Pl0000StateMachine;
+class Pl0000Body;
 class WP0070Body;
 class WP0220Body;
+
 
 class CLIENT_DLL Pl0000 final : public ContainerObject
 {
@@ -21,7 +24,7 @@ class CLIENT_DLL Pl0000 final : public ContainerObject
 public:
     typedef struct tagStateContainer {
 
-        Bool IsInput{};
+        
     } STATE_CONTAINER;
 
 public:
@@ -29,6 +32,11 @@ public:
 	explicit Pl0000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Pl0000(const Pl0000& rhs);
 	~Pl0000() override = default;
+
+public: /* pl0000 */
+    TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
+    const Matrix& Get_SheathingMatrix() const { return m_SheathMatrix; }
+
 
 public:
     HRESULT Initialize_Prototype() override;
@@ -51,9 +59,13 @@ private:
     HRESULT Ready_Components();
 
 private:
-    Shared<Transform> m_MainBodyTransform{ nullptr };
+    Shared<Pl0000Body> m_MainBody{ nullptr };
     Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
+    Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
+
+private:
+    Matrix m_SheathMatrix{};
 
 public:
 	static Shared<Pl0000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -68,7 +80,7 @@ public:
         JUMP                = 895,
 
         // IDLE
-        IDLE_Neutral        = 46,
+        IDLE_Neutral            = 46,
         IDLE_STAND_TO_Neutral   = 39,
 
         // RUN

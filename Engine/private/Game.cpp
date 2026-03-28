@@ -102,6 +102,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_SoundManager = SoundManager::Create()))
         return E_FAIL;
 
+    if (nullptr == (m_EventManager = EventManager::Create(engineDesc.levelCount)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -131,6 +134,7 @@ void Game::Update_Engine() {
   m_Pipeline->Update_Pipeline();
 
   m_LevelManager->Update(delta);
+  m_EventManager->Execute_Events();
 }
 
 HRESULT Game::Draw() const {
@@ -153,6 +157,7 @@ void Game::Clear_AllResource() const {
 
     m_FontManager->Clear_Fonts();
     m_SoundManager->Clear_SoundSources();
+    m_EventManager->Clear_AllEvents();
 }
 
 void Game::Clear_Resource(uint32 levIndex) const {
@@ -175,6 +180,9 @@ void Game::Clear_Resource(uint32 levIndex) const {
 	if (FAILED(m_LightManager->Clear_Lights())) 
 		LOG_CRITICAL(L"Failed To Clear Lights");
 	
+    if (FAILED(m_EventManager->Clear_Events(levIndex)))
+        LOG_CRITICAL(L"Failed To Clear Events");
+
 }
 
 void Game::Update_Input() const { m_InputDevice->Update(); }
@@ -536,6 +544,21 @@ HRESULT Game::StopSound(SOUNDCHANNEL targetChannel) const
         return m_SoundManager->StopAll();
     else
         return m_SoundManager->StopChannel(targetChannel);
+}
+
+HRESULT Game::Add_Instance_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const
+{
+    return m_EventManager->Add_EventOnce(levIndex, eventTag, callback);
+}
+
+HRESULT Game::Add_Permanent_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const
+{
+    return m_EventManager->Add_EventPermanent(levIndex, eventTag, callback);
+}
+
+HRESULT Game::Remove_Event(uint32 levIndex, const wstring& eventTag) const
+{
+    return m_EventManager->Remove_Event(levIndex, eventTag);
 }
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const

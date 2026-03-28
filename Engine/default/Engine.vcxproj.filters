@@ -163,6 +163,9 @@
     <Filter Include="01. Utility\05. Component\VIBuffer\VISphere">
       <UniqueIdentifier>{48cb1011-75b9-40a6-92f3-4ae9da050cee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\11. Event">
+      <UniqueIdentifier>{4e602fd2-6528-472f-aa83-f3264f144928}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -349,6 +352,9 @@
     </ClInclude>
     <ClInclude Include="..\public\VISphere.h">
       <Filter>01. Utility\05. Component\VIBuffer\VISphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EventManager.h">
+      <Filter>01. Utility\11. Event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -540,6 +546,9 @@
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Object_rttr.cpp">
       <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EventManager.cpp">
+      <Filter>01. Utility\11. Event</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

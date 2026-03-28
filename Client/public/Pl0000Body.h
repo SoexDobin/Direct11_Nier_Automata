@@ -24,7 +24,7 @@ public:
 	~Pl0000Body() override = default;
 
 public:
-	const Matrix& Get_SheathingMatrix() const { return m_SheathMatrix; }
+	TRANSFORM_FRAME Get_ModelTransform() const { return m_Model->Get_RootTransformVelocity(m_RootBoneIndex); }
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -39,16 +39,12 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
-public:
-	void Update_Movement(Float timeDelta);
-
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
 
 private:
 	int32 m_RootBoneIndex{};
-	Vector3 m_LastDirection{};
 	Matrix m_SheathMatrix{};
 
 public:

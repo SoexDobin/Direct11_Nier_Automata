@@ -44,7 +44,7 @@ HRESULT Channel::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
-void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, _Out_ TRANSFORM_FRAME& outTransform)
+void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, Bool isLoop, _Out_ TRANSFORM_FRAME& outTransform)
 {
 	if (currentTrackPosition <= 0.f)
 		currentTrackPosition = 0;
@@ -59,6 +59,14 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 
 	if (currentTrackPosition >= lastKeyFrame.trackPosition)
 	{
+		if (false == isLoop)
+		{
+			outTransform.scale = lastKeyFrame.scale;
+			outTransform.rotation = lastKeyFrame.rotation;
+			outTransform.position = lastKeyFrame.position;
+			return;
+		}
+
 		Float ratio = 0.f;
 		Float trackRange = duration - lastKeyFrame.trackPosition;
 
@@ -102,8 +110,8 @@ void Channel::Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float current
 			m_PrevTransform = currentFrame;
 		}
 		else
-			// 1. 위치 델타 계산
-			m_Transformation.position = currentFrame.position - m_PrevTransform.position;
+		{
+			m_Transformation.position = currentFrame.position - m_PrevTransform.position; // 1. 위치 델타 계산
 
 			// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
 			Quaternion qtCurr(currentFrame.rotation);
@@ -114,15 +122,16 @@ void Channel::Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float current
 			m_Transformation.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
 
 			m_PrevTransform = currentFrame;
-		
+		}
+
 	}
 	m_PrevTrackPosition = currentTrackPosition;
 }
 
-void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex)
+void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex, Bool isLoop)
 {
 	TRANSFORM_FRAME currentFrame{};
-	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
+	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, isLoop, currentFrame);
 	Update_Velocity(currentFrame, currentTrackPosition);
 
 	Matrix boneMatrix{};

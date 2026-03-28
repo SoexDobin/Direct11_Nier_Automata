@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Pl0000Body.h"
+#include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
 
 #include "StateMachine.h"
@@ -46,6 +47,10 @@ HRESULT Pl0000::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	m_SheathMatrix =
+		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-30.f)) *
+		Matrix::CreateTranslation(Vector3{ 0.f, 1.5f, -0.5f });
+
 	return S_OK;
 }
 
@@ -63,13 +68,11 @@ void Pl0000::Priority_Update(Float timeDelta)
 void Pl0000::Update(Float timeDelta)
 {
 	m_Pl0000States->Update_State(timeDelta);
-	m_Transform->Set_WorldMatrix(m_MainBodyTransform->Get_WorldMatrix());
 }
 
 void Pl0000::Late_Update(Float timeDelta)
 {
-
-
+	m_Pl0000Movement->Update_Movement(timeDelta);
 }
 
 void Pl0000::Fixed_Update(Float fixedDelta)
@@ -100,7 +103,7 @@ HRESULT Pl0000::Ready_PartObjects()
 		return E_FAIL;
 	// TODO : POD
 
-	m_MainBodyTransform = Find_PartObject(L"Pl0000Body")->Get_Component<Transform>();
+	m_MainBody = static_pointer_cast<Pl0000Body>(Find_PartObject(L"Pl0000Body"));
 
 	return S_OK;
 }
@@ -111,6 +114,14 @@ HRESULT Pl0000::Ready_Components()
 	if (nullptr == m_Pl0000Input)
 		return E_FAIL;
 
+	Pl0000Movement::PL0000_MOVEMENT_DESC movementDesc{};
+	movementDesc.velocity = Vector3{0.f, 5.f, 0.f};
+	movementDesc.moveSpeed = 0.f;
+	movementDesc.targetDirection = Vector3::Zero;
+	movementDesc.turnSpeed = 8.0f;
+	m_Pl0000Movement = Add_Component<Pl0000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
+	if (nullptr == m_Pl0000Movement)
+		return E_FAIL;
 
 	// StateMachine은 마지막에 처리
 	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(ETOI(LEVEL::GAMEPLAY))))
@@ -138,7 +149,8 @@ HRESULT Pl0000::Ready_Components()
 	else
 		return E_FAIL;
 
-
+	m_Pl0000Movement->Begin();
+	m_Pl0000Input->Begin();
 
 	return S_OK;
 }

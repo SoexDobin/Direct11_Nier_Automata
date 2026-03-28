@@ -107,7 +107,7 @@
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Pl0000Input.h">
-      <Filter>02. GameObject\Playable\P10000Input</Filter>
+      <Filter>02. GameObject\Playable\2B\Pl0000Input</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B.h">
       <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
@@ -120,6 +120,12 @@
     </ClInclude>
     <ClInclude Include="..\public\State2B_Dash.h">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Movement.h">
+      <Filter>02. GameObject\Playable\Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000Movement.h">
+      <Filter>02. GameObject\Playable\2B\Pl0000Movement</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -226,7 +232,7 @@
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000Input.cpp">
-      <Filter>02. GameObject\Playable\P10000Input</Filter>
+      <Filter>02. GameObject\Playable\2B\Pl0000Input</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B.cpp">
       <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
@@ -239,6 +245,12 @@
     </ClCompile>
     <ClCompile Include="..\private\State2B_Dash.cpp">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Movement.cpp">
+      <Filter>02. GameObject\Playable\Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000Movement.cpp">
+      <Filter>02. GameObject\Playable\2B\Pl0000Movement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -314,9 +326,6 @@
     <Filter Include="02. GameObject\Sky">
       <UniqueIdentifier>{d5aa316f-6060-4485-b596-72e8cffe7af4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Playable\P10000Input">
-      <UniqueIdentifier>{fb02974d-67e2-4b5e-8473-98ef3d9e7f38}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Playable\2B\2BStates">
       <UniqueIdentifier>{58e488f6-9331-4015-979d-3a180ad82f16}</UniqueIdentifier>
     </Filter>
@@ -325,6 +334,15 @@
     </Filter>
     <Filter Include="99. Default">
       <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\Pl0000Movement">
+      <UniqueIdentifier>{6965ea7b-9207-4220-9136-4c413257a6ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\Pl0000Input">
+      <UniqueIdentifier>{fb02974d-67e2-4b5e-8473-98ef3d9e7f38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\Movement">
+      <UniqueIdentifier>{4e89dda7-8faf-408f-9b0d-de9a56d88d49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

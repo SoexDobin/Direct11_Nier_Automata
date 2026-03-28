@@ -23,6 +23,7 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(const wstring& prototypeTag);
 	virtual HRESULT Initialize(void *arg) { return S_OK; }
+	virtual HRESULT Begin() { return S_OK; }
 
 	Bool Is_Destroy() const { return m_IsDestroy; }
 	virtual void On_Destroy() { return; }

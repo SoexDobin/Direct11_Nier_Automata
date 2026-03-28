@@ -103,10 +103,10 @@ void Pl0000Body::Submit_RenderGroup()
 void Pl0000Body::Update_Movement(Float timeDelta)
 {
 	Vector3 inputDir = Vector3::Zero;
-	if (GAME_INSTANCE->Get_DIKeyState(DIKEYBOARD_W) & 0x80) inputDir.z += 1.f;
-	if (GAME_INSTANCE->Get_DIKeyState(DIKEYBOARD_S) & 0x80) inputDir.z -= 1.f;
-	if (GAME_INSTANCE->Get_DIKeyState(DIKEYBOARD_A) & 0x80) inputDir.x -= 1.f;
-	if (GAME_INSTANCE->Get_DIKeyState(DIKEYBOARD_D) & 0x80) inputDir.x += 1.f;
+	if (GAME_INSTANCE->Get_DIKeyState(UBYTE(DIKEYBOARD_W)) & 0x80) inputDir.z += 1.f;
+	if (GAME_INSTANCE->Get_DIKeyState(UBYTE(DIKEYBOARD_S)) & 0x80) inputDir.z -= 1.f;
+	if (GAME_INSTANCE->Get_DIKeyState(UBYTE(DIKEYBOARD_A)) & 0x80) inputDir.x -= 1.f;
+	if (GAME_INSTANCE->Get_DIKeyState(UBYTE(DIKEYBOARD_D)) & 0x80) inputDir.x += 1.f;
 
 	if (inputDir.LengthSquared() > 0.f)
 	{

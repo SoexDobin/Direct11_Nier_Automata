@@ -298,7 +298,12 @@
                                    },
                     "State2B_Jump":  {
                                          "members":  [
-
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_EnterAnim",
+                                                             "type":  "unordered_set\u003cuint32\u003e"
+                                                         }
                                                      ],
                                          "base_class":  "State2B",
                                          "inherited_members":  {

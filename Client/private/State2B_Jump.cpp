@@ -46,6 +46,7 @@ void State2B_Jump::Update(Float timeDelta)
 {
 	auto pl0000 = m_Body.lock();
 	uint32 curIndex = pl0000->Get_CurrentAnimationIndex();
+	uint32 nextIndex = pl0000->Get_NextAnimationIndex();
 	Bool isAnimFinished = pl0000->Get_ModelComponent()->Is_AnimationFinished();
 
 	if (m_EnterAnim.contains(curIndex) && isAnimFinished)

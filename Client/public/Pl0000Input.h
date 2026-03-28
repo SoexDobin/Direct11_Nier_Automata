@@ -29,6 +29,7 @@ public:
 	// 키보드 단일 키 상태 판별
 	// ===================================================================
 public:
+	Bool Is_None(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::NONE; }
 	Bool Is_KeyDown(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::DOWN; }
 	Bool Is_KeyUp(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::UP; }
 	Bool Is_KeyPress(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::PRESSED || m_KeyInfos[keyID].state == KEY_STATE::MULTI_CLICKED; }
@@ -52,12 +53,14 @@ public:
 	// WASD 통합 제어 (Bool 반환 / vector 반환)
 	// ===================================================================
 public:
+	Bool Is_WASD_None() const;
 	Bool Is_WASD_UP() const;
 	Bool Is_WASD_Down() const;
 	Bool Is_WASD_Press() const;
 	Bool Is_WASD_DoubleClick() const;
 	Bool Is_WASD_Hold(Float holdThreshold) const;
 	Bool Is_WASD_Diagonal() const;
+	
 
 	Bool Is_WA_Press() const;
 	Bool Is_WA_DoubleClick() const;

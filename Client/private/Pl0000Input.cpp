@@ -138,42 +138,48 @@ void Pl0000Input::Update_P10000_KeyState(Byte rawState, INPUT_INFO &outInfo, Flo
 // ===================================================================
 // WASD 통합 제어 (Bool)
 // ===================================================================
+Bool Pl0000Input::Is_WASD_None() const
+{
+	return Is_None(UBYTE(DIKEYBOARD_W)) && Is_None(UBYTE(DIKEYBOARD_A)) &&
+		Is_None(UBYTE(DIKEYBOARD_S)) && Is_None(UBYTE(DIKEYBOARD_D));
+}
+
 Bool Pl0000Input::Is_WASD_UP() const
 {
-	return Is_KeyUp(DIKEYBOARD_W) || Is_KeyUp(DIKEYBOARD_A) ||
-		Is_KeyUp(DIKEYBOARD_S) || Is_KeyDown(DIKEYBOARD_D);
+	return Is_KeyUp(UBYTE(DIKEYBOARD_W)) || Is_KeyUp(UBYTE(DIKEYBOARD_A)) ||
+		Is_KeyUp(UBYTE(DIKEYBOARD_S)) || Is_KeyDown(UBYTE(DIKEYBOARD_D));
 }
 
 Bool Pl0000Input::Is_WASD_Down() const
 {
-	return Is_KeyDown(DIKEYBOARD_W) || Is_KeyDown(DIKEYBOARD_A) ||
-		   Is_KeyDown(DIKEYBOARD_S) || Is_KeyDown(DIKEYBOARD_D);
+	return Is_KeyDown(UBYTE(DIKEYBOARD_W)) || Is_KeyDown(UBYTE(DIKEYBOARD_A)) ||
+		Is_KeyDown(UBYTE(DIKEYBOARD_S)) || Is_KeyDown(UBYTE(DIKEYBOARD_D));
 }
 
 Bool Pl0000Input::Is_WASD_Press() const
 {
-	return Is_KeyPress(DIKEYBOARD_W) || Is_KeyPress(DIKEYBOARD_A) ||
-		   Is_KeyPress(DIKEYBOARD_S) || Is_KeyPress(DIKEYBOARD_D);
+	return Is_KeyPress(UBYTE(DIKEYBOARD_W)) || Is_KeyPress(UBYTE(DIKEYBOARD_A)) ||
+		Is_KeyPress(UBYTE(DIKEYBOARD_S)) || Is_KeyPress(UBYTE(DIKEYBOARD_D));
 }
 
 Bool Pl0000Input::Is_WASD_DoubleClick() const
 {
-	return Is_KeyMultiClick(DIKEYBOARD_W) || Is_KeyMultiClick(DIKEYBOARD_A) ||
-		   Is_KeyMultiClick(DIKEYBOARD_S) || Is_KeyMultiClick(DIKEYBOARD_D);
+	return Is_KeyMultiClick(UBYTE(DIKEYBOARD_W)) || Is_KeyMultiClick(UBYTE(DIKEYBOARD_A)) ||
+		Is_KeyMultiClick(UBYTE(DIKEYBOARD_S)) || Is_KeyMultiClick(UBYTE(DIKEYBOARD_D));
 }
 
 Bool Pl0000Input::Is_WASD_Hold(Float holdThreshold) const
 {
-	return Is_KeyHold(DIKEYBOARD_W, holdThreshold) || Is_KeyHold(DIKEYBOARD_A, holdThreshold) ||
-		   Is_KeyHold(DIKEYBOARD_S, holdThreshold) || Is_KeyHold(DIKEYBOARD_D, holdThreshold);
+	return Is_KeyHold(UBYTE(DIKEYBOARD_W), holdThreshold) || Is_KeyHold(UBYTE(DIKEYBOARD_A), holdThreshold) ||
+		Is_KeyHold(UBYTE(DIKEYBOARD_S), holdThreshold) || Is_KeyHold(UBYTE(DIKEYBOARD_D), holdThreshold);
 }
 
 Bool Pl0000Input::Is_WASD_Diagonal() const
 {
-	Bool w = Is_KeyPress(DIKEYBOARD_W);
-	Bool s = Is_KeyPress(DIKEYBOARD_S);
-	Bool a = Is_KeyPress(DIKEYBOARD_A);
-	Bool d = Is_KeyPress(DIKEYBOARD_D);
+	Bool w = Is_KeyPress(UBYTE(DIKEYBOARD_W));
+	Bool s = Is_KeyPress(UBYTE(DIKEYBOARD_S));
+	Bool a = Is_KeyPress(UBYTE(DIKEYBOARD_A));
+	Bool d = Is_KeyPress(UBYTE(DIKEYBOARD_D));
 
 	// 상반된 축 동시 입력은 대각선이 아님
 	if (w && s) return false;
@@ -184,14 +190,14 @@ Bool Pl0000Input::Is_WASD_Diagonal() const
 
 Bool Pl0000Input::Is_WA_Press() const
 {
-	return Is_KeyPress(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_A);
+	return Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyPress(UBYTE(DIKEYBOARD_A));
 }
 
 Bool Pl0000Input::Is_WA_DoubleClick() const
 {
-	if (Is_KeyMultiClick(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_A))
+	if (Is_KeyMultiClick(UBYTE(DIKEYBOARD_W)) && Is_KeyPress(UBYTE(DIKEYBOARD_A)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_W) && Is_KeyMultiClick(DIKEYBOARD_A))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyMultiClick(UBYTE(DIKEYBOARD_A)))
 		return true;
 	
 	return false;
@@ -199,9 +205,9 @@ Bool Pl0000Input::Is_WA_DoubleClick() const
 
 Bool Pl0000Input::Is_WA_Hold(Float holdThreshold) const
 {
-	if (Is_KeyHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
+	if (Is_KeyHold(UBYTE(DIKEYBOARD_W), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_A)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_W) && Is_KeyHold(DIKEYBOARD_A, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyHold(UBYTE(DIKEYBOARD_A), holdThreshold))
 		return true;
 
 	return false;
@@ -209,9 +215,9 @@ Bool Pl0000Input::Is_WA_Hold(Float holdThreshold) const
 
 Bool Pl0000Input::Is_WA_DoubleClickedHold(Float holdThreshold) const
 {
-	if (Is_KeyMultiClickHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
+	if (Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_W), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_A)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_W) && Is_KeyMultiClickHold(DIKEYBOARD_A, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_A), holdThreshold))
 		return true;
 
 	return false;
@@ -219,14 +225,14 @@ Bool Pl0000Input::Is_WA_DoubleClickedHold(Float holdThreshold) const
 
 Bool Pl0000Input::Is_WD_Press() const
 {
-	return Is_KeyPress(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_D);
+	return Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyPress(UBYTE(DIKEYBOARD_D));
 }
 
 Bool Pl0000Input::Is_WD_DoubleClick() const
 {
-	if (Is_KeyMultiClick(DIKEYBOARD_W) && Is_KeyPress(DIKEYBOARD_D))
+	if (Is_KeyMultiClick(UBYTE(DIKEYBOARD_W)) && Is_KeyPress(UBYTE(DIKEYBOARD_D)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_W) && Is_KeyMultiClick(DIKEYBOARD_D))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyMultiClick(UBYTE(DIKEYBOARD_D)))
 		return true;
 
 	return false;
@@ -234,9 +240,9 @@ Bool Pl0000Input::Is_WD_DoubleClick() const
 
 Bool Pl0000Input::Is_WD_Hold(Float holdThreshold) const
 {
-	if (Is_KeyHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
+	if (Is_KeyHold(UBYTE(DIKEYBOARD_W), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_D)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_W) && Is_KeyHold(DIKEYBOARD_D, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyHold(UBYTE(DIKEYBOARD_D), holdThreshold))
 		return true;
 
 	return false;
@@ -244,9 +250,9 @@ Bool Pl0000Input::Is_WD_Hold(Float holdThreshold) const
 
 Bool Pl0000Input::Is_WD_DoubleClickedHold(Float holdThreshold) const
 {
-	if (Is_KeyMultiClickHold(DIKEYBOARD_W, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
+	if (Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_W), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_D)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_W) && Is_KeyMultiClickHold(DIKEYBOARD_D, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_W)) && Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_D), holdThreshold))
 		return true;
 
 	return false;
@@ -254,14 +260,14 @@ Bool Pl0000Input::Is_WD_DoubleClickedHold(Float holdThreshold) const
 
 Bool Pl0000Input::Is_SA_Press() const
 {
-	return Is_KeyPress(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_A);
+	return Is_KeyPress(UBYTE(DIKEYBOARD_S)) && Is_KeyPress(UBYTE(DIKEYBOARD_A));
 }
 
 Bool Pl0000Input::Is_SA_DoubleClick() const
 {
-	if (Is_KeyMultiClick(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_A))
+	if (Is_KeyMultiClick(UBYTE(DIKEYBOARD_S)) && Is_KeyPress(UBYTE(DIKEYBOARD_A)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_S) && Is_KeyMultiClick(DIKEYBOARD_A))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_S)) && Is_KeyMultiClick(UBYTE(DIKEYBOARD_A)))
 		return true;
 
 	return false;
@@ -269,9 +275,9 @@ Bool Pl0000Input::Is_SA_DoubleClick() const
 
 Bool Pl0000Input::Is_SA_Hold(Float holdThreshold) const
 {
-	if (Is_KeyHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
+	if (Is_KeyHold(UBYTE(DIKEYBOARD_S), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_A)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_S) && Is_KeyHold(DIKEYBOARD_A, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_S) && Is_KeyHold(UBYTE(DIKEYBOARD_A), holdThreshold)))
 		return true;
 
 	return false;
@@ -279,9 +285,9 @@ Bool Pl0000Input::Is_SA_Hold(Float holdThreshold) const
 
 Bool Pl0000Input::Is_SA_DoubleClickedHold(Float holdThreshold) const
 {
-	if (Is_KeyMultiClickHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_A))
+	if (Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_S), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_A)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_S) && Is_KeyMultiClickHold(DIKEYBOARD_A, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_S)) && Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_A), holdThreshold))
 		return true;
 
 	return false;
@@ -289,14 +295,14 @@ Bool Pl0000Input::Is_SA_DoubleClickedHold(Float holdThreshold) const
 
 Bool Pl0000Input::Is_SD_Press() const
 {
-	return Is_KeyPress(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_D);
+	return Is_KeyPress(UBYTE(DIKEYBOARD_S)) && Is_KeyPress(UBYTE(DIKEYBOARD_D));
 }
 
 Bool Pl0000Input::Is_SD_DoubleClick() const
 {
-	if (Is_KeyMultiClick(DIKEYBOARD_S) && Is_KeyPress(DIKEYBOARD_D))
+	if (Is_KeyMultiClick(UBYTE(DIKEYBOARD_S)) && Is_KeyPress(UBYTE(DIKEYBOARD_D)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_S) && Is_KeyMultiClick(DIKEYBOARD_D))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_S)) && Is_KeyMultiClick(UBYTE(DIKEYBOARD_D)))
 		return true;
 
 	return false;
@@ -304,9 +310,9 @@ Bool Pl0000Input::Is_SD_DoubleClick() const
 
 Bool Pl0000Input::Is_SD_Hold(Float holdThreshold) const
 {
-	if (Is_KeyHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
+	if (Is_KeyHold(UBYTE(DIKEYBOARD_S), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_D)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_S) && Is_KeyHold(DIKEYBOARD_D, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_S) && Is_KeyHold(UBYTE(DIKEYBOARD_D), holdThreshold)))
 		return true;
 
 	return false;
@@ -314,9 +320,9 @@ Bool Pl0000Input::Is_SD_Hold(Float holdThreshold) const
 
 Bool Pl0000Input::Is_SD_DoubleClickedHold(Float holdThreshold) const
 {
-	if (Is_KeyMultiClickHold(DIKEYBOARD_S, holdThreshold) && Is_KeyPress(DIKEYBOARD_D))
+	if (Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_S), holdThreshold) && Is_KeyPress(UBYTE(DIKEYBOARD_D)))
 		return true;
-	if (Is_KeyPress(DIKEYBOARD_S) && Is_KeyMultiClickHold(DIKEYBOARD_D, holdThreshold))
+	if (Is_KeyPress(UBYTE(DIKEYBOARD_S)) && Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_D), holdThreshold))
 		return true;
 
 	return false;

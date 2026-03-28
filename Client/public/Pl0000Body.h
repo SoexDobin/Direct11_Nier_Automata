@@ -24,6 +24,9 @@ public:
 	~Pl0000Body() override = default;
 
 public:
+	const Matrix& Get_SheathingMatrix() const { return m_SheathMatrix; }
+
+public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
 	void On_Destroy() override;
@@ -46,6 +49,7 @@ private:
 private:
 	int32 m_RootBoneIndex{};
 	Vector3 m_LastDirection{};
+	Matrix m_SheathMatrix{};
 
 public:
 	static Shared<Pl0000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

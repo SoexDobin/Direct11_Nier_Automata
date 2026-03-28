@@ -101,19 +101,20 @@ void Channel::Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float current
 		{
 			m_PrevTransform = currentFrame;
 		}
+		else
+			// 1. 위치 델타 계산
+			m_Transformation.position = currentFrame.position - m_PrevTransform.position;
 
-		// 1. 위치 델타 계산
-		m_Transformation.position = currentFrame.position - m_PrevTransform.position;
+			// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
+			Quaternion qtCurr(currentFrame.rotation);
+			Quaternion qtPrev(m_PrevTransform.rotation);
+			Quaternion qtInvPrev; qtPrev.Inverse(qtInvPrev);
 
-		// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
-		Quaternion qtCurr(currentFrame.rotation);
-		Quaternion qtPrev(m_PrevTransform.rotation);
-		Quaternion qtInvPrev; qtPrev.Inverse(qtInvPrev);
+			Quaternion qtDelta = qtCurr * qtInvPrev;
+			m_Transformation.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
 
-		Quaternion qtDelta = qtCurr * qtInvPrev;
-		m_Transformation.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
-
-		m_PrevTransform = currentFrame;
+			m_PrevTransform = currentFrame;
+		
 	}
 	m_PrevTrackPosition = currentTrackPosition;
 }

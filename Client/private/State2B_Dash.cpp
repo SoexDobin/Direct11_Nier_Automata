@@ -16,7 +16,7 @@ State2B_Dash::State2B_Dash(const wstring& tag, const Shared<Pl0000>& owner)
 
 HRESULT State2B_Dash::Initialize()
 {
-	return S_OK;
+	return State2B::Initialize();
 }
 
 Bool State2B_Dash::StateEnterInvoke()
@@ -24,22 +24,22 @@ Bool State2B_Dash::StateEnterInvoke()
 
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_W))
 	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_F), 0.2f, true);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_F), 0.2f, true);
 		return true;
 	}
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_S))
 	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_B), 0.2f, true);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_B), 0.2f, true);
 		return true;
 	}
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_D))
 	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_R), 0.2f, true);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_R), 0.2f, true);
 		return true;
 	}
 	if (m_Input.lock()->Is_KeyMultiClick(DIKEYBOARD_A))
 	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_L), 0.2f, true);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_L), 0.2f, true);
 		return true;
 	}
 

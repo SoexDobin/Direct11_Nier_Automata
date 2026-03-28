@@ -51,7 +51,7 @@ void WP0220Body::Update(Float timeDelta)
 
 void WP0220Body::Late_Update(Float timeDelta)
 {
-
+	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 }
 
 void WP0220Body::Fixed_Update(Float fixedDelta)
@@ -87,7 +87,7 @@ void WP0220Body::Submit_RenderGroup()
 
 HRESULT WP0220Body::Bind_ShaderResources()
 {
-	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
+	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
 		return E_FAIL;

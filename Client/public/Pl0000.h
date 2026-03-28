@@ -60,7 +60,7 @@ public:
 	Shared<GameObject> Clone(void* arg) override;
 
 public:
-    enum P10000_STATE {
+    enum PL0000_STATE {
         IDLE                = 899,
         RUN                 = 898,
         SPRINT              = 897,
@@ -69,6 +69,7 @@ public:
 
         // IDLE
         IDLE_Neutral        = 46,
+        IDLE_STAND_TO_Neutral   = 39,
 
         // RUN
         RUN_CYCLE           = 2,
@@ -106,6 +107,9 @@ public:
         RUN_TO_JUMP         = 24,
         SPRINT_TO_JUMP      = 25,
 
+        JUMP_TO_RUN         = 10,
+        JUMP_TO_SPRINT      = 11,
+        JUMP_TO_STAND       = 114,
 
         MAIN_ATTACK_2B      = 0x00000020,
         SUB_ATTACK_2B       = 0x00000040,

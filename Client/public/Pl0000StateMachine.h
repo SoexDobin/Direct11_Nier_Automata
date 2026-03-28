@@ -24,10 +24,10 @@ public:
 	~Pl0000StateMachine() override = default;
 
 public:
-	Bool Change_State(Pl0000::P10000_STATE state);
-	Shared<State2B> Find_2BState(Pl0000::P10000_STATE state);
-	wstring Get_StateTag(Pl0000::P10000_STATE state);
-	Pl0000::P10000_STATE Get_CurP10000State();
+	Bool Change_State(Pl0000::PL0000_STATE state);
+	Shared<State2B> Find_2BState(Pl0000::PL0000_STATE state);
+	wstring Get_StateTag(Pl0000::PL0000_STATE state);
+	Pl0000::PL0000_STATE Get_CurP10000State();
 
 public:
 	HRESULT Initialize_Prototype() override;

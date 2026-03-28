@@ -41,6 +41,10 @@ HRESULT Pl0000Body::Initialize(void* arg)
 	GAME_INSTANCE->Get_MainCamera()->Set_Target(shared_from_this());
 	m_LastDirection = m_Transform->Get_Look();
 
+	m_SheathMatrix = 
+		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-30.f)) *
+		Matrix::CreateTranslation(Vector3{0.f, 1.5f, -0.5f});
+
 	return S_OK;
 }
 

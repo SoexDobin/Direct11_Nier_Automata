@@ -1,9 +1,8 @@
 #pragma once
 #include "State2B.h"
+#include "Pl0000.h"
 
 NS_BEGIN(Client)
-
-class Pl0000;
 
 class CLIENT_DLL State2B_Idle final : public State2B
 {
@@ -23,6 +22,7 @@ public:
 
 private:
 	Bool m_InitializeState{ true };
+	unordered_set<uint32> m_EnterAnim;
 
 public:
 	static Shared<State2B_Idle> Create(const wstring& tag, const Shared<Pl0000>& owner);

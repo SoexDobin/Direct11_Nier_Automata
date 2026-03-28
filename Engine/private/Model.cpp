@@ -214,7 +214,7 @@ void Model::Update_ModelAnimation(Float timeDelta)
 	}
 }
 
-void Model::Set_Animation(uint32 index, Float blendDuration, Bool isSync)
+void Model::Set_Animation(uint32 index, Float blendDuration)
 {
 	if (m_CurrentAnimIndex == index) return;
 
@@ -228,15 +228,17 @@ void Model::Set_Animation(uint32 index, Float blendDuration, Bool isSync)
 	m_BlendingElapsed = 0.f;
 	m_BlendingDuration = blendDuration;
 
-	if (isSync)
-	{
-		Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
-		m_Animations[m_NextAnimIndex]->Set_Progress(progress);
-	}
-	else
-	{
-		m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
-	}
+	//if (isSync)
+	//{
+	//	
+	//}
+	//else
+	//{
+	//	
+	//}
+	m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
+	//Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
+	//m_Animations[m_NextAnimIndex]->Set_Progress(progress);
 
 }
 

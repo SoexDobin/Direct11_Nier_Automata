@@ -21,6 +21,7 @@ public:
 	void StateExitInvoke() override;
 
 private:
+	unordered_set<uint32> m_EnterAnim;
 
 public:
 	static Shared<State2B_Jump> Create(const wstring& tag, const Shared<Pl0000>& owner);

@@ -17,54 +17,58 @@ State2B_Idle::State2B_Idle(const wstring& tag, const Shared<Pl0000>& owner)
 
 HRESULT State2B_Idle::Initialize()
 {
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::RUN_STOP_L));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::JUMP_TO_STAND));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_B));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_R));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L));
+
 	return State2B::Initialize();
 }
 
 Bool State2B_Idle::StateEnterInvoke()
 {
-	if (m_Owner.expired())
-		return false;
-	
-	/*
-	이전 애니메이션이 Dash 
-	이전 애니메이션이 Run
-	이전 애니메이션이 Sprint
-	 */	
+	auto pl0000 = m_Body.lock();
 
-	uint32 prevIndex = m_Body.lock()->Get_CurrentAnimationIndex();
-	if (Pl0000::P10000_STATE::RUN_CYCLE == prevIndex)
+	switch (const uint32 prevIndex = pl0000->Get_CurrentAnimationIndex())
 	{
-		
-		m_Body.lock()->Set_Animation( ETOI(Pl0000::P10000_STATE::RUN_STOP_L), 0.2f,false);
-	}
-	else if (Pl0000::P10000_STATE::SPRINT_CYCLE == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::SPRINT_STOP_R), 0.2f, false);
-	}
-	else if (Pl0000::P10000_STATE::DASH_F == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_F), 0.2f, false);
-	}
-	else if (Pl0000::P10000_STATE::DASH_B == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_B), 0.2f, false);
-	}
-	else if (Pl0000::P10000_STATE::DASH_R == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_R), 0.2f, false);
-	}
-	else if (Pl0000::P10000_STATE::DASH_L == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::DASH_TO_STAND_L), 0.2f, false);
-	}
+	case Pl0000::PL0000_STATE::RUN_CYCLE:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_STOP_L), 0.2f, false);
+		return true;
+	case Pl0000::PL0000_STATE::SPRINT_CYCLE:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R), 0.2f, false);
+		return true;
+	case Pl0000::PL0000_STATE::JUMP_EXIT:
+		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_TO_STAND, 0.2f, false);
+	case Pl0000::PL0000_STATE::DASH_F:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F), 0.2f, false);
+		return true;
+	case Pl0000::PL0000_STATE::DASH_B:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_B), 0.2f, false);
+		return true;
+	case Pl0000::PL0000_STATE::DASH_R:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_R), 0.2f, false);
+		return true;
+	case Pl0000::PL0000_STATE::DASH_L:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
+		return true;
+	default:
+		{
+			if (m_InitializeState)
+			{
+				m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
 
-	if (m_InitializeState)
-	{
-		m_InitializeState = true;
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::IDLE_Neutral), 0.f, true);
-	}
+				m_LightWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Body.lock()->Get_SheathingMatrix());
+				m_HeavyWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Body.lock()->Get_SheathingMatrix());
 
-	return true;
+				return true;
+			}
+			LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", prevIndex);
+			return false;
+		}
+	}
 }
 
 void State2B_Idle::Update(Float timeDelta)
@@ -83,15 +87,25 @@ void State2B_Idle::Update(Float timeDelta)
 		
 		return;
 	}
-	if (m_Input.lock()->Is_WASD_Press())
+	if (m_Input.lock()->Is_KeyDown(static_cast<uByte>(DIKEYBOARD_SPACE)))
 	{
-		if (m_States.lock()->Change_State(Pl0000::P10000_STATE::RUN))
+		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::JUMP))
 			return;
 	}
-
-	if (curIndex != Pl0000::P10000_STATE::IDLE_Neutral && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
+	if (m_Input.lock()->Is_WASD_Press())
 	{
-		m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::IDLE_Neutral), 1.f, true);
+		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::RUN))
+			return;
+	}
+	
+
+	if (m_EnterAnim.contains(curIndex) && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
+	{
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral), 0.5f, false);
+	}
+	else if (curIndex == Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
+	{
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_Neutral), 0.5f, true);
 	}
 }
 

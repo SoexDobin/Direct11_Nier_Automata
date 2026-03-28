@@ -25,7 +25,7 @@ Bool State2B_Run::StateEnterInvoke()
 {
 	uint32 prevIndex = m_Body.lock()->Get_CurrentAnimationIndex();
 	
-	m_Body.lock()->Set_Animation(ETOI(Pl0000::P10000_STATE::RUN_CYCLE), 0.2f, true);
+	m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_CYCLE), 0.2f, true);
 
 	return true;
 }
@@ -34,14 +34,14 @@ void State2B_Run::Update(Float timeDelta)
 {
 	if (m_Input.lock()->Is_WASD_DoubleClick())
 	{
-		m_States.lock()->Change_State(Pl0000::P10000_STATE::DASH);
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::DASH);
 		return;
 	}
 
 	if (m_Input.lock()->Is_WASD_Hold(0.5f) || m_Input.lock()->Is_WASD_Down() || m_Input.lock()->Is_WASD_Press())
 		return;
 
-	m_States.lock()->Change_State(Pl0000::P10000_STATE::IDLE);
+	m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
 }
 
 void State2B_Run::Late_Update(Float timeDelta)

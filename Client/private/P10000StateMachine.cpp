@@ -12,7 +12,7 @@ Pl0000StateMachine::Pl0000StateMachine(const ComPtr<ID3D11Device>& device, const
 Pl0000StateMachine::Pl0000StateMachine(const Pl0000StateMachine& rhs)
 	: StateMachine{ rhs } {}
 
-Bool Pl0000StateMachine::Change_State(Pl0000::P10000_STATE state)
+Bool Pl0000StateMachine::Change_State(Pl0000::PL0000_STATE state)
 {
 	wstring tag = Helper::To_wString(magic_enum::enum_name(state));
 	
@@ -20,14 +20,14 @@ Bool Pl0000StateMachine::Change_State(Pl0000::P10000_STATE state)
 }
 
 
-Shared<State2B> Pl0000StateMachine::Find_2BState(Pl0000::P10000_STATE state)
+Shared<State2B> Pl0000StateMachine::Find_2BState(Pl0000::PL0000_STATE state)
 {
 	wstring tag = Helper::To_wString(magic_enum::enum_name(state));
 
 	return static_pointer_cast<State2B>(Find_State(tag));
 }
 
-wstring Pl0000StateMachine::Get_StateTag(Pl0000::P10000_STATE state)
+wstring Pl0000StateMachine::Get_StateTag(Pl0000::PL0000_STATE state)
 {
 	if (Shared<State2B> searchedState = Find_2BState(state))
 	{
@@ -37,9 +37,9 @@ wstring Pl0000StateMachine::Get_StateTag(Pl0000::P10000_STATE state)
 	return L"";
 }
 
-Pl0000::P10000_STATE Pl0000StateMachine::Get_CurP10000State()
+Pl0000::PL0000_STATE Pl0000StateMachine::Get_CurP10000State()
 {
-	return magic_enum::enum_cast<Pl0000::P10000_STATE>(Helper::To_String(Get_CurrentState()->Get_StateTag())).value();
+	return magic_enum::enum_cast<Pl0000::PL0000_STATE>(Helper::To_String(Get_CurrentState()->Get_StateTag())).value();
 }
 	
 

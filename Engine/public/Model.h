@@ -39,7 +39,7 @@ public:
 
 public:
 	void Update_ModelAnimation(Float timeDelta);
-	void Set_Animation(uint32 index, Float blendDuration = 0.5f, Bool isSync = false);
+	void Set_Animation(uint32 index, Float blendDuration = 0.5f);
 
 public:
 	int32 Get_AnimationIndexByName(const wstring& name);

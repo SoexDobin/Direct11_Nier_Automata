@@ -76,8 +76,6 @@ void StateMachine::On_Destroy()
 
 void StateMachine::Update_State(Float timeDelta)
 {
-
-
 	m_CurrentState->Update(timeDelta);
 
 	m_CurrentState->Late_Update(timeDelta);

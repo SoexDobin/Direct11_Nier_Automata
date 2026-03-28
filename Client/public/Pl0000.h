@@ -101,7 +101,7 @@ public:
         // JUMP
         JUMP_ENTER          = 13, // 20
         JUMP_HOLD           = 14, // 21
-        JUMP_EXIT           = 15, // 22
+        
 
         STAND_TO_JUMP       = 23,
         RUN_TO_JUMP         = 24,
@@ -109,7 +109,8 @@ public:
 
         JUMP_TO_RUN         = 10,
         JUMP_TO_SPRINT      = 11,
-        JUMP_TO_STAND       = 114,
+        JUMP_TO_STAND = 15, // 22
+        //JUMP_TO_STAND       = 114,
 
         MAIN_ATTACK_2B      = 0x00000020,
         SUB_ATTACK_2B       = 0x00000040,

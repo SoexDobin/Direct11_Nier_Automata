@@ -202,10 +202,6 @@ void Model::Update_ModelAnimation(Float timeDelta)
 	else
 	{
 		m_IsAnimEnd = m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop, m_RootLocalNode);
-
-		if (m_IsAnimEnd && m_IsAnimLoop)
-		{
-		}
 	}
 
 	for (auto& bone : m_Bones)
@@ -216,30 +212,20 @@ void Model::Update_ModelAnimation(Float timeDelta)
 
 void Model::Set_Animation(uint32 index, Float blendDuration)
 {
-	if (m_CurrentAnimIndex == index) return;
+	if (m_CurrentAnimIndex == index || m_IsBlending) return;
 
 	if (m_IsBlending)
 	{
 		m_CurrentAnimIndex = m_NextAnimIndex;
 	}
 
-	m_NextAnimIndex = index;
+ 	m_NextAnimIndex = index;
 	m_IsBlending = true;
 	m_BlendingElapsed = 0.f;
 	m_BlendingDuration = blendDuration;
+	m_IsAnimEnd = false;
 
-	//if (isSync)
-	//{
-	//	
-	//}
-	//else
-	//{
-	//	
-	//}
 	m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
-	//Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
-	//m_Animations[m_NextAnimIndex]->Set_Progress(progress);
-
 }
 
 int32 Model::Get_BoneIndexByName(const string& boneName) const

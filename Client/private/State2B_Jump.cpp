@@ -46,20 +46,17 @@ void State2B_Jump::Update(Float timeDelta)
 {
 	auto pl0000 = m_Body.lock();
 	uint32 curIndex = pl0000->Get_CurrentAnimationIndex();
+	Bool isAnimFinished = pl0000->Get_ModelComponent()->Is_AnimationFinished();
 
-	if (m_EnterAnim.contains(curIndex) && pl0000->Get_ModelComponent()->Is_AnimationFinished())
+	if (m_EnterAnim.contains(curIndex) && isAnimFinished)
 	{
 		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_ENTER, 0.2f, false);
 	}
-	else if (curIndex == Pl0000::PL0000_STATE::JUMP_ENTER && pl0000->Get_ModelComponent()->Is_AnimationFinished())
+	else if (curIndex == Pl0000::PL0000_STATE::JUMP_ENTER && isAnimFinished)
 	{
-		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_HOLD, 0.f, false);
+		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_HOLD, 0.2f, true);
 	}
-	else if (curIndex == Pl0000::PL0000_STATE::JUMP_HOLD && pl0000->Get_ModelComponent()->Is_AnimationFinished())
-	{
-		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_EXIT, 0.2f, false);
-	}
-	else if (curIndex == Pl0000::PL0000_STATE::JUMP_EXIT && pl0000->Get_ModelComponent()->Is_AnimationFinished())
+	else if (curIndex == Pl0000::PL0000_STATE::JUMP_HOLD)
 	{
 		// 키입력 없으면
 		m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
@@ -68,16 +65,17 @@ void State2B_Jump::Update(Float timeDelta)
 	
 		
 	}
+	
 }
 
 void State2B_Jump::Late_Update(Float timeDelta)
 {
-	State2B::Late_Update(timeDelta);
+	
 }
 
 void State2B_Jump::StateExitInvoke()
 {
-	State2B::StateExitInvoke();
+	
 }
 
 Shared<State2B_Jump> State2B_Jump::Create(const wstring& tag, const Shared<Pl0000>& owner)

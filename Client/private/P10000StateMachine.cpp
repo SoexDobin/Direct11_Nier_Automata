@@ -63,9 +63,7 @@ void Pl0000StateMachine::On_Destroy()
 
 void Pl0000StateMachine::Update_State(Float timeDelta)
 {
-	m_CurrentState->Update(timeDelta);
-
-	m_CurrentState->Late_Update(timeDelta);
+	StateMachine::Update_State(timeDelta);
 }
 
 Shared<Pl0000StateMachine> Pl0000StateMachine::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

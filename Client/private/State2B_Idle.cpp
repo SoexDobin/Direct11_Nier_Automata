@@ -40,8 +40,9 @@ Bool State2B_Idle::StateEnterInvoke()
 	case Pl0000::PL0000_STATE::SPRINT_CYCLE:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R), 0.2f, false);
 		return true;
-	case Pl0000::PL0000_STATE::JUMP_EXIT:
+	case Pl0000::PL0000_STATE::JUMP_HOLD:
 		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_TO_STAND, 0.2f, false);
+		return true;
 	case Pl0000::PL0000_STATE::DASH_F:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F), 0.2f, false);
 		return true;

@@ -21,6 +21,24 @@ public:
 	} PL0000_MOVEMENT_DESC;
 
 public:
+	typedef struct tagPl0000MovementData
+	{
+		Vector3 direction{0.f, 0.f, 0.f };
+		Vector3 lookDirection{ 0.f, 0.f, 0.f };
+		
+		Bool isMove{ false };
+		Bool isJump{ false };
+		Bool isAttack{ false };
+
+		Bool canRotation{ true };
+		Bool useRootMotionDir{ true };		// 로컬 방향에 의한 tilt 수정
+	} PL0000_MOVEMENT_DATA;
+
+public:
+	void Set_MovementData(const PL0000_MOVEMENT_DATA& data) { m_CurrentMoveData = data; }
+	const PL0000_MOVEMENT_DATA& Get_MovementData() const { return m_CurrentMoveData; }
+
+public:
 	explicit Pl0000Movement();
 	explicit Pl0000Movement(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Pl0000Movement(const Pl0000Movement& rhs);
@@ -35,8 +53,11 @@ public:
 	void Update_Movement(Float timeDelta) override;
 
 private:
+	PL0000_MOVEMENT_DATA m_CurrentMoveData{};
+	Vector3 m_LastGroundedRootPositionVelocity{ 0.f, 0.f, 0.f };
+
+private:
 	Weak<Pl0000> m_OwnerContainer{};
-	Weak<Camera> m_TargetCamera{};
 	Weak<Pl0000Input> m_Input{};
 
 public:

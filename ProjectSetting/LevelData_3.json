@@ -8,45 +8,6 @@
             {
               "properties": null,
               "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            }
-          ],
-          "name": "CityOfRuins",
-          "objectID": 1208553506,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "CityOfRuins",
-          "transform": {
-            "position": [
-              50.0,
-              0.0,
-              100.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "CityOfRuins"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
             }
           ],
           "name": "ThirdPersonCamera",
@@ -72,6 +33,45 @@
             ]
           },
           "typeName": "ThirdPersonCamera"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            }
+          ],
+          "name": "CityOfRuins",
+          "objectID": 1208553506,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuins",
+          "transform": {
+            "position": [
+              50.0,
+              0.0,
+              100.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuins"
         },
         {
           "components": [

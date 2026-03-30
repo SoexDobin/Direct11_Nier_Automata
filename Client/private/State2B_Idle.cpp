@@ -6,6 +6,7 @@
 
 #include "Model.h"
 #include "Pl0000.h"
+#include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
 #include "WP0070Body.h"
 #include "WP0220Body.h"
@@ -17,6 +18,7 @@ State2B_Idle::State2B_Idle(const wstring& tag, const Shared<Pl0000>& owner)
 
 HRESULT State2B_Idle::Initialize()
 {
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::RUN_STOP_R));
 	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::RUN_STOP_L));
 	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R));
 	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::JUMP_TO_STAND));
@@ -32,50 +34,77 @@ Bool State2B_Idle::StateEnterInvoke()
 {
 	auto pl0000 = m_Body.lock();
 
-	switch (const uint32 prevIndex = pl0000->Get_CurrentAnimationIndex())
+	switch (const uint32 prevState = m_States.lock()->Get_CurP10000State())
 	{
-	case Pl0000::PL0000_STATE::RUN_CYCLE:
-		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_STOP_L), 0.2f, false);
-		return true;
-	case Pl0000::PL0000_STATE::SPRINT_CYCLE:
+	case Pl0000::PL0000_STATE::RUN:
+		{
+			if (m_Body.lock()->Get_ModelComponent()->Get_AnimationProgress() < 0.5f)
+			{
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_STOP_R), 0.2f, false);
+			}
+			else
+			{
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_STOP_L), 0.2f, false);
+			}
+			return true;
+		}
+		
+	case Pl0000::PL0000_STATE::SPRINT:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R), 0.2f, false);
 		return true;
-	case Pl0000::PL0000_STATE::JUMP_HOLD:
+	case Pl0000::PL0000_STATE::JUMP:
 		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_TO_STAND, 0.2f, false);
 		return true;
-	case Pl0000::PL0000_STATE::DASH_F:
-		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F), 0.2f, false);
-		return true;
-	case Pl0000::PL0000_STATE::DASH_B:
-		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_B), 0.2f, false);
-		return true;
-	case Pl0000::PL0000_STATE::DASH_R:
-		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_R), 0.2f, false);
-		return true;
-	case Pl0000::PL0000_STATE::DASH_L:
-		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
-		return true;
+	case Pl0000::PL0000_STATE::DASH:
+		{
+			switch (const uint32 prevAnim = m_Body.lock()->Get_ModelComponent()->Get_AnimationIndex())
+			{
+			case Pl0000::PL0000_STATE::DASH_F: case Pl0000::PL0000_STATE::STAND_TO_DASH_F:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F), 0.2f, false);
+				return true;
+			case Pl0000::PL0000_STATE::DASH_B: case Pl0000::PL0000_STATE::STAND_TO_DASH_B:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_B), 0.2f, false);
+				return true;
+			case Pl0000::PL0000_STATE::DASH_R: case Pl0000::PL0000_STATE::STAND_TO_DASH_R:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_R), 0.2f, false);
+				return true;
+			case Pl0000::PL0000_STATE::DASH_L: case Pl0000::PL0000_STATE::STAND_TO_DASH_L:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
+				return true;
+			default:
+				LOG_ERROR(L"[ENTER IDLE From DASH] : No Enter state PrevIndex {} ", prevAnim);
+				return false;
+			}
+		}
+		
 	default:
 		{
 			if (m_InitializeState)
 			{
-				m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
+				m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_Neutral), 0.2f, false);
 
 				m_LightWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_SheathingMatrix());
 				m_HeavyWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_SheathingMatrix());
+				m_InitializeState = false;
 
 				return true;
-			}
-			LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", prevIndex);
+			} 
+			LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", prevState);
 			return false;
 		}
 	}
+
 }
 
 void State2B_Idle::Update(Float timeDelta)
 {
 	uint32 curIndex = m_Body.lock()->Get_CurrentAnimationIndex();
-	uint32 nextIndex = m_Body.lock()->Get_NextAnimationIndex();
+
+	Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
+	moveData.direction = Calculate_Direction();
+	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
+	moveData.canRotation = true;
+	m_Movement.lock()->Set_MovementData(moveData);
 	
 
 	if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON))
@@ -88,17 +117,21 @@ void State2B_Idle::Update(Float timeDelta)
 		
 		return;
 	}
-	if (m_Input.lock()->Is_KeyDown(static_cast<uByte>(DIKEYBOARD_SPACE)))
+	if (m_Input.lock()->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
 	{
 		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::JUMP))
 			return;
+	}
+	if (m_Input.lock()->Is_WASD_DoubleClick())
+	{
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::DASH);
+		return;
 	}
 	if (m_Input.lock()->Is_WASD_Press())
 	{
 		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::RUN))
 			return;
 	}
-	
 
 	if (m_EnterAnim.contains(curIndex) && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
 	{

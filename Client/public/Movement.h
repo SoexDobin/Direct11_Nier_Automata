@@ -13,6 +13,7 @@ public:
 		Vector3			targetDirection{ 0.f, 0.f, 0.f };
 		Float			moveSpeed{ 0.f };
 		Float			turnSpeed{ 0.f };
+		Float			gravity{ 30.f };
 	} MOVEMENT_DESC;
 
 public:
@@ -20,6 +21,11 @@ public:
 	explicit Movement(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Movement(const Movement& rhs);
 	virtual ~Movement() override = default;
+
+public:
+	Bool Is_Grounded() const { return m_IsGrounded; }
+	Float Get_GravityScalar() const { return m_Gravity; }
+	void Add_Force(const Vector3& impulse) { m_Velocity += impulse; m_IsGrounded = false; }
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -34,7 +40,10 @@ protected:
 	Vector3			m_TargetDirection{ 0.f, 0.f, 0.f };
 	Float			m_MoveSpeed{ 0.f };
 	Float			m_TurnSpeed{ 0.f };
+	Float			m_Gravity{ 30.f };
+	Bool			m_IsGrounded{ true };
 
+public:
 	Shared<Component> Clone(void* arg = nullptr) PURE;
 };
 

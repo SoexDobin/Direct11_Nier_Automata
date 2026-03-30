@@ -46,7 +46,7 @@ void WP0070Body::Priority_Update(Float timeDelta)
 
 void WP0070Body::Update(Float timeDelta)
 {
-
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void WP0070Body::Late_Update(Float timeDelta)

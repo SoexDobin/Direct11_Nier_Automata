@@ -21,6 +21,7 @@ HRESULT Movement::Initialize(void* arg)
 		m_TurnSpeed = desc.turnSpeed;
 		m_TargetDirection = desc.targetDirection;
 		m_Velocity = desc.velocity;
+		m_Gravity = desc.gravity;
 	}
 
 	return ScriptComponent::Initialize(arg);

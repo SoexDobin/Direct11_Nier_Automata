@@ -50,7 +50,11 @@ public:
 	void Set_AnimLoop(Bool isLoop) { m_IsAnimLoop = isLoop; }
 	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
 	Bool Is_AnimationFinished() const { return m_IsAnimEnd; }
-	Float Get_AnimationProgress() const { return m_Animations[m_CurrentAnimIndex]->Get_Progress(); }
+	Float Get_AnimationProgress() const {
+		if (m_IsBlending)
+			return m_Animations[m_NextAnimIndex]->Get_Progress();
+		return m_Animations[m_CurrentAnimIndex]->Get_Progress();
+	}
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;

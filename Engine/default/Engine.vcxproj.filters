@@ -356,6 +356,9 @@
     <ClInclude Include="..\public\EventManager.h">
       <Filter>01. Utility\11. Event</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Random_Helper.h">
+      <Filter>97. Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">

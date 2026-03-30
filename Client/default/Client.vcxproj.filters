@@ -49,7 +49,7 @@
     <ClInclude Include="..\public\State.h">
       <Filter>02. GameObject\Playable\StateMachine\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\State2B_Attack.h">
+    <ClInclude Include="..\public\State2B_AttackGround.h">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Idle.h">
@@ -127,6 +127,9 @@
     <ClInclude Include="..\public\Pl0000Movement.h">
       <Filter>02. GameObject\Playable\2B\Pl0000Movement</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\State2B_AttackAir.h">
+      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -174,7 +177,7 @@
     <ClCompile Include="..\private\State.cpp">
       <Filter>02. GameObject\Playable\StateMachine\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\State2B_Attack.cpp">
+    <ClCompile Include="..\private\State2B_AttackGround.cpp">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Idle.cpp">
@@ -251,6 +254,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Pl0000Movement.cpp">
       <Filter>02. GameObject\Playable\2B\Pl0000Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_AttackAir.cpp">
+      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -343,6 +349,9 @@
     </Filter>
     <Filter Include="02. GameObject\Playable\Movement">
       <UniqueIdentifier>{4e89dda7-8faf-408f-9b0d-de9a56d88d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Playable\2B\2BPartObject\WP3000">
+      <UniqueIdentifier>{48ecdbfd-c679-4189-8f0a-932df497e15f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

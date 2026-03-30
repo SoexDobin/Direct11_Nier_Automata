@@ -147,7 +147,7 @@ Bool Pl0000Input::Is_WASD_None() const
 Bool Pl0000Input::Is_WASD_UP() const
 {
 	return Is_KeyUp(UBYTE(DIKEYBOARD_W)) || Is_KeyUp(UBYTE(DIKEYBOARD_A)) ||
-		Is_KeyUp(UBYTE(DIKEYBOARD_S)) || Is_KeyDown(UBYTE(DIKEYBOARD_D));
+		Is_KeyUp(UBYTE(DIKEYBOARD_S)) || Is_KeyUp(UBYTE(DIKEYBOARD_D));
 }
 
 Bool Pl0000Input::Is_WASD_Down() const
@@ -186,6 +186,28 @@ Bool Pl0000Input::Is_WASD_Diagonal() const
 	if (a && d) return false;
 
 	return (w || s) && (a || d);
+}
+
+Bool Pl0000Input::Is_WASD_NoneOrUp() const
+{
+	return Is_NoneOrUp(UBYTE(DIKEYBOARD_W)) && Is_NoneOrUp(UBYTE(DIKEYBOARD_A)) &&
+		Is_NoneOrUp(UBYTE(DIKEYBOARD_S)) && Is_NoneOrUp(UBYTE(DIKEYBOARD_D));
+}
+
+Bool Pl0000Input::Is_WASD_SingleClickHold(Float holdThreshold) const
+{
+	return Is_KeySingleClickHold(UBYTE(DIKEYBOARD_W), holdThreshold) ||
+		Is_KeySingleClickHold(UBYTE(DIKEYBOARD_A), holdThreshold) ||
+		Is_KeySingleClickHold(UBYTE(DIKEYBOARD_S), holdThreshold) ||
+		Is_KeySingleClickHold(UBYTE(DIKEYBOARD_D), holdThreshold);
+}
+
+Bool Pl0000Input::Is_WASD_DoubleClickedHold(Float holdThreshold) const
+{
+	return Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_W), holdThreshold) ||
+		Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_A), holdThreshold) ||
+		Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_S), holdThreshold) ||
+		Is_KeyMultiClickHold(UBYTE(DIKEYBOARD_D), holdThreshold);
 }
 
 Bool Pl0000Input::Is_WA_Press() const

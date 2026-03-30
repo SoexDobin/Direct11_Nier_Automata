@@ -329,7 +329,18 @@
                                        },
                     "State2B_Dash":  {
                                          "members":  [
-
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_EnterAnim",
+                                                             "type":  "unordered_set\u003cuint32\u003e"
+                                                         },
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_DashAnim",
+                                                             "type":  "unordered_set\u003cuint32\u003e"
+                                                         }
                                                      ],
                                          "base_class":  "State2B",
                                          "inherited_members":  {
@@ -410,7 +421,18 @@
                                         },
                     "State2B_Sprint":  {
                                            "members":  [
-
+                                                           {
+                                                               "access":  "private",
+                                                               "default":  "",
+                                                               "name":  "m_EnterAnim",
+                                                               "type":  "unordered_set\u003cuint32\u003e"
+                                                           },
+                                                           {
+                                                               "access":  "private",
+                                                               "default":  "",
+                                                               "name":  "m_ToSprint",
+                                                               "type":  "unordered_set\u003cuint32\u003e"
+                                                           }
                                                        ],
                                            "base_class":  "State2B",
                                            "inherited_members":  {
@@ -425,7 +447,7 @@
                                         "members":  [
                                                         {
                                                             "access":  "private",
-                                                            "default":  "0.25f",
+                                                            "default":  "0.20f",
                                                             "name":  "m_DoubleClickThreshold",
                                                             "type":  "Float"
                                                         },
@@ -915,7 +937,12 @@
                                     },
                     "State2B_Run":  {
                                         "members":  [
-
+                                                        {
+                                                            "access":  "private",
+                                                            "default":  "",
+                                                            "name":  "m_EnterAnim",
+                                                            "type":  "unordered_set\u003cuint32\u003e"
+                                                        }
                                                     ],
                                         "base_class":  "State2B",
                                         "inherited_members":  {

@@ -39,6 +39,9 @@ wstring Pl0000StateMachine::Get_StateTag(Pl0000::PL0000_STATE state)
 
 Pl0000::PL0000_STATE Pl0000StateMachine::Get_CurP10000State()
 {
+	if (nullptr == m_CurrentState)
+		return static_cast<Pl0000::PL0000_STATE>(0);
+
 	return magic_enum::enum_cast<Pl0000::PL0000_STATE>(Helper::To_String(Get_CurrentState()->Get_StateTag())).value();
 }
 	

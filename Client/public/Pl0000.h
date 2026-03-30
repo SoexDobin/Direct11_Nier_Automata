@@ -73,15 +73,21 @@ public:
 
 public:
     enum PL0000_STATE {
+        // HEADER
         IDLE                = 899,
         RUN                 = 898,
         SPRINT              = 897,
         DASH                = 896,
         JUMP                = 895,
+        ATTACK_GROUND       = 894,
+        ATTACK_AIR          = 893,
+        EVADE               = 892,
 
         // IDLE
         IDLE_Neutral            = 46,
         IDLE_STAND_TO_Neutral   = 39,
+
+        WALK_TO_RUN             = 7,
 
         // RUN
         RUN_CYCLE           = 2,
@@ -93,27 +99,24 @@ public:
         SPRINT_STOP_R       = 6,
         
         // DASH
-        STAND_TO_DASH_F     = 61,
-        DASH_F              = 62,
-        DASH_TO_STAND_F     = 63,
-        STAND_TO_DASH_B     = 64,
-        DASH_B              = 65,
-        DASH_TO_STAND_B     = 66,
-        STAND_TO_DASH_R     = 67,
-        DASH_R              = 68,
-        DASH_TO_STAND_R     = 69,
-        STAND_TO_DASH_L     = 70,
-        DASH_L              = 71,
-        DASH_TO_STAND_L     = 72,
-        DASH_F_TO_SPRINT    = 73,
-        DASH_B_TO_SPRINT    = 74,
-        DASH_R_TO_SPRINT    = 75,
-        DASH_L_TO_SPRINT    = 76,
+        STAND_TO_DASH_F     = 61, DASH_F              = 62, DASH_TO_STAND_F     = 63,
+        STAND_TO_DASH_B     = 64, DASH_B              = 65, DASH_TO_STAND_B     = 66,
+        STAND_TO_DASH_R     = 67, DASH_R              = 68, DASH_TO_STAND_R     = 69,
+        STAND_TO_DASH_L     = 70, DASH_L              = 71, DASH_TO_STAND_L     = 72,
+
+        DASH_F_TO_SPRINT    = 73, 
+    	DASH_B_TO_SPRINT    = 74, 
+    	DASH_R_TO_SPRINT    = 75, 
+    	DASH_L_TO_SPRINT    = 76,
         
         // JUMP
-        JUMP_ENTER          = 13, // 20
-        JUMP_HOLD           = 14, // 21
-        
+        JUMP_ENTER          = 13,
+        JUMP_HOLD           = 14,
+
+        DOUBLE_JUMP1        = 16,
+        DOUBLE_JUMP2        = 17,
+        DOUBLE_JUMP3        = 18,
+        DOUBLE_JUMP4        = 19,
 
         STAND_TO_JUMP       = 23,
         RUN_TO_JUMP         = 24,
@@ -121,12 +124,40 @@ public:
 
         JUMP_TO_RUN         = 10,
         JUMP_TO_SPRINT      = 11,
-        JUMP_TO_STAND = 15, // 22
-        //JUMP_TO_STAND       = 114,
+        JUMP_TO_STAND       = 15, 
 
-        MAIN_ATTACK_2B      = 0x00000020,
-        SUB_ATTACK_2B       = 0x00000040,
+        // LIGHT ATTACK 0070
+        LIGHT_GROUND1       = 147,
+        LIGHT_GROUND2       = 148,
+        LIGHT_GROUND3       = 149,
+        LIGHT_GROUND4       = 150,
+        LIGHT_GROUND5       = 151,
+        LIGHT_GROUND6       = 152,
+        LIGHT_GROUND7       = 153,
 
+        LIGHT_GROUND_HOLD   = 340, // pl0000_0660
+        LIGHT_GROUND_RUN    = 173, // pl0000_0180
+
+        LIGHT_AIR1          = 161,
+        LIGHT_AIR2          = 162,
+        LIGHT_AIR3          = 161,
+        LIGHT_AIR4          = 162,
+        LIGHT_AIR5          = 163,
+
+        // HEAVY ATTACK 0220
+        HEAVY_GROUND1       = 187,
+        HEAVY_GROUND2       = 190,
+        HEAVY_GROUND3       = 193,
+
+        HEAVY_GROUND_HOLD_UNFULL       = 196,
+        HEAVY_GROUND_HOLD_NO_CONTACT   = 198,
+        HEAVY_GROUND_HOLD_CYCLE        = 197,
+        HEAVY_GROUND_HOLD_FULL         = 199,
+        HEAVY_GROUND_SPRINT            = 200,
+
+        HEAVY_AIR_DOWN_ENTER    = 202,
+        HEAVY_AIR_DOWN_HOLD     = 203,
+        HEAVY_AIR_DOWN_END      = 204,
     };
 };
 

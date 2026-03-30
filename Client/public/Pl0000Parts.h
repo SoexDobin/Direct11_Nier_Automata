@@ -32,6 +32,11 @@ public:
 	void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop);
 	uint32 Get_CurrentAnimationIndex() const { return m_Model->Get_AnimationIndex(); }
 	uint32 Get_NextAnimationIndex() const { return m_Model->Get_NextAnimationIndex(); }
+	Float Get_AnimationProgress() const { return m_Model->Get_AnimationProgress(); }
+	Bool Is_AnimationFinished() const { return m_Model->Is_AnimationFinished(); }
+
+protected:
+	
 
 protected:
 	Shared<Shader> m_Shader{ nullptr };

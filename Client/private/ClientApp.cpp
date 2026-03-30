@@ -49,6 +49,10 @@ HRESULT ClientApp::Ready_StartLevel(LEVEL startLevel)
 
 HRESULT ClientApp::Ready_InitialObject()
 {
+    GAME_INSTANCE->Add_Font(L"Nier_16", L"../../Client/bin/resources/Font/NierFont_16.spritefont");
+    GAME_INSTANCE->Add_Font(L"Nier_32", L"../../Client/bin/resources/Font/NierFont_32.spritefont");
+    GAME_INSTANCE->Add_Font(L"Nier_64", L"../../Client/bin/resources/Font/NierFont_64.spritefont");
+
     GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), StaticCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"StaticCamera");
     GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeIn::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeIn");
     GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeOut::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeOut");

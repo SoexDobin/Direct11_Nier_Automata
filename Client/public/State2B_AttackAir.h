@@ -5,11 +5,11 @@ NS_BEGIN(Client)
 
 class Pl0000;
 
-class CLIENT_DLL State2B_Sprint final : public State2B
+class CLIENT_DLL State2B_AttackAir final : public State2B
 {
 public:
-	explicit State2B_Sprint(const wstring& tag, const Shared<Pl0000>& owner);
-	~State2B_Sprint() override = default;
+	explicit State2B_AttackAir(const wstring& tag, const Shared<Pl0000>& owner);
+	~State2B_AttackAir() override = default;
 
 private:
 	HRESULT Initialize() override;
@@ -22,12 +22,9 @@ public:
 
 private:
 	unordered_set<uint32> m_EnterAnim;
-	unordered_set<uint32> m_ToSprint;
-	Vector3 m_LockedDirection{};
 
 public:
-	static Shared<State2B_Sprint> Create(const wstring& tag, const Shared<Pl0000>& owner);
+	static Shared<State2B_AttackAir> Create(const wstring& tag, const Shared<Pl0000>& owner);
 };
 
 NS_END
-

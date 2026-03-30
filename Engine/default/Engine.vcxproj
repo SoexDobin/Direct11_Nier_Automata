@@ -232,6 +232,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\PartObject.h" />
     <ClInclude Include="..\public\Pipeline.h" />
     <ClInclude Include="..\public\PrototypeManager.h" />
+    <ClInclude Include="..\public\Random_Helper.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\ResourceManager.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />

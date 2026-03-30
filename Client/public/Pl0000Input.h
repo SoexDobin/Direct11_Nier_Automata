@@ -34,7 +34,6 @@ public:
 	Bool Is_KeyUp(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::UP; }
 	Bool Is_KeyPress(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::PRESSED || m_KeyInfos[keyID].state == KEY_STATE::MULTI_CLICKED; }
 	Bool Is_KeyMultiClick(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::MULTI_CLICKED; }
-
 	Bool Is_KeyHold(uByte keyID, Float holdThreshold) const
 	{
 		return (m_KeyInfos[keyID].state == KEY_STATE::PRESSED) && (m_KeyInfos[keyID].holdTimer >= holdThreshold);
@@ -47,7 +46,11 @@ public:
 	{
 		return Is_KeyHold(keyID, holdThreshold) && !m_KeyInfos[keyID].isMultiClickHold;
 	}
+	Bool Is_NoneOrUp(uByte keyID) const {
+		return m_KeyInfos[keyID].state == KEY_STATE::NONE || m_KeyInfos[keyID].state == KEY_STATE::UP;
+	}
 	Float Get_PrevHoldTimer(uByte keyID) const { return m_KeyInfos[keyID].prevHoldTimer; }
+
 
 	// ===================================================================
 	// WASD 통합 제어 (Bool 반환 / vector 반환)
@@ -60,7 +63,9 @@ public:
 	Bool Is_WASD_DoubleClick() const;
 	Bool Is_WASD_Hold(Float holdThreshold) const;
 	Bool Is_WASD_Diagonal() const;
-	
+	Bool Is_WASD_NoneOrUp() const;
+	Bool Is_WASD_SingleClickHold(Float holdThreshold) const;
+	Bool Is_WASD_DoubleClickedHold(Float holdThreshold) const;
 
 	Bool Is_WA_Press() const;
 	Bool Is_WA_DoubleClick() const;
@@ -144,7 +149,7 @@ private:
 	INPUT_INFO m_MouseInfos[ETOI(DIMB::END)];
 	LONG m_MouseMovement[ETOI(DIMB::END)];
 
-	Float m_DoubleClickThreshold = 0.25f;
+	Float m_DoubleClickThreshold = 0.20f;
 
 	// 마우스 콤보 큐
 	vector<Engine::DIMB> m_MouseComboQueue;

@@ -25,6 +25,7 @@ public:
 
 public:
 	const TRANSFORM_FRAME& Get_TransformDelta() const { return m_Transformation; }
+	void ResetVelocityState() { m_IsFirstUpdate = true; m_PrevTrackPosition = -1.f; }
 	int32 Get_BoneIndex() const { return m_BoneIndex; }
 	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, Bool isLoop, _Out_ TRANSFORM_FRAME& outTransform);
 	void Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition);

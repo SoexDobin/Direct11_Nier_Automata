@@ -3,10 +3,10 @@
 
 #include <Game.h>
 #include <SpdLogger.h>
-#include "Model.h"
-#include "StateMachine.h"
+
 #include "Pl0000.h"
 #include "Pl0000Body.h"
+#include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
 #include "WP0070Body.h"
 #include "WP0220Body.h"
@@ -18,30 +18,62 @@ State2B_Run::State2B_Run(const wstring& tag, const Shared<Pl0000>& owner)
 
 HRESULT State2B_Run::Initialize()
 {
+	m_EnterAnim.emplace(Pl0000::PL0000_STATE::JUMP_TO_RUN);
+	m_EnterAnim.emplace(Pl0000::PL0000_STATE::WALK_TO_RUN);
+
 	return State2B::Initialize();
 }
 
 Bool State2B_Run::StateEnterInvoke()
 {
-	uint32 prevIndex = m_Body.lock()->Get_CurrentAnimationIndex();
-	
-	m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_CYCLE), 0.2f, true);
+	auto pl0000 = m_Body.lock();
 
-	return true;
+	switch (auto prevState = m_States.lock()->Get_CurP10000State())
+	{
+	case Pl0000::PL0000_STATE::JUMP:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::JUMP_TO_RUN), 0.15f, false);
+		return true;
+	case Pl0000::PL0000_STATE::IDLE:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::WALK_TO_RUN), 0.2f, false);
+		return true;
+	default:
+		LOG_ERROR(L"[ENTER RUN] : No Enter state PrevIndex {} ", Helper::To_wString(magic_enum::enum_name(prevState)));
+		return false;
+	}
 }
 
 void State2B_Run::Update(Float timeDelta)
 {
+	uint32 curIndex = m_Body.lock()->Get_CurrentAnimationIndex();
+	Bool isAnimFinished = m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished();
+
+	Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
+	moveData.direction = Calculate_Direction();
+	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
+	moveData.canRotation = true;
+
+	m_Movement.lock()->Set_MovementData(moveData);
+
+	if (m_Input.lock()->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
+	{
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::JUMP);
+		return;
+	}
+
 	if (m_Input.lock()->Is_WASD_DoubleClick())
 	{
 		m_States.lock()->Change_State(Pl0000::PL0000_STATE::DASH);
 		return;
 	}
 
-	if (m_Input.lock()->Is_WASD_Hold(0.5f) || m_Input.lock()->Is_WASD_Down() || m_Input.lock()->Is_WASD_Press())
+	if (m_EnterAnim.contains(curIndex) && isAnimFinished)
+	{
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_CYCLE), 0.2f, true);
 		return;
+	}
 
-	m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
+	if (m_Input.lock()->Is_WASD_None())
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
 }
 
 void State2B_Run::Late_Update(Float timeDelta)

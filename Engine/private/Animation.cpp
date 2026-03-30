@@ -63,6 +63,19 @@ HRESULT Animation::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+void Animation::Set_Progress(Float progress)
+{
+	m_CurrentTrackPosition = m_Duration * progress;
+
+	std::fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
+	
+	for (auto& channel : m_Channels)
+	{
+		channel->ResetVelocityState();
+		// m_IsFirstUpdate=true, m_PrevTrackPosition=-1.f
+	}
+}
+
 const TRANSFORM_FRAME& Animation::Get_TransformVelocity(int32 boneIndex) const
 {
 	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };

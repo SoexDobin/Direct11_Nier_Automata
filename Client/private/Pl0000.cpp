@@ -33,6 +33,16 @@ HRESULT Pl0000::Initialize_Prototype()
 
 HRESULT Pl0000::Initialize(void* arg)
 {
+	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Add_Owner_To_Camera", [&]()
+		{
+			auto camera = GAME_INSTANCE->Get_MainCamera();
+			
+			if (camera != nullptr)
+			{
+				camera->Set_Target(shared_from_this());
+			}
+		});
+
 	if (FAILED(ContainerObject::Initialize(arg))) {
 		LOG_ERROR(L"Failed to Initialize GameObject {}", m_ObjectName);
 		return E_FAIL;
@@ -46,10 +56,6 @@ HRESULT Pl0000::Initialize(void* arg)
 		LOG_ERROR(L"Failed to Ready Components {}", m_ObjectName);
 		return E_FAIL;
 	}
-
-	m_SheathMatrix =
-		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-30.f)) *
-		Matrix::CreateTranslation(Vector3{ 0.f, 1.5f, -0.5f });
 
 	return S_OK;
 }
@@ -73,11 +79,13 @@ void Pl0000::Update(Float timeDelta)
 void Pl0000::Late_Update(Float timeDelta)
 {
 	m_Pl0000Movement->Update_Movement(timeDelta);
+
+	m_Transform->Update_WorldMatrix();
 }
 
 void Pl0000::Fixed_Update(Float fixedDelta)
 {
-	m_Transform->Update_WorldMatrix();
+	
 }
 
 HRESULT Pl0000::Render()
@@ -92,6 +100,12 @@ void Pl0000::Submit_RenderGroup()
 
 HRESULT Pl0000::Ready_PartObjects()
 {
+	m_SheathMatrix =
+		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-30.f)) *
+		Matrix::CreateTranslation(Vector3{ 0.f, 1.5f, -0.5f });
+
+
+
 	Pl0000Body::Pl0000BODY_DESC desc{};
 	desc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 
@@ -104,6 +118,8 @@ HRESULT Pl0000::Ready_PartObjects()
 	// TODO : POD
 
 	m_MainBody = static_pointer_cast<Pl0000Body>(Find_PartObject(L"Pl0000Body"));
+	Find_PartObject(L"WP0070Body")->Get_Transform()->Set_WorldMatrix(m_SheathMatrix);
+	Find_PartObject(L"WP0220Body")->Get_Transform()->Set_WorldMatrix(m_SheathMatrix);
 
 	return S_OK;
 }
@@ -115,7 +131,7 @@ HRESULT Pl0000::Ready_Components()
 		return E_FAIL;
 
 	Pl0000Movement::PL0000_MOVEMENT_DESC movementDesc{};
-	movementDesc.velocity = Vector3{0.f, 5.f, 0.f};
+	movementDesc.velocity = Vector3{0.f, 0.f, 0.f};
 	movementDesc.moveSpeed = 0.f;
 	movementDesc.targetDirection = Vector3::Zero;
 	movementDesc.turnSpeed = 8.0f;

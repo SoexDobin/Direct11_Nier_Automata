@@ -20,15 +20,15 @@ State2B_Dash::State2B_Dash(const wstring& tag, const Shared<Pl0000>& owner)
 
 HRESULT State2B_Dash::Initialize()
 {
-	m_EnterAnim.emplace(Pl0000::PL0000_STATE::STAND_TO_DASH_F);
-	m_EnterAnim.emplace(Pl0000::PL0000_STATE::STAND_TO_DASH_B);
-	m_EnterAnim.emplace(Pl0000::PL0000_STATE::STAND_TO_DASH_R);
-	m_EnterAnim.emplace(Pl0000::PL0000_STATE::STAND_TO_DASH_L);
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::STAND_TO_DASH_F));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::STAND_TO_DASH_B));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::STAND_TO_DASH_R));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::STAND_TO_DASH_L));
 
-	m_DashAnim.emplace(Pl0000::PL0000_STATE::DASH_F);
-	m_DashAnim.emplace(Pl0000::PL0000_STATE::DASH_B);
-	m_DashAnim.emplace(Pl0000::PL0000_STATE::DASH_R);
-	m_DashAnim.emplace(Pl0000::PL0000_STATE::DASH_L);
+	m_DashAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_F));
+	m_DashAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_B));
+	m_DashAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_R));
+	m_DashAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_L));
 
 	return State2B::Initialize();
 }

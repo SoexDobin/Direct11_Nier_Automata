@@ -30,7 +30,16 @@ namespace Client
 
 	HRESULT State2B::Initialize()
 	{
-		m_MainCamera = GAME_INSTANCE->Get_MainCamera();
+		GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"State_Need_Camera", [&]()
+			{
+				auto camera = GAME_INSTANCE->Get_MainCamera();
+
+				if (camera != nullptr)
+				{
+					m_MainCamera = camera;
+				}
+			});
+		
 
 		m_Body = static_pointer_cast<Pl0000Body>(m_Owner.lock()->Find_PartObject(L"Pl0000Body"));
 		m_LightWeapon = static_pointer_cast<WP0070Body>(m_Owner.lock()->Find_PartObject(L"WP0070Body"));

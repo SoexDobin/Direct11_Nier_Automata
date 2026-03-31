@@ -25,9 +25,20 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
+public:
+	TRANSFORM_FRAME Get_ModelTransform() const { return m_Model->Get_RootTransformVelocity(m_RootBoneIndex); }
+	void Set_Sheathing(const Matrix& sheathMatrix);
+	void DrawWP0070();
+	Bool Is_Sheathing() const { return m_IsSheathing; }
+	void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop) override;
+
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
+
+private:
+	int32 m_RootBoneIndex{};
+	Bool m_IsSheathing{ true };
 
 public:
 	static Shared<WP0070Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -38,6 +49,22 @@ public:
 		SHEATHE_LIGHT = 0,
 		SHEATHE_HEAVY = 1,
 
+		LIGHT_GROUND1		= 4,
+		LIGHT_GROUND2		= 5,
+		LIGHT_GROUND3		= 6,
+		LIGHT_GROUND4		= 7,
+		LIGHT_GROUND5		= 8,
+		LIGHT_GROUND6		= 9,
+		LIGHT_GROUND7		= 10,
+
+		LIGHT_GROUND_RUN	= 32,
+		LIGHT_GROUND_HOLD	= 51,
+		
+		LIGHT_AIR1			= 20,
+		LIGHT_AIR2			= 21,
+		LIGHT_AIR3			= 22,
+
+		LIGHT_COMBO			= 46
 	};
 };
 

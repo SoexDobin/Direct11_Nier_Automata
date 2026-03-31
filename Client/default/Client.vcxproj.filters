@@ -130,6 +130,9 @@
     <ClInclude Include="..\public\State2B_AttackAir.h">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\WP3000Body.h">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\WP3000</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -257,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="..\private\State2B_AttackAir.cpp">
       <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WP3000Body.cpp">
+      <Filter>02. GameObject\Playable\2B\2BPartObject\WP3000</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

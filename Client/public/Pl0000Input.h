@@ -104,8 +104,8 @@ public:
 	// 마우스 클릭 콤보 큐 (NieR 공격 시퀀스용)
 	// ===================================================================
 	//  좌클릭 1번       : {LB}
-	//  좌좌좌좌          : {LB, LB, LB, LB}
-	//  좌좌좌 + 우       : {LB, LB, LB, RB}
+	//  좌좌좌좌좌좌좌    : {LB, LB, LB, LB, LB, LB, LB}
+	
 	// ===================================================================
 public:
 	const vector<Engine::DIMB> &Get_MouseComboQueue() const { return m_MouseComboQueue; }

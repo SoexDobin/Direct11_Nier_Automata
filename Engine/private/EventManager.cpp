@@ -38,15 +38,9 @@ HRESULT EventManager::Add_EventOnce(uint32 levIndex, const wstring& eventTag, co
 {
 	if (!callback || levIndex >= m_LevelCount) return E_FAIL;
 	auto& targetMap = m_Events[levIndex];
-
-	auto iter = targetMap.find(eventTag);
-	if (iter != targetMap.end())
-	{
-		iter->second.eType = EVENT_TYPE::ONCE;
-		iter->second.callback = callback;
-		return S_OK;
-	}
+	
 	targetMap.emplace(eventTag, EVENT_INFO{ EVENT_TYPE::ONCE, callback });
+
 	return S_OK;
 }
 
@@ -54,15 +48,9 @@ HRESULT EventManager::Add_EventPermanent(uint32 levIndex, const wstring& eventTa
 {
 	if (!callback || levIndex >= m_LevelCount) return E_FAIL;
 	auto& targetMap = m_Events[levIndex];
-
-	auto iter = targetMap.find(eventTag);
-	if (iter != targetMap.end())
-	{
-		iter->second.eType = EVENT_TYPE::PERMANENT;
-		iter->second.callback = callback;
-		return S_OK;
-	}
+	
 	targetMap.emplace(eventTag, EVENT_INFO{ EVENT_TYPE::PERMANENT, callback });
+
 	return S_OK;
 }
 
@@ -70,11 +58,11 @@ HRESULT EventManager::Remove_Event(uint32 levIndex, const wstring& eventTag)
 {
 	if (levIndex >= m_LevelCount) return E_FAIL;
 	auto& targetMap = m_Events[levIndex];
+	
+	if (targetMap.find(eventTag) == targetMap.end()) return E_FAIL;
+	
+	targetMap.erase(eventTag);
 
-	auto iter = targetMap.find(eventTag);
-	if (iter == targetMap.end()) return E_FAIL;
-
-	targetMap.erase(iter);
 	return S_OK;
 }
 

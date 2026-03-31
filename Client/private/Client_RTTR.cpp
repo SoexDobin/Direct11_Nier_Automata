@@ -34,6 +34,7 @@ using rttr::registration;
 #include "SkyBox.h"
 #include "SkySphere.h"
 #include "Terrain.h"
+#include "WP3000Body.h"
 
 // </AUTO_GENERATED_INCLUDES>
 
@@ -166,6 +167,11 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Terrain::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Terrain::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<WP3000Body>("WP3000Body")
+        .constructor<>()
+        .method("Clone", &WP3000Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP3000Body::Create(device, context); })(rttr::metadata("Level", 0));
 
 
 // </AUTO_GENERATED_RTTR>

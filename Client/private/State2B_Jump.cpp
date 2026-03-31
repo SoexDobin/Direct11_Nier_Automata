@@ -17,9 +17,9 @@ State2B_Jump::State2B_Jump(const wstring& tag, const Shared<Pl0000>& owner)
 
 HRESULT State2B_Jump::Initialize()
 {	
-	m_EnterAnim.emplace(Pl0000::PL0000_STATE::STAND_TO_JUMP);
-	m_EnterAnim.emplace(Pl0000::PL0000_STATE::RUN_TO_JUMP);
-	m_EnterAnim.emplace(Pl0000::PL0000_STATE::SPRINT_TO_JUMP);
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::STAND_TO_JUMP));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::RUN_TO_JUMP));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::SPRINT_TO_JUMP));
 
 	return State2B::Initialize();
 }
@@ -73,7 +73,7 @@ void State2B_Jump::Update(Float timeDelta)
 			m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
 			return;
 		}
-		if (m_PrevMoveState == Pl0000::SPRINT)
+		if (m_PrevMoveState == Pl0000::PL0000_STATE::SPRINT)
 		{
 			m_States.lock()->Change_State(Pl0000::PL0000_STATE::SPRINT);
 			return;
@@ -104,11 +104,11 @@ void State2B_Jump::Update(Float timeDelta)
 
 	if (m_EnterAnim.contains(curIndex) && isAnimFinished)
 	{
-		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_ENTER, 0.2f, false);
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::JUMP_ENTER), 0.2f, false);
 	}
 	else if (isAnimFinished && !m_Movement.lock()->Is_Grounded())
 	{
-		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_HOLD, 0.2f, true);
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::JUMP_HOLD), 0.2f, true);
 	}
 }
 

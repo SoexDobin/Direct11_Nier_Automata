@@ -27,9 +27,19 @@ HRESULT WP0070Body::Initialize(void* arg)
 
 	if (FAILED(Ready_Components()))
 	{
-		LOG_ERROR(L"Failed To Ready_Components : P10000Body");
+		LOG_ERROR(L"Failed To Ready_Components : WP0070Body");
 		return E_FAIL;
 	}
+
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName("wp0070");
+	
+	if (m_RootBoneIndex == -1)
+	{
+		LOG_ERROR(L"Failed to Find WP0070 Root Bone");
+		return E_FAIL;
+	}
+	
+	m_Model->Set_LocalRootNode(m_RootBoneIndex);
 
 	return S_OK;
 }
@@ -81,8 +91,30 @@ HRESULT WP0070Body::Render()
 
 void WP0070Body::Submit_RenderGroup()
 {
-	if (Is_Active())
-		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+}
+
+void WP0070Body::Set_Sheathing(const Matrix& sheathMatrix)
+{
+	if (m_IsSheathing) return;
+
+	m_Model->Set_Animation(ETOI(WP0070_STATE::SHEATHE_LIGHT), 0.001f);
+	m_Transform->Set_WorldMatrix(sheathMatrix);
+	m_IsSheathing = true;
+}
+
+void WP0070Body::DrawWP0070()
+{
+	if (m_IsSheathing == false) return;
+
+	m_Transform->Set_WorldMatrix(Matrix::Identity);
+	m_IsSheathing = false;
+}
+
+void WP0070Body::Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop)
+{
+	m_Transform->Set_WorldMatrix(Matrix::Identity);
+	Pl0000Parts::Set_Animation(animIndex, blendDuration, isLoop);
 }
 
 HRESULT WP0070Body::Bind_ShaderResources()

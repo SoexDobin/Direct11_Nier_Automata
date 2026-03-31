@@ -19,7 +19,6 @@ public:
 	void Late_Update(Float timeDelta) override;
 	void StateExitInvoke() override;
 
-
 private:
 	Bool m_InitializeState{ true };
 	unordered_set<uint32> m_EnterAnim;

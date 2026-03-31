@@ -8,49 +8,6 @@
             {
               "properties": null,
               "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "VIBuffer_Rect"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            }
-          ],
-          "name": "LoadingPixelPanel",
-          "objectID": 2233491490,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "LoadingPixelPanel",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              2240.0,
-              1080.0,
-              1.0
-            ]
-          },
-          "typeName": "LoadingPixelPanel"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
             }
           ],
           "name": "StaticCamera",
@@ -89,11 +46,11 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "VIBuffer_Rect"
             },
             {
               "properties": null,
-              "typeName": "VIBuffer_Rect"
+              "typeName": "Shader"
             }
           ],
           "name": "LoadingBackground",
@@ -139,49 +96,6 @@
               "typeName": "Texture"
             }
           ],
-          "name": "LoadingFadeOut",
-          "objectID": 2458169530,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "LoadingFadeOut",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1920.0,
-              1920.0,
-              1.0
-            ]
-          },
-          "typeName": "LoadingFadeOut"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "VIBuffer_Rect"
-            }
-          ],
           "name": "LoadingLogo",
           "objectID": 3729526162,
           "parentObjectID": 0,
@@ -205,6 +119,49 @@
             ]
           },
           "typeName": "LoadingLogo"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            }
+          ],
+          "name": "LoadingPixelPanel",
+          "objectID": 2233491490,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "LoadingPixelPanel",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              2240.0,
+              1080.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingPixelPanel"
         },
         {
           "components": [
@@ -248,6 +205,49 @@
             ]
           },
           "typeName": "LoadingFadeIn"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "VIBuffer_Rect"
+            }
+          ],
+          "name": "LoadingFadeOut",
+          "objectID": 2458169530,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "LoadingFadeOut",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1920.0,
+              1920.0,
+              1.0
+            ]
+          },
+          "typeName": "LoadingFadeOut"
         }
       ]
     }

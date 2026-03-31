@@ -34,7 +34,7 @@ Bool State2B_Idle::StateEnterInvoke()
 {
 	auto pl0000 = m_Body.lock();
 
-	switch (const uint32 prevState = m_States.lock()->Get_CurP10000State())
+	switch (auto prevState = m_States.lock()->Get_CurP10000State())
 	{
 	case Pl0000::PL0000_STATE::RUN:
 		{
@@ -48,16 +48,15 @@ Bool State2B_Idle::StateEnterInvoke()
 			}
 			return true;
 		}
-		
 	case Pl0000::PL0000_STATE::SPRINT:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R), 0.2f, false);
 		return true;
 	case Pl0000::PL0000_STATE::JUMP:
-		pl0000->Set_Animation(Pl0000::PL0000_STATE::JUMP_TO_STAND, 0.2f, false);
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::JUMP_TO_STAND), 0.2f, false);
 		return true;
 	case Pl0000::PL0000_STATE::DASH:
 		{
-			switch (const uint32 prevAnim = m_Body.lock()->Get_ModelComponent()->Get_AnimationIndex())
+			switch (auto prevAnim = static_cast<Pl0000::PL0000_STATE>(m_Body.lock()->Get_ModelComponent()->Get_AnimationIndex()))
 			{
 			case Pl0000::PL0000_STATE::DASH_F: case Pl0000::PL0000_STATE::STAND_TO_DASH_F:
 				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F), 0.2f, false);
@@ -72,24 +71,26 @@ Bool State2B_Idle::StateEnterInvoke()
 				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
 				return true;
 			default:
-				LOG_ERROR(L"[ENTER IDLE From DASH] : No Enter state PrevIndex {} ", prevAnim);
+				LOG_ERROR(L"[ENTER IDLE From DASH] : No Enter state PrevIndex {} ", ETOI(prevAnim));
 				return false;
 			}
 		}
-		
+	case Pl0000::PL0000_STATE::ATTACK_GROUND: case Pl0000::PL0000_STATE::ATTACK_AIR:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral), 0.2f, false);
+		return true;
 	default:
 		{
 			if (m_InitializeState)
 			{
 				m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_Neutral), 0.2f, false);
 
-				m_LightWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_SheathingMatrix());
-				m_HeavyWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_SheathingMatrix());
+				m_LightWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_LightSheathingMatrix());
+				m_HeavyWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_HeavySheathingMatrix());
 				m_InitializeState = false;
 
 				return true;
 			} 
-			LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", prevState);
+			LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", ETOI(prevState));
 			return false;
 		}
 	}
@@ -105,18 +106,13 @@ void State2B_Idle::Update(Float timeDelta)
 	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
 	moveData.canRotation = true;
 	m_Movement.lock()->Set_MovementData(moveData);
+
+	if (m_Input.lock()->Is_MouseDown(DIMB::LBUTTON) || m_Input.lock()->Is_MouseDown(DIMB::RBUTTON))
+	{
+		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::ATTACK_GROUND))
+			return;
+	}
 	
-
-	if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON))
-	{
-
-		return;
-	}
-	if (m_Input.lock()->Is_MousePress(DIMB::RBUTTON))
-	{
-		
-		return;
-	}
 	if (m_Input.lock()->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
 	{
 		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::JUMP))
@@ -137,7 +133,7 @@ void State2B_Idle::Update(Float timeDelta)
 	{
 		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral), 0.5f, false);
 	}
-	else if (curIndex == Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
+	else if (curIndex == ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral) && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
 	{
 		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_Neutral), 0.5f, true);
 	}

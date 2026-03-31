@@ -30,7 +30,7 @@ public:
 	HRESULT Clear_AllEvents();
 private:
 	uint32 m_LevelCount{};
-	vector<unordered_map<wstring, EVENT_INFO>> m_Events;
+	vector<unordered_multimap<wstring, EVENT_INFO>> m_Events;
 
 public:
 	static Unique<EventManager> Create(uint32 levelCount);

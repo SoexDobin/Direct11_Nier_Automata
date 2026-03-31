@@ -25,6 +25,12 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
+public:
+	void Set_Sheathing(const Matrix& sheathMatrix);
+	void DrawWP0220();
+	Bool Is_Sheathing() const { return m_IsSheathing; }
+	void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop) override;
+
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
@@ -33,11 +39,30 @@ public:
 	static Shared<WP0220Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
 
+private:
+	int32 m_RootBoneIndex{};
+	Bool m_IsSheathing{ true };
+
 public:
 	enum class WP0220_STATE {
 		SHEATHE_LIGHT = 0,
 		SHEATHE_HEAVY = 1,
 
+		HEAVY_GROUND1 = 7,
+		HEAVY_GROUND2 = 9,
+		HEAVY_GROUND3 = 11,
+
+		HEAVY_GROUND_HOLD_UNFULL		= 13,
+		HEAVY_GROUND_HOLD_CYCLE			= 14,
+		HEAVY_GROUND_HOLD_NO_CONTACT	= 15,
+		HEAVY_GROUND_HOLD_FULL			= 16,
+		HEAVY_GROUND_SPRINT				= 17,
+
+		HEAVY_AIR_DOWN_ENTER		= 19,
+		HEAVY_AIR_DOWN_HOLD			= 20,
+		HEAVY_AIR_DOWN_END			= 21,
+
+		HEAVY_COMBO					= 36
 	};
 };
 

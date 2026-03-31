@@ -35,7 +35,9 @@ public:
 
 public: /* pl0000 */
     TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
-    const Matrix& Get_SheathingMatrix() const { return m_SheathMatrix; }
+
+    const Matrix& Get_LightSheathingMatrix() const { return m_LightSheathMatrix; }
+    const Matrix& Get_HeavySheathingMatrix() const { return m_HeavySheathMatrix; }
 
 
 public:
@@ -65,14 +67,15 @@ private:
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
 
 private:
-    Matrix m_SheathMatrix{};
+    Matrix m_LightSheathMatrix{};
+    Matrix m_HeavySheathMatrix{};
 
 public:
 	static Shared<Pl0000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
 
 public:
-    enum PL0000_STATE {
+    enum class PL0000_STATE {
         // HEADER
         IDLE                = 899,
         RUN                 = 898,
@@ -93,6 +96,9 @@ public:
         RUN_CYCLE           = 2,
         RUN_STOP_L          = 3,
         RUN_STOP_R          = 4,
+
+        RUN_LIGHT_CYCLE     = 590,
+        RUN_HEAVY_CYCLE     = 649,
         
         // SPRINT
         SPRINT_CYCLE        = 5,
@@ -158,6 +164,8 @@ public:
         HEAVY_AIR_DOWN_ENTER    = 202,
         HEAVY_AIR_DOWN_HOLD     = 203,
         HEAVY_AIR_DOWN_END      = 204,
+
+        LIGHT_HEAVY_COMBO       = 329,
     };
 };
 

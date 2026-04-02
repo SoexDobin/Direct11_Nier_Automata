@@ -192,20 +192,16 @@ void Model::Update_ModelAnimation(Float timeDelta)
 		{
 			m_IsBlending = false;
 			m_CurrentAnimIndex = m_NextAnimIndex;
-			m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
+			m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop, m_RootLocalNode);
 		}
 		else
 		{
-			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones);
+			m_Animations[m_CurrentAnimIndex]->Blend_TransformationMatrix(timeDelta, m_Animations[m_NextAnimIndex], ratio, m_Bones, m_IsPrevAnimLoop, m_IsAnimLoop, m_RootLocalNode);
 		}
 	}
 	else
 	{
-		m_IsAnimEnd = m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop);
-
-		if (m_IsAnimEnd && m_IsAnimLoop)
-		{
-		}
+		m_IsAnimEnd = m_Animations[m_CurrentAnimIndex]->Update_TransformationMatrix(timeDelta, m_Bones, m_IsAnimLoop, m_RootLocalNode);
 	}
 
 	for (auto& bone : m_Bones)
@@ -217,20 +213,21 @@ void Model::Update_ModelAnimation(Float timeDelta)
 void Model::Set_Animation(uint32 index, Float blendDuration)
 {
 	if (m_CurrentAnimIndex == index) return;
+	if (m_IsBlending && m_NextAnimIndex == index) return;
 
 	if (m_IsBlending)
 	{
 		m_CurrentAnimIndex = m_NextAnimIndex;
 	}
 
-	m_NextAnimIndex = index;
+	m_IsPrevAnimLoop = m_IsAnimLoop;
+ 	m_NextAnimIndex = index;
 	m_IsBlending = true;
 	m_BlendingElapsed = 0.f;
 	m_BlendingDuration = blendDuration;
+	m_IsAnimEnd = false;
 
-	Float progress = m_Animations[m_CurrentAnimIndex]->Get_Progress();
-	m_Animations[m_NextAnimIndex]->Set_Progress(progress);
-
+	m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
 }
 
 int32 Model::Get_BoneIndexByName(const string& boneName) const
@@ -243,14 +240,41 @@ int32 Model::Get_BoneIndexByName(const string& boneName) const
 	return -1;
 }
 
-const TRANSFORM_FRAME& Model::Get_BoneTransformDelta(uint32 boneIndex) const
+Matrix Model::Get_BoneMatrix(uint32 boneIndex) const
 {
-	static TRANSFORM_FRAME emptyFrame{ Vector3::One, Vector4(0.f, 0.f, 0.f, 1.f), Vector3::Zero };
-	
-	if (m_Animations.empty() || m_CurrentAnimIndex >= m_Animations.size())
-		return emptyFrame;
+	if (boneIndex >= m_Bones.size())
+		return Matrix::Identity;
+	return *m_Bones[boneIndex]->Get_CombinedTransformationMatrixPtr();
+}
 
-	return m_Animations[m_CurrentAnimIndex]->Get_TransformDelta(boneIndex);
+TRANSFORM_FRAME Model::Get_RootTransformVelocity(uint32 nodeIndex) const
+{
+	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())
+	{
+		Float ratio = m_BlendingElapsed / m_BlendingDuration;
+
+		const TRANSFORM_FRAME& curDelta = m_Animations[m_CurrentAnimIndex]->Get_TransformVelocity(nodeIndex);
+		const TRANSFORM_FRAME& nextDelta = m_Animations[m_NextAnimIndex]->Get_TransformVelocity(nodeIndex);
+
+		TRANSFORM_FRAME blendedDelta{};
+		blendedDelta.position = Vector3::Lerp(curDelta.position, nextDelta.position, ratio);
+		blendedDelta.rotation = Quaternion::Slerp(curDelta.rotation, nextDelta.rotation, ratio);
+		blendedDelta.scale = Vector3::One;
+
+		return blendedDelta;
+	}
+
+	return m_Animations[m_CurrentAnimIndex]->Get_TransformVelocity(nodeIndex);
+}
+
+void Model::Set_LocalRootNode(uint32 nodeIndex)
+{
+	m_RootLocalNode = static_cast<int32>(nodeIndex);
+	for (uint32 i = 0; i < m_NumAnimation; ++i)
+	{
+		m_Animations[i]->Set_LocalTransformationPresent(true);
+		// 모든 animation의 순회로 루트에 영향을 받는 걸 명시
+	}
 }
 
 HRESULT Model::Render(uint32 meshIndex)

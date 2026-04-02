@@ -5,24 +5,22 @@
 
 #include "Game.h"
 #include "Model.h"
+#include "OBBCollider.h"
 
-
-WP0220Body::WP0220Body() : P10000Parts{} {}
+WP0220Body::WP0220Body() : Pl0000Parts{} {}
 WP0220Body::WP0220Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: P10000Parts{ device, context } {
-}
+	: Pl0000Parts{ device, context } {}
 WP0220Body::WP0220Body(const WP0220Body& rhs)
-	: P10000Parts{ rhs } {
-}
+	: Pl0000Parts{ rhs } {}
 
 HRESULT WP0220Body::Initialize_Prototype()
 {
-	return P10000Parts::Initialize_Prototype();
+	return Pl0000Parts::Initialize_Prototype();
 }
 
 HRESULT WP0220Body::Initialize(void* arg)
 {
-	if (FAILED(P10000Parts::Initialize(arg)))
+	if (FAILED(Pl0000Parts::Initialize(arg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
@@ -30,6 +28,16 @@ HRESULT WP0220Body::Initialize(void* arg)
 		LOG_ERROR(L"Failed To Ready_Components : P10000Body");
 		return E_FAIL;
 	}
+
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName("wp0220");
+	m_WeaponBoneIndex = m_Model->Get_BoneIndexByName("bone0");
+	if (m_RootBoneIndex == -1)
+	{
+		LOG_ERROR(L"Failed to Find WP0220 Root Bone");
+		return E_FAIL;
+	}
+
+	m_Model->Set_LocalRootNode(m_RootBoneIndex);
 
 	return S_OK;
 }
@@ -46,12 +54,24 @@ void WP0220Body::Priority_Update(Float timeDelta)
 
 void WP0220Body::Update(Float timeDelta)
 {
+	m_Model->Update_ModelAnimation(timeDelta);
 
+	if (m_IsSheathing == false)
+	{
+		TRANSFORM_FRAME rootVelocity = m_Model->Get_RootTransformVelocity(m_WeaponBoneIndex);
+
+		Vector3 localPos = m_Transform->Get_Position();
+		localPos += Vector3{ rootVelocity.position.x, rootVelocity.position.y, rootVelocity.position.z };
+		m_Transform->Set_Position(localPos);
+	}
 }
 
 void WP0220Body::Late_Update(Float timeDelta)
 {
-
+	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
+	
+	Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);
+	m_AttackCollider->Update(boneMatrix * m_CombinedWorldMatrix);
 }
 
 void WP0220Body::Fixed_Update(Float fixedDelta)
@@ -85,9 +105,32 @@ void WP0220Body::Submit_RenderGroup()
 		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
+void WP0220Body::Set_Sheathing(const Matrix& sheathMatrix)
+{
+	if (m_IsSheathing) return;
+
+	m_Model->Set_Animation(ETOI(WP0220_STATE::SHEATHE_HEAVY), 0.05f);
+	m_Transform->Set_WorldMatrix(sheathMatrix);
+	m_IsSheathing = true;
+}
+
+void WP0220Body::DrawWP0220()
+{
+	if (m_IsSheathing == false) return;
+
+	m_Transform->Set_WorldMatrix(Matrix::Identity);
+	m_IsSheathing = false;
+}
+
+void WP0220Body::Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop)
+{
+	m_Transform->Set_WorldMatrix(Matrix::Identity);
+	Pl0000Parts::Set_Animation(animIndex, blendDuration, isLoop);
+}
+
 HRESULT WP0220Body::Bind_ShaderResources()
 {
-	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
+	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
 		return E_FAIL;
@@ -122,6 +165,14 @@ HRESULT WP0220Body::Ready_Components()
 	Model::MODEL_DESC modelDesc{ L"wp0220" };
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
+		return E_FAIL;
+
+	OBBCollider::OBB_COLLIDER_DESC colDesc{};
+	colDesc.extents = Vector3{ 1.f, 1.f, 1.f };
+	colDesc.rotation = Vector3::Zero;
+	colDesc.offset = Vector3::Zero;
+	m_AttackCollider = Add_Component<OBBCollider>(ETOI(LEVEL::STATIC), &colDesc);
+	if (nullptr == m_AttackCollider)
 		return E_FAIL;
 
 	return S_OK;

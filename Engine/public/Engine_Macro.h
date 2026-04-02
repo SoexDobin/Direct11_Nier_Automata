@@ -8,6 +8,7 @@ namespace Engine
 
 
 #define KEY_MAX                 256
+#define UBYTE(UINT32)           static_cast<unsigned char>(UINT32)
 
 #define RTTR_REGISTRATION_NAMED(NAME)                                          \
 static void rttr_auto_register_##NAME();                                       \

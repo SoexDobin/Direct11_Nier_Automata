@@ -96,7 +96,7 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0)))
         return E_FAIL;
 
-    // [Pass 0] In-Game 카메라 결정 (조건: 메인 우선, 에디터 카메라 제외, 대체 불가)
+
     Shared<Camera> pCurrentMain = GAME_INSTANCE->Get_MainCamera();
     
     // 만약 엔진의 메인 카메라가 있고, 그게 에디터 카메라가 아니라면 우선적으로 채택
@@ -137,6 +137,11 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     if (FAILED(GAME_INSTANCE->Draw_NoClearing()))
         return E_FAIL;
 
+    // 1. 인게임(Game Scene) 렌더링 직후 디버그 박스 렌더
+#ifdef _DEBUG
+    GAME_INSTANCE->Render_CollisionDebug();
+#endif
+
     if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(1)))
         return E_FAIL;
 
@@ -146,8 +151,14 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         return E_FAIL;
     GAME_INSTANCE->Update_Pipeline();
 
+    // 2. 에디터 화면(Editor Scene) 구조체 그리기
     if (FAILED(GAME_INSTANCE->Draw())) 
         return E_FAIL;
+
+    // 에디터 화면 렌더링 직후 디버그 박스 렌더
+#ifdef _DEBUG
+    GAME_INSTANCE->Render_CollisionDebug();
+#endif
 
     if (FAILED(GAME_INSTANCE->End_RenderOffScreen()))
         return E_FAIL;

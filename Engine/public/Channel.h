@@ -24,25 +24,27 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
-	const TRANSFORM_FRAME& Get_TransformDelta() const { return m_TransformationDelta; }
+	const TRANSFORM_FRAME& Get_TransformDelta() const { return m_Transformation; }
+	void ResetVelocityState() { m_IsFirstUpdate = true; m_PrevTrackPosition = -1.f; }
 	int32 Get_BoneIndex() const { return m_BoneIndex; }
-	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, _Out_ TRANSFORM_FRAME& outTransform);
-	void Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones);
+	void Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, Bool isLoop, _Out_ TRANSFORM_FRAME& outTransform);
+	void Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition);
+	void Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex, Bool isLoop);
 
 private:
 	uint32				m_NumKeyFrames{};
 	vector<KEYFRAME>	m_KeyFrames;
 	int32				m_BoneIndex{ -1 };
 
+	TRANSFORM_FRAME		m_Transformation{};
 	TRANSFORM_FRAME		m_PrevTransform{};
-	TRANSFORM_FRAME		m_TransformationDelta{};
 	Float				m_PrevTrackPosition{ -1.f };
 	Bool				m_IsFirstUpdate{ true };
 	Bool				m_IsFirstFrame{ true };
 
 public:
 	static Shared<Channel> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_CHANNEL& keyFrame);
-	Shared<Component> Clone(void* arg = nullptr) override { return nullptr; }
+	Shared<Component> Clone(void* arg = nullptr) override;
 
 };
 

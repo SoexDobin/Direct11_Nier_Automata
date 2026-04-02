@@ -25,7 +25,7 @@ HRESULT SkySphere::Initialize(void* arg)
 		return E_FAIL;
 
 	// 스카이박스는 매우 크게 설정
-	m_Transform->Set_Scale({ 10000.f, 10000.f, 10000.f });
+	m_Transform->Set_LocalScale({ 1.f, 1.f, 1.f });
 
 	return S_OK;
 }
@@ -33,12 +33,14 @@ HRESULT SkySphere::Initialize(void* arg)
 void SkySphere::Priority_Update(Float timeDelta)
 {
 	GameObject::Priority_Update(timeDelta);
+	Vector3 camPos{ GAME_INSTANCE->Get_CamTransform() };
+	m_Transform->Set_Position(camPos);
+	m_Transform->Update_WorldMatrix();
 }
 
 void SkySphere::Update(Float timeDelta)
 {
-	Vector3 camPos{GAME_INSTANCE->Get_CamTransform()};
-	m_Transform->Set_Position(camPos);
+
 }
 
 void SkySphere::Late_Update(Float timeDelta)
@@ -61,6 +63,11 @@ HRESULT SkySphere::Render()
 		return E_FAIL;
 	if (FAILED(m_SphereBuffer->Render())) 
 		return E_FAIL;
+
+	auto context = GAME_INSTANCE->Get_Context();
+	context->RSSetState(nullptr);                               // Rasterizer State 기본값 복구 (Cull Back)
+	context->OMSetDepthStencilState(nullptr, 0);                // Depth Stencil State 기본값 복구 (Less_Equal)
+	context->OMSetBlendState(nullptr, nullptr, 0xffffffff);     // Blend State 기본값 복구
 
 	return S_OK;
 }
@@ -88,7 +95,7 @@ HRESULT SkySphere::Ready_Components()
 {
 	Shader::SHADER_DESC shaderDesc{ VTXCUBE::Tag, VTXCUBE::Elements, VTXCUBE::numElements };
 	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
-	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::STATIC), L"Skybox_Default0" };
+	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::STATIC), L"Skybox_Default" };
 	m_Texture = Add_Component<Texture>(ETOI(LEVEL::STATIC), &textureDesc);
 	m_SphereBuffer = Add_Component<VISphere>(ETOI(LEVEL::STATIC));
 	return S_OK;

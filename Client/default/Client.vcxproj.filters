@@ -35,7 +35,7 @@
       <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Monster.h">
-      <Filter>02. GameObject\Monster</Filter>
+      <Filter>02. GameObject\Entity\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\public\ThirdPersonCamera.h">
       <Filter>02. GameObject\Camera</Filter>
@@ -44,34 +44,34 @@
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\StateMachine.h">
-      <Filter>02. GameObject\Playable\StateMachine</Filter>
+      <Filter>03. Component\StateMachine</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State.h">
-      <Filter>02. GameObject\Playable\StateMachine\State</Filter>
+      <Filter>03. Component\StateMachine\State</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\State2B_Attack.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    <ClInclude Include="..\public\State2B_AttackGround.h">
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Idle.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Jump.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Walk.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CityOfRuins.h">
       <Filter>02. GameObject\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000.h">
-      <Filter>02. GameObject\Playable\2B</Filter>
+    <ClInclude Include="..\public\Pl0000.h">
+      <Filter>02. GameObject\Entity\2B</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Run.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Sprint.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LevelTitle.h">
       <Filter>01. Level\Title</Filter>
@@ -85,14 +85,14 @@
     <ClInclude Include="..\public\StaticCamera.h">
       <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Body.h">
-      <Filter>02. GameObject\Playable\2B\2BPartObject\P10000</Filter>
+    <ClInclude Include="..\public\Pl0000Body.h">
+      <Filter>02. GameObject\Entity\2B\2BPartObject\P10000</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WP0070Body.h">
-      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0070</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WP0220Body.h">
-      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0220</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\WP0220</Filter>
     </ClInclude>
     <ClInclude Include="..\public\SkyBox.h">
       <Filter>02. GameObject\Sky</Filter>
@@ -106,20 +106,44 @@
     <ClInclude Include="..\public\LoadingFadeOut.h">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Input.h">
-      <Filter>02. GameObject\Playable\P10000Input</Filter>
+    <ClInclude Include="..\public\Pl0000Input.h">
+      <Filter>02. GameObject\Entity\2B\Pl0000Input</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B.h">
-      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000StateMachine.h">
-      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+    <ClInclude Include="..\public\Pl0000StateMachine.h">
+      <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\P10000Parts.h">
-      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
+    <ClInclude Include="..\public\Pl0000Parts.h">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State2B_Dash.h">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Movement.h">
+      <Filter>02. GameObject\Entity\Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000Movement.h">
+      <Filter>02. GameObject\Entity\2B\Pl0000Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_AttackAir.h">
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WP3000Body.h">
+      <Filter>02. GameObject\Entity\2B\2BPartObject\WP3000</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EM3100.h">
+      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterStateMachine.h">
+      <Filter>02. GameObject\Entity\Monster\MonsterStateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Entity.h">
+      <Filter>02. GameObject\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateMonster.h">
+      <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -154,7 +178,7 @@
       <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Monster.cpp">
-      <Filter>02. GameObject\Monster</Filter>
+      <Filter>02. GameObject\Entity\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\private\ThirdPersonCamera.cpp">
       <Filter>02. GameObject\Camera</Filter>
@@ -163,34 +187,34 @@
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\StateMachine.cpp">
-      <Filter>02. GameObject\Playable\StateMachine</Filter>
+      <Filter>03. Component\StateMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State.cpp">
-      <Filter>02. GameObject\Playable\StateMachine\State</Filter>
+      <Filter>03. Component\StateMachine\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\State2B_Attack.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+    <ClCompile Include="..\private\State2B_AttackGround.cpp">
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Idle.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Jump.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Walk.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CityOfRuins.cpp">
       <Filter>02. GameObject\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000.cpp">
-      <Filter>02. GameObject\Playable\2B</Filter>
+    <ClCompile Include="..\private\Pl0000.cpp">
+      <Filter>02. GameObject\Entity\2B</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Run.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Sprint.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LevelTitle.cpp">
       <Filter>01. Level\Title</Filter>
@@ -204,14 +228,14 @@
     <ClCompile Include="..\private\StaticCamera.cpp">
       <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Body.cpp">
-      <Filter>02. GameObject\Playable\2B\2BPartObject\P10000</Filter>
+    <ClCompile Include="..\private\Pl0000Body.cpp">
+      <Filter>02. GameObject\Entity\2B\2BPartObject\P10000</Filter>
     </ClCompile>
     <ClCompile Include="..\private\WP0070Body.cpp">
-      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0070</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
     </ClCompile>
     <ClCompile Include="..\private\WP0220Body.cpp">
-      <Filter>02. GameObject\Playable\2B\2BPartObject\WP0220</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\WP0220</Filter>
     </ClCompile>
     <ClCompile Include="..\private\SkyBox.cpp">
       <Filter>02. GameObject\Sky</Filter>
@@ -225,20 +249,44 @@
     <ClCompile Include="..\private\LoadingFadeOut.cpp">
       <Filter>02. GameObject\UI\LoadingUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Input.cpp">
-      <Filter>02. GameObject\Playable\P10000Input</Filter>
+    <ClCompile Include="..\private\Pl0000Input.cpp">
+      <Filter>02. GameObject\Entity\2B\Pl0000Input</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\private\P10000StateMachine.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates\StateMachine</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000Parts.cpp">
-      <Filter>02. GameObject\Playable\2B\2BPartObject</Filter>
+    <ClCompile Include="..\private\Pl0000Parts.cpp">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State2B_Dash.cpp">
-      <Filter>02. GameObject\Playable\2B\2BStates</Filter>
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Movement.cpp">
+      <Filter>02. GameObject\Entity\Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000Movement.cpp">
+      <Filter>02. GameObject\Entity\2B\Pl0000Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_AttackAir.cpp">
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WP3000Body.cpp">
+      <Filter>02. GameObject\Entity\2B\2BPartObject\WP3000</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EM3100.cpp">
+      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterStateMachine.cpp">
+      <Filter>02. GameObject\Entity\Monster\MonsterStateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Entity.cpp">
+      <Filter>02. GameObject\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateMonster.cpp">
+      <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -272,24 +320,6 @@
     <Filter Include="02. GameObject\Camera">
       <UniqueIdentifier>{3dd8255e-639e-40e9-a996-130834996b2d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Monster">
-      <UniqueIdentifier>{c932032b-94df-43d7-9e98-c5d255458cae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable">
-      <UniqueIdentifier>{fb7ab57d-06ad-47cd-aa75-fc9259684988}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\2B">
-      <UniqueIdentifier>{81f89b32-9daf-4665-8d11-2b6081a9a216}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\StateMachine">
-      <UniqueIdentifier>{5f1f5503-d429-4a82-8c0c-f8f1e1a51f48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\StateMachine\State">
-      <UniqueIdentifier>{59f48ab0-7800-40e8-b8b4-27d209ca254b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\2B\2BPartObject">
-      <UniqueIdentifier>{860aeb7a-a17a-405c-af57-46faf234f476}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Level\Title">
       <UniqueIdentifier>{9e52baab-71d4-40bb-a8f9-4fe9b21ee4b2}</UniqueIdentifier>
     </Filter>
@@ -302,29 +332,74 @@
     <Filter Include="02. GameObject\UI\Title">
       <UniqueIdentifier>{896614d3-b3cd-47f2-81e6-34cf1ffd3744}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Playable\2B\2BPartObject\P10000">
-      <UniqueIdentifier>{7099d284-19b5-4ec7-85c0-7a5e1e9b45b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\2B\2BPartObject\WP0070">
-      <UniqueIdentifier>{76bad4f2-11f8-4f5d-9074-da2549d47d54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\2B\2BPartObject\WP0220">
-      <UniqueIdentifier>{7aad67ae-f8c0-4d54-a65f-91fd0e40244b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Sky">
       <UniqueIdentifier>{d5aa316f-6060-4485-b596-72e8cffe7af4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Playable\P10000Input">
-      <UniqueIdentifier>{fb02974d-67e2-4b5e-8473-98ef3d9e7f38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\2B\2BStates">
-      <UniqueIdentifier>{58e488f6-9331-4015-979d-3a180ad82f16}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Playable\2B\2BStates\StateMachine">
-      <UniqueIdentifier>{f0281ab7-68cb-4a1f-9c19-3e73441f06a4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="99. Default">
       <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Bullet">
+      <UniqueIdentifier>{d890cac3-f6d2-454b-ba09-6ac4ea6444cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component">
+      <UniqueIdentifier>{604fe522-76b2-4359-8fac-6c3c7ab7a489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\StateMachine">
+      <UniqueIdentifier>{5f1f5503-d429-4a82-8c0c-f8f1e1a51f48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\StateMachine\State">
+      <UniqueIdentifier>{59f48ab0-7800-40e8-b8b4-27d209ca254b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity">
+      <UniqueIdentifier>{fb7ab57d-06ad-47cd-aa75-fc9259684988}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B">
+      <UniqueIdentifier>{81f89b32-9daf-4665-8d11-2b6081a9a216}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BPartObject">
+      <UniqueIdentifier>{860aeb7a-a17a-405c-af57-46faf234f476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BPartObject\P10000">
+      <UniqueIdentifier>{7099d284-19b5-4ec7-85c0-7a5e1e9b45b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BPartObject\WP0070">
+      <UniqueIdentifier>{76bad4f2-11f8-4f5d-9074-da2549d47d54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BPartObject\WP0220">
+      <UniqueIdentifier>{7aad67ae-f8c0-4d54-a65f-91fd0e40244b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BPartObject\WP3000">
+      <UniqueIdentifier>{48ecdbfd-c679-4189-8f0a-932df497e15f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BStates">
+      <UniqueIdentifier>{58e488f6-9331-4015-979d-3a180ad82f16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BStates\StateMachine">
+      <UniqueIdentifier>{f0281ab7-68cb-4a1f-9c19-3e73441f06a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\Pl0000Movement">
+      <UniqueIdentifier>{6965ea7b-9207-4220-9136-4c413257a6ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\Pl0000Input">
+      <UniqueIdentifier>{fb02974d-67e2-4b5e-8473-98ef3d9e7f38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Movement">
+      <UniqueIdentifier>{4e89dda7-8faf-408f-9b0d-de9a56d88d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster">
+      <UniqueIdentifier>{c932032b-94df-43d7-9e98-c5d255458cae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\em3100">
+      <UniqueIdentifier>{c3c42c52-488d-4b83-a482-e04b0167a700}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\em3000">
+      <UniqueIdentifier>{5ec70d50-6408-4c69-9e76-c0a13d4af7c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\MonsterStateMachine">
+      <UniqueIdentifier>{0619a228-a997-4f4b-8dc0-2785409c7c66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState">
+      <UniqueIdentifier>{dca5558f-5971-46b7-9026-fbf18f2d7a20}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

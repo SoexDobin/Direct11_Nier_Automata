@@ -32,6 +32,7 @@ HRESULT FontManager::Add_Font(const wstring& fontTag, const tChar* fontFilePath)
 	if (nullptr == Find_Font(fontTag))
 	{
 		m_Fonts.emplace(fontTag, Font::Create(m_Device, m_Context, fontFilePath));
+		return S_OK;
 	}
 
 	return E_FAIL;

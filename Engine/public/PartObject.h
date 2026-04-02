@@ -8,7 +8,7 @@ class ENGINE_DLL PartObject abstract : public GameObject
 	RTTR_ENABLE(GameObject)
 public:
 	typedef struct tagPartObjectDesc : public GameObject::GAMEOBJECT_DESC {
-		const Matrix* parentMatrix;
+		Matrix* parentMatrix;
 	} PARTOBJECT_DESC;
 
 public:
@@ -39,7 +39,7 @@ public:
 	}
 
 protected:
-	const Matrix*	m_ParentMatrix{ nullptr };
+	Matrix*			m_ParentMatrix{ nullptr };
 	Matrix			m_CombinedWorldMatrix{};
 
 public:

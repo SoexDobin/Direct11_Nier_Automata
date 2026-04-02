@@ -1,107 +1,75 @@
 #include "pch.h"
-#include "P10000Body.h"
+#include "Pl0000Body.h"
 
 #include <SpdLogger.h>
 
 #include "Game.h"
 
 #include "Model.h"
-#include "P10000.h"
+#include "Pl0000.h"
 
-P10000Body::P10000Body() : P10000Parts{} {}
-P10000Body::P10000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: P10000Parts{device, context} {}
-P10000Body::P10000Body(const P10000Body& rhs)
-	: P10000Parts{rhs} {}
+Pl0000Body::Pl0000Body() : Pl0000Parts{} {}
+Pl0000Body::Pl0000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+	: Pl0000Parts{device, context} {}
+Pl0000Body::Pl0000Body(const Pl0000Body& rhs)
+	: Pl0000Parts{rhs} {}
 
-HRESULT P10000Body::Initialize_Prototype()
+HRESULT Pl0000Body::Initialize_Prototype()
 {
 	return PartObject::Initialize_Prototype();
 }
 
-HRESULT P10000Body::Initialize(void* arg)
+HRESULT Pl0000Body::Initialize(void* arg)
 {
-	if (FAILED(P10000Parts::Initialize(arg)))
+	if (FAILED(Pl0000Parts::Initialize(arg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 	{
-		LOG_ERROR(L"Failed To Ready_Components : P10000Body");
+		LOG_ERROR(L"Failed To Ready_Components : Pl0000Body");
 		return E_FAIL;
 	}
 
-	m_RootBoneIndex = m_Model->Get_BoneIndexByName("bone0");
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName("pl0000");
+	
 	if (m_RootBoneIndex == -1)
 	{
 		LOG_ERROR(L"Failed to Find 2B Root Bone");
 		return E_FAIL;
 	}
 
-	GAME_INSTANCE->Get_MainCamera()->Set_Target(shared_from_this());
+	m_Model->Set_LocalRootNode(m_RootBoneIndex);
 
 	return S_OK;
 }
 
-void P10000Body::On_Destroy()
+void Pl0000Body::On_Destroy()
 {
 	PartObject::On_Destroy();
-	
-	m_Sword = nullptr;
-	m_GreaterSword = nullptr;
 }
 
-void P10000Body::Priority_Update(Float timeDelta)
+void Pl0000Body::Priority_Update(Float timeDelta)
 {
 
 }
 
-void P10000Body::Update(Float timeDelta)
+void Pl0000Body::Update(Float timeDelta)
 {
 	m_Model->Update_ModelAnimation(timeDelta);
-
-	Vector3 pos = m_Transform->Get_Position();
-	Quaternion quat = m_Transform->Get_LocalRotation();
-
-	TRANSFORM_FRAME transformFrame = m_Model->Get_BoneTransformDelta(m_RootBoneIndex);
-	
-	LOG_INFO(L"{}, {}, {}", transformFrame.position.x, transformFrame.position.y, transformFrame.position.z);
-
-	/*
-	                 }
-            ],
-            "duration": 34.0,
-            "name": "pl0000|pl0000_0002",
-            "rootMove": [
-                0.0,
-                0.0,
-                -362.3771057128906
-            ],
-            "rootRot": [
-                0.0,
-                0.0,
-                0.0,
-                1.0
-            ],
-            "tickPerSecond": 60.0
-	 */
-
-	m_Transform->Set_Position(pos + transformFrame.position);
-	m_Transform->Set_Rotation(quat + transformFrame.rotation);
 }
 
-void P10000Body::Late_Update(Float timeDelta)
+void Pl0000Body::Late_Update(Float timeDelta)
 {
-
-	Update_CombineWorldMatrix(*m_ParentMatrix);
+	m_Transform->Update_WorldMatrix();
+	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 }
 
-void P10000Body::Fixed_Update(Float fixedDelta)
+void Pl0000Body::Fixed_Update(Float fixedDelta)
 {
 	
-
 }
 
-HRESULT P10000Body::Render()
+HRESULT Pl0000Body::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -121,15 +89,15 @@ HRESULT P10000Body::Render()
 	return S_OK;
 }
 
-void P10000Body::Submit_RenderGroup()
+void Pl0000Body::Submit_RenderGroup()
 {
 	if (Is_Active())
 		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
-HRESULT P10000Body::Bind_ShaderResources()
+HRESULT Pl0000Body::Bind_ShaderResources()
 {
-	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
+	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
 		return E_FAIL;
@@ -154,8 +122,9 @@ HRESULT P10000Body::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT P10000Body::Ready_Components()
+HRESULT Pl0000Body::Ready_Components()
 {
+
 	Shader::SHADER_DESC shaderDesc{ VTXANIMMESH::Tag,  VTXANIMMESH::Elements, VTXANIMMESH::numElements };
 	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)
@@ -169,26 +138,26 @@ HRESULT P10000Body::Ready_Components()
 	return S_OK;
 }
 
-Shared<P10000Body> P10000Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+Shared<Pl0000Body> Pl0000Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
-	auto prototype = make_shared<P10000Body>(device, context);
+	auto prototype = make_shared<Pl0000Body>(device, context);
 
 	if (FAILED(prototype->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : P10000Body");
+		MSG_BOX("Failed to Created : Pl0000Body");
 		return nullptr;
 	}
 
 	return prototype;
 }
 
-Shared<GameObject> P10000Body::Clone(void* arg)
+Shared<GameObject> Pl0000Body::Clone(void* arg)
 {
-	auto instance = make_shared<P10000Body>(*this);
+	auto instance = make_shared<Pl0000Body>(*this);
 
 	if (FAILED(instance->Initialize(arg)))
 	{
-		MSG_BOX("Failed to Clone : P10000Body");
+		MSG_BOX("Failed to Clone : Pl0000Body");
 		return nullptr;
 	}
 

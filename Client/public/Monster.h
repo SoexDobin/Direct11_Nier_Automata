@@ -1,16 +1,16 @@
 #pragma once
-#include "GameObject.h"
-
-NS_BEGIN(Engine)
-class Shader;
-class Model;
-NS_END
+#include "Entity.h"
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL Monster : public GameObject
+class MonsterStateMachine;
+
+class CLIENT_DLL Monster : public Entity
 {
 	RTTR_ENABLE(GameObject)
+public:
+	typedef struct tagMonsterObjectDesc : public ENTITY_CONTAINER {} MONSTER_CONTAINER_DESC;
+
 public:
 	explicit Monster();
 	explicit Monster(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -32,19 +32,12 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
-public:
-
-protected:
-	HRESULT Ready_Components();
-	HRESULT Bind_ShaderResources();
-
 private:
-	Shared<Shader> m_Shader{ nullptr };
-	Shared<Model> m_Model{ nullptr };
+	Shared<MonsterStateMachine> m_States;
+	Weak<GameObject> m_TargetPlayer{};
 
 public:
-	static Shared<Monster> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	Shared<GameObject> Clone(void* arg) override;
+	virtual Shared<GameObject> Clone(void* arg) PURE;
 };
 
 NS_END

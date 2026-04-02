@@ -50,6 +50,10 @@ public:
     virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) final;
 
 public: // 충돌 함수
+    virtual void OnCollisionEnter(const Shared<GameObject>& collision) {};
+    virtual void OnCollisionStay(const Shared<GameObject>& collision) {};
+    virtual void OnCollisionExit(const Shared<GameObject>& collision) {};
+
 protected:
     ComPtr<ID3D11Device> m_Device = {nullptr};
     ComPtr<ID3D11DeviceContext> m_Context = {nullptr};
@@ -91,7 +95,7 @@ public:
 public:
      template <typename T> requires is_base_of_v<Component, T>
       	Shared<T> Get_Component() {
-        uint32 typeID = rttr::type::get<T>().get_id();
+        uint32 typeID = static_cast<uint32>(rttr::type::get<T>().get_id());
 
         for (auto &[objectID, component] : m_Components) {
             if (component->Get_TypeID() == typeID) {

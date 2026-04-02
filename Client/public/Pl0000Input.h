@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL P10000Input final : public ScriptComponent
+class CLIENT_DLL Pl0000Input final : public ScriptComponent
 {
 	RTTR_ENABLE(Component)
 public:
@@ -20,20 +20,20 @@ public:
 	} INPUT_INFO;
 
 public:
-	explicit P10000Input();
-	explicit P10000Input(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
-	explicit P10000Input(const P10000Input &rhs);
-	virtual ~P10000Input() override = default;
+	explicit Pl0000Input();
+	explicit Pl0000Input(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
+	explicit Pl0000Input(const Pl0000Input &rhs);
+	virtual ~Pl0000Input() override = default;
 
 	// ===================================================================
 	// 키보드 단일 키 상태 판별
 	// ===================================================================
 public:
+	Bool Is_None(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::NONE; }
 	Bool Is_KeyDown(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::DOWN; }
 	Bool Is_KeyUp(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::UP; }
 	Bool Is_KeyPress(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::PRESSED || m_KeyInfos[keyID].state == KEY_STATE::MULTI_CLICKED; }
 	Bool Is_KeyMultiClick(uByte keyID) const { return m_KeyInfos[keyID].state == KEY_STATE::MULTI_CLICKED; }
-
 	Bool Is_KeyHold(uByte keyID, Float holdThreshold) const
 	{
 		return (m_KeyInfos[keyID].state == KEY_STATE::PRESSED) && (m_KeyInfos[keyID].holdTimer >= holdThreshold);
@@ -46,17 +46,26 @@ public:
 	{
 		return Is_KeyHold(keyID, holdThreshold) && !m_KeyInfos[keyID].isMultiClickHold;
 	}
+	Bool Is_NoneOrUp(uByte keyID) const {
+		return m_KeyInfos[keyID].state == KEY_STATE::NONE || m_KeyInfos[keyID].state == KEY_STATE::UP;
+	}
 	Float Get_PrevHoldTimer(uByte keyID) const { return m_KeyInfos[keyID].prevHoldTimer; }
+
 
 	// ===================================================================
 	// WASD 통합 제어 (Bool 반환 / vector 반환)
 	// ===================================================================
 public:
+	Bool Is_WASD_None() const;
+	Bool Is_WASD_UP() const;
 	Bool Is_WASD_Down() const;
 	Bool Is_WASD_Press() const;
 	Bool Is_WASD_DoubleClick() const;
 	Bool Is_WASD_Hold(Float holdThreshold) const;
 	Bool Is_WASD_Diagonal() const;
+	Bool Is_WASD_NoneOrUp() const;
+	Bool Is_WASD_SingleClickHold(Float holdThreshold) const;
+	Bool Is_WASD_DoubleClickedHold(Float holdThreshold) const;
 
 	Bool Is_WA_Press() const;
 	Bool Is_WA_DoubleClick() const;
@@ -95,8 +104,8 @@ public:
 	// 마우스 클릭 콤보 큐 (NieR 공격 시퀀스용)
 	// ===================================================================
 	//  좌클릭 1번       : {LB}
-	//  좌좌좌좌          : {LB, LB, LB, LB}
-	//  좌좌좌 + 우       : {LB, LB, LB, RB}
+	//  좌좌좌좌좌좌좌    : {LB, LB, LB, LB, LB, LB, LB}
+	
 	// ===================================================================
 public:
 	const vector<Engine::DIMB> &Get_MouseComboQueue() const { return m_MouseComboQueue; }
@@ -140,7 +149,7 @@ private:
 	INPUT_INFO m_MouseInfos[ETOI(DIMB::END)];
 	LONG m_MouseMovement[ETOI(DIMB::END)];
 
-	Float m_DoubleClickThreshold = 0.25f;
+	Float m_DoubleClickThreshold = 0.20f;
 
 	// 마우스 콤보 큐
 	vector<Engine::DIMB> m_MouseComboQueue;
@@ -148,7 +157,7 @@ private:
 	Float m_ComboTimeout{ 0.8f };
 
 public:
-	static Shared<P10000Input> Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
+	static Shared<Pl0000Input> Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context);
 	Shared<Component> Clone(void *arg = nullptr) override;
 };
 

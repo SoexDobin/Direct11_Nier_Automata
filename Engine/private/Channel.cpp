@@ -10,7 +10,12 @@ Channel::Channel(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCo
 	: Component{ device, context } {}
 
 Channel::Channel(const Channel& rhs)
-	: Component{rhs}, m_NumKeyFrames{rhs.m_NumKeyFrames}, m_KeyFrames{rhs.m_KeyFrames} {}
+	: Component{ rhs }, m_NumKeyFrames{ rhs.m_NumKeyFrames }, m_KeyFrames{ rhs.m_KeyFrames }, m_BoneIndex{rhs.m_BoneIndex} 
+{
+	m_IsFirstUpdate = true; // 클론된 인스턴스는 새로운 상태로 시작해야 함
+	m_PrevTrackPosition = -1.f;
+	m_Transformation = { Vector3::One, Vector4::UnitW, Vector3::Zero };
+}
 
 void Channel::On_Destroy()
 {
@@ -39,7 +44,7 @@ HRESULT Channel::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
-void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, _Out_ TRANSFORM_FRAME& outTransform)
+void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, Bool isLoop, _Out_ TRANSFORM_FRAME& outTransform)
 {
 	if (currentTrackPosition <= 0.f)
 		currentTrackPosition = 0;
@@ -54,6 +59,14 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 
 	if (currentTrackPosition >= lastKeyFrame.trackPosition)
 	{
+		if (false == isLoop)
+		{
+			outTransform.scale = lastKeyFrame.scale;
+			outTransform.rotation = lastKeyFrame.rotation;
+			outTransform.position = lastKeyFrame.position;
+			return;
+		}
+
 		Float ratio = 0.f;
 		Float trackRange = duration - lastKeyFrame.trackPosition;
 
@@ -82,36 +95,54 @@ void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKe
 	}
 }
 
-void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones)
+void Channel::Update_Velocity(const TRANSFORM_FRAME& currentFrame, Float currentTrackPosition)
 {
-	TRANSFORM_FRAME currentFrame{};
-	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, currentFrame);
-
 	if (m_IsFirstUpdate)
 	{
 		m_PrevTransform = currentFrame;
-		m_TransformationDelta = { Vector3::One, Vector4{0,0,0,1}, Vector3::Zero };
+		m_Transformation = TRANSFORM_FRAME{ Vector3::One, Quaternion::Identity, Vector3::Zero };
 		m_IsFirstUpdate = false;
 	}
 	else
 	{
-		// 1. 위치 델타 계산
-		m_TransformationDelta.position = currentFrame.position - m_PrevTransform.position;
-		// 2. 회전 델타 계산 (Q_curr * inv(Q_prev))
-		Quaternion qtCurr(currentFrame.rotation);
-		Quaternion qtPrev(m_PrevTransform.rotation);
-		Quaternion qtInvPrev; qtPrev.Inverse(qtInvPrev);
+		if (currentTrackPosition < m_PrevTrackPosition)
+		{
+			m_PrevTransform = currentFrame;
+			//m_Transformation = { Vector3::One, Quaternion::Identity, Vector3::Zero };
+		}
+		else
+		{
+			m_Transformation.position = currentFrame.position - m_PrevTransform.position;
 
-		Quaternion qtDelta = qtCurr * qtInvPrev;
-		m_TransformationDelta.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
+			Quaternion qtCurr(currentFrame.rotation);
+			Quaternion qtPrev(m_PrevTransform.rotation);
+			Quaternion qtInvPrev; qtPrev.Inverse(qtInvPrev);
 
-		m_PrevTransform = currentFrame;
+			Quaternion qtDelta = qtCurr * qtInvPrev;
+			m_Transformation.rotation = Vector4(qtDelta.x, qtDelta.y, qtDelta.z, qtDelta.w);
+
+			m_PrevTransform = currentFrame;
+		}
+
 	}
+	m_PrevTrackPosition = currentTrackPosition;
+}
 
-	Matrix boneTransformationMatrix =
+void Channel::Update_TransformationMatrix(uint32& currentKeyFrameIndex, Float currentTrackPosition, Float duration, const vector<Shared<Bone>>& bones, int32 rootNodeIndex, Bool isLoop)
+{
+	TRANSFORM_FRAME currentFrame{};
+	Get_ChannelTransform(currentTrackPosition, currentKeyFrameIndex, duration, isLoop, currentFrame);
+	Update_Velocity(currentFrame, currentTrackPosition);
+
+	Matrix boneMatrix{};
+	if (m_BoneIndex == rootNodeIndex)
+		boneMatrix =
+		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, Vector3::Zero);
+	else 
+		boneMatrix =
 		XMMatrixAffineTransformation(currentFrame.scale, Quaternion::Identity, currentFrame.rotation, currentFrame.position);
 
-	bones[m_BoneIndex]->Update_TransformationMatrix(boneTransformationMatrix);
+	bones[m_BoneIndex]->Update_TransformationMatrix(boneMatrix);
 }
 
 Shared<Channel> Channel::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_CHANNEL& keyFrame)
@@ -126,3 +157,18 @@ Shared<Channel> Channel::Create(const ComPtr<ID3D11Device>& device, const ComPtr
 
 	return channel;
 }
+
+Shared<Component> Channel::Clone(void* arg)
+{
+	auto instance = make_shared<Channel>(*this);
+
+	if (FAILED(instance->Initialize(arg)))
+	{
+		MSG_BOX("Failed to Clone : Channel");
+		return nullptr;
+	}
+
+	return instance;
+}
+
+

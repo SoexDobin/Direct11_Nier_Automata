@@ -38,6 +38,7 @@ Bool StateMachine::Change_StateByTag(const wstring& stateTag)
 
 	if (m_States[stateTag]->StateEnterInvoke())
 	{
+		LOG_INFO(L"State Changed to: {}", stateTag);
 		if (m_CurrentState)
 			m_CurrentState->StateExitInvoke();
 		m_CurrentState = m_States[stateTag];
@@ -75,8 +76,6 @@ void StateMachine::On_Destroy()
 
 void StateMachine::Update_State(Float timeDelta)
 {
-
-
 	m_CurrentState->Update(timeDelta);
 
 	m_CurrentState->Late_Update(timeDelta);

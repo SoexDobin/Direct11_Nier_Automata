@@ -195,13 +195,17 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <None Include="RTTRGenerator.py" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\AABBCollider.h" />
     <ClInclude Include="..\public\Animation.h" />
     <ClInclude Include="..\public\Bone.h" />
     <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\public\CameraManager.h" />
     <ClInclude Include="..\public\Channel.h" />
+    <ClInclude Include="..\public\Collider.h" />
+    <ClInclude Include="..\public\CollisionManager.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\ContainerObject.h" />
+    <ClInclude Include="..\public\DebugDraw.h" />
     <ClInclude Include="..\public\Engine_Define.h" />
     <ClInclude Include="..\public\Engine_Enum.h" />
     <ClInclude Include="..\public\Engine_Function.h" />
@@ -210,6 +214,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Engine_RTTR_Metadata.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
+    <ClInclude Include="..\public\EventManager.h" />
     <ClInclude Include="..\public\Font.h" />
     <ClInclude Include="..\public\FontManager.h" />
     <ClInclude Include="..\public\Game.h" />
@@ -226,11 +231,13 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Material.h" />
     <ClInclude Include="..\public\Mesh.h" />
     <ClInclude Include="..\public\Model.h" />
+    <ClInclude Include="..\public\OBBCollider.h" />
     <ClInclude Include="..\public\Object.h" />
     <ClInclude Include="..\public\ObjectManager.h" />
     <ClInclude Include="..\public\PartObject.h" />
     <ClInclude Include="..\public\Pipeline.h" />
     <ClInclude Include="..\public\PrototypeManager.h" />
+    <ClInclude Include="..\public\Random_Helper.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\ResourceManager.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
@@ -238,6 +245,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SoundManager.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
+    <ClInclude Include="..\public\SphereCollider.h" />
     <ClInclude Include="..\public\String_Helper.h" />
     <ClInclude Include="..\public\TagRegistry.h" />
     <ClInclude Include="..\public\TextUI.h" />
@@ -253,13 +261,18 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\VISphere.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\AABBCollider.cpp" />
     <ClCompile Include="..\private\Animation.cpp" />
     <ClCompile Include="..\private\Bone.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\private\CameraManager.cpp" />
     <ClCompile Include="..\private\Channel.cpp" />
+    <ClCompile Include="..\private\Collider.cpp" />
+    <ClCompile Include="..\private\CollisionManager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\ContainerObject.cpp" />
+    <ClCompile Include="..\private\DebugDraw.cpp" />
+    <ClCompile Include="..\private\EventManager.cpp" />
     <ClCompile Include="..\private\Font.cpp" />
     <ClCompile Include="..\private\FontManager.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
@@ -275,6 +288,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Material.cpp" />
     <ClCompile Include="..\private\Mesh.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
+    <ClCompile Include="..\private\OBBCollider.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
     <ClCompile Include="..\private\ObjectManager.cpp" />
     <ClCompile Include="..\private\PartObject.cpp" />
@@ -282,7 +296,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\ResourceManager.cpp" />
+    <ClCompile Include="..\private\rttr_generated\AABBCollider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Camera_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Collider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
@@ -291,9 +307,11 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\OBBCollider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Object_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\SphereCollider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\TextUI_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Texture_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
@@ -310,6 +328,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SoundManager.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />
+    <ClCompile Include="..\private\SphereCollider.cpp" />
     <ClCompile Include="..\private\TagRegistry.cpp" />
     <ClCompile Include="..\private\TextUI.cpp" />
     <ClCompile Include="..\private\Texture.cpp" />

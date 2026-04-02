@@ -16,6 +16,8 @@
 #include "LevelSerializer.h"
 #include "FontManager.h"
 #include "SoundManager.h"
+#include "EventManager.h"
+#include "CollisionManager.h"
 
 #include "GameObject.h"
 #include "Component.h"
@@ -159,6 +161,19 @@ public: /* For SoundManager */
     void PlaySoundLoopSection(const wstring& soundKey, SOUNDCHANNEL id, Float volume, uint32 loopStartMs, uint32 loopEndMs, Bool playIntro) const;
     HRESULT StopSound(SOUNDCHANNEL targetChannel = SOUNDCHANNEL::MAX_CHANNELS) const;
 
+public: /* For EventManager*/ 
+    HRESULT Add_Instance_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const;
+    HRESULT Add_Permanent_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const;
+    HRESULT Remove_Event(uint32 levIndex, const wstring& eventTag) const;
+
+public: /* CollisionManager */
+    void Add_Collider(const Shared<class Collider>& collider) const;
+    void Remove_Collider(class Collider* collider) const;
+    void Update_Collision() const;
+#ifdef _DEBUG
+    void Render_CollisionDebug() const;
+#endif
+
 public: /* Prototype & Instantiate Facade */
     template <typename T>
     HRESULT Add_Prototype(uint32 levIndex, const Shared<T>& prototype, const wstring& prototypeTag = L"") {
@@ -203,6 +218,8 @@ private:
     Unique<LevelSerializer> m_LevelSerializer = {nullptr};
     Unique<FontManager> m_FontManager = { nullptr };
     Unique<SoundManager> m_SoundManager = { nullptr };
+    Unique<EventManager> m_EventManager = { nullptr };
+    Unique<CollisionManager> m_CollisionManager = { nullptr };
 };
 
 NS_END

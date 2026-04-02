@@ -25,16 +25,18 @@ public:
 	HRESULT Initialize(void* arg) override;
 
 public:
-	const TRANSFORM_FRAME& Get_TransformDelta(int32 boneIndex) const;
+	const TRANSFORM_FRAME& Get_TransformVelocity(int32 boneIndex) const;
 	const wstring& Get_AnimationName() { return m_Name; }
 	Float Get_Progress() const { return m_CurrentTrackPosition / m_Duration; }
-	void Set_Progress(Float progress) { m_CurrentTrackPosition = m_Duration * progress; }
-
-	
+	void Set_Progress(Float progress);
 
 public:
-	Bool Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop);
-	void Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones);
+	Bool Is_LocalTransformationPresent() const { return m_IsLocalTransformationPresent; }
+	void Set_LocalTransformationPresent(Bool isActive) { m_IsLocalTransformationPresent = isActive; }
+
+public:
+	Bool Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop, int32 rootNodeIndex = -1);
+	void Blend_TransformationMatrix(Float timeDelta, const Shared<Animation>& nextAnim, Float blendRatio, const vector<Shared<Bone>>& bones, Bool isCurLoop, Bool isNextLoop, int32 rootNodeIndex = -1);
 
 private:
 	wstring m_Name;
@@ -45,6 +47,10 @@ private:
 	uint32 m_NumChannels{};
 	vector<Shared<Channel>>	m_Channels;
 	vector<uint32>			m_CurrentKeyFrameIndices;
+
+private:
+	Bool m_IsLocalTransformationPresent{ false }; // 루트 노드에 Local Transform 이 있는지 체크
+
 
 public:
 	static Shared<Animation> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, const MODEL_ANIMATION& animationData);

@@ -39,14 +39,8 @@
         {
             "count": 1,
             "level": "STATIC",
-            "path": "Sky/Skybox_Default0.dds",
-            "tag": "Skybox_Default0"
-        },
-        {
-            "count": 1,
-            "level": "STATIC",
-            "path": "Sky/Skybox_Default1.dds",
-            "tag": "Skybox_Default1"
+            "path": "Sky/CubeMap4.dds",
+            "tag": "Skybox_Default"
         }
     ]
 }

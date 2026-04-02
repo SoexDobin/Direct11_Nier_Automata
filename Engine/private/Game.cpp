@@ -25,6 +25,9 @@ Game::~Game() {
     m_TimeManager.reset();
     m_InputDevice.reset();
 
+    m_CollisionManager->On_Destroy();
+    m_CollisionManager.reset();
+
     m_ResourceManager->On_Destroy();
     m_ResourceManager.reset();
 
@@ -102,6 +105,12 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_SoundManager = SoundManager::Create()))
         return E_FAIL;
 
+    if (nullptr == (m_EventManager = EventManager::Create(engineDesc.levelCount)))
+        return E_FAIL;
+
+    if (nullptr == (m_CollisionManager = CollisionManager::Create()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -130,7 +139,10 @@ void Game::Update_Engine() {
   m_CameraManager->Bind_MainCamera_Transform();
   m_Pipeline->Update_Pipeline();
 
+  m_CollisionManager->Update_Collision();
+
   m_LevelManager->Update(delta);
+  m_EventManager->Execute_Events();
 }
 
 HRESULT Game::Draw() const {
@@ -153,6 +165,7 @@ void Game::Clear_AllResource() const {
 
     m_FontManager->Clear_Fonts();
     m_SoundManager->Clear_SoundSources();
+    m_EventManager->Clear_AllEvents();
 }
 
 void Game::Clear_Resource(uint32 levIndex) const {
@@ -175,6 +188,9 @@ void Game::Clear_Resource(uint32 levIndex) const {
 	if (FAILED(m_LightManager->Clear_Lights())) 
 		LOG_CRITICAL(L"Failed To Clear Lights");
 	
+    if (FAILED(m_EventManager->Clear_Events(levIndex)))
+        LOG_CRITICAL(L"Failed To Clear Events");
+
 }
 
 void Game::Update_Input() const { m_InputDevice->Update(); }
@@ -537,6 +553,43 @@ HRESULT Game::StopSound(SOUNDCHANNEL targetChannel) const
     else
         return m_SoundManager->StopChannel(targetChannel);
 }
+
+HRESULT Game::Add_Instance_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const
+{
+    return m_EventManager->Add_EventOnce(levIndex, eventTag, callback);
+}
+
+HRESULT Game::Add_Permanent_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const
+{
+    return m_EventManager->Add_EventPermanent(levIndex, eventTag, callback);
+}
+
+HRESULT Game::Remove_Event(uint32 levIndex, const wstring& eventTag) const
+{
+    return m_EventManager->Remove_Event(levIndex, eventTag);
+}
+
+void Game::Add_Collider(const Shared<class Collider>& collider) const
+{
+    m_CollisionManager->Add_Collider(collider);
+}
+
+void Game::Remove_Collider(class Collider* collider) const
+{
+    m_CollisionManager->Remove_Collider(collider);
+}
+
+void Game::Update_Collision() const
+{
+    m_CollisionManager->Update_Collision();
+}
+
+#ifdef _DEBUG
+void Game::Render_CollisionDebug() const
+{
+    m_CollisionManager->Render_Debug();
+}
+#endif
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
 {

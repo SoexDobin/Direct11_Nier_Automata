@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 class CLIENT_DLL State2B_Run final : public State2B
 {
 public:
-	explicit State2B_Run(const wstring& tag, const Shared<P10000>& owner);
+	explicit State2B_Run(const wstring& tag, const Shared<Pl0000>& owner);
 	~State2B_Run() override = default;
 
 private:
@@ -18,8 +18,11 @@ public:
 	void Late_Update(Float timeDelta) override;
 	void StateExitInvoke() override;
 
+private:
+	unordered_set<uint32> m_EnterAnim;
+
 public:
-	static Shared<State2B_Run> Create(const wstring& tag, const Shared<P10000>& owner);
+	static Shared<State2B_Run> Create(const wstring& tag, const Shared<Pl0000>& owner);
 };
 
 NS_END

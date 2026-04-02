@@ -1,4 +1,5 @@
 #pragma once
+#include "Animation.h"
 #include "Component.h"
 
 NS_BEGIN(Engine)
@@ -45,13 +46,21 @@ public:
 	const wstring& Get_AnimationNameByIndex(uint32 index);
 	void Set_AnimationIndex(uint32 index) { m_CurrentAnimIndex = index; }
 	uint32 Get_AnimationIndex() const { return m_CurrentAnimIndex; }
+	uint32 Get_NextAnimationIndex() const { return m_NextAnimIndex; }
 	void Set_AnimLoop(Bool isLoop) { m_IsAnimLoop = isLoop; }
 	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
 	Bool Is_AnimationFinished() const { return m_IsAnimEnd; }
+	Float Get_AnimationProgress() const {
+		if (m_IsBlending)
+			return m_Animations[m_NextAnimIndex]->Get_Progress();
+		return m_Animations[m_CurrentAnimIndex]->Get_Progress();
+	}
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
-	const TRANSFORM_FRAME& Get_BoneTransformDelta(uint32 boneIndex) const;
+	Matrix Get_BoneMatrix(uint32 boneIndex) const; // 특정 부모 뼈대의 트랜스폼 가져오기
+	TRANSFORM_FRAME Get_RootTransformVelocity(uint32 nodeIndex) const;
+	void Set_LocalRootNode(uint32 nodeIndex);
 
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);
@@ -71,9 +80,11 @@ private:
 	wstring	m_ModelTag{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
+	int32	m_RootLocalNode{ -1 };
 
 private:
 	Bool	m_IsAnimLoop{ false };
+	Bool	m_IsPrevAnimLoop{ false };
 	Bool	m_IsAnimEnd{ false };
 	uint32	m_CurrentAnimIndex{};
 

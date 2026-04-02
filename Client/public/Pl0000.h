@@ -1,7 +1,7 @@
 #pragma once
-#include "ContainerObject.h"
-#include "P10000Input.h"
-
+#include "Entity.h"
+#include "Pl0000Input.h"
+#include "Pl0000Body.h"
 
 NS_BEGIN(Engine)
 	class Shader;
@@ -10,25 +10,32 @@ NS_BEGIN(Engine)
 
 NS_BEGIN(Client)
 
-class P10000StateMachine;
+class Pl0000Movement;
+class Pl0000StateMachine;
+class Pl0000Body;
 class WP0070Body;
 class WP0220Body;
 
-class CLIENT_DLL P10000 final : public ContainerObject
+class CLIENT_DLL Pl0000 final : public Entity
 {
-	RTTR_ENABLE(ContainerObject)
+	RTTR_ENABLE(Entity)
+public:
+    typedef struct tagPl0000Container : public ENTITY_CONTAINER {
+
+    } PL0000_CONTAINER;
 
 public:
-    typedef struct tagStateContainer {
+	explicit Pl0000();
+	explicit Pl0000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit Pl0000(const Pl0000& rhs);
+	~Pl0000() override = default;
 
-        Bool IsInput{};
-    } STATE_CONTAINER;
+public: /* pl0000 */
+    TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
 
-public:
-	explicit P10000();
-	explicit P10000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	explicit P10000(const P10000& rhs);
-	~P10000() override = default;
+    const Matrix& Get_LightSheathingMatrix() const { return m_LightSheathMatrix; }
+    const Matrix& Get_HeavySheathingMatrix() const { return m_HeavySheathMatrix; }
+
 
 public:
     HRESULT Initialize_Prototype() override;
@@ -51,60 +58,111 @@ private:
     HRESULT Ready_Components();
 
 private:
-    Shared<P10000StateMachine> m_P10000States{ nullptr };
-    Shared<P10000Input> m_P10000Input{ nullptr };
+    Shared<Pl0000Body> m_MainBody{ nullptr };
+    Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
+    Shared<Pl0000Input> m_Pl0000Input{ nullptr };
+    Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
+
+private:
+    Matrix m_LightSheathMatrix{};
+    Matrix m_HeavySheathMatrix{};
 
 public:
-	static Shared<P10000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	static Shared<Pl0000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
 
 public:
-    enum P10000_STATE {
+    enum class PL0000_STATE {
+        // HEADER
         IDLE                = 899,
         RUN                 = 898,
         SPRINT              = 897,
         DASH                = 896,
         JUMP                = 895,
+        ATTACK_GROUND       = 894,
+        ATTACK_AIR          = 893,
+        EVADE               = 892,
 
         // IDLE
-        IDLE_Neutral        = 46,
+        IDLE_Neutral            = 46,
+        IDLE_STAND_TO_Neutral   = 39,
+
+        WALK_TO_RUN             = 7,
 
         // RUN
         RUN_CYCLE           = 2,
         RUN_STOP_L          = 3,
         RUN_STOP_R          = 4,
+
+        RUN_LIGHT_CYCLE     = 590,
+        RUN_HEAVY_CYCLE     = 649,
         
         // SPRINT
         SPRINT_CYCLE        = 5,
         SPRINT_STOP_R       = 6,
         
         // DASH
-        STAND_TO_DASH_F     = 61,
-        DASH_F              = 62,
-        DASH_TO_STAND_F     = 63,
-        STAND_TO_DASH_B     = 64,
-        DASH_B              = 65,
-        DASH_TO_STAND_B     = 66,
-        STAND_TO_DASH_R     = 67,
-        DASH_R              = 68,
-        DASH_TO_STAND_R     = 69,
-        STAND_TO_DASH_L     = 70,
-        DASH_L              = 71,
-        DASH_TO_STAND_L     = 72,
-        DASH_F_TO_SPRINT    = 73,
-        DASH_B_TO_SPRINT    = 74,
-        DASH_R_TO_SPRINT    = 75,
-        DASH_L_TO_SPRINT    = 76,
+        STAND_TO_DASH_F     = 61, DASH_F              = 62, DASH_TO_STAND_F     = 63,
+        STAND_TO_DASH_B     = 64, DASH_B              = 65, DASH_TO_STAND_B     = 66,
+        STAND_TO_DASH_R     = 67, DASH_R              = 68, DASH_TO_STAND_R     = 69,
+        STAND_TO_DASH_L     = 70, DASH_L              = 71, DASH_TO_STAND_L     = 72,
+
+        DASH_F_TO_SPRINT    = 73, 
+    	DASH_B_TO_SPRINT    = 74, 
+    	DASH_R_TO_SPRINT    = 75, 
+    	DASH_L_TO_SPRINT    = 76,
         
         // JUMP
+        JUMP_ENTER          = 13,
+        JUMP_HOLD           = 14,
+
+        DOUBLE_JUMP1        = 16,
+        DOUBLE_JUMP2        = 17,
+        DOUBLE_JUMP3        = 18,
+        DOUBLE_JUMP4        = 19,
+
         STAND_TO_JUMP       = 23,
         RUN_TO_JUMP         = 24,
         SPRINT_TO_JUMP      = 25,
 
+        JUMP_TO_RUN         = 10,
+        JUMP_TO_SPRINT      = 11,
+        JUMP_TO_STAND       = 15, 
 
-        MAIN_ATTACK_2B      = 0x00000020,
-        SUB_ATTACK_2B       = 0x00000040,
+        // LIGHT ATTACK 0070
+        LIGHT_GROUND1       = 147,
+        LIGHT_GROUND2       = 148,
+        LIGHT_GROUND3       = 149,
+        LIGHT_GROUND4       = 150,
+        LIGHT_GROUND5       = 151,
+        LIGHT_GROUND6       = 152,
+        LIGHT_GROUND7       = 153,
 
+        LIGHT_GROUND_HOLD   = 340, // pl0000_0660
+        LIGHT_GROUND_RUN    = 173, // pl0000_0180
+
+        LIGHT_AIR1          = 161,
+        LIGHT_AIR2          = 162,
+        LIGHT_AIR3          = 161,
+        LIGHT_AIR4          = 162,
+        LIGHT_AIR5          = 163,
+
+        // HEAVY ATTACK 0220
+        HEAVY_GROUND1       = 187,
+        HEAVY_GROUND2       = 190,
+        HEAVY_GROUND3       = 193,
+
+        HEAVY_GROUND_HOLD_UNFULL       = 196,
+        HEAVY_GROUND_HOLD_NO_CONTACT   = 198,
+        HEAVY_GROUND_HOLD_CYCLE        = 197,
+        HEAVY_GROUND_HOLD_FULL         = 199,
+        HEAVY_GROUND_SPRINT            = 200,
+
+        HEAVY_AIR_DOWN_ENTER    = 202,
+        HEAVY_AIR_DOWN_HOLD     = 203,
+        HEAVY_AIR_DOWN_END      = 204,
+
+        LIGHT_HEAVY_COMBO       = 329,
     };
 };
 

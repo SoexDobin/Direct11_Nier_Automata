@@ -1,5 +1,5 @@
 #pragma once
-#include "P10000Parts.h"
+#include "Pl0000Parts.h"
 
 NS_BEGIN(Engine)
 class Model;
@@ -10,18 +10,21 @@ NS_BEGIN(Client)
 class WP0220Body;
 class WP0070Body;
 
-class CLIENT_DLL P10000Body final : public P10000Parts
+class CLIENT_DLL Pl0000Body final : public Pl0000Parts
 {
-	RTTR_ENABLE(P10000Parts)
+	RTTR_ENABLE(Pl0000Parts)
 public:
-	typedef struct tagP10000BodyDesc : public PARTOBJECT_DESC
-	{} P10000BODY_DESC ;
+	typedef struct tagP10000BodyDesc : public PL0000PART_DESC
+	{} Pl0000BODY_DESC ;
 
 public:
-	explicit P10000Body();
-	explicit P10000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	explicit P10000Body(const P10000Body& rhs);
-	~P10000Body() override = default;
+	explicit Pl0000Body();
+	explicit Pl0000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit Pl0000Body(const Pl0000Body& rhs);
+	~Pl0000Body() override = default;
+
+public:
+	TRANSFORM_FRAME Get_ModelTransform() const { return m_Model->Get_RootTransformVelocity(m_RootBoneIndex); }
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -42,13 +45,10 @@ private:
 
 private:
 	int32 m_RootBoneIndex{};
-
-	Shared<WP0070Body> m_Sword{ nullptr };
-	Shared<WP0220Body> m_GreaterSword{ nullptr };
-
+	Matrix m_SheathMatrix{};
 
 public:
-	static Shared<P10000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	static Shared<Pl0000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
 };
 

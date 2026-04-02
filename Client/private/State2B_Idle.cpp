@@ -1,92 +1,141 @@
 #include "pch.h"
 #include "State2B_Idle.h"
-#include "P10000Body.h"
+#include "Pl0000Body.h"
 #include <Game.h>
 #include <SpdLogger.h>
 
 #include "Model.h"
-#include "P10000.h"
-#include "P10000StateMachine.h"
+#include "Pl0000.h"
+#include "Pl0000Movement.h"
+#include "Pl0000StateMachine.h"
 #include "WP0070Body.h"
 #include "WP0220Body.h"
 
-State2B_Idle::State2B_Idle(const wstring& tag, const Shared<P10000>& owner)
+State2B_Idle::State2B_Idle(const wstring& tag, const Shared<Pl0000>& owner)
 	: State2B{tag, owner}
 {
 }
 
 HRESULT State2B_Idle::Initialize()
 {
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::RUN_STOP_R));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::RUN_STOP_L));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::JUMP_TO_STAND));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_B));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_R));
+	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L));
+
 	return State2B::Initialize();
 }
 
 Bool State2B_Idle::StateEnterInvoke()
 {
-	if (m_Owner.expired())
-		return false;
-	
-	/*
-	이전 애니메이션이 Dash 
-	이전 애니메이션이 Run
-	이전 애니메이션이 Sprint
-	 */	
+	auto pl0000 = m_Body.lock();
 
-	uint32 prevIndex = m_Body.lock()->Get_CurrentAnimationIndex();
-	if (P10000::P10000_STATE::RUN_CYCLE == prevIndex)
+	switch (auto prevState = m_States.lock()->Get_CurP10000State())
 	{
-		m_Body.lock()->Set_Animation( ETOI(P10000::P10000_STATE::RUN_STOP_L), 0.2f,false);
-	}
-	else if (P10000::P10000_STATE::SPRINT_CYCLE == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::SPRINT_STOP_R), 0.2f, false);
-	}
-	else if (P10000::P10000_STATE::DASH_F == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_F), 0.2f, false);
-	}
-	else if (P10000::P10000_STATE::DASH_B == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_B), 0.2f, false);
-	}
-	else if (P10000::P10000_STATE::DASH_R == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_R), 0.2f, false);
-	}
-	else if (P10000::P10000_STATE::DASH_L == prevIndex)
-	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::DASH_TO_STAND_L), 0.2f, false);
+	case Pl0000::PL0000_STATE::RUN:
+		{
+			if (m_Body.lock()->Get_ModelComponent()->Get_AnimationProgress() < 0.5f)
+			{
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_STOP_R), 0.2f, false);
+			}
+			else
+			{
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_STOP_L), 0.2f, false);
+			}
+			return true;
+		}
+	case Pl0000::PL0000_STATE::SPRINT:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R), 0.2f, false);
+		return true;
+	case Pl0000::PL0000_STATE::JUMP:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::JUMP_TO_STAND), 0.2f, false);
+		return true;
+	case Pl0000::PL0000_STATE::DASH:
+		{
+			switch (auto prevAnim = static_cast<Pl0000::PL0000_STATE>(m_Body.lock()->Get_ModelComponent()->Get_AnimationIndex()))
+			{
+			case Pl0000::PL0000_STATE::DASH_F: case Pl0000::PL0000_STATE::STAND_TO_DASH_F:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F), 0.2f, false);
+				return true;
+			case Pl0000::PL0000_STATE::DASH_B: case Pl0000::PL0000_STATE::STAND_TO_DASH_B:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_B), 0.2f, false);
+				return true;
+			case Pl0000::PL0000_STATE::DASH_R: case Pl0000::PL0000_STATE::STAND_TO_DASH_R:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_R), 0.2f, false);
+				return true;
+			case Pl0000::PL0000_STATE::DASH_L: case Pl0000::PL0000_STATE::STAND_TO_DASH_L:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
+				return true;
+			default:
+				LOG_ERROR(L"[ENTER IDLE From DASH] : No Enter state PrevIndex {} ", ETOI(prevAnim));
+				return false;
+			}
+		}
+	case Pl0000::PL0000_STATE::ATTACK_GROUND: case Pl0000::PL0000_STATE::ATTACK_AIR:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral), 0.2f, false);
+		return true;
+	default:
+		{
+			if (m_InitializeState)
+			{
+				m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_Neutral), 0.2f, false);
+
+				m_LightWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_LightSheathingMatrix());
+				m_HeavyWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_HeavySheathingMatrix());
+				m_InitializeState = false;
+
+				return true;
+			} 
+			LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", ETOI(prevState));
+			return false;
+		}
 	}
 
-	if (nullptr == m_States.lock()->Get_CurrentState())
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::IDLE_Neutral), 0.2f, true);
-
-	return true;
 }
 
 void State2B_Idle::Update(Float timeDelta)
 {
 	uint32 curIndex = m_Body.lock()->Get_CurrentAnimationIndex();
-	
 
-	if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON))
+	Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
+	moveData.direction = Calculate_Direction();
+	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
+	moveData.canRotation = true;
+	m_Movement.lock()->Set_MovementData(moveData);
+
+	if (m_Input.lock()->Is_MouseDown(DIMB::LBUTTON) || m_Input.lock()->Is_MouseDown(DIMB::RBUTTON))
 	{
-
-		return;
+		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::ATTACK_GROUND))
+			return;
 	}
-	if (m_Input.lock()->Is_MousePress(DIMB::RBUTTON))
+	
+	if (m_Input.lock()->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
 	{
-		
+		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::JUMP))
+			return;
+	}
+	if (m_Input.lock()->Is_WASD_DoubleClick())
+	{
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::DASH);
 		return;
 	}
 	if (m_Input.lock()->Is_WASD_Press())
 	{
-		if (m_States.lock()->Change_State(P10000::P10000_STATE::RUN))
+		if (m_States.lock()->Change_State(Pl0000::PL0000_STATE::RUN))
 			return;
 	}
 
-	if (curIndex != P10000::P10000_STATE::IDLE_Neutral && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished() )
+	if (m_EnterAnim.contains(curIndex) && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
 	{
-		m_Body.lock()->Set_Animation(ETOI(P10000::P10000_STATE::IDLE_Neutral), 0.2f, true);
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral), 0.5f, false);
+	}
+	else if (curIndex == ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral) && m_Body.lock()->Get_ModelComponent()->Is_AnimationFinished())
+	{
+		m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_Neutral), 0.5f, true);
 	}
 }
 
@@ -100,7 +149,7 @@ void State2B_Idle::StateExitInvoke()
 
 }
 
-Shared<State2B_Idle> State2B_Idle::Create(const wstring& tag, const Shared<P10000>& owner)
+Shared<State2B_Idle> State2B_Idle::Create(const wstring& tag, const Shared<Pl0000>& owner)
 {
 	auto instance = make_shared<State2B_Idle>(tag, owner);
 

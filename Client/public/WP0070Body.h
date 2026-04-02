@@ -1,6 +1,11 @@
 #pragma once
 #include "Pl0000Parts.h"
 
+NS_BEGIN(Engine)
+class OBBCollider;
+NS_END
+
+
 NS_BEGIN(Client)
 
 class CLIENT_DLL WP0070Body final : public Pl0000Parts
@@ -26,6 +31,11 @@ public:
 	void Submit_RenderGroup() override;
 
 public:
+	void OnCollisionEnter(const Shared<GameObject>& collision) override;
+	void OnCollisionStay(const Shared<GameObject>& collision) override;
+	void OnCollisionExit(const Shared<GameObject>& collision) override;
+
+public:
 	TRANSFORM_FRAME Get_ModelTransform() const { return m_Model->Get_RootTransformVelocity(m_RootBoneIndex); }
 	void Set_Sheathing(const Matrix& sheathMatrix);
 	void DrawWP0070();
@@ -38,7 +48,9 @@ private:
 
 private:
 	int32 m_RootBoneIndex{};
+	int32 m_WeaponBoneIndex{};
 	Bool m_IsSheathing{ true };
+	Shared<OBBCollider> m_AttackCollider{ nullptr };
 
 public:
 	static Shared<WP0070Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -58,13 +70,13 @@ public:
 		LIGHT_GROUND7		= 10,
 
 		LIGHT_GROUND_RUN	= 32,
-		LIGHT_GROUND_HOLD	= 51,
+		LIGHT_GROUND_HOLD	= 50,
 		
 		LIGHT_AIR1			= 20,
 		LIGHT_AIR2			= 21,
 		LIGHT_AIR3			= 22,
 
-		LIGHT_COMBO			= 46
+		LIGHT_COMBO			= 49
 	};
 };
 

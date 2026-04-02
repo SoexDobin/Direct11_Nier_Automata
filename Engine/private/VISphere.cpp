@@ -25,17 +25,21 @@ HRESULT VISphere::Initialize_Prototype(uint32 numSlices, uint32 numStacks)
 	Float phiStep = XM_PI / static_cast<Float>(numStacks);
 	Float thetaStep = XM_2PI / static_cast<Float>(numSlices);
 
+	
+
 	for (uint32 i = 1; i <= numStacks - 1; ++i)
 	{
 		Float phi = i * phiStep;
 		for (uint32 j = 0; j <= numSlices; ++j)
 		{
-			float theta = j * thetaStep;
+			Float theta = j * thetaStep;
 			VTXCUBE v;
 			v.position.x = 0.5f * sinf(phi) * cosf(theta);
 			v.position.y = 0.5f * cosf(phi);
 			v.position.z = 0.5f * sinf(phi) * sinf(theta);
-			v.texcoord = v.position;
+			v.texcoord.x = theta / XM_2PI;
+			v.texcoord.y = phi / XM_PI;
+			v.texcoord.z = 0.f;
 			vertices.push_back(v);
 		}
 	}
@@ -46,7 +50,7 @@ HRESULT VISphere::Initialize_Prototype(uint32 numSlices, uint32 numStacks)
 	bottom.texcoord = bottom.position;
 	vertices.push_back(bottom);
 
-	m_NumVertices = (uint32)vertices.size();
+	m_NumVertices = static_cast<uint32>(vertices.size());
 
 	D3D11_BUFFER_DESC VertexBufferDesc{};
 	VertexBufferDesc.ByteWidth = m_VtxStride * m_NumVertices;

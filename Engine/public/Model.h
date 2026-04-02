@@ -58,6 +58,7 @@ public:
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
+	Matrix Get_BoneMatrix(uint32 boneIndex) const; // 특정 부모 뼈대의 트랜스폼 가져오기
 	TRANSFORM_FRAME Get_RootTransformVelocity(uint32 nodeIndex) const;
 	void Set_LocalRootNode(uint32 nodeIndex);
 

@@ -5,7 +5,7 @@
 
 #include "Game.h"
 #include "Model.h"
-
+#include "OBBCollider.h"
 
 WP0070Body::WP0070Body() : Pl0000Parts{} {}
 WP0070Body::WP0070Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -32,7 +32,7 @@ HRESULT WP0070Body::Initialize(void* arg)
 	}
 
 	m_RootBoneIndex = m_Model->Get_BoneIndexByName("wp0070");
-	
+	m_WeaponBoneIndex = m_Model->Get_BoneIndexByName("bone0");
 	if (m_RootBoneIndex == -1)
 	{
 		LOG_ERROR(L"Failed to Find WP0070 Root Bone");
@@ -57,11 +57,24 @@ void WP0070Body::Priority_Update(Float timeDelta)
 void WP0070Body::Update(Float timeDelta)
 {
 	m_Model->Update_ModelAnimation(timeDelta);
+
+	if (m_IsSheathing == false)
+	{
+		TRANSFORM_FRAME rootVelocity = m_Model->Get_RootTransformVelocity(m_WeaponBoneIndex);
+
+		Vector3 localPos = m_Transform->Get_Position();
+		localPos += Vector3{ rootVelocity.position.x, rootVelocity.position.y, rootVelocity.position.z };
+		m_Transform->Set_Position(localPos);
+	}
 }
 
 void WP0070Body::Late_Update(Float timeDelta)
 {
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
+	
+	Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);
+	m_AttackCollider->Update(boneMatrix * m_CombinedWorldMatrix);
+	
 }
 
 void WP0070Body::Fixed_Update(Float fixedDelta)
@@ -94,11 +107,27 @@ void WP0070Body::Submit_RenderGroup()
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
+void WP0070Body::OnCollisionEnter(const Shared<GameObject>& collision)
+{
+	
+}
+
+void WP0070Body::OnCollisionStay(const Shared<GameObject>& collision)
+{
+	
+}
+
+void WP0070Body::OnCollisionExit(const Shared<GameObject>& collision)
+{
+	
+}
+
 void WP0070Body::Set_Sheathing(const Matrix& sheathMatrix)
 {
 	if (m_IsSheathing) return;
 
-	m_Model->Set_Animation(ETOI(WP0070_STATE::SHEATHE_LIGHT), 0.001f);
+	m_AttackCollider->Set_Active(false);
+	m_Model->Set_Animation(ETOI(WP0070_STATE::SHEATHE_LIGHT), 0.05f);
 	m_Transform->Set_WorldMatrix(sheathMatrix);
 	m_IsSheathing = true;
 }
@@ -107,6 +136,7 @@ void WP0070Body::DrawWP0070()
 {
 	if (m_IsSheathing == false) return;
 
+	m_AttackCollider->Set_Active(true);
 	m_Transform->Set_WorldMatrix(Matrix::Identity);
 	m_IsSheathing = false;
 }
@@ -157,6 +187,14 @@ HRESULT WP0070Body::Ready_Components()
 	if (nullptr == m_Model)
 		return E_FAIL;
 
+	OBBCollider::OBB_COLLIDER_DESC colDesc{};
+	colDesc.extents = Vector3{1.f, 1.f, 1.f };
+	colDesc.rotation = Vector3::Zero;
+	colDesc.offset = Vector3::Zero;
+	m_AttackCollider = Add_Component<OBBCollider>(ETOI(LEVEL::STATIC), &colDesc);
+	if (nullptr == m_AttackCollider)
+		return E_FAIL;
+	
 	return S_OK;
 }
 

@@ -166,6 +166,12 @@
     <Filter Include="01. Utility\11. Event">
       <UniqueIdentifier>{4e602fd2-6528-472f-aa83-f3264f144928}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\Collider">
+      <UniqueIdentifier>{b411774a-ce75-4709-b06b-48cc3e5e145c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Collider\Manager">
+      <UniqueIdentifier>{e253baa8-a27b-44c2-a2ea-132494a22eba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -358,6 +364,24 @@
     </ClInclude>
     <ClInclude Include="..\public\Random_Helper.h">
       <Filter>97. Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Collider.h">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CollisionManager.h">
+      <Filter>01. Utility\05. Component\Collider\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DebugDraw.h">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AABBCollider.h">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\OBBCollider.h">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SphereCollider.h">
+      <Filter>01. Utility\05. Component\Collider</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -552,6 +576,36 @@
     </ClCompile>
     <ClCompile Include="..\private\EventManager.cpp">
       <Filter>01. Utility\11. Event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Collider.cpp">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CollisionManager.cpp">
+      <Filter>01. Utility\05. Component\Collider\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DebugDraw.cpp">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AABBCollider.cpp">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\OBBCollider.cpp">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SphereCollider.cpp">
+      <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Collider_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\OBBCollider_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\AABBCollider_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\SphereCollider_rttr.cpp">
+      <Filter>96. RTTR</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

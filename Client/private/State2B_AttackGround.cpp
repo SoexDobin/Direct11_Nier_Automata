@@ -164,6 +164,14 @@ void State2B_AttackGround::Execute_Attack()
 	Bool isExitProgress = pl0000->Get_AnimationProgress() >= m_CanComboProgress[animIndex];
 	Float blendDuration = 0.15f;
 
+	if (m_PrevComboType == COMBO_TYPE::LIGHT_HEAVY &&
+		lightWeapon->Get_CurrentAnimationIndex() != ETOI(WP0070Body::WP0070_STATE::LIGHT_COMBO) &&
+		pl0000->Get_AnimationProgress() >= 0.0525f)
+	{
+		lightWeapon->DrawWP0070();
+		lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_COMBO), 0.1f, false);
+	}
+
 	if (false == isExitProgress) return;
 
 	if (m_IsHeavyCharge)
@@ -207,27 +215,14 @@ void State2B_AttackGround::Execute_Attack()
 				return; // 루트 평타는 바로 재끼기
 			}
 
-			
-			if (isNotLightRootCombo &&
-				input->Is_MousePress(DIMB::RBUTTON))
-			{
-				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_HEAVY_COMBO), blendDuration, false);
-				lightWeapon->DrawWP0070();
-				lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_COMBO), blendDuration, false);
-				heavyWeapon->DrawWP0220();
-				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_COMBO), blendDuration, false);
-
-				m_ComboStep = 0;
-				m_PrevComboType = COMBO_TYPE::LIGHT_HEAVY;
-			}
-			else if (animIndex != ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_HOLD) &&
+			if (animIndex != ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_HOLD) &&
 				isNotLightRootCombo && 
 				input->Is_MouseHold(DIMB::LBUTTON, 0.3f))
 			{
 				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_HOLD), blendDuration, false);
 				lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_GROUND_HOLD), blendDuration, false);
 				lightWeapon->DrawWP0070();
-
+			
 				m_ComboStep = 0;
 				m_PrevComboType = COMBO_TYPE::LIGHT;
 			}
@@ -276,20 +271,20 @@ void State2B_AttackGround::Execute_Attack()
 				return; // 루트 평타는 바로 재끼기
 			}
 
-			//if (animIndex != ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_CYCLE) &&
-			//	input->Is_MouseHold(DIMB::RBUTTON, 0.25f))
-			//{
-			//	m_IsHeavyCharge = true;
-			//	m_HeavyChargeDelta = 0.f;
-			//	pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_CYCLE), 0.3f, true);
-			//	lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-			//	heavyWeapon->DrawWP0220();
-			//	heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_GROUND_HOLD_CYCLE), 0.3f, true);
-			//
-			//	m_ComboStep = 0;
-			//	m_PrevComboType = COMBO_TYPE::HEAVY;
-			//}
-			//else 
+			if (animIndex != ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_CYCLE) &&
+				input->Is_MouseHold(DIMB::RBUTTON, 0.1f))
+			{
+				m_IsHeavyCharge = true;
+				m_HeavyChargeDelta = 0.f;
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_CYCLE), 0.3f, true);
+				lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
+				heavyWeapon->DrawWP0220();
+				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_GROUND_HOLD_CYCLE), 0.3f, true);
+			
+				m_ComboStep = 0;
+				m_PrevComboType = COMBO_TYPE::HEAVY;
+			}
+			else 
 			if (input->Is_MousePress(DIMB::RBUTTON))
 			{
 				pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], blendDuration, false);
@@ -303,15 +298,30 @@ void State2B_AttackGround::Execute_Attack()
 		}
 		else
 		{
-			m_ComboStep = 0;
+			m_ComboDelta = 0.f;
 
-			pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], blendDuration, false);
-			lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], blendDuration, false);
-			heavyWeapon->DrawWP0220();
+			if (m_PrevComboType == COMBO_TYPE::LIGHT && m_ComboStep != 0 && m_ComboStep < 7)
+			{
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_HEAVY_COMBO), 0.2f, false);
 
-			m_PrevComboType = COMBO_TYPE::HEAVY;
-			++m_ComboStep;
+				lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
+
+				heavyWeapon->DrawWP0220();
+				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_COMBO), 0.2f, false);
+				m_ComboStep = 0;
+				m_PrevComboType = COMBO_TYPE::LIGHT_HEAVY;
+			}
+			else
+			{
+				m_ComboStep = 0;
+				pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], blendDuration, false);
+				lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
+				heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], blendDuration, false);
+				heavyWeapon->DrawWP0220();
+
+				m_PrevComboType = COMBO_TYPE::HEAVY;
+				++m_ComboStep;
+			}
 		}
 	}
 
@@ -330,7 +340,7 @@ void State2B_AttackGround::Set_AnimationExitProgress()
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND6), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND6), 0.1f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.5f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.3f);
 
-	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.8f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.75f);
+	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.75f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.3f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_RUN), 0.25f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_RUN), 0.15f);
 
 	m_CanComboProgress.emplace(ETOI(pl::HEAVY_GROUND1), 0.15f); m_CanExitProgress.emplace(ETOI(pl::HEAVY_GROUND1), 0.25f);
@@ -341,7 +351,7 @@ void State2B_AttackGround::Set_AnimationExitProgress()
 	m_CanComboProgress.emplace(ETOI(pl::HEAVY_GROUND_HOLD_UNFULL), 0.5f); m_CanExitProgress.emplace(ETOI(pl::HEAVY_GROUND_HOLD_UNFULL), 0.25f);
 	m_CanComboProgress.emplace(ETOI(pl::HEAVY_GROUND_HOLD_NO_CONTACT), 0.5f); m_CanExitProgress.emplace(ETOI(pl::HEAVY_GROUND_HOLD_NO_CONTACT), 0.25f);
 
-	m_CanComboProgress.emplace(ETOI(pl::LIGHT_HEAVY_COMBO), 0.75f);
+	m_CanComboProgress.emplace(ETOI(pl::LIGHT_HEAVY_COMBO), 0.5f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_HEAVY_COMBO), 0.5f);
 }
 
 Shared<State2B_AttackGround> State2B_AttackGround::Create(const wstring& tag, const Shared<Pl0000>& owner)

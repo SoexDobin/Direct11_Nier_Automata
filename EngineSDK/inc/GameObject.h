@@ -50,6 +50,10 @@ public:
     virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) final;
 
 public: // 충돌 함수
+    virtual void OnCollisionEnter(const Shared<GameObject>& collision) {};
+    virtual void OnCollisionStay(const Shared<GameObject>& collision) {};
+    virtual void OnCollisionExit(const Shared<GameObject>& collision) {};
+
 protected:
     ComPtr<ID3D11Device> m_Device = {nullptr};
     ComPtr<ID3D11DeviceContext> m_Context = {nullptr};

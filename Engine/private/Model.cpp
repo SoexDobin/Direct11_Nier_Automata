@@ -240,6 +240,13 @@ int32 Model::Get_BoneIndexByName(const string& boneName) const
 	return -1;
 }
 
+Matrix Model::Get_BoneMatrix(uint32 boneIndex) const
+{
+	if (boneIndex >= m_Bones.size())
+		return Matrix::Identity;
+	return *m_Bones[boneIndex]->Get_CombinedTransformationMatrixPtr();
+}
+
 TRANSFORM_FRAME Model::Get_RootTransformVelocity(uint32 nodeIndex) const
 {
 	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())

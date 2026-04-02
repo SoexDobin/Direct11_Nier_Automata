@@ -33,8 +33,12 @@
 #include <directxtk/DDSTextureLoader.h>
 #include <directxtk/SimpleMath.h>
 #include <directxtk/WICTextureLoader.h>
+#include <directxtk/PrimitiveBatch.h>
+#include <directxtk/Effects.h>
+#include <directxtk/VertexTypes.h>
 #include <directxtk/SpriteBatch.h>
 #include <directxtk/SpriteFont.h>
+#include <directxtk/ScreenGrab.h>
 #include <wrl.h>
 
 #include <Effects11/d3dx11effect.h>

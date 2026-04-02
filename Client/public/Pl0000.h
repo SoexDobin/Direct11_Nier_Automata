@@ -1,5 +1,5 @@
 #pragma once
-#include "ContainerObject.h"
+#include "Entity.h"
 #include "Pl0000Input.h"
 #include "Pl0000Body.h"
 
@@ -16,16 +16,13 @@ class Pl0000Body;
 class WP0070Body;
 class WP0220Body;
 
-
-class CLIENT_DLL Pl0000 final : public ContainerObject
+class CLIENT_DLL Pl0000 final : public Entity
 {
-	RTTR_ENABLE(ContainerObject)
-
+	RTTR_ENABLE(Entity)
 public:
-    typedef struct tagStateContainer {
+    typedef struct tagPl0000Container : public ENTITY_CONTAINER {
 
-        
-    } STATE_CONTAINER;
+    } PL0000_CONTAINER;
 
 public:
 	explicit Pl0000();

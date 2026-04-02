@@ -22,11 +22,11 @@
 
 namespace Client {
 
-Pl0000::Pl0000() : ContainerObject{} {}
+Pl0000::Pl0000() : Entity{} {}
 Pl0000::Pl0000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: ContainerObject{ device, context } {}
+	: Entity{ device, context } {}
 Pl0000::Pl0000(const Pl0000& rhs)
-	: ContainerObject{ rhs } {}
+	: Entity{ rhs } {}
 
 HRESULT Pl0000::Initialize_Prototype()
 {

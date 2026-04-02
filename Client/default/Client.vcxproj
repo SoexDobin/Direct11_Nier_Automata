@@ -185,6 +185,8 @@
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
+    <ClInclude Include="..\public\EM3100.h" />
+    <ClInclude Include="..\public\Entity.h" />
     <ClInclude Include="..\public\FreeCamera.h" />
     <ClInclude Include="..\public\LevelGamePlay.h" />
     <ClInclude Include="..\public\LevelLoading.h" />
@@ -197,6 +199,7 @@
     <ClInclude Include="..\public\ClientApp.h" />
     <ClInclude Include="..\public\LoadingPixelPanel.h" />
     <ClInclude Include="..\public\Monster.h" />
+    <ClInclude Include="..\public\MonsterStateMachine.h" />
     <ClInclude Include="..\public\Movement.h" />
     <ClInclude Include="..\public\Pl0000.h" />
     <ClInclude Include="..\public\Pl0000Body.h" />
@@ -217,6 +220,7 @@
     <ClInclude Include="..\public\State2B_Sprint.h" />
     <ClInclude Include="..\public\State2B_Walk.h" />
     <ClInclude Include="..\public\StateMachine.h" />
+    <ClInclude Include="..\public\StateMonster.h" />
     <ClInclude Include="..\public\StaticCamera.h" />
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\ThirdPersonCamera.h" />
@@ -230,6 +234,8 @@
     <ClCompile Include="..\private\CityOfRuins.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
+    <ClCompile Include="..\private\EM3100.cpp" />
+    <ClCompile Include="..\private\Entity.cpp" />
     <ClCompile Include="..\private\FreeCamera.cpp" />
     <ClCompile Include="..\private\LevelGamePlay.cpp" />
     <ClCompile Include="..\private\LevelLoading.cpp" />
@@ -242,6 +248,7 @@
     <ClCompile Include="..\private\ClientApp.cpp" />
     <ClCompile Include="..\private\LoadingPixelPanel.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\private\MonsterStateMachine.cpp" />
     <ClCompile Include="..\private\Movement.cpp" />
     <ClCompile Include="..\private\Pl0000.cpp" />
     <ClCompile Include="..\private\Pl0000Body.cpp" />
@@ -262,6 +269,7 @@
     <ClCompile Include="..\private\State2B_Sprint.cpp" />
     <ClCompile Include="..\private\State2B_Walk.cpp" />
     <ClCompile Include="..\private\StateMachine.cpp" />
+    <ClCompile Include="..\private\StateMonster.cpp" />
     <ClCompile Include="..\private\StaticCamera.cpp" />
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\ThirdPersonCamera.cpp" />

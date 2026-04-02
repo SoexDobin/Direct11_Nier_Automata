@@ -1,6 +1,11 @@
 #pragma once
 #include "Pl0000Parts.h"
 
+NS_BEGIN(Engine)
+class OBBCollider;
+NS_END
+
+
 NS_BEGIN(Client)
 
 class CLIENT_DLL WP0220Body final : public Pl0000Parts
@@ -41,7 +46,9 @@ public:
 
 private:
 	int32 m_RootBoneIndex{};
+	int32 m_WeaponBoneIndex{};
 	Bool m_IsSheathing{ true };
+	Shared<OBBCollider> m_AttackCollider{nullptr};
 
 public:
 	enum class WP0220_STATE {
@@ -58,11 +65,11 @@ public:
 		HEAVY_GROUND_HOLD_FULL			= 16,
 		HEAVY_GROUND_SPRINT				= 17,
 
-		HEAVY_AIR_DOWN_ENTER		= 19,
-		HEAVY_AIR_DOWN_HOLD			= 20,
-		HEAVY_AIR_DOWN_END			= 21,
+		HEAVY_AIR_DOWN_ENTER			= 19,
+		HEAVY_AIR_DOWN_HOLD				= 20,
+		HEAVY_AIR_DOWN_END				= 21,
 
-		HEAVY_COMBO					= 36
+		HEAVY_COMBO						= 35
 	};
 };
 

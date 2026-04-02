@@ -25,6 +25,9 @@ Game::~Game() {
     m_TimeManager.reset();
     m_InputDevice.reset();
 
+    m_CollisionManager->On_Destroy();
+    m_CollisionManager.reset();
+
     m_ResourceManager->On_Destroy();
     m_ResourceManager.reset();
 
@@ -105,6 +108,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_EventManager = EventManager::Create(engineDesc.levelCount)))
         return E_FAIL;
 
+    if (nullptr == (m_CollisionManager = CollisionManager::Create()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -132,6 +138,8 @@ void Game::Update_Engine() {
   m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
   m_CameraManager->Bind_MainCamera_Transform();
   m_Pipeline->Update_Pipeline();
+
+  m_CollisionManager->Update_Collision();
 
   m_LevelManager->Update(delta);
   m_EventManager->Execute_Events();
@@ -560,6 +568,28 @@ HRESULT Game::Remove_Event(uint32 levIndex, const wstring& eventTag) const
 {
     return m_EventManager->Remove_Event(levIndex, eventTag);
 }
+
+void Game::Add_Collider(const Shared<class Collider>& collider) const
+{
+    m_CollisionManager->Add_Collider(collider);
+}
+
+void Game::Remove_Collider(class Collider* collider) const
+{
+    m_CollisionManager->Remove_Collider(collider);
+}
+
+void Game::Update_Collision() const
+{
+    m_CollisionManager->Update_Collision();
+}
+
+#ifdef _DEBUG
+void Game::Render_CollisionDebug() const
+{
+    m_CollisionManager->Render_Debug();
+}
+#endif
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
 {

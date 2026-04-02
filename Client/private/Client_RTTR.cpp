@@ -21,7 +21,8 @@
 #include "Pl0000StateMachine.h"
 #include "Pl0000Input.h"
 #include "Pl0000Movement.h"
-
+#include "WP3000Body.h"
+#include "EM3100.h"
 using rttr::registration;
 
 // ==============================================================
@@ -30,11 +31,10 @@ using rttr::registration;
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
 #include "FreeCamera.h"
-#include "Monster.h"
+#include "MonsterStateMachine.h"
 #include "SkyBox.h"
 #include "SkySphere.h"
 #include "Terrain.h"
-#include "WP3000Body.h"
 
 // </AUTO_GENERATED_INCLUDES>
 
@@ -106,6 +106,11 @@ void Register_Client_Reflection() {
         .method("Clone", &WP0220Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP0220Body::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<WP3000Body>("WP3000Body")
+        .constructor<>()
+        .method("Clone", &WP3000Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP3000Body::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
 
     rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
@@ -138,6 +143,13 @@ void Register_Client_Reflection() {
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuins::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
+    // MONSTER
+    rttr::registration::class_<EM3100>("EM3100")
+        .constructor<>()
+        .method("Clone", &EM3100::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return EM3100::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
@@ -148,10 +160,10 @@ void Register_Client_Reflection() {
         .method("Clone", &FreeCamera::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return FreeCamera::Create(device, context); })(rttr::metadata("Level", 0));
 
-    rttr::registration::class_<Monster>("Monster")
+    rttr::registration::class_<MonsterStateMachine>("MonsterStateMachine")
         .constructor<>()
-        .method("Clone", &Monster::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Monster::Create(device, context); })(rttr::metadata("Level", 0));
+        .method("Clone", &MonsterStateMachine::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return MonsterStateMachine::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<SkyBox>("SkyBox")
         .constructor<>()
@@ -167,11 +179,6 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Terrain::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Terrain::Create(device, context); })(rttr::metadata("Level", 0));
-
-    rttr::registration::class_<WP3000Body>("WP3000Body")
-        .constructor<>()
-        .method("Clone", &WP3000Body::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP3000Body::Create(device, context); })(rttr::metadata("Level", 0));
 
 
 // </AUTO_GENERATED_RTTR>

@@ -145,6 +145,7 @@
     <ClInclude Include="..\public\StateMonster.h">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -276,9 +277,6 @@
     <ClCompile Include="..\private\WP3000Body.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP3000</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\EM3100.cpp">
-      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\MonsterStateMachine.cpp">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine</Filter>
     </ClCompile>
@@ -287,6 +285,9 @@
     </ClCompile>
     <ClCompile Include="..\private\StateMonster.cpp">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EM3100.cpp">
+      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -432,5 +433,8 @@
     <None Include="GenerateRTTR_Client.bat">
       <Filter>99. Default</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Client.rc" />
   </ItemGroup>
 </Project>

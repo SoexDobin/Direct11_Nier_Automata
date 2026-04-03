@@ -4,6 +4,45 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "Game.h"
+
+
+void TagMask::Set_Tag(std::initializer_list<wstring> tags)
+{
+    m_Tag = 0;
+    for (const auto& name : tags)
+        Add(name);
+}
+
+Bool TagMask::Has(const wstring& tagName) const
+{
+    auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    return Has(tag);
+}
+
+void TagMask::Add(const wstring& tagName)
+{
+    auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    Add(tag);
+}
+
+void TagMask::Add(std::initializer_list<wstring> tags)
+{
+    for (const auto& name : tags)
+        Add(name);
+}
+
+void TagMask::Remove(const wstring& tagName)
+{
+    auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    Remove(tag);
+}
+
+void TagMask::Remove(std::initializer_list<wstring> tags)
+{
+    for (const auto& name : tags)
+        Remove(name);
+}
 
 wstring TagRegistry::Get_TagName(TAG tag) const {
     const auto iter = m_TagToName.find(tag);

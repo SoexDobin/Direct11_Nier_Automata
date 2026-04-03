@@ -1,5 +1,6 @@
 #pragma once
 #include "Animation.h"
+#include "AnimationTracker.h"
 #include "Component.h"
 
 NS_BEGIN(Engine)
@@ -8,6 +9,7 @@ class Material;
 class Bone;
 class Animation;
 class Shader;
+class AnimationTracker;
 
 class ENGINE_DLL Model final : public Component
 {
@@ -55,6 +57,13 @@ public:
 			return m_Animations[m_NextAnimIndex]->Get_Progress();
 		return m_Animations[m_CurrentAnimIndex]->Get_Progress();
 	}
+
+public: /* Animation Tracker */
+	void Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const;
+	void Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies) const;
+	void Clear_AnimNotifies() const;
+	Bool Is_NotifyActive(uint32 animIndex, const wstring & notifyTag) const;
+	Bool Is_NotifyActive(const wstring & notifyName) const;
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
@@ -104,6 +113,7 @@ private:
 	uint32 m_NumAnimation = {};
 	vector<Shared<Animation>> m_Animations;
 	map<wstring, uint32> m_AnimationNames;
+	Shared<AnimationTracker> m_Tracker{ nullptr };
 
 public:
 	static Shared<Model> CreatePrototype();

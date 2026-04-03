@@ -11,6 +11,16 @@ public:
 	{} ENTITY_CONTAINER;
 
 public:
+	typedef struct tagDamageInfo
+	{
+		Float	damage{ 0.f };
+		Float	knockbackForce{ 0.f };
+		Vector3 attackerPos{ 0.f, 0.f, 0.f };
+		Vector3 knockBackDir{0.f, 0.f, 0.f };
+		Bool	isGroggyAttack{ false };
+	} DAMAGE_INFO;
+
+public:
 	// TODO 공통 상태, 기능, 이벤트 정립
 
 public:

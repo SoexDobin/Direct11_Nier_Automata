@@ -60,7 +60,7 @@ void CollisionManager::Update_Collision()
 		auto srcCol = m_Colliders[i];
 		if (!srcCol || srcCol->Is_Destroy() || !srcCol->Is_Active()) continue;
 		auto srcOwner = srcCol->Get_Owner();
-		if (!srcOwner || srcOwner->Is_Destroy() || srcOwner->Is_Active()) continue;
+		if (!srcOwner || srcOwner->Is_Destroy() || !srcOwner->Is_Active()) continue;
 
 		for (size_t j = i + 1; j < m_Colliders.size(); ++j)
 		{
@@ -72,8 +72,13 @@ void CollisionManager::Update_Collision()
 			// --- Layer Mask 필터링 ---
 			uint32 srcLayerBit = srcOwner->Get_LayerMask().Get_Layer();
 			uint32 dstLayerBit = dstOwner->Get_LayerMask().Get_Layer();
-			uint32 srcMaskBits = srcOwner->Get_LayerMask().Get_Mask();
-			uint32 dstMaskBits = dstOwner->Get_LayerMask().Get_Mask();
+			
+			uint32 srcMaskBits = srcOwner->Get_LayerMask().Is_GlobalMask() ?
+				GAME_INSTANCE->Get_LayerRegister()->Get_GlobalMask(srcLayerBit)
+				: srcOwner->Get_LayerMask().Get_Mask();
+			uint32 dstMaskBits = dstOwner->Get_LayerMask().Is_GlobalMask() ?
+				GAME_INSTANCE->Get_LayerRegister()->Get_GlobalMask(dstLayerBit)
+				: dstOwner->Get_LayerMask().Get_Mask();
 
 			if ((srcMaskBits & dstLayerBit) == 0 || (dstMaskBits & srcLayerBit) == 0)
 				continue;

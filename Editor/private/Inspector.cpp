@@ -13,6 +13,7 @@
 #include "InspectorModel.h"
 #include "InspectorTexture.h"
 #include "InspectorCamera.h"
+#include "InspectorCollider.h"
 
 using namespace Engine;
 using namespace Editor;
@@ -31,6 +32,7 @@ HRESULT Inspector::Initialize() {
     m_InspectorModel = InspectorModel::Create();
     m_InspectorTexture = InspectorTexture::Create();
     m_InspectorCamera = InspectorCamera::Create();
+    m_InspectorCollider = InspectorCollider::Create();
 
     return EditorObject::Initialize();
 }
@@ -41,6 +43,8 @@ string Clean_RTTR_Name(const wstring& name) {
 
 void Inspector::Render(Bool isResize) {
     ImGui::Begin("Inspector");
+
+    Render_ProjectSettingsWindow();
 
     Shared<GameObject> selected = EDITOR->Get_SelectedObject();
     if (!selected) {
@@ -57,6 +61,73 @@ void Inspector::Render(Bool isResize) {
     GameObjectGUI(selected);
 
     ImGui::End();
+}
+
+void Inspector::Render_ProjectSettingsWindow()
+{
+    auto layerReg = GAME_INSTANCE->Get_LayerRegister();
+    auto tagReg = GAME_INSTANCE->Get_TagRegister();
+    // JSON 원본 문자열을 UI 버퍼에 단 한 번만 복사
+    if (m_IsFirstLoadSettings)
+    {
+        for (const auto& pair : layerReg->Get_AllLayers()) {
+            uint32 bit = static_cast<uint32>(pair.first);
+            int index = 0; while ((bit >>= 1) > 0) index++;
+            strcpy_s(m_LayerNames[index], 64, Helper::To_String(pair.second).c_str());
+        }
+        for (const auto& pair : tagReg->Get_AllTags()) {
+            uint32 bit = static_cast<uint32>(pair.first);
+            int index = 0; while ((bit >>= 1) > 0) index++;
+            strcpy_s(m_TagNames[index], 64, Helper::To_String(pair.second).c_str());
+        }
+        m_IsFirstLoadSettings = false;
+    }
+    // ⭐️ 헤더(드롭다운)로 묶어서 공간 낭비 방지 ⭐️
+    if (ImGui::CollapsingHeader("Global Layer & Tag Settings", ImGuiTreeNodeFlags_None))
+    {
+        // ⭐️ 스크롤을 내려도 항상 콤보박스(헤더) 바로 아래에서 세이브가 가능하도록 상단에 버튼 고정 ⭐️
+        ImGui::Columns(2, "SaveButtons", false);
+        if (ImGui::Button("Save Layers JSON", ImVec2(-1, 0))) layerReg->SaveToFile(PATH.GetLayerSettingsPath());
+        ImGui::NextColumn();
+        if (ImGui::Button("Save Tags JSON", ImVec2(-1, 0))) tagReg->SaveToFile(PATH.GetTagSettingsPath());
+        ImGui::Columns(1);
+
+        ImGui::Separator();
+        // ⭐️ 오버플로우 방지 및 스크롤 영역 (높이 250) ⭐️
+        ImGui::BeginChild("SettingsScrollArea", ImVec2(0, 250), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+        // ⭐️ 가독성 개선: 좌(Layer) / 우(Tag) 양분 ⭐️
+        ImGui::Columns(2, "LayerTagColumns", true); // 리사이즈 가능 선(true)
+        // [왼쪽 컬럼: Layers]
+        ImGui::TextDisabled("=== Layers ===");
+        for (int i = 0; i < 32; ++i)
+        {
+            ImGui::Text("L%02d", i);
+            ImGui::SameLine(35.f); // 텍스트박스 시작 지점을 가지런하게 맞춤
+            ImGui::PushItemWidth(-1.f); // 텍스트박스를 끝까지 채움
+            string label = "##Layer" + std::to_string(i);
+            if (ImGui::InputText(label.c_str(), m_LayerNames[i], 64))
+                layerReg->Set_LayerName(1 << i, Helper::To_wString(m_LayerNames[i]));
+            ImGui::PopItemWidth();
+        }
+        ImGui::NextColumn(); // 다음 열로 이동
+        // [오른쪽 컬럼: Tags]
+        ImGui::TextDisabled("=== Tags ===");
+        for (int i = 0; i < 32; ++i)
+        {
+            ImGui::Text("T%02d", i);
+            ImGui::SameLine(35.f);
+            ImGui::PushItemWidth(-1.f);
+            string label = "##Tag" + std::to_string(i);
+            if (ImGui::InputText(label.c_str(), m_TagNames[i], 64))
+                tagReg->Set_TagName(1 << i, Helper::To_wString(m_TagNames[i]));
+            ImGui::PopItemWidth();
+        }
+        // 범위 초과(넘치면) 자동 스크롤(슬라이더) 제공 구역 종료
+        ImGui::Columns(1);
+        ImGui::EndChild();
+    }
+    // 인스펙터 하단 오브젝트 정보와 분리선 출력
+    ImGui::Separator();
 }
 
 // ====================================================
@@ -100,6 +171,10 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
             }
             else if (cType == COMPONENT_TYPE::TEXTURE && m_InspectorTexture) {
                 m_InspectorTexture->RenderComponent(pComp);
+            }
+            else if ((cType == COMPONENT_TYPE::OBB_COLLIDER || cType == COMPONENT_TYPE::SPHERE_COLLIDER) && m_InspectorCollider)
+            {
+                m_InspectorCollider->RenderComponent(pComp);
             }
             else {
                 // 커스텀 인스펙터가 없는 경우 Fallback
@@ -165,7 +240,6 @@ void Inspector::Draw_GameObjectHeader(const Shared<Engine::GameObject>& obj)
         ImGui::EndCombo();
     }
 
-    // 2. Layer Mask (오브젝트가 상호작용/충돌할 레이어 마스크 - 다중 비트)
     uint32 currentMask = obj->Get_LayerMask().Get_Mask();
     string maskPreview = (currentMask == 0xFFFFFFFF) ? "Everything" : ((currentMask == 0) ? "Nothing" : "Mixed...");
 
@@ -187,6 +261,7 @@ void Inspector::Draw_GameObjectHeader(const Shared<Engine::GameObject>& obj)
         }
         ImGui::EndCombo();
     }
+
 
     // 3. Tag (오브젝트가 가진 태그 - 다중 비트)
     uint32 currentTag = obj->Get_TagMask().Get_Tags();

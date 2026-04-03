@@ -16,6 +16,9 @@ Pl0000Body::Pl0000Body(const Pl0000Body& rhs)
 
 HRESULT Pl0000Body::Initialize_Prototype()
 {
+	m_LayerMask.Set_Layer(L"Player");
+	m_TagMask.Set_Tag({ L"Player" });
+
 	return PartObject::Initialize_Prototype();
 }
 

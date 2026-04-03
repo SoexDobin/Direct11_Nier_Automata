@@ -14,12 +14,12 @@ public:
 	void Update(Bool isResize) override;
 	void Render(Bool isResize) override;
 
-	// Client 해상도 설정 메뉴 Json으로 저장해 두고 클라에서 ProjectSetting 파일 구성
 private:
 	Shared<Game> m_Game = { nullptr };
 	char m_Title[MAX_PATH] = "client";
-	
-	
+
+	Bool m_ShowProjectSettings = false;
+
 public:
 	static Shared<MenuBar> Create();
 };

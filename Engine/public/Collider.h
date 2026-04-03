@@ -20,6 +20,8 @@ protected:
 public:
 	virtual COLLIDER_TYPE Get_ColliderType() const PURE;
 	virtual COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::COLLIDER; }
+	const Vector3& Get_Offset() const { return m_Offset; }
+	virtual void Set_Offset(const Vector3& offset) { m_Offset = offset; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;

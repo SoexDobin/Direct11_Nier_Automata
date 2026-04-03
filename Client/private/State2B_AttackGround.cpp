@@ -176,7 +176,7 @@ void State2B_AttackGround::Execute_Attack()
 
 	if (m_IsHeavyCharge)
 	{
-		if (input->Is_MouseUp(DIMB::RBUTTON))
+		if (input->Is_MouseUp(DIMB::RBUTTON) || !input->Is_MousePress(DIMB::RBUTTON))
 		{
 			if (m_HeavyChargeDelta >= 2.f)
 			{
@@ -302,12 +302,12 @@ void State2B_AttackGround::Execute_Attack()
 
 			if (m_PrevComboType == COMBO_TYPE::LIGHT && m_ComboStep != 0 && m_ComboStep < 7)
 			{
-				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_HEAVY_COMBO), 0.2f, false);
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_HEAVY_COMBO), 0.1f, false);
 
 				lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
 
 				heavyWeapon->DrawWP0220();
-				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_COMBO), 0.2f, false);
+				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_COMBO), 0.1f, false);
 				m_ComboStep = 0;
 				m_PrevComboType = COMBO_TYPE::LIGHT_HEAVY;
 			}
@@ -333,7 +333,7 @@ void State2B_AttackGround::Set_AnimationExitProgress()
 {
 	using pl = Pl0000::PL0000_STATE;
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND1), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND1), 0.1f);
-	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND2), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND2), 0.1f);
+	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND2), 0.075f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND2), 0.075f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND3), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND3), 0.1f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND4), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND4), 0.1f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND5), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND5), 0.1f);

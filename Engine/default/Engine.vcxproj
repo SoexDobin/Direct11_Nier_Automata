@@ -197,6 +197,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
   <ItemGroup>
     <ClInclude Include="..\public\AABBCollider.h" />
     <ClInclude Include="..\public\Animation.h" />
+    <ClInclude Include="..\public\AnimationTracker.h" />
     <ClInclude Include="..\public\Bone.h" />
     <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\public\CameraManager.h" />
@@ -263,6 +264,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
   <ItemGroup>
     <ClCompile Include="..\private\AABBCollider.cpp" />
     <ClCompile Include="..\private\Animation.cpp" />
+    <ClCompile Include="..\private\AnimationTracker.cpp" />
     <ClCompile Include="..\private\Bone.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\private\CameraManager.cpp" />
@@ -297,6 +299,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\ResourceManager.cpp" />
     <ClCompile Include="..\private\rttr_generated\AABBCollider_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\AnimationTracker_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Camera_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Collider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">

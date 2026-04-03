@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Animation.h"
+#include "AnimationTracker.h"
 
 #include <fstream>
 #include <istream>
@@ -13,7 +14,6 @@
 Model::Model() : Component{} {}
 Model::Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Component{device, context} {}
-
 Model::Model(const Model& rhs)
 	: Component{ rhs }, 
 	m_PreLocalTransformMatrix{ rhs.m_PreLocalTransformMatrix }, 
@@ -25,13 +25,17 @@ Model::Model(const Model& rhs)
 	m_Materials{ rhs.m_Materials },
 	m_AnimationNames{ rhs.m_AnimationNames },
 	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation},
-	m_ModelTag { rhs.m_ModelTag }
+	m_ModelTag { rhs.m_ModelTag },
+	m_Tracker{ nullptr }
 {
 	for (auto& prototypeAnim : rhs.m_Animations)
 		m_Animations.push_back(static_pointer_cast<Animation>(prototypeAnim->Clone()));
 
 	for (auto& prototypeBone : rhs.m_Bones)
 		m_Bones.push_back(static_pointer_cast<Bone>(prototypeBone->Clone()));
+
+	// ★ 버그 수정: 클론할 때마다 Tracker도 새로 생성 (nullptr로 남겨두면 Reset시 크래시)
+	m_Tracker = AnimationTracker::Create(m_Device, m_Context);
 }
 
 HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& preLocalTransformMatrix)
@@ -69,6 +73,10 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 		return E_FAIL;
 
 	if (FAILED(Ready_Animation(in)))
+		return E_FAIL;
+
+	m_Tracker = AnimationTracker::Create(m_Device, m_Context);
+	if (m_Tracker == nullptr)
 		return E_FAIL;
 	
 	Update_ModelAnimation(0.f);
@@ -141,6 +149,9 @@ void Model::Set_ModelTag(const wstring& tag)
 	for (auto& pAnim : prototype->m_Animations)
 		m_Animations.push_back(static_pointer_cast<Animation>(pAnim->Clone()));
 
+	if (m_Tracker)
+		m_Tracker->Clear();
+
 	// 애니메이션 초기 바인딩 업데이트
 	Update_ModelAnimation(0.f);
 }
@@ -163,17 +174,16 @@ int32 Model::Get_AnimationIndexByName(const wstring& name)
 		return - 1;
 	}
 
-
 	return m_AnimationNames[name];
 }
 
 const wstring& Model::Get_AnimationNameByIndex(uint32 index)
 {
-	static wstring s_EmptyString = L"";
+	static wstring emptyString = L"";
 	if (index >= m_Animations.size())
 	{
 		LOG_ERROR(L"Failed to Get Animation Name by Index {}", index);
-		return s_EmptyString;
+		return emptyString;
 	}
 
 	return m_Animations[index]->Get_Name();
@@ -208,12 +218,17 @@ void Model::Update_ModelAnimation(Float timeDelta)
 	{
 		bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
 	}
+
+	uint32 activeAnimIdx = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
+	m_Tracker->Update(activeAnimIdx, Get_AnimationProgress());
 }
 
 void Model::Set_Animation(uint32 index, Float blendDuration)
 {
 	if (m_CurrentAnimIndex == index) return;
 	if (m_IsBlending && m_NextAnimIndex == index) return;
+
+	m_Tracker->Reset();
 
 	if (m_IsBlending)
 	{
@@ -228,6 +243,32 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 	m_IsAnimEnd = false;
 
 	m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
+}
+
+void Model::Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const
+{
+	m_Tracker->Add_Notify(animIndex, notify);
+}
+
+void Model::Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies) const
+{
+	m_Tracker->Add_Notify(animIndex, notifies);
+}
+
+void Model::Clear_AnimNotifies() const
+{
+	m_Tracker->Clear();
+}
+
+Bool Model::Is_NotifyActive(uint32 animIndex, const wstring& notifyTag) const
+{
+	return m_Tracker->Is_ActiveNotify(animIndex, notifyTag);
+}
+
+Bool Model::Is_NotifyActive(const wstring& notifyTag) const
+{
+	uint32 activeIndex = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
+	return m_Tracker->Is_ActiveNotify(activeIndex, notifyTag);
 }
 
 int32 Model::Get_BoneIndexByName(const string& boneName) const

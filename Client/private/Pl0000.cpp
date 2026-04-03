@@ -147,7 +147,7 @@ HRESULT Pl0000::Ready_Components()
 	movementDesc.velocity = Vector3{0.f, 0.f, 0.f};
 	movementDesc.moveSpeed = 0.f;
 	movementDesc.targetDirection = Vector3::Zero;
-	movementDesc.turnSpeed = 8.0f;
+	movementDesc.turnSpeed = 7.0f;
 	m_Pl0000Movement = Add_Component<Pl0000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
 	if (nullptr == m_Pl0000Movement)
 		return E_FAIL;

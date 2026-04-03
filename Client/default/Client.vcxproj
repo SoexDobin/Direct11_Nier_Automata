@@ -229,6 +229,7 @@
     <ClInclude Include="..\public\WP0220Body.h" />
     <ClInclude Include="..\public\WP3000Body.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\CityOfRuins.cpp" />
@@ -298,6 +299,9 @@
     <None Include="ClientRTTRGenerator.py" />
     <None Include="GenerateRTTR_Client.bat" />
     <None Include="PostBuildCopy.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Client.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

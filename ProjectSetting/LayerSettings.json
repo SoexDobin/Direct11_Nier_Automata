@@ -2,130 +2,162 @@
   "layers": [
     {
       "bit": 1,
-      "name": "LAYER0"
+      "collision_mask": 4294967294,
+      "name": "Default"
     },
     {
       "bit": 2,
-      "name": "LAYER1"
+      "collision_mask": 4294967293,
+      "name": "Player"
     },
     {
       "bit": 4,
-      "name": "LAYER2"
+      "collision_mask": 4294967291,
+      "name": "Monster"
     },
     {
       "bit": 8,
+      "collision_mask": 4294967295,
       "name": "LAYER3"
     },
     {
       "bit": 16,
+      "collision_mask": 4294967295,
       "name": "LAYER4"
     },
     {
       "bit": 32,
+      "collision_mask": 4294967295,
       "name": "LAYER5"
     },
     {
       "bit": 64,
+      "collision_mask": 4294967295,
       "name": "LAYER6"
     },
     {
       "bit": 128,
+      "collision_mask": 4294967295,
       "name": "LAYER7"
     },
     {
       "bit": 256,
+      "collision_mask": 4294967295,
       "name": "LAYER8"
     },
     {
       "bit": 512,
+      "collision_mask": 4294967295,
       "name": "LAYER9"
     },
     {
       "bit": 1024,
+      "collision_mask": 4294967295,
       "name": "LAYER10"
     },
     {
       "bit": 2048,
+      "collision_mask": 4294967295,
       "name": "LAYER11"
     },
     {
       "bit": 4096,
+      "collision_mask": 4294967295,
       "name": "LAYER12"
     },
     {
       "bit": 8192,
+      "collision_mask": 4294967295,
       "name": "LAYER13"
     },
     {
       "bit": 16384,
+      "collision_mask": 4294967295,
       "name": "LAYER14"
     },
     {
       "bit": 32768,
+      "collision_mask": 4294967295,
       "name": "LAYER15"
     },
     {
       "bit": 65536,
+      "collision_mask": 4294967295,
       "name": "LAYER16"
     },
     {
       "bit": 131072,
+      "collision_mask": 4294967295,
       "name": "LAYER17"
     },
     {
       "bit": 262144,
+      "collision_mask": 4294967295,
       "name": "LAYER18"
     },
     {
       "bit": 524288,
+      "collision_mask": 4294967295,
       "name": "LAYER19"
     },
     {
       "bit": 1048576,
+      "collision_mask": 4294967295,
       "name": "LAYER20"
     },
     {
       "bit": 2097152,
+      "collision_mask": 4294967295,
       "name": "LAYER21"
     },
     {
       "bit": 4194304,
+      "collision_mask": 4294967295,
       "name": "LAYER22"
     },
     {
       "bit": 8388608,
+      "collision_mask": 4294967295,
       "name": "LAYER23"
     },
     {
       "bit": 16777216,
+      "collision_mask": 4294967295,
       "name": "LAYER24"
     },
     {
       "bit": 33554432,
+      "collision_mask": 4294967295,
       "name": "LAYER25"
     },
     {
       "bit": 67108864,
+      "collision_mask": 4294967295,
       "name": "LAYER26"
     },
     {
       "bit": 134217728,
+      "collision_mask": 4294967295,
       "name": "LAYER27"
     },
     {
       "bit": 268435456,
+      "collision_mask": 4294967295,
       "name": "LAYER28"
     },
     {
       "bit": 536870912,
+      "collision_mask": 4294967295,
       "name": "LAYER29"
     },
     {
       "bit": 1073741824,
+      "collision_mask": 4294967295,
       "name": "LAYER30"
     },
     {
       "bit": 2147483648,
+      "collision_mask": 4294967295,
       "name": "LAYER31"
     }
   ],

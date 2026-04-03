@@ -15,6 +15,9 @@ WP0220Body::WP0220Body(const WP0220Body& rhs)
 
 HRESULT WP0220Body::Initialize_Prototype()
 {
+	m_LayerMask.Set_Layer(L"Player");
+	m_TagMask.Set_Tag({L"PlayerWeapon", L"" });
+
 	return Pl0000Parts::Initialize_Prototype();
 }
 
@@ -168,9 +171,9 @@ HRESULT WP0220Body::Ready_Components()
 		return E_FAIL;
 
 	OBBCollider::OBB_COLLIDER_DESC colDesc{};
-	colDesc.extents = Vector3{ 1.f, 1.f, 1.f };
+	colDesc.extents = Vector3{ 0.25f, 0.05f, 0.8f };
 	colDesc.rotation = Vector3::Zero;
-	colDesc.offset = Vector3::Zero;
+	colDesc.offset = Vector3{ -0.05f, 0.f, -1.f }; 
 	m_AttackCollider = Add_Component<OBBCollider>(ETOI(LEVEL::STATIC), &colDesc);
 	if (nullptr == m_AttackCollider)
 		return E_FAIL;

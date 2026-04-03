@@ -46,6 +46,7 @@ public: /* For Editor / Tool */
     const D3D11_VIEWPORT& Get_ViewportDesc() const { return m_GraphicDevice->Get_ViewportDesc(); }
     ComPtr<ID3D11Device> Get_Device() const { return m_GraphicDevice->Get_Device(); }
     ComPtr<ID3D11DeviceContext> Get_Context() const { return m_GraphicDevice->Get_Context(); }
+    ComPtr<IDXGISwapChain1> Get_SwapChain() const { return m_GraphicDevice->Get_SwapChain(); }
     Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
     Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
 

@@ -172,6 +172,9 @@
     <Filter Include="01. Utility\05. Component\Collider\Manager">
       <UniqueIdentifier>{e253baa8-a27b-44c2-a2ea-132494a22eba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\Model\AnimationNotify">
+      <UniqueIdentifier>{153143a6-4bd7-41c7-9f50-4a16074c94d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -382,6 +385,9 @@
     </ClInclude>
     <ClInclude Include="..\public\SphereCollider.h">
       <Filter>01. Utility\05. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AnimationTracker.h">
+      <Filter>01. Utility\05. Component\Model\AnimationNotify</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -605,6 +611,12 @@
       <Filter>96. RTTR</Filter>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\SphereCollider_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AnimationTracker.cpp">
+      <Filter>01. Utility\05. Component\Model\AnimationNotify</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\AnimationTracker_rttr.cpp">
       <Filter>96. RTTR</Filter>
     </ClCompile>
   </ItemGroup>

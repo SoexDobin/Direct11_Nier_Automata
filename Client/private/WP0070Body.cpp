@@ -17,6 +17,9 @@ WP0070Body::WP0070Body(const WP0070Body& rhs)
 
 HRESULT WP0070Body::Initialize_Prototype()
 {
+	m_LayerMask.Set_Layer(L"Player");
+	m_TagMask.Set_Tag({ L"PlayerWeapon" });
+
 	return Pl0000Parts::Initialize_Prototype();
 }
 
@@ -126,7 +129,7 @@ void WP0070Body::Set_Sheathing(const Matrix& sheathMatrix)
 {
 	if (m_IsSheathing) return;
 
-	m_AttackCollider->Set_Active(false);
+	//m_AttackCollider->Set_Active(false);
 	m_Model->Set_Animation(ETOI(WP0070_STATE::SHEATHE_LIGHT), 0.05f);
 	m_Transform->Set_WorldMatrix(sheathMatrix);
 	m_IsSheathing = true;
@@ -136,7 +139,7 @@ void WP0070Body::DrawWP0070()
 {
 	if (m_IsSheathing == false) return;
 
-	m_AttackCollider->Set_Active(true);
+	//m_AttackCollider->Set_Active(true);
 	m_Transform->Set_WorldMatrix(Matrix::Identity);
 	m_IsSheathing = false;
 }
@@ -188,9 +191,9 @@ HRESULT WP0070Body::Ready_Components()
 		return E_FAIL;
 
 	OBBCollider::OBB_COLLIDER_DESC colDesc{};
-	colDesc.extents = Vector3{1.f, 1.f, 1.f };
+	colDesc.extents = Vector3{ 0.075f, 0.1f, 0.7f }; 
 	colDesc.rotation = Vector3::Zero;
-	colDesc.offset = Vector3::Zero;
+	colDesc.offset = Vector3{ 0.f, 0.f, -0.55f };
 	m_AttackCollider = Add_Component<OBBCollider>(ETOI(LEVEL::STATIC), &colDesc);
 	if (nullptr == m_AttackCollider)
 		return E_FAIL;

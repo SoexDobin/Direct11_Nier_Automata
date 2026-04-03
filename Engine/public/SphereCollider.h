@@ -27,7 +27,12 @@ public:
 	void Update(const Matrix& worldMatrix) override;
 	Bool Intersect(const Shared<Collider>& target) override;
 	const BoundingSphere& Get_Bounding() const { return m_Transformed; }
+	Float Get_Radius() const { return m_Original.Radius; }
 	void Set_Radius(Float radius) { m_Original.Radius = radius; }
+	void Set_Offset(const Vector3& offset) override {
+		m_Offset = offset;
+		m_Original.Center = offset;
+	}
 
 #ifdef _DEBUG
 	HRESULT Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color) override;

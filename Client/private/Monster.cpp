@@ -14,7 +14,10 @@ Monster::Monster(const Monster& rhs)
 
 HRESULT Monster::Initialize_Prototype()
 {
-	return GameObject::Initialize_Prototype();
+	m_LayerMask.Set_Layer(L"Monster");
+	m_TagMask.Set_Tag({ L"Monster" });
+
+	return Entity::Initialize_Prototype();
 }
 
 HRESULT Monster::Initialize(void* arg)

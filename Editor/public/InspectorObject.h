@@ -21,6 +21,9 @@ public:
     std::vector<std::wstring> Get_TagNames() const;
     void Set_TagNames(const std::vector<std::wstring>& names);
 
+    Bool Get_UseCustomMask() const;
+    void Set_UseCustomMask(Bool use);
+
 private:
     Shared<Engine::GameObject> m_pTarget{ nullptr };
 };

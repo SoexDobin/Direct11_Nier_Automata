@@ -8,37 +8,6 @@
             {
               "properties": null,
               "typeName": "Transform"
-            }
-          ],
-          "name": "ThirdPersonCamera",
-          "objectID": 4249569602,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "ThirdPersonCamera",
-          "transform": {
-            "position": [
-              7.376703262329102,
-              2.8175606727600098,
-              1.7651050090789795
-            ],
-            "rotation": [
-              13.418737411499023,
-              -103.13771057128906,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "ThirdPersonCamera"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
             },
             {
               "properties": null,
@@ -82,77 +51,22 @@
             {
               "properties": null,
               "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "AABBCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
             }
           ],
-          "name": "EM3100",
-          "objectID": 2285713722,
+          "name": "ThirdPersonCamera",
+          "objectID": 4249569602,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "EM3100",
+          "prototypeTag": "ThirdPersonCamera",
           "transform": {
             "position": [
-              0.0,
-              0.0,
-              10.0
+              7.376703262329102,
+              2.8175606727600098,
+              1.7651050090789795
             ],
             "rotation": [
-              0.0,
-              179.99989318847656,
-              0.0
-            ],
-            "scale": [
-              0.9999992251396179,
-              1.0,
-              0.9999992251396179
-            ]
-          },
-          "typeName": "EM3100"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            }
-          ],
-          "name": "CityOfRuins",
-          "objectID": 1208553506,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "CityOfRuins",
-          "transform": {
-            "position": [
-              50.0,
-              0.0,
-              100.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
+              13.418737411499023,
+              -103.13771057128906,
               0.0
             ],
             "scale": [
@@ -161,7 +75,7 @@
               1.0
             ]
           },
-          "typeName": "CityOfRuins"
+          "typeName": "ThirdPersonCamera"
         },
         {
           "components": [
@@ -193,6 +107,92 @@
             ]
           },
           "typeName": "Pl0000"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            }
+          ],
+          "name": "CityOfRuins",
+          "objectID": 1208553506,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuins",
+          "transform": {
+            "position": [
+              50.0,
+              0.0,
+              100.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuins"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "AABBCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            }
+          ],
+          "name": "EM3100",
+          "objectID": 2285713722,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "EM3100",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              10.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "EM3100"
         }
       ]
     }

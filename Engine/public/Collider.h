@@ -22,6 +22,7 @@ public:
 	virtual COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::COLLIDER; }
 	const Vector3& Get_Offset() const { return m_Offset; }
 	virtual void Set_Offset(const Vector3& offset) { m_Offset = offset; }
+	virtual Vector3 Get_Pivot() const PURE;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -32,9 +33,9 @@ public:
 	virtual Bool Intersect(const Shared<Collider>& target);
 
 public:
-	void Add_OverlapMember(Collider* collider) { m_OverlapMembers.insert(collider); }
-	void Release_OverlapMember(Collider* collider) { m_OverlapMembers.erase(collider); }
-	Bool Is_Overlapped(Collider* collider) const { return m_OverlapMembers.contains(collider); }
+	void Add_OverlapMember(const Shared<Collider>& collider) { m_OverlapMembers.insert(collider.get()); }
+	void Release_OverlapMember(const Shared<Collider>& collider) { m_OverlapMembers.erase(collider.get()); }
+	Bool Is_Overlapped(const Shared<Collider>& collider) const { return m_OverlapMembers.contains(collider.get()); }
 
 	void Set_IsColliding(Bool isColliding) { m_IsColliding = isColliding; }
 	Bool Get_IsColliding() const { return m_IsColliding; }

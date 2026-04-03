@@ -1,78 +1,76 @@
 #include "pch.h"
-#include "Pl0000Body.h"
+#include "Em3100Body.h"
 
+#include <Random_Helper.h>
+
+#include "AABBCollider.h"
 #include <SpdLogger.h>
-
 #include "Game.h"
-
 #include "Model.h"
-#include "Pl0000.h"
 
-Pl0000Body::Pl0000Body() : Pl0000Parts{} {}
-Pl0000Body::Pl0000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: Pl0000Parts{device, context} {}
-Pl0000Body::Pl0000Body(const Pl0000Body& rhs)
-	: Pl0000Parts{rhs} {}
 
-HRESULT Pl0000Body::Initialize_Prototype()
+Em3100Body::Em3100Body() : PartObject{} {}
+Em3100Body::Em3100Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+	: PartObject{ device, context } {
+}
+Em3100Body::Em3100Body(const Em3100Body& rhs)
+	: PartObject{ rhs } {
+}
+
+HRESULT Em3100Body::Initialize_Prototype()
 {
-	m_LayerMask.Set_Layer(L"Player");
-	m_TagMask.Set_Tag({ L"Player", L"HitBox" });
+	m_LayerMask.Set_Layer(L"Monster");
+	m_TagMask.Set_Tag({ L"Monster" });
 
 	return PartObject::Initialize_Prototype();
 }
 
-HRESULT Pl0000Body::Initialize(void* arg)
+HRESULT Em3100Body::Initialize(void* arg)
 {
-	if (FAILED(Pl0000Parts::Initialize(arg)))
+	if (FAILED(PartObject::Initialize(arg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 	{
-		LOG_ERROR(L"Failed To Ready_Components : Pl0000Body");
+		LOG_ERROR(L"Failed To Ready_Components : EM3100Body");
 		return E_FAIL;
 	}
 
-	m_RootBoneIndex = m_Model->Get_BoneIndexByName("pl0000");
-	
-	if (m_RootBoneIndex == -1)
-	{
-		LOG_ERROR(L"Failed to Find 2B Root Bone");
-		return E_FAIL;
-	}
-
-	m_Model->Set_LocalRootNode(m_RootBoneIndex);
+	int32 rand = Helper::Random_Int(0, 3);
+	m_Model->Set_AnimationIndex(rand);
+	m_Model->Set_AnimLoop(true);
 
 	return S_OK;
 }
 
-void Pl0000Body::On_Destroy()
+void Em3100Body::On_Destroy()
 {
 	PartObject::On_Destroy();
 }
 
-void Pl0000Body::Priority_Update(Float timeDelta)
+void Em3100Body::Priority_Update(Float timeDelta)
 {
 
 }
 
-void Pl0000Body::Update(Float timeDelta)
+void Em3100Body::Update(Float timeDelta)
 {
 	m_Model->Update_ModelAnimation(timeDelta);
 }
 
-void Pl0000Body::Late_Update(Float timeDelta)
+void Em3100Body::Late_Update(Float timeDelta)
 {
 	m_Transform->Update_WorldMatrix();
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
+	m_HitBox->Update(m_CombinedWorldMatrix);
 }
 
-void Pl0000Body::Fixed_Update(Float fixedDelta)
+void Em3100Body::Fixed_Update(Float fixedDelta)
 {
-	
+
 }
 
-HRESULT Pl0000Body::Render()
+HRESULT Em3100Body::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -92,13 +90,13 @@ HRESULT Pl0000Body::Render()
 	return S_OK;
 }
 
-void Pl0000Body::Submit_RenderGroup()
+void Em3100Body::Submit_RenderGroup()
 {
 	if (Is_Active())
 		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
-HRESULT Pl0000Body::Bind_ShaderResources()
+HRESULT Em3100Body::Bind_ShaderResources()
 {
 	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
 		return E_FAIL;
@@ -125,46 +123,50 @@ HRESULT Pl0000Body::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT Pl0000Body::Ready_Components()
+HRESULT Em3100Body::Ready_Components()
 {
-
 	Shader::SHADER_DESC shaderDesc{ VTXANIMMESH::Tag,  VTXANIMMESH::Elements, VTXANIMMESH::numElements };
 	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	Model::MODEL_DESC modelDesc{ L"p10000" };
+	Model::MODEL_DESC modelDesc{ L"em3100" };
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
+		return E_FAIL;
+
+	AABBCollider::AABB_COLLIDER_DESC aabbDesc{};
+	aabbDesc.extents = Vector3{ 1.f, 1.f, 1.f };
+	aabbDesc.offset = Vector3{ 0.f, 1.f, 0.f };;
+	m_HitBox = Add_Component<AABBCollider>(ETOI(LEVEL::STATIC), &aabbDesc);
+	if (nullptr == m_HitBox)
 		return E_FAIL;
 
 	return S_OK;
 }
 
-Shared<Pl0000Body> Pl0000Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+Shared<Em3100Body> Em3100Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
-	auto prototype = make_shared<Pl0000Body>(device, context);
+	auto prototype = make_shared<Em3100Body>(device, context);
 
 	if (FAILED(prototype->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : Pl0000Body");
+		MSG_BOX("Failed to Created : Em3100Body");
 		return nullptr;
 	}
 
 	return prototype;
 }
 
-Shared<GameObject> Pl0000Body::Clone(void* arg)
+Shared<GameObject> Em3100Body::Clone(void* arg)
 {
-	auto instance = make_shared<Pl0000Body>(*this);
+	auto instance = make_shared<Em3100Body>(*this);
 
 	if (FAILED(instance->Initialize(arg)))
 	{
-		MSG_BOX("Failed to Clone : Pl0000Body");
+		MSG_BOX("Failed to Clone : Em3100Body");
 		return nullptr;
 	}
 
 	return instance;
 }
-
-

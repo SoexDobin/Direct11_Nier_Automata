@@ -7,9 +7,9 @@ class MonsterStateMachine;
 
 class CLIENT_DLL Monster : public Entity
 {
-	RTTR_ENABLE(GameObject)
+	RTTR_ENABLE(Entity)
 public:
-	typedef struct tagMonsterObjectDesc : public ENTITY_CONTAINER {} MONSTER_CONTAINER_DESC;
+	typedef struct tagMonsterObjectDesc : public ENTITY_CONTAINER_DESC {} MONSTER_CONTAINER_DESC;
 
 public:
 	explicit Monster();

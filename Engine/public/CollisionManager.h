@@ -21,10 +21,10 @@ public:
 
 public: 
 	void Add_Collider(const Shared<Collider>& collider);
-	void Remove_Collider(Collider* collider);
+	void Remove_Collider(const Shared<Collider>& collider);
 
 public: 
-	void Update_Collision();
+	void Update_Collision() const;
 
 public: /* 디버그 렌더링 */
 #ifdef _DEBUG

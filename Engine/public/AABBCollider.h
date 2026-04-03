@@ -27,7 +27,11 @@ public:
 	void Update(const Matrix& worldMatrix) override;
 	Bool Intersect(const Shared<Collider>& target) override;
 	const BoundingBox& Get_Bounding() const { return m_Transformed; }
+	Vector3 Get_CurrentExtends() const { return m_Transformed.Extents; }
+
 	void Set_Extents(const Vector3& extents) { m_Original.Extents = extents; }
+	virtual Vector3 Get_Pivot() const override { return m_Transformed.Center; }
+	
 
 #ifdef _DEBUG
 	HRESULT Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color) override;

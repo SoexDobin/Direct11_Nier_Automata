@@ -180,6 +180,7 @@ enum class TAG : unsigned __int32 {
   TAG_31 = 1u << 31,
 
   END = 32,
+	NONE = 33,
   ALL_TAG = 0xFFFFFFFF,
 };
 } // namespace Engine

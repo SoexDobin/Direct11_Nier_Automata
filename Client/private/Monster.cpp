@@ -14,7 +14,7 @@ Monster::Monster(const Monster& rhs)
 
 HRESULT Monster::Initialize_Prototype()
 {
-	m_LayerMask.Set_Layer(L"Monster");
+	m_LayerMask.Set_Layer(L"MonsterPhysical");
 	m_TagMask.Set_Tag({ L"Monster" });
 
 	return Entity::Initialize_Prototype();

@@ -169,7 +169,7 @@ public: /* For EventManager*/
 
 public: /* CollisionManager */
     void Add_Collider(const Shared<class Collider>& collider) const;
-    void Remove_Collider(class Collider* collider) const;
+    void Remove_Collider(const Shared<class Collider>& collider) const;
     void Update_Collision() const;
 #ifdef _DEBUG
     void Render_CollisionDebug() const;

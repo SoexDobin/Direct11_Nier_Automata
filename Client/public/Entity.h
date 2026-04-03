@@ -8,7 +8,9 @@ class CLIENT_DLL Entity abstract : public ContainerObject
 	RTTR_ENABLE(ContainerObject)
 public:
 	typedef struct tagEntityObject : public CONTAINEROBJECT_DESC
-	{} ENTITY_CONTAINER;
+	{
+		
+	} ENTITY_CONTAINER_DESC;
 
 public:
 	typedef struct tagDamageInfo
@@ -17,7 +19,7 @@ public:
 		Float	knockbackForce{ 0.f };
 		Vector3 attackerPos{ 0.f, 0.f, 0.f };
 		Vector3 knockBackDir{0.f, 0.f, 0.f };
-		Bool	isGroggyAttack{ false };
+		uint32 groggyWeight{ 0 };
 	} DAMAGE_INFO;
 
 public:
@@ -30,7 +32,27 @@ public:
 	virtual ~Entity() override = default;
 
 public: /* Entity interface */
-	virtual void TakeDamage() {};
+	virtual void TakeDamage(const DAMAGE_INFO& dmgInfo);
+	virtual void OnDeath() {};
+	virtual void Pushout(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio = 1.f);
+	virtual void Pullout(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio = 1.f);
+
+protected:
+	Float Get_HP() const { return m_Hp; }
+	Float Get_MaxHP() const { return m_MaxHp; }
+	Bool Is_Dead() const { return m_Hp <= 0.f; }
+	Bool Is_Invincible() const { return m_IsInvincible; }
+	void Set_Invincible(Bool isInvincible) { m_IsInvincible = isInvincible; }
+
+private:
+	Bool Calc_Penetration(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Vector3& outDir, Float& outDepth);
+	Float Get_RadiusByColliderType(const Shared<Collider>& collider, const Vector3 colDirection);
+
+protected:
+	Float m_Hp{ 100.f };
+	Float m_MaxHp{ 100.f };
+	Bool m_IsInvincible{ false };
+	Bool m_IsStatic{ false };
 
 public:
 	virtual Shared<GameObject> Clone(void* arg) PURE;

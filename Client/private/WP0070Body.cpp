@@ -17,7 +17,7 @@ WP0070Body::WP0070Body(const WP0070Body& rhs)
 
 HRESULT WP0070Body::Initialize_Prototype()
 {
-	m_LayerMask.Set_Layer(L"Player");
+	m_LayerMask.Set_Layer(L"PlayerWeapon");
 	m_TagMask.Set_Tag({ L"PlayerWeapon" });
 
 	return Pl0000Parts::Initialize_Prototype();
@@ -110,17 +110,17 @@ void WP0070Body::Submit_RenderGroup()
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
-void WP0070Body::OnCollisionEnter(const Shared<GameObject>& collision)
+void WP0070Body::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	
 }
 
-void WP0070Body::OnCollisionStay(const Shared<GameObject>& collision)
+void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	
 }
 
-void WP0070Body::OnCollisionExit(const Shared<GameObject>& collision)
+void WP0070Body::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	
 }

@@ -14,6 +14,19 @@
                                          "has_clone":  false,
                                          "category":  "other"
                                      },
+                    "Em3100Body":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "PartObject",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "State2B_AttackGround":  {
                                                  "members":  [
                                                                  {
@@ -68,7 +81,7 @@
                                           "has_clone":  false,
                                           "category":  "level"
                                       },
-                    "EM3100":  {
+                    "Em3100":  {
                                    "members":  [
 
                                                ],
@@ -276,6 +289,37 @@
                                          "has_clone":  false,
                                          "category":  "other"
                                      },
+                    "State2B_Idle":  {
+                                         "members":  [
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_EnterAnim",
+                                                             "type":  "unordered_set\u003cuint32\u003e"
+                                                         }
+                                                     ],
+                                         "base_class":  "State2B",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Client",
+                                         "has_create":  true,
+                                         "has_clone":  false,
+                                         "category":  "other"
+                                     },
+                    "Pl0000Body":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "Pl0000Parts",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "State2B_Dash":  {
                                          "members":  [
                                                          {
@@ -466,19 +510,6 @@
                                       "has_clone":  false,
                                       "category":  "other"
                                   },
-                    "Pl0000":  {
-                                   "members":  [
-
-                                               ],
-                                   "base_class":  "Entity",
-                                   "inherited_members":  {
-
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
                     "Terrain":  {
                                     "namespace":  "Engine",
                                     "base_class":  "GameObject",
@@ -564,19 +595,6 @@
                                                           ],
                                     "has_clone":  true
                                 },
-                    "Pl0000StateMachine":  {
-                                               "members":  [
-
-                                                           ],
-                                               "base_class":  "StateMachine",
-                                               "inherited_members":  {
-
-                                                                     },
-                                               "namespace":  "Client",
-                                               "has_create":  true,
-                                               "has_clone":  true,
-                                               "category":  "other"
-                                           },
                     "FreeCamera":  {
                                        "members":  [
 
@@ -697,24 +715,19 @@
                                            "has_clone":  true,
                                            "category":  "other"
                                        },
-                    "State2B_Idle":  {
-                                         "members":  [
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "",
-                                                             "name":  "m_EnterAnim",
-                                                             "type":  "unordered_set\u003cuint32\u003e"
-                                                         }
-                                                     ],
-                                         "base_class":  "State2B",
-                                         "inherited_members":  {
+                    "Pl0000StateMachine":  {
+                                               "members":  [
 
-                                                               },
-                                         "namespace":  "Client",
-                                         "has_create":  true,
-                                         "has_clone":  false,
-                                         "category":  "other"
-                                     },
+                                                           ],
+                                               "base_class":  "StateMachine",
+                                               "inherited_members":  {
+
+                                                                     },
+                                               "namespace":  "Client",
+                                               "has_create":  true,
+                                               "has_clone":  true,
+                                               "category":  "other"
+                                           },
                     "LoadingPixelPanel":  {
                                               "namespace":  "Engine",
                                               "base_class":  "UIObject",
@@ -994,19 +1007,19 @@
                                          "has_clone":  false,
                                          "category":  "level"
                                      },
-                    "Pl0000Body":  {
-                                       "members":  [
+                    "Pl0000":  {
+                                   "members":  [
 
-                                                   ],
-                                       "base_class":  "Pl0000Parts",
-                                       "inherited_members":  {
+                                               ],
+                                   "base_class":  "Entity",
+                                   "inherited_members":  {
 
-                                                             },
-                                       "namespace":  "Engine",
-                                       "has_create":  true,
-                                       "has_clone":  true,
-                                       "category":  "other"
-                                   },
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "WP3000Body":  {
                                        "members":  [
                                                        {

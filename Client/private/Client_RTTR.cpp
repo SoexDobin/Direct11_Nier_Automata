@@ -22,7 +22,8 @@
 #include "Pl0000Input.h"
 #include "Pl0000Movement.h"
 #include "WP3000Body.h"
-#include "EM3100.h"
+#include "Em3100.h"
+#include "Em3100Body.h"
 using rttr::registration;
 
 // ==============================================================
@@ -144,10 +145,15 @@ void Register_Client_Reflection() {
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
     // MONSTER
-    rttr::registration::class_<EM3100>("EM3100")
+    rttr::registration::class_<Em3100>("Em3100")
         .constructor<>()
-        .method("Clone", &EM3100::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return EM3100::Create(device, context); })
+        .method("Clone", &Em3100::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3100::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<Em3100Body>("Em3100Body")
+        .constructor<>()
+        .method("Clone", &Em3100Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3100Body::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
   // ==============================================================

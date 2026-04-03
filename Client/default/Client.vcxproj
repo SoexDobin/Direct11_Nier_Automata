@@ -185,7 +185,8 @@
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
-    <ClInclude Include="..\public\EM3100.h" />
+    <ClInclude Include="..\public\Em3100.h" />
+    <ClInclude Include="..\public\Em3100Body.h" />
     <ClInclude Include="..\public\Entity.h" />
     <ClInclude Include="..\public\FreeCamera.h" />
     <ClInclude Include="..\public\LevelGamePlay.h" />
@@ -235,7 +236,8 @@
     <ClCompile Include="..\private\CityOfRuins.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
-    <ClCompile Include="..\private\EM3100.cpp" />
+    <ClCompile Include="..\private\Em3100.cpp" />
+    <ClCompile Include="..\private\Em3100Body.cpp" />
     <ClCompile Include="..\private\Entity.cpp" />
     <ClCompile Include="..\private\FreeCamera.cpp" />
     <ClCompile Include="..\private\LevelGamePlay.cpp" />

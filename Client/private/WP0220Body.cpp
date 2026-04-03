@@ -15,8 +15,8 @@ WP0220Body::WP0220Body(const WP0220Body& rhs)
 
 HRESULT WP0220Body::Initialize_Prototype()
 {
-	m_LayerMask.Set_Layer(L"Player");
-	m_TagMask.Set_Tag({L"PlayerWeapon", L"" });
+	m_LayerMask.Set_Layer(L"PlayerWeapon");
+	m_TagMask.Set_Tag({L"PlayerWeapon" });
 
 	return Pl0000Parts::Initialize_Prototype();
 }

@@ -3,6 +3,7 @@
 
 #include <Game.h>
 #include <SpdLogger.h>
+#include <SphereCollider.h>
 
 #include "Shader.h"
 #include "Model.h"
@@ -30,6 +31,8 @@ Pl0000::Pl0000(const Pl0000& rhs)
 
 HRESULT Pl0000::Initialize_Prototype()
 {
+	m_LayerMask.Set_Layer(L"PlayerPhysical");
+
 	return ContainerObject::Initialize_Prototype();
 }
 
@@ -83,6 +86,7 @@ void Pl0000::Late_Update(Float timeDelta)
 	m_Pl0000Movement->Update_Movement(timeDelta);
 
 	m_Transform->Update_WorldMatrix();
+	m_PhysicalZone->Update(m_Transform->Get_WorldMatrix());
 }
 
 void Pl0000::Fixed_Update(Float fixedDelta)
@@ -98,6 +102,28 @@ HRESULT Pl0000::Render()
 void Pl0000::Submit_RenderGroup()
 {
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+}
+
+void Pl0000::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+	
+}
+
+void Pl0000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+	auto target = targetCollider->Get_Owner();
+	auto targetLayers = target->Get_LayerMask();
+	auto targetTags = target->Get_TagMask();
+
+	if (targetLayers.Has(L"Monster"))
+	{
+		Pullout(ownCollider, targetCollider, 1.0f);
+	}
+}
+
+void Pl0000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+	
 }
 
 HRESULT Pl0000::Ready_PartObjects()
@@ -183,6 +209,13 @@ HRESULT Pl0000::Ready_Components()
 
 	m_Pl0000Movement->Begin();
 	m_Pl0000Input->Begin();
+
+	SphereCollider::SPHERE_COLLIDER_DESC physicalZoneDesc{};
+	physicalZoneDesc.offset = Vector3::Zero;
+	physicalZoneDesc.radius = 1.f;
+	m_PhysicalZone = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &physicalZoneDesc);
+	if (nullptr == m_PhysicalZone)
+		return E_FAIL;
 
 	return S_OK;
 }

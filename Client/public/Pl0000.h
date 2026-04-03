@@ -6,6 +6,7 @@
 NS_BEGIN(Engine)
 	class Shader;
     class Model;
+    class SphereCollider;
 }
 
 NS_BEGIN(Client)
@@ -20,9 +21,9 @@ class CLIENT_DLL Pl0000 final : public Entity
 {
 	RTTR_ENABLE(Entity)
 public:
-    typedef struct tagPl0000Container : public ENTITY_CONTAINER {
+    typedef struct tagPl0000Container : public ENTITY_CONTAINER_DESC {
 
-    } PL0000_CONTAINER;
+    } PL0000_CONTAINER_DESC;
 
 public:
 	explicit Pl0000();
@@ -51,6 +52,11 @@ public:
     HRESULT Render() override;
     void Submit_RenderGroup() override;
 
+public:
+	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+    void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+    void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+
 private:
 
 private:
@@ -62,6 +68,7 @@ private:
     Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
+    Shared<SphereCollider> m_PhysicalZone{ nullptr };
 
 private:
     Matrix m_LightSheathMatrix{};

@@ -172,6 +172,12 @@ void MenuBar::Render(Bool isResize) {
                                 // 상호 양방향 충돌 스위치 동시 처리
                                 layerReg->Toggle_GlobalMask_Symmetric(rowBit, colBit);
                             }
+                            if (ImGui::IsItemHovered())
+                            {
+                                string rowName = activeLayers[row].second;
+                                string colName = activeLayers[layerCount - 1 - col].second;
+                                ImGui::SetTooltip("%s vs %s", rowName.c_str(), colName.c_str());
+                            }
                             ImGui::PopID();
                         }
                     }

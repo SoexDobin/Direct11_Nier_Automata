@@ -2,38 +2,38 @@
   "layers": [
     {
       "bit": 1,
-      "collision_mask": 4294967294,
+      "collision_mask": 4294967295,
       "name": "Default"
     },
     {
       "bit": 2,
-      "collision_mask": 4294967293,
+      "collision_mask": 4294967249,
       "name": "Player"
     },
     {
       "bit": 4,
-      "collision_mask": 4294967291,
-      "name": "Monster"
+      "collision_mask": 4294967201,
+      "name": "PlayerPhysical"
     },
     {
       "bit": 8,
-      "collision_mask": 4294967295,
-      "name": "LAYER3"
+      "collision_mask": 4294967249,
+      "name": "PlayerWeapon"
     },
     {
       "bit": 16,
-      "collision_mask": 4294967295,
-      "name": "LAYER4"
+      "collision_mask": 4294967259,
+      "name": "Monster"
     },
     {
       "bit": 32,
-      "collision_mask": 4294967295,
-      "name": "LAYER5"
+      "collision_mask": 4294967205,
+      "name": "MonsterPhysical"
     },
     {
       "bit": 64,
-      "collision_mask": 4294967295,
-      "name": "LAYER6"
+      "collision_mask": 4294967259,
+      "name": "Bullet"
     },
     {
       "bit": 128,

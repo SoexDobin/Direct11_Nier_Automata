@@ -574,7 +574,7 @@ void Game::Add_Collider(const Shared<class Collider>& collider) const
     m_CollisionManager->Add_Collider(collider);
 }
 
-void Game::Remove_Collider(class Collider* collider) const
+void Game::Remove_Collider(const Shared<class Collider>& collider) const
 {
     m_CollisionManager->Remove_Collider(collider);
 }

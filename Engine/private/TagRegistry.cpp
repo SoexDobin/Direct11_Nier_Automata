@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Game.h"
+#include "SpdLogger.h"
 
 
 void TagMask::Set_Tag(std::initializer_list<wstring> tags)
@@ -17,12 +18,24 @@ void TagMask::Set_Tag(std::initializer_list<wstring> tags)
 Bool TagMask::Has(const wstring& tagName) const
 {
     auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    if (tag == TAG::NONE)
+    {
+        LOG_ERROR(L"Wrong Tag Naming {}", tagName);
+        return false;
+    }
+
     return Has(tag);
 }
 
 void TagMask::Add(const wstring& tagName)
 {
     auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    if (tag == TAG::NONE)
+    {
+        LOG_ERROR(L"Wrong Tag Naming {}", tagName);
+        return;
+    }
+
     Add(tag);
 }
 
@@ -35,6 +48,12 @@ void TagMask::Add(std::initializer_list<wstring> tags)
 void TagMask::Remove(const wstring& tagName)
 {
     auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    if (tag == TAG::NONE)
+    {
+        LOG_ERROR(L"Wrong Tag Naming {}", tagName);
+    	return;
+    }
+		
     Remove(tag);
 }
 
@@ -61,7 +80,7 @@ TAG TagRegistry::Get_TagByName(const wstring &name) const {
     if (it != m_NameToTag.end())
 		return it->second;
 
-    return TAG::TAG_0;
+    return TAG::NONE;
 }
 
 void TagRegistry::Set_TagName(TAG tag, const wstring &name) {

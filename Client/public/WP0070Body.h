@@ -31,9 +31,9 @@ public:
 	void Submit_RenderGroup() override;
 
 public:
-	void OnCollisionEnter(const Shared<GameObject>& collision) override;
-	void OnCollisionStay(const Shared<GameObject>& collision) override;
-	void OnCollisionExit(const Shared<GameObject>& collision) override;
+	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 public:
 	TRANSFORM_FRAME Get_ModelTransform() const { return m_Model->Get_RootTransformVelocity(m_RootBoneIndex); }

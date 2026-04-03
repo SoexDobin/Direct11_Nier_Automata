@@ -38,7 +38,8 @@ namespace Client
 				{
 					m_MainCamera = camera;
 				}
-			});
+			}
+		);
 		
 
 		m_Body = static_pointer_cast<Pl0000Body>(m_Owner.lock()->Find_PartObject(L"Pl0000Body"));

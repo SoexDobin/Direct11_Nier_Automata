@@ -34,18 +34,18 @@ void CollisionManager::Add_Collider(const Shared<Collider>& collider)
 	m_Colliders.push_back(collider);
 }
 
-void CollisionManager::Remove_Collider(Collider* collider)
+void CollisionManager::Remove_Collider(const Shared<Collider>& collider)
 {
 	if (nullptr == collider) return;
 
 	for (auto& col : m_Colliders)
 	{
-		if (col && col.get() != collider)
+		if (col && col != collider)
 			col->Release_OverlapMember(collider);
 	}
 
 	auto iter = ranges::find_if(m_Colliders.begin(), m_Colliders.end(), [collider](const Shared<Collider>& col) {
-		return col.get() == collider;
+		return col == collider;
 	});
 	if (iter != m_Colliders.end())
 	{
@@ -53,7 +53,7 @@ void CollisionManager::Remove_Collider(Collider* collider)
 	}
 }
 
-void CollisionManager::Update_Collision()
+void CollisionManager::Update_Collision() const
 {
 	for (size_t i = 0; i < m_Colliders.size(); ++i)
 	{
@@ -89,29 +89,29 @@ void CollisionManager::Update_Collision()
 				srcCol->Set_IsColliding(true);
 				dstCol->Set_IsColliding(true);
 
-				if (!srcCol->Is_Overlapped(dstCol.get()))
+				if (!srcCol->Is_Overlapped(dstCol))
 				{
-					srcCol->Add_OverlapMember(dstCol.get());
-					srcOwner->OnCollisionEnter(dstOwner);
+					srcCol->Add_OverlapMember(dstCol);
+					srcOwner->OnCollisionEnter(srcCol, dstCol);
 
-					dstCol->Add_OverlapMember(srcCol.get());
-					dstOwner->OnCollisionEnter(srcOwner);
+					dstCol->Add_OverlapMember(srcCol);
+					dstOwner->OnCollisionEnter(dstCol, srcCol);
 				}
 				else
 				{
-					srcOwner->OnCollisionStay(dstOwner);
-					dstOwner->OnCollisionStay(srcOwner);
+					srcOwner->OnCollisionStay(srcCol, dstCol);
+					dstOwner->OnCollisionStay(dstCol, srcCol);
 				}
 			}
 			else
 			{
-				if (srcCol->Is_Overlapped(dstCol.get()))
+				if (srcCol->Is_Overlapped(dstCol))
 				{
-					srcCol->Release_OverlapMember(dstCol.get());
-					srcOwner->OnCollisionExit(dstOwner);
+					srcCol->Release_OverlapMember(dstCol);
+					srcOwner->OnCollisionExit(srcCol, dstCol);
 
-					dstCol->Release_OverlapMember(srcCol.get());
-					dstOwner->OnCollisionExit(srcOwner);
+					dstCol->Release_OverlapMember(srcCol);
+					dstOwner->OnCollisionExit(dstCol, srcCol);
 				}
 			}
 		}

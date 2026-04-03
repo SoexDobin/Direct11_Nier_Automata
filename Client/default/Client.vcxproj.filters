@@ -133,8 +133,8 @@
     <ClInclude Include="..\public\WP3000Body.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP3000</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\EM3100.h">
-      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
+    <ClInclude Include="..\public\Em3100.h">
+      <Filter>02. GameObject\Entity\Monster\EM3100</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MonsterStateMachine.h">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine</Filter>
@@ -145,7 +145,12 @@
     <ClInclude Include="..\public\StateMonster.h">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource.h">
+      <Filter>99. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3100Body.h">
+      <Filter>02. GameObject\Entity\Monster\EM3100\EM3100Parts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -286,8 +291,11 @@
     <ClCompile Include="..\private\StateMonster.cpp">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\EM3100.cpp">
-      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
+    <ClCompile Include="..\private\Em3100.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3100</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3100Body.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3100\EM3100Parts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -390,9 +398,6 @@
     <Filter Include="02. GameObject\Entity\Monster">
       <UniqueIdentifier>{c932032b-94df-43d7-9e98-c5d255458cae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Entity\Monster\em3100">
-      <UniqueIdentifier>{c3c42c52-488d-4b83-a482-e04b0167a700}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Entity\Monster\em3000">
       <UniqueIdentifier>{5ec70d50-6408-4c69-9e76-c0a13d4af7c9}</UniqueIdentifier>
     </Filter>
@@ -401,6 +406,12 @@
     </Filter>
     <Filter Include="02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState">
       <UniqueIdentifier>{dca5558f-5971-46b7-9026-fbf18f2d7a20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3100">
+      <UniqueIdentifier>{c3c42c52-488d-4b83-a482-e04b0167a700}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3100\EM3100Parts">
+      <UniqueIdentifier>{b7bc5419-8226-46d1-974d-20b77a8c2845}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -435,6 +446,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Client.rc" />
+    <ResourceCompile Include="Client.rc">
+      <Filter>99. Default</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

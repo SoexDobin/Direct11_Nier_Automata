@@ -39,6 +39,7 @@ public:
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
+	HRESULT Ready_AnimationNotify();
 
 public:
 	static Shared<WP0220Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

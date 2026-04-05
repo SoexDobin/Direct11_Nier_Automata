@@ -115,9 +115,9 @@ void Pl0000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<C
 	auto targetLayers = target->Get_LayerMask();
 	auto targetTags = target->Get_TagMask();
 
-	if (targetLayers.Has(L"Monster"))
+	if (targetLayers.Has(L"MonsterPhysical"))
 	{
-		Pullout(ownCollider, targetCollider, 1.0f);
+		m_Pl0000Movement->Add_Correction(PushoutDelta(ownCollider, targetCollider, 1.0f));
 	}
 }
 
@@ -132,11 +132,12 @@ HRESULT Pl0000::Ready_PartObjects()
 		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-30.f)) *
 		Matrix::CreateTranslation(Vector3{ 0.f, 1.5f, -0.4f });
 	m_HeavySheathMatrix = 
-		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-20.f)) *
+		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationY(XMConvertToRadians(-40.f))  * Matrix::CreateRotationZ(XMConvertToRadians(-20.f)) *
 		Matrix::CreateTranslation(Vector3{ 0.f, 1.0f, -0.5f });
 
 	Pl0000Body::Pl0000BODY_DESC desc{};
 	desc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
+	desc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
 
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000Body", L"Pl0000Body", &desc)))
 		return E_FAIL;
@@ -211,8 +212,8 @@ HRESULT Pl0000::Ready_Components()
 	m_Pl0000Input->Begin();
 
 	SphereCollider::SPHERE_COLLIDER_DESC physicalZoneDesc{};
-	physicalZoneDesc.offset = Vector3::Zero;
-	physicalZoneDesc.radius = 1.f;
+	physicalZoneDesc.offset = Vector3::UnitY;
+	physicalZoneDesc.radius = 0.75f;
 	m_PhysicalZone = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &physicalZoneDesc);
 	if (nullptr == m_PhysicalZone)
 		return E_FAIL;

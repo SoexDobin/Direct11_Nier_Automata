@@ -10,6 +10,7 @@ typedef struct ENGINE_DLL LayerMask final {
         : m_Layer(layerMask.m_Layer), m_Mask(layerMask.m_Mask) {}
 
     uint32 Get_Layer() const { return m_Layer; }
+    const wstring& Get_LayerName() const;
     void Set_Layer(const LAYER layer) { m_Layer = ETOI(layer); }
     void Set_Layer(const wstring& layerName);
     uint32 Get_Mask() const { return m_Mask; }

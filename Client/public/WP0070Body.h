@@ -43,14 +43,21 @@ public:
 	void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop) override;
 
 private:
+	void Active_LightWeapon();
+	void DeActive_LightWeapon();
+
+private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
+	HRESULT Ready_AnimationNotify();
 
 private:
 	int32 m_RootBoneIndex{};
 	int32 m_WeaponBoneIndex{};
 	Bool m_IsSheathing{ true };
 	Shared<OBBCollider> m_AttackCollider{ nullptr };
+	unordered_set<uint32> m_HitEntities;
+	
 
 public:
 	static Shared<WP0070Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -76,7 +83,7 @@ public:
 		LIGHT_AIR2			= 21,
 		LIGHT_AIR3			= 22,
 
-		LIGHT_COMBO			= 49
+		LIGHT_COMBO			= 45
 	};
 };
 
@@ -87,13 +94,13 @@ NS_END
 wp0070_0001.mot > 1
 wp0070_005a.mot > 2
 wp0070_005b.mot > 3
-wp0070_0100.mot > 4 (지상 1타)
-wp0070_0101.mot > 5 (지상 2타)
-wp0070_0102.mot > 6 (지상 3타)
-wp0070_0103.mot > 7 (지상 4타)
-wp0070_0104.mot > 8 (지상 5타)
-wp0070_0105.mot > 9 (지상 6타)
-wp0070_0106.mot > 10 (지상 7타)
+wp0070_0100.mot > 4
+wp0070_0101.mot > 5
+wp0070_0102.mot > 6
+wp0070_0103.mot > 7
+wp0070_0104.mot > 8
+wp0070_0105.mot > 9
+wp0070_0106.mot > 10 
 wp0070_0107.mot > 11
 wp0070_0108.mot > 12
 wp0070_0110.mot > 13

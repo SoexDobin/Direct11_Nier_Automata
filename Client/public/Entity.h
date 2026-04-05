@@ -15,11 +15,12 @@ public:
 public:
 	typedef struct tagDamageInfo
 	{
-		Float	damage{ 0.f };
-		Float	knockbackForce{ 0.f };
-		Vector3 attackerPos{ 0.f, 0.f, 0.f };
-		Vector3 knockBackDir{0.f, 0.f, 0.f };
-		uint32 groggyWeight{ 0 };
+		ATK_TYPE	attackType{ ATK_TYPE::END };
+		Float		damage{ 0.f };
+		Float		knockbackForce{ 0.f };
+		Vector3		attackerPos{ 0.f, 0.f, 0.f };
+		Vector3		knockBackDir{0.f, 0.f, 0.f };
+		uint32		groggyWeight{ 0 };
 	} DAMAGE_INFO;
 
 public:
@@ -34,7 +35,7 @@ public:
 public: /* Entity interface */
 	virtual void TakeDamage(const DAMAGE_INFO& dmgInfo);
 	virtual void OnDeath() {};
-	virtual void Pushout(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio = 1.f);
+	virtual Vector3 PushoutDelta(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio = 1.f);
 	virtual void Pullout(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio = 1.f);
 
 protected:

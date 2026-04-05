@@ -83,6 +83,11 @@ void Em3100::Submit_RenderGroup()
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
+void Em3100::TakeDamage(const DAMAGE_INFO& dmgInfo)
+{
+	Play_HitSFX(dmgInfo);
+}
+
 void Em3100::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	
@@ -103,6 +108,8 @@ HRESULT Em3100::Ready_PartObjects()
 {
 	Em3100Body::EM3100BODY_DESC em3100BodyDesc{};
 	em3100BodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
+	em3100BodyDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
+
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3100Body", L"Em3100Body", &em3100BodyDesc)))
 		return E_FAIL;
 
@@ -113,7 +120,7 @@ HRESULT Em3100::Ready_Components()
 {
 	SphereCollider::SPHERE_COLLIDER_DESC sphereDesc{};
 	sphereDesc.radius = 1.f;
-	sphereDesc.offset = Vector3::Zero;
+	sphereDesc.offset = Vector3::UnitY;
 	m_InteractionZone = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereDesc);
 	if (nullptr == m_InteractionZone)
 		return E_FAIL;

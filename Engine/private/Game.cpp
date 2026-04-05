@@ -546,12 +546,12 @@ void Game::PlaySoundLoopSection(const wstring& soundKey, SOUNDCHANNEL id, Float 
     m_SoundManager->PlaySoundLoopSection(soundKey, id, volume, loopStartMs, loopEndMs, playIntro);
 }
 
-HRESULT Game::StopSound(SOUNDCHANNEL targetChannel) const
+void Game::StopSound(SOUNDCHANNEL targetChannel) const
 {
     if (targetChannel == SOUNDCHANNEL::MAX_CHANNELS)
-        return m_SoundManager->StopAll();
+        m_SoundManager->StopAll();
     else
-        return m_SoundManager->StopChannel(targetChannel);
+        m_SoundManager->StopChannel(targetChannel);
 }
 
 HRESULT Game::Add_Instance_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const

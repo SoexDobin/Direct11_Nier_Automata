@@ -41,9 +41,10 @@ void SkyBox::Update(Float timeDelta)
 	Vector3 camPos{ 
 		GAME_INSTANCE->Get_CamTransform().x, 
 		GAME_INSTANCE->Get_CamTransform().y, 
-		GAME_INSTANCE->Get_CamTransform().z };
+		GAME_INSTANCE->Get_CamTransform().z 
+	};
 
-	m_Transform->Set_Position(camPos);
+	m_Transform->Set_LocalPosition(camPos);
 	m_Transform->Update_WorldMatrix();
 }
 

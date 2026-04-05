@@ -220,6 +220,7 @@ void Model::Update_ModelAnimation(Float timeDelta)
 	}
 
 	uint32 activeAnimIdx = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
+	
 	m_Tracker->Update(activeAnimIdx, Get_AnimationProgress());
 }
 
@@ -247,12 +248,35 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 
 void Model::Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const
 {
-	m_Tracker->Add_Notify(animIndex, notify);
+	if (animIndex >= m_Animations.size() || m_Tracker == nullptr)
+	{
+		LOG_ERROR(L"Failed to Add Animation Notify {} : {}", notify.notifyTag, animIndex);
+		return;
+	}
+
+	Float duration = m_Animations[animIndex]->Get_Duration();
+
+	if (duration <= 0.f)
+	{
+		duration = 1.f;
+	}
+
+	AnimationTracker::ANIMATION_TRACKER_NOTIFY trackerNotify;
+
+	trackerNotify.notifyTag = notify.notifyTag;
+	trackerNotify.type = notify.type;
+	trackerNotify.invokeProgress = notify.invokeFrame / duration;
+	trackerNotify.endProgress = notify.endFrame / duration;
+	trackerNotify.onNotify = notify.onNotify;
+	trackerNotify.onEndNotify = notify.onEndNotify;
+
+	m_Tracker->Add_Notify(animIndex, trackerNotify);
 }
 
 void Model::Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies) const
 {
-	m_Tracker->Add_Notify(animIndex, notifies);
+	for (auto notify : notifies)
+		Add_AnimNotify(animIndex, notify);
 }
 
 void Model::Clear_AnimNotifies() const

@@ -58,6 +58,8 @@ void State2B_Jump::Update(Float timeDelta)
 	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
 	moveData.isJump = true;
 	moveData.canRotation = true;
+	moveData.useRootMotionDir = false;
+
 
 	m_Movement.lock()->Set_MovementData(moveData);
 

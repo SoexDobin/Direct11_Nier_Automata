@@ -26,17 +26,17 @@ void Entity::TakeDamage(const DAMAGE_INFO& dmgInfo)
 	}
 }
 
-void Entity::Pushout(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio)
+Vector3 Entity::PushoutDelta(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio)
 {
 	Vector3 pushDir;
 	Float depth;
 
 	if (Calc_Penetration(ownCollider, targetCollider, pushDir, depth))
 	{
-		Vector3 newPos = m_Transform->Get_Position() + (pushDir * (depth * ratio));
-		newPos.y = m_Transform->Get_Position().y;
-		m_Transform->Set_Position(newPos);
+		return pushDir * (depth * ratio);
 	}
+
+	return Vector3::Zero;
 }
 
 void Entity::Pullout(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio)

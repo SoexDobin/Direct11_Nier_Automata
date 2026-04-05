@@ -1,6 +1,7 @@
 #include "AnimationTracker.h"
 
 #include "Game.h"
+#include "SpdLogger.h"
 
 AnimationTracker::AnimationTracker() : Component{} {}
 AnimationTracker::AnimationTracker(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -19,13 +20,13 @@ HRESULT AnimationTracker::Initialize(void* arg)
 }
 
 
-void AnimationTracker::Add_Notify(uint32 animIndex, const ANIMATION_NOTIFY& notify)
+void AnimationTracker::Add_Notify(uint32 animIndex, const ANIMATION_TRACKER_NOTIFY& notify)
 {
 	m_Notifies[animIndex].push_back(notify);
 	m_States[animIndex].push_back(false);
 }
 
-void AnimationTracker::Add_Notify(uint32 animIndex, std::initializer_list<ANIMATION_NOTIFY> notifies)
+void AnimationTracker::Add_Notify(uint32 animIndex, std::initializer_list<ANIMATION_TRACKER_NOTIFY> notifies)
 {
 	for (const auto& notify : notifies)
 		Add_Notify(animIndex, notify);
@@ -66,6 +67,7 @@ void AnimationTracker::Update(uint32 animIndex, Float progress)
 
 		if (NOTIFY_TYPE::POINT == notify.type)
 		{
+
 			if (false == notifyStates[i] && progress >= notify.invokeProgress)
 			{
 				if (notify.onNotify)

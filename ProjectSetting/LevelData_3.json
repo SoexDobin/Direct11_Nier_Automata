@@ -17,13 +17,13 @@
           "prototypeTag": "ThirdPersonCamera",
           "transform": {
             "position": [
-              7.376703262329102,
-              2.8175606727600098,
-              1.7651050090789795
+              0.0,
+              10.0,
+              -10.0
             ],
             "rotation": [
-              13.418737411499023,
-              -103.13771057128906,
+              44.99999237060547,
+              0.0,
               0.0
             ],
             "scale": [
@@ -42,11 +42,11 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Shader"
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Model"
             }
           ],
           "name": "CityOfRuins",
@@ -72,84 +72,6 @@
             ]
           },
           "typeName": "CityOfRuins"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "VICube"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "Texture"
-            }
-          ],
-          "name": "SkyBox",
-          "objectID": 545929098,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "SkyBox",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1000.0,
-              1000.0,
-              1000.0
-            ]
-          },
-          "typeName": "SkyBox"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            }
-          ],
-          "name": "Pl0000",
-          "objectID": 4267756554,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Pl0000",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Pl0000"
         },
         {
           "components": [
@@ -185,6 +107,76 @@
             ]
           },
           "typeName": "Em3100"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em3100_1",
+          "objectID": 1330530108,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em3100",
+          "transform": {
+            "position": [
+              -5.0,
+              0.0,
+              7.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em3100"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Pl0000",
+          "objectID": 4267756554,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Pl0000",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Pl0000"
         }
       ]
     }

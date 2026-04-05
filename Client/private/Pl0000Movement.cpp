@@ -125,6 +125,8 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 #endif
 	
 	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicsDelta;
+	nextPosition += m_CorrectionDelta;
+	Reset_Correction();
 
 	Float groundHeight = 0.f; // TODO Nav메시를 통한 y축 판별
 	if (nextPosition.y <= groundHeight) {

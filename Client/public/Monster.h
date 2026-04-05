@@ -32,6 +32,9 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
+protected:
+	void Play_HitSFX(const DAMAGE_INFO& dmgInfo) const;
+
 private:
 	Shared<MonsterStateMachine> m_States;
 	Weak<GameObject> m_TargetPlayer{};

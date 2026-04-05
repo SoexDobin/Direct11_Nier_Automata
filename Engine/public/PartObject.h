@@ -3,11 +3,14 @@
 
 NS_BEGIN(Engine)
 
+class ContainerObject;
+
 class ENGINE_DLL PartObject abstract : public GameObject
 {
 	RTTR_ENABLE(GameObject)
 public:
 	typedef struct tagPartObjectDesc : public GameObject::GAMEOBJECT_DESC {
+		Shared<ContainerObject> Owner{nullptr};
 		Matrix* parentMatrix;
 	} PARTOBJECT_DESC;
 
@@ -17,6 +20,9 @@ public:
 	explicit PartObject(const PartObject& rhs);
 	virtual ~PartObject() override = default;
 	
+public:
+	Shared<ContainerObject> Get_Owner() const { return m_Owner.lock(); }
+
 public:
 	GAMEOBJECTTYPE Get_GameObjectType() final { return GAMEOBJECTTYPE::PART; }
 	HRESULT Initialize_Prototype() override;
@@ -39,6 +45,7 @@ public:
 	}
 
 protected:
+	Weak<ContainerObject> m_Owner{};
 	Matrix*			m_ParentMatrix{ nullptr };
 	Matrix			m_CombinedWorldMatrix{};
 

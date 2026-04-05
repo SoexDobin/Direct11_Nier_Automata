@@ -7,6 +7,130 @@
         {
             "path": "Sound/Core_GameTitle_Intro.wav",
             "tag": "Title_Intro"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_01.wav",
+            "tag": "Wp0070_Swing1"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_02.wav",
+            "tag": "Wp0070_Swing2"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_03_throw.wav",
+            "tag": "Wp0070_Throw3"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_03_catch.wav",
+            "tag": "Wp0070_Catch3"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_04_throw.wav",
+            "tag": "Wp0070_Throw4"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_04_catch.wav",
+            "tag": "Wp0070_Catch4"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_05_throw.wav",
+            "tag": "Wp0070_Throw5"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_05_return.wav",
+            "tag": "Wp0070_Return5"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_06.wav",
+            "tag": "Wp0070_Swing6"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_06_catch.wav",
+            "tag": "Wp0070_Catch6"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_06_return.wav",
+            "tag": "Wp0070_Return6"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_07_throw.wav",
+            "tag": "Wp0070_Throw7"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_swing_07_impact.wav",
+            "tag": "Wp0070_Impact7"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_hold_01.wav",
+            "tag": "Wp0070_Hold1"
+        },
+        {
+            "path": "Sound/wpf000/wpf000_hold_02.wav",
+            "tag": "Wp0070_Hold2"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_swing_01.wav",
+            "tag": "Wp0220_Swing1_1"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_swing_02.wav",
+            "tag": "Wp0220_Swing1_2"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_swing2_01.wav",
+            "tag": "Wp0220_Swing2_1"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_swing3_01.wav",
+            "tag": "Wp0220_Swing3_1"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_swing3_02.wav",
+            "tag": "Wp0220_Swing3_2"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_swing3_03.wav",
+            "tag": "Wp0220_Swing3_3"
+        },
+        {
+            "path": "Sound/Hit/sword_hit1.wav",
+            "tag": "SwordHit1"
+        },
+        {
+            "path": "Sound/Hit/sword_hit2.wav",
+            "tag": "SwordHit2"
+        },
+        {
+            "path": "Sound/Hit/sword_hit3.wav",
+            "tag": "SwordHit3"
+        },
+        {
+            "path": "Sound/Hit/sword_hit4.wav",
+            "tag": "SwordHit4"
+        },
+        {
+            "path": "Sound/Hit/sword_hit5.wav",
+            "tag": "SwordHit5"
+        },
+        {
+            "path": "Sound/Hit/big_sword_hit1.wav",
+            "tag": "BigSwordHit1"
+        },
+        {
+            "path": "Sound/Hit/big_sword_hit2.wav",
+            "tag": "BigSwordHit2"
+        },
+        {
+            "path": "Sound/Hit/big_sword_hit3.wav",
+            "tag": "BigSwordHit3"
+        },
+        {
+            "path": "Sound/Hit/big_sword_hit4.wav",
+            "tag": "BigSwordHit4"
+        },
+        {
+            "path": "Sound/Hit/big_sword_hit5.wav",
+            "tag": "BigSwordHit5"
         }
     ]
 }

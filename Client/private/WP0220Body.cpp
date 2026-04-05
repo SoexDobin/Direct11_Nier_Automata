@@ -32,6 +32,12 @@ HRESULT WP0220Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	if (FAILED(Ready_AnimationNotify()))
+	{
+		LOG_ERROR(L"Failed To Ready Animation Notify : WP0220Body");
+		return E_FAIL;
+	}
+
 	m_RootBoneIndex = m_Model->Get_BoneIndexByName("wp0220");
 	m_WeaponBoneIndex = m_Model->Get_BoneIndexByName("bone0");
 	if (m_RootBoneIndex == -1)
@@ -63,9 +69,6 @@ void WP0220Body::Update(Float timeDelta)
 	{
 		TRANSFORM_FRAME rootVelocity = m_Model->Get_RootTransformVelocity(m_WeaponBoneIndex);
 
-		Vector3 localPos = m_Transform->Get_Position();
-		localPos += Vector3{ rootVelocity.position.x, rootVelocity.position.y, rootVelocity.position.z };
-		m_Transform->Set_Position(localPos);
 	}
 }
 
@@ -112,7 +115,8 @@ void WP0220Body::Set_Sheathing(const Matrix& sheathMatrix)
 {
 	if (m_IsSheathing) return;
 
-	m_Model->Set_Animation(ETOI(WP0220_STATE::SHEATHE_HEAVY), 0.05f);
+	m_Model->Set_Animation(ETOI(WP0220_STATE::SHEATHE_HEAVY), 0);
+	m_Model->Set_AnimLoop(false);
 	m_Transform->Set_WorldMatrix(sheathMatrix);
 	m_IsSheathing = true;
 }
@@ -177,6 +181,34 @@ HRESULT WP0220Body::Ready_Components()
 	m_AttackCollider = Add_Component<OBBCollider>(ETOI(LEVEL::STATIC), &colDesc);
 	if (nullptr == m_AttackCollider)
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT WP0220Body::Ready_AnimationNotify()
+{
+	using Notify = AnimationTracker::ANIMATION_NOTIFY;
+
+	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND1), {
+	Notify{ L"Wp0220_Stop1", 30, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Swing1_1", 30, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing1_1", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+	Notify{ L"Wp0220_Stop2", 60, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Swing1_2", 60, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing1_2", SOUNDCHANNEL::CHANNEL_12, 0.5f); } }
+		});
+
+	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND2), {
+	Notify{ L"Wp0220_Stop1", 65, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Swing2_1", 65, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing2_1", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		});
+
+	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND3), {
+	Notify{ L"Wp0220_Stop1", 45, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Swing3_1", 45, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing3_1", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+	Notify{ L"Wp0220_Stop2", 65, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Swing3_2", 65, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing3_2", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+	Notify{ L"Wp0220_Stop3", 108, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Swing3_3", 108, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing3_3", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		});
 
 	return S_OK;
 }

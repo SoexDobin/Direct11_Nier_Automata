@@ -121,7 +121,7 @@ void State2B_Dash::Update(Float timeDelta)
 			break;
 		}
 	}
-	else if (m_DashAnim.contains(curIndex) && isAnimFinished)
+	else if (m_DashAnim.contains(curIndex) && dashProgress >= 0.7f)
 	{
 		if (!input->Is_WASD_NoneOrUp())
 		{

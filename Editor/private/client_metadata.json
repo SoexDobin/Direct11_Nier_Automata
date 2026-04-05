@@ -610,7 +610,12 @@
                                    },
                     "WP0070Body":  {
                                        "members":  [
-
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "",
+                                                           "name":  "m_HitEntities",
+                                                           "type":  "unordered_set\u003cuint32\u003e"
+                                                       }
                                                    ],
                                        "base_class":  "Pl0000Parts",
                                        "inherited_members":  {

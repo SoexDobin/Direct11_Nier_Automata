@@ -160,7 +160,7 @@ public: /* For SoundManager */
     void PlaySoundFX(const wstring& soundKey, SOUNDCHANNEL id, Float volume = -1.f) const;
     void PlaySoundFXOnce(const wstring& soundKey, SOUNDCHANNEL id, Float volume = -1.f) const;
     void PlaySoundLoopSection(const wstring& soundKey, SOUNDCHANNEL id, Float volume, uint32 loopStartMs, uint32 loopEndMs, Bool playIntro) const;
-    HRESULT StopSound(SOUNDCHANNEL targetChannel = SOUNDCHANNEL::MAX_CHANNELS) const;
+    void StopSound(SOUNDCHANNEL targetChannel = SOUNDCHANNEL::MAX_CHANNELS) const;
 
 public: /* For EventManager*/ 
     HRESULT Add_Instance_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const;

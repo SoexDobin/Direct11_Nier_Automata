@@ -5,7 +5,6 @@ NS_BEGIN(Engine)
 class Model;
 class Shader;
 class SphereCollider;
-class AABBCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -34,6 +33,9 @@ public:
 	void Fixed_Update(Float fixedDelta) override;
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
+
+public:
+	void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
 
 public:
 	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;

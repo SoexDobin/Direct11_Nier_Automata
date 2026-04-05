@@ -2,6 +2,7 @@
 #include "Monster.h"
 
 #include <Game.h>
+#include <Random_Helper.h>
 #include <Transform.h>
 
 #include "SpdLogger.h"
@@ -72,5 +73,43 @@ HRESULT Monster::Render()
 
 void Monster::Submit_RenderGroup()
 {
+}
+
+void Monster::Play_HitSFX(const DAMAGE_INFO& dmgInfo) const
+{
+	switch (int32 rand = Helper::Random_Int(0, 4))
+	{
+	case 0:
+		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit1", SOUNDCHANNEL::CHANNEL_20, 0.5f);
+		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit1", SOUNDCHANNEL::CHANNEL_20, 0.5f);
+		break;
+	case 1:
+		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit2", SOUNDCHANNEL::CHANNEL_21, 0.5f);
+		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit2", SOUNDCHANNEL::CHANNEL_21, 0.5f);
+		break;
+	case 2:
+		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit3", SOUNDCHANNEL::CHANNEL_22, 0.5f);
+		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit3", SOUNDCHANNEL::CHANNEL_22, 0.5f);
+		break;
+	case 3:
+		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit4", SOUNDCHANNEL::CHANNEL_23, 0.5f);
+		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit4", SOUNDCHANNEL::CHANNEL_23, 0.5f);
+		break;
+	default:
+		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit5", SOUNDCHANNEL::CHANNEL_24, 0.5f);
+		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit5", SOUNDCHANNEL::CHANNEL_24, 0.5f);
+		break;
+	}
+	
 }
 

@@ -28,7 +28,7 @@ public:
 	Bool Intersect(const Shared<Collider>& target) override;
 	const BoundingBox& Get_Bounding() const { return m_Transformed; }
 	Vector3 Get_CurrentExtends() const { return m_Transformed.Extents; }
-
+	Vector3 ClosestPoint(const Vector3& point) override;
 	void Set_Extents(const Vector3& extents) { m_Original.Extents = extents; }
 	virtual Vector3 Get_Pivot() const override { return m_Transformed.Center; }
 	

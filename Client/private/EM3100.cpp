@@ -86,6 +86,7 @@ void Em3100::Submit_RenderGroup()
 void Em3100::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
 	Play_HitSFX(dmgInfo);
+	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
 }
 
 void Em3100::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)

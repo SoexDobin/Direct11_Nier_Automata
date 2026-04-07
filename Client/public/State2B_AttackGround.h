@@ -39,6 +39,7 @@ private:
 	unordered_set<uint32> m_EnterAnim;
 
 	Bool m_IsHeavyCharge{};
+	Bool m_IsChargeEnd{};
 	Float m_HeavyChargeDelta{};
 
 	const uint32 LIGHT_BODY[7] = {

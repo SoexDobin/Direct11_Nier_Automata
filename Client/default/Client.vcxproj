@@ -181,6 +181,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\Bullet.h" />
     <ClInclude Include="..\public\CityOfRuins.h" />
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
@@ -202,14 +203,17 @@
     <ClInclude Include="..\public\Monster.h" />
     <ClInclude Include="..\public\MonsterStateMachine.h" />
     <ClInclude Include="..\public\Movement.h" />
+    <ClInclude Include="..\public\ParticleEffect.h" />
     <ClInclude Include="..\public\Pl0000.h" />
     <ClInclude Include="..\public\Pl0000Body.h" />
     <ClInclude Include="..\public\Pl0000Input.h" />
     <ClInclude Include="..\public\Pl0000Parts.h" />
     <ClInclude Include="..\public\Pl0000StateMachine.h" />
     <ClInclude Include="..\public\Pl0000Movement.h" />
+    <ClInclude Include="..\public\Projectile.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\SkySphere.h" />
+    <ClInclude Include="..\public\SparkEffect.h" />
     <ClInclude Include="..\public\State.h" />
     <ClInclude Include="..\public\State2B.h" />
     <ClInclude Include="..\public\State2B_AttackAir.h" />
@@ -233,6 +237,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\CityOfRuins.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
@@ -253,14 +258,17 @@
     <ClCompile Include="..\private\Monster.cpp" />
     <ClCompile Include="..\private\MonsterStateMachine.cpp" />
     <ClCompile Include="..\private\Movement.cpp" />
+    <ClCompile Include="..\private\ParticleEffect.cpp" />
     <ClCompile Include="..\private\Pl0000.cpp" />
     <ClCompile Include="..\private\Pl0000Body.cpp" />
     <ClCompile Include="..\private\Pl0000Input.cpp" />
     <ClCompile Include="..\private\Pl0000Parts.cpp" />
     <ClCompile Include="..\private\P10000StateMachine.cpp" />
     <ClCompile Include="..\private\Pl0000Movement.cpp" />
+    <ClCompile Include="..\private\Projectile.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
+    <ClCompile Include="..\private\SparkEffect.cpp" />
     <ClCompile Include="..\private\State.cpp" />
     <ClCompile Include="..\private\State2B.cpp" />
     <ClCompile Include="..\private\State2B_AttackAir.cpp" />
@@ -294,6 +302,8 @@
     <FxCompile Include="..\bin\shaders\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxNormTex.hlsl" />
+    <FxCompile Include="..\bin\shaders\Shader_VtxParticlePoint.hlsl" />
+    <FxCompile Include="..\bin\shaders\Shader_VtxParticleRect.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxSphere.hlsl" />
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl" />
   </ItemGroup>

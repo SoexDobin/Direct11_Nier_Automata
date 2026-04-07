@@ -34,13 +34,14 @@ public:
 
 protected:
 	void Play_HitSFX(const DAMAGE_INFO& dmgInfo) const;
+	void DisplaySparkEffect(ATK_TYPE atkType, Vector3 position, Quaternion rotation = { 0.f, 0.f, 0.f, 1.f }) const;
 
 private:
 	Shared<MonsterStateMachine> m_States;
 	Weak<GameObject> m_TargetPlayer{};
 
 public:
-	virtual Shared<GameObject> Clone(void* arg) PURE;
+	virtual Shared<GameObject> Clone(void* arg) override PURE;
 };
 
 NS_END

@@ -18,6 +18,10 @@ public:
 		ATK_TYPE	attackType{ ATK_TYPE::END };
 		Float		damage{ 0.f };
 		Float		knockbackForce{ 0.f };
+
+		Vector3		hitPosition{ 0.f, 0.f, 0.f };
+		Quaternion	hitRotation{ 0.f, 0.f, 0.f, 1.f };
+
 		Vector3		attackerPos{ 0.f, 0.f, 0.f };
 		Vector3		knockBackDir{0.f, 0.f, 0.f };
 		uint32		groggyWeight{ 0 };
@@ -45,7 +49,7 @@ protected:
 	Bool Is_Invincible() const { return m_IsInvincible; }
 	void Set_Invincible(Bool isInvincible) { m_IsInvincible = isInvincible; }
 
-private:
+public: // Utility
 	Bool Calc_Penetration(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Vector3& outDir, Float& outDepth);
 	Float Get_RadiusByColliderType(const Shared<Collider>& collider, const Vector3 colDirection);
 

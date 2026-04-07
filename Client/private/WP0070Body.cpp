@@ -122,32 +122,27 @@ void WP0070Body::OnCollisionEnter(const Shared<Collider>& ownCollider, const Sha
 void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	if (!m_AttackCollider->Is_Active()) return;
-	
-	
+
 	auto target = targetCollider->Get_Owner();
-	LOG_INFO(L"{}", target->Get_Name());
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
-
-	if (target->Get_LayerMask().Get_LayerName() != L"Monster")
-	{
-		LOG_INFO(L"-> 레이어가 Monster가 아닙니다. 반환됨. {}", ETOI(target->Get_LayerMask().Get_Layer()));
-		return;
-	}
-
-
 	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
 
 	uint32 targetID = target->Get_ObjectID();
 	if (m_HitEntities.contains(targetID) == false)
 	{
 		m_HitEntities.insert(targetID);
-		
+
+		Vector3 boneScale{};
+		Quaternion boneQuat{};
+		Vector3 boneTranslation{};
+		m_Model->Get_BoneMatrix(m_WeaponBoneIndex).Decompose(boneScale, boneQuat, boneTranslation);
+
 		Entity::DAMAGE_INFO dmgInfo{};
 		dmgInfo.attackType = ATK_TYPE::LIGHT;
+		dmgInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
+		dmgInfo.hitRotation = m_AttackCollider->Get_CurrentOrientation();
 
-		
 		auto mon = static_pointer_cast<PartObject>(target)->Get_Owner();
-
 		static_pointer_cast<Monster>(mon)->TakeDamage(dmgInfo);
 	}
 }
@@ -330,7 +325,17 @@ HRESULT WP0070Body::Ready_AnimationNotify()
 		Notify{L"Hold", 59, active },
 		});
 
-	
+	m_Model->Add_AnimNotify(ETOI(WP0070_STATE::LIGHT_COMBO), {
+	Notify{ L"Sound_Stop", 10, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
+	Notify{ L"Sound_Swing", 10, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Swing1", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
+	Notify{ L"Sound_Stop", 25, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
+	Notify{ L"Sound_Swing", 25, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Swing2", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
+	Notify{ L"Sound_Stop", 60, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
+	Notify{ L"Sound_Swing", 60, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Hold2", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
+		Notify{L"Combo", 10, 70, active, deActive },
+		Notify{L"Combo", 25, active },
+		Notify{L"Combo", 60, active },
+		});
 
 	return S_OK;
 }

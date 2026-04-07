@@ -42,6 +42,7 @@ public:
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
+	HRESULT Ready_AnimationNotify();
 
 private:
 	int32 m_RootBoneIndex{};

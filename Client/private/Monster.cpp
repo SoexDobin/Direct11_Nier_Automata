@@ -5,6 +5,7 @@
 #include <Random_Helper.h>
 #include <Transform.h>
 
+#include "SparkEffect.h"
 #include "SpdLogger.h"
 
 Monster::Monster() : Entity{} {}
@@ -80,36 +81,60 @@ void Monster::Play_HitSFX(const DAMAGE_INFO& dmgInfo) const
 	switch (int32 rand = Helper::Random_Int(0, 4))
 	{
 	case 0:
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_20);
 		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
-			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit1", SOUNDCHANNEL::CHANNEL_20, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit1", SOUNDCHANNEL::CHANNEL_20, 0.3f);
 		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
-			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit1", SOUNDCHANNEL::CHANNEL_20, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit1", SOUNDCHANNEL::CHANNEL_20, 0.3f);
+		else if (dmgInfo.attackType == ATK_TYPE::POD)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BulletHit1", SOUNDCHANNEL::CHANNEL_20, 0.3f);
 		break;
 	case 1:
-		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
-			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit2", SOUNDCHANNEL::CHANNEL_21, 0.5f);
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_21);
+		if (dmgInfo.attackType == ATK_TYPE::LIGHT )
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit2", SOUNDCHANNEL::CHANNEL_21, 0.3f);
 		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
-			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit2", SOUNDCHANNEL::CHANNEL_21, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit2", SOUNDCHANNEL::CHANNEL_21, 0.3f);
+		else if (dmgInfo.attackType == ATK_TYPE::POD)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BulletHit2", SOUNDCHANNEL::CHANNEL_21, 0.3f);
 		break;
 	case 2:
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_22);
 		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
-			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit3", SOUNDCHANNEL::CHANNEL_22, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit3", SOUNDCHANNEL::CHANNEL_22, 0.3f);
 		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
-			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit3", SOUNDCHANNEL::CHANNEL_22, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit3", SOUNDCHANNEL::CHANNEL_22, 0.3f);
+		else if (dmgInfo.attackType == ATK_TYPE::POD)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BulletHit3", SOUNDCHANNEL::CHANNEL_22, 0.3f);
 		break;
 	case 3:
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_23);
 		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
-			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit4", SOUNDCHANNEL::CHANNEL_23, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit4", SOUNDCHANNEL::CHANNEL_23, 0.3f);
 		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
-			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit4", SOUNDCHANNEL::CHANNEL_23, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit4", SOUNDCHANNEL::CHANNEL_23, 0.3f);
+		else if (dmgInfo.attackType == ATK_TYPE::POD)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BulletHit4", SOUNDCHANNEL::CHANNEL_23, 0.3f);
 		break;
 	default:
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_24);
 		if (dmgInfo.attackType == ATK_TYPE::LIGHT)
-			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit5", SOUNDCHANNEL::CHANNEL_24, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"SwordHit5", SOUNDCHANNEL::CHANNEL_24, 0.3f);
 		else if (dmgInfo.attackType == ATK_TYPE::HEAVY)
-			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit5", SOUNDCHANNEL::CHANNEL_24, 0.5f);
+			GAME_INSTANCE->PlaySoundFXOnce(L"BigSwordHit5", SOUNDCHANNEL::CHANNEL_24, 0.3f);
+		else if (dmgInfo.attackType == ATK_TYPE::POD)
+			GAME_INSTANCE->PlaySoundFXOnce(L"BulletHit1", SOUNDCHANNEL::CHANNEL_24, 0.3f);
 		break;
 	}
 	
+}
+
+void Monster::DisplaySparkEffect(ATK_TYPE atkType, Vector3 position, Quaternion rotation) const
+{
+	SparkEffect::SPARK_EFFECT_DESC sparkDesc{};
+	sparkDesc.atkType = atkType;
+	sparkDesc.position = position;
+	sparkDesc.rotation = rotation;
+	GAME_INSTANCE->Instantiate<SparkEffect>(L"SparkEffect", ETOI(LEVEL::GAMEPLAY), &sparkDesc);
 }
 

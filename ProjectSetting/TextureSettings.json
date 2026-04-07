@@ -41,6 +41,18 @@
             "level": "STATIC",
             "path": "Sky/CubeMap4.dds",
             "tag": "Skybox_Default"
+        },
+        {
+            "count": 30,
+            "level": "GAMEPLAY",
+            "path": "Texture/Effect/Spark/Spark_%d.dds",
+            "tag": "Effect_Spark"
+        },
+        {
+            "count": 30,
+            "level": "GAMEPLAY",
+            "path": "Texture/Effect/Spark2/Spark2_%d.dds",
+            "tag": "Effect_Spark2"
         }
     ]
 }

@@ -147,6 +147,7 @@ void CollisionManager::Render_Debug() const
 	m_Effect->SetView(GAME_INSTANCE->Get_Transform(D3DTS::VIEW));
 	m_Effect->SetProjection(GAME_INSTANCE->Get_Transform(D3DTS::PROJ));
 
+	m_Context->GSSetShader(nullptr, nullptr, 0);
 	m_Context->IASetInputLayout(m_InputLayout.Get());
 
 	m_Effect->Apply(m_Context.Get());

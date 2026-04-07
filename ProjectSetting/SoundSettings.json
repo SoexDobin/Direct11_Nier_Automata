@@ -131,6 +131,62 @@
         {
             "path": "Sound/Hit/big_sword_hit5.wav",
             "tag": "BigSwordHit5"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_hammer.wav",
+            "tag": "Wp0220_Hammer"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_charge_impact.wav",
+            "tag": "Wp0220_Charge_Impact"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_charge_swing_01.wav",
+            "tag": "Wp0220_Charge_Swing1"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_charge_swing_02.wav",
+            "tag": "Wp0220_Charge_Swing2"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_charge_swing_03.wav",
+            "tag": "Wp0220_Charge_Swing3"
+        },
+        {
+            "path": "Sound/wpf200/wpf200_charge_swing_04.wav",
+            "tag": "Wp0220_Charge_Swing4"
+        },
+        {
+            "path": "Sound/pl0000/charge/charge_start.wav",
+            "tag": "Pl_Charge_Start"
+        },
+        {
+            "path": "Sound/pl0000/charge/charge_end.wav",
+            "tag": "Pl_Charge_End"
+        },
+        {
+            "path": "Sound/pl0000/charge/charge_loop.wav",
+            "tag": "Pl_Charge_Loop"
+        },
+        {
+            "path": "Sound/wp3000/wp3000_valcan_shot.wav",
+            "tag": "Wp3000_Shot"
+        },
+        {
+            "path": "Sound/Hit/bullet_hit1.wav",
+            "tag": "BulletHit1"
+        },
+        {
+            "path": "Sound/Hit/bullet_hit2.wav",
+            "tag": "BulletHit2"
+        },
+        {
+            "path": "Sound/Hit/bullet_hit3.wav",
+            "tag": "BulletHit3"
+        },
+        {
+            "path": "Sound/Hit/bullet_hit4.wav",
+            "tag": "BulletHit4"
         }
     ]
 }

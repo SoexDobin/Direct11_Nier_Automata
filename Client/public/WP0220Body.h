@@ -30,6 +30,15 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
+private:
+	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+
+private:
+	void Active_LightWeapon();
+	void DeActive_LightWeapon();
+
 public:
 	void Set_Sheathing(const Matrix& sheathMatrix);
 	void DrawWP0220();
@@ -50,6 +59,7 @@ private:
 	int32 m_WeaponBoneIndex{};
 	Bool m_IsSheathing{ true };
 	Shared<OBBCollider> m_AttackCollider{nullptr};
+	unordered_set<uint32> m_HitEntities;
 
 public:
 	enum class WP0220_STATE {

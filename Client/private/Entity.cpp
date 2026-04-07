@@ -101,7 +101,7 @@ Float Entity::Get_RadiusByColliderType(const Shared<Collider>& collider, const V
 	if (colType == COLLIDER_TYPE::OBB)
 	{
 #ifdef _DEBUG
-		LOG_DEBUG(L"Use OBB Collider Compare Are You Sure?");
+		//LOG_DEBUG(L"Use OBB Collider Compare Are You Sure?");
 #endif
 		auto obb = static_pointer_cast<OBBCollider>(collider);
 

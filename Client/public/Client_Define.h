@@ -10,7 +10,7 @@
 namespace Client
 {
 	enum class LEVEL { STATIC, LOADING, TITLE, GAMEPLAY, LEVEL_END };
-	enum class ATK_TYPE { LIGHT, HEAVY, END };
+	enum class ATK_TYPE { LIGHT, HEAVY, POD, END };
 
 	constexpr const Char* WorldMatrix = "g_WorldMatrix";
 	constexpr const Char* ViewMatrix = "g_ViewMatrix";

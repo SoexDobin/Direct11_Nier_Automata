@@ -24,6 +24,9 @@
 #include "WP3000Body.h"
 #include "Em3100.h"
 #include "Em3100Body.h"
+#include "SparkEffect.h"
+#include "Bullet.h"
+
 using rttr::registration;
 
 // ==============================================================
@@ -154,6 +157,20 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Em3100Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3100Body::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    // Projectile
+    rttr::registration::class_<Bullet>("Bullet")
+        .constructor<>()
+        .method("Clone", &Bullet::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Bullet::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    // Effect
+    rttr::registration::class_<SparkEffect>("SparkEffect")
+        .constructor<>()
+        .method("Clone", &SparkEffect::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SparkEffect::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
   // ==============================================================

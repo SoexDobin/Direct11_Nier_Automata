@@ -30,6 +30,7 @@ public:
 	virtual Vector3 Get_Pivot() const override { return m_Transformed.Center; }
 	Vector3 Get_CurrentExtends() const { return m_Transformed.Extents; }
 	Quaternion Get_CurrentOrientation() const { return m_Transformed.Orientation; }
+	Vector3 ClosestPoint(const Vector3& point) override;
 
 	Vector3 Get_Extents() const { return m_Original.Extents; }
 	void Set_Extents(const Vector3& extents) { m_Original.Extents = extents; }

@@ -33,6 +33,12 @@ HRESULT Pl0000Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	if (FAILED(Ready_AnimationNotify()))
+	{
+		LOG_ERROR(L"Failed To Ready_AnimationNotify : Pl0000Body");
+		return E_FAIL;
+	}
+
 	m_RootBoneIndex = m_Model->Get_BoneIndexByName("pl0000");
 	
 	if (m_RootBoneIndex == -1)
@@ -137,6 +143,12 @@ HRESULT Pl0000Body::Ready_Components()
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT Pl0000Body::Ready_AnimationNotify()
+{
 
 	return S_OK;
 }

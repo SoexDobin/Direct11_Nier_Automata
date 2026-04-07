@@ -151,6 +151,18 @@
     <ClInclude Include="..\public\Em3100Body.h">
       <Filter>02. GameObject\Entity\Monster\EM3100\EM3100Parts</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SparkEffect.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ParticleEffect.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Projectile.h">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bullet.h">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -297,6 +309,18 @@
     <ClCompile Include="..\private\Em3100Body.cpp">
       <Filter>02. GameObject\Entity\Monster\EM3100\EM3100Parts</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\SparkEffect.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ParticleEffect.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile.cpp">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bullet.cpp">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -413,6 +437,9 @@
     <Filter Include="02. GameObject\Entity\Monster\EM3100\EM3100Parts">
       <UniqueIdentifier>{b7bc5419-8226-46d1-974d-20b77a8c2845}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect">
+      <UniqueIdentifier>{ae9e970c-e8b9-461e-b50d-496bf13fc6f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl">
@@ -431,6 +458,12 @@
       <Filter>97. Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\bin\shaders\Shader_VtxSphere.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\shaders\Shader_VtxParticlePoint.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\shaders\Shader_VtxParticleRect.hlsl">
       <Filter>97. Shader</Filter>
     </FxCompile>
   </ItemGroup>

@@ -23,6 +23,7 @@ public:
 	const Vector3& Get_Offset() const { return m_Offset; }
 	virtual void Set_Offset(const Vector3& offset) { m_Offset = offset; }
 	virtual Vector3 Get_Pivot() const PURE;
+	virtual Vector3 ClosestPoint(const Vector3& point) PURE;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -51,7 +52,7 @@ protected:
 	unordered_set<Collider*> m_OverlapMembers;
 
 public:
-	Shared<Component> Clone(void* arg = nullptr) PURE;
+	Shared<Component> Clone(void* arg = nullptr) override PURE;
 
 };
 

@@ -175,6 +175,9 @@
     <Filter Include="01. Utility\05. Component\Model\AnimationNotify">
       <UniqueIdentifier>{153143a6-4bd7-41c7-9f50-4a16074c94d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer\Instance">
+      <UniqueIdentifier>{871c6f93-4aec-4e5c-a06d-6084ae6b8c44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -388,6 +391,15 @@
     </ClInclude>
     <ClInclude Include="..\public\AnimationTracker.h">
       <Filter>01. Utility\05. Component\Model\AnimationNotify</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Instance.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Particle_Point.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Particle_Rect.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -617,6 +629,21 @@
       <Filter>01. Utility\05. Component\Model\AnimationNotify</Filter>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\AnimationTracker_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Instance.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Particle_Point.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Particle_Rect.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Point_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Rect_rttr.cpp">
       <Filter>96. RTTR</Filter>
     </ClCompile>
   </ItemGroup>

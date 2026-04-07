@@ -7,7 +7,7 @@
 #include "Game.h"
 #include "SpdLogger.h"
 
-const wstring& LayerMask::Get_LayerName() const
+wstring LayerMask::Get_LayerName() const
 {
     return GAME_INSTANCE->Get_LayerRegister()->Get_LayerName(m_Layer);
 }

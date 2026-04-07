@@ -72,9 +72,7 @@ void Texture::On_Destroy() {
 	Component::On_Destroy();
 }
 
-HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader>& shader,
-                                         const Char* constantName,
-                                         uint32 index) {
+HRESULT Texture::Bind_ShaderResourceView(const Shared<Shader>& shader, const Char* constantName, uint32 index) {
 	if (index >= m_NumSRVs) {
 		return E_INVALIDARG;
 	}

@@ -5,6 +5,7 @@
 
 #include "Game.h"
 #include "Model.h"
+#include "Monster.h"
 #include "OBBCollider.h"
 
 WP0220Body::WP0220Body() : Pl0000Parts{} {}
@@ -111,10 +112,55 @@ void WP0220Body::Submit_RenderGroup()
 		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
+void WP0220Body::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+
+}
+
+void WP0220Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+	if (!m_AttackCollider->Is_Active()) return;
+
+
+	auto target = targetCollider->Get_Owner();
+	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
+	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
+
+	uint32 targetID = target->Get_ObjectID();
+	if (m_HitEntities.contains(targetID) == false)
+	{
+		m_HitEntities.insert(targetID);
+
+		Entity::DAMAGE_INFO dmgInfo{};
+		dmgInfo.attackType = ATK_TYPE::LIGHT;
+
+		auto mon = static_pointer_cast<PartObject>(target)->Get_Owner();
+		static_pointer_cast<Monster>(mon)->TakeDamage(dmgInfo);
+	}
+}
+
+void WP0220Body::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+
+}
+
+void WP0220Body::Active_LightWeapon()
+{
+	m_AttackCollider->Set_Active(true);
+	m_HitEntities.clear();
+}
+
+void WP0220Body::DeActive_LightWeapon()
+{
+	m_AttackCollider->Set_Active(false);
+	m_HitEntities.clear();
+}
+
 void WP0220Body::Set_Sheathing(const Matrix& sheathMatrix)
 {
 	if (m_IsSheathing) return;
 
+	m_AttackCollider->Set_Active(false);
 	m_Model->Set_Animation(ETOI(WP0220_STATE::SHEATHE_HEAVY), 0);
 	m_Model->Set_AnimLoop(false);
 	m_Transform->Set_WorldMatrix(sheathMatrix);
@@ -189,16 +235,24 @@ HRESULT WP0220Body::Ready_AnimationNotify()
 {
 	using Notify = AnimationTracker::ANIMATION_NOTIFY;
 
+	auto active = [this]() { Active_LightWeapon(); };
+	auto deActive = [this]() { DeActive_LightWeapon(); };
+
+
 	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND1), {
 	Notify{ L"Wp0220_Stop1", 30, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
 	Notify{ L"Wp0220_Swing1_1", 30, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing1_1", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
 	Notify{ L"Wp0220_Stop2", 60, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
-	Notify{ L"Wp0220_Swing1_2", 60, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing1_2", SOUNDCHANNEL::CHANNEL_12, 0.5f); } }
+	Notify{ L"Wp0220_Swing1_2", 60, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing1_2", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		Notify{L"Swing1", 30, 100, active, deActive },
+		Notify{L"Swing1", 60, active,  },
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND2), {
 	Notify{ L"Wp0220_Stop1", 65, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
 	Notify{ L"Wp0220_Swing2_1", 65, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing2_1", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		Notify{L"Swing2", 65, 100, active, deActive },
+		Notify{L"Swing2", 80, active,  },
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND3), {
@@ -208,6 +262,39 @@ HRESULT WP0220Body::Ready_AnimationNotify()
 	Notify{ L"Wp0220_Swing3_2", 65, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing3_2", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
 	Notify{ L"Wp0220_Stop3", 108, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
 	Notify{ L"Wp0220_Swing3_3", 108, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing3_3", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		Notify{L"Swing3", 50, 70, active, deActive },
+		Notify{L"Swing3", 60, active,  },
+		// 충격파 111 프레임일때 bone위치에 Instant
+		});
+
+	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_COMBO), {
+	Notify{ L"Wp0220_Stop1", 40, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Swing3_2", 40, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing3_2", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+	Notify{ L"Wp0220_Stop1", 75, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Hammer", 75, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Hammer", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		Notify{L"Swing3", 40, 85, active, deActive },
+		Notify{L"Swing3", 80, active },
+		});
+
+	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND_HOLD_UNFULL), {
+	Notify{ L"Wp0220_Stop1", 40, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Charge_Impact", 40, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Charge_Impact", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		// 충격파
+		});
+
+	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND_HOLD_FULL), {
+	Notify{ L"Wp0220_Stop1", 0, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Charge_Swing1", 0, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Charge_Swing1", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+	Notify{ L"Wp0220_Stop2", 20, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Charge_Swing2", 20, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Charge_Swing2", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+	Notify{ L"Wp0220_Stop3", 30, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Charge_Swing3", 30, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Charge_Swing3", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+	Notify{ L"Wp0220_Stop4", 40, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
+	Notify{ L"Wp0220_Charge_Swing4", 40, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Charge_Swing4", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		Notify{L"Swing1", 0, 50, active, deActive },
+		Notify{L"Swing2", 20, active },
+		Notify{L"Swing2", 30, active },
+		Notify{L"Swing2", 40, active },
 		});
 
 	return S_OK;

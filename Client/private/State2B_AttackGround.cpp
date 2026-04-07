@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "State2B_AttackGround.h"
 
+#include <Game.h>
 #include <SpdLogger.h>
 
 #include "Pl0000.h"
@@ -141,7 +142,16 @@ void State2B_AttackGround::Late_Update(Float timeDelta)
 	}
 
 	if (m_IsHeavyCharge)
+	{
 		m_HeavyChargeDelta += timeDelta;
+
+		if (!m_IsChargeEnd && m_HeavyChargeDelta >= 2.f)
+		{
+			m_IsChargeEnd = true;
+			GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_8);
+			GAME_INSTANCE->PlaySoundFXOnce(L"Pl_Charge_End", SOUNDCHANNEL::CHANNEL_8, 0.5f);
+		}
+	}
 }
 
 void State2B_AttackGround::StateExitInvoke()
@@ -351,6 +361,7 @@ void State2B_AttackGround::Execute_Attack()
 			m_ComboStep = 0;
 			m_PrevComboType = COMBO_TYPE::HEAVY;
 			m_IsHeavyCharge = false;
+			m_IsChargeEnd = false;
 		}
 		return; // 아직 차징 중이면 다른 입력은 컷
 	}
@@ -360,6 +371,8 @@ void State2B_AttackGround::Execute_Attack()
 	{
 		if (actualAnimIndex != ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_CYCLE))
 		{
+			GAME_INSTANCE->PlaySoundFXOnce(L"Pl_Charge_Start", SOUNDCHANNEL::CHANNEL_8, 0.5f);
+
 			m_IsHeavyCharge = true;
 			m_HeavyChargeDelta = 0.f;
 			m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_CYCLE);

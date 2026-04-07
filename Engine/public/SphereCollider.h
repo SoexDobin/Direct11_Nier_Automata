@@ -28,7 +28,8 @@ public:
 	Bool Intersect(const Shared<Collider>& target) override;
 	const BoundingSphere& Get_Bounding() const { return m_Transformed; }
 	Float Get_CurrentRadius() const { return m_Transformed.Radius; }
-	virtual Vector3 Get_Pivot() const override { return m_Transformed.Center; }
+	Vector3 Get_Pivot() const override { return m_Transformed.Center; }
+	Vector3 ClosestPoint(const Vector3& point) override;
 
 	Float Get_Radius() const { return m_Original.Radius; }
 	void Set_Radius(Float radius) { m_Original.Radius = radius; }

@@ -57,7 +57,6 @@ private:
 	Bool m_IsSheathing{ true };
 	Shared<OBBCollider> m_AttackCollider{ nullptr };
 	unordered_set<uint32> m_HitEntities;
-	
 
 public:
 	static Shared<WP0070Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

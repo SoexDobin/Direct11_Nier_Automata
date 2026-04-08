@@ -125,6 +125,9 @@ void Game::Update_Engine() {
 
   m_ObjectManager->LateUpdate(delta);
 
+  m_CameraManager->Bind_MainCamera_Transform();
+  m_Pipeline->Update_Pipeline();
+
   while (m_TimeManager->Is_FixedUpdate()) {
     Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
     m_ObjectManager->FixedUpdate(fixedDelta);
@@ -136,8 +139,6 @@ void Game::Update_Engine() {
 
   m_ObjectManager->Cleanup_GameObjects(0);
   m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
-  m_CameraManager->Bind_MainCamera_Transform();
-  m_Pipeline->Update_Pipeline();
 
   m_CollisionManager->Update_Collision();
 
@@ -152,6 +153,12 @@ HRESULT Game::Draw() const {
 HRESULT Game::Draw_NoClearing() const {
     m_Renderer->Draw_NoClearing();
     return S_OK;
+}
+
+void Game::Update_CameraPipeline()
+{
+    m_CameraManager->Bind_MainCamera_Transform();
+    m_Pipeline->Update_Pipeline();
 }
 
 void Game::Clear_AllResource() const {
@@ -624,7 +631,6 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, 
     }
     else {
         auto pComponent = std::static_pointer_cast<Component>(protoObject);
-        
         cloned = pComponent->Clone(arg);
     }
 

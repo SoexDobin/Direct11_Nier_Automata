@@ -138,6 +138,7 @@ void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 		m_Model->Get_BoneMatrix(m_WeaponBoneIndex).Decompose(boneScale, boneQuat, boneTranslation);
 
 		Entity::DAMAGE_INFO dmgInfo{};
+		dmgInfo.damage = 10.f;
 		dmgInfo.attackType = ATK_TYPE::LIGHT;
 		dmgInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
 		dmgInfo.hitRotation = m_AttackCollider->Get_CurrentOrientation();

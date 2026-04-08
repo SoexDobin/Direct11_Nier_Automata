@@ -26,6 +26,7 @@
 #include "Em3100Body.h"
 #include "SparkEffect.h"
 #include "Bullet.h"
+#include "HpBarWorldUI.h"
 
 using rttr::registration;
 
@@ -172,6 +173,13 @@ void Register_Client_Reflection() {
         .method("Clone", &SparkEffect::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SparkEffect::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    // IN GAME UI
+    rttr::registration::class_<HpBarWorldUI>("HpBarWorldUI")
+        .constructor<>()
+        .method("Clone", &HpBarWorldUI::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return HpBarWorldUI::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가

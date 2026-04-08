@@ -6,7 +6,9 @@
 #include "Shader.h"
 #include "Model.h"
 #include "AABBCollider.h"
+#include "Bullet.h"
 #include "Em3100Body.h"
+#include "HpBarWorldUI.h"
 #include "SphereCollider.h"
 #include "SpdLogger.h"
 #include "Random_Helper.h"
@@ -49,6 +51,20 @@ HRESULT Em3100::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Test", [this]()
+		{
+			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
+			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
+			UI_hpDesc.worldOffset = Vector3{ 0.f, 1.f, 0.f };
+			UI_hpDesc.anchor = UI_ANCHOR::TOP_LEFT;
+			UI_hpDesc.sizeX = 200.f;
+			UI_hpDesc.sizeY = 10.f;
+			UI_hpDesc.x = 0.f;
+			UI_hpDesc.y = 0.f;
+			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", ETOI(LEVEL::GAMEPLAY), &UI_hpDesc);
+		});
+
+
 	return S_OK;
 }
 
@@ -87,6 +103,8 @@ void Em3100::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
 	Play_HitSFX(dmgInfo);
 	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
+
+	Entity::TakeDamage(dmgInfo);
 }
 
 void Em3100::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)

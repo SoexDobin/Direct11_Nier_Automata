@@ -11,6 +11,45 @@
             },
             {
               "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "name": "CityOfRuins",
+          "objectID": 1208553506,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuins",
+          "transform": {
+            "position": [
+              50.0,
+              0.0,
+              100.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuins"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
               "typeName": "SphereCollider"
             }
           ],
@@ -112,23 +151,19 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
+              "typeName": "SphereCollider"
             }
           ],
-          "name": "CityOfRuins",
-          "objectID": 1208553506,
+          "name": "Em3100_1",
+          "objectID": 1330530108,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "CityOfRuins",
+          "prototypeTag": "Em3100",
           "transform": {
             "position": [
-              50.0,
+              5.0,
               0.0,
-              100.0
+              7.5
             ],
             "rotation": [
               0.0,
@@ -141,7 +176,7 @@
               1.0
             ]
           },
-          "typeName": "CityOfRuins"
+          "typeName": "Em3100"
         },
         {
           "components": [
@@ -154,8 +189,8 @@
               "typeName": "SphereCollider"
             }
           ],
-          "name": "Em3100_1",
-          "objectID": 1330530108,
+          "name": "Em3100_2",
+          "objectID": 1331097783,
           "parentObjectID": 0,
           "properties": null,
           "prototypeTag": "Em3100",

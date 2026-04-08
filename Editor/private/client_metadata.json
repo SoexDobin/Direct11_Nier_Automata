@@ -1204,6 +1204,24 @@
                                                                     ],
                                               "has_clone":  true
                                           },
+                    "HpBarWorldUI":  {
+                                         "members":  [
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "0.f, 0.f, 0.f",
+                                                             "name":  "m_WorldOffset",
+                                                             "type":  "Vector3"
+                                                         }
+                                                     ],
+                                         "base_class":  "WorldUIObject",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Engine",
+                                         "has_create":  true,
+                                         "has_clone":  true,
+                                         "category":  "other"
+                                     },
                     "SkyBox":  {
                                    "namespace":  "Engine",
                                    "base_class":  "GameObject",

@@ -4,6 +4,7 @@
 NS_BEGIN(Client)
 
 class MonsterStateMachine;
+class HpBarWorldUI;
 
 class CLIENT_DLL Monster : public Entity
 {
@@ -36,7 +37,10 @@ protected:
 	void Play_HitSFX(const DAMAGE_INFO& dmgInfo) const;
 	void DisplaySparkEffect(ATK_TYPE atkType, Vector3 position, Quaternion rotation = { 0.f, 0.f, 0.f, 1.f }) const;
 
-private:
+protected:
+	Shared<HpBarWorldUI> m_HpBarUI{ nullptr };
+
+protected:
 	Shared<MonsterStateMachine> m_States;
 	Weak<GameObject> m_TargetPlayer{};
 

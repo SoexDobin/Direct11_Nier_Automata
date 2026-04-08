@@ -78,6 +78,8 @@ HRESULT CameraManager::Set_MainCamera(const Shared<Camera>& camera)
 
 	m_MainCamera = camera;
 
+	GAME_INSTANCE->Update_CameraPipeline();
+
 	return S_OK;
 }
 

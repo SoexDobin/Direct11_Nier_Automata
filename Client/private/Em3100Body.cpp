@@ -5,6 +5,7 @@
 
 #include "AABBCollider.h"
 #include <SpdLogger.h>
+
 #include "Game.h"
 #include "Model.h"
 
@@ -50,7 +51,6 @@ void Em3100Body::On_Destroy()
 
 void Em3100Body::Priority_Update(Float timeDelta)
 {
-
 }
 
 void Em3100Body::Update(Float timeDelta)

@@ -223,7 +223,7 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			Entity::DAMAGE_INFO dmgInfo{};
 			dmgInfo.attackType = ATK_TYPE::POD;
 			dmgInfo.attackerPos = m_Transform->Get_Position();
-			dmgInfo.damage = 0.f;
+			dmgInfo.damage = 10.f;
 			dmgInfo.groggyWeight = 0;
 			dmgInfo.knockbackForce = 0.2f;
 

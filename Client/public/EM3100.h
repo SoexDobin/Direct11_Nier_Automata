@@ -45,7 +45,7 @@ public:
 private:
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_Components();
-	
+
 private:
 	Shared<SphereCollider> m_InteractionZone{ nullptr };
 	Shared<MonsterStateMachine> m_States{ nullptr };

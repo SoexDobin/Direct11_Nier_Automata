@@ -5,8 +5,7 @@
 #include <SpdLogger.h>
 #include <SphereCollider.h>
 
-#include "Shader.h"
-#include "Model.h"
+#include "Bullet.h"
 #include "Pl0000Body.h"
 #include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
@@ -46,6 +45,35 @@ HRESULT Pl0000::Initialize(void* arg)
 			{
 				camera->Set_Target(shared_from_this());
 			}
+
+#ifdef _DEBUG
+			//Entity::DAMAGE_INFO dmgInfo{};
+			//dmgInfo.attackType = ATK_TYPE::LIGHT;
+			//dmgInfo.attackerPos = m_Transform->Get_Position() + Vector3{ 0.f, 0.f, -10.f };
+			//dmgInfo.damage = 25.f;
+			//dmgInfo.groggyWeight = 10;
+			//dmgInfo.knockbackForce = 0.5f;
+			//// 2. 총알 공통 속성 세팅 (정지 상태 고정)
+			//Bullet::BULLET_DESC desc{};
+			//desc.isPermanent = false;
+			//desc.damageInfo = dmgInfo;
+			//desc.resourceTag = L"candy";         // 💡 테스트용 모델이 잘 뜨는지 확인
+			//desc.targetLayer = L"Player";
+			//desc.speed = 0.0f;                   // 스피드 0
+			//desc.maxDistance = 9999.f;
+			//desc.direction = m_Transform->Get_Look();
+			//
+			//Float spawnHeight = m_Transform->Get_Position().y + 1.f; // 공중에 깔려면 y값을 적절히 조절하세요 (ex: 1.0f)
+			//for (int x = -1; x <= 2; ++x)
+			//{
+			//	for (int z = -1; z <= 2; ++z)
+			//	{
+			//		desc.initialPosition = Vector3(static_cast<Float>(x), spawnHeight, static_cast<Float>(z));
+			//		GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", ETOI(LEVEL::GAMEPLAY), &desc);
+			//	}
+			//}
+#endif
+
 		});
 
 	if (FAILED(ContainerObject::Initialize(arg))) {
@@ -174,7 +202,7 @@ HRESULT Pl0000::Ready_Components()
 	movementDesc.velocity = Vector3{0.f, 0.f, 0.f};
 	movementDesc.moveSpeed = 0.f;
 	movementDesc.targetDirection = Vector3::Zero;
-	movementDesc.turnSpeed = 7.0f;
+	movementDesc.turnSpeed = 7.5f;
 	m_Pl0000Movement = Add_Component<Pl0000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
 	if (nullptr == m_Pl0000Movement)
 		return E_FAIL;

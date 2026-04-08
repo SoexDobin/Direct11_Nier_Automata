@@ -42,7 +42,7 @@ public: /* Entity interface */
 	virtual Vector3 PushoutDelta(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio = 1.f);
 	virtual void Pullout(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider, Float ratio = 1.f);
 
-protected:
+public:
 	Float Get_HP() const { return m_Hp; }
 	Float Get_MaxHP() const { return m_MaxHp; }
 	Bool Is_Dead() const { return m_Hp <= 0.f; }
@@ -54,8 +54,8 @@ public: // Utility
 	Float Get_RadiusByColliderType(const Shared<Collider>& collider, const Vector3 colDirection);
 
 protected:
-	Float m_Hp{ 100.f };
-	Float m_MaxHp{ 100.f };
+	Float m_Hp{ 1000.f };
+	Float m_MaxHp{ 1000.f };
 	Bool m_IsInvincible{ false };
 	Bool m_IsStatic{ false };
 

@@ -159,7 +159,7 @@ HRESULT Bullet::Ready_Components()
 		return E_FAIL;
 
 	SphereCollider::SPHERE_COLLIDER_DESC sphereColliderDesc{};
-	sphereColliderDesc.radius = 0.3f;
+	sphereColliderDesc.radius = 1.f;
 	sphereColliderDesc.offset = Vector3::Zero;
 	m_Collider = Add_Component<SphereCollider>(ETOI(LEVEL::GAMEPLAY), &sphereColliderDesc);
 	if (nullptr == m_Collider)

@@ -263,6 +263,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\VIBuffer_Terrain.h" />
     <ClInclude Include="..\public\VICube.h" />
     <ClInclude Include="..\public\VISphere.h" />
+    <ClInclude Include="..\public\WorldUIObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\AABBCollider.cpp" />
@@ -352,6 +353,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
     <ClCompile Include="..\private\VICube.cpp" />
     <ClCompile Include="..\private\VISphere.cpp" />
+    <ClCompile Include="..\private\WorldUIObject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

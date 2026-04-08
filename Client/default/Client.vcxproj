@@ -190,6 +190,7 @@
     <ClInclude Include="..\public\Em3100Body.h" />
     <ClInclude Include="..\public\Entity.h" />
     <ClInclude Include="..\public\FreeCamera.h" />
+    <ClInclude Include="..\public\HpBarWorldUI.h" />
     <ClInclude Include="..\public\LevelGamePlay.h" />
     <ClInclude Include="..\public\LevelLoading.h" />
     <ClInclude Include="..\public\LevelTitle.h" />
@@ -245,6 +246,7 @@
     <ClCompile Include="..\private\Em3100Body.cpp" />
     <ClCompile Include="..\private\Entity.cpp" />
     <ClCompile Include="..\private\FreeCamera.cpp" />
+    <ClCompile Include="..\private\HpBarWorldUI.cpp" />
     <ClCompile Include="..\private\LevelGamePlay.cpp" />
     <ClCompile Include="..\private\LevelLoading.cpp" />
     <ClCompile Include="..\private\LevelTitle.cpp" />

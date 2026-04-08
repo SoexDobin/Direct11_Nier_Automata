@@ -39,6 +39,8 @@ public:
     HRESULT Draw() const;
     HRESULT Draw_NoClearing() const;
 
+    void Update_CameraPipeline();
+
     void Clear_Resource(uint32 levIndex) const;
     void Clear_AllResource() const;
 

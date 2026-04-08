@@ -28,6 +28,9 @@ namespace Client
 	constexpr const Char* DiffuseLight = "g_LightDiffuse";
 	constexpr const Char* SpecularLight = "g_LightSpecular";
 	constexpr const Char* AmbientLight = "g_LightAmbient";
+
+	// 특수 값
+	constexpr const Char* HpRatio = "g_HpRatio"; // Tex Pass1
 }
 
 using namespace Client;

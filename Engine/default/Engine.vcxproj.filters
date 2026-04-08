@@ -401,6 +401,7 @@
     <ClInclude Include="..\public\VIBuffer_Particle_Rect.h">
       <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\WorldUIObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -646,5 +647,6 @@
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Rect_rttr.cpp">
       <Filter>96. RTTR</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\WorldUIObject.cpp" />
   </ItemGroup>
 </Project>

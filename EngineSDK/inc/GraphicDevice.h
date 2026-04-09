@@ -6,13 +6,13 @@
 NS_BEGIN(Engine)
 class GraphicDevice final : public Object {
 private:
-  struct OffscreenRenderTarget {
-    ComPtr<ID3D11Texture2D> texture;
-    ComPtr<ID3D11RenderTargetView> RTV;
-    ComPtr<ID3D11ShaderResourceView> SRV;
-    ComPtr<ID3D11DepthStencilView> DSV;
-    D3D11_VIEWPORT viewport;
-  };
+    struct OffscreenRenderTarget {
+        ComPtr<ID3D11Texture2D> texture;
+        ComPtr<ID3D11RenderTargetView> RTV;
+        ComPtr<ID3D11ShaderResourceView> SRV;
+        ComPtr<ID3D11DepthStencilView> DSV;
+        D3D11_VIEWPORT viewport;
+    };
 
 public:
 	GraphicDevice() = default;

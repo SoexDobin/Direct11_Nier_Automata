@@ -16,9 +16,6 @@
 #include "LevelSerializer.h"
 #include "Timer.h"
 
-#include "Component.h"
-#include "GameObject.h"
-
 IMPLEMENT_SINGLETON(Game);
 
 Game::~Game() {
@@ -109,6 +106,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
         return E_FAIL;
 
     if (nullptr == (m_CollisionManager = CollisionManager::Create()))
+        return E_FAIL;
+
+    if (nullptr == (m_RenderTargetManager = RenderTargetManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
         return E_FAIL;
 
     return S_OK;
@@ -597,6 +597,17 @@ void Game::Render_CollisionDebug() const
     m_CollisionManager->Render_Debug();
 }
 #endif
+
+HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color) const
+{
+    return m_RenderTargetManager->Add_RenderTarget(renderTargetTag, sizeX, sizeY, pixelFormat, color);
+}
+
+HRESULT Game::Bind_RenderTarget_ShaderResource(const Shared<Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const
+{
+    return m_RenderTargetManager->Bind_ShaderResource(shader, constantName, renderTargetTag);
+}
+
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
 {

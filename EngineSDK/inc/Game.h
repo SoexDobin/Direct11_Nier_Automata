@@ -18,6 +18,7 @@
 #include "SoundManager.h"
 #include "EventManager.h"
 #include "CollisionManager.h"
+#include "RenderTargetManager.h"
 
 #include "GameObject.h"
 #include "Component.h"
@@ -177,6 +178,10 @@ public: /* CollisionManager */
     void Render_CollisionDebug() const;
 #endif
 
+public:
+    HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;
+    HRESULT Bind_RenderTarget_ShaderResource(const Shared<class Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const;
+
 public: /* Prototype & Instantiate Facade */
     template <typename T>
     HRESULT Add_Prototype(uint32 levIndex, const Shared<T>& prototype, const wstring& prototypeTag = L"") {
@@ -223,6 +228,7 @@ private:
     Unique<SoundManager> m_SoundManager = { nullptr };
     Unique<EventManager> m_EventManager = { nullptr };
     Unique<CollisionManager> m_CollisionManager = { nullptr };
+    Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
 };
 
 NS_END

@@ -3,9 +3,6 @@
 
 #include <Game.h>
 
-#include "Shader.h"
-#include "Model.h"
-#include "AABBCollider.h"
 #include "Bullet.h"
 #include "Em3100Body.h"
 #include "HpBarWorldUI.h"
@@ -51,7 +48,7 @@ HRESULT Em3100::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Test", [this]()
+	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Add_HpBar", [this]()
 		{
 			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
 			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
@@ -70,7 +67,7 @@ HRESULT Em3100::Initialize(void* arg)
 
 void Em3100::Priority_Update(Float timeDelta)
 {
-	Monster::Priority_Update(timeDelta);
+
 }
 
 void Em3100::Update(Float timeDelta)

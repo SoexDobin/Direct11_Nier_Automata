@@ -312,7 +312,7 @@ Matrix Model::Get_BoneMatrix(uint32 boneIndex) const
 	return *m_Bones[boneIndex]->Get_CombinedTransformationMatrixPtr();
 }
 
-TRANSFORM_FRAME Model::Get_RootTransformVelocity(uint32 nodeIndex) const
+const TRANSFORM_FRAME& Model::Get_RootTransformVelocity(uint32 nodeIndex) const
 {
 	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())
 	{

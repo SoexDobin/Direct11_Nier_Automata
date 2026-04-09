@@ -166,6 +166,27 @@
     <ClInclude Include="..\public\HpBarWorldUI.h">
       <Filter>02. GameObject\UI\WorldUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Em0010.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em0010Movement.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Idle.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Hit.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em0010Body.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterSight.h">
+      <Filter>02. GameObject\Entity\Monster</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -327,6 +348,27 @@
     <ClCompile Include="..\private\HpBarWorldUI.cpp">
       <Filter>02. GameObject\UI\WorldUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Em0010.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em0010Movement.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Idle.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Hit.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em0010Body.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterSight.cpp">
+      <Filter>02. GameObject\Entity\Monster</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -448,6 +490,21 @@
     </Filter>
     <Filter Include="02. GameObject\UI\WorldUI">
       <UniqueIdentifier>{79aebeed-9972-4538-9cda-a4f5d0877b5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010">
+      <UniqueIdentifier>{6d08f494-7467-4200-9067-8db59e81a64e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010Parts">
+      <UniqueIdentifier>{bc6c1f76-eb6c-4361-8f2b-ad000b10ad70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010Movement">
+      <UniqueIdentifier>{d9b86e2f-2c54-410b-a9c5-2265e32bd7e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010States">
+      <UniqueIdentifier>{15bb4d8e-551e-4a07-853b-77b872d98d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body">
+      <UniqueIdentifier>{5f1c2560-e6d2-4819-92d1-325a821543a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

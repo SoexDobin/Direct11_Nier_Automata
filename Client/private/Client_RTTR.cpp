@@ -27,6 +27,10 @@
 #include "SparkEffect.h"
 #include "Bullet.h"
 #include "HpBarWorldUI.h"
+#include "Em0010.h"
+#include "Em0010Body.h"
+#include "Em0010Movement.h"
+#include "MonsterSight.h"
 
 using rttr::registration;
 
@@ -158,6 +162,30 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Em3100Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3100Body::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em0010>("Em0010")
+        .constructor<>()
+        .method("Clone", &Em0010::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em0010::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em0010Body>("Em0010Body")
+        .constructor<>()
+        .method("Clone", &Em0010Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em0010Body::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<MonsterSight>("MonsterSight")
+        .constructor<>()
+        .method("Clone", &MonsterSight::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return MonsterSight::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em0010Movement>("Em0010Movement")
+        .constructor<>()
+        .method("Clone", &Em0010Movement::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em0010Movement::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
     // Projectile

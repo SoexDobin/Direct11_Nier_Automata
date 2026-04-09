@@ -186,6 +186,10 @@
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
+    <ClInclude Include="..\public\Em0010.h" />
+    <ClInclude Include="..\public\Em0010Body.h" />
+    <ClInclude Include="..\public\Em0010Movement.h" />
+    <ClInclude Include="..\public\MonsterSight.h" />
     <ClInclude Include="..\public\Em3100.h" />
     <ClInclude Include="..\public\Em3100Body.h" />
     <ClInclude Include="..\public\Entity.h" />
@@ -225,6 +229,9 @@
     <ClInclude Include="..\public\State2B_Run.h" />
     <ClInclude Include="..\public\State2B_Sprint.h" />
     <ClInclude Include="..\public\State2B_Walk.h" />
+    <ClInclude Include="..\public\StateEm0010.h" />
+    <ClInclude Include="..\public\StateEm0010_Hit.h" />
+    <ClInclude Include="..\public\StateEm0010_Idle.h" />
     <ClInclude Include="..\public\StateMachine.h" />
     <ClInclude Include="..\public\StateMonster.h" />
     <ClInclude Include="..\public\StaticCamera.h" />
@@ -242,6 +249,10 @@
     <ClCompile Include="..\private\CityOfRuins.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
+    <ClCompile Include="..\private\Em0010.cpp" />
+    <ClCompile Include="..\private\Em0010Body.cpp" />
+    <ClCompile Include="..\private\Em0010Movement.cpp" />
+    <ClCompile Include="..\private\MonsterSight.cpp" />
     <ClCompile Include="..\private\Em3100.cpp" />
     <ClCompile Include="..\private\Em3100Body.cpp" />
     <ClCompile Include="..\private\Entity.cpp" />
@@ -281,6 +292,9 @@
     <ClCompile Include="..\private\State2B_Run.cpp" />
     <ClCompile Include="..\private\State2B_Sprint.cpp" />
     <ClCompile Include="..\private\State2B_Walk.cpp" />
+    <ClCompile Include="..\private\StateEm0010.cpp" />
+    <ClCompile Include="..\private\StateEm0010_Hit.cpp" />
+    <ClCompile Include="..\private\StateEm0010_Idle.cpp" />
     <ClCompile Include="..\private\StateMachine.cpp" />
     <ClCompile Include="..\private\StateMonster.cpp" />
     <ClCompile Include="..\private\StaticCamera.cpp" />

@@ -23,7 +23,7 @@ HRESULT EditorApp::Initialize() {
     desc.hInst = g_hInst;
     desc.winMode = WINMODE::FULL;
     desc.levelCount = ClientSettingManager::GetInstance()->Get_LevelCount();
-    desc.startLevel = 2;
+    desc.startLevel = 3;
     desc.viewportWidth = 1920;
     desc.viewportHeight = 1080;
     desc.useOffscreenRendering = true;

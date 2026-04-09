@@ -70,16 +70,6 @@ void HpBarWorldUI::Late_Update(Float timeDelta)
 	Matrix viewMat = GAME_INSTANCE->Get_Transform(D3DTS::VIEW);
 	Matrix projMat = GAME_INSTANCE->Get_Transform(D3DTS::PROJ);
 
-	//Matrix trueViewMat = GAME_INSTANCE->Get_MainCamera()->Get_Transform()->Get_WorldMatrix().Invert();
-	//Matrix trueProjMat = XMMatrixPerspectiveFovLH(
-	//	GAME_INSTANCE->Get_MainCamera()->Get_FovY(),
-	//	GAME_INSTANCE->Get_MainCamera()->Get_Aspect(),
-	//	GAME_INSTANCE->Get_MainCamera()->Get_NearPlane(),
-	//	GAME_INSTANCE->Get_MainCamera()->Get_FarPlane()
-	//);
-	//viewMat = trueViewMat;
-	//projMat = trueProjMat;
-
 	D3D11_VIEWPORT viewport = GAME_INSTANCE->Get_ViewportDesc();
 
 	Vector3 screenPos = XMVector3Project(
@@ -92,7 +82,6 @@ void HpBarWorldUI::Late_Update(Float timeDelta)
 
 	Set_Active(true);
 	m_Transform->Set_LocalPosition(screenPos.x, screenPos.y, 0.f);
-	LOG_INFO(L"{} / {}", screenPos.x, screenPos.y);
 	UIObject::Update_UITransform();
 }
 

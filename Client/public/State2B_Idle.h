@@ -20,8 +20,8 @@ public:
 	void StateExitInvoke() override;
 
 private:
-	Bool m_InitializeState{ true };
 	unordered_set<uint32> m_EnterAnim;
+	Bool m_InitializeState{ true };
 
 public:
 	static Shared<State2B_Idle> Create(const wstring& tag, const Shared<Pl0000>& owner);

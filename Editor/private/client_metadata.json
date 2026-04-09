@@ -1,6 +1,24 @@
 ﻿{
     "version":  "1.0",
     "classes":  {
+                    "StateEm0010_Idle":  {
+                                             "members":  [
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "",
+                                                                 "name":  "m_EnterAnim",
+                                                                 "type":  "unordered_set\u003cuint32\u003e"
+                                                             }
+                                                         ],
+                                             "base_class":  "StateEm0010",
+                                             "inherited_members":  {
+
+                                                                   },
+                                             "namespace":  "Client",
+                                             "has_create":  true,
+                                             "has_clone":  false,
+                                             "category":  "other"
+                                         },
                     "State2B_Walk":  {
                                          "members":  [
 
@@ -27,6 +45,19 @@
                                        "has_clone":  true,
                                        "category":  "other"
                                    },
+                    "Em0010Movement":  {
+                                           "members":  [
+
+                                                       ],
+                                           "base_class":  "Movement",
+                                           "inherited_members":  {
+
+                                                                 },
+                                           "namespace":  "Engine",
+                                           "has_create":  true,
+                                           "has_clone":  true,
+                                           "category":  "other"
+                                       },
                     "LoadingFadeIn":  {
                                           "namespace":  "Engine",
                                           "base_class":  "UIObject",
@@ -217,6 +248,30 @@
                                                             ],
                                       "has_clone":  true
                                   },
+                    "Pl0000Input":  {
+                                        "members":  [
+                                                        {
+                                                            "access":  "private",
+                                                            "default":  "0.20f",
+                                                            "name":  "m_DoubleClickThreshold",
+                                                            "type":  "Float"
+                                                        },
+                                                        {
+                                                            "access":  "private",
+                                                            "default":  "",
+                                                            "name":  "m_MouseComboQueue",
+                                                            "type":  "vector\u003cEngine::DIMB\u003e"
+                                                        }
+                                                    ],
+                                        "base_class":  "ScriptComponent",
+                                        "inherited_members":  {
+
+                                                              },
+                                        "namespace":  "Client",
+                                        "has_create":  true,
+                                        "has_clone":  true,
+                                        "category":  "other"
+                                    },
                     "LoadingFadeOut":  {
                                            "namespace":  "Engine",
                                            "base_class":  "UIObject",
@@ -375,30 +430,19 @@
                                          "has_clone":  false,
                                          "category":  "other"
                                      },
-                    "State2B_Dash":  {
-                                         "members":  [
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "",
-                                                             "name":  "m_EnterAnim",
-                                                             "type":  "unordered_set\u003cuint32\u003e"
-                                                         },
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "",
-                                                             "name":  "m_DashAnim",
-                                                             "type":  "unordered_set\u003cuint32\u003e"
-                                                         }
-                                                     ],
-                                         "base_class":  "State2B",
-                                         "inherited_members":  {
+                    "Pl0000Body":  {
+                                       "members":  [
 
-                                                               },
-                                         "namespace":  "Client",
-                                         "has_create":  true,
-                                         "has_clone":  false,
-                                         "category":  "other"
-                                     },
+                                                   ],
+                                       "base_class":  "Pl0000Parts",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "MonsterStateMachine":  {
                                                 "members":  [
 
@@ -504,30 +548,19 @@
                                            "has_clone":  false,
                                            "category":  "other"
                                        },
-                    "Pl0000Input":  {
-                                        "members":  [
-                                                        {
-                                                            "access":  "private",
-                                                            "default":  "0.20f",
-                                                            "name":  "m_DoubleClickThreshold",
-                                                            "type":  "Float"
-                                                        },
-                                                        {
-                                                            "access":  "private",
-                                                            "default":  "",
-                                                            "name":  "m_MouseComboQueue",
-                                                            "type":  "vector\u003cEngine::DIMB\u003e"
-                                                        }
-                                                    ],
-                                        "base_class":  "ScriptComponent",
-                                        "inherited_members":  {
+                    "Em0010":  {
+                                   "members":  [
 
-                                                              },
-                                        "namespace":  "Client",
-                                        "has_create":  true,
-                                        "has_clone":  true,
-                                        "category":  "other"
-                                    },
+                                               ],
+                                   "base_class":  "Monster",
+                                   "inherited_members":  {
+
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "Level_GamePlay":  {
                                            "members":  [
 
@@ -552,6 +585,30 @@
                                            "has_clone":  false,
                                            "category":  "level"
                                        },
+                    "State2B_Dash":  {
+                                         "members":  [
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_EnterAnim",
+                                                             "type":  "unordered_set\u003cuint32\u003e"
+                                                         },
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_DashAnim",
+                                                             "type":  "unordered_set\u003cuint32\u003e"
+                                                         }
+                                                     ],
+                                         "base_class":  "State2B",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Client",
+                                         "has_create":  true,
+                                         "has_clone":  false,
+                                         "category":  "other"
+                                     },
                     "ClientApp":  {
                                       "members":  [
 
@@ -565,19 +622,6 @@
                                       "has_clone":  false,
                                       "category":  "other"
                                   },
-                    "Pl0000":  {
-                                   "members":  [
-
-                                               ],
-                                   "base_class":  "Entity",
-                                   "inherited_members":  {
-
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
                     "Terrain":  {
                                     "namespace":  "Engine",
                                     "base_class":  "GameObject",
@@ -788,6 +832,19 @@
                                            "has_clone":  true,
                                            "category":  "other"
                                        },
+                    "StateEm0010_Hit":  {
+                                            "members":  [
+
+                                                        ],
+                                            "base_class":  "StateEm0010",
+                                            "inherited_members":  {
+
+                                                                  },
+                                            "namespace":  "Client",
+                                            "has_create":  true,
+                                            "has_clone":  false,
+                                            "category":  "other"
+                                        },
                     "Pl0000StateMachine":  {
                                                "members":  [
 
@@ -869,6 +926,19 @@
                                                                     ],
                                               "has_clone":  true
                                           },
+                    "MonsterSight":  {
+                                         "members":  [
+
+                                                     ],
+                                         "base_class":  "PartObject",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Engine",
+                                         "has_create":  true,
+                                         "has_clone":  true,
+                                         "category":  "other"
+                                     },
                     "Loader":  {
                                    "members":  [
                                                    {
@@ -1110,19 +1180,19 @@
                                          "has_clone":  false,
                                          "category":  "level"
                                      },
-                    "Pl0000Body":  {
-                                       "members":  [
+                    "Pl0000":  {
+                                   "members":  [
 
-                                                   ],
-                                       "base_class":  "Pl0000Parts",
-                                       "inherited_members":  {
+                                               ],
+                                   "base_class":  "Entity",
+                                   "inherited_members":  {
 
-                                                             },
-                                       "namespace":  "Engine",
-                                       "has_create":  true,
-                                       "has_clone":  true,
-                                       "category":  "other"
-                                   },
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "Bullet":  {
                                    "members":  [
 
@@ -1300,6 +1370,19 @@
                                                        }
                                                    ],
                                        "base_class":  "Pl0000Parts",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
+                    "Em0010Body":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "PartObject",
                                        "inherited_members":  {
 
                                                              },

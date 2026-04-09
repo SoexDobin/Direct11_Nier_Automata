@@ -114,15 +114,6 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 		Float rootSpeed = rootPositionVelocity.Length();
 		worldMoveDelta = m_CurrentMoveData.direction * rootSpeed;
 	}
-
-#ifdef _DEBUG
-	if (worldMoveDelta.Length() <= 0.f)
-	{
-		auto a = m_Owner.lock()->Get_Component<Pl0000StateMachine>();
-		auto b = dynamic_pointer_cast<Pl0000>(m_Owner.lock())->Find_PartObject(L"Pl0000Body")->Get_Component<Model>();
-		LOG_DEBUG(L"{} : {} {} {}", b->Get_AnimationIndex(), worldMoveDelta.x, worldMoveDelta.y, worldMoveDelta.z);
-	}
-#endif
 	
 	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicsDelta;
 	nextPosition += m_CorrectionDelta;

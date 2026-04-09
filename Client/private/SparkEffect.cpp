@@ -147,6 +147,9 @@ HRESULT SparkEffect::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
 		return E_FAIL;
+
+
+
 	if (FAILED(m_Shader->Bind_RawValue("g_LockUpRight", &isLocked, sizeof(uint32))))
 		return E_FAIL;
 	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DiffuseMap, Helper::Random_Int(0, 29))))
@@ -157,7 +160,7 @@ HRESULT SparkEffect::Bind_ShaderResources()
 
 void SparkEffect::Submit_RenderGroup()
 {
-	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::BLEND, shared_from_this());
 }
 
 Shared<SparkEffect> SparkEffect::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

@@ -66,9 +66,15 @@ void HpBarWorldUI::Late_Update(Float timeDelta)
 	}
 
 	Vector3 worldPos = m_Target.lock()->Get_Transform()->Get_Position() + m_WorldOffset;
-
 	Matrix viewMat = GAME_INSTANCE->Get_Transform(D3DTS::VIEW);
 	Matrix projMat = GAME_INSTANCE->Get_Transform(D3DTS::PROJ);
+
+	Vector3 cameraViewMat = XMVector3TransformCoord(worldPos, viewMat);
+	if (cameraViewMat.z < 0.f)
+	{
+		m_TargetInBack = true;
+		return;
+	}
 
 	D3D11_VIEWPORT viewport = GAME_INSTANCE->Get_ViewportDesc();
 
@@ -80,15 +86,19 @@ void HpBarWorldUI::Late_Update(Float timeDelta)
 		projMat, viewMat, Matrix::Identity
 	);
 
-	Set_Active(true);
+	m_TargetInBack = false;
 	m_Transform->Set_LocalPosition(screenPos.x, screenPos.y, 0.f);
-	UIObject::Update_UITransform();
+	Update_UITransform();
 }
 
-inline void HpBarWorldUI::Submit_RenderGroup()
+void HpBarWorldUI::Submit_RenderGroup()
 {
-	if (Is_Active())
-		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::WORLDUI, shared_from_this());
+	if (m_Target.expired() || m_Target.lock()->Is_Destroy())
+		return;
+
+	if (m_TargetInBack) return;
+
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::WORLDUI, shared_from_this());
 }
 
 HRESULT HpBarWorldUI::Render()

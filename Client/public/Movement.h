@@ -29,6 +29,9 @@ public:
 	void Add_Correction(const Vector3& correction) { m_CorrectionDelta += correction; }
 	void Reset_Correction() { m_CorrectionDelta = Vector3::Zero; }
 
+	virtual void Reduce_RootMotion() { m_RootMotionScale = 0.25f; } 
+	virtual void Reset_RootMotionStop() { m_RootMotionScale = 1.0f; }
+
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg = nullptr) override;
@@ -44,6 +47,7 @@ protected:
 	Float			m_TurnSpeed{ 0.f };
 	Float			m_Gravity{ 30.f };
 	Bool			m_IsGrounded{ true };
+	Float			m_RootMotionScale{ 1.0f };
 	Vector3			m_CorrectionDelta{ 0.f };
 
 public:

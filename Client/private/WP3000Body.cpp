@@ -222,7 +222,6 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			// 총알 매개변수 세팅
 			Entity::DAMAGE_INFO dmgInfo{};
 			dmgInfo.attackType = ATK_TYPE::POD;
-			dmgInfo.attackerPos = m_Transform->Get_Position();
 			dmgInfo.damage = 10.f;
 			dmgInfo.groggyWeight = 0;
 			dmgInfo.knockbackForce = 0.2f;

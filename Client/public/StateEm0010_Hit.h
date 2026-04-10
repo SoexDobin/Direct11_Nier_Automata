@@ -18,6 +18,12 @@ public:
 	void Late_Update(Float timeDelta) override;
 	void StateExitInvoke() override;
 
+private:
+	Bool Is_BackAttack();
+
+private:
+	const Float n_ReChaseDistance = 8.f;
+
 public:
 	static Shared<StateEm0010_Hit> Create(const wstring& tag, const Shared<Em0010>& owner);
 };

@@ -38,6 +38,7 @@ private:
 private:
 	void Active_LightWeapon();
 	void DeActive_LightWeapon();
+	void Impact_Shockwave(const Vector3& offset);
 
 public:
 	void Set_Sheathing(const Matrix& sheathMatrix);

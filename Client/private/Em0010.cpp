@@ -8,9 +8,13 @@
 #include "HpBarWorldUI.h"
 #include "Em0010Body.h"
 #include "Em0010Movement.h"
+#include "MonsterAOE.h"
 #include "MonsterSight.h"
 #include "MonsterStateMachine.h"
 #include "State2B_Run.h"
+#include "StateEm0010_Attack.h"
+#include "StateEm0010_Chase.h"
+#include "StateEm0010_Dead.h"
 #include "StateEm0010_Hit.h"
 #include "StateEm0010_Idle.h"
 
@@ -19,6 +23,11 @@ Em0010::Em0010(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCont
 	: Monster{device, context} {}
 Em0010::Em0010(const Em0010& rhs) 
 	: Monster{rhs} {}
+
+Em0010::~Em0010()
+{
+	m_MainBody.reset();
+}
 
 HRESULT Em0010::Initialize_Prototype()
 {
@@ -70,6 +79,7 @@ HRESULT Em0010::Initialize(void* arg)
 
 void Em0010::On_Destroy()
 {
+	m_MainBody.reset();
 	Monster::On_Destroy();
 }
 
@@ -80,6 +90,12 @@ void Em0010::Priority_Update(Float timeDelta)
 
 void Em0010::Update(Float timeDelta)
 {
+	if (m_LagDuration > 0.f)
+	{
+		m_LagDuration -= timeDelta;
+		timeDelta *= 0.05f;
+	}
+
 	m_States->Update_State(timeDelta);
 	m_Em0010Movement->Update_Movement(timeDelta);
 	m_Transform->Update_WorldMatrix();
@@ -108,10 +124,24 @@ void Em0010::Submit_RenderGroup()
 
 void Em0010::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
+	if (Is_Dead()) return;
+
+	if (m_TargetPlayer.expired() && false == dmgInfo.attacker.expired())
+		m_TargetPlayer = dmgInfo.attacker;
+
 	Play_HitSFX(dmgInfo);
 	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
+		
+	if (dmgInfo.attackType != ATK_TYPE::POD)
+		m_States->Change_State(MonsterStateMachine::MONSTER_STATE::Hit);
 
 	Entity::TakeDamage(dmgInfo);
+}
+
+void Em0010::OnDeath()
+{
+	m_MainBody->OffHitBox();
+	m_States->Change_State(MonsterStateMachine::MONSTER_STATE::DEAD);
 }
 
 void Em0010::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -121,7 +151,7 @@ void Em0010::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 
 void Em0010::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	
+	Monster::OnCollisionStay(ownCollider, targetCollider);
 }
 
 void Em0010::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -129,21 +159,81 @@ void Em0010::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<C
 
 }
 
+void Em0010::OnAttackHit(const Shared<GameObject>& target)
+{
+	if (m_Em0010Movement)
+	{
+		m_Em0010Movement->Reduce_RootMotion();
+	}
+}
+
 HRESULT Em0010::Ready_PartObjects()
 {
+	auto thisObject = static_pointer_cast<ContainerObject>(shared_from_this());
+
 	Em0010Body::EM0010BODY_DESC em0010BodyDesc{};
 	em0010BodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	em0010BodyDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
+	em0010BodyDesc.Owner = thisObject;
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em0010Body", L"Em0010Body", &em0010BodyDesc)))
 		return E_FAIL;
 
 	MonsterSight::MONSTER_SIGHT_DESC em0010SightDesc{};
 	em0010SightDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	em0010SightDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
-	em0010SightDesc.radius = 3.f;
+	em0010SightDesc.Owner = thisObject;
+	em0010SightDesc.radius = 8.f;
 	em0010SightDesc.offset = Vector3::Zero;
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterSight", L"Em0010Sight", &em0010SightDesc)))
 		return E_FAIL;
+
+	m_MainBody = static_pointer_cast<Em0010Body>(Find_PartObject(L"Em0010Body"));
+	if (nullptr == m_MainBody)
+		return E_FAIL;
+
+	DAMAGE_INFO em0010DamageInfo{};
+	em0010DamageInfo.attacker = shared_from_this();
+	em0010DamageInfo.attackType = ATK_TYPE::HEAVY;
+	em0010DamageInfo.damage = 10.f;
+	em0010DamageInfo.groggyWeight = 10.f;
+	em0010DamageInfo.knockbackForce = 1.f;
+
+	MonsterAOE::MONSTER_AOE_DESC leftArmDesc{};
+	leftArmDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
+	leftArmDesc.Owner = thisObject;
+	leftArmDesc.model = m_MainBody->Get_ModelComponent();
+	leftArmDesc.offset = Vector3::Zero;
+	leftArmDesc.radius = 0.75f;
+	leftArmDesc.targetBoneName = "bone304";
+	leftArmDesc.dmgInfo = em0010DamageInfo;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010LeftArm", &leftArmDesc)))
+		return E_FAIL;
+	
+	MonsterAOE::MONSTER_AOE_DESC rightArmDesc{};
+	rightArmDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
+	rightArmDesc.Owner = thisObject;
+	rightArmDesc.model = m_MainBody->Get_ModelComponent();
+	rightArmDesc.offset = Vector3::Zero;
+	rightArmDesc.radius = 0.75f;
+	rightArmDesc.targetBoneName = "bone560";
+	rightArmDesc.dmgInfo = em0010DamageInfo;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010RightArm", &rightArmDesc)))
+		return E_FAIL;
+	
+	MonsterAOE::MONSTER_AOE_DESC footDesc{};
+	footDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
+	footDesc.Owner = thisObject;
+	footDesc.model = m_MainBody->Get_ModelComponent();
+	footDesc.offset = Vector3::Zero;
+	footDesc.radius = 2.5f;
+	footDesc.targetBoneName = "bone4094";
+	footDesc.dmgInfo = em0010DamageInfo;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010Foot", &footDesc)))
+		return E_FAIL;
+
+	if (FAILED(m_MainBody->Begin()))
+	{
+		LOG_ERROR(L"Failed to Begin Main Body");
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -169,6 +259,15 @@ HRESULT Em0010::Ready_Components()
 			return E_FAIL;
 		if (FAILED(m_States->Add_State(StateEm0010_Hit::Create(
 			Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::Hit)), em0010))))
+			return E_FAIL;
+		if (FAILED(m_States->Add_State(StateEm0010_Chase::Create(
+			Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::CHASE)), em0010))))
+			return E_FAIL;
+		if (FAILED(m_States->Add_State(StateEm0010_Attack::Create(
+			Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::ATTACK)), em0010))))
+			return E_FAIL;
+		if (FAILED(m_States->Add_State(StateEm0010_Dead::Create(
+			Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::DEAD)), em0010))))
 			return E_FAIL;
 
 		m_States->Change_State(MonsterStateMachine::MONSTER_STATE::IDLE);
@@ -212,6 +311,14 @@ Shared<GameObject> Em0010::Clone(void* arg)
 	}
 
 	return instance;
+}
+
+void Em0010::Apply_PushoutCorrection(const Vector3& correction)
+{
+	if (m_Em0010Movement)
+	{
+		m_Em0010Movement->Add_Correction(correction);
+	}
 }
 
 

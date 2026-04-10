@@ -43,6 +43,7 @@ private:
 	HRESULT Ready_Components();
 
 private:
+	Bool m_TargetInBack{};
 	Weak<Entity> m_Target{};
 	Vector3 m_WorldOffset = { 0.f, 0.f, 0.f };
 

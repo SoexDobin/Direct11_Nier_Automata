@@ -2,10 +2,14 @@
 #include "Em0010Body.h"
 
 #include <AABBCollider.h>
+#include <ContainerObject.h>
 #include <Game.h>
 #include <Model.h>
 #include <Shader.h>
 #include <SpdLogger.h>
+
+#include "MonsterAOE.h"
+#include "Entity.h"
 
 Em0010Body::Em0010Body() : PartObject{} {}
 Em0010Body::Em0010Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -47,6 +51,23 @@ HRESULT Em0010Body::Initialize(void* arg)
 	}
 
 	m_Model->Set_LocalRootNode(m_RootBoneIndex);
+
+	return S_OK;
+}
+
+HRESULT Em0010Body::Begin()
+{
+	m_LeftArm = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010LeftArm"));
+	if (m_LeftArm.expired())
+		return E_FAIL;
+
+	m_RightArm = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010RightArm"));
+	if (m_RightArm.expired())
+		return E_FAIL;
+
+	m_Foot = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010Foot"));
+	if (m_Foot.expired())
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -94,7 +115,12 @@ void Em0010Body::Priority_Update(Float timeDelta)
 
 void Em0010Body::Update(Float timeDelta)
 {
-	m_Model->Update_ModelAnimation(timeDelta);
+	Float actualTimeDelta = timeDelta;
+	if (auto entity = static_pointer_cast<Entity>(m_Owner.lock())) {
+		if (entity->Get_LagDuration() > 0.f) 
+			actualTimeDelta *= 0.05f;
+	}
+	m_Model->Update_ModelAnimation(actualTimeDelta);
 }
 
 void Em0010Body::Late_Update(Float timeDelta)
@@ -132,6 +158,21 @@ HRESULT Em0010Body::Render()
 void Em0010Body::Submit_RenderGroup()
 {
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+}
+
+void Em0010Body::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+	
+}
+
+void Em0010Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+	
+}
+
+void Em0010Body::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
+{
+	
 }
 
 HRESULT Em0010Body::Bind_ShaderResources()

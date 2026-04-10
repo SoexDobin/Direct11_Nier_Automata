@@ -1,5 +1,6 @@
 #include "RenderTarget.h"
 
+#include "Shader.h"
 #include "SpdLogger.h"
 
 RenderTarget::RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -43,7 +44,7 @@ HRESULT RenderTarget::Begin()
 
 HRESULT RenderTarget::Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const
 {
-	return Bind_ShaderResource(shader, constantName);
+	return shader->Bind_SRV(constantName, m_ShaderResourceView);
 }
 
 void RenderTarget::Clear_RenderTarget() const

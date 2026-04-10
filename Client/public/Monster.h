@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 class MonsterStateMachine;
 class HpBarWorldUI;
 
-class CLIENT_DLL Monster : public Entity
+class CLIENT_DLL Monster abstract : public Entity
 {
 	RTTR_ENABLE(Entity)
 public:
@@ -32,6 +32,18 @@ public:
 	void Fixed_Update(Float fixedDelta) override;
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
+
+protected:
+	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+
+public:
+	Bool Is_TargetFront() const;
+	Bool Has_Target() const { return !m_TargetPlayer.expired(); }
+	void Set_Target(const Shared<GameObject>& target) { m_TargetPlayer = target; }
+	Vector3 Get_DirectionToTarget() const;
+	Float Get_DistanceToTarget() const;
 
 protected:
 	void Play_HitSFX(const DAMAGE_INFO& dmgInfo) const;

@@ -1,4 +1,6 @@
 #pragma once
+#include <AABBCollider.h>
+
 #include "PartObject.h"
 
 NS_BEGIN(Engine)
@@ -7,6 +9,8 @@ class AABBCollider;
 NS_END
 
 NS_BEGIN(Client)
+
+class MonsterAOE;
 
 class CLIENT_DLL Em0010Body final : public PartObject
 {
@@ -35,6 +39,7 @@ public:
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
+	HRESULT Begin() override;
 	void On_Destroy() override;
 
 public:
@@ -45,6 +50,12 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
+public:
+	void OffHitBox() const { m_HitBox->Set_Active(false); }
+	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
@@ -52,9 +63,13 @@ private:
 
 private:
 	int32 m_RootBoneIndex{};
-	Shared<Shader>	m_Shader{ nullptr };
-	Shared<Model>	m_Model{ nullptr };
-	Shared<AABBCollider> m_HitBox{ nullptr };
+	Shared<Shader>			m_Shader{ nullptr };
+	Shared<Model>			m_Model{ nullptr };
+	Shared<AABBCollider>	m_HitBox{ nullptr };
+
+	Weak<MonsterAOE>		m_LeftArm{};
+	Weak<MonsterAOE>		m_RightArm{};
+	Weak<MonsterAOE>		m_Foot{};
 
 public:
 	static Shared<Em0010Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

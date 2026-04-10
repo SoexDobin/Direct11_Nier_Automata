@@ -1,6 +1,24 @@
 ﻿{
     "version":  "1.0",
     "classes":  {
+                    "State2B_AttackAir":  {
+                                              "members":  [
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "",
+                                                                  "name":  "m_EnterAnim",
+                                                                  "type":  "unordered_set\u003cuint32\u003e"
+                                                              }
+                                                          ],
+                                              "base_class":  "State2B",
+                                              "inherited_members":  {
+
+                                                                    },
+                                              "namespace":  "Client",
+                                              "has_create":  true,
+                                              "has_clone":  false,
+                                              "category":  "other"
+                                          },
                     "StateEm0010_Idle":  {
                                              "members":  [
                                                              {
@@ -394,24 +412,139 @@
                                         "has_clone":  true,
                                         "category":  "other"
                                     },
-                    "State2B_Jump":  {
-                                         "members":  [
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "",
-                                                             "name":  "m_EnterAnim",
-                                                             "type":  "unordered_set\u003cuint32\u003e"
-                                                         }
-                                                     ],
-                                         "base_class":  "State2B",
-                                         "inherited_members":  {
+                    "Pl0000Shockwave":  {
+                                            "namespace":  "Engine",
+                                            "base_class":  "GameObject",
+                                            "category":  "gameobject",
+                                            "members":  [
+                                                            {
+                                                                "access":  "private",
+                                                                "default":  "",
+                                                                "name":  "m_HitEntities",
+                                                                "type":  "unordered_set\u003cuint32\u003e"
+                                                            }
+                                                        ],
+                                            "has_create":  true,
+                                            "inherited_members":  [
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "nullptr",
+                                                                          "name":  "m_Device",
+                                                                          "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                      },
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "nullptr",
+                                                                          "name":  "m_Context",
+                                                                          "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                      },
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "",
+                                                                          "name":  "m_LayerMask",
+                                                                          "type":  "LayerMask"
+                                                                      },
+                                                                      {
+                                                                          "access":  "protected",
+                                                                          "default":  "",
+                                                                          "name":  "m_TagMask",
+                                                                          "type":  "TagMask"
+                                                                      }
+                                                                  ],
+                                            "transform_members":  [
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Vector3::One",
+                                                                          "name":  "m_LocalScale",
+                                                                          "type":  "Vector3"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Quaternion::Identity",
+                                                                          "name":  "m_LocalRotation",
+                                                                          "type":  "Quaternion"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Vector3::Zero",
+                                                                          "name":  "m_LocalPosition",
+                                                                          "type":  "Vector3"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "Matrix::Identity",
+                                                                          "name":  "m_WorldMatrix",
+                                                                          "type":  "Matrix"
+                                                                      },
+                                                                      {
+                                                                          "access":  "private",
+                                                                          "default":  "true",
+                                                                          "name":  "m_IsDirty",
+                                                                          "type":  "Bool"
+                                                                      }
+                                                                  ],
+                                            "has_clone":  true
+                                        },
+                    "WP3000Body":  {
+                                       "members":  [
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "0.f",
+                                                           "name":  "m_FireRateTimer",
+                                                           "type":  "Float"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "0.075f",
+                                                           "name":  "m_FireRate",
+                                                           "type":  "Float"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "-1",
+                                                           "name":  "m_RootBoneIndex",
+                                                           "type":  "int32"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "0.f",
+                                                           "name":  "m_HoverTime",
+                                                           "type":  "Float"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "0.2f",
+                                                           "name":  "m_HoverAmplitude",
+                                                           "type":  "Float"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "2.0f",
+                                                           "name":  "m_HoverSpeed",
+                                                           "type":  "Float"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "5.0f",
+                                                           "name":  "m_FollowSpeed",
+                                                           "type":  "Float"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "POD_STATE::IDLE",
+                                                           "name":  "m_PodState",
+                                                           "type":  "POD_STATE"
+                                                       }
+                                                   ],
+                                       "base_class":  "Pl0000Parts",
+                                       "inherited_members":  {
 
-                                                               },
-                                         "namespace":  "Client",
-                                         "has_create":  true,
-                                         "has_clone":  false,
-                                         "category":  "other"
-                                     },
+                                                             },
+                                       "namespace":  "Client",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "State2B_Idle":  {
                                          "members":  [
                                                          {
@@ -548,6 +681,24 @@
                                            "has_clone":  false,
                                            "category":  "other"
                                        },
+                    "StateEm0010_Chase":  {
+                                              "members":  [
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "",
+                                                                  "name":  "m_EnterAnim",
+                                                                  "type":  "unordered_set\u003cuint32\u003e"
+                                                              }
+                                                          ],
+                                              "base_class":  "StateEm0010",
+                                              "inherited_members":  {
+
+                                                                    },
+                                              "namespace":  "Client",
+                                              "has_create":  true,
+                                              "has_clone":  false,
+                                              "category":  "other"
+                                          },
                     "Em0010":  {
                                    "members":  [
 
@@ -806,32 +957,42 @@
                                                               ],
                                         "has_clone":  true
                                     },
-                    "StaticCamera":  {
+                    "State2B_Jump":  {
                                          "members":  [
-
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "",
+                                                             "name":  "m_EnterAnim",
+                                                             "type":  "unordered_set\u003cuint32\u003e"
+                                                         }
                                                      ],
-                                         "base_class":  "Camera",
+                                         "base_class":  "State2B",
                                          "inherited_members":  {
 
                                                                },
                                          "namespace":  "Client",
                                          "has_create":  true,
+                                         "has_clone":  false,
+                                         "category":  "other"
+                                     },
+                    "HpBarWorldUI":  {
+                                         "members":  [
+                                                         {
+                                                             "access":  "private",
+                                                             "default":  "0.f, 0.f, 0.f",
+                                                             "name":  "m_WorldOffset",
+                                                             "type":  "Vector3"
+                                                         }
+                                                     ],
+                                         "base_class":  "WorldUIObject",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Engine",
+                                         "has_create":  true,
                                          "has_clone":  true,
                                          "category":  "other"
                                      },
-                    "Pl0000Movement":  {
-                                           "members":  [
-
-                                                       ],
-                                           "base_class":  "Movement",
-                                           "inherited_members":  {
-
-                                                                 },
-                                           "namespace":  "Engine",
-                                           "has_create":  true,
-                                           "has_clone":  true,
-                                           "category":  "other"
-                                       },
                     "StateEm0010_Hit":  {
                                             "members":  [
 
@@ -998,24 +1159,19 @@
                                    "has_clone":  false,
                                    "category":  "level"
                                },
-                    "State2B_AttackAir":  {
-                                              "members":  [
-                                                              {
-                                                                  "access":  "private",
-                                                                  "default":  "",
-                                                                  "name":  "m_EnterAnim",
-                                                                  "type":  "unordered_set\u003cuint32\u003e"
-                                                              }
-                                                          ],
-                                              "base_class":  "State2B",
-                                              "inherited_members":  {
+                    "Pl0000Movement":  {
+                                           "members":  [
 
-                                                                    },
-                                              "namespace":  "Client",
-                                              "has_create":  true,
-                                              "has_clone":  false,
-                                              "category":  "other"
-                                          },
+                                                       ],
+                                           "base_class":  "Movement",
+                                           "inherited_members":  {
+
+                                                                 },
+                                           "namespace":  "Engine",
+                                           "has_create":  true,
+                                           "has_clone":  true,
+                                           "category":  "other"
+                                       },
                     "State2B_AttackGround":  {
                                                  "members":  [
                                                                  {
@@ -1114,6 +1270,32 @@
                                                               ],
                                         "has_clone":  true
                                     },
+                    "Em0010Body":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "PartObject",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
+                    "StaticCamera":  {
+                                         "members":  [
+
+                                                     ],
+                                         "base_class":  "Camera",
+                                         "inherited_members":  {
+
+                                                               },
+                                         "namespace":  "Client",
+                                         "has_create":  true,
+                                         "has_clone":  true,
+                                         "category":  "other"
+                                     },
                     "State2B_Run":  {
                                         "members":  [
                                                         {
@@ -1274,24 +1456,6 @@
                                                                     ],
                                               "has_clone":  true
                                           },
-                    "HpBarWorldUI":  {
-                                         "members":  [
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "0.f, 0.f, 0.f",
-                                                             "name":  "m_WorldOffset",
-                                                             "type":  "Vector3"
-                                                         }
-                                                     ],
-                                         "base_class":  "WorldUIObject",
-                                         "inherited_members":  {
-
-                                                               },
-                                         "namespace":  "Engine",
-                                         "has_create":  true,
-                                         "has_clone":  true,
-                                         "category":  "other"
-                                     },
                     "SkyBox":  {
                                    "namespace":  "Engine",
                                    "base_class":  "GameObject",
@@ -1378,9 +1542,14 @@
                                        "has_clone":  true,
                                        "category":  "other"
                                    },
-                    "Em0010Body":  {
+                    "MonsterAOE":  {
                                        "members":  [
-
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "",
+                                                           "name":  "m_HitEntities",
+                                                           "type":  "unordered_set\u003cuint32\u003e"
+                                                       }
                                                    ],
                                        "base_class":  "PartObject",
                                        "inherited_members":  {
@@ -1391,65 +1560,23 @@
                                        "has_clone":  true,
                                        "category":  "other"
                                    },
-                    "WP3000Body":  {
-                                       "members":  [
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "0.f",
-                                                           "name":  "m_FireRateTimer",
-                                                           "type":  "Float"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "0.075f",
-                                                           "name":  "m_FireRate",
-                                                           "type":  "Float"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "-1",
-                                                           "name":  "m_RootBoneIndex",
-                                                           "type":  "int32"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "0.f",
-                                                           "name":  "m_HoverTime",
-                                                           "type":  "Float"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "0.2f",
-                                                           "name":  "m_HoverAmplitude",
-                                                           "type":  "Float"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "2.0f",
-                                                           "name":  "m_HoverSpeed",
-                                                           "type":  "Float"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "5.0f",
-                                                           "name":  "m_FollowSpeed",
-                                                           "type":  "Float"
-                                                       },
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "POD_STATE::IDLE",
-                                                           "name":  "m_PodState",
-                                                           "type":  "POD_STATE"
-                                                       }
-                                                   ],
-                                       "base_class":  "Pl0000Parts",
-                                       "inherited_members":  {
+                    "StateEm0010_Dead":  {
+                                             "members":  [
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "",
+                                                                 "name":  "m_DeadAnim",
+                                                                 "type":  "unordered_set\u003cuint32\u003e"
+                                                             }
+                                                         ],
+                                             "base_class":  "StateEm0010",
+                                             "inherited_members":  {
 
-                                                             },
-                                       "namespace":  "Client",
-                                       "has_create":  true,
-                                       "has_clone":  true,
-                                       "category":  "other"
-                                   }
+                                                                   },
+                                             "namespace":  "Client",
+                                             "has_create":  true,
+                                             "has_clone":  false,
+                                             "category":  "other"
+                                         }
                 }
 }

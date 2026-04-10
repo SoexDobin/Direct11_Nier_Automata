@@ -114,6 +114,9 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 		Float rootSpeed = rootPositionVelocity.Length();
 		worldMoveDelta = m_CurrentMoveData.direction * rootSpeed;
 	}
+
+	// 💡 루트 모션 스케일 적용 (타격 시 m_RootMotionScale = 0.1f 가 되어 1/10 속도로 느리게 전진)
+	worldMoveDelta *= m_RootMotionScale;
 	
 	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicsDelta;
 	nextPosition += m_CorrectionDelta;

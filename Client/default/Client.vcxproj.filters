@@ -185,7 +185,22 @@
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MonsterSight.h">
-      <Filter>02. GameObject\Entity\Monster</Filter>
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterAOE.h">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000Shockwave.h">
+      <Filter>02. GameObject\Entity\2B</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Dead.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="StateEm0010_Attack.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Chase.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -367,7 +382,22 @@
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MonsterSight.cpp">
-      <Filter>02. GameObject\Entity\Monster</Filter>
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterAOE.cpp">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000Shockwave.cpp">
+      <Filter>02. GameObject\Entity\2B</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Dead.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="StateEm0010_Attack.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Chase.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -415,9 +445,6 @@
     </Filter>
     <Filter Include="02. GameObject\Sky">
       <UniqueIdentifier>{d5aa316f-6060-4485-b596-72e8cffe7af4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="99. Default">
-      <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\Bullet">
       <UniqueIdentifier>{d890cac3-f6d2-454b-ba09-6ac4ea6444cb}</UniqueIdentifier>
@@ -505,6 +532,12 @@
     </Filter>
     <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body">
       <UniqueIdentifier>{5f1c2560-e6d2-4819-92d1-325a821543a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\ForMonster">
+      <UniqueIdentifier>{b88d85c6-e0cd-40ed-b691-62a3074efab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Default">
+      <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

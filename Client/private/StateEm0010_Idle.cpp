@@ -8,41 +8,54 @@
 #include "MonsterStateMachine.h"
 
 StateEm0010_Idle::StateEm0010_Idle(const wstring& tag, const Shared<Em0010>& owner)
-	: StateEm0010(tag, owner)
-{
-}
+	: StateEm0010(tag, owner) {}
 
 HRESULT StateEm0010_Idle::Initialize()
 {
-	
+	using msState = MonsterStateMachine::MONSTER_STATE;
+	m_EnterAnim.emplace(ETOI(msState::MOVE));
+
 	return StateEm0010::Initialize();
 }
 
 
 Bool StateEm0010_Idle::StateEnterInvoke()
 {
+	if (m_Owner.lock()->Is_Dead()) return false;
 	auto em0010 = m_Body.lock();
 
 	switch (auto prevState = m_States.lock()->Get_CurMonsterState())
 	{
-		default:
+	case MonsterStateMachine::MONSTER_STATE::Hit:
+		em0010->Set_Animation(ETOI(Em0010::EM0010_STATE::IDLE), 0.2f, true);
+		return true;
+	case MonsterStateMachine::MONSTER_STATE::MOVE:
+		em0010->Set_Animation(ETOI(Em0010::EM0010_STATE::WALK_END), 0.2f, true);
+		return true;
+	case MonsterStateMachine::MONSTER_STATE::CHASE:
+		em0010->Set_Animation(ETOI(Em0010::EM0010_STATE::SPRINT_END), 0.2f, true);
+		return true;
+	default:
+	{
+		if (m_InitializeState)
 		{
-			if (m_InitializeState)
-			{
-				m_Body.lock()->Set_Animation(ETOI(MonsterStateMachine::MONSTER_STATE::IDLE), 0.2f, true);
-				m_InitializeState = false;
+			em0010->Set_Animation(ETOI(Em0010::EM0010_STATE::IDLE), 0.2f, true);
+			m_InitializeState = false;
 
-				return true;
-			}
-			LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", ETOI(prevState));
-			return false;
+			return true;
 		}
+		LOG_ERROR(L"[ENTER IDLE] : No Enter state PrevIndex {} ", ETOI(prevState));
+		return false;
+	}
 	}
 }
 
 void StateEm0010_Idle::Update(Float timeDelta)
 {
-	
+	if (Has_Target())
+	{
+		m_States.lock()->Change_State(MonsterStateMachine::MONSTER_STATE::CHASE);
+	}
 }
 
 void StateEm0010_Idle::Late_Update(Float timeDelta)

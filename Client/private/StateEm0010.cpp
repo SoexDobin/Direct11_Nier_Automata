@@ -32,3 +32,27 @@ HRESULT StateEm0010::Initialize()
 	return S_OK;
 }
 
+Float StateEm0010::Get_DistanceToTarget() const
+{
+	if (m_Owner.expired()) return FLT_MAX;
+	return m_Owner.lock()->Get_DistanceToTarget();
+}
+
+Vector3 StateEm0010::Get_DirectionToTarget() const
+{
+	if (m_Owner.expired()) return Vector3::Zero;
+	return m_Owner.lock()->Get_DirectionToTarget();
+}
+
+Bool StateEm0010::Has_Target() const
+{
+	if (m_Owner.expired()) return false;
+	return m_Owner.lock()->Has_Target();
+}
+
+Bool StateEm0010::Is_TargetFront() const
+{
+	if (m_Owner.expired()) return false;
+	return m_Owner.lock()->Is_TargetFront();
+}
+

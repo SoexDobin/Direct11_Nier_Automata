@@ -16,6 +16,14 @@ Entity::Entity(const Entity& rhs)
 
 void Entity::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
+	m_LastDamageInfo.attacker = dmgInfo.attacker;
+	m_LastDamageInfo.attackType = dmgInfo.attackType;
+	m_LastDamageInfo.damage = dmgInfo.damage;
+	m_LastDamageInfo.groggyWeight = dmgInfo.groggyWeight;
+	m_LastDamageInfo.hitPosition = dmgInfo.hitPosition;
+	m_LastDamageInfo.hitRotation = dmgInfo.hitRotation;
+	m_LastDamageInfo.knockbackForce = dmgInfo.knockbackForce;
+
 	if (m_IsInvincible) return;
 	if (Is_Dead()) return;
 	m_Hp -= dmgInfo.damage;

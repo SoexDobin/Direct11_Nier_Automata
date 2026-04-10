@@ -18,7 +18,7 @@ public:
 	explicit Em0010();
 	explicit Em0010(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Em0010(const Em0010& rhs);
-	~Em0010() override = default;
+	~Em0010() override;
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -34,8 +34,12 @@ public:
 	void Submit_RenderGroup() override;
 
 public:
-	const TRANSFORM_FRAME& Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
+	const TRANSFORM_FRAME& Get_BodyModelTransform() const
+	{
+		return m_MainBody->Get_ModelTransform();
+	}
 	void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
+	void OnDeath() override;
 
 public:
 	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
@@ -54,15 +58,16 @@ private:
 public:
 	static Shared<Em0010> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
+	void Apply_PushoutCorrection(const Vector3& correction) override;
+	void OnAttackHit(const Shared<GameObject>& target) override;
 
-public:
 	enum class EM0010_STATE
 	{
 		IDLE = 0,
 		WALK_F = 1, WALK_B = 2,
 		WALK_L = 3, WALK_R = 4,
 		WALK_LOOK_TARGET_L = 5, WALK_LOOK_TARGET_R = 6,
-		WALK_END = 7,  // 0x001a
+		WALK_END = 7, 
 
 		SPRINT_1 = 9, SPRINT_2 = 10,
 		START_SPRINT_1 = 12, START_SPRINT_2 = 13,

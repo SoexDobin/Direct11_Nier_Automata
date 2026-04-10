@@ -7,43 +7,43 @@
     },
     {
       "bit": 2,
-      "collision_mask": 4294967249,
+      "collision_mask": 4294967121,
       "name": "Player"
     },
     {
       "bit": 4,
-      "collision_mask": 4294967201,
+      "collision_mask": 4294966945,
       "name": "PlayerPhysical"
     },
     {
       "bit": 8,
-      "collision_mask": 4294967249,
+      "collision_mask": 4294966865,
       "name": "PlayerWeapon"
     },
     {
       "bit": 16,
-      "collision_mask": 4294967259,
+      "collision_mask": 4294966875,
       "name": "Monster"
     },
     {
       "bit": 32,
-      "collision_mask": 4294967205,
+      "collision_mask": 4294966821,
       "name": "MonsterPhysical"
     },
     {
       "bit": 64,
-      "collision_mask": 4294967259,
+      "collision_mask": 4294966875,
       "name": "Bullet"
     },
     {
       "bit": 128,
-      "collision_mask": 4294967295,
-      "name": "LAYER7"
+      "collision_mask": 4294966789,
+      "name": "Sight"
     },
     {
       "bit": 256,
-      "collision_mask": 4294967295,
-      "name": "LAYER8"
+      "collision_mask": 4294966787,
+      "name": "MonsterAttack"
     },
     {
       "bit": 512,

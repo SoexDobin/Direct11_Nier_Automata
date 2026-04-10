@@ -25,16 +25,15 @@ public:
 		Vector3 lookDirection{ 0.f, 0.f, 0.f };
 
 		Bool isMove{ false };
-		Bool isJump{ false };
 		Bool isAttack{ false };
-
 		Bool canRotation{ true };
 		Bool useRootMotionDir{ true };		// 로컬 방향에 의한 tilt 수정
-	} Em0010_MOVEMENT_DATA;
+		Float rootMotionScale{ 1.f };
+	} EM0010_MOVEMENT_DATA;
 
 public:
-	void Set_MovementData(const Em0010_MOVEMENT_DATA& data) { m_CurrentMoveData = data; }
-	const Em0010_MOVEMENT_DATA& Get_MovementData() const { return m_CurrentMoveData; }
+	void Set_MovementData(const EM0010_MOVEMENT_DATA& data) { m_CurrentMoveData = data; Reset_RootMotionStop(); }
+	const EM0010_MOVEMENT_DATA& Get_MovementData() const { return m_CurrentMoveData; }
 
 public:
 	explicit Em0010Movement();
@@ -51,7 +50,7 @@ public:
 	void Update_Movement(Float timeDelta) override;
 
 private:
-	Em0010_MOVEMENT_DATA m_CurrentMoveData{};
+	EM0010_MOVEMENT_DATA m_CurrentMoveData{};
 	Vector3 m_LastGroundedRootPositionVelocity{ 0.f, 0.f, 0.f };
 
 private:

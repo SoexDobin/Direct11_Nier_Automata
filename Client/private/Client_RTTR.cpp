@@ -21,6 +21,7 @@
 #include "Pl0000StateMachine.h"
 #include "Pl0000Input.h"
 #include "Pl0000Movement.h"
+#include "Pl0000Shockwave.h"
 #include "WP3000Body.h"
 #include "Em3100.h"
 #include "Em3100Body.h"
@@ -40,6 +41,7 @@ using rttr::registration;
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
 #include "FreeCamera.h"
+#include "MonsterAOE.h"
 #include "MonsterStateMachine.h"
 #include "SkyBox.h"
 #include "SkySphere.h"
@@ -146,6 +148,11 @@ void Register_Client_Reflection() {
         .method("Clone", &Pl0000Movement::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000Movement::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<Pl0000Shockwave>("Pl0000Shockwave")
+        .constructor<>()
+        .method("Clone", &Pl0000Shockwave::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000Shockwave::Create(device, context); })
+		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
     rttr::registration::class_<CityOfRuins>("CityOfRuins")
         .constructor<>()
         .method("Clone", &CityOfRuins::Clone)
@@ -218,6 +225,11 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &FreeCamera::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return FreeCamera::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<MonsterAOE>("MonsterAOE")
+        .constructor<>()
+        .method("Clone", &MonsterAOE::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return MonsterAOE::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<MonsterStateMachine>("MonsterStateMachine")
         .constructor<>()

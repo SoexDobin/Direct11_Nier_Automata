@@ -80,7 +80,6 @@ HRESULT Pl0000::Initialize(void* arg)
 		LOG_ERROR(L"Failed to Initialize GameObject {}", m_ObjectName);
 		return E_FAIL;
 	}
-
 	if (FAILED(Ready_PartObjects())) {
 		LOG_ERROR(L"Failed to Ready PartObjects {}", m_ObjectName);
 		return E_FAIL;
@@ -106,11 +105,21 @@ void Pl0000::Priority_Update(Float timeDelta)
 
 void Pl0000::Update(Float timeDelta)
 {
+	if (m_LagDuration > 0.f)
+	{
+		m_LagDuration -= timeDelta;
+		timeDelta *= 0.05f; 
+	}
+
+
 	m_Pl0000States->Update_State(timeDelta);
 }
 
 void Pl0000::Late_Update(Float timeDelta)
 {
+	if (m_LagDuration > 0.f)
+		timeDelta *= 0.05f;
+
 	m_Pl0000Movement->Update_Movement(timeDelta);
 
 	m_Transform->Update_WorldMatrix();
@@ -143,15 +152,23 @@ void Pl0000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<C
 	auto targetLayers = target->Get_LayerMask();
 	auto targetTags = target->Get_TagMask();
 
-	if (targetLayers.Has(L"MonsterPhysical"))
-	{
-		m_Pl0000Movement->Add_Correction(PushoutDelta(ownCollider, targetCollider, 1.0f));
-	}
+	//if (targetLayers.Get_LayerName() == L"MonsterPhysical")
+	//{
+	//	m_Pl0000Movement->Add_Correction(PushoutDelta(ownCollider, targetCollider, 1.0f));
+	//}
 }
 
 void Pl0000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	
+}
+
+void Pl0000::OnAttackHit(const Shared<GameObject>& target)
+{
+	if (m_Pl0000Movement)
+	{
+		m_Pl0000Movement->Reduce_RootMotion();
+	}
 }
 
 HRESULT Pl0000::Ready_PartObjects()

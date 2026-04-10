@@ -57,7 +57,8 @@ public:
     void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
     void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
-private:
+public:
+    void OnAttackHit(const Shared<GameObject>& target) override;
 
 private:
     HRESULT Ready_PartObjects();
@@ -118,6 +119,12 @@ public:
     	DASH_B_TO_SPRINT    = 74, 
     	DASH_R_TO_SPRINT    = 75, 
     	DASH_L_TO_SPRINT    = 76,
+
+        // EVADE
+        EVADE_FRONT         = 27,
+        EVADE_BACKWARD      = 28,
+        EVADE_RIGHT         = 29,
+        EVADE_LEFT          = 30,
         
         // JUMP
         JUMP_ENTER          = 13,

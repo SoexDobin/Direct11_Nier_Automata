@@ -26,6 +26,9 @@ public:
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
+	void On_Destroy() override;
+	void On_Enable() override;
+	void On_Disable() override;
 
 private:
 	void Update(Float timeDelta) override;
@@ -42,6 +45,7 @@ private:
 public:
 	static Shared<MonsterSight> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
+	
 };
 
 

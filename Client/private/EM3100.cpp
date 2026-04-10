@@ -135,7 +135,7 @@ HRESULT Em3100::Ready_PartObjects()
 HRESULT Em3100::Ready_Components()
 {
 	SphereCollider::SPHERE_COLLIDER_DESC sphereDesc{};
-	sphereDesc.radius = 1.f;
+	sphereDesc.radius = 3.f;
 	sphereDesc.offset = Vector3::UnitY;
 	m_InteractionZone = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereDesc);
 	if (nullptr == m_InteractionZone)

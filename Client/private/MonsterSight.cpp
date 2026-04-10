@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "MonsterSight.h"
+
+#include <ContainerObject.h>
+
+#include "Monster.h"
 #include "SphereCollider.h"
 #include "SpdLogger.h"
 
@@ -11,6 +15,7 @@ MonsterSight::MonsterSight(const MonsterSight& rhs)
 
 HRESULT MonsterSight::Initialize_Prototype()
 {
+	m_LayerMask.Set_Layer(L"Sight");
 	return PartObject::Initialize_Prototype();
 }
 
@@ -44,6 +49,21 @@ HRESULT MonsterSight::Initialize(void* arg)
 	return S_OK;
 }
 
+void MonsterSight::On_Destroy()
+{
+	PartObject::On_Destroy();
+}
+
+void MonsterSight::On_Enable()
+{
+	PartObject::On_Enable();
+}
+
+void MonsterSight::On_Disable()
+{
+	PartObject::On_Disable();
+}
+
 void MonsterSight::Update(Float timeDelta)
 {
 	m_Transform->Update_WorldMatrix();
@@ -58,7 +78,13 @@ void MonsterSight::Late_Update(Float timeDelta)
 
 void MonsterSight::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	
+	auto target = targetCollider->Get_Owner();
+	if (nullptr == target) return;
+
+	wstring targetLayerName = target->Get_LayerMask().Get_LayerName();
+	if (L"PlayerPhysical" != targetLayerName) return;
+	auto monster = static_pointer_cast<Monster>(m_Owner.lock());
+	monster->Set_Target(target);
 }
 
 void MonsterSight::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -68,7 +94,7 @@ void MonsterSight::OnCollisionStay(const Shared<Collider>& ownCollider, const Sh
 
 void MonsterSight::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	
+	// TODO: 만약 이탈과 관련된 코드 구현시 State를 변경하고 진행, 원점 돌아가는 것도 생각	
 }
 
 Shared<MonsterSight> MonsterSight::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

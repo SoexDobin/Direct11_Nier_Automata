@@ -5,8 +5,9 @@
 
 #include "Game.h"
 #include "Model.h"
-#include "Monster.h"
 #include "OBBCollider.h"
+#include "Entity.h"
+#include "Monster.h"
 
 WP0070Body::WP0070Body() : Pl0000Parts{} {}
 WP0070Body::WP0070Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -66,7 +67,11 @@ void WP0070Body::Priority_Update(Float timeDelta)
 
 void WP0070Body::Update(Float timeDelta)
 {
-	m_Model->Update_ModelAnimation(timeDelta);
+	Float actualTimeDelta = timeDelta;
+	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
+		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
+	}
+	m_Model->Update_ModelAnimation(actualTimeDelta);
 
 	if (m_IsSheathing == false)
 	{
@@ -138,13 +143,25 @@ void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 		m_Model->Get_BoneMatrix(m_WeaponBoneIndex).Decompose(boneScale, boneQuat, boneTranslation);
 
 		Entity::DAMAGE_INFO dmgInfo{};
-		dmgInfo.damage = 10.f;
+		dmgInfo.attacker = m_Owner.lock();
+		dmgInfo.damage = 100.f;
+		dmgInfo.groggyWeight = 100;
 		dmgInfo.attackType = ATK_TYPE::LIGHT;
 		dmgInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
 		dmgInfo.hitRotation = m_AttackCollider->Get_CurrentOrientation();
+		dmgInfo.knockbackForce = 1.5f;
 
 		auto mon = static_pointer_cast<PartObject>(target)->Get_Owner();
-		static_pointer_cast<Monster>(mon)->TakeDamage(dmgInfo);
+		static_pointer_cast<Entity>(mon)->TakeDamage(dmgInfo);
+
+		auto monster = static_pointer_cast<Monster>(static_pointer_cast<PartObject>(target)->Get_Owner());
+		monster->TakeDamage(dmgInfo);
+		monster->OnAttackHit(shared_from_this());
+		monster->Add_HitLag(0.05f);
+
+		auto attackerEntity = static_pointer_cast<Entity>(dmgInfo.attacker.lock());
+		attackerEntity->OnAttackHit(monster);
+		attackerEntity->Add_HitLag(0.05f);
 	}
 }
 
@@ -271,11 +288,11 @@ HRESULT WP0070Body::Ready_AnimationNotify()
 	Notify{ L"Sound_Stop", 10, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
 	Notify{ L"Sound_Catch", 5, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Catch3", SOUNDCHANNEL::CHANNEL_9, 0.3f); } },
 	Notify{ L"Sound_Throw", 10, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Throw3", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
-		Notify{L"Swing3", 15, 100, active, deActive },
-		Notify{L"Swing3", 36, active,  },
-		Notify{L"Swing3", 41, active,  },
-		Notify{L"Swing3", 46, active,  },
-		Notify{L"Swing3", 51, active },
+		Notify{L"Swing3", 10, 100, active, deActive },
+		Notify{L"Swing3", 30, active,  },
+		Notify{L"Swing3", 40, active,  },
+		Notify{L"Swing3", 45, active,  },
+		Notify{L"Swing3", 50, active },
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0070_STATE::LIGHT_GROUND4), {
@@ -283,11 +300,11 @@ HRESULT WP0070Body::Ready_AnimationNotify()
 	Notify{ L"Sound_Stop", 25, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
 	Notify{ L"Sound_Catch", 20, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Catch4", SOUNDCHANNEL::CHANNEL_9, 0.3f); } },
 	Notify{ L"Sound_Throw", 25, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Throw4", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
-		Notify{L"Swing4", 30, 100, active, deActive },
-		Notify{L"Swing4", 36, active,  },
-		Notify{L"Swing4", 41, active,  },
-		Notify{L"Swing4", 46, active,  },
-		Notify{L"Swing4", 51, active },
+		Notify{L"Swing4", 25, 100, active, deActive },
+		Notify{L"Swing4", 30, active,  },
+		Notify{L"Swing4", 40, active,  },
+		Notify{L"Swing4", 45, active,  },
+		Notify{L"Swing4", 50, active },
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0070_STATE::LIGHT_GROUND5), {
@@ -295,11 +312,11 @@ HRESULT WP0070Body::Ready_AnimationNotify()
 	Notify{ L"Sound_Stop", 25, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
 	Notify{ L"Sound_Return", 20, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Return5", SOUNDCHANNEL::CHANNEL_9, 0.3f); } },
 	Notify{ L"Sound_Throw", 25, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Throw5", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
-		Notify{L"Swing5", 30, 100, active, deActive },
-		Notify{L"Swing5", 36, active,  },
-		Notify{L"Swing5", 41, active,  },
-		Notify{L"Swing5", 46, active,  },
-		Notify{L"Swing5", 51, active },
+		Notify{L"Swing5", 25, 100, active, deActive },
+		Notify{L"Swing5", 30, active,  },
+		Notify{L"Swing5", 40, active,  },
+		Notify{L"Swing5", 45, active,  },
+		Notify{L"Swing5", 50, active },
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0070_STATE::LIGHT_GROUND6), {

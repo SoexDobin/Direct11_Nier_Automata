@@ -136,7 +136,7 @@ HRESULT Em3100Body::Ready_Components()
 		return E_FAIL;
 
 	AABBCollider::AABB_COLLIDER_DESC aabbDesc{};
-	aabbDesc.extents = Vector3{ 1.f, 1.f, 1.f };
+	aabbDesc.extents = Vector3{ 3.f, 3.f, 3.f };
 	aabbDesc.offset = Vector3{ 0.f, 1.f, 0.f };;
 	m_HitBox = Add_Component<AABBCollider>(ETOI(LEVEL::STATIC), &aabbDesc);
 	if (nullptr == m_HitBox)

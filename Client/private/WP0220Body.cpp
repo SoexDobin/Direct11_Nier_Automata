@@ -7,6 +7,8 @@
 #include "Model.h"
 #include "Monster.h"
 #include "OBBCollider.h"
+#include "Pl0000Shockwave.h"
+#include "Entity.h"
 
 WP0220Body::WP0220Body() : Pl0000Parts{} {}
 WP0220Body::WP0220Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -64,7 +66,11 @@ void WP0220Body::Priority_Update(Float timeDelta)
 
 void WP0220Body::Update(Float timeDelta)
 {
-	m_Model->Update_ModelAnimation(timeDelta);
+	Float actualTimeDelta = timeDelta;
+	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
+		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
+	}
+	m_Model->Update_ModelAnimation(actualTimeDelta);
 
 	if (m_IsSheathing == false)
 	{
@@ -132,10 +138,23 @@ void WP0220Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 		m_HitEntities.insert(targetID);
 
 		Entity::DAMAGE_INFO dmgInfo{};
-		dmgInfo.attackType = ATK_TYPE::LIGHT;
+		dmgInfo.attacker = m_Owner.lock();
+		dmgInfo.damage = 175.f;
+		dmgInfo.groggyWeight = 175.f;
+		dmgInfo.attackType = ATK_TYPE::HEAVY;
+		dmgInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
+		dmgInfo.hitRotation = m_AttackCollider->Get_CurrentOrientation();
+		dmgInfo.knockbackForce = 2.f;
 
-		auto mon = static_pointer_cast<PartObject>(target)->Get_Owner();
-		static_pointer_cast<Monster>(mon)->TakeDamage(dmgInfo);
+		auto monster = static_pointer_cast<Monster>(static_pointer_cast<PartObject>(target)->Get_Owner());
+		monster->TakeDamage(dmgInfo);
+		monster->OnAttackHit(shared_from_this());
+		monster->Add_HitLag(0.2f);
+
+		auto attackerEntity = static_pointer_cast<Entity>(dmgInfo.attacker.lock());
+		attackerEntity->OnAttackHit(monster);
+		attackerEntity->Add_HitLag(0.2f);
+
 	}
 }
 
@@ -154,6 +173,29 @@ void WP0220Body::DeActive_LightWeapon()
 {
 	m_AttackCollider->Set_Active(false);
 	m_HitEntities.clear();
+}
+
+void WP0220Body::Impact_Shockwave(const Vector3& offset)
+{
+	Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);
+	Matrix worldMatrix = boneMatrix * m_CombinedWorldMatrix; 
+
+	Vector3 truePos = Vector3::Transform(offset, worldMatrix);
+
+	Entity::DAMAGE_INFO dmgInfo{};
+	dmgInfo.attacker = m_Owner.lock();
+	dmgInfo.damage = 225.f;
+	dmgInfo.groggyWeight = 225.f;
+	dmgInfo.attackType = ATK_TYPE::HEAVY;
+	dmgInfo.hitPosition = truePos;
+	dmgInfo.hitRotation = Quaternion::Identity;
+	dmgInfo.knockbackForce = 5.f;
+
+	Pl0000Shockwave::PLAYER_SHOCKWAVE_DESC desc{};
+	desc.damageInfo = dmgInfo;
+	desc.position = truePos;
+	desc.radius = 2.5f;
+	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", ETOI(LEVEL::GAMEPLAY), &desc);
 }
 
 void WP0220Body::Set_Sheathing(const Matrix& sheathMatrix)
@@ -237,7 +279,8 @@ HRESULT WP0220Body::Ready_AnimationNotify()
 
 	auto active = [this]() { Active_LightWeapon(); };
 	auto deActive = [this]() { DeActive_LightWeapon(); };
-
+	auto impactShockwave = [this]() { Impact_Shockwave(Vector3{0.f, 0.f, -2.f }); };
+	auto impactCombo = [this]() { Impact_Shockwave(Vector3{0.f, 0.f, -2.f}); };
 
 	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND1), {
 	Notify{ L"Wp0220_Stop1", 30, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
@@ -252,7 +295,7 @@ HRESULT WP0220Body::Ready_AnimationNotify()
 	Notify{ L"Wp0220_Stop1", 65, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
 	Notify{ L"Wp0220_Swing2_1", 65, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing2_1", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
 		Notify{L"Swing2", 65, 100, active, deActive },
-		Notify{L"Swing2", 80, active,  },
+		Notify{L"Swing2", 80, active  },
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND3), {
@@ -264,6 +307,7 @@ HRESULT WP0220Body::Ready_AnimationNotify()
 	Notify{ L"Wp0220_Swing3_3", 108, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Swing3_3", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
 		Notify{L"Swing3", 50, 70, active, deActive },
 		Notify{L"Swing3", 60, active,  },
+		Notify{L"Impact", 111, impactShockwave}
 		// 충격파 111 프레임일때 bone위치에 Instant
 		});
 
@@ -274,11 +318,13 @@ HRESULT WP0220Body::Ready_AnimationNotify()
 	Notify{ L"Wp0220_Hammer", 75, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Hammer", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
 		Notify{L"Swing3", 40, 85, active, deActive },
 		Notify{L"Swing3", 80, active },
+		Notify{L"Impact", 80, impactCombo }
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_GROUND_HOLD_UNFULL), {
 	Notify{ L"Wp0220_Stop1", 40, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); } },
 	Notify{ L"Wp0220_Charge_Impact", 40, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Charge_Impact", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		Notify{L"Impact", 40, impactShockwave}
 		// 충격파
 		});
 

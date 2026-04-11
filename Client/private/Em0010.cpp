@@ -126,16 +126,13 @@ void Em0010::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
 	if (Is_Dead()) return;
 
-	if (m_TargetPlayer.expired() && false == dmgInfo.attacker.expired())
-		m_TargetPlayer = dmgInfo.attacker;
-
 	Play_HitSFX(dmgInfo);
 	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
 		
 	if (dmgInfo.attackType != ATK_TYPE::POD)
 		m_States->Change_State(MonsterStateMachine::MONSTER_STATE::Hit);
 
-	Entity::TakeDamage(dmgInfo);
+	Monster::TakeDamage(dmgInfo);
 }
 
 void Em0010::OnDeath()

@@ -18,7 +18,7 @@
 #include "State2B_Run.h"
 #include "State2B_Sprint.h"
 #include "State2B_Walk.h"
-#include "State2B_Dash.h"
+#include "State2B_Evade.h"
 
 namespace Client {
 
@@ -152,15 +152,18 @@ void Pl0000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<C
 	auto targetLayers = target->Get_LayerMask();
 	auto targetTags = target->Get_TagMask();
 
-	//if (targetLayers.Get_LayerName() == L"MonsterPhysical")
-	//{
-	//	m_Pl0000Movement->Add_Correction(PushoutDelta(ownCollider, targetCollider, 1.0f));
-	//}
 }
 
 void Pl0000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	
+}
+
+void Pl0000::TakeDamage(const DAMAGE_INFO& dmgInfo)
+{
+	if (TryEvade(dmgInfo.attacker.lock())) return;
+	LOG_INFO(L"Hit ---------------------");
+	Entity::TakeDamage(dmgInfo);
 }
 
 void Pl0000::OnAttackHit(const Shared<GameObject>& target)
@@ -169,6 +172,33 @@ void Pl0000::OnAttackHit(const Shared<GameObject>& target)
 	{
 		m_Pl0000Movement->Reduce_RootMotion();
 	}
+}
+
+Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
+{
+	if (m_Pl0000States->Get_CurP10000State() != PL0000_STATE::EVADE)
+		return false;
+
+	auto dashState = static_pointer_cast<State2B_Evade>(
+		m_Pl0000States->Find_2BState(PL0000_STATE::EVADE));
+	if (!dashState)
+		return false;
+
+	Bool isEvaded = dashState->TryEvade_FromDash();
+
+	if (isEvaded && attacker)
+	{
+		if (attacker->Get_GameObjectType() == GAMEOBJECTTYPE::PART)
+		{
+			m_LockOnTarget = static_pointer_cast<PartObject>(attacker)->Get_Owner();
+		}
+		else if (attacker->Get_GameObjectType() == GAMEOBJECTTYPE::CONTAINER)
+		{
+			m_LockOnTarget = attacker;
+		}
+	}
+
+	return isEvaded;
 }
 
 HRESULT Pl0000::Ready_PartObjects()
@@ -191,6 +221,8 @@ HRESULT Pl0000::Ready_PartObjects()
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body", &desc)))
 		return E_FAIL;
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP3000Body", L"WP3000Body", &desc)))
+		return E_FAIL;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000EvadeChecker", L"Pl0000EvadeChecker", &desc)))
 		return E_FAIL;
 
 	m_MainBody = static_pointer_cast<Pl0000Body>(Find_PartObject(L"Pl0000Body"));
@@ -241,8 +273,8 @@ HRESULT Pl0000::Ready_Components()
 		if (FAILED(m_Pl0000States->Add_State(State2B_Jump::Create(
 			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::JUMP)), pl0000))))
 			return E_FAIL;
-		if (FAILED(m_Pl0000States->Add_State(State2B_Dash::Create(
-			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::DASH)), pl0000))))
+		if (FAILED(m_Pl0000States->Add_State(State2B_Evade::Create(
+			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::EVADE)), pl0000))))
 			return E_FAIL;
 		if (FAILED(m_Pl0000States->Add_State(State2B_AttackGround::Create(
 			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::ATTACK_GROUND)), pl0000))))

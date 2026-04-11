@@ -90,6 +90,7 @@ public:
 		JUMP_TO_3 = 86,		// 0x0504
 		SWING_FRONT = 87,	// 0x0510
 		PUNCH_FRONT = 88,	// 0x0512
+		SWING_TWICE = 89, 
 	};
 
 };

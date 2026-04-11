@@ -118,7 +118,7 @@
     <ClInclude Include="..\public\Pl0000Parts.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\State2B_Dash.h">
+    <ClInclude Include="..\public\State2B_Evade.h">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Movement.h">
@@ -201,6 +201,12 @@
     </ClInclude>
     <ClInclude Include="..\public\StateEm0010_Chase.h">
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FireFlashEffect.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000EvadeChecker.h">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -318,7 +324,7 @@
     <ClCompile Include="..\private\Pl0000Parts.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\State2B_Dash.cpp">
+    <ClCompile Include="..\private\State2B_Evade.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Movement.cpp">
@@ -398,6 +404,12 @@
     </ClCompile>
     <ClCompile Include="..\private\StateEm0010_Chase.cpp">
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FireFlashEffect.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000EvadeChecker.cpp">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

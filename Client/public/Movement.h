@@ -29,7 +29,7 @@ public:
 	void Add_Correction(const Vector3& correction) { m_CorrectionDelta += correction; }
 	void Reset_Correction() { m_CorrectionDelta = Vector3::Zero; }
 
-	virtual void Reduce_RootMotion() { m_RootMotionScale = 0.25f; } 
+	virtual void Reduce_RootMotion(Float lazyAmount = 0.1f) { m_RootMotionScale = lazyAmount; }
 	virtual void Reset_RootMotionStop() { m_RootMotionScale = 1.0f; }
 
 public:

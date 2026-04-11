@@ -59,6 +59,12 @@
             "level": "GAMEPLAY",
             "path": "UI/HUD/UI_Hp_Bar.png",
             "tag": "UI_Hp_Bar"
+        },
+        {
+            "count": 1,
+            "level": "GAMEPLAY",
+            "path": "Texture/Effect/FireFlash/FireFlash.dds",
+            "tag": "Fire_Flash"
         }
     ]
 }

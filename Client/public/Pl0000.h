@@ -10,8 +10,9 @@ NS_BEGIN(Engine)
 }
 
 NS_BEGIN(Client)
+	class Pl0000EvadeChecker;
 
-class Pl0000Movement;
+	class Pl0000Movement;
 class Pl0000StateMachine;
 class Pl0000Body;
 class WP0070Body;
@@ -33,16 +34,13 @@ public:
 
 public: /* pl0000 */
     TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
-
     const Matrix& Get_LightSheathingMatrix() const { return m_LightSheathMatrix; }
     const Matrix& Get_HeavySheathingMatrix() const { return m_HeavySheathMatrix; }
-
 
 public:
     HRESULT Initialize_Prototype() override;
     HRESULT Initialize(void* arg) override;
     void On_Destroy() override;
-
 
 public:
     void Priority_Update(Float timeDelta) override;
@@ -58,11 +56,20 @@ public:
     void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 public:
+    void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
     void OnAttackHit(const Shared<GameObject>& target) override;
+    Bool TryEvade(const Shared<GameObject>& attacker);
 
 private:
     HRESULT Ready_PartObjects();
     HRESULT Ready_Components();
+
+public:
+    void Set_LockOnTarget(const Shared<GameObject>& target) { m_LockOnTarget = target; }
+    Weak<GameObject> Get_LockOnTarget() const { return m_LockOnTarget; }
+
+private:
+    Weak<GameObject> m_LockOnTarget{};
 
 private:
     Shared<Pl0000Body> m_MainBody{ nullptr };
@@ -85,11 +92,10 @@ public:
         IDLE                = 899,
         RUN                 = 898,
         SPRINT              = 897,
-        DASH                = 896,
+        EVADE                = 896,
         JUMP                = 895,
         ATTACK_GROUND       = 894,
         ATTACK_AIR          = 893,
-        EVADE               = 892,
 
         // IDLE
         IDLE_Neutral            = 46,

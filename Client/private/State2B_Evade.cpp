@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "State2B_Dash.h"
+#include "State2B_Evade.h"
 
 #include <Game.h>
 #include <SpdLogger.h>
@@ -12,13 +12,14 @@
 #include "Pl0000StateMachine.h"
 #include "Model.h"
 #include "Pl0000Movement.h"
+#include "Random_Helper.h"
 
-State2B_Dash::State2B_Dash(const wstring& tag, const Shared<Pl0000>& owner)
+State2B_Evade::State2B_Evade(const wstring& tag, const Shared<Pl0000>& owner)
 	: State2B{tag, owner}
 {
 }
 
-HRESULT State2B_Dash::Initialize()
+HRESULT State2B_Evade::Initialize()
 {
 	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::STAND_TO_DASH_F));
 	m_EnterAnim.emplace(ETOI(Pl0000::PL0000_STATE::STAND_TO_DASH_B));
@@ -30,15 +31,22 @@ HRESULT State2B_Dash::Initialize()
 	m_DashAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_R));
 	m_DashAnim.emplace(ETOI(Pl0000::PL0000_STATE::DASH_L));
 
+	m_EvadeAnim.emplace(ETOI(Pl0000::PL0000_STATE::EVADE_FRONT));
+	m_EvadeAnim.emplace(ETOI(Pl0000::PL0000_STATE::EVADE_BACKWARD));
+	m_EvadeAnim.emplace(ETOI(Pl0000::PL0000_STATE::EVADE_RIGHT));
+	m_EvadeAnim.emplace(ETOI(Pl0000::PL0000_STATE::EVADE_LEFT));
+
 	return State2B::Initialize();
 }
 
-Bool State2B_Dash::StateEnterInvoke()
+Bool State2B_Evade::StateEnterInvoke()
 {
 	auto pl0000 = m_Body.lock();
 	auto input = m_Input.lock();
 	
 	m_OriginalFov = m_MainCamera.lock()->Get_FovY();
+	m_EvadePhase = EVADE_PHASE::ENTER;
+	PlayEvadeSFX(m_EvadePhase);
 
 	if (input->Is_KeyPress(UBYTE(DIKEYBOARD_W))) {
 		m_DashDir = DASH_DIR::FRONT;
@@ -66,13 +74,61 @@ Bool State2B_Dash::StateEnterInvoke()
 
 }
 
-void State2B_Dash::Update(Float timeDelta)
+void State2B_Evade::Update(Float timeDelta)
 {
 	auto pl0000 = m_Body.lock();
 	auto input = m_Input.lock();
 	uint32 curIndex = pl0000->Get_CurrentAnimationIndex();
 	Bool isAnimFinished = pl0000->Is_AnimationFinished();
 	Float dashProgress = pl0000->Get_AnimationProgress();
+
+	if (m_EvadePhase == EVADE_PHASE::EVADE)
+	{
+		Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
+		moveData.direction = Calculate_Direction();
+		moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
+		moveData.useRootMotionDir = false;
+		m_Movement.lock()->Set_MovementData(moveData);
+		if (dashProgress <= 0.55f)
+			return;
+		
+		
+
+		m_Owner.lock()->Set_Invincible(false);
+		if (input->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
+		{
+			m_States.lock()->Change_State(Pl0000::PL0000_STATE::JUMP);
+			return;
+		}
+		if (input->Is_MousePress(DIMB::LBUTTON) || input->Is_MousePress(DIMB::RBUTTON))
+		{
+			if (auto target = m_Owner.lock()->Get_LockOnTarget().lock())
+			{
+				if (!target->Is_Destroy())
+				{
+					auto myTransform = m_Owner.lock()->Get_Component<Transform>();
+					auto targetTransform = target->Get_Component<Transform>();
+					Vector3 myPos = myTransform->Get_Position();
+					Vector3 targetPos = targetTransform->Get_Position();
+					targetPos.y = myPos.y;
+					// 즉각적으로 회전 (대상을 바라봄)
+					myTransform->LookAt(targetPos);
+				}
+			}
+
+			m_States.lock()->Change_State(Pl0000::PL0000_STATE::ATTACK_GROUND);
+			return;
+		}
+		if (input->Is_WASD_DoubleClickedHold(0.f))
+		{
+			m_States.lock()->Change_State(Pl0000::PL0000_STATE::SPRINT);
+			return;
+		}
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
+		return;
+	}
+
+	// DASH 
 
 	Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
 	moveData.direction = Calculate_Direction();
@@ -89,14 +145,19 @@ void State2B_Dash::Update(Float timeDelta)
 	moveData.useRootMotionDir = false;
 	m_Movement.lock()->Set_MovementData(moveData);
 
+
 	if (input->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
 	{
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_7);
+		m_EvadePhase = EVADE_PHASE::END;
 		m_States.lock()->Change_State(Pl0000::PL0000_STATE::JUMP);
 		return;
 	}
 
 	if (input->Is_WASD_NoneOrUp())
 	{
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_7);
+		m_EvadePhase = EVADE_PHASE::END;
 		m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
 		return;
 	}
@@ -105,15 +166,19 @@ void State2B_Dash::Update(Float timeDelta)
 	{
 		switch (m_DashDir) {
 		case DASH_DIR::FRONT: 
+			m_EvadePhase = EVADE_PHASE::DASH;
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_F), 0.5f, false); 
 			break;
 		case DASH_DIR::BACK:  
+			m_EvadePhase = EVADE_PHASE::DASH;
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_B), 0.5f, false); 
 			break;
 		case DASH_DIR::RIGHT: 
+			m_EvadePhase = EVADE_PHASE::DASH;
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_R), 0.5f, false); 
 			break;
 		case DASH_DIR::LEFT:  
+			m_EvadePhase = EVADE_PHASE::DASH;
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_L), 0.5f, false); 
 			break;
 		case DASH_DIR::NONE:
@@ -123,6 +188,7 @@ void State2B_Dash::Update(Float timeDelta)
 	}
 	else if (m_DashAnim.contains(curIndex) && dashProgress >= 0.7f)
 	{
+		m_EvadePhase = EVADE_PHASE::END;
 		if (!input->Is_WASD_NoneOrUp())
 		{
 			m_States.lock()->Change_State(Pl0000::PL0000_STATE::SPRINT);
@@ -132,15 +198,18 @@ void State2B_Dash::Update(Float timeDelta)
 	}
 }
 
-void State2B_Dash::Late_Update(Float timeDelta)
+void State2B_Evade::Late_Update(Float timeDelta)
 {
+	if (m_EvadePhase == EVADE_PHASE::EVADE)
+		return;
+
 	Float dashProgress = m_Body.lock()->Get_AnimationProgress();
 
 	Float extraFovRadian = sinf(dashProgress * XM_PI) * XMConvertToRadians(8.f);
 	m_MainCamera.lock()->Set_FovY(m_OriginalFov + extraFovRadian);
 }
 
-void State2B_Dash::StateExitInvoke()
+void State2B_Evade::StateExitInvoke()
 {
 	if (m_OriginalFov > 0.f)
 	{
@@ -149,9 +218,68 @@ void State2B_Dash::StateExitInvoke()
 	}
 }
 
-Shared<State2B_Dash> State2B_Dash::Create(const wstring& tag, const Shared<Pl0000>& owner)
+void State2B_Evade::PlayEvadeSFX(EVADE_PHASE evadePhase) const
 {
-	auto instance = make_shared<State2B_Dash>(tag, owner);
+	if (evadePhase == EVADE_PHASE::ENTER || evadePhase == EVADE_PHASE::DASH)
+	{
+		int32 rand = Helper::Random_Int(0, 3);
+		wstring anim[] = {
+			L"Pl_Dash1",
+			L"Pl_Dash2",
+			L"Pl_Dash3",
+			L"Pl_Dash4"
+		};
+
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_7);
+		GAME_INSTANCE->PlaySoundFXOnce(anim[rand], SOUNDCHANNEL::CHANNEL_7, 0.5f);
+	}
+	else if (evadePhase == EVADE_PHASE::EVADE)
+	{
+		GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_7);
+		GAME_INSTANCE->PlaySoundFXOnce(L"Pl_Evade", SOUNDCHANNEL::CHANNEL_7, 0.5f);
+	}
+}
+
+Bool State2B_Evade::TryEvade_FromDash()
+{
+	if (m_EvadePhase == EVADE_PHASE::EVADE) return true;
+
+	auto pl0000 = m_Body.lock();
+	Float progress = pl0000->Get_AnimationProgress();
+
+	if (progress >= 0.9f)
+		return false;
+
+	m_EvadePhase = EVADE_PHASE::EVADE;
+	PlayEvadeSFX(m_EvadePhase);
+
+	switch (m_DashDir)
+	{
+	case DASH_DIR::FRONT:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::EVADE_FRONT), 0.1f, false);
+		break;
+	case DASH_DIR::BACK:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::EVADE_BACKWARD), 0.1f, false);
+		break;
+	case DASH_DIR::RIGHT:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::EVADE_RIGHT), 0.1f, false);
+		break;
+	case DASH_DIR::LEFT:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::EVADE_LEFT), 0.1f, false);
+		break;
+	default:
+		return false;
+	}
+
+	auto owner = m_Owner.lock();
+	owner->Set_Invincible(true);
+	owner->Add_HitLag(0.08f);
+	return true; 
+}
+
+Shared<State2B_Evade> State2B_Evade::Create(const wstring& tag, const Shared<Pl0000>& owner)
+{
+	auto instance = make_shared<State2B_Evade>(tag, owner);
 
 	if (FAILED(instance->Initialize()))
 	{

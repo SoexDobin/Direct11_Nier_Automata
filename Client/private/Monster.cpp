@@ -107,6 +107,14 @@ void Monster::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<
 
 }
 
+void Monster::TakeDamage(const DAMAGE_INFO& dmgInfo)
+{
+	if (m_TargetPlayer.expired())
+		m_TargetPlayer = dmgInfo.attacker;
+
+	Entity::TakeDamage(dmgInfo);
+}
+
 Bool Monster::Is_TargetFront() const
 {
 	if (m_TargetPlayer.expired()) return false;

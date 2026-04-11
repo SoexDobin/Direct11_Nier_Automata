@@ -189,6 +189,7 @@
     <ClInclude Include="..\public\Em0010.h" />
     <ClInclude Include="..\public\Em0010Body.h" />
     <ClInclude Include="..\public\Em0010Movement.h" />
+    <ClInclude Include="..\public\FireFlashEffect.h" />
     <ClInclude Include="..\public\MonsterAOE.h" />
     <ClInclude Include="..\public\MonsterSight.h" />
     <ClInclude Include="..\public\Em3100.h" />
@@ -212,6 +213,7 @@
     <ClInclude Include="..\public\ParticleEffect.h" />
     <ClInclude Include="..\public\Pl0000.h" />
     <ClInclude Include="..\public\Pl0000Body.h" />
+    <ClInclude Include="..\public\Pl0000EvadeChecker.h" />
     <ClInclude Include="..\public\Pl0000Input.h" />
     <ClInclude Include="..\public\Pl0000Parts.h" />
     <ClInclude Include="..\public\Pl0000Shockwave.h" />
@@ -225,7 +227,7 @@
     <ClInclude Include="..\public\State2B.h" />
     <ClInclude Include="..\public\State2B_AttackAir.h" />
     <ClInclude Include="..\public\State2B_AttackGround.h" />
-    <ClInclude Include="..\public\State2B_Dash.h" />
+    <ClInclude Include="..\public\State2B_Evade.h" />
     <ClInclude Include="..\public\State2B_Idle.h" />
     <ClInclude Include="..\public\State2B_Jump.h" />
     <ClInclude Include="..\public\State2B_Run.h" />
@@ -257,6 +259,7 @@
     <ClCompile Include="..\private\Em0010.cpp" />
     <ClCompile Include="..\private\Em0010Body.cpp" />
     <ClCompile Include="..\private\Em0010Movement.cpp" />
+    <ClCompile Include="..\private\FireFlashEffect.cpp" />
     <ClCompile Include="..\private\MonsterAOE.cpp" />
     <ClCompile Include="..\private\MonsterSight.cpp" />
     <ClCompile Include="..\private\Em3100.cpp" />
@@ -280,6 +283,7 @@
     <ClCompile Include="..\private\ParticleEffect.cpp" />
     <ClCompile Include="..\private\Pl0000.cpp" />
     <ClCompile Include="..\private\Pl0000Body.cpp" />
+    <ClCompile Include="..\private\Pl0000EvadeChecker.cpp" />
     <ClCompile Include="..\private\Pl0000Input.cpp" />
     <ClCompile Include="..\private\Pl0000Parts.cpp" />
     <ClCompile Include="..\private\P10000StateMachine.cpp" />
@@ -293,7 +297,7 @@
     <ClCompile Include="..\private\State2B.cpp" />
     <ClCompile Include="..\private\State2B_AttackAir.cpp" />
     <ClCompile Include="..\private\State2B_AttackGround.cpp" />
-    <ClCompile Include="..\private\State2B_Dash.cpp" />
+    <ClCompile Include="..\private\State2B_Evade.cpp" />
     <ClCompile Include="..\private\State2B_Idle.cpp" />
     <ClCompile Include="..\private\State2B_Jump.cpp" />
     <ClCompile Include="..\private\State2B_Run.cpp" />

@@ -4,9 +4,11 @@
 #include <SpdLogger.h>
 
 #include "Bullet.h"
+#include "FireFlashEffect.h"
 #include "Game.h"
 #include "Model.h"
 #include "Pl0000.h"
+#include "Random_Helper.h"
 
 
 NS_BEGIN(Client)
@@ -121,7 +123,6 @@ void WP3000Body::Late_Update(Float timeDelta)
 			Vector3 scale, position;
 			Quaternion rot;
 
-			// 부모와 결합 된 결과물(m_CombinedWorldMatrix)에서 최종 World Position과 Scale만 축출
 			m_CombinedWorldMatrix.Decompose(scale, rot, position);
 			
 			Quaternion cameraRot = camera->Get_Transform()->Get_Quaternion();
@@ -221,10 +222,11 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			m_FireRateTimer = 0.f;
 			// 총알 매개변수 세팅
 			Entity::DAMAGE_INFO dmgInfo{};
+			dmgInfo.attacker = m_Owner.lock();
 			dmgInfo.attackType = ATK_TYPE::POD;
-			dmgInfo.damage = 10.f;
+			dmgInfo.damage = static_cast<Float>(Helper::Random_Double(10.f, 20.f));
 			dmgInfo.groggyWeight = 0;
-			dmgInfo.knockbackForce = 0.2f;
+			dmgInfo.knockbackForce = 1.f;
 
 			Bullet::BULLET_DESC desc{};
 			desc.damageInfo = dmgInfo;
@@ -232,10 +234,15 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			desc.targetLayer = L"Monster";
 			desc.isPermanent = false;
 			desc.speed = 30.0f; // 탄속
-			desc.maxDistance = 100.f; // 50미터 쯤 날아가면 소멸
-			desc.initialPosition = worldPosition + Vector3{0.f, 0.25f, 0.f };
+			desc.maxDistance = 100.f; 
+			desc.initialPosition = worldPosition;
 			desc.direction = m_CombinedWorldMatrix.Backward() + Vector3{ 0.f, 0.25f, 0.f };
 
+			FireFlashEffect::FIRE_FLASH_EFFECT_DESC effectDesc{};
+			effectDesc.parentMatrix = m_Transform->Get_WorldMatrix();
+
+			// TODO : 샷 이펙트는 매트릭스 줘서 따라다니게 해야함
+			GAME_INSTANCE->Instantiate<FireFlashEffect>(L"FireFlashEffect", ETOI(LEVEL::GAMEPLAY), &effectDesc);
 			GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", ETOI(LEVEL::GAMEPLAY), &desc);
 			GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_14);
 			GAME_INSTANCE->PlaySoundFXOnce(L"Wp3000_Shot", SOUNDCHANNEL::CHANNEL_14, 0.4f);

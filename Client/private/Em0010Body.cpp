@@ -8,6 +8,7 @@
 #include <Shader.h>
 #include <SpdLogger.h>
 
+#include "Em0010.h"
 #include "MonsterAOE.h"
 #include "Entity.h"
 
@@ -60,14 +61,17 @@ HRESULT Em0010Body::Begin()
 	m_LeftArm = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010LeftArm"));
 	if (m_LeftArm.expired())
 		return E_FAIL;
+	m_LeftArm.lock()->DeActive_Attack();
 
 	m_RightArm = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010RightArm"));
 	if (m_RightArm.expired())
 		return E_FAIL;
+	m_RightArm.lock()->DeActive_Attack();
 
 	m_Foot = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010Foot"));
 	if (m_Foot.expired())
 		return E_FAIL;
+	m_Foot.lock()->DeActive_Attack();
 
 	return S_OK;
 }
@@ -226,6 +230,40 @@ HRESULT Em0010Body::Ready_Components()
 
 HRESULT Em0010Body::Ready_AnimationNotify()
 {
+	using em0010State = Em0010::EM0010_STATE;
+	using notify = AnimationTracker::ANIMATION_NOTIFY;
+
+	auto activeRightArm = [this]() { m_RightArm.lock()->Active_Attack(); };
+	auto deActiveRightArm = [this]() { m_RightArm.lock()->DeActive_Attack(); };
+
+	auto activeLeftArm = [this]() { m_LeftArm.lock()->Active_Attack(); };
+	auto deActiveLeftArm = [this]() { m_LeftArm.lock()->DeActive_Attack(); };
+
+	auto activeFoot = [this]() { m_Foot.lock()->Active_Attack(); };
+	auto deActiveFoot = [this]() { m_Foot.lock()->DeActive_Attack(); };
+
+	m_Model->Add_AnimNotify(ETOI(em0010State::SWING_FRONT), {
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_19); }},
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em_Tele1", SOUNDCHANNEL::CHANNEL_19, 0.5f); }},
+		notify{L"Swing", 70.f, 80.f, activeRightArm, deActiveRightArm}
+		});
+	m_Model->Add_AnimNotify(ETOI(em0010State::PUNCH_FRONT), {
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_19); }},
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em_Tele1", SOUNDCHANNEL::CHANNEL_19, 0.5f); }},
+		notify{L"Punch", 80.f, 90.f, activeLeftArm, deActiveLeftArm}
+		});
+	m_Model->Add_AnimNotify(ETOI(em0010State::FOOT_ATTACK), {
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_19); }},
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em_Tele1", SOUNDCHANNEL::CHANNEL_19, 0.5f); }},
+		notify{L"Foot", 60.f, 65.f, activeFoot, deActiveFoot}
+		});
+	m_Model->Add_AnimNotify(ETOI(em0010State::SWING_TWICE), {
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_19); }},
+		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em_Tele1", SOUNDCHANNEL::CHANNEL_19, 0.5f); }},
+		notify{L"LeftSwing", 75.f, 85.f, activeLeftArm, deActiveLeftArm},
+		notify{L"RightSwing", 120.f, 130.f, activeRightArm, deActiveRightArm},
+		});
+
 	return S_OK;
 }
 

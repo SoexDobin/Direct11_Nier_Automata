@@ -39,6 +39,9 @@ protected:
 	void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 public:
+	void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
+
+public:
 	Bool Is_TargetFront() const;
 	Bool Has_Target() const { return !m_TargetPlayer.expired(); }
 	void Set_Target(const Shared<GameObject>& target) { m_TargetPlayer = target; }

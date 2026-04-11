@@ -187,6 +187,34 @@
         {
             "path": "Sound/Hit/bullet_hit4.wav",
             "tag": "BulletHit4"
+        },
+        {
+            "path": "Sound/pl0000/evade/pl0000_Dash1.wav",
+            "tag": "Pl_Dash1"
+        },
+        {
+            "path": "Sound/pl0000/evade/pl0000_Dash2.wav",
+            "tag": "Pl_Dash2"
+        },
+        {
+            "path": "Sound/pl0000/evade/pl0000_Dash3.wav",
+            "tag": "Pl_Dash3"
+        },
+        {
+            "path": "Sound/pl0000/evade/pl0000_Dash4.wav",
+            "tag": "Pl_Dash4"
+        },
+        {
+            "path": "Sound/pl0000/evade/pl0000_Evade.wav",
+            "tag": "Pl_Evade"
+        },
+        {
+            "path": "Sound/em0000/Tele1.wav",
+            "tag": "Em_Tele1"
+        },
+        {
+            "path": "Sound/em0000/Tele2.wav",
+            "tag": "Em_Tele2"
         }
     ]
 }

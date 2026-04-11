@@ -140,7 +140,7 @@ void MenuBar::Render(Bool isResize) {
                     string name = Helper::To_String(layerReg->Get_LayerName(bit));
                     activeLayers.push_back({ bit, name });
                 }
-                int layerCount = activeLayers.size();
+                size_t layerCount = activeLayers.size();
 
                 // 표(Table) UI 생성
                 if (layerCount > 0 && ImGui::BeginTable("CollisionMatrixTable", layerCount + 1, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))

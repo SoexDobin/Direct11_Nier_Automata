@@ -45,7 +45,7 @@ public:
 	~Pl0000Movement() override = default;
 	
 public:
-	void Reduce_RootMotion() override { m_RootMotionScale = 0.25f; }
+	void Reduce_RootMotion(Float lazyAmount = 0.1f) override { m_RootMotionScale = lazyAmount; }
 	void Reset_RootMotionStop() override { m_RootMotionScale = 1.0f; }
 
 public:

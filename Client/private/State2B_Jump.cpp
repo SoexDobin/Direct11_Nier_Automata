@@ -41,7 +41,7 @@ Bool State2B_Jump::StateEnterInvoke()
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_TO_JUMP), 0.2f, false);
 		m_PrevMoveState = Pl0000::PL0000_STATE::RUN;
 		return true;
-	case Pl0000::PL0000_STATE::SPRINT: case Pl0000::PL0000_STATE::DASH:
+	case Pl0000::PL0000_STATE::SPRINT: case Pl0000::PL0000_STATE::EVADE:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_TO_JUMP), 0.2f, false);
 		m_PrevMoveState = Pl0000::PL0000_STATE::SPRINT;
 		return true;

@@ -44,6 +44,7 @@ public:
 	void Set_Animation(uint32 index, Float blendDuration = 0.5f);
 
 public:
+	Bool Is_Blending() const { return m_IsBlending; }
 	int32 Get_AnimationIndexByName(const wstring& name);
 	const wstring& Get_AnimationNameByIndex(uint32 index);
 	void Set_AnimationIndex(uint32 index) { m_CurrentAnimIndex = index; }

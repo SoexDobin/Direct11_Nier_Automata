@@ -7,7 +7,7 @@ NS_BEGIN(Engine)
 typedef struct ENGINE_DLL LayerMask final {
     LayerMask() = default;
     LayerMask(const LayerMask &layerMask)
-        : m_Layer(layerMask.m_Layer), m_Mask(layerMask.m_Mask) {}
+        : m_Layer(layerMask.m_Layer), m_Mask(layerMask.m_Mask), m_UseCustomMask(layerMask.m_UseCustomMask) {}
 
     uint32 Get_Layer() const { return m_Layer; }
     wstring Get_LayerName() const;
@@ -18,6 +18,7 @@ typedef struct ENGINE_DLL LayerMask final {
     void Set_UseCustomMask(Bool use) { m_UseCustomMask = use; }
     void Set_Mask(const wstring& maskName);
     void Set_Mask(std::initializer_list<wstring> layerName);
+    void ClearMask() { m_Mask = 0; }
 
     void Add(LAYER layer) { m_Mask |= ETOI(layer); }
     void Add(uint32 layer) { m_Mask |= layer; }

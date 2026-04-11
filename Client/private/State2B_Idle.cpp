@@ -54,9 +54,13 @@ Bool State2B_Idle::StateEnterInvoke()
 	case Pl0000::PL0000_STATE::JUMP:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::JUMP_TO_STAND), 0.2f, false);
 		return true;
-	case Pl0000::PL0000_STATE::DASH:
+	case Pl0000::PL0000_STATE::EVADE:
 		{
-			switch (auto prevAnim = static_cast<Pl0000::PL0000_STATE>(m_Body.lock()->Get_ModelComponent()->Get_AnimationIndex()))
+			// 현재 애니메이션이 블렌딩 중이라면 NextAnimIndex를 확인하여 정확한 DASH 애니메이션 도출
+			auto model = m_Body.lock()->Get_ModelComponent();
+			uint32 animIndex = model->Is_Blending() ? model->Get_NextAnimationIndex() : model->Get_AnimationIndex();
+
+			switch (auto prevAnim = static_cast<Pl0000::PL0000_STATE>(animIndex))
 			{
 			case Pl0000::PL0000_STATE::DASH_F: case Pl0000::PL0000_STATE::STAND_TO_DASH_F:
 				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_F), 0.2f, false);
@@ -64,15 +68,20 @@ Bool State2B_Idle::StateEnterInvoke()
 			case Pl0000::PL0000_STATE::DASH_B: case Pl0000::PL0000_STATE::STAND_TO_DASH_B:
 				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_B), 0.2f, false);
 				return true;
-			case Pl0000::PL0000_STATE::DASH_R: case Pl0000::PL0000_STATE::STAND_TO_DASH_R:
+			case Pl0000::PL0000_STATE::DASH_R: case Pl0000::PL0000_STATE::STAND_TO_DASH_R: 
 				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_R), 0.2f, false);
 				return true;
-			case Pl0000::PL0000_STATE::DASH_L: case Pl0000::PL0000_STATE::STAND_TO_DASH_L:
+			case Pl0000::PL0000_STATE::DASH_L: case Pl0000::PL0000_STATE::STAND_TO_DASH_L: 
 				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_TO_STAND_L), 0.2f, false);
 				return true;
+			case Pl0000::PL0000_STATE::EVADE_FRONT: case Pl0000::PL0000_STATE::EVADE_BACKWARD: 
+			case Pl0000::PL0000_STATE::EVADE_RIGHT: case Pl0000::PL0000_STATE::EVADE_LEFT:
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral), 0.2f, false);
+				return true;
 			default:
-				LOG_ERROR(L"[ENTER IDLE From DASH] : No Enter state PrevIndex {} ", ETOI(prevAnim));
-				return false;
+				// [FIX] 만약 너무 빨리 취소되어 이전 애니메이션 (RUN_STOP 등)이 넘어온 경우 자연스럽게 IDLE로 전이
+				pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_STAND_TO_Neutral), 0.2f, false);
+				return true;
 			}
 		}
 	case Pl0000::PL0000_STATE::ATTACK_GROUND: case Pl0000::PL0000_STATE::ATTACK_AIR:
@@ -120,7 +129,7 @@ void State2B_Idle::Update(Float timeDelta)
 	}
 	if (m_Input.lock()->Is_WASD_DoubleClick())
 	{
-		m_States.lock()->Change_State(Pl0000::PL0000_STATE::DASH);
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::EVADE);
 		return;
 	}
 	if (m_Input.lock()->Is_WASD_Press())

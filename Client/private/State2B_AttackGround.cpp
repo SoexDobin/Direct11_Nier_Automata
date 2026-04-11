@@ -64,7 +64,7 @@ Bool State2B_AttackGround::StateEnterInvoke()
 			m_PrevComboType = COMBO_TYPE::HEAVY;
 		}
 		return true;
-	case Pl0000::PL0000_STATE::RUN: case Pl0000::PL0000_STATE::SPRINT: case Pl0000::PL0000_STATE::DASH:
+	case Pl0000::PL0000_STATE::RUN: case Pl0000::PL0000_STATE::SPRINT: case Pl0000::PL0000_STATE::EVADE:
 		if (clickLeft)
 		{
 			lightWeapon->DrawWP0070();
@@ -106,7 +106,7 @@ void State2B_AttackGround::Update(Float timeDelta)
 	// 항상 ATTACK보다 DASH 판정해서 EVADE로 빼기
 	if (input->Is_WASD_DoubleClick())
 	{
-		m_States.lock()->Change_State(Pl0000::PL0000_STATE::DASH);
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::EVADE);
 		return;
 	}
 

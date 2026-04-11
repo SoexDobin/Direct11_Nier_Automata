@@ -1,17 +1,17 @@
 #include "pch.h"
-#include "SparkEffect.h"
+#include "FireFlashEffect.h"
 #include "VIBuffer_Particle_Point.h"
 #include <Game.h>
 #include "Random_Helper.h"
 #include "SpdLogger.h"
 
-SparkEffect::SparkEffect() : ParticleEffect{} {}
-SparkEffect::SparkEffect(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+FireFlashEffect::FireFlashEffect() : ParticleEffect{} {}
+FireFlashEffect::FireFlashEffect(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: ParticleEffect{device, context} {}
-SparkEffect::SparkEffect(const SparkEffect& rhs)
+FireFlashEffect::FireFlashEffect(const FireFlashEffect& rhs)
 	: ParticleEffect{rhs} {}
 
-HRESULT SparkEffect::Initialize_Prototype()
+HRESULT FireFlashEffect::Initialize_Prototype()
 {
 	if (FAILED(ParticleEffect::Initialize_Prototype()))
 	{
@@ -22,7 +22,7 @@ HRESULT SparkEffect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT SparkEffect::Initialize(void* arg)
+HRESULT FireFlashEffect::Initialize(void* arg)
 {
 	if (nullptr == arg)
 	{
@@ -36,9 +36,9 @@ HRESULT SparkEffect::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	SPARK_EFFECT_DESC& desc = *static_cast<SPARK_EFFECT_DESC*>(arg);
+	FIRE_FLASH_EFFECT_DESC& desc = *static_cast<FIRE_FLASH_EFFECT_DESC*>(arg);
 
-	if (FAILED(Ready_Components(desc.atkType, desc.position, desc.rotation)))
+	if (FAILED(Ready_Components(desc.parentMatrix)))
 	{
 		LOG_ERROR(L"Failed to Ready_Components ParticleEffect");
 		return E_FAIL;
@@ -47,12 +47,12 @@ HRESULT SparkEffect::Initialize(void* arg)
 	return S_OK;
 }
 
-void SparkEffect::Priority_Update(Float timeDelta)
+void FireFlashEffect::Priority_Update(Float timeDelta)
 {
 	
 }
 
-void SparkEffect::Update(Float timeDelta)
+void FireFlashEffect::Update(Float timeDelta)
 {
 	m_Acc += timeDelta;
 	
@@ -66,17 +66,17 @@ void SparkEffect::Update(Float timeDelta)
 	m_Transform->Update_WorldMatrix();
 }
 
-void SparkEffect::Late_Update(Float timeDelta)
+void FireFlashEffect::Late_Update(Float timeDelta)
 {
 	
 }
 
-void SparkEffect::Fixed_Update(Float fixedDelta)
+void FireFlashEffect::Fixed_Update(Float fixedDelta)
 {
 	
 }
 
-HRESULT SparkEffect::Render()
+HRESULT FireFlashEffect::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -93,7 +93,7 @@ HRESULT SparkEffect::Render()
 	return S_OK;
 }
 
-HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPosition, const Quaternion& initialRotation)
+HRESULT FireFlashEffect::Ready_Components(const Matrix& parentMatrix)
 {
 	Shader::SHADER_DESC shaderDesc{ VTXPARTICLE_POINT_DESC::Tag, VTXPARTICLE_POINT_DESC::Elements, VTXPARTICLE_POINT_DESC::numElements };
 	m_Shader = Add_Component<Shader>(ETOI(LEVEL::GAMEPLAY), &shaderDesc);
@@ -101,7 +101,7 @@ HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPo
 		return S_OK;
 
 	VIBuffer_Particle_Point::VIBUFFER_INSTANCE_POINT_DESC instanceDesc{};
-	instanceDesc.numInstances = 70;
+	instanceDesc.numInstances = 30;
 	instanceDesc.isLoop = false;
 	instanceDesc.center = Vector3::Zero;
 	instanceDesc.pivot = Vector3::Zero;
@@ -114,28 +114,17 @@ HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPo
 	if (nullptr == m_Buffer)
 		return S_OK;
 
-	wstring textureTag{};
-	if (atkType == ATK_TYPE::POD)
-	{
-		textureTag = L"Effect_Spark2";
-	}
-	else
-	{
-		textureTag = L"Effect_Spark";
-	}
-
-	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::GAMEPLAY), textureTag };
+	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::GAMEPLAY), L"Fire_Flash" };
 	m_Texture = Add_Component<Texture>(ETOI(LEVEL::GAMEPLAY), &textureDesc);
 	if (nullptr == m_Texture)
 		return E_FAIL;
 
-	m_Transform->Set_Rotation(initialRotation);
-	m_Transform->Set_Position(initialPosition);
+	m_Transform->Set_WorldMatrix(parentMatrix);
 
 	return S_OK;
 }
 
-HRESULT SparkEffect::Bind_ShaderResources()
+HRESULT FireFlashEffect::Bind_ShaderResources()
 {
 	uint32 isLocked = 1;
 
@@ -158,31 +147,31 @@ HRESULT SparkEffect::Bind_ShaderResources()
 	return S_OK;
 }
 
-void SparkEffect::Submit_RenderGroup()
+void FireFlashEffect::Submit_RenderGroup()
 {
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::BLEND, shared_from_this());
 }
 
-Shared<SparkEffect> SparkEffect::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+Shared<FireFlashEffect> FireFlashEffect::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
-	auto prototype = make_shared<SparkEffect>(device, context);
+	auto prototype = make_shared<FireFlashEffect>(device, context);
 
 	if (FAILED(prototype->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : SparkEffect");
+		MSG_BOX("Failed to Created : FireFlashEffect");
 		return nullptr;
 	}
 
 	return prototype;
 }
 
-Shared<GameObject> SparkEffect::Clone(void* arg)
+Shared<GameObject> FireFlashEffect::Clone(void* arg)
 {
-	auto instance = make_shared<SparkEffect>(*this);
+	auto instance = make_shared<FireFlashEffect>(*this);
 
 	if (FAILED(instance->Initialize(arg)))
 	{
-		MSG_BOX("Failed to Clone : SparkEffect");
+		MSG_BOX("Failed to Clone : FireFlashEffect");
 		return nullptr;
 	}
 

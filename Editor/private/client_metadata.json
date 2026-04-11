@@ -19,6 +19,24 @@
                                               "has_clone":  false,
                                               "category":  "other"
                                           },
+                    "StateEm0010_Chase":  {
+                                              "members":  [
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "",
+                                                                  "name":  "m_EnterAnim",
+                                                                  "type":  "unordered_set\u003cuint32\u003e"
+                                                              }
+                                                          ],
+                                              "base_class":  "StateEm0010",
+                                              "inherited_members":  {
+
+                                                                    },
+                                              "namespace":  "Client",
+                                              "has_create":  true,
+                                              "has_clone":  false,
+                                              "category":  "other"
+                                          },
                     "StateEm0010_Idle":  {
                                              "members":  [
                                                              {
@@ -681,24 +699,36 @@
                                            "has_clone":  false,
                                            "category":  "other"
                                        },
-                    "StateEm0010_Chase":  {
-                                              "members":  [
-                                                              {
-                                                                  "access":  "private",
-                                                                  "default":  "",
-                                                                  "name":  "m_EnterAnim",
-                                                                  "type":  "unordered_set\u003cuint32\u003e"
-                                                              }
-                                                          ],
-                                              "base_class":  "StateEm0010",
-                                              "inherited_members":  {
+                    "State2B_Evade":  {
+                                          "members":  [
+                                                          {
+                                                              "access":  "private",
+                                                              "default":  "",
+                                                              "name":  "m_EnterAnim",
+                                                              "type":  "unordered_set\u003cuint32\u003e"
+                                                          },
+                                                          {
+                                                              "access":  "private",
+                                                              "default":  "",
+                                                              "name":  "m_DashAnim",
+                                                              "type":  "unordered_set\u003cuint32\u003e"
+                                                          },
+                                                          {
+                                                              "access":  "private",
+                                                              "default":  "",
+                                                              "name":  "m_EvadeAnim",
+                                                              "type":  "unordered_set\u003cuint32\u003e"
+                                                          }
+                                                      ],
+                                          "base_class":  "State2B",
+                                          "inherited_members":  {
 
-                                                                    },
-                                              "namespace":  "Client",
-                                              "has_create":  true,
-                                              "has_clone":  false,
-                                              "category":  "other"
-                                          },
+                                                                },
+                                          "namespace":  "Client",
+                                          "has_create":  true,
+                                          "has_clone":  false,
+                                          "category":  "other"
+                                      },
                     "Em0010":  {
                                    "members":  [
 
@@ -712,6 +742,19 @@
                                    "has_clone":  true,
                                    "category":  "other"
                                },
+                    "ThirdPersonCamera":  {
+                                              "members":  [
+
+                                                          ],
+                                              "base_class":  "Camera",
+                                              "inherited_members":  {
+
+                                                                    },
+                                              "namespace":  "Client",
+                                              "has_create":  true,
+                                              "has_clone":  true,
+                                              "category":  "other"
+                                          },
                     "Level_GamePlay":  {
                                            "members":  [
 
@@ -736,30 +779,6 @@
                                            "has_clone":  false,
                                            "category":  "level"
                                        },
-                    "State2B_Dash":  {
-                                         "members":  [
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "",
-                                                             "name":  "m_EnterAnim",
-                                                             "type":  "unordered_set\u003cuint32\u003e"
-                                                         },
-                                                         {
-                                                             "access":  "private",
-                                                             "default":  "",
-                                                             "name":  "m_DashAnim",
-                                                             "type":  "unordered_set\u003cuint32\u003e"
-                                                         }
-                                                     ],
-                                         "base_class":  "State2B",
-                                         "inherited_members":  {
-
-                                                               },
-                                         "namespace":  "Client",
-                                         "has_create":  true,
-                                         "has_clone":  false,
-                                         "category":  "other"
-                                     },
                     "ClientApp":  {
                                       "members":  [
 
@@ -1172,36 +1191,19 @@
                                            "has_clone":  true,
                                            "category":  "other"
                                        },
-                    "State2B_AttackGround":  {
-                                                 "members":  [
-                                                                 {
-                                                                     "access":  "private",
-                                                                     "default":  "",
-                                                                     "name":  "m_CanComboProgress",
-                                                                     "type":  "unordered_map\u003cuint32, Float\u003e"
-                                                                 },
-                                                                 {
-                                                                     "access":  "private",
-                                                                     "default":  "",
-                                                                     "name":  "m_CanExitProgress",
-                                                                     "type":  "unordered_map\u003cuint32, Float\u003e"
-                                                                 },
-                                                                 {
-                                                                     "access":  "private",
-                                                                     "default":  "",
-                                                                     "name":  "m_EnterAnim",
-                                                                     "type":  "unordered_set\u003cuint32\u003e"
-                                                                 }
-                                                             ],
-                                                 "base_class":  "State2B",
-                                                 "inherited_members":  {
+                    "Pl0000EvadeChecker":  {
+                                               "members":  [
 
-                                                                       },
-                                                 "namespace":  "Client",
-                                                 "has_create":  true,
-                                                 "has_clone":  false,
-                                                 "category":  "other"
-                                             },
+                                                           ],
+                                               "base_class":  "PartObject",
+                                               "inherited_members":  {
+
+                                                                     },
+                                               "namespace":  "Engine",
+                                               "has_create":  true,
+                                               "has_clone":  true,
+                                               "category":  "other"
+                                           },
                     "CityOfRuins":  {
                                         "namespace":  "Engine",
                                         "base_class":  "GameObject",
@@ -1314,19 +1316,19 @@
                                         "has_clone":  false,
                                         "category":  "other"
                                     },
-                    "ThirdPersonCamera":  {
-                                              "members":  [
+                    "Bullet":  {
+                                   "members":  [
 
-                                                          ],
-                                              "base_class":  "Camera",
-                                              "inherited_members":  {
+                                               ],
+                                   "base_class":  "Projectile",
+                                   "inherited_members":  {
 
-                                                                    },
-                                              "namespace":  "Client",
-                                              "has_create":  true,
-                                              "has_clone":  true,
-                                              "category":  "other"
-                                          },
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "LevelLoading":  {
                                          "members":  [
                                                          {
@@ -1375,19 +1377,19 @@
                                    "has_clone":  true,
                                    "category":  "other"
                                },
-                    "Bullet":  {
-                                   "members":  [
+                    "FireFlashEffect":  {
+                                            "members":  [
 
-                                               ],
-                                   "base_class":  "Projectile",
-                                   "inherited_members":  {
+                                                        ],
+                                            "base_class":  "ParticleEffect",
+                                            "inherited_members":  {
 
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
+                                                                  },
+                                            "namespace":  "Engine",
+                                            "has_create":  true,
+                                            "has_clone":  true,
+                                            "category":  "other"
+                                        },
                     "LoadingBackground":  {
                                               "namespace":  "Engine",
                                               "base_class":  "UIObject",
@@ -1560,6 +1562,36 @@
                                        "has_clone":  true,
                                        "category":  "other"
                                    },
+                    "State2B_AttackGround":  {
+                                                 "members":  [
+                                                                 {
+                                                                     "access":  "private",
+                                                                     "default":  "",
+                                                                     "name":  "m_CanComboProgress",
+                                                                     "type":  "unordered_map\u003cuint32, Float\u003e"
+                                                                 },
+                                                                 {
+                                                                     "access":  "private",
+                                                                     "default":  "",
+                                                                     "name":  "m_CanExitProgress",
+                                                                     "type":  "unordered_map\u003cuint32, Float\u003e"
+                                                                 },
+                                                                 {
+                                                                     "access":  "private",
+                                                                     "default":  "",
+                                                                     "name":  "m_EnterAnim",
+                                                                     "type":  "unordered_set\u003cuint32\u003e"
+                                                                 }
+                                                             ],
+                                                 "base_class":  "State2B",
+                                                 "inherited_members":  {
+
+                                                                       },
+                                                 "namespace":  "Client",
+                                                 "has_create":  true,
+                                                 "has_clone":  false,
+                                                 "category":  "other"
+                                             },
                     "StateEm0010_Dead":  {
                                              "members":  [
                                                              {

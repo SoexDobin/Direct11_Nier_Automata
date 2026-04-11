@@ -40,7 +40,7 @@ void LayerMask::Remove(std::initializer_list<wstring> layerNames)
 void LayerMask::Set_Mask(const wstring& maskName)
 {
     auto mask = GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(maskName);
-    m_Layer = ETOI(mask);
+    m_Mask = ETOI(mask);
 }
 
 void LayerMask::Add(const wstring& layerName)

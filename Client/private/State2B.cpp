@@ -53,6 +53,12 @@ namespace Client
 		return S_OK;
 	}
 
+	Bool State2B::HasTarget() const
+	{
+		if (m_Owner.expired()) return false;
+		return !m_Owner.lock()->Get_LockOnTarget().expired();
+	}
+
 	Vector3 State2B::Calculate_Direction()
 	{
 		if (m_MainCamera.expired()) return Vector3::Zero;

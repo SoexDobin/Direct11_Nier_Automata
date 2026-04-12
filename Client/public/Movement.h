@@ -23,6 +23,10 @@ public:
 	virtual ~Movement() override = default;
 
 public:
+	Float Get_Gravity() const { return m_Gravity; }
+	void Set_Gravity(Float gravity) { m_Gravity = gravity; }
+
+public:
 	Bool Is_Grounded() const { return m_IsGrounded; }
 	Float Get_GravityScalar() const { return m_Gravity; }
 	void Add_Force(const Vector3& impulse) { m_Velocity += impulse; m_IsGrounded = false; }

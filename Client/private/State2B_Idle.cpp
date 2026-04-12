@@ -51,7 +51,7 @@ Bool State2B_Idle::StateEnterInvoke()
 	case Pl0000::PL0000_STATE::SPRINT:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_STOP_R), 0.2f, false);
 		return true;
-	case Pl0000::PL0000_STATE::JUMP:
+	case Pl0000::PL0000_STATE::JUMP: case Pl0000::PL0000_STATE::HEAVY_AIR_DOWN_END : case Pl0000::PL0000_STATE::LIGHT_AIR_DOWN_END:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::JUMP_TO_STAND), 0.2f, false);
 		return true;
 	case Pl0000::PL0000_STATE::EVADE:

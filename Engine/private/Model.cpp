@@ -238,9 +238,20 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 
 	m_IsPrevAnimLoop = m_IsAnimLoop;
  	m_NextAnimIndex = index;
-	m_IsBlending = true;
-	m_BlendingElapsed = 0.f;
-	m_BlendingDuration = blendDuration;
+
+	if (blendDuration <= 0.0001f)
+	{
+		m_IsBlending = false;
+		m_CurrentAnimIndex = index; // 즉시 현재 타겟으로 할당
+		m_BlendingElapsed = 0.f;
+		m_BlendingDuration = 0.f;
+	}
+	else
+	{
+		m_IsBlending = true;
+		m_BlendingElapsed = 0.f;
+		m_BlendingDuration = blendDuration;
+	}
 	m_IsAnimEnd = false;
 
 	m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
@@ -293,6 +304,26 @@ Bool Model::Is_NotifyActive(const wstring& notifyTag) const
 {
 	uint32 activeIndex = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
 	return m_Tracker->Is_ActiveNotify(activeIndex, notifyTag);
+}
+
+vector<BONE_SNAPSHOT> Model::Get_SnapShot_BoneMatrices()
+{
+	vector<BONE_SNAPSHOT> snapShots;
+	snapShots.resize(m_NumMeshes);
+
+	for (uint32 i = 0 ; i < m_NumMeshes; ++i)
+	{
+		m_Meshes[i]->Fill_BoneMatrices(m_Bones);
+
+		const uint32 numBones = m_Meshes[i]->Get_NumMeshBones();
+		snapShots[i].numBones = numBones;
+
+		memcpy(snapShots[i].matrices,
+			m_Meshes[i]->Get_BoneMatrices(),
+			sizeof(Matrix) * numBones);
+	}
+
+	return snapShots;
 }
 
 int32 Model::Get_BoneIndexByName(const string& boneName) const

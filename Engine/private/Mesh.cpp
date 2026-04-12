@@ -10,6 +10,13 @@ Mesh::Mesh(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>
 Mesh::Mesh(const Mesh& rhs)
 	: VIBuffer{ rhs } {}
 
+void Mesh::Fill_BoneMatrices(const vector<Shared<Bone>>& bones)
+{
+	for (uint32 i = 0; i < m_NumBones; ++i)
+	{
+		m_BoneMatrices[i] = m_OffsetMatrices[i] * (*bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrixPtr());
+	}
+}
 
 HRESULT Mesh::Initialize_Prototype(Bool isAnim, const MODEL_MESH& modelMesh, const Matrix& preTransformMatrix)
 {

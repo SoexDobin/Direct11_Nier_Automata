@@ -66,6 +66,9 @@ public: /* Animation Tracker */
 	Bool Is_NotifyActive(uint32 animIndex, const wstring & notifyTag) const;
 	Bool Is_NotifyActive(const wstring & notifyName) const;
 
+public: /* snap shot */
+	vector<BONE_SNAPSHOT> Get_SnapShot_BoneMatrices();
+
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
 	Matrix Get_BoneMatrix(uint32 boneIndex) const; // 특정 부모 뼈대의 트랜스폼 가져오기

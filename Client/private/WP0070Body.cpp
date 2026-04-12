@@ -132,7 +132,7 @@ void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
 	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
 
-	uint32 targetID = target->Get_ObjectID();
+	uint32 targetID = target->Get_InstanceID();
 	if (m_HitEntities.contains(targetID) == false)
 	{
 		m_HitEntities.insert(targetID);
@@ -172,6 +172,8 @@ void WP0070Body::OnCollisionExit(const Shared<Collider>& ownCollider, const Shar
 
 void WP0070Body::Set_Sheathing(const Matrix& sheathMatrix)
 {
+	m_Transform->Set_WorldMatrix(sheathMatrix);
+
 	if (m_IsSheathing) return;
 
 	m_AttackCollider->Set_Active(false);
@@ -193,6 +195,7 @@ void WP0070Body::Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoo
 {
 	m_Transform->Set_WorldMatrix(Matrix::Identity);
 	Pl0000Parts::Set_Animation(animIndex, blendDuration, isLoop);
+	m_Model->Update_ModelAnimation(0.0001f);
 }
 
 void WP0070Body::Active_LightWeapon()

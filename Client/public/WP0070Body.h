@@ -82,6 +82,10 @@ public:
 		LIGHT_AIR2			= 21,
 		LIGHT_AIR3			= 22,
 
+		LIGHT_AIR_DOWN_ENTER	= 34,
+		LIGHT_AIR_DOWN_HOLD		= 35,
+		LIGHT_AIR_DOWN_END		= 36,
+
 		LIGHT_COMBO			= 45
 	};
 };
@@ -123,7 +127,7 @@ wp0070_0157.mot > 30
 wp0070_0160.mot > 31
 wp0070_0180.mot > 32
 wp0070_0188.mot > 33
-wp0070_018d.mot > 34
+wp0070_018d.mot > 34 // dir 
 wp0070_018e.mot > 35
 wp0070_018f.mot > 36
 wp0070_01e0.mot > 37

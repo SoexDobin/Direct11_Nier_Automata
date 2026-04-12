@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "Pl0000Input.h"
 #include "Pl0000Body.h"
+#include "Pl0000MonsterChecker.h"
 
 NS_BEGIN(Engine)
 	class Shader;
@@ -10,6 +11,7 @@ NS_BEGIN(Engine)
 }
 
 NS_BEGIN(Client)
+	class Pl0000MonsterChecker;
 	class Pl0000EvadeChecker;
 
 	class Pl0000Movement;
@@ -33,6 +35,7 @@ public:
 	~Pl0000() override = default;
 
 public: /* pl0000 */
+    Shared<GameObject> Get_ClosestTarget() const { return m_MonsterChecker->Get_ClosestTarget(); }
     TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
     const Matrix& Get_LightSheathingMatrix() const { return m_LightSheathMatrix; }
     const Matrix& Get_HeavySheathingMatrix() const { return m_HeavySheathMatrix; }
@@ -73,6 +76,8 @@ private:
 
 private:
     Shared<Pl0000Body> m_MainBody{ nullptr };
+    Shared<Pl0000MonsterChecker> m_MonsterChecker{ nullptr };
+
     Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
@@ -166,6 +171,10 @@ public:
         LIGHT_AIR3          = 161,
         LIGHT_AIR4          = 162,
         LIGHT_AIR5          = 163,
+
+        LIGHT_AIR_DOWN_ENTER    = 175,
+        LIGHT_AIR_DOWN_HOLD     = 176,
+        LIGHT_AIR_DOWN_END      = 177,
 
         // HEAVY ATTACK 0220
         HEAVY_GROUND1       = 187,

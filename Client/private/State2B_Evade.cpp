@@ -89,10 +89,8 @@ void State2B_Evade::Update(Float timeDelta)
 		moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
 		moveData.useRootMotionDir = false;
 		m_Movement.lock()->Set_MovementData(moveData);
-		if (dashProgress <= 0.55f)
+		if (dashProgress <= 0.5f)
 			return;
-		
-		
 
 		m_Owner.lock()->Set_Invincible(false);
 		if (input->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
@@ -106,13 +104,12 @@ void State2B_Evade::Update(Float timeDelta)
 			{
 				if (!target->Is_Destroy())
 				{
-					auto myTransform = m_Owner.lock()->Get_Component<Transform>();
 					auto targetTransform = target->Get_Component<Transform>();
-					Vector3 myPos = myTransform->Get_Position();
+					Vector3 myPos = m_Owner.lock()->Get_Transform()->Get_Position();
 					Vector3 targetPos = targetTransform->Get_Position();
 					targetPos.y = myPos.y;
-					// 즉각적으로 회전 (대상을 바라봄)
-					myTransform->LookAt(targetPos);
+					
+					m_Owner.lock()->Get_Transform()->LookAt(targetPos);
 				}
 			}
 
@@ -162,7 +159,7 @@ void State2B_Evade::Update(Float timeDelta)
 		return;
 	}
 
-	if (m_EnterAnim.contains(curIndex) && dashProgress >= 0.7f)
+	if (m_EnterAnim.contains(curIndex) && dashProgress >= 0.8f)
 	{
 		switch (m_DashDir) {
 		case DASH_DIR::FRONT: 

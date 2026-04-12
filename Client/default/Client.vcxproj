@@ -214,7 +214,9 @@
     <ClInclude Include="..\public\Pl0000.h" />
     <ClInclude Include="..\public\Pl0000Body.h" />
     <ClInclude Include="..\public\Pl0000EvadeChecker.h" />
+    <ClInclude Include="..\public\Pl0000EvadeGhost.h" />
     <ClInclude Include="..\public\Pl0000Input.h" />
+    <ClInclude Include="..\public\Pl0000MonsterChecker.h" />
     <ClInclude Include="..\public\Pl0000Parts.h" />
     <ClInclude Include="..\public\Pl0000Shockwave.h" />
     <ClInclude Include="..\public\Pl0000StateMachine.h" />
@@ -284,7 +286,9 @@
     <ClCompile Include="..\private\Pl0000.cpp" />
     <ClCompile Include="..\private\Pl0000Body.cpp" />
     <ClCompile Include="..\private\Pl0000EvadeChecker.cpp" />
+    <ClCompile Include="..\private\Pl0000EvadeGhost.cpp" />
     <ClCompile Include="..\private\Pl0000Input.cpp" />
+    <ClCompile Include="..\private\Pl0000MonsterChecker.cpp" />
     <ClCompile Include="..\private\Pl0000Parts.cpp" />
     <ClCompile Include="..\private\P10000StateMachine.cpp" />
     <ClCompile Include="..\private\Pl0000Movement.cpp" />

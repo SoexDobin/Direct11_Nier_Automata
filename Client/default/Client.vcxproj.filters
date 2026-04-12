@@ -208,6 +208,10 @@
     <ClInclude Include="..\public\Pl0000EvadeChecker.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Pl0000MonsterChecker.h">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000EvadeGhost.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -411,6 +415,10 @@
     <ClCompile Include="..\private\Pl0000EvadeChecker.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Pl0000MonsterChecker.cpp">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000EvadeGhost.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">

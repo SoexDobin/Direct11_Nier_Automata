@@ -125,7 +125,8 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 	Float groundHeight = 0.f; // TODO Nav메시를 통한 y축 판별
 	if (nextPosition.y <= groundHeight) {
 		nextPosition.y = groundHeight;
-		m_Velocity.y = 0.f;
+		//m_Velocity.y = 0.f;
+		m_Velocity = Vector3::Zero;
 		m_IsGrounded = true;
 	}
 	else {

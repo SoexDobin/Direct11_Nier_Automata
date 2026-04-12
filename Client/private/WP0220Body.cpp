@@ -132,7 +132,7 @@ void WP0220Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
 	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
 
-	uint32 targetID = target->Get_ObjectID();
+	uint32 targetID = target->Get_InstanceID();
 	if (m_HitEntities.contains(targetID) == false)
 	{
 		m_HitEntities.insert(targetID);
@@ -194,12 +194,14 @@ void WP0220Body::Impact_Shockwave(const Vector3& offset)
 	Pl0000Shockwave::PLAYER_SHOCKWAVE_DESC desc{};
 	desc.damageInfo = dmgInfo;
 	desc.position = truePos;
-	desc.radius = 2.5f;
+	desc.radius = 3.f;
 	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", ETOI(LEVEL::GAMEPLAY), &desc);
 }
 
 void WP0220Body::Set_Sheathing(const Matrix& sheathMatrix)
 {
+	m_Transform->Set_WorldMatrix(sheathMatrix);
+
 	if (m_IsSheathing) return;
 
 	m_AttackCollider->Set_Active(false);
@@ -221,6 +223,7 @@ void WP0220Body::Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoo
 {
 	m_Transform->Set_WorldMatrix(Matrix::Identity);
 	Pl0000Parts::Set_Animation(animIndex, blendDuration, isLoop);
+	m_Model->Update_ModelAnimation(0.0001f);
 }
 
 HRESULT WP0220Body::Bind_ShaderResources()
@@ -341,6 +344,12 @@ HRESULT WP0220Body::Ready_AnimationNotify()
 		Notify{L"Swing2", 20, active },
 		Notify{L"Swing2", 30, active },
 		Notify{L"Swing2", 40, active },
+		});
+
+	m_Model->Add_AnimNotify(ETOI(WP0220_STATE::HEAVY_AIR_DOWN_END), {
+		Notify{L"Wp0220_Stop1", 0, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_12); }},
+		Notify{L"Wp0220_Air_Down", 0, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0220_Hammer", SOUNDCHANNEL::CHANNEL_12, 0.5f); } },
+		Notify{L"Impact", 10, impactShockwave}
 		});
 
 	return S_OK;

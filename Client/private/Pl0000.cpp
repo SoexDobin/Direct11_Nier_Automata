@@ -9,6 +9,7 @@
 #include "Pl0000Body.h"
 #include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
+#include "State2B_AttackAir.h"
 #include "State2B_AttackGround.h"
 #include "WP3000Body.h"
 
@@ -111,6 +112,30 @@ void Pl0000::Update(Float timeDelta)
 		timeDelta *= 0.05f; 
 	}
 
+	if (auto target = m_LockOnTarget.lock())
+	{
+		if (target->Is_Destroy() || !target->Is_Active())
+		{
+			m_LockOnTarget.reset(); // 대상 파괴 시 파기
+		}
+		else
+		{
+			Vector3 myPos = Get_Transform()->Get_Position();
+			Vector3 targetPos = target->Get_Transform()->Get_Position();
+			
+			Vector3 myLook = Get_Transform()->Get_Look();
+			myLook.y = 0.f;
+			if (myLook.Length() > 0.001f) myLook.Normalize();
+			Vector3 dirToTarget = targetPos - myPos;
+			dirToTarget.y = 0.f;
+			if (dirToTarget.Length() > 0.001f) dirToTarget.Normalize();
+			
+			if (myLook.Dot(dirToTarget) <= 0.f)
+			{
+				m_LockOnTarget.reset();
+			}
+		}
+	}
 
 	m_Pl0000States->Update_State(timeDelta);
 }
@@ -162,7 +187,9 @@ void Pl0000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<C
 void Pl0000::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
 	if (TryEvade(dmgInfo.attacker.lock())) return;
+
 	LOG_INFO(L"Hit ---------------------");
+
 	Entity::TakeDamage(dmgInfo);
 }
 
@@ -224,8 +251,11 @@ HRESULT Pl0000::Ready_PartObjects()
 		return E_FAIL;
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000EvadeChecker", L"Pl0000EvadeChecker", &desc)))
 		return E_FAIL;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000MonsterChecker", L"Pl0000MonsterChecker", &desc)))
+		return E_FAIL;
 
 	m_MainBody = static_pointer_cast<Pl0000Body>(Find_PartObject(L"Pl0000Body"));
+	m_MonsterChecker = static_pointer_cast<Pl0000MonsterChecker>(Find_PartObject(L"Pl0000MonsterChecker"));
 
 	auto wp0070 = static_pointer_cast<WP0070Body>(Find_PartObject(L"WP0070Body"));
 	wp0070->DrawWP0070();
@@ -278,6 +308,9 @@ HRESULT Pl0000::Ready_Components()
 			return E_FAIL;
 		if (FAILED(m_Pl0000States->Add_State(State2B_AttackGround::Create(
 			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::ATTACK_GROUND)), pl0000))))
+			return E_FAIL;
+		if (FAILED(m_Pl0000States->Add_State(State2B_AttackAir::Create(
+			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::ATTACK_AIR)), pl0000))))
 			return E_FAIL;
 
 		m_Pl0000States->Change_State(PL0000_STATE::IDLE);

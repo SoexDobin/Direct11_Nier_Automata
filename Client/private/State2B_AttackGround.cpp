@@ -29,6 +29,10 @@ Bool State2B_AttackGround::StateEnterInvoke()
 {
 	m_Movement.lock()->Reset_RootMotionStop();
 
+	Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
+	moveData.useRootMotionDir = true;
+	m_Movement.lock()->Set_MovementData(moveData);
+
 	auto pl0000 = m_Body.lock();
 	auto lightWeapon = m_LightWeapon.lock();
 	auto heavyWeapon = m_HeavyWeapon.lock();
@@ -40,13 +44,13 @@ Bool State2B_AttackGround::StateEnterInvoke()
 
 	switch (prevState)
 	{
-	case Pl0000::PL0000_STATE::IDLE:
+	case Pl0000::PL0000_STATE::IDLE: case Pl0000::PL0000_STATE::ATTACK_AIR:
 		if (clickLeft)
 		{
 			lightWeapon->DrawWP0070();
 			heavyWeapon->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
-			pl0000->Set_Animation(LIGHT_BODY[m_ComboStep], 0.15f, false);
-			lightWeapon->Set_Animation(LIGHT_WP[m_ComboStep], 0.15f, false);
+			pl0000->Set_Animation(LIGHT_BODY[m_ComboStep], 0.05f, false);
+			lightWeapon->Set_Animation(LIGHT_WP[m_ComboStep], 0.f, false);
 			m_LastOrderedAnimIndex = LIGHT_BODY[m_ComboStep];
 			
 			++m_ComboStep;
@@ -56,8 +60,8 @@ Bool State2B_AttackGround::StateEnterInvoke()
 		{
 			lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
 			heavyWeapon->DrawWP0220();
-			pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], 0.15f, false);
-			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.15f, false);
+			pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
+			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.f, false);
 			m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
 			
 			++m_ComboStep;
@@ -69,8 +73,8 @@ Bool State2B_AttackGround::StateEnterInvoke()
 		{
 			lightWeapon->DrawWP0070();
 			heavyWeapon->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
-			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN), 0.15f, false);
-			lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_GROUND_RUN), 0.15f, false);
+			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN), 0.05f, false);
+			lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_GROUND_RUN), 0.f, false);
 			m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN);
 
 			++m_ComboStep;
@@ -80,8 +84,8 @@ Bool State2B_AttackGround::StateEnterInvoke()
 		{
 			lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
 			heavyWeapon->DrawWP0220();
-			pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], 0.15f, false);
-			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.15f, false);
+			pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
+			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.f, false);
 			m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
 
 			++m_ComboStep;
@@ -138,7 +142,7 @@ void State2B_AttackGround::Update(Float timeDelta)
 void State2B_AttackGround::Late_Update(Float timeDelta)
 {
 	m_ComboDelta += timeDelta;
-	if (m_ComboDelta >= 2.0f)
+	if (m_ComboDelta >= n_ComboDelta)
 	{
 		m_ComboDelta = 0.f;
 		m_ComboStep = 0;
@@ -148,7 +152,7 @@ void State2B_AttackGround::Late_Update(Float timeDelta)
 	{
 		m_HeavyChargeDelta += timeDelta;
 
-		if (!m_IsChargeEnd && m_HeavyChargeDelta >= 2.f)
+		if (!m_IsChargeEnd && m_HeavyChargeDelta >= n_ChargeDelta)
 		{
 			m_IsChargeEnd = true;
 			GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_8);
@@ -373,7 +377,7 @@ void State2B_AttackGround::Set_AnimationExitProgress()
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND6), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND6), 0.1f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.5f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.3f);
 
-	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.75f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.3f);
+	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.65f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.3f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_RUN), 0.25f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_RUN), 0.15f);
 
 	m_CanComboProgress.emplace(ETOI(pl::HEAVY_GROUND1), 0.15f); m_CanExitProgress.emplace(ETOI(pl::HEAVY_GROUND1), 0.2f);

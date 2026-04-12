@@ -16,6 +16,11 @@ public:
 	~Mesh() override = default;
 
 public:
+	void Fill_BoneMatrices(const vector<Shared<Bone>>& bones); // 현재 위치에기반 월드로의 본 캡쳐
+	const Matrix* Get_BoneMatrices() const { return m_BoneMatrices; }
+	uint32 Get_NumMeshBones() const { return m_NumBones; }
+
+public:
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::MESH; }
 	HRESULT Initialize_Prototype(Bool isAnim, const MODEL_MESH& meshData, const Matrix& preTransformMatrix);
 	HRESULT Initialize_Prototype() override;
@@ -34,7 +39,7 @@ private:
 	uint32				m_MaterialIndex{};
 	uint32				m_NumBones{};
 	vector<uint32>		m_BoneIndices;
-	Matrix				m_BoneMatrices[512] = {};
+	Matrix				m_BoneMatrices[MODEL_BONE_MAX] = {};
 	vector<Matrix>		m_OffsetMatrices;
 
 public:

@@ -8,6 +8,12 @@
                                                                   "default":  "",
                                                                   "name":  "m_EnterAnim",
                                                                   "type":  "unordered_set\u003cuint32\u003e"
+                                                              },
+                                                              {
+                                                                  "access":  "private",
+                                                                  "default":  "",
+                                                                  "name":  "m_EndAnim",
+                                                                  "type":  "unordered_set\u003cuint32\u003e"
                                                               }
                                                           ],
                                               "base_class":  "State2B",
@@ -417,19 +423,24 @@
                                        "has_clone":  false,
                                        "category":  "level"
                                    },
-                    "SparkEffect":  {
-                                        "members":  [
+                    "Pl0000MonsterChecker":  {
+                                                 "members":  [
+                                                                 {
+                                                                     "access":  "private",
+                                                                     "default":  "",
+                                                                     "name":  "m_CheckedMonsters",
+                                                                     "type":  "list\u003cWeak\u003cGameObject\u003e\u003e"
+                                                                 }
+                                                             ],
+                                                 "base_class":  "PartObject",
+                                                 "inherited_members":  {
 
-                                                    ],
-                                        "base_class":  "ParticleEffect",
-                                        "inherited_members":  {
-
-                                                              },
-                                        "namespace":  "Engine",
-                                        "has_create":  true,
-                                        "has_clone":  true,
-                                        "category":  "other"
-                                    },
+                                                                       },
+                                                 "namespace":  "Engine",
+                                                 "has_create":  true,
+                                                 "has_clone":  true,
+                                                 "category":  "other"
+                                             },
                     "Pl0000Shockwave":  {
                                             "namespace":  "Engine",
                                             "base_class":  "GameObject",
@@ -1329,6 +1340,19 @@
                                    "has_clone":  true,
                                    "category":  "other"
                                },
+                    "SparkEffect":  {
+                                        "members":  [
+
+                                                    ],
+                                        "base_class":  "ParticleEffect",
+                                        "inherited_members":  {
+
+                                                              },
+                                        "namespace":  "Engine",
+                                        "has_create":  true,
+                                        "has_clone":  true,
+                                        "category":  "other"
+                                    },
                     "LevelLoading":  {
                                          "members":  [
                                                          {

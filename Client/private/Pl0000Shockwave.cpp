@@ -88,7 +88,7 @@ void Pl0000Shockwave::OnCollisionStay(const Shared<Collider>& ownCollider, const
 	auto target = targetCollider->Get_Owner();
 	
 	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
-	uint32 targetID = target->Get_ObjectID();
+	uint32 targetID = target->Get_InstanceID();
 	if (!m_HitEntities.contains(targetID))
 	{
 		m_HitEntities.insert(targetID);

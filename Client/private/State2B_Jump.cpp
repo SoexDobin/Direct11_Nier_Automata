@@ -87,6 +87,14 @@ void State2B_Jump::Update(Float timeDelta)
 		}
 	}
 
+	// 점플 공격
+	if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON) || 
+		m_Input.lock()->Is_MousePress(DIMB::RBUTTON))
+	{
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::ATTACK_AIR);
+		return;
+	}
+
 	// 더블 점프
 	if ((m_CanDoubleJump && m_Input.lock()->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
 		|| m_CanDoubleJump && m_Input.lock()->Is_KeyMultiClick(UBYTE(DIKEYBOARD_SPACE)))

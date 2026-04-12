@@ -27,6 +27,7 @@ protected:
 	virtual HRESULT Initialize();
 
 public:
+	Bool HasTarget() const;
 	Vector3 Calculate_Direction();
 
 protected:
@@ -40,6 +41,10 @@ protected:
 	Weak<Pl0000Input> m_Input{};
 	Weak<Pl0000Movement> m_Movement;
 	Weak<Pl0000StateMachine> m_States{};
+
+protected:
+	const Float n_ComboDelta = {2.f};
+	const Float n_ChargeDelta = {1.5f};
 };
 
 NS_END

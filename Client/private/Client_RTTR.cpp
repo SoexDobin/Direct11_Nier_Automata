@@ -35,6 +35,7 @@
 #include "MonsterSight.h"
 #include "MonsterAOE.h"
 #include "Pl0000EvadeChecker.h"
+#include "Pl0000MonsterChecker.h"
 
 using rttr::registration;
 
@@ -160,6 +161,15 @@ void Register_Client_Reflection() {
         .method("Clone", &Pl0000Shockwave::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000Shockwave::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<Pl0000MonsterChecker>("Pl0000MonsterChecker")
+        .constructor<>()
+        .method("Clone", &Pl0000MonsterChecker::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000MonsterChecker::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+
+
+
     rttr::registration::class_<CityOfRuins>("CityOfRuins")
         .constructor<>()
         .method("Clone", &CityOfRuins::Clone)

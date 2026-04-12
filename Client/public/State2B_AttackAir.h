@@ -21,7 +21,9 @@ public:
 	void StateExitInvoke() override;
 
 private:
+	Bool m_IsHoming{};
 	unordered_set<uint32> m_EnterAnim;
+	unordered_set<uint32> m_EndAnim;
 
 public:
 	static Shared<State2B_AttackAir> Create(const wstring& tag, const Shared<Pl0000>& owner);

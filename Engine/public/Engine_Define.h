@@ -47,6 +47,8 @@
 #include "fmod_common.h"
 #include "fmod_errors.h"
 
+#include "recastnavigation/Recast.h"
+
 #ifdef min
 #undef min
 #endif
@@ -54,7 +56,7 @@
 #undef max
 #endif
 
-#define MAGIC_ENUM_RANGE_MAX 900 // 512개로 늘림
+#define MAGIC_ENUM_RANGE_MAX 900 
 
 #include "magic_enum/magic_enum.hpp"
 

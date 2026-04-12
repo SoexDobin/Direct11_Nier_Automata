@@ -47,6 +47,8 @@
 #include "fmod_common.h"
 #include "fmod_errors.h"
 
+#include "recastnavigation/Recast.h"
+
 #ifdef min
 #undef min
 #endif

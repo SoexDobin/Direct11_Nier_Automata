@@ -115,21 +115,18 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 		worldMoveDelta = m_CurrentMoveData.direction * rootSpeed;
 	}
 
-#ifdef _DEBUG
-	if (worldMoveDelta.Length() <= 0.f)
-	{
-		auto a = m_Owner.lock()->Get_Component<Pl0000StateMachine>();
-		auto b = dynamic_pointer_cast<Pl0000>(m_Owner.lock())->Find_PartObject(L"Pl0000Body")->Get_Component<Model>();
-		LOG_DEBUG(L"{} : {} {} {}", b->Get_AnimationIndex(), worldMoveDelta.x, worldMoveDelta.y, worldMoveDelta.z);
-	}
-#endif
+	// 💡 루트 모션 스케일 적용 (타격 시 m_RootMotionScale = 0.1f 가 되어 1/10 속도로 느리게 전진)
+	worldMoveDelta *= m_RootMotionScale;
 	
 	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicsDelta;
+	nextPosition += m_CorrectionDelta;
+	Reset_Correction();
 
 	Float groundHeight = 0.f; // TODO Nav메시를 통한 y축 판별
 	if (nextPosition.y <= groundHeight) {
 		nextPosition.y = groundHeight;
-		m_Velocity.y = 0.f;
+		//m_Velocity.y = 0.f;
+		m_Velocity = Vector3::Zero;
 		m_IsGrounded = true;
 	}
 	else {

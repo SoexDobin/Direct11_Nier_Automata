@@ -18,13 +18,15 @@ public:
 	{
 		IDLE,
 		MOVE,
-		CHASE,
-		GROGGY,
-		RETURN,
 
-		PHASE_1,
-		PHASE_2,
-		PHASE_3,
+		AWAIT,
+		ATTACK,
+		CHASE,
+		RETURN,
+		
+		Hit,
+		GROGGY,
+		DEAD,
 	};
 
 public:

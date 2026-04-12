@@ -2,15 +2,19 @@
 #include "Entity.h"
 #include "Pl0000Input.h"
 #include "Pl0000Body.h"
+#include "Pl0000MonsterChecker.h"
 
 NS_BEGIN(Engine)
 	class Shader;
     class Model;
+    class SphereCollider;
 }
 
 NS_BEGIN(Client)
+	class Pl0000MonsterChecker;
+	class Pl0000EvadeChecker;
 
-class Pl0000Movement;
+	class Pl0000Movement;
 class Pl0000StateMachine;
 class Pl0000Body;
 class WP0070Body;
@@ -20,9 +24,9 @@ class CLIENT_DLL Pl0000 final : public Entity
 {
 	RTTR_ENABLE(Entity)
 public:
-    typedef struct tagPl0000Container : public ENTITY_CONTAINER {
+    typedef struct tagPl0000Container : public ENTITY_CONTAINER_DESC {
 
-    } PL0000_CONTAINER;
+    } PL0000_CONTAINER_DESC;
 
 public:
 	explicit Pl0000();
@@ -31,17 +35,15 @@ public:
 	~Pl0000() override = default;
 
 public: /* pl0000 */
+    Shared<GameObject> Get_ClosestTarget() const { return m_MonsterChecker->Get_ClosestTarget(); }
     TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
-
     const Matrix& Get_LightSheathingMatrix() const { return m_LightSheathMatrix; }
     const Matrix& Get_HeavySheathingMatrix() const { return m_HeavySheathMatrix; }
-
 
 public:
     HRESULT Initialize_Prototype() override;
     HRESULT Initialize(void* arg) override;
     void On_Destroy() override;
-
 
 public:
     void Priority_Update(Float timeDelta) override;
@@ -51,17 +53,35 @@ public:
     HRESULT Render() override;
     void Submit_RenderGroup() override;
 
-private:
+public:
+	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+    void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+    void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+
+public:
+    void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
+    void OnAttackHit(const Shared<GameObject>& target) override;
+    Bool TryEvade(const Shared<GameObject>& attacker);
 
 private:
     HRESULT Ready_PartObjects();
     HRESULT Ready_Components();
 
+public:
+    void Set_LockOnTarget(const Shared<GameObject>& target) { m_LockOnTarget = target; }
+    Weak<GameObject> Get_LockOnTarget() const { return m_LockOnTarget; }
+
+private:
+    Weak<GameObject> m_LockOnTarget{};
+
 private:
     Shared<Pl0000Body> m_MainBody{ nullptr };
+    Shared<Pl0000MonsterChecker> m_MonsterChecker{ nullptr };
+
     Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
+    Shared<SphereCollider> m_PhysicalZone{ nullptr };
 
 private:
     Matrix m_LightSheathMatrix{};
@@ -77,11 +97,10 @@ public:
         IDLE                = 899,
         RUN                 = 898,
         SPRINT              = 897,
-        DASH                = 896,
+        EVADE                = 896,
         JUMP                = 895,
         ATTACK_GROUND       = 894,
         ATTACK_AIR          = 893,
-        EVADE               = 892,
 
         // IDLE
         IDLE_Neutral            = 46,
@@ -111,6 +130,12 @@ public:
     	DASH_B_TO_SPRINT    = 74, 
     	DASH_R_TO_SPRINT    = 75, 
     	DASH_L_TO_SPRINT    = 76,
+
+        // EVADE
+        EVADE_FRONT         = 27,
+        EVADE_BACKWARD      = 28,
+        EVADE_RIGHT         = 29,
+        EVADE_LEFT          = 30,
         
         // JUMP
         JUMP_ENTER          = 13,
@@ -146,6 +171,10 @@ public:
         LIGHT_AIR3          = 161,
         LIGHT_AIR4          = 162,
         LIGHT_AIR5          = 163,
+
+        LIGHT_AIR_DOWN_ENTER    = 175,
+        LIGHT_AIR_DOWN_HOLD     = 176,
+        LIGHT_AIR_DOWN_END      = 177,
 
         // HEAVY ATTACK 0220
         HEAVY_GROUND1       = 187,

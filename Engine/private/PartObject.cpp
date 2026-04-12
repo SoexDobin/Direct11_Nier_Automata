@@ -18,6 +18,7 @@ HRESULT PartObject::Initialize(void* arg)
 	if (arg)
 	{
 		auto desc = *static_cast<PARTOBJECT_DESC*>(arg);
+		m_Owner = desc.Owner;
 		m_ParentMatrix = desc.parentMatrix;
 	}
 	else return E_FAIL;

@@ -5,7 +5,7 @@ NS_BEGIN(Engine)
 
 class GameObject;
 
-class ENGINE_DLL Component abstract : public Object {
+class ENGINE_DLL Component abstract : public Object, public enable_shared_from_this<Component> {
     RTTR_ENABLE(Object)
 public:
 	typedef struct tagComponentDesc : public OBJECT_DESC {} COMPONENT_DESC;

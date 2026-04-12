@@ -44,16 +44,16 @@ Bool State2B_Sprint::StateEnterInvoke()
 	{
 		switch (auto animIndex = static_cast<Pl0000::PL0000_STATE>(pl0000->Get_ModelComponent()->Get_AnimationIndex()))
 		{
-		case Pl0000::PL0000_STATE::DASH_F:
+		case Pl0000::PL0000_STATE::DASH_F: case Pl0000::PL0000_STATE::EVADE_FRONT:
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_F_TO_SPRINT), 0.25f, false);
 			return true;
-		case Pl0000::PL0000_STATE::DASH_B:
+		case Pl0000::PL0000_STATE::DASH_B: case Pl0000::PL0000_STATE::EVADE_BACKWARD:
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_B_TO_SPRINT), 0.25f, false);
 			return true;
-		case Pl0000::PL0000_STATE::DASH_R:
+		case Pl0000::PL0000_STATE::DASH_R: case Pl0000::PL0000_STATE::EVADE_RIGHT:
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_R_TO_SPRINT), 0.25f, false);
 			return true;
-		case Pl0000::PL0000_STATE::DASH_L:
+		case Pl0000::PL0000_STATE::DASH_L: case Pl0000::PL0000_STATE::EVADE_LEFT:
 			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::DASH_L_TO_SPRINT), 0.25f, false);
 			return true;
 

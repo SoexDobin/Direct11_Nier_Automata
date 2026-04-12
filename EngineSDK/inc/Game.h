@@ -18,6 +18,7 @@
 #include "SoundManager.h"
 #include "EventManager.h"
 #include "CollisionManager.h"
+#include "RenderTargetManager.h"
 
 #include "GameObject.h"
 #include "Component.h"
@@ -39,6 +40,8 @@ public:
     HRESULT Draw() const;
     HRESULT Draw_NoClearing() const;
 
+    void Update_CameraPipeline();
+
     void Clear_Resource(uint32 levIndex) const;
     void Clear_AllResource() const;
 
@@ -46,6 +49,7 @@ public: /* For Editor / Tool */
     const D3D11_VIEWPORT& Get_ViewportDesc() const { return m_GraphicDevice->Get_ViewportDesc(); }
     ComPtr<ID3D11Device> Get_Device() const { return m_GraphicDevice->Get_Device(); }
     ComPtr<ID3D11DeviceContext> Get_Context() const { return m_GraphicDevice->Get_Context(); }
+    ComPtr<IDXGISwapChain1> Get_SwapChain() const { return m_GraphicDevice->Get_SwapChain(); }
     Shared<LayerRegistry> Get_LayerRegister() const { return m_LayerRegistry; }
     Shared<TagRegistry> Get_TagRegister() const { return m_TagRegistry; }
 
@@ -159,7 +163,7 @@ public: /* For SoundManager */
     void PlaySoundFX(const wstring& soundKey, SOUNDCHANNEL id, Float volume = -1.f) const;
     void PlaySoundFXOnce(const wstring& soundKey, SOUNDCHANNEL id, Float volume = -1.f) const;
     void PlaySoundLoopSection(const wstring& soundKey, SOUNDCHANNEL id, Float volume, uint32 loopStartMs, uint32 loopEndMs, Bool playIntro) const;
-    HRESULT StopSound(SOUNDCHANNEL targetChannel = SOUNDCHANNEL::MAX_CHANNELS) const;
+    void StopSound(SOUNDCHANNEL targetChannel = SOUNDCHANNEL::MAX_CHANNELS) const;
 
 public: /* For EventManager*/ 
     HRESULT Add_Instance_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const;
@@ -168,11 +172,15 @@ public: /* For EventManager*/
 
 public: /* CollisionManager */
     void Add_Collider(const Shared<class Collider>& collider) const;
-    void Remove_Collider(class Collider* collider) const;
+    void Remove_Collider(const Shared<class Collider>& collider) const;
     void Update_Collision() const;
 #ifdef _DEBUG
     void Render_CollisionDebug() const;
 #endif
+
+public:
+    HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;
+    HRESULT Bind_RenderTarget_ShaderResource(const Shared<class Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const;
 
 public: /* Prototype & Instantiate Facade */
     template <typename T>
@@ -220,6 +228,7 @@ private:
     Unique<SoundManager> m_SoundManager = { nullptr };
     Unique<EventManager> m_EventManager = { nullptr };
     Unique<CollisionManager> m_CollisionManager = { nullptr };
+    Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
 };
 
 NS_END

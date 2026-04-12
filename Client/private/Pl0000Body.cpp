@@ -5,8 +5,8 @@
 
 #include "Game.h"
 
-#include "Model.h"
-#include "Pl0000.h"
+#include "AABBCollider.h"
+#include "Entity.h"
 
 Pl0000Body::Pl0000Body() : Pl0000Parts{} {}
 Pl0000Body::Pl0000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -16,6 +16,9 @@ Pl0000Body::Pl0000Body(const Pl0000Body& rhs)
 
 HRESULT Pl0000Body::Initialize_Prototype()
 {
+	m_LayerMask.Set_Layer(L"Player");
+	m_TagMask.Set_Tag({ L"Player" });
+
 	return PartObject::Initialize_Prototype();
 }
 
@@ -27,6 +30,12 @@ HRESULT Pl0000Body::Initialize(void* arg)
 	if (FAILED(Ready_Components()))
 	{
 		LOG_ERROR(L"Failed To Ready_Components : Pl0000Body");
+		return E_FAIL;
+	}
+
+	if (FAILED(Ready_AnimationNotify()))
+	{
+		LOG_ERROR(L"Failed To Ready_AnimationNotify : Pl0000Body");
 		return E_FAIL;
 	}
 
@@ -55,13 +64,18 @@ void Pl0000Body::Priority_Update(Float timeDelta)
 
 void Pl0000Body::Update(Float timeDelta)
 {
-	m_Model->Update_ModelAnimation(timeDelta);
+	Float actualTimeDelta = timeDelta;
+	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
+		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
+	}
+	m_Model->Update_ModelAnimation(actualTimeDelta);
 }
 
 void Pl0000Body::Late_Update(Float timeDelta)
 {
 	m_Transform->Update_WorldMatrix();
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
+	m_HitBox->Update(m_CombinedWorldMatrix);
 }
 
 void Pl0000Body::Fixed_Update(Float fixedDelta)
@@ -134,6 +148,17 @@ HRESULT Pl0000Body::Ready_Components()
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;
+
+	AABBCollider::AABB_COLLIDER_DESC colDesc{};
+	colDesc.extents = Vector3{ 0.5f, 1.f, 0.5f };
+	colDesc.offset = Vector3::UnitY;
+	m_HitBox = Add_Component<AABBCollider>(ETOI(LEVEL::STATIC), &colDesc);
+
+	return S_OK;
+}
+
+HRESULT Pl0000Body::Ready_AnimationNotify()
+{
 
 	return S_OK;
 }

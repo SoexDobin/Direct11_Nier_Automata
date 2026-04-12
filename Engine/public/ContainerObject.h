@@ -19,6 +19,9 @@ public:
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
+	void On_Destroy() override;
+	void On_Enable() override;
+	void On_Disable() override;
 
 public:
 	GAMEOBJECTTYPE Get_GameObjectType() final { return GAMEOBJECTTYPE::CONTAINER; }
@@ -37,8 +40,8 @@ protected:
 	unordered_map<wstring, Shared<PartObject>> m_PartObjects;
 
 public:
-	virtual Shared<GameObject> Clone(void* arg) PURE;
-
+	virtual Shared<GameObject> Clone(void* arg) override PURE;
+	
 };
 
 NS_END

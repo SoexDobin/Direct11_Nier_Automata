@@ -17,6 +17,8 @@ HRESULT Font::Initialize(void* arg) { return Object::Initialize(arg); }
 
 void Font::Draw(const tChar* text, const Vector2& position, const Color& color)
 {
+	m_Context->GSSetShader(nullptr, nullptr, 0);
+
 	m_Batch->Begin();
 
 	m_Font->DrawString(m_Batch.get(), text, position, color);

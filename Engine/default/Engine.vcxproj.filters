@@ -172,6 +172,18 @@
     <Filter Include="01. Utility\05. Component\Collider\Manager">
       <UniqueIdentifier>{e253baa8-a27b-44c2-a2ea-132494a22eba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\Model\AnimationNotify">
+      <UniqueIdentifier>{153143a6-4bd7-41c7-9f50-4a16074c94d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\VIBuffer\Instance">
+      <UniqueIdentifier>{871c6f93-4aec-4e5c-a06d-6084ae6b8c44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\04. RenderTarget">
+      <UniqueIdentifier>{eb69689c-2047-4141-86b4-7f0dcd51d02d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\04. RenderTarget\Manager">
+      <UniqueIdentifier>{37f69072-1107-4dae-be93-94d0cf636a47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -383,6 +395,23 @@
     <ClInclude Include="..\public\SphereCollider.h">
       <Filter>01. Utility\05. Component\Collider</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\AnimationTracker.h">
+      <Filter>01. Utility\05. Component\Model\AnimationNotify</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Instance.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Particle_Point.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Particle_Rect.h">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WorldUIObject.h" />
+    <ClInclude Include="..\public\RenderTarget.h">
+      <Filter>00. System\04. RenderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RenderTargetManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -607,5 +636,31 @@
     <ClCompile Include="..\private\rttr_generated\SphereCollider_rttr.cpp">
       <Filter>96. RTTR</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\AnimationTracker.cpp">
+      <Filter>01. Utility\05. Component\Model\AnimationNotify</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\AnimationTracker_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Instance.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Particle_Point.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Particle_Rect.cpp">
+      <Filter>01. Utility\05. Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Point_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Rect_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WorldUIObject.cpp" />
+    <ClCompile Include="..\private\RenderTarget.cpp">
+      <Filter>00. System\04. RenderTarget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RenderTargetManager.cpp" />
   </ItemGroup>
 </Project>

@@ -34,18 +34,18 @@ void CollisionManager::Add_Collider(const Shared<Collider>& collider)
 	m_Colliders.push_back(collider);
 }
 
-void CollisionManager::Remove_Collider(Collider* collider)
+void CollisionManager::Remove_Collider(const Shared<Collider>& collider)
 {
 	if (nullptr == collider) return;
 
 	for (auto& col : m_Colliders)
 	{
-		if (col && col.get() != collider)
+		if (col && col != collider)
 			col->Release_OverlapMember(collider);
 	}
 
 	auto iter = ranges::find_if(m_Colliders.begin(), m_Colliders.end(), [collider](const Shared<Collider>& col) {
-		return col.get() == collider;
+		return col == collider;
 	});
 	if (iter != m_Colliders.end())
 	{
@@ -53,14 +53,14 @@ void CollisionManager::Remove_Collider(Collider* collider)
 	}
 }
 
-void CollisionManager::Update_Collision()
+void CollisionManager::Update_Collision() const
 {
 	for (size_t i = 0; i < m_Colliders.size(); ++i)
 	{
 		auto srcCol = m_Colliders[i];
 		if (!srcCol || srcCol->Is_Destroy() || !srcCol->Is_Active()) continue;
 		auto srcOwner = srcCol->Get_Owner();
-		if (!srcOwner || srcOwner->Is_Destroy() || srcOwner->Is_Active()) continue;
+		if (!srcOwner || srcOwner->Is_Destroy() || !srcOwner->Is_Active()) continue;
 
 		for (size_t j = i + 1; j < m_Colliders.size(); ++j)
 		{
@@ -72,8 +72,13 @@ void CollisionManager::Update_Collision()
 			// --- Layer Mask 필터링 ---
 			uint32 srcLayerBit = srcOwner->Get_LayerMask().Get_Layer();
 			uint32 dstLayerBit = dstOwner->Get_LayerMask().Get_Layer();
-			uint32 srcMaskBits = srcOwner->Get_LayerMask().Get_Mask();
-			uint32 dstMaskBits = dstOwner->Get_LayerMask().Get_Mask();
+			
+			uint32 srcMaskBits = srcOwner->Get_LayerMask().Is_GlobalMask() ?
+				GAME_INSTANCE->Get_LayerRegister()->Get_GlobalMask(srcLayerBit)
+				: srcOwner->Get_LayerMask().Get_Mask();
+			uint32 dstMaskBits = dstOwner->Get_LayerMask().Is_GlobalMask() ?
+				GAME_INSTANCE->Get_LayerRegister()->Get_GlobalMask(dstLayerBit)
+				: dstOwner->Get_LayerMask().Get_Mask();
 
 			if ((srcMaskBits & dstLayerBit) == 0 || (dstMaskBits & srcLayerBit) == 0)
 				continue;
@@ -84,29 +89,29 @@ void CollisionManager::Update_Collision()
 				srcCol->Set_IsColliding(true);
 				dstCol->Set_IsColliding(true);
 
-				if (!srcCol->Is_Overlapped(dstCol.get()))
+				if (!srcCol->Is_Overlapped(dstCol))
 				{
-					srcCol->Add_OverlapMember(dstCol.get());
-					srcOwner->OnCollisionEnter(dstOwner);
+					srcCol->Add_OverlapMember(dstCol);
+					srcOwner->OnCollisionEnter(srcCol, dstCol);
 
-					dstCol->Add_OverlapMember(srcCol.get());
-					dstOwner->OnCollisionEnter(srcOwner);
+					dstCol->Add_OverlapMember(srcCol);
+					dstOwner->OnCollisionEnter(dstCol, srcCol);
 				}
 				else
 				{
-					srcOwner->OnCollisionStay(dstOwner);
-					dstOwner->OnCollisionStay(srcOwner);
+					srcOwner->OnCollisionStay(srcCol, dstCol);
+					dstOwner->OnCollisionStay(dstCol, srcCol);
 				}
 			}
 			else
 			{
-				if (srcCol->Is_Overlapped(dstCol.get()))
+				if (srcCol->Is_Overlapped(dstCol))
 				{
-					srcCol->Release_OverlapMember(dstCol.get());
-					srcOwner->OnCollisionExit(dstOwner);
+					srcCol->Release_OverlapMember(dstCol);
+					srcOwner->OnCollisionExit(srcCol, dstCol);
 
-					dstCol->Release_OverlapMember(srcCol.get());
-					dstOwner->OnCollisionExit(srcOwner);
+					dstCol->Release_OverlapMember(srcCol);
+					dstOwner->OnCollisionExit(dstCol, srcCol);
 				}
 			}
 		}
@@ -142,6 +147,7 @@ void CollisionManager::Render_Debug() const
 	m_Effect->SetView(GAME_INSTANCE->Get_Transform(D3DTS::VIEW));
 	m_Effect->SetProjection(GAME_INSTANCE->Get_Transform(D3DTS::PROJ));
 
+	m_Context->GSSetShader(nullptr, nullptr, 0);
 	m_Context->IASetInputLayout(m_InputLayout.Get());
 
 	m_Effect->Apply(m_Context.Get());

@@ -11,6 +11,7 @@ class Game;
 class Component;
 class ScriptComponent;
 class Transform;
+class Collider;
 
 class ENGINE_DLL GameObject abstract : public Object, public enable_shared_from_this<GameObject> {
 	RTTR_ENABLE(Object)
@@ -50,9 +51,9 @@ public:
     virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) final;
 
 public: // 충돌 함수
-    virtual void OnCollisionEnter(const Shared<GameObject>& collision) {};
-    virtual void OnCollisionStay(const Shared<GameObject>& collision) {};
-    virtual void OnCollisionExit(const Shared<GameObject>& collision) {};
+    virtual void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) {};
+    virtual void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) {};
+    virtual void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) {};
 
 protected:
     ComPtr<ID3D11Device> m_Device = {nullptr};

@@ -41,9 +41,12 @@ Bool State2B_Jump::StateEnterInvoke()
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::RUN_TO_JUMP), 0.2f, false);
 		m_PrevMoveState = Pl0000::PL0000_STATE::RUN;
 		return true;
-	case Pl0000::PL0000_STATE::SPRINT: case Pl0000::PL0000_STATE::DASH:
+	case Pl0000::PL0000_STATE::SPRINT: 
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_TO_JUMP), 0.2f, false);
 		m_PrevMoveState = Pl0000::PL0000_STATE::SPRINT;
+	case Pl0000::PL0000_STATE::EVADE:
+		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::SPRINT_TO_JUMP), 0.2f, false);
+		m_PrevMoveState = Pl0000::PL0000_STATE::EVADE;
 		return true;
 	default: 
 		LOG_ERROR(L"[ENTER JUMP] : No Enter state PrevIndex {} ", Helper::To_wString(magic_enum::enum_name(prevState)));
@@ -57,7 +60,9 @@ void State2B_Jump::Update(Float timeDelta)
 	moveData.direction = Calculate_Direction();
 	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
 	moveData.isJump = true;
-	moveData.canRotation = true;
+	moveData.canRotation = (m_PrevMoveState != Pl0000::PL0000_STATE::EVADE);
+	moveData.useRootMotionDir = false;
+
 
 	m_Movement.lock()->Set_MovementData(moveData);
 
@@ -85,10 +90,20 @@ void State2B_Jump::Update(Float timeDelta)
 		}
 	}
 
+	// 점플 공격
+	if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON) || 
+		m_Input.lock()->Is_MousePress(DIMB::RBUTTON))
+	{
+		m_States.lock()->Change_State(Pl0000::PL0000_STATE::ATTACK_AIR);
+		return;
+	}
+
 	// 더블 점프
 	if ((m_CanDoubleJump && m_Input.lock()->Is_KeyDown(UBYTE(DIKEYBOARD_SPACE)))
 		|| m_CanDoubleJump && m_Input.lock()->Is_KeyMultiClick(UBYTE(DIKEYBOARD_SPACE)))
 	{
+		m_PrevMoveState = Pl0000::PL0000_STATE::IDLE;
+
 		m_Movement.lock()->Add_Force(Vector3(0.f, JumpScalar, 0.f));
 		if (false == m_Input.lock()->Is_NoneOrUp(UBYTE(DIKEYBOARD_S)))
 		{

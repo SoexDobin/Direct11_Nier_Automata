@@ -2,23 +2,23 @@
   "tags": [
     {
       "bit": 1,
-      "name": "TAG_0"
+      "name": "Player"
     },
     {
       "bit": 2,
-      "name": "TAG_1"
+      "name": "PlayerWeapon"
     },
     {
       "bit": 4,
-      "name": "TAG_2"
+      "name": "Monster"
     },
     {
       "bit": 8,
-      "name": "TAG_3"
+      "name": "Bullet"
     },
     {
       "bit": 16,
-      "name": "TAG_4"
+      "name": "Physical"
     },
     {
       "bit": 32,

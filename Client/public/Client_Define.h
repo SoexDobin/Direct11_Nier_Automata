@@ -10,7 +10,7 @@
 namespace Client
 {
 	enum class LEVEL { STATIC, LOADING, TITLE, GAMEPLAY, LEVEL_END };
-
+	enum class ATK_TYPE { LIGHT, HEAVY, POD, END };
 
 	constexpr const Char* WorldMatrix = "g_WorldMatrix";
 	constexpr const Char* ViewMatrix = "g_ViewMatrix";
@@ -18,6 +18,7 @@ namespace Client
 
 	constexpr const Char* CameraPosition = "g_CameraPosition";
 
+	constexpr const Char* DefaultMap = "g_Texture";
 	constexpr const Char* DiffuseMap = "g_DiffuseTexture";
 	constexpr const Char* NormalMap = "g_NormalTexture";
 
@@ -27,6 +28,9 @@ namespace Client
 	constexpr const Char* DiffuseLight = "g_LightDiffuse";
 	constexpr const Char* SpecularLight = "g_LightSpecular";
 	constexpr const Char* AmbientLight = "g_LightAmbient";
+
+	// 특수 값
+	constexpr const Char* HpRatio = "g_HpRatio"; // Tex Pass1
 }
 
 using namespace Client;

@@ -120,6 +120,9 @@
     <ClInclude Include="..\public\InspectorCamera.h">
       <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\InspectorCollider.h">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -168,6 +171,9 @@
       <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\InspectorCamera.cpp">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\InspectorCollider.cpp">
       <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClCompile>
   </ItemGroup>

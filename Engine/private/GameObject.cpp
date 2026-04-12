@@ -56,14 +56,24 @@ void GameObject::On_Destroy() {
 	m_IsDestroy = true;
 
     for (auto &component : m_Components)
-		Destroy(component.second);
+    {
+        component.second->On_Destroy();
+        Destroy(component.second);
+    }
     m_Components.clear();
 
     for (auto &component : m_Scripts)
-		Destroy(component.second);
+    {
+        component.second->On_Destroy();
+        Destroy(component.second);
+    }
     m_Scripts.clear();
 
-    Destroy(m_Transform);
+    if (m_Transform)
+    {
+        m_Transform->On_Destroy();
+        Destroy(m_Transform);
+    }
 
     for (auto &child : m_Children)
 		Destroy(child);

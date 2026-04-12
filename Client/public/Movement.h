@@ -23,9 +23,18 @@ public:
 	virtual ~Movement() override = default;
 
 public:
+	Float Get_Gravity() const { return m_Gravity; }
+	void Set_Gravity(Float gravity) { m_Gravity = gravity; }
+
+public:
 	Bool Is_Grounded() const { return m_IsGrounded; }
 	Float Get_GravityScalar() const { return m_Gravity; }
 	void Add_Force(const Vector3& impulse) { m_Velocity += impulse; m_IsGrounded = false; }
+	void Add_Correction(const Vector3& correction) { m_CorrectionDelta += correction; }
+	void Reset_Correction() { m_CorrectionDelta = Vector3::Zero; }
+
+	virtual void Reduce_RootMotion(Float lazyAmount = 0.1f) { m_RootMotionScale = lazyAmount; }
+	virtual void Reset_RootMotionStop() { m_RootMotionScale = 1.0f; }
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -42,6 +51,8 @@ protected:
 	Float			m_TurnSpeed{ 0.f };
 	Float			m_Gravity{ 30.f };
 	Bool			m_IsGrounded{ true };
+	Float			m_RootMotionScale{ 1.0f };
+	Vector3			m_CorrectionDelta{ 0.f };
 
 public:
 	Shared<Component> Clone(void* arg = nullptr) PURE;

@@ -70,6 +70,24 @@ Bool OBBCollider::Intersect(const Shared<Collider>& target)
 }
 
 #ifdef _DEBUG
+Vector3 OBBCollider::ClosestPoint(const Vector3& point)
+{
+	Vector3 center = m_Transformed.Center;
+	Vector3 extents = m_Transformed.Extents;
+	Quaternion orientation = m_Transformed.Orientation;
+
+	Quaternion invQuat{};
+	orientation.Inverse(invQuat);
+
+	Vector3 localPoint = Vector3::Transform(point - center, invQuat);
+
+	localPoint.x = clamp(localPoint.x, extents.x, extents.x);
+	localPoint.y = clamp(localPoint.y, extents.y, extents.y);
+	localPoint.z = clamp(localPoint.z, extents.z, extents.z);
+
+	return Vector3::Transform(localPoint, orientation);
+}
+
 HRESULT OBBCollider::Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color)
 {
 	DX::Draw(batch.get(), m_Transformed, color);

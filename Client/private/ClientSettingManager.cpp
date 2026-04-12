@@ -458,6 +458,9 @@ HRESULT ClientSettingManager::Load_Shader() const
 				std::wstring animMesh = L"vtxanimmesh";
 				std::wstring cube = L"vtxcube";
 				std::wstring sphere = L"vtxsphere";
+
+				std::wstring particlePoint = L"vtxparticlepoint";
+				std::wstring particleRect = L"vtxparticlerect";
 				
 				auto itTex = std::search(
 						tagName.begin(), tagName.end(), 
@@ -482,6 +485,14 @@ HRESULT ClientSettingManager::Load_Shader() const
 				auto itSphereTex = std::search(
 					tagName.begin(), tagName.end(),
 					sphere.begin(), sphere.end(), CaseInsensitiveCompare
+				);
+				auto itParticlePoint = std::search(
+					tagName.begin(), tagName.end(),
+					particlePoint.begin(), particlePoint.end(), CaseInsensitiveCompare
+				);
+				auto itParticleRect = std::search(
+					tagName.begin(), tagName.end(),
+					particleRect.begin(), particleRect.end(), CaseInsensitiveCompare
 				);
 
 				if (itAnimTex != tagName.end())
@@ -512,7 +523,17 @@ HRESULT ClientSettingManager::Load_Shader() const
 				else if (itSphereTex != tagName.end())
 				{
 					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXSPHERE::Elements, VTXSPHERE::numElements, VTXSPHERE::Tag)))
-						LOG_ERROR(L"Failed to Load Shader {}", VTXCUBE::Tag);
+						LOG_ERROR(L"Failed to Load Shader {}", VTXSPHERE::Tag);
+				}
+				else if (itParticlePoint != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXPARTICLE_POINT_DESC::Elements, VTXPARTICLE_POINT_DESC::numElements, VTXPARTICLE_POINT_DESC::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXPARTICLE_POINT_DESC::Tag);
+				}
+				else if (itParticleRect != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXPARTICLE_RECT_DESC::Elements, VTXPARTICLE_RECT_DESC::numElements, VTXPARTICLE_RECT_DESC::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXPARTICLE_RECT_DESC::Tag);
 				}
 				else
 				{

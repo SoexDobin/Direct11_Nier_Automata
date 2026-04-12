@@ -44,6 +44,13 @@ private:
 	HRESULT Ready_Components();
 
 private:
+	void Pod_Fire(Float timeDelta);
+
+private:
+	Float m_FireRateTimer = 0.f;
+	Float m_FireRate = 0.075f;
+
+private:
 	int32 m_RootBoneIndex = -1;
 	Float m_HoverTime = 0.f;
 	Float m_HoverAmplitude = 0.2f;   // 상하 진폭

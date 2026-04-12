@@ -69,6 +69,19 @@ Bool AABBCollider::Intersect(const Shared<Collider>& target)
 		return false;
 	}
 }
+
+Vector3 AABBCollider::ClosestPoint(const Vector3& point)
+{
+	Vector3 center = m_Transformed.Center;
+	Vector3 extends = m_Transformed.Extents;
+
+	Vector3 closest = point;
+	closest.x = clamp(closest.x, center.x - extends.x, center.x + extends.x);
+	closest.y = clamp(closest.y, center.y - extends.y, center.y + extends.y);
+	closest.z = clamp(closest.z, center.z - extends.z, center.z + extends.z);
+
+	return closest;
+}
 #ifdef _DEBUG
 HRESULT AABBCollider::Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color)
 {

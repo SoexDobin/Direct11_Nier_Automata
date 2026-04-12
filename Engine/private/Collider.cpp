@@ -1,5 +1,4 @@
 #include "Collider.h"
-
 #include "Game.h"
 
 Collider::Collider() : Component{} {}
@@ -10,14 +9,14 @@ Collider::Collider(const Collider& rhs)
 
 Collider::~Collider()
 {
-	Collider::On_Destroy();
+	
 }
 
 void Collider::On_Destroy()
 {
 	if (GAME_INSTANCE)
 	{
-		GAME_INSTANCE->Remove_Collider(this);
+		GAME_INSTANCE->Remove_Collider(static_pointer_cast<Collider>(shared_from_this()));
 	}
 	Component::On_Destroy();
 }

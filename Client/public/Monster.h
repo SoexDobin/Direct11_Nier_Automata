@@ -4,12 +4,13 @@
 NS_BEGIN(Client)
 
 class MonsterStateMachine;
+class HpBarWorldUI;
 
-class CLIENT_DLL Monster : public Entity
+class CLIENT_DLL Monster abstract : public Entity
 {
-	RTTR_ENABLE(GameObject)
+	RTTR_ENABLE(Entity)
 public:
-	typedef struct tagMonsterObjectDesc : public ENTITY_CONTAINER {} MONSTER_CONTAINER_DESC;
+	typedef struct tagMonsterObjectDesc : public ENTITY_CONTAINER_DESC {} MONSTER_CONTAINER_DESC;
 
 public:
 	explicit Monster();
@@ -32,12 +33,34 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
-private:
+protected:
+	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+	void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+
+public:
+	void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
+
+public:
+	Bool Is_TargetFront() const;
+	Bool Has_Target() const { return !m_TargetPlayer.expired(); }
+	void Set_Target(const Shared<GameObject>& target) { m_TargetPlayer = target; }
+	Vector3 Get_DirectionToTarget() const;
+	Float Get_DistanceToTarget() const;
+
+protected:
+	void Play_HitSFX(const DAMAGE_INFO& dmgInfo) const;
+	void DisplaySparkEffect(ATK_TYPE atkType, Vector3 position, Quaternion rotation = { 0.f, 0.f, 0.f, 1.f }) const;
+
+protected:
+	Shared<HpBarWorldUI> m_HpBarUI{ nullptr };
+
+protected:
 	Shared<MonsterStateMachine> m_States;
 	Weak<GameObject> m_TargetPlayer{};
 
 public:
-	virtual Shared<GameObject> Clone(void* arg) PURE;
+	virtual Shared<GameObject> Clone(void* arg) override PURE;
 };
 
 NS_END

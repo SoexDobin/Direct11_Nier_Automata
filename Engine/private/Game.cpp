@@ -16,9 +16,6 @@
 #include "LevelSerializer.h"
 #include "Timer.h"
 
-#include "Component.h"
-#include "GameObject.h"
-
 IMPLEMENT_SINGLETON(Game);
 
 Game::~Game() {
@@ -111,6 +108,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_CollisionManager = CollisionManager::Create()))
         return E_FAIL;
 
+    if (nullptr == (m_RenderTargetManager = RenderTargetManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -125,6 +125,9 @@ void Game::Update_Engine() {
 
   m_ObjectManager->LateUpdate(delta);
 
+  m_CameraManager->Bind_MainCamera_Transform();
+  m_Pipeline->Update_Pipeline();
+
   while (m_TimeManager->Is_FixedUpdate()) {
     Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
     m_ObjectManager->FixedUpdate(fixedDelta);
@@ -136,8 +139,6 @@ void Game::Update_Engine() {
 
   m_ObjectManager->Cleanup_GameObjects(0);
   m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
-  m_CameraManager->Bind_MainCamera_Transform();
-  m_Pipeline->Update_Pipeline();
 
   m_CollisionManager->Update_Collision();
 
@@ -152,6 +153,12 @@ HRESULT Game::Draw() const {
 HRESULT Game::Draw_NoClearing() const {
     m_Renderer->Draw_NoClearing();
     return S_OK;
+}
+
+void Game::Update_CameraPipeline()
+{
+    m_CameraManager->Bind_MainCamera_Transform();
+    m_Pipeline->Update_Pipeline();
 }
 
 void Game::Clear_AllResource() const {
@@ -546,12 +553,12 @@ void Game::PlaySoundLoopSection(const wstring& soundKey, SOUNDCHANNEL id, Float 
     m_SoundManager->PlaySoundLoopSection(soundKey, id, volume, loopStartMs, loopEndMs, playIntro);
 }
 
-HRESULT Game::StopSound(SOUNDCHANNEL targetChannel) const
+void Game::StopSound(SOUNDCHANNEL targetChannel) const
 {
     if (targetChannel == SOUNDCHANNEL::MAX_CHANNELS)
-        return m_SoundManager->StopAll();
+        m_SoundManager->StopAll();
     else
-        return m_SoundManager->StopChannel(targetChannel);
+        m_SoundManager->StopChannel(targetChannel);
 }
 
 HRESULT Game::Add_Instance_Event(uint32 levIndex, const wstring& eventTag, const std::function<void()>& callback) const
@@ -574,7 +581,7 @@ void Game::Add_Collider(const Shared<class Collider>& collider) const
     m_CollisionManager->Add_Collider(collider);
 }
 
-void Game::Remove_Collider(class Collider* collider) const
+void Game::Remove_Collider(const Shared<class Collider>& collider) const
 {
     m_CollisionManager->Remove_Collider(collider);
 }
@@ -590,6 +597,17 @@ void Game::Render_CollisionDebug() const
     m_CollisionManager->Render_Debug();
 }
 #endif
+
+HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color) const
+{
+    return m_RenderTargetManager->Add_RenderTarget(renderTargetTag, sizeX, sizeY, pixelFormat, color);
+}
+
+HRESULT Game::Bind_RenderTarget_ShaderResource(const Shared<Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const
+{
+    return m_RenderTargetManager->Bind_ShaderResource(shader, constantName, renderTargetTag);
+}
+
 
 Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
 {
@@ -624,7 +642,6 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, 
     }
     else {
         auto pComponent = std::static_pointer_cast<Component>(protoObject);
-        
         cloned = pComponent->Clone(arg);
     }
 

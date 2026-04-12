@@ -197,6 +197,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
   <ItemGroup>
     <ClInclude Include="..\public\AABBCollider.h" />
     <ClInclude Include="..\public\Animation.h" />
+    <ClInclude Include="..\public\AnimationTracker.h" />
     <ClInclude Include="..\public\Bone.h" />
     <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\public\CameraManager.h" />
@@ -239,6 +240,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\PrototypeManager.h" />
     <ClInclude Include="..\public\Random_Helper.h" />
     <ClInclude Include="..\public\Renderer.h" />
+    <ClInclude Include="..\public\RenderTarget.h" />
+    <ClInclude Include="..\public\RenderTargetManager.h" />
     <ClInclude Include="..\public\ResourceManager.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
     <ClInclude Include="..\public\LevelSerializer.h" />
@@ -255,14 +258,19 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Transform.h" />
     <ClInclude Include="..\public\UIObject.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
+    <ClInclude Include="..\public\VIBuffer_Instance.h" />
+    <ClInclude Include="..\public\VIBuffer_Particle_Point.h" />
+    <ClInclude Include="..\public\VIBuffer_Particle_Rect.h" />
     <ClInclude Include="..\public\VIBuffer_Rect.h" />
     <ClInclude Include="..\public\VIBuffer_Terrain.h" />
     <ClInclude Include="..\public\VICube.h" />
     <ClInclude Include="..\public\VISphere.h" />
+    <ClInclude Include="..\public\WorldUIObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\AABBCollider.cpp" />
     <ClCompile Include="..\private\Animation.cpp" />
+    <ClCompile Include="..\private\AnimationTracker.cpp" />
     <ClCompile Include="..\private\Bone.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\private\CameraManager.cpp" />
@@ -295,8 +303,11 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Pipeline.cpp" />
     <ClCompile Include="..\private\PrototypeManager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
+    <ClCompile Include="..\private\RenderTarget.cpp" />
+    <ClCompile Include="..\private\RenderTargetManager.cpp" />
     <ClCompile Include="..\private\ResourceManager.cpp" />
     <ClCompile Include="..\private\rttr_generated\AABBCollider_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\AnimationTracker_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Camera_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Collider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
@@ -317,6 +328,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Point_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Rect_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp" />
@@ -337,10 +350,14 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Transform.cpp" />
     <ClCompile Include="..\private\UIObject.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Instance.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Particle_Point.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Particle_Rect.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
     <ClCompile Include="..\private\VICube.cpp" />
     <ClCompile Include="..\private\VISphere.cpp" />
+    <ClCompile Include="..\private\WorldUIObject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

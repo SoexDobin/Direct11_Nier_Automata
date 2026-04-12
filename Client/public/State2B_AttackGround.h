@@ -32,11 +32,14 @@ private:
 	uint32 m_ComboStep{};
 	COMBO_TYPE m_PrevComboType{};
 	Float m_ComboDelta{};
+	uint32 m_LastOrderedAnimIndex{ };
+
 	unordered_map<uint32, Float> m_CanComboProgress;
 	unordered_map<uint32, Float> m_CanExitProgress;
 	unordered_set<uint32> m_EnterAnim;
 
 	Bool m_IsHeavyCharge{};
+	Bool m_IsChargeEnd{};
 	Float m_HeavyChargeDelta{};
 
 	const uint32 LIGHT_BODY[7] = {

@@ -57,6 +57,17 @@ namespace Engine
 		Float trackPosition; // Animation의 Duration 절대값 위치
 	} KEYFRAME;
 
+	typedef struct tagVertexPosition
+	{
+		Vector3			position;
+
+		inline static const std::wstring Tag = { L"VTX_Pos" };
+		static const uint32_t numElements = { 1 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+	} VTXPOS;
+
 	typedef struct tagVertexTexcoord
 	{
 		Vector3			position;
@@ -127,8 +138,8 @@ namespace Engine
 
 	typedef struct tagVertexCube
 	{
-		XMFLOAT3			position;
-		XMFLOAT3			texcoord;
+		Vector3				position;
+		Vector3				texcoord;
 
 		inline static const std::wstring Tag = { L"VTX_Cube" };
 		static const uint32_t numElements = { 2 };
@@ -140,8 +151,8 @@ namespace Engine
 
 	typedef struct tagVertexSphere
 	{
-		XMFLOAT3			position;
-		XMFLOAT3			texcoord;
+		Vector3				position;
+		Vector3				texcoord;
 
 		inline static const std::wstring Tag = { L"VTX_Sphere" };
 		static const uint32_t numElements = { 2 };
@@ -150,6 +161,48 @@ namespace Engine
 			{"TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA,0 }
 		};
 	} VTXSPHERE;
+
+	typedef struct tagVertexParticleInstance
+	{
+		Vector4 right;
+		Vector4 up;
+		Vector4 look;
+		Vector4 translation;
+		Vector2 lifeTime;
+	} VTXPARTICLE_INSTANCE;
+
+	typedef struct tagVertexParticlePointDesc
+	{
+		inline static const std::wstring Tag = { L"VTX_Particle_Point" };
+		static const uint32_t numElements = { 6 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			
+			{"WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1}
+		};
+	} VTXPARTICLE_POINT_DESC;
+
+	typedef struct tagVertexParticleRectDesc
+	{
+		inline static const std::wstring Tag = {L"VTX_Particle_Rect"};
+		static const uint32_t numElements = { 7 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA,0 },
+
+			{"WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{"TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1}
+		};
+	} VTXPARTICLE_RECT_DESC;
+
+	
 
 }
 

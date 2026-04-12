@@ -1,7 +1,7 @@
 #ifndef Engine_ModelStruc_h__
 #define Engine_ModelStruct_h__
 
-namespace Engine
+namespace Engine // For Converting
 {
 	constexpr char MODEL_MAGIC[4] = { 'N','M','D','L' };
 	constexpr uint32 MODEL_VERSION = 1;
@@ -68,6 +68,15 @@ namespace Engine
 		std::vector<MODEL_CHANNEL> channels;
 	} MODEL_ANIMATION;
 
+}
+
+namespace Engine
+{
+	typedef struct boneSnapShot
+	{
+		Matrix matrices[MODEL_BONE_MAX];
+		uint32 numBones{ 0 };
+	} BONE_SNAPSHOT;
 }
 
 #endif

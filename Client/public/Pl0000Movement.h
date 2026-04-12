@@ -35,7 +35,7 @@ public:
 	} PL0000_MOVEMENT_DATA;
 
 public:
-	void Set_MovementData(const PL0000_MOVEMENT_DATA& data) { m_CurrentMoveData = data; }
+	void Set_MovementData(const PL0000_MOVEMENT_DATA& data) { m_CurrentMoveData = data; Reset_RootMotionStop(); }
 	const PL0000_MOVEMENT_DATA& Get_MovementData() const { return m_CurrentMoveData; }
 
 public:
@@ -44,6 +44,10 @@ public:
 	explicit Pl0000Movement(const Pl0000Movement& rhs);
 	~Pl0000Movement() override = default;
 	
+public:
+	void Reduce_RootMotion(Float lazyAmount = 0.1f) override { m_RootMotionScale = lazyAmount; }
+	void Reset_RootMotionStop() override { m_RootMotionScale = 1.0f; }
+
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg = nullptr) override;

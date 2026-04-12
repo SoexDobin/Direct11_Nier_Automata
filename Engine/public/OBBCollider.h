@@ -27,7 +27,17 @@ public:
 	void Update(const Matrix& worldMatrix) override;
 	Bool Intersect(const Shared<Collider>& target) override;
 	const BoundingOrientedBox& Get_Bounding() const { return m_Transformed; }
+	virtual Vector3 Get_Pivot() const override { return m_Transformed.Center; }
+	Vector3 Get_CurrentExtends() const { return m_Transformed.Extents; }
+	Quaternion Get_CurrentOrientation() const { return m_Transformed.Orientation; }
+	Vector3 ClosestPoint(const Vector3& point) override;
+
+	Vector3 Get_Extents() const { return m_Original.Extents; }
 	void Set_Extents(const Vector3& extents) { m_Original.Extents = extents; }
+	void Set_Offset(const Vector3& offset) override {
+		m_Offset = offset;
+		m_Original.Center = offset;
+	}
 
 #ifdef _DEBUG
 	HRESULT Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color) override;
@@ -43,4 +53,4 @@ public:
 	static Shared<OBBCollider> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
 };
 
-NS_END
+NS_END 

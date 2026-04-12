@@ -3,6 +3,7 @@
 
 NS_BEGIN(Engine)
 class Model;
+class AABBCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -42,10 +43,12 @@ public:
 private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
+	HRESULT Ready_AnimationNotify();
 
 private:
-	int32 m_RootBoneIndex{};
-	Matrix m_SheathMatrix{};
+	int32					m_RootBoneIndex{};
+	Matrix					m_SheathMatrix{};
+	Shared<AABBCollider>	m_HitBox { nullptr };
 
 public:
 	static Shared<Pl0000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

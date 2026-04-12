@@ -1,5 +1,6 @@
 #pragma once
 #include "Animation.h"
+#include "AnimationTracker.h"
 #include "Component.h"
 
 NS_BEGIN(Engine)
@@ -8,6 +9,7 @@ class Material;
 class Bone;
 class Animation;
 class Shader;
+class AnimationTracker;
 
 class ENGINE_DLL Model final : public Component
 {
@@ -42,6 +44,7 @@ public:
 	void Set_Animation(uint32 index, Float blendDuration = 0.5f);
 
 public:
+	Bool Is_Blending() const { return m_IsBlending; }
 	int32 Get_AnimationIndexByName(const wstring& name);
 	const wstring& Get_AnimationNameByIndex(uint32 index);
 	void Set_AnimationIndex(uint32 index) { m_CurrentAnimIndex = index; }
@@ -56,10 +59,20 @@ public:
 		return m_Animations[m_CurrentAnimIndex]->Get_Progress();
 	}
 
+public: /* Animation Tracker */
+	void Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const;
+	void Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies) const;
+	void Clear_AnimNotifies() const;
+	Bool Is_NotifyActive(uint32 animIndex, const wstring & notifyTag) const;
+	Bool Is_NotifyActive(const wstring & notifyName) const;
+
+public: /* snap shot */
+	vector<BONE_SNAPSHOT> Get_SnapShot_BoneMatrices();
+
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
 	Matrix Get_BoneMatrix(uint32 boneIndex) const; // 특정 부모 뼈대의 트랜스폼 가져오기
-	TRANSFORM_FRAME Get_RootTransformVelocity(uint32 nodeIndex) const;
+	const TRANSFORM_FRAME& Get_RootTransformVelocity(uint32 nodeIndex) const;
 	void Set_LocalRootNode(uint32 nodeIndex);
 
 	HRESULT Render(uint32 meshIndex);
@@ -104,6 +117,7 @@ private:
 	uint32 m_NumAnimation = {};
 	vector<Shared<Animation>> m_Animations;
 	map<wstring, uint32> m_AnimationNames;
+	Shared<AnimationTracker> m_Tracker{ nullptr };
 
 public:
 	static Shared<Model> CreatePrototype();

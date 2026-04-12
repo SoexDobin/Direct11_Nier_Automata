@@ -17,13 +17,13 @@
           "prototypeTag": "ThirdPersonCamera",
           "transform": {
             "position": [
-              7.376703262329102,
-              2.8175606727600098,
-              1.7651050090789795
+              0.0,
+              10.0,
+              -10.0
             ],
             "rotation": [
-              13.418737411499023,
-              -103.13771057128906,
+              44.99999237060547,
+              0.0,
               0.0
             ],
             "scale": [
@@ -42,27 +42,19 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "VICube"
-            },
-            {
-              "properties": null,
-              "typeName": "Texture"
+              "typeName": "SphereCollider"
             }
           ],
-          "name": "SkyBox",
-          "objectID": 545929098,
+          "name": "Em3100_2",
+          "objectID": 1331097783,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "SkyBox",
+          "prototypeTag": "Em3100",
           "transform": {
             "position": [
+              -5.0,
               0.0,
-              0.0,
-              0.0
+              27.5
             ],
             "rotation": [
               0.0,
@@ -70,12 +62,12 @@
               0.0
             ],
             "scale": [
-              1000.0,
-              1000.0,
-              1000.0
+              1.0,
+              1.0,
+              1.0
             ]
           },
-          "typeName": "SkyBox"
+          "typeName": "Em3100"
         },
         {
           "components": [
@@ -86,43 +78,171 @@
             {
               "properties": null,
               "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "AABBCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
             }
           ],
-          "name": "EM3100",
-          "objectID": 2285713722,
+          "name": "Em3100",
+          "objectID": 1107778682,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "EM3100",
+          "prototypeTag": "Em3100",
           "transform": {
             "position": [
               0.0,
               0.0,
-              10.0
+              30.0
             ],
             "rotation": [
               0.0,
-              179.99989318847656,
+              0.0,
               0.0
             ],
             "scale": [
-              0.9999992251396179,
               1.0,
-              0.9999992251396179
+              1.0,
+              1.0
             ]
           },
-          "typeName": "EM3100"
+          "typeName": "Em3100"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em3100_1",
+          "objectID": 1330530108,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em3100",
+          "transform": {
+            "position": [
+              5.0,
+              0.0,
+              27.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em3100"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em0010_2",
+          "objectID": 4215260095,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              -5.0,
+              0.0,
+              12.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em0010",
+          "objectID": 4160192466,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              15.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Pl0000",
+          "objectID": 4267756554,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Pl0000",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Pl0000"
         },
         {
           "components": [
@@ -168,18 +288,22 @@
             {
               "properties": null,
               "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
             }
           ],
-          "name": "Pl0000",
-          "objectID": 4267756554,
+          "name": "Em0010_1",
+          "objectID": 4214692420,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Pl0000",
+          "prototypeTag": "Em0010",
           "transform": {
             "position": [
+              5.0,
               0.0,
-              0.0,
-              0.0
+              12.5
             ],
             "rotation": [
               0.0,
@@ -192,7 +316,7 @@
               1.0
             ]
           },
-          "typeName": "Pl0000"
+          "typeName": "Em0010"
         }
       ]
     }

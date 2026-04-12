@@ -10,6 +10,7 @@ typedef struct ENGINE_DLL TagMask final
 public:
 	uint32 Get_Tags() const { return m_Tag; }
 	void Set_Tags(uint32 tags) { m_Tag = tags; }
+	void Set_Tag(std::initializer_list<wstring> tags);
 
 	void Add(TAG tag) { m_Tag |= ETOI(tag); }
 	void Add(uint32 tag) { m_Tag |= tag; }
@@ -19,6 +20,14 @@ public:
 	Bool Has(uint32 tag) const { return (m_Tag & tag) != 0; }
 	Bool HasAny(uint32 tags) const { return (m_Tag & tags) != 0; }
 	Bool HasAll(uint32 tags) const { return (m_Tag & tags) == tags; }
+	Bool Has(const wstring& tagName) const;
+
+	void Add(const wstring& tagName);
+	void Add(std::initializer_list<wstring> tags);
+	void Remove(const wstring& tagName);
+	void Remove(std::initializer_list<wstring> tags);
+	
+
 	void Clear() { m_Tag = 0; }
 
 private:

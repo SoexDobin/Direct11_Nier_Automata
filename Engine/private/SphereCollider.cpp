@@ -63,6 +63,20 @@ Bool SphereCollider::Intersect(const Shared<Collider>& target)
 		return false;
 	}
 }
+
+Vector3 SphereCollider::ClosestPoint(const Vector3& point)
+{
+	Vector3 center = m_Transformed.Center;
+	Vector3 toPoint = point - center;
+	Float length = toPoint.Length();
+
+	if (length <= m_Transformed.Radius)
+		return point;
+
+	toPoint.Normalize();
+	return center + toPoint * m_Transformed.Radius;
+}
+
 #ifdef _DEBUG
 HRESULT SphereCollider::Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color)
 {

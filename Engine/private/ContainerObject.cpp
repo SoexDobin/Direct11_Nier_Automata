@@ -19,6 +19,47 @@ HRESULT ContainerObject::Initialize(void* arg)
 	return GameObject::Initialize(arg);
 }
 
+void ContainerObject::On_Destroy()
+{
+	for (auto& [tag, partObj] : m_PartObjects)
+	{
+		if (partObj && !partObj->Is_Destroy())
+		{
+			partObj->On_Destroy();
+			Destroy(partObj);
+		}
+	}
+	m_PartObjects.clear();
+
+	GameObject::On_Destroy();
+}
+
+void ContainerObject::On_Enable()
+{
+	for (auto& [tag, partObj] : m_PartObjects)
+	{
+		if (partObj)
+		{
+			partObj->Set_Active(false);
+		}
+	}
+
+	GameObject::On_Enable();
+}
+
+void ContainerObject::On_Disable()
+{
+	for (auto& [tag, partObj] : m_PartObjects)
+	{
+		if (partObj)
+		{
+			partObj->Set_Active(true);
+		}
+	}
+
+	GameObject::On_Disable();
+}
+
 HRESULT ContainerObject::Add_PartObject(uint32 prototypeLevIndex, const wstring& prototypeTag, const wstring& partTag, void* arg)
 {
 	if (nullptr != Find_PartObject(partTag))

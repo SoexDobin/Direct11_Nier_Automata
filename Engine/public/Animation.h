@@ -29,6 +29,8 @@ public:
 	const wstring& Get_AnimationName() { return m_Name; }
 	Float Get_Progress() const { return m_CurrentTrackPosition / m_Duration; }
 	void Set_Progress(Float progress);
+	Float Get_Duration() const { return m_Duration; }
+	Float Get_TickPerSecond() const { return m_TickPerSecond; }
 
 public:
 	Bool Is_LocalTransformationPresent() const { return m_IsLocalTransformationPresent; }

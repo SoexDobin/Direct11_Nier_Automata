@@ -1,0 +1,166 @@
+#include "pch.h"
+#include "Em0010Movement.h"
+#include "Em0010.h"
+#include <SpdLogger.h>
+
+Em0010Movement::Em0010Movement() : Movement{} {}
+Em0010Movement::Em0010Movement(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+	: Movement{device, context} {}
+Em0010Movement::Em0010Movement(const Em0010Movement& rhs)
+	: Movement{rhs} {}
+
+HRESULT Em0010Movement::Initialize_Prototype()
+{
+	return Movement::Initialize_Prototype();
+}
+
+HRESULT Em0010Movement::Initialize(void* arg)
+{
+	if (FAILED(Movement::Initialize(arg)))
+	{
+		LOG_ERROR(L"Failed to Init {}", m_ObjectName);
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT Em0010Movement::Begin()
+{
+	if (!m_Owner.expired())
+	{
+		m_OwnerContainer = static_pointer_cast<Em0010>(m_Owner.lock());
+		if (m_OwnerContainer.expired())
+		{
+			LOG_ERROR(L"Failed To Find Em0010 Container");
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+void Em0010Movement::Update_Movement(Float timeDelta)
+{
+	if (m_Owner.expired()) return;
+
+	Shared<Transform> ownerTransform = m_Owner.lock()->Get_Transform();
+
+	if (false == m_IsGrounded)
+	{
+		m_Velocity.y -= m_Gravity * timeDelta;
+	}
+
+	Vector3 physicalDelta = m_Velocity * timeDelta; // y이동
+
+	TRANSFORM_FRAME transformFrame = m_OwnerContainer.lock()->Get_BodyModelTransform();
+	Vector3 rootPositionVelocity = transformFrame.position;
+
+	if (m_IsGrounded)
+	{
+		m_LastGroundedRootPositionVelocity = rootPositionVelocity;
+		m_LastGroundedRootPositionVelocity.y = 0.f;
+	}
+	else
+	{
+		if (m_CurrentMoveData.isMove)
+		{
+			rootPositionVelocity = m_LastGroundedRootPositionVelocity;
+		}
+		else
+		{
+			rootPositionVelocity = Vector3::Zero;
+		}
+	}
+
+	if (m_CurrentMoveData.canRotation)
+	{
+		// 기본 이동 방향
+		Vector3 targetRotDir = m_CurrentMoveData.direction;
+
+		// 명시된 look이 있으면 덮음
+		if (m_CurrentMoveData.lookDirection.LengthSquared() > 0.f)
+		{
+			targetRotDir = m_CurrentMoveData.lookDirection;
+		}
+
+		if (targetRotDir.LengthSquared() > 0.f)
+		{
+			Float targetYaw = atan2f(targetRotDir.x, targetRotDir.z);
+			Quaternion targetQuat = Quaternion::CreateFromYawPitchRoll(targetYaw, 0.f, 0.f);
+
+			Float turnDelta = m_TurnSpeed * timeDelta;
+			Quaternion currentQuat = ownerTransform->Get_Quaternion();
+			Quaternion nextQuat = Quaternion::Slerp(currentQuat, targetQuat, turnDelta);
+			ownerTransform->Set_Rotation(nextQuat);
+		}
+	}
+
+	Vector3 worldMoveDelta{}; // x이동
+
+	if (m_CurrentMoveData.isMove || m_CurrentMoveData.isAttack)
+	{
+		if (m_CurrentMoveData.useRootMotionDir)
+		{
+			worldMoveDelta = Vector3::Transform(rootPositionVelocity * -1.f,ownerTransform->Get_Quaternion());
+
+			worldMoveDelta *= m_CurrentMoveData.rootMotionScale;
+		}
+		else
+		{
+			Float rootSpeed = rootPositionVelocity.Length();
+			worldMoveDelta = m_CurrentMoveData.direction * rootSpeed * m_CurrentMoveData.rootMotionScale;
+		}
+	}
+
+	// 💡 Add hitstop scale:
+	worldMoveDelta *= m_RootMotionScale;
+
+	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicalDelta;
+
+	nextPosition += m_CorrectionDelta;
+	Reset_Correction();
+
+	Float groundHeight = 0.f; // TODO: NavMesh 연동
+	if (nextPosition.y <= groundHeight)
+	{
+		nextPosition.y = groundHeight;
+		m_Velocity.y = 0.f;
+		m_IsGrounded = true;
+	}
+	else
+	{
+		m_IsGrounded = false;
+	}
+
+	ownerTransform->Set_Position(nextPosition);
+}
+
+Shared<Em0010Movement> Em0010Movement::Create(const ComPtr<ID3D11Device>& device,
+                                              const ComPtr<ID3D11DeviceContext>& context)
+{
+	auto prototype = make_shared<Em0010Movement>(device, context);
+
+	if (FAILED(prototype->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : Em0010Movement");
+		return nullptr;
+	}
+
+	return prototype;
+}
+
+Shared<Component> Em0010Movement::Clone(void* arg)
+{
+	auto instance = make_shared<Em0010Movement>(*this);
+
+	if (FAILED(instance->Initialize(arg)))
+	{
+		MSG_BOX("Failed to Clone : Em0010Movement");
+		return nullptr;
+	}
+
+	return instance;
+}
+
+

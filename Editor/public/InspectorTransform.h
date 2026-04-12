@@ -14,7 +14,7 @@ public:
 	~InspectorTransform() override = default;
 
 public:
-	HRESULT Initialize();
+	HRESULT Initialize() override;
 	void Render(Bool isResize) override {} // Not used directly in polling anymore
 	void RenderComponent(const std::shared_ptr<Engine::Transform>& pTransform);
 

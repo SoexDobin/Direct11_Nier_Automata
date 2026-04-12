@@ -90,7 +90,8 @@ HRESULT ResourceManager::Load_Texture(uint32 levIndex, const tChar* texturePath,
 
         if (FAILED(hr)) { return E_FAIL; }
 
-        m_SRVs[levIndex].emplace(texturePath, srv);
+        //m_SRVs[levIndex].emplace(texturePath, srv);
+        m_SRVs[levIndex].emplace(szFullPath, srv);
     }
 
     return S_OK;

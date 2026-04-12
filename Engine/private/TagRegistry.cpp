@@ -4,6 +4,64 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "Game.h"
+#include "SpdLogger.h"
+
+
+void TagMask::Set_Tag(std::initializer_list<wstring> tags)
+{
+    m_Tag = 0;
+    for (const auto& name : tags)
+        Add(name);
+}
+
+Bool TagMask::Has(const wstring& tagName) const
+{
+    auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    if (tag == TAG::NONE)
+    {
+        LOG_ERROR(L"Wrong Tag Naming {}", tagName);
+        return false;
+    }
+
+    return Has(tag);
+}
+
+void TagMask::Add(const wstring& tagName)
+{
+    auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    if (tag == TAG::NONE)
+    {
+        LOG_ERROR(L"Wrong Tag Naming {}", tagName);
+        return;
+    }
+
+    Add(tag);
+}
+
+void TagMask::Add(std::initializer_list<wstring> tags)
+{
+    for (const auto& name : tags)
+        Add(name);
+}
+
+void TagMask::Remove(const wstring& tagName)
+{
+    auto tag = GAME_INSTANCE->Get_TagRegister()->Get_TagByName(tagName);
+    if (tag == TAG::NONE)
+    {
+        LOG_ERROR(L"Wrong Tag Naming {}", tagName);
+    	return;
+    }
+		
+    Remove(tag);
+}
+
+void TagMask::Remove(std::initializer_list<wstring> tags)
+{
+    for (const auto& name : tags)
+        Remove(name);
+}
 
 wstring TagRegistry::Get_TagName(TAG tag) const {
     const auto iter = m_TagToName.find(tag);
@@ -22,7 +80,7 @@ TAG TagRegistry::Get_TagByName(const wstring &name) const {
     if (it != m_NameToTag.end())
 		return it->second;
 
-    return TAG::TAG_0;
+    return TAG::NONE;
 }
 
 void TagRegistry::Set_TagName(TAG tag, const wstring &name) {

@@ -118,7 +118,7 @@
     <ClInclude Include="..\public\Pl0000Parts.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\State2B_Dash.h">
+    <ClInclude Include="..\public\State2B_Evade.h">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Movement.h">
@@ -133,8 +133,8 @@
     <ClInclude Include="..\public\WP3000Body.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP3000</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\EM3100.h">
-      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
+    <ClInclude Include="..\public\Em3100.h">
+      <Filter>02. GameObject\Entity\Monster\EM3100</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MonsterStateMachine.h">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine</Filter>
@@ -145,6 +145,73 @@
     <ClInclude Include="..\public\StateMonster.h">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>99. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3100Body.h">
+      <Filter>02. GameObject\Entity\Monster\EM3100\EM3100Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SparkEffect.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ParticleEffect.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Projectile.h">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bullet.h">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HpBarWorldUI.h">
+      <Filter>02. GameObject\UI\WorldUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em0010.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em0010Movement.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Idle.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Hit.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em0010Body.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterSight.h">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterAOE.h">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000Shockwave.h">
+      <Filter>02. GameObject\Entity\2B</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Dead.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="StateEm0010_Attack.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Chase.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FireFlashEffect.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000EvadeChecker.h">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000MonsterChecker.h">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000EvadeGhost.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -261,7 +328,7 @@
     <ClCompile Include="..\private\Pl0000Parts.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\State2B_Dash.cpp">
+    <ClCompile Include="..\private\State2B_Evade.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Movement.cpp">
@@ -276,9 +343,6 @@
     <ClCompile Include="..\private\WP3000Body.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP3000</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\EM3100.cpp">
-      <Filter>02. GameObject\Entity\Monster\em3100</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\MonsterStateMachine.cpp">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine</Filter>
     </ClCompile>
@@ -288,6 +352,73 @@
     <ClCompile Include="..\private\StateMonster.cpp">
       <Filter>02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Em3100.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3100</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3100Body.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3100\EM3100Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SparkEffect.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ParticleEffect.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile.cpp">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bullet.cpp">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HpBarWorldUI.cpp">
+      <Filter>02. GameObject\UI\WorldUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em0010.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em0010Movement.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Idle.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Hit.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em0010Body.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterSight.cpp">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterAOE.cpp">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000Shockwave.cpp">
+      <Filter>02. GameObject\Entity\2B</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Dead.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="StateEm0010_Attack.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Chase.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FireFlashEffect.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000EvadeChecker.cpp">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000MonsterChecker.cpp">
+      <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000EvadeGhost.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -334,9 +465,6 @@
     </Filter>
     <Filter Include="02. GameObject\Sky">
       <UniqueIdentifier>{d5aa316f-6060-4485-b596-72e8cffe7af4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="99. Default">
-      <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\Bullet">
       <UniqueIdentifier>{d890cac3-f6d2-454b-ba09-6ac4ea6444cb}</UniqueIdentifier>
@@ -389,9 +517,6 @@
     <Filter Include="02. GameObject\Entity\Monster">
       <UniqueIdentifier>{c932032b-94df-43d7-9e98-c5d255458cae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Entity\Monster\em3100">
-      <UniqueIdentifier>{c3c42c52-488d-4b83-a482-e04b0167a700}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Entity\Monster\em3000">
       <UniqueIdentifier>{5ec70d50-6408-4c69-9e76-c0a13d4af7c9}</UniqueIdentifier>
     </Filter>
@@ -400,6 +525,39 @@
     </Filter>
     <Filter Include="02. GameObject\Entity\Monster\MonsterStateMachine\MonsterState">
       <UniqueIdentifier>{dca5558f-5971-46b7-9026-fbf18f2d7a20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3100">
+      <UniqueIdentifier>{c3c42c52-488d-4b83-a482-e04b0167a700}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3100\EM3100Parts">
+      <UniqueIdentifier>{b7bc5419-8226-46d1-974d-20b77a8c2845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect">
+      <UniqueIdentifier>{ae9e970c-e8b9-461e-b50d-496bf13fc6f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\WorldUI">
+      <UniqueIdentifier>{79aebeed-9972-4538-9cda-a4f5d0877b5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010">
+      <UniqueIdentifier>{6d08f494-7467-4200-9067-8db59e81a64e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010Parts">
+      <UniqueIdentifier>{bc6c1f76-eb6c-4361-8f2b-ad000b10ad70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010Movement">
+      <UniqueIdentifier>{d9b86e2f-2c54-410b-a9c5-2265e32bd7e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010States">
+      <UniqueIdentifier>{15bb4d8e-551e-4a07-853b-77b872d98d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM0010\Em0010Parts\Body">
+      <UniqueIdentifier>{5f1c2560-e6d2-4819-92d1-325a821543a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\ForMonster">
+      <UniqueIdentifier>{b88d85c6-e0cd-40ed-b691-62a3074efab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Default">
+      <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -421,6 +579,12 @@
     <FxCompile Include="..\bin\shaders\Shader_VtxSphere.hlsl">
       <Filter>97. Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\bin\shaders\Shader_VtxParticlePoint.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\bin\shaders\Shader_VtxParticleRect.hlsl">
+      <Filter>97. Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="PostBuildCopy.bat">
@@ -432,5 +596,10 @@
     <None Include="GenerateRTTR_Client.bat">
       <Filter>99. Default</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Client.rc">
+      <Filter>99. Default</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

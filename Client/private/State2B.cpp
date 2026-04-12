@@ -38,7 +38,8 @@ namespace Client
 				{
 					m_MainCamera = camera;
 				}
-			});
+			}
+		);
 		
 
 		m_Body = static_pointer_cast<Pl0000Body>(m_Owner.lock()->Find_PartObject(L"Pl0000Body"));
@@ -50,6 +51,12 @@ namespace Client
 		m_Movement = m_Owner.lock()->Get_Component<Pl0000Movement>();
 
 		return S_OK;
+	}
+
+	Bool State2B::HasTarget() const
+	{
+		if (m_Owner.expired()) return false;
+		return !m_Owner.lock()->Get_LockOnTarget().expired();
 	}
 
 	Vector3 State2B::Calculate_Direction()

@@ -3,9 +3,12 @@
 
 #include <SpdLogger.h>
 
+#include "Bullet.h"
+#include "FireFlashEffect.h"
 #include "Game.h"
 #include "Model.h"
 #include "Pl0000.h"
+#include "Random_Helper.h"
 
 
 NS_BEGIN(Client)
@@ -86,6 +89,9 @@ void WP3000Body::Update(Float timeDelta)
 		}
 	}
 
+	if (animIndex == ETOI(POD_STATE::SHOOT_LOOP))
+		Pod_Fire(timeDelta);
+
 	m_Model->Update_ModelAnimation(timeDelta);
 }
 
@@ -117,7 +123,6 @@ void WP3000Body::Late_Update(Float timeDelta)
 			Vector3 scale, position;
 			Quaternion rot;
 
-			// 부모와 결합 된 결과물(m_CombinedWorldMatrix)에서 최종 World Position과 Scale만 축출
 			m_CombinedWorldMatrix.Decompose(scale, rot, position);
 			
 			Quaternion cameraRot = camera->Get_Transform()->Get_Quaternion();
@@ -199,6 +204,50 @@ HRESULT WP3000Body::Ready_Components()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void WP3000Body::Pod_Fire(Float timeDelta)
+{
+	m_FireRateTimer += timeDelta;
+	// Shift 키를 누르고 있을 때
+
+	if (GAME_INSTANCE->Get_DIKeyState(DIK_LSHIFT) & 0x8000)
+	{
+		if (m_FireRateTimer >= m_FireRate)
+		{
+			Vector3 worldScale{}, worldPosition{};
+			Quaternion worldRot{};
+			m_CombinedWorldMatrix.Decompose(worldScale, worldRot, worldPosition);
+
+			m_FireRateTimer = 0.f;
+			// 총알 매개변수 세팅
+			Entity::DAMAGE_INFO dmgInfo{};
+			dmgInfo.attacker = m_Owner.lock();
+			dmgInfo.attackType = ATK_TYPE::POD;
+			dmgInfo.damage = static_cast<Float>(Helper::Random_Double(10.f, 20.f));
+			dmgInfo.groggyWeight = 0;
+			dmgInfo.knockbackForce = 1.f;
+
+			Bullet::BULLET_DESC desc{};
+			desc.damageInfo = dmgInfo;
+			desc.resourceTag = L"candy";
+			desc.targetLayer = L"Monster";
+			desc.isPermanent = false;
+			desc.speed = 30.0f; // 탄속
+			desc.maxDistance = 100.f; 
+			desc.initialPosition = worldPosition;
+			desc.direction = m_CombinedWorldMatrix.Backward() + Vector3{ 0.f, 0.25f, 0.f };
+
+			FireFlashEffect::FIRE_FLASH_EFFECT_DESC effectDesc{};
+			effectDesc.parentMatrix = m_Transform->Get_WorldMatrix();
+
+			// TODO : 샷 이펙트는 매트릭스 줘서 따라다니게 해야함
+			GAME_INSTANCE->Instantiate<FireFlashEffect>(L"FireFlashEffect", ETOI(LEVEL::GAMEPLAY), &effectDesc);
+			GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", ETOI(LEVEL::GAMEPLAY), &desc);
+			GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_14);
+			GAME_INSTANCE->PlaySoundFXOnce(L"Wp3000_Shot", SOUNDCHANNEL::CHANNEL_14, 0.4f);
+		}
+	}
 }
 
 Shared<WP3000Body> WP3000Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

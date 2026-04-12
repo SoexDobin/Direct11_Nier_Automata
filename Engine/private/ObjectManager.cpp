@@ -32,8 +32,9 @@ void ObjectManager::PriorityUpdate(Float timeDelta) {
 
 	if (curLevel != 0) {
 		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
-			if ((m_LayerMask & layerBit) == 1) continue;
-			for (auto& obj : objects) {
+			if ((m_LayerMask & layerBit) == 0) continue;
+			for (size_t i = 0; i < objects.size(); ++i) {
+				auto obj = objects[i];
 				if (!obj->Is_Destroy() && obj->Is_Active())
 					obj->Priority_Update(timeDelta);
 			}
@@ -53,8 +54,9 @@ void ObjectManager::Update(Float timeDelta) {
 
 	if (curLevel != 0) {
 		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
-			if ((m_LayerMask & layerBit) == 1) continue;
-			for (auto& obj : objects) {
+			if ((m_LayerMask & layerBit) == 0) continue;
+			for (size_t i = 0; i < objects.size(); ++i) {
+				auto obj = objects[i];
 				if (!obj->Is_Destroy() && obj->Is_Active())
 					obj->Update(timeDelta);
 			}
@@ -74,8 +76,9 @@ void ObjectManager::LateUpdate(Float timeDelta) {
 
 	if (curLevel != 0) {
 		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
-			if ((m_LayerMask & layerBit) == 1) continue;
-			for (auto& obj : objects) {
+			if ((m_LayerMask & layerBit) == 0) continue;
+			for(size_t i = 0; i < objects.size(); ++i) {
+				auto obj = objects[i];
 				if (!obj->Is_Destroy() && obj->Is_Active())
 					obj->Late_Update(timeDelta);
 			}
@@ -95,8 +98,9 @@ void ObjectManager::FixedUpdate(Float fixedDelta) {
 
 	if (curLevel != 0) {
 		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
-			if ((m_LayerMask & layerBit) == 1) continue;
-			for (auto& obj : objects) {
+			if ((m_LayerMask & layerBit) == 0) continue;
+			for (size_t i = 0; i < objects.size(); ++i) {
+				auto obj = objects[i];
 				if (!obj->Is_Destroy() && obj->Is_Active())
 					obj->Fixed_Update(fixedDelta);
 			}
@@ -116,7 +120,7 @@ void ObjectManager::Submit_RenderGroup() {
 
 	if (curLevel != 0) {
 		for (auto& [layerBit, objects] : m_ObjectByLayer[curLevel]) {
-			if ((m_LayerMask & layerBit) == 1) continue;
+			if ((m_LayerMask & layerBit) == 0) continue;
 			for (auto& obj : objects) {
 				if (!obj->Is_Destroy() && obj->Is_Active())
 					obj->Submit_RenderGroup();

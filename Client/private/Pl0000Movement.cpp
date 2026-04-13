@@ -130,11 +130,29 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 
 	if (auto nav = m_Navigation.lock())
 	{
-		if (nav->Has_NeighborCell(nextPosition))
-		{
-			Float groundHeight = nav->Get_HeightAtPoint(nextPosition);
+		bool isInAir = !m_IsGrounded;
+		bool bValidNav = nav->Has_NeighborCell(nextPosition);
 
-			if (nextPosition.y < groundHeight)
+		if (isInAir || bValidNav)
+		{
+			Float groundHeight = -FLT_MAX;
+			
+			if (bValidNav)
+			{
+				groundHeight = nav->Get_HeightAtPoint(nextPosition);
+			}
+			else
+			{
+				// 공중에서 점프하여 NavMesh 구역을 벗어난 경우 (또는 다른 섬으로 건너뛰는 경우)
+				// 밑에 유효한 셀이 있는지 글로벌 탐색 시도
+				nav->Compute_CurrentCellByPosition(nextPosition);
+				if (nav->Get_CurrentCellIndex() != -1)
+				{
+					groundHeight = nav->Get_HeightAtPoint(nextPosition);
+				}
+			}
+
+			if (nextPosition.y <= groundHeight)
 			{
 				nextPosition.y = groundHeight;
 				m_Velocity = Vector3::Zero;
@@ -149,6 +167,7 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 		}
 		else
 		{
+			// 지상에서 벗어나려 한 경우 (보이지 않는 벽) => X,Z축 롤백 수행
 			Vector3 rollbackPos = ownerTransform->Get_Position();
 
 			rollbackPos.y += physicsDelta.y;

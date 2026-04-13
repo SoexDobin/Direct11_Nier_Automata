@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "SpdLogger.h"
 #include "Transform.h"
+#include "String_Helper.h"
 
 #ifdef _DEBUG
 Bool Navigation::s_DebugRender = false;
@@ -72,6 +73,22 @@ HRESULT Navigation::Build_FromMesh(
 	}
 	m_Cells = std::move(buildResult.navCells);
 	m_CurrentCellIndex = 0;
+	return S_OK;
+}
+
+HRESULT Navigation::Load_FromBinary(const string& filePath)
+{
+	auto cells = NavigationBuilder::Import_Binary(filePath);
+	if (cells.empty())
+	{
+		LOG_ERROR(L"[Navigation] Load_FromBinary 실패: {}",
+			Helper::To_wString(filePath));
+		return E_FAIL;
+	}
+	m_Cells = std::move(cells);
+	m_CurrentCellIndex = 0;
+
+	LOG_INFO(L"[Navigation] Loaded {} cells from binary", m_Cells.size());
 	return S_OK;
 }
 

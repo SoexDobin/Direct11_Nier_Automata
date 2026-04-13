@@ -43,7 +43,7 @@ Bool State2B_AttackAir::StateEnterInvoke()
 	}
 	
 	m_Movement.lock()->Reset_RootMotionStop();
-	m_Movement.lock()->Set_Gravity(70.f);
+	m_Movement.lock()->Set_Gravity(80.f);
 	m_Movement.lock()->Add_Force(Vector3{ 0.f, 5.f, 0.f });
 
 	pl0000Body->Set_Animation(ETOI(Pl0000::PL0000_STATE::HEAVY_AIR_DOWN_ENTER), 0.2f, false);
@@ -127,7 +127,7 @@ void State2B_AttackAir::Update(Float timeDelta)
 			if (distance > 1.5f)
 			{
 				dirToTarget.Normalize();
-				Float homingSpeed = 25.f;
+				Float homingSpeed = 30.f;
 
 				m_Movement.lock()->Add_Correction(dirToTarget * homingSpeed * timeDelta);
 			}

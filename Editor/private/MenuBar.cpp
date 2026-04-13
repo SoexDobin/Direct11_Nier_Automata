@@ -7,6 +7,7 @@
 #include "InputDevice.h"    
 #include "CollisionManager.h"
 #include "Navigation.h"
+#include "NavHelper.h"
 
 
 MenuBar::MenuBar() {}
@@ -33,6 +34,10 @@ void MenuBar::Render(Bool isResize) {
           Bool showModelViewer = EDITOR->Get_ModelViewer()->Is_Enabled();
           if (ImGui::MenuItem("Model Viewer", nullptr, showModelViewer))
               EDITOR->Get_ModelViewer()->Set_Enable(!showModelViewer);
+
+          Bool showNavHelper = EDITOR->Get_NavHelper()->Is_Enabled();
+          if (ImGui::MenuItem("NavMesh Builder", nullptr, showNavHelper))
+              EDITOR->Get_NavHelper()->Set_Enable(!showNavHelper);
 
           ImGui::MenuItem("Project Settings", nullptr, &m_ShowProjectSettings);
 
@@ -151,24 +156,24 @@ void MenuBar::Render(Bool isResize) {
                 size_t layerCount = activeLayers.size();
 
                 // 표(Table) UI 생성
-                if (layerCount > 0 && ImGui::BeginTable("CollisionMatrixTable", layerCount + 1, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))
+                if (layerCount > 0 && ImGui::BeginTable("CollisionMatrixTable", static_cast<int32>(layerCount + 1), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))
                 {
                     ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
                     ImGui::TableSetColumnIndex(0);
                     ImGui::TextDisabled("/");
                     // 상단 가로축 헤더
-                    for (int i = 0; i < layerCount; ++i) {
+                    for (size_t i = 0; i < layerCount; ++i) {
                         ImGui::TableSetColumnIndex(i + 1);
                         ImGui::Text(activeLayers[layerCount - 1 - i].second.substr(0, 3).c_str());
                     }
                     // 행 그리기 (계단식)
-                    for (int row = 0; row < layerCount; ++row)
+                    for (size_t row = 0; row < layerCount; ++row)
                     {
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         ImGui::Text(activeLayers[row].second.c_str()); // 좌측 세로축 헤더
                         uint32 rowBit = activeLayers[row].first;
-                        for (int col = 0; col < layerCount - row; ++col)
+                        for (size_t col = 0; col < layerCount - row; ++col)
                         {
                             ImGui::TableSetColumnIndex(col + 1);
                             uint32 colBit = activeLayers[layerCount - 1 - col].first;

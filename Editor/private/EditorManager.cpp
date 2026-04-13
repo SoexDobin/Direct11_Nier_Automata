@@ -12,6 +12,7 @@
 #include "Hierarchy.h"
 #include "ModelViewer.h"
 #include "AssetBrowser.h"
+#include "NavHelper.h"
 #include "Transform.h"
 
 IMPLEMENT_SINGLETON(EditorManager)
@@ -58,6 +59,8 @@ HRESULT EditorManager::Initialize()
         return E_FAIL;
     if (nullptr == (m_AssetBrowser = AssetBrowser::Create()))
         return E_FAIL;
+    if (nullptr == (m_NavHelper = NavHelper::Create()))
+        return E_FAIL;
 
 	return S_OK;
 }
@@ -87,6 +90,7 @@ void EditorManager::Update(Bool IsResetView) {
     m_Hierarchy->Update(IsResetView);
     m_ModelViewer->Update(IsResetView);
     m_AssetBrowser->Update(IsResetView);
+    m_NavHelper->Update(IsResetView);
 }
 
 HRESULT EditorManager::Render(Bool IsResetView) {
@@ -203,6 +207,7 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     m_Hierarchy->Render(IsResetView);
     m_ModelViewer->Render(IsResetView);
     m_AssetBrowser->Render(IsResetView);
+    m_NavHelper->Render(IsResetView);
 
     return S_OK;
 }

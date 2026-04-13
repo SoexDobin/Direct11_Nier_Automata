@@ -37,6 +37,8 @@ public: /* build nav */
 		const int32* triangles, int32 numTriangles,
 		const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params = {}
 	);
+	/// .nnav 바이너리 파일에서 NavCell 로드 (이웃 정보 포함, SetUp_Neighbors 불필요)
+	HRESULT Load_FromBinary(const string& filePath);
 
 public:
 	Bool Has_NeighborCell(const Vector3& position);

@@ -3,13 +3,12 @@
 #include "NavCell.h"
 
 struct rcPolyMesh;
-struct rcPolyMeshDetail;
 
 NS_BEGIN(Engine)
 
 class Model;
 
-class NavigationBuilder final : public EngineManager
+class ENGINE_DLL NavigationBuilder final : public EngineManager
 {
 public:
 	typedef struct tagNavBuildParamsDesc
@@ -24,7 +23,6 @@ public:
 		int32 maxEdgeLen			{ 12 };			
 		int32 minRegionArea			{ 8 };			// 최소 리전 면적				// ↑ 크면: 작은 섬, 고립된 NavCell 제거
 		int32 mergeRegionArea		{ 20 };
-		int32 maxVertexPerPoly		{ 6 };
 
 		Float detailSampleDist		{ 6.f };		// 디테일 샘플 간격			// 가장 중요! Compute_Height의 Y 정밀도 결정. ↓ 작으면 삼각형 거칠어짐
 		Float detailSampleMaxError	{ 1.f };		// 윤곽 단순화 오차			// ↑ 크면: 엣지 직선화, NavCell 수↓ / ↓ 작으면: 원본 밀착, NavCell 수↑
@@ -51,24 +49,26 @@ public:
 public:
 	static vector<NavCellBinary> Bake_For_Preview(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
 	static HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
-private:\
-	static vector<NavCellBinary> Convert_To_BinaryData(struct rcPolyMesh* pMesh);
-	static void Compute_Neighbors(vector<NavCellBinary>& outData, struct rcPolyMesh* pMesh);
+	/// .nnav 바이너리를 읽어 NavCell 배열 생성 (Recast 이웃 정보 포함, SetUp_Neighbors 불필요)
+	static vector<NavCell> Import_Binary(const string& filePath);
+private:
+	static vector<NavCellBinary> Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors);
 
 public:
+	/// rcPolyMesh 기반 NavMesh 빌드 (maxVertsPerPoly=3, Recast 이웃 직접 사용)
 	NAV_BUILD_RESULT Build(
 		const Float* vertices, int32 numVertices,
 		const int32* triangles, int32 numTriangles,
 		const NAV_BUILD_PARAMS_DESC&params = {}
 	);
-	/// rcPolyMeshDetail 결과로부터 NavCell 생성 + 이웃 자동 연결
-	void ExtractCells(
+
+private:
+	/// rcPolyMesh에서 NavCell 추출 + Recast 이웃 직접 대입
+	static void ExtractCells_FromPolyMesh(
 		const rcPolyMesh& mesh,
-		const rcPolyMeshDetail& detail,
+		const rcConfig& cfg,
 		_Out_ vector<NavCell>& outCells
-	) const;
-	/// NavCell 목록에서 공유 엣지를 찾아 이웃을 자동 연결
-	void SetUp_Neighbors(vector<NavCell>& cells) const;
+	);
 
 public:
 	static Unique<NavigationBuilder> Create();

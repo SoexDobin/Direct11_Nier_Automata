@@ -96,40 +96,9 @@ HRESULT CityOfRuins::Ready_Components()
 
 	{
 		Navigation::NAVIGATION_DESC navDesc{};
-		m_Navigation = Add_Component<Navigation>(ETOI(LEVEL::STATIC), &navDesc);
-		if (nullptr == m_Navigation)
-			return E_FAIL;
-
-		vector<Float> vertices;
-		vector<int32> tris;
-		m_Model->Extract_RawMeshForNavigation(vertices, tris);
-		int32 numVertices = static_cast<int32>(vertices.size() / 3);
-		int32 numTris = static_cast<int32>(tris.size() / 3);
-
-		m_Transform->Set_Position(50.f, 0.f, 100.f);
-		m_Transform->Update_WorldMatrix();
-		Matrix worldMat = m_Transform->Get_WorldMatrix();
-
-		for (size_t i = 0; i < vertices.size(); i += 3)
-		{
-			Vector3 pos = Vector3{ vertices[i], vertices[i + 1], vertices[i + 2] };
-
-			// Transform의 크기, 회전, 위치를 모두 적용
-			pos = XMVector3TransformCoord(pos, worldMat);
-
-			vertices[i] = pos.x;
-			vertices[i + 1] = pos.y;
-			vertices[i + 2] = pos.z;
-		}         
-
-		NavigationBuilder::NAV_BUILD_PARAMS_DESC buildParam{};
-		buildParam.cellSize = 0.4f;
-		buildParam.cellHeight = 0.2f;
-		buildParam.detailSampleDist = 1.f;
-		auto result = GAME_INSTANCE->Build_Navigation(vertices.data(), numVertices, tris.data(), numTris, buildParam);
-		if(result.isSuccess)
-		{
-			m_Navigation->Set_NavCells(std::move(result.navCells));
+		m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
+		if (m_Navigation == nullptr) {
+			LOG_ERROR("Failed to hook pre-baked Navigation Mesh!");
 		}
 	}
 	

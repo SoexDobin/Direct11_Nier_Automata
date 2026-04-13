@@ -5,7 +5,7 @@ NS_BEGIN(Engine)
 
 class Shader;
 
-class RenderTarget final : public Object
+class ENGINE_DLL RenderTarget final : public Object
 {
 public:
 	explicit RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -16,8 +16,8 @@ public:
 	HRESULT Begin() override;
 	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; };
 
-public:
 	ComPtr<ID3D11RenderTargetView> Get_RenderTargetView() const { return m_RenderTargetView; }
+	ComPtr<ID3D11ShaderResourceView> Get_ShaderResourceView() const { return m_ShaderResourceView; }
 	HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const;
 	void Clear_RenderTarget() const;
 

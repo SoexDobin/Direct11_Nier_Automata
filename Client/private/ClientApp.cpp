@@ -29,6 +29,8 @@ HRESULT ClientApp::Initialize(const ENGINE_DESC& desc)
     }
     if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
         return E_FAIL;
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Navigation_FromBinary()))
+        return E_FAIL;
     if (FAILED(Ready_InitialObject()))
         return E_FAIL;
 

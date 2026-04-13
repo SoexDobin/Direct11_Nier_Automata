@@ -111,21 +111,20 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 		}
 	}
 	
-	Vector3 worldMoveDelta{};
+	Vector3 worldMoveVelocity{};
 	if (m_CurrentMoveData.useRootMotionDir)
 	{
-		worldMoveDelta = Vector3::Transform(rootPositionVelocity * -1.f, ownerTransform->Get_Quaternion());
+		worldMoveVelocity = Vector3::Transform(rootPositionVelocity * -1.f, ownerTransform->Get_Quaternion());
 	}
 	else
 	{
 		Float rootSpeed = rootPositionVelocity.Length();
-		worldMoveDelta = m_CurrentMoveData.direction * rootSpeed;
+		worldMoveVelocity = m_CurrentMoveData.direction * rootSpeed;
 	}
 
-	// 💡 루트 모션 스케일 적용 (타격 시 m_RootMotionScale = 0.1f 가 되어 1/10 속도로 느리게 전진)
-	worldMoveDelta *= m_RootMotionScale;
+	worldMoveVelocity *= m_RootMotionScale;
 	
-	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicsDelta;
+	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveVelocity * timeDelta + physicsDelta;
 	nextPosition += m_CorrectionDelta;
 	Reset_Correction();
 
@@ -133,7 +132,7 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 	{
 		if (nav->Has_NeighborCell(nextPosition))
 		{
-			Float groundHeight = nav->Get_HeightAtPoint(nextPosition.x, nextPosition.z);
+			Float groundHeight = nav->Get_HeightAtPoint(nextPosition);
 
 			if (nextPosition.y < groundHeight)
 			{
@@ -154,7 +153,7 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 
 			rollbackPos.y += physicsDelta.y;
 
-			Float groundHeight = nav->Get_HeightAtPoint(rollbackPos.x, rollbackPos.z);
+			Float groundHeight = nav->Get_HeightAtPoint(rollbackPos);
 			if (rollbackPos.y <= groundHeight) {
 				rollbackPos.y = groundHeight;
 				m_IsGrounded = true;
@@ -171,8 +170,7 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 	}
 }
 
-Shared<Pl0000Movement> Pl0000Movement::Create(const ComPtr<ID3D11Device>& device,
-                                              const ComPtr<ID3D11DeviceContext>& context)
+Shared<Pl0000Movement> Pl0000Movement::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
 	auto prototype = make_shared<Pl0000Movement>(device, context);
 

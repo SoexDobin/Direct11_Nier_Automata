@@ -25,6 +25,14 @@ HRESULT Navigation::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+#ifdef _DEBUG
+	if (FAILED(Ready_Debug()))
+	{
+		LOG_ERROR(L"Failed To Ready Navigation Debug Draw");
+		return E_FAIL;
+	}
+#endif
+
 	auto* desc = static_cast<NAVIGATION_DESC*>(arg);
 	m_CurrentCellIndex = desc->startCellIndex;
 	if (m_CurrentCellIndex >= 0 && m_CurrentCellIndex < static_cast<int32>(m_Cells.size()))
@@ -48,7 +56,7 @@ void Navigation::Set_NavCells(vector<NavCell>&& cells)
 }
 
 HRESULT Navigation::Build_FromMesh(
-	const float* vertices, int32 numVertices,
+	const Float* vertices, int32 numVertices,
 	const int32* triangles, int32 numTriangles,
 	const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params)
 {
@@ -87,7 +95,7 @@ Bool Navigation::Has_NeighborCell(const Vector3& position)
 		neighborIndex = nextNeighbor;
 	}
 
-	return false; // 이웃 없음 (완전 경계 밖)
+	return false; // 전체 셀을 뒤져도 이웃 없음 (완전 NavMesh 밖)
 }
 
 void Navigation::Compute_Height(const Shared<Transform>& transform)
@@ -100,12 +108,28 @@ void Navigation::Compute_Height(const Shared<Transform>& transform)
 	transform->Set_Position(pos.x, y, pos.z);
 }
 
-Float Navigation::Get_HeightAtPoint(Float pointX, Float pointZ) const
+void Navigation::Compute_CurrentCellByPosition(const Vector3& position)
+{
+	for (int32 i = 0; i < m_Cells.size(); ++i)
+	{
+		int32 neighborIndex = -1;
+		if (m_Cells[i].IsIn(position, &neighborIndex))
+		{
+			m_CurrentCellIndex = i;
+			return;
+		}
+	}
+
+	LOG_WARN(L"[Navigation] Failed to find Navigation Cell at Initial Position!");
+	m_CurrentCellIndex = 0;
+}
+
+Float Navigation::Get_HeightAtPoint(const Vector3& position) const
 {
 	if (m_CurrentCellIndex < 0 || m_CurrentCellIndex >= static_cast<int32>(m_Cells.size()))
 		return 0.f;
 
-	return m_Cells[m_CurrentCellIndex].Compute_Height(pointX, pointZ);
+	return m_Cells[m_CurrentCellIndex].Compute_Height(position.x, position.z);
 }
 
 Shared<Navigation> Navigation::CreatePrototype()
@@ -140,3 +164,42 @@ Shared<Component> Navigation::Clone(void* arg)
 	}
 	return nav;
 }
+
+#ifdef _DEBUG
+HRESULT Navigation::Ready_Debug()
+{
+	m_Batch = make_shared<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>(m_Context.Get());
+	m_Effect = make_shared<DirectX::BasicEffect>(m_Device.Get());
+	m_Effect->SetVertexColorEnabled(true);
+	const void* shaderByteCode;
+	size_t byteCodeLength;
+	m_Effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+	if (FAILED(m_Device->CreateInputLayout(DirectX::VertexPositionColor::InputElements,
+		DirectX::VertexPositionColor::InputElementCount,
+		shaderByteCode, byteCodeLength,
+		m_InputLayout.GetAddressOf())))
+	{
+		return E_FAIL;
+	}
+	return S_OK;
+}
+HRESULT Navigation::Render_Debug()
+{
+	if (!m_Batch || !m_Effect) return E_FAIL;
+	m_Effect->SetView(GAME_INSTANCE->Get_Transform(D3DTS::VIEW));
+	m_Effect->SetProjection(GAME_INSTANCE->Get_Transform(D3DTS::PROJ));
+
+	m_Effect->SetWorld(Matrix::Identity);
+	m_Context->IASetInputLayout(m_InputLayout.Get());
+	m_Effect->Apply(m_Context.Get());
+	m_Batch->Begin();
+	for (int32 i = 0; i < m_Cells.size(); ++i)
+	{
+		// 플레이어가 위치한 현재 셀은 붉은색, 나머지는 초록색 라인으로 긋습니다.
+		XMVECTORF32 renderColor = (i == m_CurrentCellIndex) ? Colors::Red : Colors::Green;
+		m_Cells[i].Render_Debug(m_Batch, static_cast<Color>(renderColor));
+	}
+	m_Batch->End();
+	return S_OK;
+}
+#endif

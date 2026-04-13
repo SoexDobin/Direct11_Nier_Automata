@@ -32,7 +32,6 @@ public:
 public: /* build nav */
 	vector<NavCell> Get_NavCells() const { return m_Cells; }
 	void Set_NavCells(vector<NavCell>&& cells);
-	/// 소스 메시로부터 직접 빌드
 	HRESULT Build_FromMesh(
 		const Float* vertices, int32 numVertices,
 		const int32* triangles, int32 numTriangles,
@@ -42,7 +41,8 @@ public: /* build nav */
 public:
 	Bool Has_NeighborCell(const Vector3& position);
 	void Compute_Height(const Shared<Transform>& transform);
-	Float Get_HeightAtPoint(Float pointX, Float pointZ) const;
+	Float Get_HeightAtPoint(const Vector3& position) const;
+	void Compute_CurrentCellByPosition(const Vector3& position);
 
 public:
 	uint32 Get_NumCells() const { return static_cast<uint32>(m_Cells.size()); }
@@ -57,6 +57,16 @@ public:
 	static Shared<Navigation> CreatePrototype();
 	static Shared<Navigation> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<Component> Clone(void* arg = nullptr) override;
+
+#ifdef _DEBUG
+private:
+	Shared<PrimitiveBatch<DirectX::VertexPositionColor>> m_Batch { nullptr };
+	Shared<BasicEffect> m_Effect{ nullptr };
+	ComPtr<ID3D11InputLayout> m_InputLayout { nullptr };
+public:
+	HRESULT Ready_Debug();
+	HRESULT Render_Debug();
+#endif
 };
 
 NS_END

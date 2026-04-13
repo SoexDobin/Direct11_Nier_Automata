@@ -56,6 +56,10 @@ void CityOfRuins::Priority_Update(Float timeDelta)
 
 HRESULT CityOfRuins::Render()
 {
+#ifdef _DEBUG
+	m_Navigation->Render_Debug();
+#endif
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -121,6 +125,9 @@ HRESULT CityOfRuins::Ready_Components()
 		NavigationBuilder::NAV_BUILD_PARAMS_DESC buildParam{};
 		buildParam.cellSize = 0.4f;
 		buildParam.cellHeight = 0.2f;
+
+		//buildParam.moveableSlopeAngle = 60.f;
+
 		buildParam.detailSampleDist = 1.f;
 		auto result = GAME_INSTANCE->Build_Navigation(vertices.data(), numVertices, tris.data(), numTris, buildParam);
 		if(result.isSuccess)

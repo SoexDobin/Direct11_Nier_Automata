@@ -1,5 +1,9 @@
 #include "NavCell.h"
 
+#ifdef _DEBUG
+#include "DebugDraw.h"
+#endif
+
 NavCell::NavCell(const Vector3& a, const Vector3& b, const Vector3& c, int32 index)
 	: m_Index{ index }
 {
@@ -151,6 +155,23 @@ void NavCell::Set_Neighbor(CELL_LINE line, int32 neighborIndex)
 {
 	m_Neighbors[static_cast<int32>(line)] = neighborIndex;
 }
+
+
+#ifdef _DEBUG
+HRESULT NavCell::Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color)
+{
+	DX::DrawTriangle(batch.get(), m_Points[0], m_Points[1], m_Points[2], color);
+
+	Vector3 edge0Center = (m_Points[0] + m_Points[1]) * 0.5f;
+	DX::DrawRay(batch.get(), edge0Center, m_Normal[0], true, Colors::Yellow);
+	Vector3 edge1Center = (m_Points[1] + m_Points[2]) * 0.5f;
+	DX::DrawRay(batch.get(), edge1Center, m_Normal[1], true, Colors::Yellow);
+	Vector3 edge2Center = (m_Points[2] + m_Points[0]) * 0.5f;
+	DX::DrawRay(batch.get(), edge2Center, m_Normal[2], true, Colors::Yellow);
+
+	return S_OK;
+}
+#endif
 
 Shared<NavCell> NavCell::Create(const Vector3& a, const Vector3& b, const Vector3& c, int32 index, const Shared<Navigation>& owner)
 {

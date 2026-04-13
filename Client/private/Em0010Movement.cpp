@@ -96,27 +96,27 @@ void Em0010Movement::Update_Movement(Float timeDelta)
 		}
 	}
 
-	Vector3 worldMoveDelta{}; // x이동
+	Vector3 worldMoveVelocity{}; // x이동
 
 	if (m_CurrentMoveData.isMove || m_CurrentMoveData.isAttack)
 	{
 		if (m_CurrentMoveData.useRootMotionDir)
 		{
-			worldMoveDelta = Vector3::Transform(rootPositionVelocity * -1.f,ownerTransform->Get_Quaternion());
+			worldMoveVelocity = Vector3::Transform(rootPositionVelocity * -1.f,ownerTransform->Get_Quaternion());
 
-			worldMoveDelta *= m_CurrentMoveData.rootMotionScale;
+			worldMoveVelocity *= m_CurrentMoveData.rootMotionScale;
 		}
 		else
 		{
 			Float rootSpeed = rootPositionVelocity.Length();
-			worldMoveDelta = m_CurrentMoveData.direction * rootSpeed * m_CurrentMoveData.rootMotionScale;
+			worldMoveVelocity = m_CurrentMoveData.direction * rootSpeed * m_CurrentMoveData.rootMotionScale;
 		}
 	}
 
 	// 💡 Add hitstop scale:
-	worldMoveDelta *= m_RootMotionScale;
+	worldMoveVelocity *= m_RootMotionScale;
 
-	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicalDelta;
+	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveVelocity * timeDelta + physicalDelta;
 
 	nextPosition += m_CorrectionDelta;
 	Reset_Correction();

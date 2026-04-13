@@ -302,8 +302,11 @@ HRESULT Pl0000::Ready_Components()
 						m_Navigation->Set_NavCells(std::move(static_pointer_cast<Navigation>(terrainNav)->Get_NavCells()));
 				}
 
-				
-				m_Transform->Set_Position(m_Navigation->Get_NavCells()[m_Navigation->Get_CurrentCellIndex()].Get_Point(NavCell::CELL_POINT::A));
+				m_Navigation->Compute_CurrentCellByPosition(m_Transform->Get_Position());
+				auto pos = m_Transform->Get_Position();
+				Float height = m_Navigation->Get_HeightAtPoint(pos);
+
+				m_Transform->Set_Position(pos.x, height, pos.y);
 			}
 
 		});

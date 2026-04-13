@@ -39,6 +39,11 @@ public:
 	void Set_Neighbor(CELL_LINE line, int32 neighborIndex);
 	int32 Get_Neighbor(CELL_LINE line) const { return m_Neighbors[static_cast<int32>(line)]; }
 
+#ifdef _DEBUG
+public:
+	HRESULT Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color);
+#endif
+
 private:
 	Weak<Navigation> m_Owner{};
 	int32 m_Index{ -1 };

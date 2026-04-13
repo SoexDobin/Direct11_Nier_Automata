@@ -693,5 +693,8 @@
     <ClCompile Include="..\private\NavigationBuilder.cpp">
       <Filter>01. Utility\05. Component\Navigation\Builder</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Navigation_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

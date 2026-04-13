@@ -66,13 +66,16 @@ public: /* Animation Tracker */
 	Bool Is_NotifyActive(uint32 animIndex, const wstring & notifyTag) const;
 	Bool Is_NotifyActive(const wstring & notifyName) const;
 
+public: /* Mesh Info */
+	void Extract_RawMeshForNavigation(_Out_ vector<Float>& outPositions, _Out_ vector<int32>& outIndices) const;
+
 public: /* snap shot */
 	vector<BONE_SNAPSHOT> Get_SnapShot_BoneMatrices();
 
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
 	Matrix Get_BoneMatrix(uint32 boneIndex) const; // 특정 부모 뼈대의 트랜스폼 가져오기
-	const TRANSFORM_FRAME& Get_RootTransformVelocity(uint32 nodeIndex) const;
+	TRANSFORM_FRAME Get_RootTransformVelocity(uint32 nodeIndex) const;
 	void Set_LocalRootNode(uint32 nodeIndex);
 
 	HRESULT Render(uint32 meshIndex);

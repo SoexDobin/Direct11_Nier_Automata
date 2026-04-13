@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Pl0000Input.h"
 #include "Pl0000.h"
-#include "Pl0000StateMachine.h"
+#include "Navigation.h"
 
 Pl0000Movement::Pl0000Movement() : Movement{} {}
 Pl0000Movement::Pl0000Movement(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -46,6 +46,13 @@ HRESULT Pl0000Movement::Begin()
 			LOG_ERROR(L"Failed To Find Pl0000Input");
 			return E_FAIL;
 		}
+
+		m_Navigation = m_Owner.lock()->Get_Component<Navigation>();
+		if (m_Navigation.expired())
+		{
+			LOG_ERROR(L"Failed To Find Pl0000 Navigation");
+			return E_FAIL;
+		}
 	}
 
 	return S_OK;
@@ -53,7 +60,7 @@ HRESULT Pl0000Movement::Begin()
 
 void Pl0000Movement::Update_Movement(Float timeDelta)
 {
-	if (m_Owner.expired() || m_Input.expired()) return;
+	if (m_Owner.expired() || m_Input.expired() || m_Navigation.expired()) return;
 
 	Shared<Transform> ownerTransform = m_Owner.lock()->Get_Transform();
 
@@ -122,18 +129,46 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 	nextPosition += m_CorrectionDelta;
 	Reset_Correction();
 
-	Float groundHeight = 0.f; // TODO Nav메시를 통한 y축 판별
-	if (nextPosition.y <= groundHeight) {
-		nextPosition.y = groundHeight;
-		//m_Velocity.y = 0.f;
-		m_Velocity = Vector3::Zero;
-		m_IsGrounded = true;
-	}
-	else {
-		m_IsGrounded = false;
-	}
+	if (auto nav = m_Navigation.lock())
+	{
+		if (nav->Has_NeighborCell(nextPosition))
+		{
+			Float groundHeight = nav->Get_HeightAtPoint(nextPosition.x, nextPosition.z);
 
-	ownerTransform->Set_Position(nextPosition);
+			if (nextPosition.y < groundHeight)
+			{
+				nextPosition.y = groundHeight;
+				m_Velocity = Vector3::Zero;
+				m_IsGrounded = true;
+			}
+			else
+			{
+				m_IsGrounded = false;
+			}
+
+			ownerTransform->Set_Position(nextPosition);
+		}
+		else
+		{
+			Vector3 rollbackPos = ownerTransform->Get_Position();
+
+			rollbackPos.y += physicsDelta.y;
+
+			Float groundHeight = nav->Get_HeightAtPoint(rollbackPos.x, rollbackPos.z);
+			if (rollbackPos.y <= groundHeight) {
+				rollbackPos.y = groundHeight;
+				m_IsGrounded = true;
+				m_Velocity = Vector3::Zero;
+			}
+
+			ownerTransform->Set_Position(rollbackPos);
+		}
+	}
+	else
+	{
+		LOG_ERROR(L"There is no Navigation");
+		ownerTransform->Set_Position(nextPosition);
+	}
 }
 
 Shared<Pl0000Movement> Pl0000Movement::Create(const ComPtr<ID3D11Device>& device,

@@ -12,21 +12,21 @@ class NavigationBuilder final : public EngineManager
 public:
 	typedef struct tagNavBuildParamsDesc
 	{
-		Float cellSize				{ 0.2f };
-		Float cellHeight			{ 0.2f };
-		Float moveableSlopeAngle	{ 45.f };
-		Float agentHeight			{ 2.f };
-		Float agentRadius			{ 0.6f };
-		Float agentMaxClimb			{ 0.8f };
+		Float cellSize				{ 0.2f };		// XZ 복셀 크기 (wu)			// ↓ 작으면: 정밀도↑, 셀 수↑, 느림 / ↑ 크면: 거칠고 수 적음
+		Float cellHeight			{ 0.2f };		// Y축 복셀 높이 (wu)		// ↓ 작으면: Y 정밀↑, Compute_Height 정확 / ↑ 크면: 계단화
+		Float moveableSlopeAngle	{ 45.f };		// 최대 경사각 (도)			// 작으면: 급경사 NavCell 제거 / ↑ 크면: 가파른 곳도 이동 가능
+		Float agentHeight			{ 2.f };		// 캐릭터 키 (wu)			// 천장 낮은 곳 NavCell 제거
+		Float agentRadius			{ 0.6f };		// 캐릭터 반경 (wu)			// 벽에서 NavCell 경계가 안쪽으로 침식 (Erode)
+		Float agentMaxClimb			{ 0.8f };		// 오를 수 있는 단차 (wu)		// 값↑이면 높은 턱도 NavCell 연결
 		
-		int32 maxEdgeLen			{ 12 };
-		int32 minRegionArea			{ 8 };
+		int32 maxEdgeLen			{ 12 };			
+		int32 minRegionArea			{ 8 };			// 최소 리전 면적				// ↑ 크면: 작은 섬, 고립된 NavCell 제거
 		int32 mergeRegionArea		{ 20 };
 		int32 maxVertexPerPoly		{ 6 };
 
-		Float detailSampleDist		{ 6.f };
-		Float detailSampleMaxError	{ 1.f };
-		Float maxSimplificationError{ 1.3f };
+		Float detailSampleDist		{ 6.f };		// 디테일 샘플 간격			// 가장 중요! Compute_Height의 Y 정밀도 결정. ↓ 작으면 삼각형 거칠어짐
+		Float detailSampleMaxError	{ 1.f };		// 윤곽 단순화 오차			// ↑ 크면: 엣지 직선화, NavCell 수↓ / ↓ 작으면: 원본 밀착, NavCell 수↑
+		Float maxSimplificationError{ 1.3f };		
 	} NAV_BUILD_PARAMS_DESC;
 
 	struct NAV_BUILD_RESULT
@@ -58,9 +58,9 @@ public:
 		const rcPolyMesh& mesh,
 		const rcPolyMeshDetail& detail,
 		_Out_ vector<NavCell>& outCells
-	);
+	) const;
 	/// NavCell 목록에서 공유 엣지를 찾아 이웃을 자동 연결
-	void SetUp_Neighbors(vector<NavCell>& cells);
+	void SetUp_Neighbors(vector<NavCell>& cells) const;
 
 public:
 	static Unique<NavigationBuilder> Create();

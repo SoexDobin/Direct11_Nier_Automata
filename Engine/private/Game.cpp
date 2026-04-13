@@ -108,6 +108,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_CollisionManager = CollisionManager::Create()))
         return E_FAIL;
 
+    if (nullptr == (m_NavigationBuilder = NavigationBuilder::Create()))
+        return E_FAIL;
+
     if (nullptr == (m_RenderTargetManager = RenderTargetManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
         return E_FAIL;
 
@@ -115,35 +118,36 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
 }
 
 void Game::Update_Engine() {
-  const Float delta = m_TimeManager->Update_Timers();
+    const Float delta = m_TimeManager->Update_Timers();
 
-  m_InputDevice->Update();
+    m_InputDevice->Update();
 
-  m_ObjectManager->PriorityUpdate(delta);
+    m_ObjectManager->PriorityUpdate(delta);
 
-  m_ObjectManager->Update(delta);
+    m_ObjectManager->Update(delta);
 
-  m_ObjectManager->LateUpdate(delta);
+    m_ObjectManager->LateUpdate(delta);
 
-  m_CameraManager->Bind_MainCamera_Transform();
-  m_Pipeline->Update_Pipeline();
+    m_CameraManager->Bind_MainCamera_Transform();
+    m_Pipeline->Update_Pipeline();
 
-  while (m_TimeManager->Is_FixedUpdate()) {
-    Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
-    m_ObjectManager->FixedUpdate(fixedDelta);
-    m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
-    m_TimeManager->Has_FixedUpdate();
-  }
 
-  m_ObjectManager->Submit_RenderGroup();
+    while (m_TimeManager->Is_FixedUpdate()) {
+        Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
+        m_ObjectManager->FixedUpdate(fixedDelta);
+        m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
+        m_TimeManager->Has_FixedUpdate();
+    }
 
-  m_ObjectManager->Cleanup_GameObjects(0);
-  m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
+    m_ObjectManager->Submit_RenderGroup();
 
-  m_CollisionManager->Update_Collision();
+    m_ObjectManager->Cleanup_GameObjects(0);
+    m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
 
-  m_LevelManager->Update(delta);
-  m_EventManager->Execute_Events();
+    m_CollisionManager->Update_Collision();
+
+    m_LevelManager->Update(delta);
+    m_EventManager->Execute_Events();
 }
 
 HRESULT Game::Draw() const {
@@ -357,6 +361,11 @@ Shared<GameObject> Game::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID)
         pObj = m_ObjectManager->Find_ObjectByObjectID(0, objectID);
     }
     return pObj;
+}
+
+Shared<GameObject> Game::Find_ObjectByObjectTag(uint32 levIndex, const wstring& tag) const
+{
+    return m_ObjectManager->Find_ObjectByObjectTag(levIndex, tag);
 }
 
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
@@ -597,6 +606,14 @@ void Game::Render_CollisionDebug() const
     m_CollisionManager->Render_Debug();
 }
 #endif
+
+
+NavigationBuilder::NAV_BUILD_RESULT Game::Build_Navigation(const Float* vertices, int32 numVertices,
+	const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params)
+{
+    return m_NavigationBuilder->Build(vertices, numVertices, triangles, numTriangles, params);
+}
+
 
 HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color) const
 {

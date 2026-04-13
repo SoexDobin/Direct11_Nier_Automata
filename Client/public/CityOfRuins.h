@@ -4,6 +4,7 @@
 NS_BEGIN(Engine)
 	class Shader;
 	class Model;
+	class Navigation;
 NS_END
 
 NS_BEGIN(Client)
@@ -41,6 +42,7 @@ protected:
 private:
 	Shared<Shader> m_Shader{ nullptr };
 	Shared<Model> m_Model{ nullptr };
+	Shared<Navigation> m_Navigation{ nullptr };
 
 public:
 	static Shared<CityOfRuins> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

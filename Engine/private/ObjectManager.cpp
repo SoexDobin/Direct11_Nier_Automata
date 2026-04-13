@@ -268,6 +268,21 @@ const unordered_map<uint32, Shared<GameObject>>& ObjectManager::Get_GameObjects(
 	return m_ObjectByInstance[levIndex];
 }
 
+Shared<GameObject> ObjectManager::Find_ObjectByObjectTag(uint32 levIndex, const wstring& tagName)
+{
+	if (levIndex >= m_LevelCount)
+		return nullptr;
+	
+	for (auto& pair : m_ObjectByInstance[levIndex])
+	{
+		if (pair.second->Get_Name() == tagName)
+		{
+			return pair.second;
+		}
+	}
+	return nullptr;
+}
+
 Unique<ObjectManager> ObjectManager::Create(uint32 levCount) {
 	auto objectManager = make_unique<ObjectManager>();
 

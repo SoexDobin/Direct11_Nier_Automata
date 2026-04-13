@@ -9,6 +9,30 @@ NavCell::NavCell(const Vector3& a, const Vector3& b, const Vector3& c, int32 ind
 	m_Neighbors[0] = -1;
 	m_Neighbors[1] = -1;
 	m_Neighbors[2] = -1;
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		const Vector3& p0 = m_Points[i];
+		const Vector3& p1 = m_Points[(i + 1) % 3];
+
+		Vector3 lineDir = p1 - p0;
+		// 시계 방향 90 도 회전을 통한 내적을 통한 안 밖 판별
+		Vector3 normal = Vector3{ -lineDir.z, 0.f, lineDir.x };
+		normal.Normalize();
+
+		// p2는 항상 삼각형 안쪽에 위치한 정점
+		const Vector3& p2 = m_Points[(i + 2) % 3];
+		Vector3 dirToP2 = p2 - p0;
+		dirToP2.y = 0.f;
+
+		// normal 방향이 p2(안쪽)를 향하고 있다면, normal을 뒤집어 바깥쪽을 구하게 함
+		if (dirToP2.Dot(normal) > 0.f)
+		{
+			normal = -normal;
+		}
+
+		m_Normal[i] = normal;
+	}
 }
 HRESULT NavCell::Initialize(const Shared<Navigation>& owner)
 {
@@ -44,8 +68,26 @@ HRESULT NavCell::Begin()
 	return Object::Begin();
 }
 
-Bool NavCell::IsIn(const Vector3& position, int32* outNeighborIndex, Vector3* outSliderNormal) const
+Bool NavCell::IsIn(const Vector3& position, int32* outNeighborIndex) const
 {
+	for (int32 i = 0; i < 3; ++i)
+	{
+		Vector3 dir = position - m_Points[i];
+		dir.y = 0.f;
+
+		// 내적(Dot) 검사: 밖으로 나가는 방향(m_Normals)과 내 방향(dir)이 일치하는가?
+		// 내적 값(Dot)이 양수라면 해당 선분을 넘어서 바깥으로 나갔음을 의미
+		// (부동 소수점 오차 보정을 위해 약간의 epsilon 여유를 둠)
+		if (dir.Dot(m_Normal[i]) > 0.001f)
+		{
+			if (outNeighborIndex)
+			{
+				*outNeighborIndex = m_Neighbors[i];
+			}
+			return false;
+		}
+	}
+
 	return true;
 }
 

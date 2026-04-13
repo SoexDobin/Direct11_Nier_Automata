@@ -306,6 +306,27 @@ Bool Model::Is_NotifyActive(const wstring& notifyTag) const
 	return m_Tracker->Is_ActiveNotify(activeIndex, notifyTag);
 }
 
+void Model::Extract_RawMeshForNavigation(vector<Float>& outPositions, vector<int32>& outIndices) const
+{
+	outPositions.clear();
+	outIndices.clear();
+	int32 vertexOffset = 0;
+	for (const auto& mesh : m_Meshes)
+	{
+		const auto& meshPos = mesh->Get_RawPositions();
+		const auto& meshInd = mesh->Get_RawIndices();
+		// 정점 복사 
+		outPositions.insert(outPositions.end(), meshPos.begin(), meshPos.end());
+		// 인덱스는 이전에 쌓인 정점 개수(vertexOffset)만큼 더해서 연결!
+		for (int32 idx : meshInd)
+		{
+			outIndices.push_back(idx + vertexOffset);
+		}
+		
+		vertexOffset += static_cast<int32>(meshPos.size() / 3);
+	}
+}
+
 vector<BONE_SNAPSHOT> Model::Get_SnapShot_BoneMatrices()
 {
 	vector<BONE_SNAPSHOT> snapShots;
@@ -343,7 +364,7 @@ Matrix Model::Get_BoneMatrix(uint32 boneIndex) const
 	return *m_Bones[boneIndex]->Get_CombinedTransformationMatrixPtr();
 }
 
-const TRANSFORM_FRAME& Model::Get_RootTransformVelocity(uint32 nodeIndex) const
+TRANSFORM_FRAME Model::Get_RootTransformVelocity(uint32 nodeIndex) const
 {
 	if (m_IsBlending && m_NextAnimIndex < m_Animations.size())
 	{

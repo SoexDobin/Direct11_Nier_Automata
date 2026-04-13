@@ -22,10 +22,10 @@
 
 #include "GameObject.h"
 #include "Component.h"
+#include "NavigationBuilder.h"
 
 NS_BEGIN(Engine)
-
-class LayerRegistry;
+	class LayerRegistry;
 class TagRegistry;
 
 class ENGINE_DLL Game {
@@ -105,6 +105,7 @@ public: /* For ObjectManager */
 	HRESULT Clear_AllGameObjects() const;
     Shared<GameObject> Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const;
     Shared<GameObject> Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const;
+    Shared<GameObject> Find_ObjectByObjectTag(uint32 levIndex, const wstring& tag) const;
     void Clearing_ObjectManager(uint32 levIndex) const;
 
 public: /* For CameraManager */
@@ -178,6 +179,9 @@ public: /* CollisionManager */
     void Render_CollisionDebug() const;
 #endif
 
+public: /* NavigationBuilder */
+    NavigationBuilder::NAV_BUILD_RESULT Build_Navigation(const Float* vertices, int32 numVertices, const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params);
+
 public:
     HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;
     HRESULT Bind_RenderTarget_ShaderResource(const Shared<class Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const;
@@ -229,6 +233,7 @@ private:
     Unique<EventManager> m_EventManager = { nullptr };
     Unique<CollisionManager> m_CollisionManager = { nullptr };
     Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
+    Unique<NavigationBuilder> m_NavigationBuilder = { nullptr };
 };
 
 NS_END

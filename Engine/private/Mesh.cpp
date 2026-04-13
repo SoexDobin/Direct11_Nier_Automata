@@ -56,6 +56,12 @@ HRESULT Mesh::Initialize_Prototype(Bool isAnim, const MODEL_MESH& modelMesh, con
 		indices[numIndices++] = modelMesh.indices[i];
 	}
 
+	m_RawIndices.resize(m_NumIndices);
+	for (size_t i = 0; i < m_NumIndices; ++i)
+	{
+		m_RawIndices[i] = static_cast<int32>(indices[i]);
+	}
+
 	D3D11_SUBRESOURCE_DATA		indexInitialData{};
 	indexInitialData.pSysMem = indices;
 
@@ -129,6 +135,14 @@ HRESULT Mesh::Ready_VertexBuffer_For_NonAnim(const MODEL_MESH& meshData, const M
 		vertices[i].texcoord = meshData.vertices[i].texcoord;
 	}
 
+	m_RawPosition.reserve(m_NumVertices * 3);
+	for (uint32 i = 0; i < m_NumVertices; ++i)
+	{
+		m_RawPosition.push_back(vertices[i].position.x);
+		m_RawPosition.push_back(vertices[i].position.y);
+		m_RawPosition.push_back(vertices[i].position.z);
+	}
+
 	D3D11_SUBRESOURCE_DATA vertexInitialData{};
 	vertexInitialData.pSysMem = vertices;
 	
@@ -162,7 +176,6 @@ HRESULT Mesh::Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData)
 	{
 		vertices[i] = meshData.animVertices[i];
 	}
-	
 
 	m_NumBones = meshData.boneIndices.size();
 

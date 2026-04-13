@@ -25,7 +25,7 @@ public:
 	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
 
 public:
-	Bool IsIn(const Vector3& position, _Out_ int32* outNeighborIndex, _Out_ Vector3* outSliderNormal = nullptr) const;
+	Bool IsIn(const Vector3& position, _Out_ int32* outNeighborIndex) const;
 	Float Compute_Height(Float pointX, Float pointZ) const;
 	Bool Compare_Points(const Vector3& src, const Vector3& dst) const;
 
@@ -41,8 +41,10 @@ public:
 
 private:
 	Weak<Navigation> m_Owner{};
-	Vector3 m_Points[3]{};
 	int32 m_Index{ -1 };
+	Vector3 m_Points[3]{};
+	Vector3 m_Normal[3]{};
+	Plane m_CellPlane{};
 	int32 m_Neighbors[3]{ -1, -1, -1 };
 
 public:

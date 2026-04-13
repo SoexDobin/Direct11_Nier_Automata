@@ -56,7 +56,7 @@
 #undef max
 #endif
 
-#define MAGIC_ENUM_RANGE_MAX 900 // 512개로 늘림
+#define MAGIC_ENUM_RANGE_MAX 900 
 
 #include "magic_enum/magic_enum.hpp"
 

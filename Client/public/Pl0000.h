@@ -8,6 +8,7 @@ NS_BEGIN(Engine)
 	class Shader;
     class Model;
     class SphereCollider;
+    class Navigation;
 }
 
 NS_BEGIN(Client)
@@ -15,10 +16,10 @@ NS_BEGIN(Client)
 	class Pl0000EvadeChecker;
 
 	class Pl0000Movement;
-class Pl0000StateMachine;
-class Pl0000Body;
-class WP0070Body;
-class WP0220Body;
+    class Pl0000StateMachine;
+    class Pl0000Body;
+    class WP0070Body;
+    class WP0220Body;
 
 class CLIENT_DLL Pl0000 final : public Entity
 {
@@ -82,6 +83,7 @@ private:
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
     Shared<SphereCollider> m_PhysicalZone{ nullptr };
+    Shared<Navigation> m_Navigation{ nullptr };
 
 private:
     Matrix m_LightSheathMatrix{};

@@ -4,6 +4,7 @@
 #include <Game.h>
 #include <SpdLogger.h>
 #include <SphereCollider.h>
+#include <Navigation.h>
 
 #include "Bullet.h"
 #include "Pl0000Body.h"
@@ -146,7 +147,6 @@ void Pl0000::Late_Update(Float timeDelta)
 		timeDelta *= 0.05f;
 
 	m_Pl0000Movement->Update_Movement(timeDelta);
-
 	m_Transform->Update_WorldMatrix();
 	m_PhysicalZone->Update(m_Transform->Get_WorldMatrix());
 }
@@ -285,6 +285,28 @@ HRESULT Pl0000::Ready_Components()
 	m_Pl0000Movement = Add_Component<Pl0000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
 	if (nullptr == m_Pl0000Movement)
 		return E_FAIL;
+
+	Navigation::NAVIGATION_DESC navDesc;
+	navDesc.startCellIndex = 0;
+	m_Navigation = Add_Component<Navigation>(ETOI(LEVEL::STATIC), &navDesc);
+	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Set_Player", [this]()
+		{
+			
+			Shared<GameObject> terrain = GAME_INSTANCE->Find_ObjectByObjectTag(ETOI(LEVEL::GAMEPLAY), L"CityOfRuins");
+			if (terrain)
+			{
+				for (auto& terrainNav : terrain->Get_Components())
+				{
+					auto name = terrainNav->Get_Name();
+					if (name == L"Navigation")
+						m_Navigation->Set_NavCells(std::move(static_pointer_cast<Navigation>(terrainNav)->Get_NavCells()));
+				}
+
+				
+				m_Transform->Set_Position(m_Navigation->Get_NavCells()[m_Navigation->Get_CurrentCellIndex()].Get_Point(NavCell::CELL_POINT::A));
+			}
+
+		});
 
 	// StateMachine은 마지막에 처리
 	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(ETOI(LEVEL::GAMEPLAY))))

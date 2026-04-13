@@ -63,6 +63,7 @@ enum class COMPONENT_TYPE {
 	ANIMATION_TRACKER,
 	CHANNEL,
 
+	NAVIGATION,
 };
 
 } // namespace Engine

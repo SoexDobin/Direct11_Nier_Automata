@@ -324,6 +324,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Navigation_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\OBBCollider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Object_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp" />

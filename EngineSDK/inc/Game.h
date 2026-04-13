@@ -175,9 +175,6 @@ public: /* CollisionManager */
     void Add_Collider(const Shared<class Collider>& collider) const;
     void Remove_Collider(const Shared<class Collider>& collider) const;
     void Update_Collision() const;
-#ifdef _DEBUG
-    void Render_CollisionDebug() const;
-#endif
 
 public: /* NavigationBuilder */
     NavigationBuilder::NAV_BUILD_RESULT Build_Navigation(const Float* vertices, int32 numVertices, const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params);
@@ -234,6 +231,14 @@ private:
     Unique<CollisionManager> m_CollisionManager = { nullptr };
     Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
     Unique<NavigationBuilder> m_NavigationBuilder = { nullptr };
+
+
+#ifdef _DEBUG /* For Debug Function */
+public:
+    void Render_CollisionDebug() const;
+    Bool Toggle_RenderDebug() const;
+#endif
+
 };
 
 NS_END

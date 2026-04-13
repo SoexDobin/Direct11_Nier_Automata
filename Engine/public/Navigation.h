@@ -60,12 +60,16 @@ public:
 
 #ifdef _DEBUG
 private:
+	static Bool s_DebugRender;
 	Shared<PrimitiveBatch<DirectX::VertexPositionColor>> m_Batch { nullptr };
 	Shared<BasicEffect> m_Effect{ nullptr };
 	ComPtr<ID3D11InputLayout> m_InputLayout { nullptr };
+
 public:
 	HRESULT Ready_Debug();
 	HRESULT Render_Debug();
+	static void Toggle_DebugRender() { s_DebugRender = !s_DebugRender; }
+	static Bool Get_DebugRender() { return s_DebugRender; }
 #endif
 };
 

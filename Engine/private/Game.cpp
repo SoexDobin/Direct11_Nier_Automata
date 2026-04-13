@@ -600,14 +600,6 @@ void Game::Update_Collision() const
     m_CollisionManager->Update_Collision();
 }
 
-#ifdef _DEBUG
-void Game::Render_CollisionDebug() const
-{
-    m_CollisionManager->Render_Debug();
-}
-#endif
-
-
 NavigationBuilder::NAV_BUILD_RESULT Game::Build_Navigation(const Float* vertices, int32 numVertices,
 	const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params)
 {
@@ -689,3 +681,16 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& pr
 
     return Instantiate_Internal(protoType, objectID, levIndex, arg);
 }
+
+#ifdef _DEBUG
+void Game::Render_CollisionDebug() const
+{
+    m_CollisionManager->Render_Debug();
+}
+
+Bool Game::Toggle_RenderDebug() const
+{
+    return m_CollisionManager->Toggle_DebugMode();
+}
+
+#endif

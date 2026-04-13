@@ -4,6 +4,10 @@
 #include "SpdLogger.h"
 #include "Transform.h"
 
+#ifdef _DEBUG
+Bool Navigation::s_DebugRender = false;
+#endif
+
 Navigation::Navigation() : Component{} {}
 Navigation::Navigation(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) 
 	: Component{ device, context } {}
@@ -185,6 +189,8 @@ HRESULT Navigation::Ready_Debug()
 }
 HRESULT Navigation::Render_Debug()
 {
+	if (!s_DebugRender) return S_OK;
+
 	if (!m_Batch || !m_Effect) return E_FAIL;
 	m_Effect->SetView(GAME_INSTANCE->Get_Transform(D3DTS::VIEW));
 	m_Effect->SetProjection(GAME_INSTANCE->Get_Transform(D3DTS::PROJ));

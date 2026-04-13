@@ -432,6 +432,9 @@
     <ClInclude Include="..\public\NavigationBuilder.h">
       <Filter>01. Utility\05. Component\Navigation\Builder</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Engine_NavStruct.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">

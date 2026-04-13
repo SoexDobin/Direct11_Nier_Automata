@@ -4,8 +4,9 @@
 #include "EditorManager.h"
 #include "ModelViewer.h"
 #include "ClientSettingManager.h"
-#include "ModelViewer.h"
-
+#include "InputDevice.h"    
+#include "CollisionManager.h"
+#include "Navigation.h"
 
 
 MenuBar::MenuBar() {}
@@ -15,10 +16,17 @@ HRESULT MenuBar::Initialize() {
     m_Game = GAME_INSTANCE;
     return EditorObject::Initialize();
 }
-void MenuBar::Update(Bool isResize) { EditorObject::Update(isResize); }
+void MenuBar::Update(Bool isResize)
+{
+    Update_HotKey();
+	EditorObject::Update(isResize);
+}
 void MenuBar::Render(Bool isResize) {
   EditorObject::Render(isResize);
 	if (ImGui::BeginMainMenuBar()) {
+
+        Render_Debug(); // Debug Rays
+
         if (ImGui::BeginMenu("WindowSetting")) {
           ImGui::Separator();
 
@@ -186,6 +194,43 @@ void MenuBar::Render(Bool isResize) {
             }
         }
         ImGui::End();
+    }
+}
+
+void MenuBar::Update_HotKey()
+{
+    Bool currF1 = (GAME_INSTANCE->Get_DIKeyState(DIK_F1) & 0x80) != 0;
+    Bool currF2 = (GAME_INSTANCE->Get_DIKeyState(DIK_F2) & 0x80) != 0;
+
+    if (currF1 && !m_PrevF1)
+    {
+        auto result = GAME_INSTANCE->Toggle_RenderDebug();
+    }
+
+    if (currF2 && !m_PrevF2)
+    {
+        Navigation::Toggle_DebugRender();
+    }
+
+    m_PrevF1 = currF1;
+    m_PrevF2 = currF2;
+}
+
+void MenuBar::Render_Debug()
+{
+    if (ImGui::BeginMenu("Debug"))
+    {
+        Bool colDebug = GAME_INSTANCE->Toggle_RenderDebug();
+
+        if (ImGui::MenuItem("Toggle DebugRender Collider", "F1", &colDebug))
+			;
+
+        Bool navDebug = Navigation::Get_DebugRender();
+        if (ImGui::MenuItem("Toggle DebugRender Navigation", "F2", &navDebug))
+            ;
+        
+
+        ImGui::EndMenu();
     }
 }
 

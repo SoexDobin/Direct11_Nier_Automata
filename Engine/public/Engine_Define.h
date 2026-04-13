@@ -80,6 +80,7 @@
 #include "Engine_RTTR_Metadata.h"
 #include "Engine_Typedef.h"
 #include "Engine_ModelStruct.h"
+#include "Engine_NavStruct.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

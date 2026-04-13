@@ -2,6 +2,7 @@
 #include "SpdLogger.h"
 #include <recastnavigation/Recast.h>
 #include <recastnavigation/RecastAlloc.h>
+#include "Model.h"
 
 NavigationBuilder::NavigationBuilder() : EngineManager{} {}
 
@@ -20,9 +21,26 @@ HRESULT NavigationBuilder::Begin()
 	return EngineManager::Begin();
 }
 
+vector<NavCellBinary> NavigationBuilder::Bake_For_Preview(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
+{
+	vector<Float> rawPos;
+	vector<int32> rawIndices;
+	model->Extract_RawMeshForNavigation(rawPos, rawIndices);
+
+	for (size_t i = 0; i < rawPos.size(); ++i) {
+	//		Vector3 transformed = Vector3::Transform(rawPos[i], worldMatrix);
+
+	}
+}
+
+HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
+{
+
+}
+
 NavigationBuilder::NAV_BUILD_RESULT NavigationBuilder::Build(const Float* vertices, int32 numVertices,
-															 const int32* triangles, int32 numTriangles, 
-															 const NAV_BUILD_PARAMS_DESC& params)
+                                                             const int32* triangles, int32 numTriangles, 
+                                                             const NAV_BUILD_PARAMS_DESC& params)
 {
 	NAV_BUILD_RESULT build{};
 	rcContext ctx{};

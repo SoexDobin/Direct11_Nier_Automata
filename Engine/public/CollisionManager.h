@@ -30,14 +30,18 @@ public: /* 디버그 렌더링 */
 #ifdef _DEBUG
 	HRESULT Initialize_Debug();
 	void Render_Debug() const;
-	void Toggle_DebugMode() { m_DebugMode = !m_DebugMode; }
+	Bool Toggle_DebugMode()
+	{
+		m_DebugMode = !m_DebugMode;
+		return m_DebugMode;
+	}
 	Bool Get_DebugMode() const { return m_DebugMode; }
 #endif
 
 private:
 	vector<Shared<Collider>> m_Colliders;
 #ifdef _DEBUG
-	Bool m_DebugMode = { true };
+	Bool m_DebugMode = { false };
 	ComPtr<ID3D11Device> m_Device{ nullptr }; 
 	ComPtr<ID3D11DeviceContext> m_Context{ nullptr };
 	ComPtr<ID3D11InputLayout> m_InputLayout{ nullptr };

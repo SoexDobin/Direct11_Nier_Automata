@@ -7,6 +7,8 @@ struct rcPolyMeshDetail;
 
 NS_BEGIN(Engine)
 
+class Model;
+
 class NavigationBuilder final : public EngineManager
 {
 public:
@@ -47,7 +49,13 @@ public:
 	HRESULT Begin() override;
 
 public:
-	/// 소스 메시(position + index 배열)로부터 NavCell 목록을 빌드
+	static vector<NavCellBinary> Bake_For_Preview(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
+	static HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
+private:\
+	static vector<NavCellBinary> Convert_To_BinaryData(struct rcPolyMesh* pMesh);
+	static void Compute_Neighbors(vector<NavCellBinary>& outData, struct rcPolyMesh* pMesh);
+
+public:
 	NAV_BUILD_RESULT Build(
 		const Float* vertices, int32 numVertices,
 		const int32* triangles, int32 numTriangles,

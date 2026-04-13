@@ -201,6 +201,7 @@
     <ClInclude Include="..\public\LogConsole.h" />
     <ClInclude Include="..\public\MenuBar.h" />
     <ClInclude Include="..\public\ModelViewer.h" />
+    <ClInclude Include="..\public\NavHelper.h" />
     <ClInclude Include="..\public\PathManager.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="framework.h" />
@@ -226,6 +227,7 @@
     <ClCompile Include="..\private\LogConsole.cpp" />
     <ClCompile Include="..\private\MenuBar.cpp" />
     <ClCompile Include="..\private\ModelViewer.cpp" />
+    <ClCompile Include="..\private\NavHelper.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

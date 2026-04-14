@@ -7,6 +7,7 @@
 #include <Navigation.h>
 
 #include "Bullet.h"
+#include "Monster.h"
 #include "Pl0000Body.h"
 #include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
@@ -174,9 +175,17 @@ void Pl0000::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 void Pl0000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	auto target = targetCollider->Get_Owner();
-	auto targetLayers = target->Get_LayerMask();
-	auto targetTags = target->Get_TagMask();
+	auto targetLayerName = target->Get_LayerMask().Get_LayerName();
 
+	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::CONTAINER ||
+		targetLayerName != L"MonsterPhysical")
+		return;
+	
+	if (static_pointer_cast<Monster>(target)->Is_Static())
+	{
+		Vector3 pushOutDelta = PushoutDelta(ownCollider, targetCollider, 1.f);
+		m_Pl0000Movement->Add_Correction(pushOutDelta);
+	}
 }
 
 void Pl0000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -288,28 +297,7 @@ HRESULT Pl0000::Ready_Components()
 
 	Navigation::NAVIGATION_DESC navDesc;
 	navDesc.startCellIndex = 0;
-	m_Navigation = Add_Component<Navigation>(ETOI(LEVEL::STATIC), &navDesc);
-	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Set_Player", [this]()
-		{
-			
-			Shared<GameObject> terrain = GAME_INSTANCE->Find_ObjectByObjectTag(ETOI(LEVEL::GAMEPLAY), L"CityOfRuins");
-			if (terrain)
-			{
-				for (auto& terrainNav : terrain->Get_Components())
-				{
-					auto name = terrainNav->Get_Name();
-					if (name == L"Navigation")
-						m_Navigation->Set_NavCells(std::move(static_pointer_cast<Navigation>(terrainNav)->Get_NavCells()));
-				}
-
-				m_Navigation->Compute_CurrentCellByPosition(m_Transform->Get_Position());
-				auto pos = m_Transform->Get_Position();
-				Float height = m_Navigation->Get_HeightAtPoint(pos);
-
-				m_Transform->Set_Position(pos.x, height, pos.y);
-			}
-
-		});
+	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
 
 	// StateMachine은 마지막에 처리
 	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(ETOI(LEVEL::GAMEPLAY))))

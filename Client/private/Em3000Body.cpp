@@ -5,17 +5,49 @@
 #include <Game.h>
 #include <SpdLogger.h>
 
+#include <Shader.h>
 #include "Entity.h"
 
-Em3000Body::Em3000Body() : Em3000Parts{} {}
+Em3000Body::Em3000Body() : PartObject{} {}
 Em3000Body::Em3000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: Em3000Parts{device, context} {}
+	: PartObject{device, context} {}
 Em3000Body::Em3000Body(const Em3000Body& rhs)
-	: Em3000Parts{ rhs } {}
+	: PartObject{ rhs } {}
+
+const TRANSFORM_FRAME& Em3000Body::Get_ModelTransform() const
+{
+	return m_Model->Get_RootTransformVelocity(m_RootBoneIndex);
+}
+
+void Em3000Body::Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop)
+{
+	m_Model->Set_Animation(animIndex, blendDuration);
+	m_Model->Set_AnimLoop(isLoop);
+}
+
+uint32 Em3000Body::Get_CurrentAnimationIndex() const
+{
+	return m_Model->Get_AnimationIndex();
+}
+
+uint32 Em3000Body::Get_NextAnimationIndex() const
+{
+	return m_Model->Get_NextAnimationIndex();
+}
+
+Float Em3000Body::Get_AnimationProgress() const
+{
+	return m_Model->Get_AnimationProgress();
+}
+
+Bool Em3000Body::Is_AnimationFinished() const
+{
+	return m_Model->Is_AnimationFinished();
+}
 
 HRESULT Em3000Body::Initialize_Prototype()
 {
-	return Em3000Parts::Initialize_Prototype();
+	return PartObject::Initialize_Prototype();
 }
 
 HRESULT Em3000Body::Initialize(void* arg)
@@ -55,7 +87,7 @@ HRESULT Em3000Body::Begin()
 
 void Em3000Body::On_Destroy()
 {
-	Em3000Parts::On_Destroy();
+	PartObject::On_Destroy();
 }
 
 void Em3000Body::Priority_Update(Float timeDelta)
@@ -152,8 +184,8 @@ HRESULT Em3000Body::Ready_Components()
 		return E_FAIL;
 
 	AABBCollider::AABB_COLLIDER_DESC aabbDesc{};
-	aabbDesc.extents = Vector3{ 1.f, 1.f, 1.f };
-	aabbDesc.offset = Vector3{ 0.f, 1.f, 0.f };;
+	aabbDesc.extents = Vector3{ 2.f, 2.f, 2.f };
+	aabbDesc.offset = Vector3{ 0.f, 2.f, 0.f };;
 	m_HitBox = Add_Component<AABBCollider>(ETOI(LEVEL::STATIC), &aabbDesc);
 	if (nullptr == m_HitBox)
 		return E_FAIL;
@@ -163,6 +195,8 @@ HRESULT Em3000Body::Ready_Components()
 
 HRESULT Em3000Body::Ready_AnimationNotify()
 {
+
+
 	return S_OK;
 }
 

@@ -36,6 +36,12 @@
 #include "MonsterAOE.h"
 #include "Pl0000EvadeChecker.h"
 #include "Pl0000MonsterChecker.h"
+#include "Em3000.h"
+#include "Em3000Body.h"
+#include "Em3000Movement.h"
+#include "Em3001.h"
+#include "Em3002.h"
+#include "Em3003.h"
 
 using rttr::registration;
 
@@ -44,8 +50,6 @@ using rttr::registration;
 // 자동으로 Client/public 내부의 헤더를 스캔하여 포함시킵니다.
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
-#include "Em3000.h"
-#include "Em3000Body.h"
 #include "FreeCamera.h"
 #include "MonsterStateMachine.h"
 #include "SkyBox.h"
@@ -219,6 +223,42 @@ void Register_Client_Reflection() {
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em0010Movement::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
+    rttr::registration::class_<Em3000>("Em3000")
+        .constructor<>()
+        .method("Clone", &Em3000::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em3000Body>("Em3000Body")
+        .constructor<>()
+        .method("Clone", &Em3000Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000Body::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em3000Movement>("Em3000Movement")
+        .constructor<>()
+        .method("Clone", &Em3000Movement::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em3000Movement::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em3001>("Em3001")
+        .constructor<>()
+        .method("Clone", &Em3001::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3001::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em3002>("Em3002")
+        .constructor<>()
+        .method("Clone", &Em3002::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3002::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<Em3003>("Em3003")
+        .constructor<>()
+        .method("Clone", &Em3003::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3003::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
     // Projectile
     rttr::registration::class_<Bullet>("Bullet")
         .constructor<>()
@@ -250,16 +290,6 @@ void Register_Client_Reflection() {
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
   // <AUTO_GENERATED_RTTR>
-    rttr::registration::class_<Em3000>("Em3000")
-        .constructor<>()
-        .method("Clone", &Em3000::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000::Create(device, context); })(rttr::metadata("Level", 0));
-
-    rttr::registration::class_<Em3000Body>("Em3000Body")
-        .constructor<>()
-        .method("Clone", &Em3000Body::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000Body::Create(device, context); })(rttr::metadata("Level", 0));
-
     rttr::registration::class_<FreeCamera>("FreeCamera")
         .constructor<>()
         .method("Clone", &FreeCamera::Clone)

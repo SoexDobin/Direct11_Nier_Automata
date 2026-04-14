@@ -233,6 +233,9 @@
     <ClInclude Include="..\public\Em3003.h">
       <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3003</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Em3000Movement.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Movement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -461,6 +464,9 @@
     <ClCompile Include="..\private\Em3003.cpp">
       <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3003</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Em3000Movement.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Movement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -615,6 +621,12 @@
     </Filter>
     <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3003">
       <UniqueIdentifier>{5960a74e-ebda-4a6b-aed3-fa26d1fecc5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000Movement">
+      <UniqueIdentifier>{189a453d-fd57-4858-a50a-0e74a51990b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000StateMachine">
+      <UniqueIdentifier>{04d5fba8-8e86-493b-bf5a-3ca266ca4241}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

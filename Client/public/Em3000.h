@@ -20,7 +20,7 @@ public:
 		
 	} EM3000_DESC;
 public:
-	explicit Em3000();
+	explicit Em3000() = default;
 	explicit Em3000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Em3000(const Em3000& rhs);
 	~Em3000() override = default;
@@ -39,10 +39,7 @@ public:
 	void Submit_RenderGroup() override;
 
 public:
-	const TRANSFORM_FRAME& Get_BodyModelTransform() const
-	{
-		return m_MainBody->Get_ModelTransform();
-	}
+	const TRANSFORM_FRAME& Get_BodyModelTransform() const;
 	void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
 	void OnDeath() override;
 
@@ -64,7 +61,6 @@ private:
 public:
 	static Shared<Em3000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
-
 
 };
 

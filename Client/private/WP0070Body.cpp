@@ -195,7 +195,7 @@ void WP0070Body::Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoo
 {
 	m_Transform->Set_WorldMatrix(Matrix::Identity);
 	Pl0000Parts::Set_Animation(animIndex, blendDuration, isLoop);
-	m_Model->Update_ModelAnimation(0.0001f);
+	m_Model->Update_ModelAnimation(0.001f);
 }
 
 void WP0070Body::Active_LightWeapon()
@@ -251,7 +251,7 @@ HRESULT WP0070Body::Ready_Components()
 		return E_FAIL;
 
 	OBBCollider::OBB_COLLIDER_DESC colDesc{};
-	colDesc.extents = Vector3{ 0.075f, 0.1f, 0.7f }; 
+	colDesc.extents = Vector3{ 0.075f, 0.1f, 1.f }; 
 	colDesc.rotation = Vector3::Zero;
 	colDesc.offset = Vector3{ 0.f, 0.f, -0.55f };
 	m_AttackCollider = Add_Component<OBBCollider>(ETOI(LEVEL::STATIC), &colDesc);

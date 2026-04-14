@@ -191,6 +191,7 @@
     <ClInclude Include="..\public\Em0010Movement.h" />
     <ClInclude Include="..\public\Em3000.h" />
     <ClInclude Include="..\public\Em3000Body.h" />
+    <ClInclude Include="..\public\Em3000Movement.h" />
     <ClInclude Include="..\public\Em3000Parts.h" />
     <ClInclude Include="..\public\Em3001.h" />
     <ClInclude Include="..\public\Em3002.h" />
@@ -270,6 +271,7 @@
     <ClCompile Include="..\private\Em0010Movement.cpp" />
     <ClCompile Include="..\private\Em3000.cpp" />
     <ClCompile Include="..\private\Em3000Body.cpp" />
+    <ClCompile Include="..\private\Em3000Movement.cpp" />
     <ClCompile Include="..\private\Em3000Parts.cpp" />
     <ClCompile Include="..\private\Em3001.cpp" />
     <ClCompile Include="..\private\Em3002.cpp" />

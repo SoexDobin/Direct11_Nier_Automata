@@ -1,11 +1,12 @@
 #include "pch.h"
 #include "Em3000Body.h"
 
-#include <AABBCollider.h>
 #include <Game.h>
 #include <SpdLogger.h>
 
 #include <Shader.h>
+#include <SphereCollider.h>
+
 #include "Entity.h"
 
 Em3000Body::Em3000Body() : PartObject{} {}
@@ -47,6 +48,9 @@ Bool Em3000Body::Is_AnimationFinished() const
 
 HRESULT Em3000Body::Initialize_Prototype()
 {
+	m_LayerMask.Set_Layer(L"Monster");
+	m_TagMask.Set_Tag({ L"Monster" });
+
 	return PartObject::Initialize_Prototype();
 }
 
@@ -183,10 +187,10 @@ HRESULT Em3000Body::Ready_Components()
 	if (nullptr == m_Model)
 		return E_FAIL;
 
-	AABBCollider::AABB_COLLIDER_DESC aabbDesc{};
-	aabbDesc.extents = Vector3{ 2.f, 2.f, 2.f };
-	aabbDesc.offset = Vector3{ 0.f, 2.f, 0.f };;
-	m_HitBox = Add_Component<AABBCollider>(ETOI(LEVEL::STATIC), &aabbDesc);
+	SphereCollider::SPHERE_COLLIDER_DESC sphereDesc{};
+	sphereDesc.radius = 3.f;
+	sphereDesc.offset = Vector3::UnitY;
+	m_HitBox = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereDesc);
 	if (nullptr == m_HitBox)
 		return E_FAIL;
 

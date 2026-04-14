@@ -2,7 +2,7 @@
 #include "Em3000Parts.h"
 
 NS_BEGIN(Engine)
-class AABBCollider;
+class SphereCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -60,7 +60,7 @@ private:
 	int32					m_RootBoneIndex{ -1 };
 	Shared<Shader>			m_Shader{ nullptr };
 	Shared<Model>			m_Model{ nullptr };
-	Shared<AABBCollider>	m_HitBox{ nullptr };
+	Shared<SphereCollider>	m_HitBox{ nullptr };
 
 public:
 	static Shared<Em3000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

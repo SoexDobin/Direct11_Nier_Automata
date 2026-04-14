@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "Em0010Movement.h"
+
+#include <Game.h>
+
 #include "Em0010.h"
 #include "Navigation.h"
 #include <SpdLogger.h>
@@ -22,6 +25,11 @@ HRESULT Em0010Movement::Initialize(void* arg)
 		LOG_ERROR(L"Failed to Init {}", m_ObjectName);
 		return E_FAIL;
 	}
+
+	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Set_RootPos", [this]()
+		{
+			m_RootPosition = m_Owner.lock()->Get_Transform()->Get_Position();
+		});
 
 	return S_OK;
 }

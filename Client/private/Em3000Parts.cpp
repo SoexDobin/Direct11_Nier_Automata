@@ -29,12 +29,21 @@ HRESULT Em3000Parts::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+
+
 	auto desc = static_cast<tagEm3000PartsDesc*>(arg);
+
+	if (FAILED(Ready_Components(desc->shaderDesc, desc->modelResourceTag)))
+	{
+		LOG_ERROR(L"Failed to Ready_Components BodyModel Em3000Parts");
+		return E_FAIL;
+	}
+
 	if (false == desc->bodyModel.expired())
 	{
-		m_Model = desc->bodyModel.lock();
+		m_BodyModel = desc->bodyModel.lock();
 
-		if (nullptr == desc->targetBoneName)
+		if (nullptr != desc->targetBoneName)
 		{
 			m_BoneName = desc->targetBoneName;
 			m_TargetBoneIndex = m_BodyModel.lock()->Get_BoneIndexByName(m_BoneName);
@@ -45,11 +54,7 @@ HRESULT Em3000Parts::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_Components(desc->shaderDesc, desc->modelResourceTag)))
-	{
-		LOG_ERROR(L"Failed to Ready_Components BodyModel Em3000Parts");
-		return E_FAIL;
-	}
+
 
 	return PartObject::Initialize(arg);
 }
@@ -93,7 +98,8 @@ void Em3000Parts::Late_Update(Float timeDelta)
 
 	Matrix boneMatrix = m_BodyModel.lock()->Get_BoneMatrix(m_TargetBoneIndex);
 
-	m_CombinedWorldMatrix = m_Transform->Get_WorldMatrix() * boneMatrix * (*m_ParentMatrix);
+	Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 HRESULT Em3000Parts::Render()

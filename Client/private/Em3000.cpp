@@ -56,6 +56,8 @@ HRESULT Em3000::Initialize(void* arg)
 		});
 
 	m_IsStatic = true;
+	m_MaxHp = 100000.f;
+	m_Hp = 100000.f;
 
 	return S_OK;
 }
@@ -72,6 +74,12 @@ void Em3000::Priority_Update(Float timeDelta)
 
 void Em3000::Update(Float timeDelta)
 {
+	if (m_LagDuration > 0.f)
+	{
+		m_LagDuration -= timeDelta;
+		timeDelta *= 0.05f;
+	}
+
 	m_Transform->Update_WorldMatrix();
 	m_Em3000Movement->Update_Movement(timeDelta);
 	m_PhysicalZone->Update(*m_Transform->Get_WorldMatrixPtr());
@@ -89,7 +97,7 @@ void Em3000::Fixed_Update(Float fixedDelta)
 
 HRESULT Em3000::Render()
 {
-	return Monster::Render();
+	return S_OK;
 }
 
 void Em3000::Submit_RenderGroup()
@@ -104,12 +112,23 @@ const TRANSFORM_FRAME& Em3000::Get_BodyModelTransform() const
 
 void Em3000::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
+	if (Is_Dead()) return;
+
+	Play_HitSFX(dmgInfo);
+	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
+
+	// TODO : 스테이트 구성하면 키기
+	if (dmgInfo.attackType != ATK_TYPE::POD)
+		//m_States->Change_State(MonsterStateMachine::MONSTER_STATE::Hit);
+
 	Monster::TakeDamage(dmgInfo);
 }
 
 void Em3000::OnDeath()
 {
-	Monster::OnDeath();
+	//m_MainBody->OffHitBox();
+	// TODO : 콜라이더 끄기
+	//m_States->Change_State(MonsterStateMachine::MONSTER_STATE::DEAD);
 }
 
 void Em3000::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -119,7 +138,7 @@ void Em3000::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 
 void Em3000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	
+	Monster::OnCollisionStay(ownCollider, targetCollider);
 }
 
 void Em3000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -217,7 +236,7 @@ HRESULT Em3000::Ready_Components()
 
 	SphereCollider::SPHERE_COLLIDER_DESC physicalZoneDesc{};
 	physicalZoneDesc.offset = Vector3::UnitY;
-	physicalZoneDesc.radius = 2.f;
+	physicalZoneDesc.radius = 3.f;
 	m_PhysicalZone = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &physicalZoneDesc);
 	if (nullptr == m_PhysicalZone)
 		return E_FAIL;

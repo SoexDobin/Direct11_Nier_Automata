@@ -1482,6 +1482,24 @@
                                                                     ],
                                               "has_clone":  true
                                           },
+                    "StateEm0010_Walk":  {
+                                             "members":  [
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "",
+                                                                 "name":  "m_EnterAnim",
+                                                                 "type":  "unordered_set\u003cuint32\u003e"
+                                                             }
+                                                         ],
+                                             "base_class":  "StateEm0010",
+                                             "inherited_members":  {
+
+                                                                   },
+                                             "namespace":  "Client",
+                                             "has_create":  true,
+                                             "has_clone":  false,
+                                             "category":  "other"
+                                         },
                     "SkyBox":  {
                                    "namespace":  "Engine",
                                    "base_class":  "GameObject",

@@ -62,9 +62,8 @@ void State2B_Jump::Update(Float timeDelta)
 	moveData.isJump = true;
 	moveData.canRotation = (m_PrevMoveState != Pl0000::PL0000_STATE::EVADE);
 	moveData.useRootMotionDir = false;
-
-
 	m_Movement.lock()->Set_MovementData(moveData);
+	m_Movement.lock()->Reduce_RootMotion(0.75f);
 
 	auto pl0000 = m_Body.lock();
 	uint32 curIndex = pl0000->Get_CurrentAnimationIndex();
@@ -134,7 +133,7 @@ void State2B_Jump::Late_Update(Float timeDelta)
 
 void State2B_Jump::StateExitInvoke()
 {
-	
+	m_Movement.lock()->Reset_RootMotionStop();
 }
 
 Shared<State2B_Jump> State2B_Jump::Create(const wstring& tag, const Shared<Pl0000>& owner)

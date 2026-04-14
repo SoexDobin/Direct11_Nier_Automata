@@ -44,6 +44,8 @@ using rttr::registration;
 // 자동으로 Client/public 내부의 헤더를 스캔하여 포함시킵니다.
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
+#include "Em3000.h"
+#include "Em3000Body.h"
 #include "FreeCamera.h"
 #include "MonsterStateMachine.h"
 #include "SkyBox.h"
@@ -248,6 +250,16 @@ void Register_Client_Reflection() {
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
   // <AUTO_GENERATED_RTTR>
+    rttr::registration::class_<Em3000>("Em3000")
+        .constructor<>()
+        .method("Clone", &Em3000::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<Em3000Body>("Em3000Body")
+        .constructor<>()
+        .method("Clone", &Em3000Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000Body::Create(device, context); })(rttr::metadata("Level", 0));
+
     rttr::registration::class_<FreeCamera>("FreeCamera")
         .constructor<>()
         .method("Clone", &FreeCamera::Clone)

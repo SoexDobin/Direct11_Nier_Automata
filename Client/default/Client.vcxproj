@@ -189,6 +189,12 @@
     <ClInclude Include="..\public\Em0010.h" />
     <ClInclude Include="..\public\Em0010Body.h" />
     <ClInclude Include="..\public\Em0010Movement.h" />
+    <ClInclude Include="..\public\Em3000.h" />
+    <ClInclude Include="..\public\Em3000Body.h" />
+    <ClInclude Include="..\public\Em3000Parts.h" />
+    <ClInclude Include="..\public\Em3001.h" />
+    <ClInclude Include="..\public\Em3002.h" />
+    <ClInclude Include="..\public\Em3003.h" />
     <ClInclude Include="..\public\FireFlashEffect.h" />
     <ClInclude Include="..\public\MonsterAOE.h" />
     <ClInclude Include="..\public\MonsterSight.h" />
@@ -236,10 +242,12 @@
     <ClInclude Include="..\public\State2B_Sprint.h" />
     <ClInclude Include="..\public\State2B_Walk.h" />
     <ClInclude Include="..\public\StateEm0010.h" />
+    <ClInclude Include="..\public\StateEm0010_Attack.h" />
     <ClInclude Include="..\public\StateEm0010_Chase.h" />
     <ClInclude Include="..\public\StateEm0010_Dead.h" />
     <ClInclude Include="..\public\StateEm0010_Hit.h" />
     <ClInclude Include="..\public\StateEm0010_Idle.h" />
+    <ClInclude Include="..\public\StateEm0010_Walk.h" />
     <ClInclude Include="..\public\StateMachine.h" />
     <ClInclude Include="..\public\StateMonster.h" />
     <ClInclude Include="..\public\StaticCamera.h" />
@@ -251,7 +259,6 @@
     <ClInclude Include="..\public\WP3000Body.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="StateEm0010_Attack.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Bullet.cpp" />
@@ -261,6 +268,12 @@
     <ClCompile Include="..\private\Em0010.cpp" />
     <ClCompile Include="..\private\Em0010Body.cpp" />
     <ClCompile Include="..\private\Em0010Movement.cpp" />
+    <ClCompile Include="..\private\Em3000.cpp" />
+    <ClCompile Include="..\private\Em3000Body.cpp" />
+    <ClCompile Include="..\private\Em3000Parts.cpp" />
+    <ClCompile Include="..\private\Em3001.cpp" />
+    <ClCompile Include="..\private\Em3002.cpp" />
+    <ClCompile Include="..\private\Em3003.cpp" />
     <ClCompile Include="..\private\FireFlashEffect.cpp" />
     <ClCompile Include="..\private\MonsterAOE.cpp" />
     <ClCompile Include="..\private\MonsterSight.cpp" />
@@ -308,10 +321,12 @@
     <ClCompile Include="..\private\State2B_Sprint.cpp" />
     <ClCompile Include="..\private\State2B_Walk.cpp" />
     <ClCompile Include="..\private\StateEm0010.cpp" />
+    <ClCompile Include="..\private\StateEm0010_Attack.cpp" />
     <ClCompile Include="..\private\StateEm0010_Chase.cpp" />
     <ClCompile Include="..\private\StateEm0010_Dead.cpp" />
     <ClCompile Include="..\private\StateEm0010_Hit.cpp" />
     <ClCompile Include="..\private\StateEm0010_Idle.cpp" />
+    <ClCompile Include="..\private\StateEm0010_Walk.cpp" />
     <ClCompile Include="..\private\StateMachine.cpp" />
     <ClCompile Include="..\private\StateMonster.cpp" />
     <ClCompile Include="..\private\StaticCamera.cpp" />
@@ -329,7 +344,6 @@
       <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</IncludeInUnityFile>
       <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</IncludeInUnityFile>
     </ClCompile>
-    <ClCompile Include="StateEm0010_Attack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxAnimMesh.hlsl" />

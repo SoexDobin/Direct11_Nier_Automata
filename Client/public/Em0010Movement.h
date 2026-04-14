@@ -3,6 +3,7 @@
 
 NS_BEGIN(Engine)
 class Transform;
+class Navigation;
 NS_END
 
 NS_BEGIN(Client)
@@ -36,6 +37,18 @@ public:
 	const EM0010_MOVEMENT_DATA& Get_MovementData() const { return m_CurrentMoveData; }
 
 public:
+	Vector3 Get_RootPosition() const { return m_RootPosition; }
+	void Set_RootPosition(const Vector3& rootPos) { m_RootPosition = rootPos; }
+
+public:
+	void Set_TargetPosition(const Vector3& targetPos) {
+		m_TargetPosition = targetPos; m_HasWalkTarget = true;}
+	Vector3 Get_TargetPosition() const { return m_TargetPosition; }
+	void Clear_TargetPosition() { m_HasWalkTarget = false; }
+	Bool Has_WalkTarget() const { return m_HasWalkTarget; }
+	Bool Has_ReachedTarget(Float threshold = 1.0f) const;
+
+public:
 	explicit Em0010Movement();
 	explicit Em0010Movement(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Em0010Movement(const Em0010Movement& rhs);
@@ -54,7 +67,13 @@ private:
 	Vector3 m_LastGroundedRootPositionVelocity{ 0.f, 0.f, 0.f };
 
 private:
+	Vector3 m_RootPosition{};
+	Vector3 m_TargetPosition{};
+	Bool m_HasWalkTarget{ false };
+
+private:
 	Weak<Em0010> m_OwnerContainer{};
+	Weak<Navigation> m_Navigation{};
 
 public:
 	static Shared<Em0010Movement> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

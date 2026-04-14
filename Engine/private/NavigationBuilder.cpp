@@ -25,7 +25,7 @@ HRESULT NavigationBuilder::Begin()
 	return EngineManager::Begin();
 }
 
-vector<NavCellBinary> NavigationBuilder::Bake_For_Preview(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
+vector<NavCellBinary> NavigationBuilder::Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
 {
 	return Bake_Internal(model, worldMatrix, config, false);
 }
@@ -76,7 +76,7 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 	// 1. 모델에서 Raw 데이터 추출
 	vector<Float> rawPos;
 	vector<int32_t> rawIndices;
-	model->Extract_RawMeshForNavigation(rawPos, rawIndices);
+	model->Extract_RawMeshData(rawPos, rawIndices);
 
 	int32 numVertices = static_cast<int32>(rawPos.size() / 3);
 	int32 numTris = static_cast<int32>(rawIndices.size() / 3);

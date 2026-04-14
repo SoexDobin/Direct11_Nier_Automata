@@ -477,7 +477,7 @@ void NavHelper::BakePreview()
 	rcConfig cfg = Build_RcConfig();
 	Matrix worldMat = Build_WorldMatrix();
 
-	m_PreviewCells = NavigationBuilder::Bake_For_Preview(m_pSelectedModel, worldMat, cfg);
+	m_PreviewCells = GAME_INSTANCE->Bake_Navigation(m_pSelectedModel, worldMat, cfg);
 	m_HasPreview = !m_PreviewCells.empty();
 
 	if (m_HasPreview)
@@ -510,7 +510,7 @@ void NavHelper::SaveBinary()
 
 	string fileName = Helper::To_String(navDataDir) + string(m_SaveName) + ".nnav";
 
-	if (SUCCEEDED(NavigationBuilder::Export_Binary(fileName, m_pSelectedModel, worldMat, cfg)))
+	if (SUCCEEDED(GAME_INSTANCE->Export_Navigation(fileName, m_pSelectedModel, worldMat, cfg)))
 	{
 		string msg = "NavMesh exported: " + fileName;
 		LOG_INFO(L"[NavHelper] {}", Helper::To_wString(msg));

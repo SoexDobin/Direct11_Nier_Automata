@@ -126,7 +126,9 @@
     <ClInclude Include="..\public\InspectorCollider.h">
       <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\NavHelper.h" />
+    <ClInclude Include="..\public\NavHelper.h">
+      <Filter>01. EditorObject\NavHelper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -180,7 +182,9 @@
     <ClCompile Include="..\private\InspectorCollider.cpp">
       <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\NavHelper.cpp" />
+    <ClCompile Include="..\private\NavHelper.cpp">
+      <Filter>01. EditorObject\NavHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Editor.ico">

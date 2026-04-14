@@ -606,6 +606,21 @@ NavigationBuilder::NAV_BUILD_RESULT Game::Build_Navigation(const Float* vertices
     return m_NavigationBuilder->Build(vertices, numVertices, triangles, numTriangles, params);
 }
 
+vector<NavCellBinary> Game::Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+{
+    return m_NavigationBuilder->Bake_Navigation(model, worldMatrix, config);
+}
+
+HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+{
+    return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config);
+}
+
+vector<NavCell> Game::Import_Navigation(const string& filePath) const
+{
+    return m_NavigationBuilder->Import_Binary(filePath);
+}
+
 
 HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color) const
 {

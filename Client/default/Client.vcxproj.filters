@@ -196,9 +196,6 @@
     <ClInclude Include="..\public\StateEm0010_Dead.h">
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
     </ClInclude>
-    <ClInclude Include="StateEm0010_Attack.h">
-      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\StateEm0010_Chase.h">
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
     </ClInclude>
@@ -212,6 +209,30 @@
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Pl0000EvadeGhost.h" />
+    <ClInclude Include="..\public\StateEm0010_Walk.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3000.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm0010_Attack.h">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3000Body.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3000Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3001.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3001</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3000Parts.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3002.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3002</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3003.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3003</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -403,9 +424,6 @@
     <ClCompile Include="..\private\StateEm0010_Dead.cpp">
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
     </ClCompile>
-    <ClCompile Include="StateEm0010_Attack.cpp">
-      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\StateEm0010_Chase.cpp">
       <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
     </ClCompile>
@@ -419,6 +437,30 @@
       <Filter>02. GameObject\Entity\2B\2BPartObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000EvadeGhost.cpp" />
+    <ClCompile Include="..\private\StateEm0010_Walk.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000Parts.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm0010_Attack.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM0010\Em0010States</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000Body.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3000Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3001.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3001</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3002.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3002</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3003.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3003</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -517,9 +559,6 @@
     <Filter Include="02. GameObject\Entity\Monster">
       <UniqueIdentifier>{c932032b-94df-43d7-9e98-c5d255458cae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Entity\Monster\em3000">
-      <UniqueIdentifier>{5ec70d50-6408-4c69-9e76-c0a13d4af7c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Entity\Monster\MonsterStateMachine">
       <UniqueIdentifier>{0619a228-a997-4f4b-8dc0-2785409c7c66}</UniqueIdentifier>
     </Filter>
@@ -558,6 +597,24 @@
     </Filter>
     <Filter Include="99. Default">
       <UniqueIdentifier>{20b4df47-31ad-4c3f-b5ee-43f69137b03d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000">
+      <UniqueIdentifier>{5ec70d50-6408-4c69-9e76-c0a13d4af7c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000Parts">
+      <UniqueIdentifier>{1f213ca4-84c9-4c85-87a9-424090304d0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3000Body">
+      <UniqueIdentifier>{9749cf3e-ad49-43bb-b304-340aefbc3a0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3001">
+      <UniqueIdentifier>{c947b8af-df18-4ccf-ac24-415ae6a26153}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3002">
+      <UniqueIdentifier>{c0b9d8a9-063c-4bb9-9008-feaa7b5a9f84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000Parts\Em3003">
+      <UniqueIdentifier>{5960a74e-ebda-4a6b-aed3-fa26d1fecc5a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

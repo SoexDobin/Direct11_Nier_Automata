@@ -30,7 +30,8 @@ protected:
 	Weak<MonsterStateMachine> m_States{};
 
 protected:
-	const Float n_LeastDistance = 3.f;
+	const Float n_LeastDistance{ 3.f };
+	const Float n_WanderRadius{ 10.f };
 };
 
 NS_END

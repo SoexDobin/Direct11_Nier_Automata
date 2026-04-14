@@ -163,7 +163,7 @@ void MenuBar::Render(Bool isResize) {
                     ImGui::TextDisabled("/");
                     // 상단 가로축 헤더
                     for (size_t i = 0; i < layerCount; ++i) {
-                        ImGui::TableSetColumnIndex(i + 1);
+                        ImGui::TableSetColumnIndex(static_cast<int32>(i + 1));
                         ImGui::Text(activeLayers[layerCount - 1 - i].second.substr(0, 3).c_str());
                     }
                     // 행 그리기 (계단식)
@@ -175,11 +175,11 @@ void MenuBar::Render(Bool isResize) {
                         uint32 rowBit = activeLayers[row].first;
                         for (size_t col = 0; col < layerCount - row; ++col)
                         {
-                            ImGui::TableSetColumnIndex(col + 1);
+                            ImGui::TableSetColumnIndex(static_cast<int32>(col + 1));
                             uint32 colBit = activeLayers[layerCount - 1 - col].first;
 
                             bool isColliding = (layerReg->Get_GlobalMask(rowBit) & colBit) != 0;
-                            ImGui::PushID(row * 100 + col);
+                            ImGui::PushID(static_cast<int32>(row * 100 + col));
                             if (ImGui::Checkbox("##col_mat", &isColliding))
                             {
                                 // 상호 양방향 충돌 스위치 동시 처리

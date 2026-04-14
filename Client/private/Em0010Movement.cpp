@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Em0010Movement.h"
 #include "Em0010.h"
+#include "Navigation.h"
 #include <SpdLogger.h>
 
 Em0010Movement::Em0010Movement() : Movement{} {}
@@ -35,9 +36,29 @@ HRESULT Em0010Movement::Begin()
 			LOG_ERROR(L"Failed To Find Em0010 Container");
 			return E_FAIL;
 		}
+
+		m_Navigation = m_Owner.lock()->Get_Component<Navigation>();
+		if (m_Navigation.expired())
+		{
+			LOG_ERROR(L"Failed To Find Em0010 Navigation");
+			return E_FAIL;
+		}
 	}
 
 	return S_OK;
+}
+
+
+Bool Em0010Movement::Has_ReachedTarget(Float threshold) const
+{
+	if (!m_HasWalkTarget) return true;
+	if (m_Owner.expired()) return true;
+
+	Vector3 currentPos = m_Owner.lock()->Get_Transform()->Get_Position();
+	Vector3 diff = m_TargetPosition - currentPos;
+	diff.y = 0.f;
+
+	return diff.Length() <= threshold;
 }
 
 void Em0010Movement::Update_Movement(Float timeDelta)
@@ -113,7 +134,6 @@ void Em0010Movement::Update_Movement(Float timeDelta)
 		}
 	}
 
-	// 💡 Add hitstop scale:
 	worldMoveVelocity *= m_RootMotionScale;
 
 	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveVelocity * timeDelta + physicalDelta;
@@ -121,19 +141,38 @@ void Em0010Movement::Update_Movement(Float timeDelta)
 	nextPosition += m_CorrectionDelta;
 	Reset_Correction();
 
-	Float groundHeight = 0.f; // TODO: NavMesh 연동
-	if (nextPosition.y <= groundHeight)
+	if (auto nav = m_Navigation.lock())
 	{
-		nextPosition.y = groundHeight;
-		m_Velocity.y = 0.f;
-		m_IsGrounded = true;
+		Float groundHeight = -FLT_MAX;
+		Bool validNav = nav->Has_NeighborCell(nextPosition);
+
+		if (validNav)
+		{
+			groundHeight = nav->Get_HeightAtPoint(nextPosition);
+			nextPosition.y = groundHeight;
+
+			m_IsGrounded = true;
+			ownerTransform->Set_Position(nextPosition);
+		}
+		else
+		{
+			Vector3 rollbackPos = ownerTransform->Get_Position();
+
+			groundHeight = nav->Get_HeightAtPoint(rollbackPos);
+
+			if (rollbackPos.y <= groundHeight) {
+				rollbackPos.y = groundHeight;
+				m_IsGrounded = true;
+				m_Velocity = Vector3::Zero;
+			}
+
+			ownerTransform->Set_Position(rollbackPos);
+		}
 	}
 	else
 	{
-		m_IsGrounded = false;
+		ownerTransform->Set_Position(nextPosition);
 	}
-
-	ownerTransform->Set_Position(nextPosition);
 }
 
 Shared<Em0010Movement> Em0010Movement::Create(const ComPtr<ID3D11Device>& device,

@@ -67,7 +67,7 @@ public: /* Animation Tracker */
 	Bool Is_NotifyActive(const wstring & notifyName) const;
 
 public: /* Mesh Info */
-	void Extract_RawMeshForNavigation(_Out_ vector<Float>& outPositions, _Out_ vector<int32>& outIndices) const;
+	void Extract_RawMeshData(_Out_ vector<Float>& outPositions, _Out_ vector<int32>& outIndices) const;
 
 public: /* snap shot */
 	vector<BONE_SNAPSHOT> Get_SnapShot_BoneMatrices();
@@ -75,7 +75,7 @@ public: /* snap shot */
 public:
 	int32 Get_BoneIndexByName(const string& boneName) const;
 	Matrix Get_BoneMatrix(uint32 boneIndex) const; // 특정 부모 뼈대의 트랜스폼 가져오기
-	TRANSFORM_FRAME Get_RootTransformVelocity(uint32 nodeIndex) const;
+	const TRANSFORM_FRAME& Get_RootTransformVelocity(uint32 nodeIndex);
 	void Set_LocalRootNode(uint32 nodeIndex);
 
 	HRESULT Render(uint32 meshIndex);
@@ -93,6 +93,7 @@ private:
 	HRESULT Ready_Animation(ifstream& in);
 
 private:
+	TRANSFORM_FRAME m_TransformFrame{};
 	wstring	m_ModelTag{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };

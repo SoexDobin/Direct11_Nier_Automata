@@ -130,14 +130,13 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 
 	if (auto nav = m_Navigation.lock())
 	{
-		bool isInAir = !m_IsGrounded;
-		bool bValidNav = nav->Has_NeighborCell(nextPosition);
+		Bool validNav = nav->Has_NeighborCell(nextPosition);
 
-		if (isInAir || bValidNav)
+		if (!m_IsGrounded || validNav)
 		{
 			Float groundHeight = -FLT_MAX;
 			
-			if (bValidNav)
+			if (validNav)
 			{
 				groundHeight = nav->Get_HeightAtPoint(nextPosition);
 			}
@@ -184,7 +183,6 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 	}
 	else
 	{
-		LOG_ERROR(L"There is no Navigation");
 		ownerTransform->Set_Position(nextPosition);
 	}
 }

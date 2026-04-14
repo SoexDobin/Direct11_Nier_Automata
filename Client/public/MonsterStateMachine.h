@@ -17,7 +17,7 @@ public:
 	enum class MONSTER_STATE
 	{
 		IDLE,
-		MOVE,
+		WALK,
 
 		AWAIT,
 		ATTACK,

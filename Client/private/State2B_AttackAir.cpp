@@ -65,10 +65,8 @@ void State2B_AttackAir::Update(Float timeDelta)
 
 	Pl0000Movement::PL0000_MOVEMENT_DATA movementData{};
 	movementData.isMove = false;
-	movementData.isJump = true;
 	movementData.isAttack = true;
 	movementData.canRotation = false;
-	m_Movement.lock()->Set_MovementData(movementData);
 
 	// 만약 땅에 먼저 닿으면 LIGHT, HEAVY END 애니메이션 되면서 끝
 	if (m_Movement.lock()->Is_Grounded())
@@ -86,28 +84,40 @@ void State2B_AttackAir::Update(Float timeDelta)
 				m_LightWeapon.lock()->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_AIR_DOWN_END), 0.05f, false);
 			}
 
+			movementData.isJump = false;
+			movementData.useRootMotionDir = false;
+			m_Movement.lock()->Set_MovementData(movementData);
+
 			return;
 		}
 
-		if (false == m_EndAnim.contains(animIndex) || progress <= 0.1f) return;
+		if (false == m_EndAnim.contains(animIndex) || progress <= 0.1f)
+		{
+			movementData.isJump = false;
+			movementData.useRootMotionDir = false;
+			m_Movement.lock()->Set_MovementData(movementData);
+			return;
+		}
 
 		if (m_Input.lock()->Is_MousePress(DIMB::LBUTTON) || m_Input.lock()->Is_MousePress(DIMB::RBUTTON))
 		{
 			m_States.lock()->Change_State(Pl0000::PL0000_STATE::ATTACK_GROUND);
 			return;
 		}
-
-		if (m_Input.lock()->Is_WASD_SingleClickHold(0.5f) || m_Input.lock()->Is_WASD_Press())
+		else if (m_Input.lock()->Is_WASD_SingleClickHold(0.5f) || m_Input.lock()->Is_WASD_Press())
 		{
 			m_States.lock()->Change_State(Pl0000::PL0000_STATE::RUN);
 			return;
 		}
-
-		if (m_EndAnim.contains(animIndex) && isFinished)
+		else if (m_EndAnim.contains(animIndex) && isFinished)
 		{
 			m_States.lock()->Change_State(Pl0000::PL0000_STATE::IDLE);
 			return;
 		}
+
+		movementData.isJump = false;
+		movementData.useRootMotionDir = false;
+		m_Movement.lock()->Set_MovementData(movementData);
 	}
 	else
 	{
@@ -150,13 +160,10 @@ void State2B_AttackAir::Update(Float timeDelta)
 			pl0000Body->Set_Animation(ETOI(Pl0000::PL0000_STATE::HEAVY_AIR_DOWN_HOLD), 0.1f, true);
 			m_HeavyWeapon.lock()->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_AIR_DOWN_HOLD), 0.1f, true);
 		}
-			
-		else
-		{
-			//pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_AIR_DOWN_HOLD), 0.2f, true);
-			//m_LightWeapon.lock()->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_AIR_DOWN_HOLD), 0.2f, true);
-		}
 	}
+
+	movementData.isJump = true;
+	m_Movement.lock()->Set_MovementData(movementData);
 }
 
 void State2B_AttackAir::Late_Update(Float timeDelta)

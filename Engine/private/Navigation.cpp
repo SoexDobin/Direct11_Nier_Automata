@@ -78,10 +78,10 @@ HRESULT Navigation::Build_FromMesh(
 
 HRESULT Navigation::Load_FromBinary(const string& filePath)
 {
-	auto cells = NavigationBuilder::Import_Binary(filePath);
+	auto cells = GAME_INSTANCE->Import_Navigation(filePath);
 	if (cells.empty())
 	{
-		LOG_ERROR(L"[Navigation] Load_FromBinary 실패: {}",
+		LOG_ERROR(L"[Navigation] Load_FromBinary Failed : {}",
 			Helper::To_wString(filePath));
 		return E_FAIL;
 	}
@@ -131,14 +131,29 @@ void Navigation::Compute_Height(const Shared<Transform>& transform)
 
 void Navigation::Compute_CurrentCellByPosition(const Vector3& position)
 {
+	int32 bestIndex = -1;
+	Float minHeightDiff = FLT_MAX;
+
 	for (int32 i = 0; i < m_Cells.size(); ++i)
 	{
 		int32 neighborIndex = -1;
 		if (m_Cells[i].IsIn(position, &neighborIndex))
 		{
-			m_CurrentCellIndex = i;
-			return;
+			Float cellHeight = m_Cells[i].Compute_Height(position.x, position.z);
+			Float heightDiff = fabsf(position.y - cellHeight);
+
+			if (heightDiff < minHeightDiff)
+			{
+				minHeightDiff = heightDiff;
+				bestIndex = i;
+			}
 		}
+	}
+
+	if (bestIndex != -1)
+	{
+		m_CurrentCellIndex = bestIndex;
+		return;
 	}
 
 	LOG_WARN(L"[Navigation] Failed to find Navigation Cell at Initial Position!");

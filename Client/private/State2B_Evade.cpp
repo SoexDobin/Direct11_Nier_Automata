@@ -130,6 +130,7 @@ void State2B_Evade::Update(Float timeDelta)
 	Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
 	moveData.direction = Calculate_Direction();
 	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
+	m_Movement.lock()->Reduce_RootMotion(0.5f);
 
 	if (m_DashDir != DASH_DIR::FRONT)
 	{
@@ -213,6 +214,8 @@ void State2B_Evade::StateExitInvoke()
 		m_MainCamera.lock()->Set_FovY(m_OriginalFov);
 		m_OriginalFov = 0.f;
 	}
+
+	m_Movement.lock()->Reset_RootMotionStop();
 }
 
 void State2B_Evade::PlayEvadeSFX(EVADE_PHASE evadePhase) const

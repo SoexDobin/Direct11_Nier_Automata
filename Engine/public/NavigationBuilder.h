@@ -8,7 +8,7 @@ NS_BEGIN(Engine)
 
 class Model;
 
-class ENGINE_DLL NavigationBuilder final : public EngineManager
+class NavigationBuilder final : public EngineManager
 {
 public:
 	typedef struct tagNavBuildParamsDesc
@@ -47,15 +47,13 @@ public:
 	HRESULT Begin() override;
 
 public:
-	static vector<NavCellBinary> Bake_For_Preview(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
-	static HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
-	/// .nnav 바이너리를 읽어 NavCell 배열 생성 (Recast 이웃 정보 포함, SetUp_Neighbors 불필요)
-	static vector<NavCell> Import_Binary(const string& filePath);
+	vector<NavCellBinary> Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
+	HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
+	vector<NavCell> Import_Binary(const string& filePath);
 private:
 	static vector<NavCellBinary> Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors);
 
 public:
-	/// rcPolyMesh 기반 NavMesh 빌드 (maxVertsPerPoly=3, Recast 이웃 직접 사용)
 	NAV_BUILD_RESULT Build(
 		const Float* vertices, int32 numVertices,
 		const int32* triangles, int32 numTriangles,

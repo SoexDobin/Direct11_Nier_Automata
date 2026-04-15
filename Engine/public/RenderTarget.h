@@ -4,6 +4,7 @@
 NS_BEGIN(Engine)
 
 class Shader;
+class VIBuffer_Rect;
 
 class ENGINE_DLL RenderTarget final : public Object
 {
@@ -33,6 +34,13 @@ public:
 	static Shared<RenderTarget> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, 
 		uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
 	
+#ifdef _DEBUG
+private:
+	Matrix		m_WorldMatrix = {};
+public:
+	HRESULT Ready_Debug(Float x, Float y, Float sizeX, Float sizeY);
+	HRESULT Render_Debug(const Shared<VIBuffer_Rect>& buffer, const Shared<Shader>& shader) const;
+#endif
 };
 
 NS_END

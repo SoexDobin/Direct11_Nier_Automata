@@ -502,6 +502,10 @@ HRESULT Game::Add_Light(const LIGHT_DESC &lightDesc) const {
 HRESULT Game::Remove_Light(uint32 index) const {
   return m_LightManager->Remove_Light(index);
 }
+HRESULT Game::Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const
+{
+    return m_LightManager->Render_Lights(shader, buffer);
+}
 
 Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const {
     uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
@@ -627,6 +631,21 @@ HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uin
     return m_RenderTargetManager->Add_RenderTarget(renderTargetTag, sizeX, sizeY, pixelFormat, color);
 }
 
+HRESULT Game::Add_MultiRenderTarget(const wstring& multiRenderTargetTag, const wstring& renderTargetTag) const
+{
+    return m_RenderTargetManager->Add_MultiRenderTarget(multiRenderTargetTag, renderTargetTag);
+}
+
+HRESULT Game::Begin_MultiRenderTarget(const wstring& multiRenderTargetTag) const
+{
+    return m_RenderTargetManager->Begin_MultiRenderTarget(multiRenderTargetTag);
+}
+
+HRESULT Game::End_MultiRenderTarget() const
+{
+    return m_RenderTargetManager->End_MultiRenderTarget();
+}
+
 HRESULT Game::Bind_RenderTarget_ShaderResource(const Shared<Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const
 {
     return m_RenderTargetManager->Bind_ShaderResource(shader, constantName, renderTargetTag);
@@ -706,6 +725,16 @@ void Game::Render_CollisionDebug() const
 Bool Game::Toggle_RenderDebug() const
 {
     return m_CollisionManager->Toggle_DebugMode();
+}
+
+HRESULT Game::Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const
+{
+    return m_RenderTargetManager->Ready_RenderTarget_Debug(renderTargetTag, x, y, sizeX, sizeY);
+}
+
+HRESULT Game::Render_RenderTarget_Debug(const Shared<class VIBuffer_Rect>& buffer, const Shared<class Shader>& shader, const wstring& multiRenderTargetTag) const
+{
+    return m_RenderTargetManager->Render_RenderTarget_Debug(buffer, shader, multiRenderTargetTag);
 }
 
 #endif

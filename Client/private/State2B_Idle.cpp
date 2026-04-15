@@ -93,8 +93,8 @@ Bool State2B_Idle::StateEnterInvoke()
 			{
 				m_Body.lock()->Set_Animation(ETOI(Pl0000::PL0000_STATE::IDLE_Neutral), 0.2f, false);
 
-				m_LightWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_LightSheathingMatrix());
-				m_HeavyWeapon.lock()->Get_Transform()->Set_WorldMatrix(m_Owner.lock()->Get_HeavySheathingMatrix());
+				m_Owner.lock()->Sheathe_LightWeapon();
+				m_Owner.lock()->Sheathe_HeavyWeapon();
 				m_InitializeState = false;
 
 				return true;

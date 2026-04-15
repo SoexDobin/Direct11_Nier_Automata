@@ -130,7 +130,7 @@ void State2B_Evade::Update(Float timeDelta)
 	Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
 	moveData.direction = Calculate_Direction();
 	moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
-	m_Movement.lock()->Reduce_RootMotion(0.5f);
+	m_Movement.lock()->Reduce_RootMotion(0.25f);
 
 	if (m_DashDir != DASH_DIR::FRONT)
 	{

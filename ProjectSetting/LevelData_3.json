@@ -8,88 +8,6 @@
             {
               "properties": null,
               "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "Em0010",
-          "objectID": 4160192466,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em0010",
-          "transform": {
-            "position": [
-              65.0,
-              -18.0,
-              45.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em0010"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "CityOfRuins",
-          "objectID": 1208553506,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "CityOfRuins",
-          "transform": {
-            "position": [
-              50.0,
-              0.0,
-              100.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "CityOfRuins"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
             }
           ],
           "name": "ThirdPersonCamera",
@@ -115,45 +33,6 @@
             ]
           },
           "typeName": "ThirdPersonCamera"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "Em3000",
-          "objectID": 2943248738,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em3000",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              30.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em3000"
         },
         {
           "components": [
@@ -203,6 +82,166 @@
             {
               "properties": null,
               "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em3000",
+          "objectID": 2943248738,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em3000",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              30.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em3000"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em3100_2",
+          "objectID": 1331097783,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em3100",
+          "transform": {
+            "position": [
+              -5.0,
+              0.0,
+              27.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em3100"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "CityOfRuinEntry",
+          "objectID": 2254198226,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuinEntry",
+          "transform": {
+            "position": [
+              50.0,
+              0.0,
+              100.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuinEntry"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "CityOfRuinBridge",
+          "objectID": 695165170,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuinBridge",
+          "transform": {
+            "position": [
+              220.0,
+              0.0,
+              185.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuinBridge"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
             }
           ],
           "name": "Em0010_1",
@@ -318,16 +357,16 @@
               "typeName": "Navigation"
             }
           ],
-          "name": "Em0010_2",
-          "objectID": 4215260095,
+          "name": "Em0010",
+          "objectID": 4160192466,
           "parentObjectID": 0,
           "properties": null,
           "prototypeTag": "Em0010",
           "transform": {
             "position": [
-              71.69999694824219,
+              65.0,
               -18.0,
-              47.0
+              45.0
             ],
             "rotation": [
               0.0,
@@ -351,18 +390,22 @@
             {
               "properties": null,
               "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
             }
           ],
-          "name": "Em3100_2",
-          "objectID": 1331097783,
+          "name": "Em0010_2",
+          "objectID": 4215260095,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Em3100",
+          "prototypeTag": "Em0010",
           "transform": {
             "position": [
-              -5.0,
-              0.0,
-              27.5
+              71.69999694824219,
+              -18.0,
+              47.0
             ],
             "rotation": [
               0.0,
@@ -375,7 +418,7 @@
               1.0
             ]
           },
-          "typeName": "Em3100"
+          "typeName": "Em0010"
         }
       ]
     }

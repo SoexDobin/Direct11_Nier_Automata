@@ -2,7 +2,7 @@
 #include "Client_Function.h"
 #include <rttr/registration>
 
-#include "CityOfRuins.h"
+#include "CityOfRuinEntry.h"
 #include "LoadingBackground.h"
 #include "LoadingLogo.h"
 #include "LoadingPixelPanel.h"
@@ -28,6 +28,7 @@
 #include "SparkEffect.h"
 #include "FireFlashEffect.h"
 #include "Bullet.h"
+#include "CityOfRuinBridge.h"
 #include "HpBarWorldUI.h"
 #include "Em0010.h"
 #include "Em0010Body.h"
@@ -42,6 +43,8 @@
 #include "Em3001.h"
 #include "Em3002.h"
 #include "Em3003.h"
+#include "SheathWP0070Body.h"
+#include "SheathWP0220Body.h"
 
 using rttr::registration;
 
@@ -172,15 +175,30 @@ void Register_Client_Reflection() {
         .method("Clone", &Pl0000MonsterChecker::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000MonsterChecker::Create(device, context); })
         (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
-
-
-
-
-    rttr::registration::class_<CityOfRuins>("CityOfRuins")
+    rttr::registration::class_<SheathWP0070Body>("SheathWP0070Body")
         .constructor<>()
-        .method("Clone", &CityOfRuins::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuins::Create(device, context); })
+        .method("Clone", &SheathWP0070Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SheathWP0070Body::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<SheathWP0220Body>("SheathWP0220Body")
+        .constructor<>()
+        .method("Clone", &SheathWP0220Body::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SheathWP0220Body::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+
+
+    rttr::registration::class_<CityOfRuinEntry>("CityOfRuinEntry")
+        .constructor<>()
+        .method("Clone", &CityOfRuinEntry::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuinEntry::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<CityOfRuinBridge>("CityOfRuinBridge")
+        .constructor<>()
+        .method("Clone", &CityOfRuinBridge::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuinBridge::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
     // MONSTER
     rttr::registration::class_<Em3100>("Em3100")

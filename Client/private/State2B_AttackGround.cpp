@@ -33,7 +33,8 @@ Bool State2B_AttackGround::StateEnterInvoke()
 	moveData.useRootMotionDir = true;
 	m_Movement.lock()->Set_MovementData(moveData);
 
-	auto pl0000 = m_Body.lock();
+	auto pl0000 = m_Owner.lock();
+	auto pl0000Body = m_Body.lock();
 	auto lightWeapon = m_LightWeapon.lock();
 	auto heavyWeapon = m_HeavyWeapon.lock();
 	auto prevState = m_States.lock()->Get_CurP10000State();
@@ -47,9 +48,9 @@ Bool State2B_AttackGround::StateEnterInvoke()
 	case Pl0000::PL0000_STATE::IDLE: case Pl0000::PL0000_STATE::ATTACK_AIR:
 		if (clickLeft)
 		{
-			lightWeapon->DrawWP0070();
-			heavyWeapon->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
-			pl0000->Set_Animation(LIGHT_BODY[m_ComboStep], 0.05f, false);
+			pl0000->Draw_LightWeapon();
+			pl0000->Sheathe_HeavyWeapon();
+			pl0000Body->Set_Animation(LIGHT_BODY[m_ComboStep], 0.05f, false);
 			lightWeapon->Set_Animation(LIGHT_WP[m_ComboStep], 0.f, false);
 			m_LastOrderedAnimIndex = LIGHT_BODY[m_ComboStep];
 			
@@ -58,9 +59,9 @@ Bool State2B_AttackGround::StateEnterInvoke()
 		}
 		else
 		{
-			lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-			heavyWeapon->DrawWP0220();
-			pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
+			pl0000->Sheathe_LightWeapon();
+			pl0000->Draw_HeavyWeapon();
+			pl0000Body->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
 			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.f, false);
 			m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
 			
@@ -71,9 +72,9 @@ Bool State2B_AttackGround::StateEnterInvoke()
 	case Pl0000::PL0000_STATE::RUN: case Pl0000::PL0000_STATE::SPRINT: case Pl0000::PL0000_STATE::EVADE:
 		if (clickLeft)
 		{
-			lightWeapon->DrawWP0070();
-			heavyWeapon->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
-			pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN), 0.05f, false);
+			pl0000->Draw_LightWeapon();
+			pl0000->Sheathe_HeavyWeapon();
+			pl0000Body->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN), 0.05f, false);
 			lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_GROUND_RUN), 0.f, false);
 			m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN);
 
@@ -82,9 +83,9 @@ Bool State2B_AttackGround::StateEnterInvoke()
 		}
 		else
 		{
-			lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-			heavyWeapon->DrawWP0220();
-			pl0000->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
+			pl0000->Sheathe_LightWeapon();
+			pl0000->Draw_HeavyWeapon();
+			pl0000Body->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
 			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.f, false);
 			m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
 
@@ -114,8 +115,7 @@ void State2B_AttackGround::Update(Float timeDelta)
 		return;
 	}
 
-	//if (!m_EnterAnim.contains(animIndex))
-		Execute_Attack();
+	Execute_Attack();
 
 	if (input->Is_MousePress(DIMB::LBUTTON) ||
 		input->Is_MousePress(DIMB::RBUTTON) ||
@@ -126,7 +126,6 @@ void State2B_AttackGround::Update(Float timeDelta)
 		return; // 이하 RUN 등 탈출 로직 완전 무시
 	}
 
-	// Attack 빠져나가기
 	if (m_CanExitProgress[animIndex] >= pl0000->Get_AnimationProgress()) return;
 
 	if (input->Is_WASD_Press())
@@ -163,42 +162,36 @@ void State2B_AttackGround::Late_Update(Float timeDelta)
 
 void State2B_AttackGround::StateExitInvoke()
 {
-	if (auto lightWp = m_LightWeapon.lock())
-	{
-		lightWp->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-	}
-		
-	if (auto heavyWp = m_HeavyWeapon.lock())
-	{
-		heavyWp->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
-	}
+	m_Owner.lock()->Sheathe_LightWeapon();
+	m_Owner.lock()->Sheathe_HeavyWeapon();
 		
 	m_Movement.lock()->Reset_RootMotionStop();
 }
 
 void State2B_AttackGround::Execute_Attack()
 {
-	auto pl0000 = m_Body.lock();
+	auto pl0000 = m_Owner.lock();
+	auto pl0000Body = m_Body.lock();
 	auto input = m_Input.lock();
 	auto lightWeapon = m_LightWeapon.lock();
 	auto heavyWeapon = m_HeavyWeapon.lock();
-	uint32 actualAnimIndex = pl0000->Get_CurrentAnimationIndex();
+	uint32 actualAnimIndex = pl0000Body->Get_CurrentAnimationIndex();
 	Float blendDuration = 0.15f;
 
 	if (m_IsHeavyCharge)
 	{
 		if (input->Is_MouseUp(DIMB::RBUTTON) || !input->Is_MousePress(DIMB::RBUTTON))
 		{
-			if (m_HeavyChargeDelta >= 2.f) // 풀차지
+			if (m_HeavyChargeDelta >= n_ChargeDelta) // 풀차지
 			{
 				m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_FULL);
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
 				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_GROUND_HOLD_FULL), blendDuration, false);
 			}
 			else // 미완성 차지
 			{
 				m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_UNFULL);
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
 				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_GROUND_HOLD_UNFULL), blendDuration, false);
 			}
 
@@ -220,9 +213,9 @@ void State2B_AttackGround::Execute_Attack()
 			m_IsHeavyCharge = true;
 			m_HeavyChargeDelta = 0.f;
 			m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND_HOLD_CYCLE);
-			pl0000->Set_Animation(m_LastOrderedAnimIndex, 0.2f, true);
-			lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-			heavyWeapon->DrawWP0220();
+			pl0000Body->Set_Animation(m_LastOrderedAnimIndex, 0.2f, true);
+			pl0000->Sheathe_LightWeapon();
+			pl0000->Draw_HeavyWeapon();
 			heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_GROUND_HOLD_CYCLE), 0.3f, true);
 			m_ComboStep = 0;
 			m_PrevComboType = COMBO_TYPE::HEAVY;
@@ -235,7 +228,7 @@ void State2B_AttackGround::Execute_Attack()
 		// 내가 틀라고 명령한 애니메이션으로 아직 모델이 완전히 전환되지 않았다면? 클릭 판정을 아예 보류.
 		if (actualAnimIndex != m_LastOrderedAnimIndex) return;
 		// 전환이 완료되었다면 진행률(isExitProgress) 검사 수행
-		Bool isExitProgress = pl0000->Get_AnimationProgress() >= m_CanComboProgress[actualAnimIndex];
+		Bool isExitProgress = pl0000Body->Get_AnimationProgress() >= m_CanComboProgress[actualAnimIndex];
 		if (false == isExitProgress) return;
 	}
 
@@ -254,9 +247,9 @@ void State2B_AttackGround::Execute_Attack()
 				if (actualAnimIndex != ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_HOLD))
 				{
 					m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_HOLD);
-					pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+					pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
 					lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_GROUND_HOLD), blendDuration, false);
-					lightWeapon->DrawWP0070();
+					pl0000->Draw_LightWeapon();
 					m_ComboStep = 0;
 					m_PrevComboType = COMBO_TYPE::LIGHT;
 					break; // 홀드 했으면 콤보 흐름 강제 중단
@@ -265,19 +258,20 @@ void State2B_AttackGround::Execute_Attack()
 			else if (m_ComboStep == 0) // 루트 진입 (0타)
 			{
 				m_LastOrderedAnimIndex = LIGHT_BODY[0];
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
 				if (lightWeapon->Is_Sheathing()) lightWeapon->DrawWP0070();
 				lightWeapon->Set_Animation(LIGHT_WP[0], blendDuration, false);
-				heavyWeapon->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
+				pl0000->Sheathe_HeavyWeapon();
 
 				m_ComboStep = 1;
 			}
 			else if (m_ComboStep < 7) // 1~6타
 			{
 				m_LastOrderedAnimIndex = LIGHT_BODY[m_ComboStep];
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
 				lightWeapon->Set_Animation(LIGHT_WP[m_ComboStep], blendDuration, false);
-				lightWeapon->DrawWP0070();
+				pl0000->Draw_LightWeapon();
+
 				m_ComboStep++;
 			}
 			break;
@@ -285,10 +279,10 @@ void State2B_AttackGround::Execute_Attack()
 			// 강공 및 기타 상태에서 좌클릭 시 리셋 안정성 보장
 			m_ComboStep = 0;
 			m_LastOrderedAnimIndex = LIGHT_BODY[m_ComboStep];
-			pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
-			lightWeapon->DrawWP0070();
+			pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+			pl0000->Draw_LightWeapon();
 			lightWeapon->Set_Animation(LIGHT_WP[m_ComboStep], blendDuration, false);
-			heavyWeapon->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
+			pl0000->Sheathe_HeavyWeapon();
 
 			m_PrevComboType = COMBO_TYPE::LIGHT;
 			m_ComboStep = 1;
@@ -303,9 +297,9 @@ void State2B_AttackGround::Execute_Attack()
 			if (m_ComboStep == 0) // 루트 진입 (0타)
 			{
 				m_LastOrderedAnimIndex = HEAVY_BODY[0];
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
-				if (heavyWeapon->Is_Sheathing()) heavyWeapon->DrawWP0220();
-				lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+				if (heavyWeapon->Is_Sheathing()) pl0000->Draw_HeavyWeapon();
+				pl0000->Sheathe_LightWeapon();
 				heavyWeapon->Set_Animation(HEAVY_WP[0], blendDuration, false);
 	
 				m_ComboStep = 1;
@@ -313,9 +307,9 @@ void State2B_AttackGround::Execute_Attack()
 			else if (m_ComboStep < 3) // 강공 1, 2타
 			{
 				m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
-				lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-				heavyWeapon->DrawWP0220();
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+				pl0000->Sheathe_LightWeapon();
+				pl0000->Draw_HeavyWeapon();
 				heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], blendDuration, false);
 
 				m_ComboStep++;
@@ -325,10 +319,10 @@ void State2B_AttackGround::Execute_Attack()
 			if (m_ComboStep != 0 && m_ComboStep < 7)
 			{
 				m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::LIGHT_HEAVY_COMBO);
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, 0.1f, false);
-				lightWeapon->DrawWP0070();
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, 0.1f, false);
+				pl0000->Draw_LightWeapon();
 				lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_COMBO), 0.1f, false);
-				heavyWeapon->DrawWP0220();
+				pl0000->Draw_HeavyWeapon();
 				heavyWeapon->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_COMBO), 0.1f, false);
 	
 				m_ComboStep = -1;
@@ -338,10 +332,10 @@ void State2B_AttackGround::Execute_Attack()
 			{
 				m_ComboStep = 0;
 				m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
-				pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
-				lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
+				pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+				pl0000->Sheathe_LightWeapon();
 				heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], blendDuration, false);
-				heavyWeapon->DrawWP0220();
+				pl0000->Draw_HeavyWeapon();
 
 				m_ComboStep = 1;
 				m_PrevComboType = COMBO_TYPE::HEAVY;
@@ -352,10 +346,10 @@ void State2B_AttackGround::Execute_Attack()
 			// 교차 콤보 직후 우클 누를 때 정상적인 첫 타 복귀
 			m_ComboStep = 0;
 			m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
-			pl0000->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
-			lightWeapon->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
+			pl0000Body->Set_Animation(m_LastOrderedAnimIndex, blendDuration, false);
+			pl0000->Sheathe_LightWeapon();
 			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], blendDuration, false);
-			heavyWeapon->DrawWP0220();
+			pl0000->Draw_HeavyWeapon();
 
 			m_ComboStep = 1;
 			m_PrevComboType = COMBO_TYPE::HEAVY;
@@ -375,7 +369,7 @@ void State2B_AttackGround::Set_AnimationExitProgress()
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND4), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND4), 0.1f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND5), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND5), 0.1f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND6), 0.1f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND6), 0.1f);
-	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.5f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.3f);
+	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.5f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND7), 0.4f);
 
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.65f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_HOLD), 0.3f);
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_GROUND_RUN), 0.25f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_GROUND_RUN), 0.15f);

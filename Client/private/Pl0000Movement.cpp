@@ -7,6 +7,7 @@
 #include "Pl0000Input.h"
 #include "Pl0000.h"
 #include "Navigation.h"
+#include "NavigationManager.h"
 
 Pl0000Movement::Pl0000Movement() : Movement{} {}
 Pl0000Movement::Pl0000Movement(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

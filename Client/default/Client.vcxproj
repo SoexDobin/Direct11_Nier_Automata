@@ -182,7 +182,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Bullet.h" />
-    <ClInclude Include="..\public\CityOfRuins.h" />
+    <ClInclude Include="..\public\CityOfRuinBridge.h" />
+    <ClInclude Include="..\public\CityOfRuinEntry.h" />
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
@@ -217,6 +218,7 @@
     <ClInclude Include="..\public\Monster.h" />
     <ClInclude Include="..\public\MonsterStateMachine.h" />
     <ClInclude Include="..\public\Movement.h" />
+    <ClInclude Include="..\public\NavigationManager.h" />
     <ClInclude Include="..\public\ParticleEffect.h" />
     <ClInclude Include="..\public\Pl0000.h" />
     <ClInclude Include="..\public\Pl0000Body.h" />
@@ -229,6 +231,8 @@
     <ClInclude Include="..\public\Pl0000StateMachine.h" />
     <ClInclude Include="..\public\Pl0000Movement.h" />
     <ClInclude Include="..\public\Projectile.h" />
+    <ClInclude Include="..\public\SheathWP0070Body.h" />
+    <ClInclude Include="..\public\SheathWP0220Body.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\public\SparkEffect.h" />
@@ -263,7 +267,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Bullet.cpp" />
-    <ClCompile Include="..\private\CityOfRuins.cpp" />
+    <ClCompile Include="..\private\CityOfRuinBridge.cpp" />
+    <ClCompile Include="..\private\CityOfRuinEntry.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
     <ClCompile Include="..\private\Em0010.cpp" />
@@ -297,6 +302,7 @@
     <ClCompile Include="..\private\Monster.cpp" />
     <ClCompile Include="..\private\MonsterStateMachine.cpp" />
     <ClCompile Include="..\private\Movement.cpp" />
+    <ClCompile Include="..\private\NavigationManager.cpp" />
     <ClCompile Include="..\private\ParticleEffect.cpp" />
     <ClCompile Include="..\private\Pl0000.cpp" />
     <ClCompile Include="..\private\Pl0000Body.cpp" />
@@ -309,6 +315,8 @@
     <ClCompile Include="..\private\Pl0000Movement.cpp" />
     <ClCompile Include="..\private\Pl0000Shockwave.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />
+    <ClCompile Include="..\private\SheathWP0070Body.cpp" />
+    <ClCompile Include="..\private\SheathWP0220Body.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\private\SparkEffect.cpp" />

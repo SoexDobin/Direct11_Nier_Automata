@@ -44,7 +44,7 @@ public:
 	Bool Has_NeighborCell(const Vector3& position);
 	void Compute_Height(const Shared<Transform>& transform);
 	Float Get_HeightAtPoint(const Vector3& position) const;
-	void Compute_CurrentCellByPosition(const Vector3& position);
+	Bool Compute_CurrentCellByPosition(const Vector3& position);
 
 public:
 	uint32 Get_NumCells() const { return static_cast<uint32>(m_Cells.size()); }

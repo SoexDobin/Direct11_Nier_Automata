@@ -94,6 +94,8 @@ void WP0220Body::Fixed_Update(Float fixedDelta)
 
 HRESULT WP0220Body::Render()
 {
+	if (m_IsActive == false) return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -114,8 +116,8 @@ HRESULT WP0220Body::Render()
 
 void WP0220Body::Submit_RenderGroup()
 {
-	if (Is_Active())
-		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	if (m_IsActive == false) return;
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
 void WP0220Body::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -189,7 +191,7 @@ void WP0220Body::Impact_Shockwave(const Vector3& offset)
 	dmgInfo.attackType = ATK_TYPE::HEAVY;
 	dmgInfo.hitPosition = truePos;
 	dmgInfo.hitRotation = Quaternion::Identity;
-	dmgInfo.knockbackForce = 5.f;
+	dmgInfo.knockbackForce = 3.5f;
 
 	Pl0000Shockwave::PLAYER_SHOCKWAVE_DESC desc{};
 	desc.damageInfo = dmgInfo;
@@ -198,24 +200,17 @@ void WP0220Body::Impact_Shockwave(const Vector3& offset)
 	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", ETOI(LEVEL::GAMEPLAY), &desc);
 }
 
-void WP0220Body::Set_Sheathing(const Matrix& sheathMatrix)
+void WP0220Body::Set_Sheathing()
 {
-	m_Transform->Set_WorldMatrix(sheathMatrix);
-
 	if (m_IsSheathing) return;
-
 	m_AttackCollider->Set_Active(false);
-	m_Model->Set_Animation(ETOI(WP0220_STATE::SHEATHE_HEAVY), 0);
-	m_Model->Set_AnimLoop(false);
-	m_Transform->Set_WorldMatrix(sheathMatrix);
 	m_IsSheathing = true;
 }
 
 void WP0220Body::DrawWP0220()
 {
 	if (m_IsSheathing == false) return;
-
-	m_Transform->Set_WorldMatrix(Matrix::Identity);
+	m_AttackCollider->Set_Active(true);
 	m_IsSheathing = false;
 }
 

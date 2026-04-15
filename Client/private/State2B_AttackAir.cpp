@@ -47,8 +47,8 @@ Bool State2B_AttackAir::StateEnterInvoke()
 	m_Movement.lock()->Add_Force(Vector3{ 0.f, 5.f, 0.f });
 
 	pl0000Body->Set_Animation(ETOI(Pl0000::PL0000_STATE::HEAVY_AIR_DOWN_ENTER), 0.2f, false);
-	m_LightWeapon.lock()->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-	m_HeavyWeapon.lock()->DrawWP0220();
+	pl0000->Sheathe_LightWeapon();
+	pl0000->Draw_HeavyWeapon();
 	m_HeavyWeapon.lock()->Set_Animation(ETOI(WP0220Body::WP0220_STATE::HEAVY_AIR_DOWN_ENTER), 0.2f, false);
 
 	return true;
@@ -173,8 +173,8 @@ void State2B_AttackAir::Late_Update(Float timeDelta)
 
 void State2B_AttackAir::StateExitInvoke()
 {
-	m_LightWeapon.lock()->Set_Sheathing(m_Owner.lock()->Get_LightSheathingMatrix());
-	m_HeavyWeapon.lock()->Set_Sheathing(m_Owner.lock()->Get_HeavySheathingMatrix());
+	m_Owner.lock()->Sheathe_LightWeapon();
+	m_Owner.lock()->Sheathe_HeavyWeapon();
 	m_Movement.lock()->Reset_RootMotionStop();
 	m_Movement.lock()->Set_Gravity(30.f);
 }

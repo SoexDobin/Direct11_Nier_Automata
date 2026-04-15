@@ -20,7 +20,7 @@ public:
 		Float agentRadius			{ 0.6f };		// 캐릭터 반경 (wu)			// 벽에서 NavCell 경계가 안쪽으로 침식 (Erode)
 		Float agentMaxClimb			{ 0.8f };		// 오를 수 있는 단차 (wu)		// 값↑이면 높은 턱도 NavCell 연결
 		
-		int32 maxEdgeLen			{ 12 };			
+		int32 maxEdgeLen			{ 12 };			 
 		int32 minRegionArea			{ 8 };			// 최소 리전 면적				// ↑ 크면: 작은 섬, 고립된 NavCell 제거
 		int32 mergeRegionArea		{ 20 };
 

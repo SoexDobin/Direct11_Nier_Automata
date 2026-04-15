@@ -129,7 +129,7 @@ void Navigation::Compute_Height(const Shared<Transform>& transform)
 	transform->Set_Position(pos.x, y, pos.z);
 }
 
-void Navigation::Compute_CurrentCellByPosition(const Vector3& position)
+Bool Navigation::Compute_CurrentCellByPosition(const Vector3& position)
 {
 	int32 bestIndex = -1;
 	Float minHeightDiff = FLT_MAX;
@@ -153,11 +153,12 @@ void Navigation::Compute_CurrentCellByPosition(const Vector3& position)
 	if (bestIndex != -1)
 	{
 		m_CurrentCellIndex = bestIndex;
-		return;
+		return true;
 	}
 
 	LOG_WARN(L"[Navigation] Failed to find Navigation Cell at Initial Position!");
 	m_CurrentCellIndex = 0;
+	return false;
 }
 
 Float Navigation::Get_HeightAtPoint(const Vector3& position) const

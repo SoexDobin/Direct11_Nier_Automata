@@ -7,7 +7,10 @@
 #include "Model.h"
 #include "OBBCollider.h"
 #include "Entity.h"
+#include "Navigation.h"
 #include "Monster.h"
+#include "Pl0000.h"
+#include "Pl0000Shockwave.h"
 
 WP0070Body::WP0070Body() : Pl0000Parts{} {}
 WP0070Body::WP0070Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -51,7 +54,7 @@ HRESULT WP0070Body::Initialize(void* arg)
 	}
 	
 	m_Model->Set_LocalRootNode(m_RootBoneIndex);
-
+	m_Pl0000 = static_pointer_cast<Pl0000>(m_Owner.lock());
 	return S_OK;
 }
 
@@ -62,7 +65,7 @@ void WP0070Body::On_Destroy()
 
 void WP0070Body::Priority_Update(Float timeDelta)
 {
-
+	
 }
 
 void WP0070Body::Update(Float timeDelta)
@@ -71,22 +74,63 @@ void WP0070Body::Update(Float timeDelta)
 	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
 		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
 	}
+
 	m_Model->Update_ModelAnimation(actualTimeDelta);
-
-	if (m_IsSheathing == false)
-	{
-		TRANSFORM_FRAME rootVelocity = m_Model->Get_RootTransformVelocity(m_WeaponBoneIndex);
-
-	}
 }
 
 void WP0070Body::Late_Update(Float timeDelta)
 {
+	uint32 animIndex = m_Model->Get_AnimationIndex();
+	Bool isFinished = m_Model->Is_AnimationFinished();
+
+	if (!m_DetachTransform
+		&& animIndex == ETOI(WP0070_STATE::LIGHT_GROUND7)
+		&& isFinished)
+	{
+		m_DetachTransform = true;
+	}
+
+	if (m_DetachTransform)
+	{
+		if (!m_DetachTransform)
+		{
+			m_DetachTransform = true;
+		}
+
+		if (!m_IsHitTheGround)
+		{
+			Float speed = 50.f;
+		
+			Vector3 lookDir = m_Pl0000.lock()->Get_Body()->Get_Transform()->Get_Look();
+			lookDir.y = 0.f;
+			lookDir.Normalize();
+
+			Quaternion quat = Quaternion::CreateFromAxisAngle(Vector3::UnitX, 45.f);
+
+			lookDir = Vector3::Transform(lookDir, quat);
+
+			m_CombinedWorldMatrix *= Matrix::CreateTranslation(lookDir * speed * timeDelta);
+			Vector3 worldNextPos = m_CombinedWorldMatrix.Translation();
+
+			if (worldNextPos.y <= m_Owner.lock()->Get_Transform()->Get_Position().y - 1.5f)
+			{
+				m_IsHitTheGround = true;
+
+				GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10);
+				GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Impact7", SOUNDCHANNEL::CHANNEL_10, 0.5f);
+				Impact_Shockwave(Vector3::Zero);
+
+				return;
+			}
+		}
+		Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);
+		m_AttackCollider->Update(boneMatrix * m_CombinedWorldMatrix);
+		return;
+	}
+
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
-	
 	Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);
 	m_AttackCollider->Update(boneMatrix * m_CombinedWorldMatrix);
-	
 }
 
 void WP0070Body::Fixed_Update(Float fixedDelta)
@@ -96,6 +140,8 @@ void WP0070Body::Fixed_Update(Float fixedDelta)
 
 HRESULT WP0070Body::Render()
 {
+	if (m_IsActive == false) return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -116,6 +162,7 @@ HRESULT WP0070Body::Render()
 
 void WP0070Body::Submit_RenderGroup()
 {
+	if (m_IsActive == false) return;
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
@@ -170,17 +217,16 @@ void WP0070Body::OnCollisionExit(const Shared<Collider>& ownCollider, const Shar
 	
 }
 
-void WP0070Body::Set_Sheathing(const Matrix& sheathMatrix)
+void WP0070Body::Set_Sheathing()
 {
-	m_Transform->Set_WorldMatrix(sheathMatrix);
+	m_DetachTransform = false;
+	m_IsHitTheGround = false;
 
 	if (m_IsSheathing) return;
 
 	m_AttackCollider->Set_Active(false);
-	m_Model->Set_Animation(ETOI(WP0070_STATE::SHEATHE_LIGHT), 0);
-	m_Model->Set_AnimLoop(false);
-	m_Transform->Set_WorldMatrix(sheathMatrix);
 	m_IsSheathing = true;
+	m_IsActive = false;
 }
 
 void WP0070Body::DrawWP0070()
@@ -193,6 +239,9 @@ void WP0070Body::DrawWP0070()
 
 void WP0070Body::Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop)
 {
+	m_DetachTransform = false;
+	m_IsHitTheGround = false;
+
 	m_Transform->Set_WorldMatrix(Matrix::Identity);
 	Pl0000Parts::Set_Animation(animIndex, blendDuration, isLoop);
 	m_Model->Update_ModelAnimation(0.001f);
@@ -210,9 +259,31 @@ void WP0070Body::DeActive_LightWeapon()
 	m_HitEntities.clear();
 }
 
+void WP0070Body::Impact_Shockwave(const Vector3& offset)
+{
+	Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);
+	Matrix worldMatrix = boneMatrix * m_CombinedWorldMatrix;
+
+	Vector3 truePos = Vector3::Transform(offset, worldMatrix);
+
+	Entity::DAMAGE_INFO dmgInfo{};
+	dmgInfo.attacker = m_Owner.lock();
+	dmgInfo.damage = 125.f;
+	dmgInfo.groggyWeight = 125.f;
+	dmgInfo.attackType = ATK_TYPE::LIGHT;
+	dmgInfo.hitPosition = truePos;
+	dmgInfo.hitRotation = Quaternion::Identity;
+	dmgInfo.knockbackForce = 2.f;
+
+	Pl0000Shockwave::PLAYER_SHOCKWAVE_DESC desc{};
+	desc.damageInfo = dmgInfo;
+	desc.position = truePos;
+	desc.radius = 2.f;
+	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", ETOI(LEVEL::GAMEPLAY), &desc);
+}
+
 HRESULT WP0070Body::Bind_ShaderResources()
 {
-
 	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
@@ -220,19 +291,6 @@ HRESULT WP0070Body::Bind_ShaderResources()
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
-		return E_FAIL;
-
-	const LIGHT_DESC* lightDesc = GAME_INSTANCE->Get_LightDesc(0);
-	if (nullptr == lightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_Shader->Bind_RawValue(DirectionLight, &lightDesc->direction, sizeof(Float4))))
-		return E_FAIL;
-	if (FAILED(m_Shader->Bind_RawValue(DiffuseLight, &lightDesc->diffuse, sizeof(Float4))))
-		return E_FAIL;
-	if (FAILED(m_Shader->Bind_RawValue(AmbientLight, &lightDesc->ambient, sizeof(Float4))))
-		return E_FAIL;
-	if (FAILED(m_Shader->Bind_RawValue(SpecularLight, &lightDesc->specular, sizeof(Float4))))
 		return E_FAIL;
 
 	return S_OK;
@@ -323,11 +381,11 @@ HRESULT WP0070Body::Ready_AnimationNotify()
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0070_STATE::LIGHT_GROUND6), {
-	Notify{ L"Sound_Stop", 25, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_9); } },
-	Notify{ L"Sound_Stop", 25, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
-	Notify{ L"Sound_Catch", 25, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Catch6", SOUNDCHANNEL::CHANNEL_9, 0.3f); } },
-	Notify{ L"Sound_Swing", 25, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Swing6", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
-		Notify{L"Swing6", 30, 50, active, deActive },
+	Notify{ L"Sound_Stop", 20, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_9); } },
+	Notify{ L"Sound_Stop", 20, []() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_10); } },
+	Notify{ L"Sound_Catch", 20, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Catch6", SOUNDCHANNEL::CHANNEL_9, 0.3f); } },
+	Notify{ L"Sound_Swing", 20, []() { GAME_INSTANCE->PlaySoundFXOnce(L"Wp0070_Swing6", SOUNDCHANNEL::CHANNEL_10, 0.5f); } },
+		Notify{L"Swing6", 20, 50, active, deActive },
 		});
 
 	m_Model->Add_AnimNotify(ETOI(WP0070_STATE::LIGHT_GROUND7), {

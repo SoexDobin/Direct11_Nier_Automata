@@ -4,8 +4,10 @@
 #include "EditorManager.h"
 #include "ModelViewer.h"
 #include "ClientSettingManager.h"
-#include "ModelViewer.h"
-
+#include "InputDevice.h"    
+#include "CollisionManager.h"
+#include "Navigation.h"
+#include "NavHelper.h"
 
 
 MenuBar::MenuBar() {}
@@ -15,16 +17,27 @@ HRESULT MenuBar::Initialize() {
     m_Game = GAME_INSTANCE;
     return EditorObject::Initialize();
 }
-void MenuBar::Update(Bool isResize) { EditorObject::Update(isResize); }
+void MenuBar::Update(Bool isResize)
+{
+    Update_HotKey();
+	EditorObject::Update(isResize);
+}
 void MenuBar::Render(Bool isResize) {
   EditorObject::Render(isResize);
 	if (ImGui::BeginMainMenuBar()) {
+
+        Render_Debug(); // Debug Rays
+
         if (ImGui::BeginMenu("WindowSetting")) {
           ImGui::Separator();
 
           Bool showModelViewer = EDITOR->Get_ModelViewer()->Is_Enabled();
           if (ImGui::MenuItem("Model Viewer", nullptr, showModelViewer))
               EDITOR->Get_ModelViewer()->Set_Enable(!showModelViewer);
+
+          Bool showNavHelper = EDITOR->Get_NavHelper()->Is_Enabled();
+          if (ImGui::MenuItem("NavMesh Builder", nullptr, showNavHelper))
+              EDITOR->Get_NavHelper()->Set_Enable(!showNavHelper);
 
           ImGui::MenuItem("Project Settings", nullptr, &m_ShowProjectSettings);
 
@@ -143,30 +156,30 @@ void MenuBar::Render(Bool isResize) {
                 size_t layerCount = activeLayers.size();
 
                 // 표(Table) UI 생성
-                if (layerCount > 0 && ImGui::BeginTable("CollisionMatrixTable", layerCount + 1, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))
+                if (layerCount > 0 && ImGui::BeginTable("CollisionMatrixTable", static_cast<int32>(layerCount + 1), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))
                 {
                     ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
                     ImGui::TableSetColumnIndex(0);
                     ImGui::TextDisabled("/");
                     // 상단 가로축 헤더
-                    for (int i = 0; i < layerCount; ++i) {
-                        ImGui::TableSetColumnIndex(i + 1);
+                    for (size_t i = 0; i < layerCount; ++i) {
+                        ImGui::TableSetColumnIndex(static_cast<int32>(i + 1));
                         ImGui::Text(activeLayers[layerCount - 1 - i].second.substr(0, 3).c_str());
                     }
                     // 행 그리기 (계단식)
-                    for (int row = 0; row < layerCount; ++row)
+                    for (size_t row = 0; row < layerCount; ++row)
                     {
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         ImGui::Text(activeLayers[row].second.c_str()); // 좌측 세로축 헤더
                         uint32 rowBit = activeLayers[row].first;
-                        for (int col = 0; col < layerCount - row; ++col)
+                        for (size_t col = 0; col < layerCount - row; ++col)
                         {
-                            ImGui::TableSetColumnIndex(col + 1);
+                            ImGui::TableSetColumnIndex(static_cast<int32>(col + 1));
                             uint32 colBit = activeLayers[layerCount - 1 - col].first;
 
                             bool isColliding = (layerReg->Get_GlobalMask(rowBit) & colBit) != 0;
-                            ImGui::PushID(row * 100 + col);
+                            ImGui::PushID(static_cast<int32>(row * 100 + col));
                             if (ImGui::Checkbox("##col_mat", &isColliding))
                             {
                                 // 상호 양방향 충돌 스위치 동시 처리
@@ -186,6 +199,43 @@ void MenuBar::Render(Bool isResize) {
             }
         }
         ImGui::End();
+    }
+}
+
+void MenuBar::Update_HotKey()
+{
+    Bool currF1 = (GAME_INSTANCE->Get_DIKeyState(DIK_F1) & 0x80) != 0;
+    Bool currF2 = (GAME_INSTANCE->Get_DIKeyState(DIK_F2) & 0x80) != 0;
+
+    if (currF1 && !m_PrevF1)
+    {
+        auto result = GAME_INSTANCE->Toggle_RenderDebug();
+    }
+
+    if (currF2 && !m_PrevF2)
+    {
+        Navigation::Toggle_DebugRender();
+    }
+
+    m_PrevF1 = currF1;
+    m_PrevF2 = currF2;
+}
+
+void MenuBar::Render_Debug()
+{
+    if (ImGui::BeginMenu("Debug"))
+    {
+        Bool colDebug = GAME_INSTANCE->Toggle_RenderDebug();
+
+        if (ImGui::MenuItem("Toggle DebugRender Collider", "F1", &colDebug))
+			;
+
+        Bool navDebug = Navigation::Get_DebugRender();
+        if (ImGui::MenuItem("Toggle DebugRender Navigation", "F2", &navDebug))
+            ;
+        
+
+        ImGui::EndMenu();
     }
 }
 

@@ -52,6 +52,9 @@
     <Filter Include="01. EditorObject\Inspector\InspectorObject">
       <UniqueIdentifier>{ecb36892-4de6-4d99-baad-03bc79b2c23d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. EditorObject\NavHelper">
+      <UniqueIdentifier>{c3efd76b-9f24-4593-af6e-c47ed8b01265}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\EditorApp.h">
@@ -123,6 +126,9 @@
     <ClInclude Include="..\public\InspectorCollider.h">
       <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\NavHelper.h">
+      <Filter>01. EditorObject\NavHelper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -175,6 +181,9 @@
     </ClCompile>
     <ClCompile Include="..\private\InspectorCollider.cpp">
       <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\NavHelper.cpp">
+      <Filter>01. EditorObject\NavHelper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

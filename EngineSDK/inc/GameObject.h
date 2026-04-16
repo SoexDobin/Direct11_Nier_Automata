@@ -93,6 +93,12 @@ public:
         return static_pointer_cast<T>(Add_Component(levIndex, Helper::To_wString(rttr::type::get<T>().get_name()), arg));
     }
 
+    template <typename T>
+    Shared<T> Add_Component_Tag(uint32 levIndex, const wstring& prototypeTag, void* arg = nullptr)
+    {
+        return static_pointer_cast<T>(Add_Component(levIndex, prototypeTag, arg));
+    }
+
 public:
      template <typename T> requires is_base_of_v<Component, T>
       	Shared<T> Get_Component() {

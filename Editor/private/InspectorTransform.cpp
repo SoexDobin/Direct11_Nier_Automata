@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "InspectorTransform.h"
+
+#include <ContainerObject.h>
+#include <PartObject.h>
+
 #include "EditorManager.h"
 #include "Transform.h"
 
@@ -11,38 +15,56 @@ HRESULT InspectorTransform::Initialize()
     return S_OK;
 }
 
-void InspectorTransform::RenderComponent(const Shared<Transform>& pTransform)
+void InspectorTransform::RenderComponent(const Shared<Transform>& transform)
 {
-	if (!pTransform) return;
+	if (!transform) return;
 
     if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        Vector3 pos = pTransform->Get_LocalPosition();
-        Vector3 rot = pTransform->Get_LocalEulerAngles();
-        Vector3 scale = pTransform->Get_LocalScale();
+        Vector3 pos = transform->Get_LocalPosition();
+        Vector3 rot = transform->Get_LocalEulerAngles();
+        Vector3 scale = transform->Get_LocalScale();
 
         ImGui::Text("Position");
         ImGui::PushItemWidth(-1);
-        if (ImGui::DragFloat3("##Pos", reinterpret_cast<float*>(&pos), 0.1f)) {
-            pTransform->Set_LocalPositionByValue(pos);
+        if (ImGui::DragFloat3("##Pos", reinterpret_cast<Float*>(&pos), 0.1f)) {
+            transform->Set_LocalPositionByValue(pos);
+            CheckPart(transform->Get_Owner());
         }
         ImGui::PopItemWidth();
 
         ImGui::Text("Rotation (Degrees)");
         ImGui::PushItemWidth(-1);
-        if (ImGui::DragFloat3("##Rot", reinterpret_cast<float*>(&rot), 1.0f, 0.0f, 360.0f)) {
-            pTransform->Set_LocalEulerAngleByValue(rot);
+        if (ImGui::DragFloat3("##Rot", reinterpret_cast<Float*>(&rot), 1.0f, 0.0f, 360.0f)) {
+            transform->Set_LocalEulerAngleByValue(rot);
+            CheckPart(transform->Get_Owner());
         }
         ImGui::PopItemWidth();
 
         ImGui::Text("Scale");
         ImGui::PushItemWidth(-1);
-        if (ImGui::DragFloat3("##Scale", reinterpret_cast<float*>(&scale), 0.05f, 0.001f, 100.0f)) {
-            pTransform->Set_LocalScaleByValue(scale);
+        if (ImGui::DragFloat3("##Scale", reinterpret_cast<Float*>(&scale), 0.05f, 0.001f, 100.0f)) {
+            transform->Set_LocalScaleByValue(scale);
+            CheckPart(transform->Get_Owner());
         }
         ImGui::PopItemWidth();
 
         ImGui::Spacing();
+    }
+}
+
+void InspectorTransform::CheckPart(const Shared<GameObject>& isPart)
+{
+    auto owner = isPart;
+    if (owner->Get_GameObjectType() == GAMEOBJECTTYPE::CONTAINER)
+    {
+        auto container = static_pointer_cast<ContainerObject>(owner);
+        for (auto part : container->Get_PartObjects())
+        {
+            part->Get_Transform()->Update_WorldMatrix();
+            part->Update(0.f);
+            part->Late_Update(0.f);
+        }
     }
 }
 

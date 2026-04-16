@@ -35,6 +35,7 @@ public:
 public:
 	HRESULT Add_PartObject(uint32 prototypeLevIndex, const wstring& prototypeTag, const wstring& partTag, void* arg = nullptr); 
 	Shared<PartObject> Find_PartObject(const wstring& partTag);
+	vector<Shared<PartObject>> Get_PartObjects();
 
 protected:
 	unordered_map<wstring, Shared<PartObject>> m_PartObjects;

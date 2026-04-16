@@ -15,10 +15,17 @@ public:
 	void Render(Bool isResize) override;
 
 private:
+	void Update_HotKey();
+	void Render_Debug();
+
+private:
 	Shared<Game> m_Game = { nullptr };
 	char m_Title[MAX_PATH] = "client";
 
 	Bool m_ShowProjectSettings = false;
+
+	Bool m_PrevF1 = false;
+	Bool m_PrevF2 = false;
 
 public:
 	static Shared<MenuBar> Create();

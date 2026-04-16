@@ -3,6 +3,9 @@
 
 NS_BEGIN(Engine)
 
+class Shader;
+class VIBuffer_Rect;
+
 class Light final : public Object
 {
 	NO_COPY(Light)
@@ -22,6 +25,9 @@ public:
 	void On_Enable() override { Object::On_Enable(); }
 	void Set_Active(Bool isActive) override { Object::Set_Active(isActive); }
 	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
+
+public:
+	HRESULT Render(const Shared<Shader>& shader, const Shared<VIBuffer_Rect>& buffer);
 
 private:
 	LIGHT_DESC m_LightDesc = {};

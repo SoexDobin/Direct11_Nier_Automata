@@ -2,6 +2,7 @@
 
 #include "Shader.h"
 #include "SpdLogger.h"
+#include "VIBuffer_Rect.h"
 
 RenderTarget::RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: m_Device{device}, m_Context{context}
@@ -52,9 +53,7 @@ void RenderTarget::Clear_RenderTarget() const
 	m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), m_ClearColor);
 }
 
-Shared<RenderTarget> RenderTarget::Create(const ComPtr<ID3D11Device>& device,
-	const ComPtr<ID3D11DeviceContext>& context, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat,
-	const Color& clearColor)
+Shared<RenderTarget> RenderTarget::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor)
 {
 	auto renderTarget = make_shared<RenderTarget>(device, context);
 
@@ -66,3 +65,33 @@ Shared<RenderTarget> RenderTarget::Create(const ComPtr<ID3D11Device>& device,
 
 	return renderTarget;
 }
+
+#ifdef _DEBUG
+HRESULT RenderTarget::Ready_Debug(Float x, Float y, Float sizeX, Float sizeY)
+{
+	uint32			numViewports = { 1 };
+	D3D11_VIEWPORT	viewportDesc{};
+	m_Context->RSGetViewports(&numViewports, &viewportDesc);
+
+	m_WorldMatrix = Matrix::Identity;
+
+	m_WorldMatrix._11 = sizeX;
+	m_WorldMatrix._22 = sizeY;
+
+	m_WorldMatrix._41 = x - viewportDesc.Width * 0.5f;
+	m_WorldMatrix._42 = -y + viewportDesc.Height * 0.5f;
+
+	return S_OK;
+}
+
+HRESULT RenderTarget::Render_Debug(const Shared<VIBuffer_Rect>& buffer, const Shared<Shader>& shader) const
+{
+	shader->Bind_Matrix(WorldMatrix, &m_WorldMatrix);
+	shader->Bind_SRV(DefaultMap, m_ShaderResourceView);
+	shader->Begin(0);
+	buffer->Bind_Resources();
+	buffer->Render();
+
+	return S_OK;
+}
+#endif

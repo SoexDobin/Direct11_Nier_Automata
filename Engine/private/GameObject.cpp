@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "Game.h"
 #include "ID_Helper.h"
+#include "Navigation.h"
 #include "ScriptComponent.h"
 #include "SpdLogger.h"
 #include "Transform.h"
@@ -240,25 +241,31 @@ void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& inst
             }
         }
         comp->Post_Load(instanceMap);
+
+        // 네비게이션 위치 후처리
+        if (comp->Get_ComponentType() == COMPONENT_TYPE::NAVIGATION)
+        {
+            static_pointer_cast<Navigation>(comp)->Compute_CurrentCellByPosition(m_Transform->Get_Position());
+        }
     }
 }
 
 HRESULT GameObject::Remove_Child(const Shared<GameObject> &child) {
-  if (m_IsDestroy)
+    if (m_IsDestroy)
+      return S_OK;
+
+    auto it = std::find(m_Children.begin(), m_Children.end(), child);
+    if (it == m_Children.end())
+      return E_FAIL;
+
+    m_Children.erase(it);
     return S_OK;
-
-  auto it = std::find(m_Children.begin(), m_Children.end(), child);
-  if (it == m_Children.end())
-    return E_FAIL;
-
-  m_Children.erase(it);
-  return S_OK;
 }
 
 Shared<GameObject> GameObject::Get_Parent() const {
-  if (m_Parent.expired())
-    return nullptr;
-  return m_Parent.lock();
+    if (m_Parent.expired())
+		return nullptr;
+    return m_Parent.lock();
 }
 
 const vector<Shared<GameObject>> &GameObject::Get_Children() const {

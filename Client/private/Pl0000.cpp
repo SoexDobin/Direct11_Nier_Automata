@@ -4,11 +4,15 @@
 #include <Game.h>
 #include <SpdLogger.h>
 #include <SphereCollider.h>
+#include <Navigation.h>
 
 #include "Bullet.h"
+#include "Monster.h"
 #include "Pl0000Body.h"
 #include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
+#include "SheathWP0070Body.h"
+#include "SheathWP0220Body.h"
 #include "State2B_AttackAir.h"
 #include "State2B_AttackGround.h"
 #include "WP3000Body.h"
@@ -28,6 +32,66 @@ Pl0000::Pl0000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCont
 	: Entity{ device, context } {}
 Pl0000::Pl0000(const Pl0000& rhs)
 	: Entity{ rhs } {}
+
+void Pl0000::Set_Navigation(const Shared<Navigation>& linkedNavigation)
+{
+	m_Navigation = linkedNavigation;
+}
+
+void Pl0000::Draw_LightWeapon()
+{
+	if (m_LightWeapon)
+	{
+		m_LightWeapon->Set_Active(true);
+		m_LightWeapon->DrawWP0070();
+	}
+	
+	if (m_SheathLightWeapon)
+	{
+		m_SheathLightWeapon->Set_Active(false);
+	}
+}
+void Pl0000::Sheathe_LightWeapon()
+{
+	if (m_LightWeapon)
+	{
+		m_LightWeapon->Set_Active(false);
+		m_LightWeapon->Set_Sheathing(); 
+	}
+
+	if (m_SheathLightWeapon)
+	{
+		m_SheathLightWeapon->Set_Active(true);
+	}
+}
+
+void Pl0000::Draw_HeavyWeapon()
+{
+	if (m_HeavyWeapon)
+	{
+		m_HeavyWeapon->Set_Active(true);
+		m_HeavyWeapon->DrawWP0220();
+	}
+
+	if (m_SheathHeavyWeapon)
+	{
+		m_SheathHeavyWeapon->Set_Active(false);
+	}
+}
+
+void Pl0000::Sheathe_HeavyWeapon()
+{
+	if (m_HeavyWeapon)
+	{
+		m_HeavyWeapon->Set_Active(false);
+		m_HeavyWeapon->Set_Sheathing();
+	}
+
+	if (m_SheathHeavyWeapon)
+	{
+		m_SheathHeavyWeapon->Set_Active(true);
+	}
+}
 
 HRESULT Pl0000::Initialize_Prototype()
 {
@@ -146,7 +210,6 @@ void Pl0000::Late_Update(Float timeDelta)
 		timeDelta *= 0.05f;
 
 	m_Pl0000Movement->Update_Movement(timeDelta);
-
 	m_Transform->Update_WorldMatrix();
 	m_PhysicalZone->Update(m_Transform->Get_WorldMatrix());
 }
@@ -174,9 +237,17 @@ void Pl0000::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 void Pl0000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	auto target = targetCollider->Get_Owner();
-	auto targetLayers = target->Get_LayerMask();
-	auto targetTags = target->Get_TagMask();
+	auto targetLayerName = target->Get_LayerMask().Get_LayerName();
 
+	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::CONTAINER ||
+		targetLayerName != L"MonsterPhysical")
+		return;
+	
+	if (static_pointer_cast<Monster>(target)->Is_Static())
+	{
+		Vector3 pushOutDelta = PushoutDelta(ownCollider, targetCollider, 1.f);
+		m_Pl0000Movement->Add_Correction(pushOutDelta);
+	}
 }
 
 void Pl0000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -229,14 +300,7 @@ Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
 }
 
 HRESULT Pl0000::Ready_PartObjects()
-{
-	m_LightSheathMatrix =
-		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationZ(XMConvertToRadians(-30.f)) *
-		Matrix::CreateTranslation(Vector3{ 0.f, 1.5f, -0.4f });
-	m_HeavySheathMatrix = 
-		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * Matrix::CreateRotationY(XMConvertToRadians(-40.f))  * Matrix::CreateRotationZ(XMConvertToRadians(-20.f)) *
-		Matrix::CreateTranslation(Vector3{ 0.f, 1.0f, -0.5f });
-
+{	
 	Pl0000Body::Pl0000BODY_DESC desc{};
 	desc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 	desc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
@@ -245,7 +309,11 @@ HRESULT Pl0000::Ready_PartObjects()
 		return E_FAIL;
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0070Body", L"WP0070Body", &desc)))
 		return E_FAIL;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"SheathWP0070Body", L"SheathWP0070Body", &desc)))
+		return E_FAIL;
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body", &desc)))
+		return E_FAIL;
+	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"SheathWP0220Body", L"SheathWP0220Body", &desc)))
 		return E_FAIL;
 	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP3000Body", L"WP3000Body", &desc)))
 		return E_FAIL;
@@ -257,12 +325,10 @@ HRESULT Pl0000::Ready_PartObjects()
 	m_MainBody = static_pointer_cast<Pl0000Body>(Find_PartObject(L"Pl0000Body"));
 	m_MonsterChecker = static_pointer_cast<Pl0000MonsterChecker>(Find_PartObject(L"Pl0000MonsterChecker"));
 
-	auto wp0070 = static_pointer_cast<WP0070Body>(Find_PartObject(L"WP0070Body"));
-	wp0070->DrawWP0070();
-	wp0070->Set_Sheathing(m_LightSheathMatrix);
-	auto wp0220 = static_pointer_cast<WP0220Body>(Find_PartObject(L"WP0220Body"));
-	wp0220->DrawWP0220();
-	wp0220->Set_Sheathing(m_HeavySheathMatrix);
+	m_LightWeapon = static_pointer_cast<WP0070Body>(Find_PartObject(L"WP0070Body"));
+	m_SheathLightWeapon = static_pointer_cast<SheathWP0070Body>(Find_PartObject(L"SheathWP0070Body"));
+	m_HeavyWeapon = static_pointer_cast<WP0220Body>(Find_PartObject(L"WP0220Body"));
+	m_SheathHeavyWeapon = static_pointer_cast<SheathWP0220Body>(Find_PartObject(L"SheathWP0220Body"));
 
 	auto wp3000 = static_pointer_cast<WP3000Body>(Find_PartObject(L"WP3000Body"));
 	wp3000->Set_Pl0000Container(static_pointer_cast<Pl0000>(shared_from_this()));
@@ -285,6 +351,10 @@ HRESULT Pl0000::Ready_Components()
 	m_Pl0000Movement = Add_Component<Pl0000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
 	if (nullptr == m_Pl0000Movement)
 		return E_FAIL;
+
+	Navigation::NAVIGATION_DESC navDesc;
+	navDesc.startCellIndex = 0;
+	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
 
 	// StateMachine은 마지막에 처리
 	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(ETOI(LEVEL::GAMEPLAY))))

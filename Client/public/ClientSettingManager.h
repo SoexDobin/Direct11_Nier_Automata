@@ -32,6 +32,9 @@ public: /* Sound */
 	HRESULT Load_Sound_FromJson() const;
 	HRESULT Sync_SoundJson_FromCSV() const;
 
+public: /* Navigation */
+	HRESULT Load_Navigation_FromBinary() const;
+
 public:
 	HRESULT Ready_Client_Prototypes(LEVEL level) const;
 	HRESULT Load_EngineDesc(ENGINE_DESC& outDesc) const;

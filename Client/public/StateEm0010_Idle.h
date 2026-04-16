@@ -19,8 +19,14 @@ public:
 	void StateExitInvoke() override;
 
 private:
+	void Update_Wander(Float timeDelta);
+
+private:
 	Bool m_InitializeState{ true };
 	unordered_set<uint32> m_EnterAnim;
+
+	Vector3 m_RootPosition{};
+	Float m_WanderTimer{};
 
 public:
 	static Shared<StateEm0010_Idle> Create(const wstring& tag, const Shared<Em0010>& owner);

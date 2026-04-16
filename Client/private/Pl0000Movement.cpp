@@ -6,7 +6,8 @@
 #include "Camera.h"
 #include "Pl0000Input.h"
 #include "Pl0000.h"
-#include "Pl0000StateMachine.h"
+#include "Navigation.h"
+#include "NavigationManager.h"
 
 Pl0000Movement::Pl0000Movement() : Movement{} {}
 Pl0000Movement::Pl0000Movement(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -46,6 +47,13 @@ HRESULT Pl0000Movement::Begin()
 			LOG_ERROR(L"Failed To Find Pl0000Input");
 			return E_FAIL;
 		}
+
+		m_Navigation = m_Owner.lock()->Get_Component<Navigation>();
+		if (m_Navigation.expired())
+		{
+			LOG_ERROR(L"Failed To Find Pl0000 Navigation");
+			return E_FAIL;
+		}
 	}
 
 	return S_OK;
@@ -53,7 +61,7 @@ HRESULT Pl0000Movement::Begin()
 
 void Pl0000Movement::Update_Movement(Float timeDelta)
 {
-	if (m_Owner.expired() || m_Input.expired()) return;
+	if (m_Owner.expired() || m_Input.expired() || m_Navigation.expired()) return;
 
 	Shared<Transform> ownerTransform = m_Owner.lock()->Get_Transform();
 
@@ -104,40 +112,83 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 		}
 	}
 	
-	Vector3 worldMoveDelta{};
+	Vector3 worldMoveVelocity{};
 	if (m_CurrentMoveData.useRootMotionDir)
 	{
-		worldMoveDelta = Vector3::Transform(rootPositionVelocity * -1.f, ownerTransform->Get_Quaternion());
+		worldMoveVelocity = Vector3::Transform(rootPositionVelocity * -1.f, ownerTransform->Get_Quaternion());
 	}
 	else
 	{
 		Float rootSpeed = rootPositionVelocity.Length();
-		worldMoveDelta = m_CurrentMoveData.direction * rootSpeed;
+		worldMoveVelocity = m_CurrentMoveData.direction * rootSpeed;
 	}
 
-	// 💡 루트 모션 스케일 적용 (타격 시 m_RootMotionScale = 0.1f 가 되어 1/10 속도로 느리게 전진)
-	worldMoveDelta *= m_RootMotionScale;
+	worldMoveVelocity *= m_RootMotionScale;
 	
-	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveDelta * timeDelta + physicsDelta;
+	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveVelocity * timeDelta + physicsDelta;
 	nextPosition += m_CorrectionDelta;
 	Reset_Correction();
 
-	Float groundHeight = 0.f; // TODO Nav메시를 통한 y축 판별
-	if (nextPosition.y <= groundHeight) {
-		nextPosition.y = groundHeight;
-		//m_Velocity.y = 0.f;
-		m_Velocity = Vector3::Zero;
-		m_IsGrounded = true;
-	}
-	else {
-		m_IsGrounded = false;
-	}
+	if (auto nav = m_Navigation.lock())
+	{
+		Bool validNav = nav->Has_NeighborCell(nextPosition);
 
-	ownerTransform->Set_Position(nextPosition);
+		if (!m_IsGrounded || validNav)
+		{
+			Float groundHeight = -FLT_MAX;
+			
+			if (validNav)
+			{
+				groundHeight = nav->Get_HeightAtPoint(nextPosition);
+			}
+			else
+			{
+				// 공중에서 점프하여 NavMesh 구역을 벗어난 경우 (또는 다른 섬으로 건너뛰는 경우)
+				// 밑에 유효한 셀이 있는지 글로벌 탐색 시도
+				nav->Compute_CurrentCellByPosition(nextPosition);
+				if (nav->Get_CurrentCellIndex() != -1)
+				{
+					groundHeight = nav->Get_HeightAtPoint(nextPosition);
+				}
+			}
+
+			if (nextPosition.y <= groundHeight)
+			{
+				nextPosition.y = groundHeight;
+				m_Velocity = Vector3::Zero;
+				m_IsGrounded = true;
+			}
+			else
+			{
+				m_IsGrounded = false;
+			}
+
+			ownerTransform->Set_Position(nextPosition);
+		}
+		else
+		{
+			// 지상에서 벗어나려 한 경우 (보이지 않는 벽) => X,Z축 롤백 수행
+			Vector3 rollbackPos = ownerTransform->Get_Position();
+
+			rollbackPos.y += physicsDelta.y;
+
+			Float groundHeight = nav->Get_HeightAtPoint(rollbackPos);
+			if (rollbackPos.y <= groundHeight) {
+				rollbackPos.y = groundHeight;
+				m_IsGrounded = true;
+				m_Velocity = Vector3::Zero;
+			}
+
+			ownerTransform->Set_Position(rollbackPos);
+		}
+	}
+	else
+	{
+		ownerTransform->Set_Position(nextPosition);
+	}
 }
 
-Shared<Pl0000Movement> Pl0000Movement::Create(const ComPtr<ID3D11Device>& device,
-                                              const ComPtr<ID3D11DeviceContext>& context)
+Shared<Pl0000Movement> Pl0000Movement::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
 	auto prototype = make_shared<Pl0000Movement>(device, context);
 

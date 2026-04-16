@@ -11,6 +11,7 @@
     "spdlog",
     "python3",
     "rttr",
-    "effects11"
+    "effects11",
+    "recastnavigation"
   ]
 }

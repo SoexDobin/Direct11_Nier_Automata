@@ -4,8 +4,9 @@
 NS_BEGIN(Engine)
 
 class Shader;
+class VIBuffer_Rect;
 
-class RenderTarget final : public Object
+class ENGINE_DLL RenderTarget final : public Object
 {
 public:
 	explicit RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -16,8 +17,8 @@ public:
 	HRESULT Begin() override;
 	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; };
 
-public:
 	ComPtr<ID3D11RenderTargetView> Get_RenderTargetView() const { return m_RenderTargetView; }
+	ComPtr<ID3D11ShaderResourceView> Get_ShaderResourceView() const { return m_ShaderResourceView; }
 	HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const;
 	void Clear_RenderTarget() const;
 
@@ -33,6 +34,13 @@ public:
 	static Shared<RenderTarget> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, 
 		uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
 	
+#ifdef _DEBUG
+private:
+	Matrix		m_WorldMatrix = {};
+public:
+	HRESULT Ready_Debug(Float x, Float y, Float sizeX, Float sizeY);
+	HRESULT Render_Debug(const Shared<VIBuffer_Rect>& buffer, const Shared<Shader>& shader) const;
+#endif
 };
 
 NS_END

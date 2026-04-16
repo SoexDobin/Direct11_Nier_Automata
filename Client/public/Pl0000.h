@@ -8,17 +8,21 @@ NS_BEGIN(Engine)
 	class Shader;
     class Model;
     class SphereCollider;
+    class Navigation;
 }
 
 NS_BEGIN(Client)
+	class SheathWP0070Body;
+	class SheathWP0220Body;
+
 	class Pl0000MonsterChecker;
 	class Pl0000EvadeChecker;
 
 	class Pl0000Movement;
-class Pl0000StateMachine;
-class Pl0000Body;
-class WP0070Body;
-class WP0220Body;
+    class Pl0000StateMachine;
+    class Pl0000Body;
+    class WP0070Body;
+    class WP0220Body;
 
 class CLIENT_DLL Pl0000 final : public Entity
 {
@@ -35,10 +39,16 @@ public:
 	~Pl0000() override = default;
 
 public: /* pl0000 */
+    Shared<Pl0000Body> Get_Body() const { return m_MainBody; }
     Shared<GameObject> Get_ClosestTarget() const { return m_MonsterChecker->Get_ClosestTarget(); }
     TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
-    const Matrix& Get_LightSheathingMatrix() const { return m_LightSheathMatrix; }
-    const Matrix& Get_HeavySheathingMatrix() const { return m_HeavySheathMatrix; }
+    void Set_Navigation(const Shared<Navigation>& linkedNavigation);
+
+public:
+    void Draw_LightWeapon();
+    void Sheathe_LightWeapon();
+    void Draw_HeavyWeapon();
+    void Sheathe_HeavyWeapon();
 
 public:
     HRESULT Initialize_Prototype() override;
@@ -78,14 +88,16 @@ private:
     Shared<Pl0000Body> m_MainBody{ nullptr };
     Shared<Pl0000MonsterChecker> m_MonsterChecker{ nullptr };
 
+    Shared<WP0070Body> m_LightWeapon{ nullptr };
+    Shared<WP0220Body> m_HeavyWeapon{ nullptr };
+    Shared<SheathWP0070Body> m_SheathLightWeapon{ nullptr };
+    Shared<SheathWP0220Body> m_SheathHeavyWeapon{ nullptr };
+
     Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
     Shared<SphereCollider> m_PhysicalZone{ nullptr };
-
-private:
-    Matrix m_LightSheathMatrix{};
-    Matrix m_HeavySheathMatrix{};
+    Shared<Navigation> m_Navigation{ nullptr };
 
 public:
 	static Shared<Pl0000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

@@ -182,13 +182,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Bullet.h" />
-    <ClInclude Include="..\public\CityOfRuins.h" />
+    <ClInclude Include="..\public\CityOfRuinBridge.h" />
+    <ClInclude Include="..\public\CityOfRuinEntry.h" />
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
     <ClInclude Include="..\public\Em0010.h" />
     <ClInclude Include="..\public\Em0010Body.h" />
     <ClInclude Include="..\public\Em0010Movement.h" />
+    <ClInclude Include="..\public\Em3000.h" />
+    <ClInclude Include="..\public\Em3000Body.h" />
+    <ClInclude Include="..\public\Em3000Movement.h" />
+    <ClInclude Include="..\public\Em3000Parts.h" />
+    <ClInclude Include="..\public\Em3001.h" />
+    <ClInclude Include="..\public\Em3002.h" />
+    <ClInclude Include="..\public\Em3003.h" />
     <ClInclude Include="..\public\FireFlashEffect.h" />
     <ClInclude Include="..\public\MonsterAOE.h" />
     <ClInclude Include="..\public\MonsterSight.h" />
@@ -210,6 +218,7 @@
     <ClInclude Include="..\public\Monster.h" />
     <ClInclude Include="..\public\MonsterStateMachine.h" />
     <ClInclude Include="..\public\Movement.h" />
+    <ClInclude Include="..\public\NavigationManager.h" />
     <ClInclude Include="..\public\ParticleEffect.h" />
     <ClInclude Include="..\public\Pl0000.h" />
     <ClInclude Include="..\public\Pl0000Body.h" />
@@ -222,6 +231,8 @@
     <ClInclude Include="..\public\Pl0000StateMachine.h" />
     <ClInclude Include="..\public\Pl0000Movement.h" />
     <ClInclude Include="..\public\Projectile.h" />
+    <ClInclude Include="..\public\SheathWP0070Body.h" />
+    <ClInclude Include="..\public\SheathWP0220Body.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\SkySphere.h" />
     <ClInclude Include="..\public\SparkEffect.h" />
@@ -236,10 +247,12 @@
     <ClInclude Include="..\public\State2B_Sprint.h" />
     <ClInclude Include="..\public\State2B_Walk.h" />
     <ClInclude Include="..\public\StateEm0010.h" />
+    <ClInclude Include="..\public\StateEm0010_Attack.h" />
     <ClInclude Include="..\public\StateEm0010_Chase.h" />
     <ClInclude Include="..\public\StateEm0010_Dead.h" />
     <ClInclude Include="..\public\StateEm0010_Hit.h" />
     <ClInclude Include="..\public\StateEm0010_Idle.h" />
+    <ClInclude Include="..\public\StateEm0010_Walk.h" />
     <ClInclude Include="..\public\StateMachine.h" />
     <ClInclude Include="..\public\StateMonster.h" />
     <ClInclude Include="..\public\StaticCamera.h" />
@@ -251,16 +264,23 @@
     <ClInclude Include="..\public\WP3000Body.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="StateEm0010_Attack.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Bullet.cpp" />
-    <ClCompile Include="..\private\CityOfRuins.cpp" />
+    <ClCompile Include="..\private\CityOfRuinBridge.cpp" />
+    <ClCompile Include="..\private\CityOfRuinEntry.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
     <ClCompile Include="..\private\Em0010.cpp" />
     <ClCompile Include="..\private\Em0010Body.cpp" />
     <ClCompile Include="..\private\Em0010Movement.cpp" />
+    <ClCompile Include="..\private\Em3000.cpp" />
+    <ClCompile Include="..\private\Em3000Body.cpp" />
+    <ClCompile Include="..\private\Em3000Movement.cpp" />
+    <ClCompile Include="..\private\Em3000Parts.cpp" />
+    <ClCompile Include="..\private\Em3001.cpp" />
+    <ClCompile Include="..\private\Em3002.cpp" />
+    <ClCompile Include="..\private\Em3003.cpp" />
     <ClCompile Include="..\private\FireFlashEffect.cpp" />
     <ClCompile Include="..\private\MonsterAOE.cpp" />
     <ClCompile Include="..\private\MonsterSight.cpp" />
@@ -282,6 +302,7 @@
     <ClCompile Include="..\private\Monster.cpp" />
     <ClCompile Include="..\private\MonsterStateMachine.cpp" />
     <ClCompile Include="..\private\Movement.cpp" />
+    <ClCompile Include="..\private\NavigationManager.cpp" />
     <ClCompile Include="..\private\ParticleEffect.cpp" />
     <ClCompile Include="..\private\Pl0000.cpp" />
     <ClCompile Include="..\private\Pl0000Body.cpp" />
@@ -294,6 +315,8 @@
     <ClCompile Include="..\private\Pl0000Movement.cpp" />
     <ClCompile Include="..\private\Pl0000Shockwave.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />
+    <ClCompile Include="..\private\SheathWP0070Body.cpp" />
+    <ClCompile Include="..\private\SheathWP0220Body.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
     <ClCompile Include="..\private\SparkEffect.cpp" />
@@ -308,10 +331,12 @@
     <ClCompile Include="..\private\State2B_Sprint.cpp" />
     <ClCompile Include="..\private\State2B_Walk.cpp" />
     <ClCompile Include="..\private\StateEm0010.cpp" />
+    <ClCompile Include="..\private\StateEm0010_Attack.cpp" />
     <ClCompile Include="..\private\StateEm0010_Chase.cpp" />
     <ClCompile Include="..\private\StateEm0010_Dead.cpp" />
     <ClCompile Include="..\private\StateEm0010_Hit.cpp" />
     <ClCompile Include="..\private\StateEm0010_Idle.cpp" />
+    <ClCompile Include="..\private\StateEm0010_Walk.cpp" />
     <ClCompile Include="..\private\StateMachine.cpp" />
     <ClCompile Include="..\private\StateMonster.cpp" />
     <ClCompile Include="..\private\StaticCamera.cpp" />
@@ -329,7 +354,6 @@
       <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</IncludeInUnityFile>
       <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</IncludeInUnityFile>
     </ClCompile>
-    <ClCompile Include="StateEm0010_Attack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\Shader_VtxAnimMesh.hlsl" />

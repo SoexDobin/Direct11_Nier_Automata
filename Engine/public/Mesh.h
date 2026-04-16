@@ -28,6 +28,10 @@ public:
 	void On_Destroy() override;
 
 public:
+	const vector<Float>& Get_RawPositions() const { return m_RawPosition; }
+	const vector<int32>& Get_RawIndices() const { return m_RawIndices; }
+
+public:
 	uint32 Get_MaterialIndex() const { return m_MaterialIndex; }
 	HRESULT Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, const vector<Shared<Bone>>& Bones);
 
@@ -41,6 +45,10 @@ private:
 	vector<uint32>		m_BoneIndices;
 	Matrix				m_BoneMatrices[MODEL_BONE_MAX] = {};
 	vector<Matrix>		m_OffsetMatrices;
+
+private:
+	vector<Float> m_RawPosition;
+	vector<int32> m_RawIndices;
 
 public:
 	static Shared<Mesh> CreatePrototype();

@@ -8,6 +8,7 @@
 #include "TagRegistry.h"
 #include "LayerRegistry.h"
 #include "GameObject.h"
+#include "Navigation.h"
 #include <regex>
 
 IMPLEMENT_SINGLETON(ClientSettingManager)
@@ -452,6 +453,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 				std::replace(filePath.begin(), filePath.end(), L'\\', L'/');
 				std::wstring tagName = entry.path().stem().wstring() + entry.path().extension().wstring();
 
+
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
 				std::wstring staticMesh = L"vtxmesh";
@@ -662,6 +664,50 @@ HRESULT ClientSettingManager::Sync_SoundJson_FromCSV() const
 
 	ofstream jsonFile(m_ProjectSettingPath + L"SoundSettings.json");
 	jsonFile << jsonRoot.dump(4);
+
+	return S_OK;
+}
+
+HRESULT ClientSettingManager::Load_Navigation_FromBinary() const
+{
+	wstring navDataDir = m_ProjectSettingPath + L"NavData/";
+	if (!std::filesystem::exists(navDataDir))
+	{
+		LOG_WARN(L"NavData directory not found: {}", navDataDir);
+		return S_OK;
+	}
+
+	for (const auto& entry : std::filesystem::directory_iterator(navDataDir))
+	{
+		if (entry.is_regular_file() && entry.path().extension() == L".nnav")
+		{
+			std::wstring filename = entry.path().stem().wstring();
+			std::string filePathStr = Helper::To_String(entry.path().wstring());
+			
+			// Create Navigation component
+			auto pNav = Engine::Navigation::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+			if (!pNav) {
+				LOG_ERROR(L"Failed to create Navigation component prototype for: {}", filename);
+				continue;
+			}
+
+			if (FAILED(pNav->Load_FromBinary(filePathStr)))
+			{
+				LOG_ERROR(L"Failed to load Navigation binary: {}", filename);
+				continue;
+			}
+
+			// Add to Engine PrototypeManager (Level STATIC)
+			if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), pNav, filename)))
+			{
+				LOG_ERROR(L"Failed to register Navigation prototype: {}", filename);
+			}
+			else
+			{
+				LOG_INFO(L"Auto-Registered Navigation Prototype: {}", filename);
+			}
+		}
+	}
 
 	return S_OK;
 }

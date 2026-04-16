@@ -5,6 +5,7 @@
 
 #include "ClientSettingManager.h"
 #include "Game.h"
+#include "NavigationManager.h"
 
 
 Loader::Loader(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
@@ -190,6 +191,16 @@ HRESULT Loader::Loading_Global_Prototype()
         LOG_ERROR(L"Failed to Ready Client Prototypes");
         return E_FAIL;
     }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Navigation_FromBinary())) {
+        LOG_ERROR(L"Failed to Ready Load_Navigation_FromBinary");
+        return E_FAIL;
+    }
+    else
+    {
+        NavigationManager::GetInstance()->Mapping_NavigationTable();
+    }
+    
 
     return S_OK;
 }

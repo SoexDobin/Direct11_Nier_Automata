@@ -37,14 +37,19 @@ public:
 
 public:
 	TRANSFORM_FRAME Get_ModelTransform() const { return m_Model->Get_RootTransformVelocity(m_RootBoneIndex); }
-	void Set_Sheathing(const Matrix& sheathMatrix);
+	void Set_Sheathing();
 	void DrawWP0070();
 	Bool Is_Sheathing() const { return m_IsSheathing; }
 	void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop) override;
 
+public:
+	Bool Is_DetachedTransform() const { return m_DetachTransform; }
+	void Set_DetachedTransform(Bool isDetached) { m_DetachTransform = isDetached; }
+
 private:
 	void Active_LightWeapon();
 	void DeActive_LightWeapon();
+	void Impact_Shockwave(const Vector3& offset);
 
 private:
 	HRESULT Bind_ShaderResources();
@@ -57,6 +62,11 @@ private:
 	Bool m_IsSheathing{ true };
 	Shared<OBBCollider> m_AttackCollider{ nullptr };
 	unordered_set<uint32> m_HitEntities;
+
+	Bool m_DetachTransform{ false };
+	Bool m_IsHitTheGround{ false };
+	Vector3 m_LocalLightPosition{};
+
 
 public:
 	static Shared<WP0070Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

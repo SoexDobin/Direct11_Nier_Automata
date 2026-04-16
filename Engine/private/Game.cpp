@@ -87,6 +87,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_CameraManager = CameraManager::Create(engineDesc.levelCount)))
 		return E_FAIL;
 
+    if (nullptr == (m_RenderTargetManager = RenderTargetManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
+        return E_FAIL;
+
     if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),m_GraphicDevice->Get_Context())))
 		return E_FAIL;
 
@@ -111,8 +114,6 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_NavigationBuilder = NavigationBuilder::Create()))
         return E_FAIL;
 
-    if (nullptr == (m_RenderTargetManager = RenderTargetManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
-        return E_FAIL;
 
     return S_OK;
 }

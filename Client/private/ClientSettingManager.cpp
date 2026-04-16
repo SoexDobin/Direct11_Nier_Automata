@@ -453,6 +453,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 				std::replace(filePath.begin(), filePath.end(), L'\\', L'/');
 				std::wstring tagName = entry.path().stem().wstring() + entry.path().extension().wstring();
 
+
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
 				std::wstring staticMesh = L"vtxmesh";

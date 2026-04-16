@@ -106,7 +106,7 @@ HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPo
 	instanceDesc.center = Vector3::Zero;
 	instanceDesc.pivot = Vector3::Zero;
 	instanceDesc.range = Vector3::Zero;
-	instanceDesc.scale = Vector2{ 1.f, 2.f };
+	instanceDesc.scale = Vector2{ 1.f, 3.f };
 	instanceDesc.speed = Vector2::Zero;
 	instanceDesc.lifeTime = Vector2{ 0.1f, 0.25f };
 
@@ -160,7 +160,7 @@ HRESULT SparkEffect::Bind_ShaderResources()
 
 void SparkEffect::Submit_RenderGroup()
 {
-	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::BLEND, shared_from_this());
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONLIGHT, shared_from_this());
 }
 
 Shared<SparkEffect> SparkEffect::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

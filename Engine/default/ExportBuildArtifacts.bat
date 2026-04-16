@@ -16,8 +16,8 @@ echo.
 echo ===== [2/4] Copying Engine headers to EngineSDK\inc ===== 
 xcopy /Y /I		"..\public\*.h*"					"..\..\EngineSDK\inc\"
 xcopy /Y /I		"..\private\*.inl"					"..\..\EngineSDK\inc\"
-xcopy /Y /I		"..\bin\ShaderFiles\*.hlsli*"		"..\..\EngineSDK\inc\"
-xcopy /Y /I		"..\bin\ShaderFiles\*.hlsl*"		"..\..\EngineSDK\inc\"
+xcopy /Y /I		"..\bin\shaders\*.hlsli*"		"..\..\EngineSDK\inc\"
+xcopy /Y /I		"..\bin\shaders\*.hlsl*"		"..\..\EngineSDK\inc\"
 xcopy /Y /I /E "..\external\FMOD"					"..\..\EngineSDK\inc\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\include" "..\..\EngineSDK\inc\"
 echo =================================================
@@ -26,8 +26,8 @@ echo.
 echo ===== [3/4] Copying Engine.dll to Client\bin ===== 
 xcopy /Y /I "..\bin\Engine.dll"						"..\..\Client\bin\"
 xcopy /Y /I "..\bin\Engine.dll"						"..\..\Editor\bin\"
-xcopy /Y /I	"..\bin\ShaderFiles\*.hlsli*"			"..\..\Client\bin\"
-xcopy /Y /I	"..\bin\ShaderFiles\*.hlsl*"			"..\..\Client\bin\"
+xcopy /Y /I	"..\bin\shaders\*.hlsli*"				"..\..\Client\shaders\bin\"
+xcopy /Y /I	"..\bin\shaders\*.hlsl*"				"..\..\Client\shaders\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Client\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Editor\bin\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Client\bin\"

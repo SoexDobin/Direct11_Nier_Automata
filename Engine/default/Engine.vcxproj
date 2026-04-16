@@ -198,7 +198,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\bin\ShaderFiles\EngineShaderDefine.hlsli" />
+    <None Include="..\bin\shaders\EngineShaderDefine.hlsli" />
     <None Include="..\vcpkg.json" />
     <None Include="ExportBuildArtifacts.bat" />
     <None Include="GenerateRTTR.bat" />
@@ -379,12 +379,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\WorldUIObject.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\bin\ShaderFiles\DeferredShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
+    <FxCompile Include="..\bin\shaders\DeferredShader.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

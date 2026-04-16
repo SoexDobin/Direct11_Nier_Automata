@@ -89,7 +89,7 @@ HRESULT CityOfRuinEntry::Ready_Components()
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	Model::MODEL_DESC modelDesc{ L"CityOfRuinEntry" };
+	Model::MODEL_DESC modelDesc{ L"CityOfRuinEntry1" };
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;

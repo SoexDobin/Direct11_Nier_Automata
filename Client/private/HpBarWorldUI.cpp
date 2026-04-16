@@ -119,6 +119,9 @@ HRESULT HpBarWorldUI::Render()
 	if (FAILED(Bind_ShaderResource(m_Shader, ProjMatrix, D3DTS::PROJ)))
 		return E_FAIL;
 
+	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
+		return E_FAIL;
+
 	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DefaultMap, 0)))
 		return E_FAIL;
 

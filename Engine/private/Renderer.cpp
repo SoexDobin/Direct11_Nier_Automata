@@ -17,15 +17,15 @@ void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject>
 void Renderer::Draw() {
 	Render_Group(ETOI(RENDERGROUP::PRIORITY));
 
+	Render_Group(ETOI(RENDERGROUP::NONLIGHT));
+
 	Render_Group(ETOI(RENDERGROUP::NONBLEND));
 
 	Render_Lights();
 
 	Render_Deferred();
 
-	
 	Render_Group(ETOI(RENDERGROUP::BLEND));
-
 	Render_Group(ETOI(RENDERGROUP::WORLDUI));
 	Render_Group(ETOI(RENDERGROUP::UI));
 
@@ -87,7 +87,7 @@ HRESULT Renderer::Initialize(void *arg) {
 		return E_FAIL;
 
 	m_Buffer = VIBuffer_Rect::Create(m_Device, m_Context);
-	m_Shader = Shader::Create(m_Device, m_Context, L"../bin/ShaderFiles/Shader_Deferred.hlsl", VTXTEX::Elements, VTXTEX::numElements);
+	m_Shader = Shader::Create(m_Device, m_Context, L"../../Engine/bin/shaders/DeferredShader.hlsl", VTXTEX::Elements, VTXTEX::numElements);
 
 	m_WorldMatrix = Matrix::CreateScale(viewportDesc.Width, viewportDesc.Height, 1.f);
 	m_ViewMatrix = Matrix::Identity;
@@ -212,10 +212,10 @@ Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device> &device, const ComP
 #ifdef _DEBUG
 void Renderer::Render_Debug()
 {
-	if (FAILED(m_Shader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+	if (FAILED(m_Shader->Bind_Matrix(ViewMatrix, &m_ViewMatrix)))
 		return;
 
-	if (FAILED(m_Shader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+	if (FAILED(m_Shader->Bind_Matrix(ProjMatrix, &m_ProjMatrix)))
 		return;
 
 	if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_GameObject)))

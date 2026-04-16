@@ -29,6 +29,10 @@ void Renderer::Draw() {
 	Render_Group(ETOI(RENDERGROUP::WORLDUI));
 	Render_Group(ETOI(RENDERGROUP::UI));
 
+#ifdef _DEBUG
+	Render_Debug();
+#endif
+
 	for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
         m_RenderGroup[i].clear();
 	}

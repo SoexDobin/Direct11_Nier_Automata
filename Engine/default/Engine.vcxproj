@@ -153,6 +153,11 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
       <Message>Reflection Engine Class</Message>
     </PreBuildEvent>
+    <FxCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShaderModel>5.0</ShaderModel>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -186,9 +191,14 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
       <Message>Reflection Engine Class</Message>
     </PreBuildEvent>
+    <FxCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShaderModel>5.0</ShaderModel>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\public\EngineShaderDefine.hlsli" />
+    <None Include="..\bin\ShaderFiles\EngineShaderDefine.hlsli" />
     <None Include="..\vcpkg.json" />
     <None Include="ExportBuildArtifacts.bat" />
     <None Include="GenerateRTTR.bat" />
@@ -213,6 +223,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Engine_Macro.h" />
     <ClInclude Include="..\public\Engine_ModelStruct.h" />
     <ClInclude Include="..\public\Engine_NavStruct.h" />
+    <ClInclude Include="..\public\Engine_Rendering_Const.h" />
     <ClInclude Include="..\public\Engine_RTTR_Metadata.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />

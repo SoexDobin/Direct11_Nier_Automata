@@ -207,7 +207,7 @@
     <None Include="RTTRGenerator.py">
       <Filter>99. SystemFiles</Filter>
     </None>
-    <None Include="..\public\EngineShaderDefine.hlsli">
+    <None Include="..\bin\ShaderFiles\EngineShaderDefine.hlsli">
       <Filter>02. ShaderFiles</Filter>
     </None>
   </ItemGroup>
@@ -433,6 +433,9 @@
       <Filter>01. Utility\05. Component\Navigation\Builder</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Engine_NavStruct.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_Rendering_Const.h">
       <Filter>98. Headers</Filter>
     </ClInclude>
   </ItemGroup>

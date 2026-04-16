@@ -44,6 +44,17 @@ HRESULT LightManager::Clear_Lights()
 	return S_OK; 
 }
 
+HRESULT LightManager::Render_Lights(const Shared<Shader>& shader, const Shared<VIBuffer_Rect>& buffer)
+{
+	for (auto& light : m_Lights)
+	{
+		if (light)
+			light->Render(shader, buffer);
+	}
+
+	return S_OK;
+}
+
 HRESULT LightManager::Initialize_Prototype() { return EngineManager::Initialize_Prototype(); }
 HRESULT LightManager::Initialize(void* arg) { return EngineManager::Initialize(arg); }
 void LightManager::On_Destroy()

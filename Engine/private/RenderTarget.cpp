@@ -53,9 +53,7 @@ void RenderTarget::Clear_RenderTarget() const
 	m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), m_ClearColor);
 }
 
-Shared<RenderTarget> RenderTarget::Create(const ComPtr<ID3D11Device>& device,
-	const ComPtr<ID3D11DeviceContext>& context, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat,
-	const Color& clearColor)
+Shared<RenderTarget> RenderTarget::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor)
 {
 	auto renderTarget = make_shared<RenderTarget>(device, context);
 
@@ -89,7 +87,7 @@ HRESULT RenderTarget::Ready_Debug(Float x, Float y, Float sizeX, Float sizeY)
 HRESULT RenderTarget::Render_Debug(const Shared<VIBuffer_Rect>& buffer, const Shared<Shader>& shader) const
 {
 	shader->Bind_Matrix(WorldMatrix, &m_WorldMatrix);
-	shader->Bind_SRV("g_Texture", m_ShaderResourceView);
+	shader->Bind_SRV(DefaultMap, m_ShaderResourceView);
 	shader->Begin(0);
 	buffer->Bind_Resources();
 	buffer->Render();

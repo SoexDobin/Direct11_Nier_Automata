@@ -149,6 +149,7 @@ public: /* For.LightManager */
     const LIGHT_DESC *Get_LightDesc(uint32 index) const;
     HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
     HRESULT Remove_Light(uint32 index) const;
+    HRESULT Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const;
 
 public: /* For LevelSerialize */
     HRESULT SerializeLevel(uint32 levIndex, const wstring& path) const;
@@ -184,6 +185,9 @@ public: /* NavigationBuilder */
 
 public:
     HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;
+    HRESULT Add_MultiRenderTarget(const wstring& multiRenderTargetTag, const wstring& renderTargetTag) const;
+    HRESULT Begin_MultiRenderTarget(const wstring& multiRenderTargetTag) const;
+    HRESULT End_MultiRenderTarget() const;
     HRESULT Bind_RenderTarget_ShaderResource(const Shared<class Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const;
 
 public: /* Prototype & Instantiate Facade */
@@ -240,6 +244,9 @@ private:
 public:
     void Render_CollisionDebug() const;
     Bool Toggle_RenderDebug() const;
+    HRESULT Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const;
+	HRESULT Render_RenderTarget_Debug(const Shared<class VIBuffer_Rect>& buffer, const Shared<class Shader>& shader, const wstring& multiRenderTargetTag) const;
+
 #endif
 
 };

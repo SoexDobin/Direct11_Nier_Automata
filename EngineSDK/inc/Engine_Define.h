@@ -81,6 +81,7 @@
 #include "Engine_Typedef.h"
 #include "Engine_ModelStruct.h"
 #include "Engine_NavStruct.h"
+#include "Engine_Rendering_Const.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

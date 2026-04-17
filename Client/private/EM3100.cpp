@@ -2,6 +2,7 @@
 #include "Em3100.h"
 
 #include <Game.h>
+#include <Navigation.h>
 
 #include "Bullet.h"
 #include "Em3100Body.h"
@@ -134,6 +135,12 @@ HRESULT Em3100::Ready_PartObjects()
 
 HRESULT Em3100::Ready_Components()
 {
+	Navigation::NAVIGATION_DESC navDesc;
+	navDesc.startCellIndex = 0;
+	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
+	if (nullptr == m_Navigation)
+		return E_FAIL;
+
 	SphereCollider::SPHERE_COLLIDER_DESC sphereDesc{};
 	sphereDesc.radius = 3.f;
 	sphereDesc.offset = Vector3::UnitY;

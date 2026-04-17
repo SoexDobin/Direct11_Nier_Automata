@@ -3,8 +3,10 @@
 
 #include <AABBCollider.h>
 #include <Collider.h>
+#include <Game.h>
 #include <OBBCollider.h>
 #include <SphereCollider.h>
+#include <Navigation.h>
 
 #include "SpdLogger.h"
 
@@ -13,6 +15,12 @@ Entity::Entity(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCont
 	: ContainerObject{device, context} {}
 Entity::Entity(const Entity& rhs)
 	: ContainerObject{rhs} {}
+
+void Entity::Set_Navigation(const Shared<Navigation>& navigation)
+{
+	uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+	m_Navigation = Add_Component<Navigation>(levIndex, navigation->Get_ObjectDesc());
+}
 
 void Entity::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {

@@ -172,7 +172,7 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
             else if (cType == COMPONENT_TYPE::TEXTURE && m_InspectorTexture) {
                 m_InspectorTexture->RenderComponent(pComp);
             }
-            else if ((cType == COMPONENT_TYPE::OBB_COLLIDER || cType == COMPONENT_TYPE::SPHERE_COLLIDER) && m_InspectorCollider)
+            else if ((cType == COMPONENT_TYPE::OBB_COLLIDER || cType == COMPONENT_TYPE::SPHERE_COLLIDER || cType == COMPONENT_TYPE::AABB_COLLIDER) && m_InspectorCollider)
             {
                 m_InspectorCollider->RenderComponent(pComp);
             }

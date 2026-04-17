@@ -4,6 +4,7 @@
 #include <SpdLogger.h>
 
 #include "ClientSettingManager.h"
+#include "NavigationManager.h"
 
 LevelGamePlay::LevelGamePlay(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Level{ device, context }
@@ -29,6 +30,8 @@ void LevelGamePlay::On_Destroy()
 
 void LevelGamePlay::Update_Level(Float timeDelta)
 {
+	NavigationManager::GetInstance()->Setting_NavigationSector(LEVEL::GAMEPLAY);
+
 	Level::Update_Level(timeDelta);
 }
 

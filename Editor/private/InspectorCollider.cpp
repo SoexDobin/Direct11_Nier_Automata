@@ -49,11 +49,15 @@ void InspectorCollider::RenderOBB(const std::shared_ptr<Engine::OBBCollider>& pO
 	Vector3 offset = pOBB->Get_Offset();
 	if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
 		pOBB->Set_Offset(offset);
+		pOBB->Get_Owner()->Get_Transform()->Update_WorldMatrix();
+		pOBB->Update(pOBB->Get_Owner()->Get_Transform()->Get_WorldMatrix());
 	}
 
 	Vector3 extents = pOBB->Get_Extents();
 	if (ImGui::DragFloat3("Extents(Half-Size)", reinterpret_cast<Float*>(&extents), 0.05f, 0.01f, 1000.f)) {
 		pOBB->Set_Extents(extents);
+		pOBB->Get_Owner()->Get_Transform()->Update_WorldMatrix();
+		pOBB->Update(pOBB->Get_Owner()->Get_Transform()->Get_WorldMatrix());
 	}
 }
 
@@ -61,15 +65,19 @@ void InspectorCollider::RenderSphere(const std::shared_ptr<Engine::SphereCollide
 {
 	ImGui::TextDisabled("Type: Sphere");
 	ImGui::Separator();
-
+	
 	Vector3 offset = pSphere->Get_Offset();
 	if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
 		pSphere->Set_Offset(offset);
+		pSphere->Get_Owner()->Get_Transform()->Update_WorldMatrix();
+		pSphere->Update(pSphere->Get_Owner()->Get_Transform()->Get_WorldMatrix());
 	}
 
 	Float radius = pSphere->Get_Radius();
 	if (ImGui::DragFloat("Radius", &radius, 0.05f, 0.01f, 1000.f)) {
 		pSphere->Set_Radius(radius);
+		pSphere->Get_Owner()->Get_Transform()->Update_WorldMatrix();
+		pSphere->Update(pSphere->Get_Owner()->Get_Transform()->Get_WorldMatrix());
 	}
 }
 
@@ -77,15 +85,19 @@ void InspectorCollider::RenderAABB(const std::shared_ptr<Engine::AABBCollider>& 
 {
 	ImGui::TextDisabled("Type: AABB");
 	ImGui::Separator();
-
+	
 	Vector3 offset = pAABB->Get_Offset();
 	if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
 		pAABB->Set_Offset(offset);
+		pAABB->Get_Owner()->Get_Transform()->Update_WorldMatrix();
+		pAABB->Update(pAABB->Get_Owner()->Get_Transform()->Get_WorldMatrix());
 	}
 
 	Vector3 extents = pAABB->Get_Extents();
 	if (ImGui::DragFloat3("Extents(Half-Size)", reinterpret_cast<Float*>(&extents), 0.05f, 0.01f, 1000.f)) {
 		pAABB->Set_Extents(extents);
+		pAABB->Get_Owner()->Get_Transform()->Update_WorldMatrix();
+		pAABB->Update(pAABB->Get_Owner()->Get_Transform()->Get_WorldMatrix());
 	}
 }
 

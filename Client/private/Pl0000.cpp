@@ -249,6 +249,12 @@ void Pl0000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<C
 	
 }
 
+void Pl0000::Set_Navigation(const Shared<Navigation>& navigation)
+{
+	m_Pl0000Movement->Set_TargetNavigation(navigation);
+	Entity::Set_Navigation(navigation);
+}
+
 void Pl0000::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
 	if (TryEvade(dmgInfo.attacker.lock())) return;

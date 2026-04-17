@@ -5,7 +5,7 @@
 #include <Entity.h>
 #include <Navigation.h>
 #include <SpdLogger.h>
-
+#include <Navigation.h>
 #include "AABBCollider.h"
 
 NavigationSector::NavigationSector(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -26,13 +26,14 @@ HRESULT NavigationSector::Initialize(void* arg)
 	if (FAILED(GameObject::Initialize(arg)))
 	{
 		LOG_ERROR(L"Failed to Create NavigationSector");
-		return S_OK;
+		return E_FAIL;
 	}
 
 	if (arg)
 	{
 		NAVIGATION_COLLISION_DESC& desc = *static_cast<NAVIGATION_COLLISION_DESC*>(arg);
 
+		m_Navigation = GAME_INSTANCE->Instantiate<Navigation>(desc.navTag, ETOI(LEVEL::STATIC), &desc);
 		AABBCollider::AABB_COLLIDER_DESC colDesc{};
 		colDesc.offset = Vector3::Zero;
 		colDesc.extents = desc.collisionExtends;
@@ -68,7 +69,7 @@ void NavigationSector::On_Destroy()
 
 void NavigationSector::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	if (m_Navigation.expired()) return;
+	if (m_Navigation == nullptr) return;
 
 	auto target = targetCollider->Get_Owner();
 
@@ -77,14 +78,15 @@ void NavigationSector::OnCollisionEnter(const Shared<Collider>& ownCollider, con
 
 	if (auto entity = static_pointer_cast<Entity>(target))
 	{
-		if (entity->Get_Navigation()->Get_InstanceID() == m_Navigation.lock()->Get_InstanceID())
+		if (nullptr == entity->Get_Navigation()) return;
+		if (entity->Get_Navigation()->Get_InstanceID() == m_Navigation->Get_InstanceID())
 		{
 			LOG_ERROR(L"Enter Same Navigation Sector"); 
 			return;
 		}
 			
 		LOG_INFO(L"Enter Navigation Sector {}", m_ObjectName);
-		entity->Set_Navigation(m_Navigation.lock());
+		entity->Set_Navigation(m_Navigation);
 	}
 }
 

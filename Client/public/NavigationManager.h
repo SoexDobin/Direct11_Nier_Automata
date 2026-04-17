@@ -20,6 +20,8 @@ public:
 private:
 	HRESULT Setting_GamePlay();
 
+	Bool m_InitialFinished{ false };
+
 };
 
 NS_END

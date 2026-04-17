@@ -36,6 +36,9 @@ public:
 	} PL0000_MOVEMENT_DATA;
 
 public:
+	void Set_TargetNavigation(const Shared<Navigation>& navigation);
+
+public:
 	void Set_MovementData(const PL0000_MOVEMENT_DATA& data) { m_CurrentMoveData = data; Reset_RootMotionStop(); }
 	const PL0000_MOVEMENT_DATA& Get_MovementData() const { return m_CurrentMoveData; }
 

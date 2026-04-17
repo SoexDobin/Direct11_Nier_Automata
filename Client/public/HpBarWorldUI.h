@@ -44,6 +44,8 @@ private:
 
 private:
 	Bool m_TargetInBack{};
+	Bool m_IsOutOfRange{};
+	Float m_Alpha{1.f};
 	Weak<Entity> m_Target{};
 	Vector3 m_WorldOffset = { 0.f, 0.f, 0.f };
 

@@ -30,6 +30,12 @@ HRESULT Pl0000Movement::Initialize(void* arg)
 	return S_OK;
 }
 
+void Pl0000Movement::Set_TargetNavigation(const Shared<Navigation>& navigation)
+{
+	m_Navigation.reset();
+	m_Navigation = navigation;
+}
+
 HRESULT Pl0000Movement::Begin()
 {
 	if (!m_Owner.expired())

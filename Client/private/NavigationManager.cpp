@@ -16,8 +16,11 @@ NavigationManager::~NavigationManager()
 
 HRESULT NavigationManager::Setting_NavigationSector(LEVEL level)
 {
+	if (m_InitialFinished) return S_OK;
+
 	if (level == LEVEL::GAMEPLAY)
 	{
+		m_InitialFinished = true;
 		return 	Setting_GamePlay();
 	}
 
@@ -29,18 +32,16 @@ HRESULT NavigationManager::Setting_GamePlay()
 {
 	Navigation::NAVIGATION_DESC desc{ };
 
-	auto bridge = GAME_INSTANCE->Instantiate<Navigation>(L"CityOfRuinBridge", ETOI(LEVEL::STATIC), &desc);
 	NavigationSector::NAVIGATION_COLLISION_DESC bridgeSectorDesc{};
-	bridgeSectorDesc.TargetCollider = bridge;
-	bridgeSectorDesc.worldPosition = Vector3::Zero;
-	bridgeSectorDesc.collisionExtends = Vector3::Zero;
+	bridgeSectorDesc.navTag = L"CityOfRuinBridge";
+	bridgeSectorDesc.worldPosition = Vector3{ 235.f, 20.f, 120.f};
+	bridgeSectorDesc.collisionExtends = Vector3{ 40.f, 50.f, 50.f};
 	auto bridgeSector = GAME_INSTANCE->Instantiate<NavigationSector>(L"NavigationSector", ETOI(LEVEL::GAMEPLAY), &bridgeSectorDesc);
 	
 	NavigationSector::NAVIGATION_COLLISION_DESC entrySectorDesc{};
-	auto entry = GAME_INSTANCE->Instantiate<Navigation>(L"CityOfRuinEntry", ETOI(LEVEL::STATIC), &desc);
-	entrySectorDesc.TargetCollider = entry;
-	entrySectorDesc.worldPosition = Vector3::Zero;
-	entrySectorDesc.collisionExtends = Vector3::Zero;
+	entrySectorDesc.navTag = L"CityOfRuinEntry";
+	entrySectorDesc.worldPosition = Vector3{ 90.f, 20.f, 60.f };
+	entrySectorDesc.collisionExtends = Vector3{ 100.f, 50.f, 70.f };
 	auto entrySector = GAME_INSTANCE->Instantiate<NavigationSector>(L"NavigationSector", ETOI(LEVEL::GAMEPLAY), &entrySectorDesc);
 
 	return S_OK;

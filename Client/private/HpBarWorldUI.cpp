@@ -76,6 +76,29 @@ void HpBarWorldUI::Late_Update(Float timeDelta)
 		return;
 	}
 
+	{
+		Float distance = cameraViewMat.Length();
+
+		if (distance >= 50.f)
+		{
+			m_IsOutOfRange = true;
+			return;
+		}
+		m_IsOutOfRange = false;
+
+		if (distance <= 20.f)
+		{
+
+			m_Alpha = 1.f;
+			m_Texture->Set_RGBA({ 1.f, 1.f ,1.f ,m_Alpha });
+		}
+		else
+		{
+			m_Alpha = 1.f - ((distance - 20.f) / 30.f);
+			m_Texture->Set_RGBA({ 1.f, 1.f ,1.f ,m_Alpha });
+		}
+	}
+
 	D3D11_VIEWPORT viewport = GAME_INSTANCE->Get_ViewportDesc();
 
 	Vector3 screenPos = XMVector3Project(
@@ -96,7 +119,8 @@ void HpBarWorldUI::Submit_RenderGroup()
 	if (m_Target.expired() || m_Target.lock()->Is_Destroy())
 		return;
 
-	//if (m_TargetInBack) return;
+	if (m_TargetInBack) return;
+	if (m_IsOutOfRange) return;
 
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::WORLDUI, shared_from_this());
 }
@@ -108,10 +132,6 @@ HRESULT HpBarWorldUI::Render()
 
 	Float hpRatio = m_Target.lock()->Get_HP() / m_Target.lock()->Get_MaxHP();
 	if (FAILED(m_Shader->Bind_RawValue(HpRatio, &hpRatio, sizeof(Float))))
-		return E_FAIL;
-
-	Vector3 targetWorldPos = m_Target.lock()->Get_Transform()->Get_Position() + m_WorldOffset;
-	if (FAILED(m_Shader->Bind_RawValue(TargetPosition, &targetWorldPos, sizeof(Vector3))))
 		return E_FAIL;
 
 	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))

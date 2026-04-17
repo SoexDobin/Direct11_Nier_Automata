@@ -14,7 +14,7 @@ class CLIENT_DLL NavigationSector final : public GameObject
 public:
 	typedef struct tagNavigationCollisionDesc : public GAMEOBJECT_DESC
 	{
-		Weak<Navigation> TargetCollider;
+		wstring navTag{};
 		Vector3 worldPosition{ 0.f, 0.f, 0.f };
 		Vector3 collisionExtends{ 0.f, 0.f, 0.f };
 	} NAVIGATION_COLLISION_DESC;
@@ -37,7 +37,7 @@ public:
 
 private:
 	Shared<AABBCollider> m_AABBCollider{ nullptr };
-	Weak<Navigation> m_Navigation{ };
+	Shared<Navigation> m_Navigation{ };
 
 	unordered_set<uint32> m_TargetLayerIndex;
 

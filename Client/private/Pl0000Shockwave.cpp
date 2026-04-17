@@ -50,16 +50,16 @@ void Pl0000Shockwave::On_Destroy()
 
 void Pl0000Shockwave::Priority_Update(Float timeDelta)
 {
-	//if (false == isFirstFrame)
-	//{
-	//	Destroy(shared_from_this());
-	//	Set_Active(false);
-	//}
-	//
-	//if (isFirstFrame)
-	//{
-	//	isFirstFrame = false;
-	//}
+	if (false == isFirstFrame)
+	{
+		Destroy(shared_from_this());
+		Set_Active(false);
+	}
+	
+	if (isFirstFrame)
+	{
+		isFirstFrame = false;
+	}
 }
 
 void Pl0000Shockwave::Update(Float timeDelta)

@@ -38,9 +38,9 @@ public:
 
 public:
 	Shared<Navigation> Get_Navigation() { return m_Navigation; };
-	void Set_Navigation(const Shared<Navigation>& navigation) { m_Navigation = navigation; }
 
 public:
+	virtual void Set_Navigation(const Shared<Navigation>& navigation);
 	virtual void Apply_PushoutCorrection(const Vector3& correction) {};
 	virtual void OnAttackHit(const Shared<GameObject>& target) {};
 	virtual void Add_HitLag(Float duration) { m_LagDuration = duration; }
@@ -76,7 +76,7 @@ protected:
 	DAMAGE_INFO m_LastDamageInfo{};
 
 public:
-	virtual Shared<GameObject> Clone(void* arg) PURE;
+	virtual Shared<GameObject> Clone(void* arg) override PURE;
 };
 
 NS_END

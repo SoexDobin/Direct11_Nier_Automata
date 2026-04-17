@@ -42,9 +42,24 @@ void Renderer::Draw() {
 }
 
 void Renderer::Draw_NoClearing() {
-    for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
-        Render_Group(i);
-    }
+	Render_Group(ETOI(RENDERGROUP::PRIORITY));
+	Render_Group(ETOI(RENDERGROUP::NONLIGHT));
+	
+	if (FAILED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_GameObject)))
+		return;
+	Render_Group(ETOI(RENDERGROUP::NONBLEND));
+	if (FAILED(GAME_INSTANCE->End_MultiRenderTarget()))
+		return;
+
+	Render_Lights();
+	Render_Combined();
+	Render_Group(ETOI(RENDERGROUP::BLEND));
+	Render_Group(ETOI(RENDERGROUP::WORLDUI));
+	Render_Group(ETOI(RENDERGROUP::UI));
+	//for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i)
+	//{
+	//	m_RenderGroup[i].clear();
+	//}
 }
 
 // TODO : draw call check clear group all frame
@@ -95,7 +110,6 @@ HRESULT Renderer::Initialize(void *arg) {
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_GameObject, RT_NORMAL)))
 		return E_FAIL;
-
 	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_LIGHT, RT_SHADE)))
 		return E_FAIL;
 
@@ -182,10 +196,6 @@ void Renderer::Render_Lights() const
 
 	m_Shader->Bind_SRV(NormalMap, nullptr);
 	m_Shader->Begin(0);
-
-
-	if (FAILED(GAME_INSTANCE->End_MultiRenderTarget()))
-		return;
 }
 
 void Renderer::Render_Group(uint32 groupIndex) const

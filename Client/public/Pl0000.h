@@ -68,6 +68,7 @@ public:
     void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 public:
+    void Set_Navigation(const Shared<Navigation>& navigation) override;
     void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
     void OnAttackHit(const Shared<GameObject>& target) override;
     Bool TryEvade(const Shared<GameObject>& attacker);

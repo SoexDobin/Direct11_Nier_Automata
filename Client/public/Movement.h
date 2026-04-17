@@ -55,7 +55,7 @@ protected:
 	Vector3			m_CorrectionDelta{ 0.f };
 
 public:
-	Shared<Component> Clone(void* arg = nullptr) PURE;
+	Shared<Component> Clone(void* arg = nullptr) override PURE;
 };
 
 NS_END

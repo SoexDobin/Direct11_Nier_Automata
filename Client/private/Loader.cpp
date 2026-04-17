@@ -149,7 +149,7 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
     LightDesc.type = LIGHT::DIRECTIONAL;
     LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
     LightDesc.diffuse = Vector4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.ambient = Vector4(0.1f, 0.1f, 0.1f, 1.f);
     LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
 
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))

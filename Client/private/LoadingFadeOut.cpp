@@ -77,9 +77,9 @@ HRESULT LoadingFadeOut::Render() {
         return E_FAIL;
     if (FAILED(Bind_ShaderResource(m_Shader, ProjMatrix, D3DTS::PROJ)))
         return E_FAIL;
-    if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, "g_Texture", 0)))
+    if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DefaultMap, 0)))
         return E_FAIL;
-    if (FAILED(m_Shader->Bind_RawValue("g_RGBA", m_Texture->Get_RGBA_Absolute(), sizeof(Color))))
+    if (FAILED(m_Shader->Bind_RawValue(DefaultColor, m_Texture->Get_RGBA_Absolute(), sizeof(Color))))
         return E_FAIL;
 
     if (FAILED(m_Shader->Begin(0)))

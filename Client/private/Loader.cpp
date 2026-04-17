@@ -196,11 +196,6 @@ HRESULT Loader::Loading_Global_Prototype()
         LOG_ERROR(L"Failed to Ready Load_Navigation_FromBinary");
         return E_FAIL;
     }
-    else
-    {
-        NavigationManager::GetInstance()->Mapping_NavigationTable();
-    }
-    
 
     return S_OK;
 }

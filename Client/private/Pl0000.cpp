@@ -27,16 +27,10 @@
 
 namespace Client {
 
-Pl0000::Pl0000() : Entity{} {}
 Pl0000::Pl0000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Entity{ device, context } {}
 Pl0000::Pl0000(const Pl0000& rhs)
 	: Entity{ rhs } {}
-
-void Pl0000::Set_Navigation(const Shared<Navigation>& linkedNavigation)
-{
-	m_Navigation = linkedNavigation;
-}
 
 void Pl0000::Draw_LightWeapon()
 {

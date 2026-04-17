@@ -20,6 +20,7 @@ public:
 	HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName, const wstring& rtTag);
 
 public:
+	HRESULT Resize_RenderTargets(uint32 sizeX, uint32 sizeY);
 	HRESULT Add_MultiRenderTarget(const wstring& mrtTag, const wstring& rtTag);
 	HRESULT Begin_MultiRenderTarget(const wstring& mrtTag);
 	HRESULT End_MultiRenderTarget();

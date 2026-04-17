@@ -23,6 +23,7 @@ public:
 	HRESULT Clear_RenderGroup();
 
 public:
+	HRESULT OnResize(uint32 width, uint32 height);
 	HRESULT Initialize(void *arg) override;
 	void On_Destroy() override;
 	void On_Disable() override;
@@ -30,7 +31,7 @@ public:
 	void Set_Active(Bool isActive) override;
 
 private:
-	void Render_Deferred() const;
+	void Render_Combined() const;
 	void Render_Lights() const;
 	void Render_Group(uint32 groupIndex) const;
 	void Render_Recursive(const Shared<GameObject>& object) const;

@@ -110,7 +110,7 @@ HRESULT Em3000Parts::Render()
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
 		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
-		m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
+		//m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
 		if (FAILED(m_Shader->Begin(0)))
 			return E_FAIL;
 		m_Model->Render(i);

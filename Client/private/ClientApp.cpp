@@ -9,6 +9,7 @@
 
 #include "LoadingFadeIn.h"
 #include "LoadingFadeOut.h"
+#include "NavigationManager.h"
 #include "SpdLogger.h"
 #include "StaticCamera.h"
 #include "VISphere.h"
@@ -16,7 +17,10 @@
 
 ClientApp::ClientApp() {}
 
-ClientApp::~ClientApp() {}
+ClientApp::~ClientApp()
+{
+    NavigationManager::DestroyInstance();
+}
 
 HRESULT ClientApp::Initialize(const ENGINE_DESC& desc) 
 {

@@ -248,6 +248,9 @@
     <ClInclude Include="..\public\SheathWP0220Body.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0220</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\NavigationSector.h">
+      <Filter>02. GameObject\NavigationCollision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -491,6 +494,9 @@
     <ClCompile Include="..\private\SheathWP0220Body.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0220</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\NavigationSector.cpp">
+      <Filter>02. GameObject\NavigationCollision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -651,6 +657,9 @@
     </Filter>
     <Filter Include="02. GameObject\World">
       <UniqueIdentifier>{9d488e4b-716c-4500-a17f-75dd1911dc79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\NavigationCollision">
+      <UniqueIdentifier>{39b54fc0-86f9-4c2f-8008-a696a843c49a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

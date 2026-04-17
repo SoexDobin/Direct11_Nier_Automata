@@ -59,15 +59,15 @@ void TitleBackground::Fixed_Update(Float fixedDelta) {
 }
 
 HRESULT TitleBackground::Render() {
-    if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, "g_WorldMatrix")))
+    if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
         return E_FAIL;
-    if (FAILED(Bind_ShaderResource(m_Shader, "g_ViewMatrix", D3DTS::VIEW)))
+    if (FAILED(Bind_ShaderResource(m_Shader, ViewMatrix, D3DTS::VIEW)))
         return E_FAIL;
-    if (FAILED(Bind_ShaderResource(m_Shader, "g_ProjMatrix", D3DTS::PROJ)))
+    if (FAILED(Bind_ShaderResource(m_Shader, ProjMatrix, D3DTS::PROJ)))
         return E_FAIL;
-    if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, "g_Texture", 0)))
+    if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DefaultMap, 0)))
         return E_FAIL;
-    if (FAILED(m_Shader->Bind_RawValue("g_RGBA", m_Texture->Get_RGBA_Absolute(), sizeof(Color))))
+    if (FAILED(m_Shader->Bind_RawValue(DefaultColor, m_Texture->Get_RGBA_Absolute(), sizeof(Color))))
         return E_FAIL;
 
     if (FAILED(m_Shader->Begin(0)))

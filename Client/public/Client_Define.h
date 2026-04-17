@@ -19,6 +19,7 @@ namespace Client
 
 	// 특수 값
 	constexpr const Char* HpRatio = "g_HpRatio"; // Tex Pass1
+	constexpr const Char* TargetPosition = "g_TargetWorldPosition";
 }
 
 using namespace Client;

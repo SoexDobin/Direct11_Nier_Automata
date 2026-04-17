@@ -1,6 +1,10 @@
 #pragma once
 #include "ContainerObject.h"
 
+NS_BEGIN(Engine)
+class Navigation;
+NS_END
+
 NS_BEGIN(Client)
 
 class CLIENT_DLL Entity abstract : public ContainerObject
@@ -33,6 +37,10 @@ public:
 	virtual ~Entity() override = default;
 
 public:
+	Shared<Navigation> Get_Navigation() { return m_Navigation; };
+	void Set_Navigation(const Shared<Navigation>& navigation) { m_Navigation = navigation; }
+
+public:
 	virtual void Apply_PushoutCorrection(const Vector3& correction) {};
 	virtual void OnAttackHit(const Shared<GameObject>& target) {};
 	virtual void Add_HitLag(Float duration) { m_LagDuration = duration; }
@@ -58,13 +66,13 @@ public: // Utility
 	Float Get_RadiusByColliderType(const Shared<Collider>& collider, const Vector3 colDirection);
 
 protected:
+	Shared<Navigation> m_Navigation{ nullptr };
+
 	Float m_Hp{ 1000.f };
 	Float m_MaxHp{ 1000.f };
 	Float m_LagDuration{ 0.f };
 	Bool m_IsInvincible{ false };
 	Bool m_IsStatic{ false };
-
-
 	DAMAGE_INFO m_LastDamageInfo{};
 
 public:

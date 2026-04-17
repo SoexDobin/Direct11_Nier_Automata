@@ -350,6 +350,79 @@
                                            "has_clone":  true,
                                            "category":  "other"
                                        },
+                    "NavigationSector":  {
+                                             "namespace":  "Engine",
+                                             "base_class":  "GameObject",
+                                             "category":  "gameobject",
+                                             "members":  [
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "",
+                                                                 "name":  "m_TargetLayerIndex",
+                                                                 "type":  "unordered_set\u003cuint32\u003e"
+                                                             }
+                                                         ],
+                                             "has_create":  true,
+                                             "inherited_members":  [
+                                                                       {
+                                                                           "access":  "protected",
+                                                                           "default":  "nullptr",
+                                                                           "name":  "m_Device",
+                                                                           "type":  "ComPtr\u003cID3D11Device\u003e"
+                                                                       },
+                                                                       {
+                                                                           "access":  "protected",
+                                                                           "default":  "nullptr",
+                                                                           "name":  "m_Context",
+                                                                           "type":  "ComPtr\u003cID3D11DeviceContext\u003e"
+                                                                       },
+                                                                       {
+                                                                           "access":  "protected",
+                                                                           "default":  "",
+                                                                           "name":  "m_LayerMask",
+                                                                           "type":  "LayerMask"
+                                                                       },
+                                                                       {
+                                                                           "access":  "protected",
+                                                                           "default":  "",
+                                                                           "name":  "m_TagMask",
+                                                                           "type":  "TagMask"
+                                                                       }
+                                                                   ],
+                                             "transform_members":  [
+                                                                       {
+                                                                           "access":  "private",
+                                                                           "default":  "Vector3::One",
+                                                                           "name":  "m_LocalScale",
+                                                                           "type":  "Vector3"
+                                                                       },
+                                                                       {
+                                                                           "access":  "private",
+                                                                           "default":  "Quaternion::Identity",
+                                                                           "name":  "m_LocalRotation",
+                                                                           "type":  "Quaternion"
+                                                                       },
+                                                                       {
+                                                                           "access":  "private",
+                                                                           "default":  "Vector3::Zero",
+                                                                           "name":  "m_LocalPosition",
+                                                                           "type":  "Vector3"
+                                                                       },
+                                                                       {
+                                                                           "access":  "private",
+                                                                           "default":  "Matrix::Identity",
+                                                                           "name":  "m_WorldMatrix",
+                                                                           "type":  "Matrix"
+                                                                       },
+                                                                       {
+                                                                           "access":  "private",
+                                                                           "default":  "true",
+                                                                           "name":  "m_IsDirty",
+                                                                           "type":  "Bool"
+                                                                       }
+                                                                   ],
+                                             "has_clone":  true
+                                         },
                     "FireFlashEffect":  {
                                             "members":  [
 
@@ -716,19 +789,6 @@
                                                                   ],
                                             "has_clone":  true
                                         },
-                    "Bullet":  {
-                                   "members":  [
-
-                                               ],
-                                   "base_class":  "Projectile",
-                                   "inherited_members":  {
-
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
                     "LevelLoading":  {
                                          "members":  [
                                                          {
@@ -764,24 +824,19 @@
                                          "has_clone":  false,
                                          "category":  "level"
                                      },
-                    "WP0220Body":  {
-                                       "members":  [
-                                                       {
-                                                           "access":  "private",
-                                                           "default":  "",
-                                                           "name":  "m_HitEntities",
-                                                           "type":  "unordered_set\u003cuint32\u003e"
-                                                       }
-                                                   ],
-                                       "base_class":  "Pl0000Parts",
-                                       "inherited_members":  {
+                    "Bullet":  {
+                                   "members":  [
 
-                                                             },
-                                       "namespace":  "Engine",
-                                       "has_create":  true,
-                                       "has_clone":  true,
-                                       "category":  "other"
-                                   },
+                                               ],
+                                   "base_class":  "Projectile",
+                                   "inherited_members":  {
+
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "StateEm0010_Chase":  {
                                               "members":  [
                                                               {
@@ -1334,6 +1389,24 @@
                                    "has_clone":  true,
                                    "category":  "other"
                                },
+                    "WP0220Body":  {
+                                       "members":  [
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "",
+                                                           "name":  "m_HitEntities",
+                                                           "type":  "unordered_set\u003cuint32\u003e"
+                                                       }
+                                                   ],
+                                       "base_class":  "Pl0000Parts",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "SheathWP0220Body":  {
                                              "members":  [
 

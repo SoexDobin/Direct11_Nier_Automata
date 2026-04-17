@@ -19,11 +19,14 @@ void Renderer::Draw() {
 
 	Render_Group(ETOI(RENDERGROUP::NONLIGHT));
 
+	if (FAILED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_GameObject)))
+		return;
 	Render_Group(ETOI(RENDERGROUP::NONBLEND));
+	if (FAILED(GAME_INSTANCE->End_MultiRenderTarget()))
+		return;
 
 	Render_Lights();
-
-	Render_Deferred();
+	Render_Combined();
 
 	Render_Group(ETOI(RENDERGROUP::BLEND));
 	Render_Group(ETOI(RENDERGROUP::WORLDUI));
@@ -53,6 +56,16 @@ HRESULT Renderer::Clear_RenderGroup()
         group.shrink_to_fit();
 
     return S_OK;
+}
+
+HRESULT Renderer::OnResize(uint32 width, uint32 height)
+{
+	if (width == 0 || height == 0) return S_OK;
+
+	m_WorldMatrix = Matrix::CreateScale(static_cast<Float>(width), static_cast<Float>(height), 1.f);
+	m_ProjMatrix = Matrix::CreateOrthographic(static_cast<Float>(width), static_cast<Float>(height), 0.f, 1.f);
+
+	return S_OK;
 }
 
 HRESULT Renderer::Initialize(void *arg) {
@@ -116,7 +129,7 @@ void Renderer::On_Enable() { EngineManager::On_Enable(); }
 
 void Renderer::Set_Active(Bool isActive) { EngineManager::Set_Active(isActive); }
 
-void Renderer::Render_Deferred() const
+void Renderer::Render_Combined() const
 {
 	if(FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_WorldMatrix)))
 		return;
@@ -135,6 +148,10 @@ void Renderer::Render_Deferred() const
 	m_Shader->Begin(ETOI(DEFERRED::COMBINED));
 	m_Buffer->Bind_Resources();
 	m_Buffer->Render();
+
+	m_Shader->Bind_SRV(DiffuseMap, nullptr);
+	m_Shader->Bind_SRV(ShadeMap, nullptr);
+	m_Shader->Begin(ETOI(DEFERRED::COMBINED));
 }
 
 void Renderer::Render_Lights() const
@@ -162,14 +179,17 @@ void Renderer::Render_Lights() const
 
 	if (FAILED(GAME_INSTANCE->End_MultiRenderTarget()))
 		return;
+
+	m_Shader->Bind_SRV(NormalMap, nullptr);
+	m_Shader->Begin(0);
+
+
+	if (FAILED(GAME_INSTANCE->End_MultiRenderTarget()))
+		return;
 }
 
 void Renderer::Render_Group(uint32 groupIndex) const
 {
-	if (groupIndex == ETOI(RENDERGROUP::NONBLEND))
-		if (FAILED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_GameObject))) 
-			return;
-
 	for (auto& object : m_RenderGroup[groupIndex])
 	{
 		uint32 objLayer = object->Get_LayerMask().Get_Layer();
@@ -180,10 +200,6 @@ void Renderer::Render_Group(uint32 groupIndex) const
 
 		Render_Recursive(object);
 	}
-
-	if (groupIndex == ETOI(RENDERGROUP::NONBLEND))
-		if (FAILED(GAME_INSTANCE->End_MultiRenderTarget())) 
-			return;
 }
 void Renderer::Render_Recursive(const Shared<GameObject>& object) const
 {

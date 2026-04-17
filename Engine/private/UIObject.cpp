@@ -88,7 +88,7 @@ void UIObject::Update_UITransform(Float viewportWidth, Float viewportHeight) con
     Vector3 finalPos;
     finalPos.x = (offset.x + anchorPosX) - (baseWidth * 0.5f);
     finalPos.y = -(offset.y + anchorPosY) + (baseHeight * 0.5f);
-    finalPos.z = 0.f;
+    finalPos.z = offset.z;
     
     Matrix matScale = Matrix::CreateScale(size.x, size.y, 1.f);
     Matrix matRotation = Matrix::CreateFromQuaternion(rotation);

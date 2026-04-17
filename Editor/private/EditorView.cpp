@@ -147,6 +147,16 @@ void EditorView::RenderView(Bool isResize) {
 
 	ImGui::Begin("Game View");
 
+	Float currentFPS = GAME_INSTANCE->Get_FPS();
+
+	// 2. 눈에 잘 띄는 초록색 텍스트로 FPS 텍스트 출력
+	ImGui::TextColored(ImVec4(0.1f, 1.0f, 0.1f, 1.0f), "FPS: %.1f", currentFPS);
+
+	// 아래 메뉴들과 같은 줄에 배치하고 싶을 경우 유지, 아래로 내리고 싶으면 삭제
+	ImGui::SameLine();
+	ImGui::Spacing();
+	ImGui::SameLine();
+
 	// 마우스가 GameView 컨텐츠 영역 내에 있거나, 카메라 등으로 마우스가 락(Lock)되어 있으면 입력 허용
 	EDITOR_STATE state = EDITOR->Get_State();
 	Bool isGameViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);

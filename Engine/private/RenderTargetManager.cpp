@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "RenderTarget.h"
+#include "SpdLogger.h"
 
 RenderTargetManager::RenderTargetManager(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: m_Device{device}, m_Context{context} {}
@@ -38,6 +39,19 @@ HRESULT RenderTargetManager::Bind_ShaderResource(const Shared<Shader>& shader, c
 		return E_FAIL;
 
 	return renderTarget->Bind_ShaderResource(shader, constantName);
+}
+
+HRESULT RenderTargetManager::Resize_RenderTargets(uint32 sizeX, uint32 sizeY)
+{
+	for (auto target: m_RenderTargets)
+	{
+		if (FAILED(target.second->OnResize(sizeX, sizeY)))
+		{
+			LOG_CRITICAL(L"Failed to Resize RenderTarget: {}", target.first);
+			return E_FAIL;
+		}
+	}
+	return S_OK;
 }
 
 HRESULT RenderTargetManager::Add_MultiRenderTarget(const wstring& mrtTag, const wstring& rtTag)

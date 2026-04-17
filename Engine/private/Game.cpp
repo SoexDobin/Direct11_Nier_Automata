@@ -241,7 +241,30 @@ HRESULT Game::OnResize(uint32 width, uint32 height, uint32 offscreenIndex)
 		camera->Set_Aspect(fAspect);
 	}
 
-	return m_GraphicDevice->OnResize(width, height, offscreenIndex);
+    if (offscreenIndex != UINT_MAX)
+    {
+        return S_OK;
+    }
+
+    if (FAILED(m_GraphicDevice->OnResize(width, height, offscreenIndex))) 
+    {
+        LOG_ERROR(L"Failed to Resize GraphicDevice");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_RenderTargetManager->Resize_RenderTargets(width, height)))
+    {
+        LOG_ERROR(L"Failed to Resize RenderTargets");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_Renderer->OnResize(width, height)))
+    {
+        LOG_ERROR(L"Failed to Resize Renderer");
+        return E_FAIL;
+    }
+
+	return S_OK;
 }
 
 HRESULT Game::Begin_RenderOffScreen(uint32 screenIndex) const {
@@ -737,5 +760,4 @@ HRESULT Game::Render_RenderTarget_Debug(const Shared<class VIBuffer_Rect>& buffe
 {
     return m_RenderTargetManager->Render_RenderTarget_Debug(buffer, shader, multiRenderTargetTag);
 }
-
 #endif

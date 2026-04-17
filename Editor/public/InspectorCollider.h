@@ -4,6 +4,7 @@ NS_BEGIN(Engine)
 class Component;
 class OBBCollider;
 class SphereCollider;
+class AABBCollider;
 NS_END
 NS_BEGIN(Editor)
 class InspectorCollider final : public EditorObject
@@ -19,6 +20,7 @@ public:
 private:
 	void RenderOBB(const std::shared_ptr<Engine::OBBCollider>& pOBB);
 	void RenderSphere(const std::shared_ptr<Engine::SphereCollider>& pSphere);
+	void RenderAABB(const std::shared_ptr<Engine::AABBCollider>& pAABB);
 public:
 	static std::shared_ptr<InspectorCollider> Create();
 };

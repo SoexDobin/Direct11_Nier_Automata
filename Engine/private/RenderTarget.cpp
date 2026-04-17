@@ -9,6 +9,15 @@ RenderTarget::RenderTarget(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D
 {
 }
 
+HRESULT RenderTarget::OnResize(uint32 sizeX, uint32 sizeY)
+{
+	m_ShaderResourceView.Reset();
+	m_RenderTargetView.Reset();
+	m_Texture2D.Reset();
+
+	return Initialize(sizeX, sizeY, m_PixelFormat, m_ClearColor);
+}
+
 HRESULT RenderTarget::Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor)
 {
 	D3D11_TEXTURE2D_DESC texDesc{};
@@ -34,6 +43,7 @@ HRESULT RenderTarget::Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFo
 		return E_FAIL;
 
 	m_ClearColor = clearColor;
+	m_PixelFormat = pixelFormat;
 
 	return S_OK;
 }
@@ -91,6 +101,9 @@ HRESULT RenderTarget::Render_Debug(const Shared<VIBuffer_Rect>& buffer, const Sh
 	shader->Begin(0);
 	buffer->Bind_Resources();
 	buffer->Render();
+
+	shader->Bind_SRV(DefaultMap, nullptr);
+	shader->Begin(0);
 
 	return S_OK;
 }

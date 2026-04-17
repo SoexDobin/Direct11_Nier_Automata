@@ -129,7 +129,7 @@ public: /* For ResourceManager */
     vector<Shared<Model>> Get_Models(uint32 levIndex) const;
 
 public: /* For Renderer */
-	void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
+	void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject>& gameObject) const;
 
 public: /* For Pipeline */
     HRESULT Bind_CameraPosition(const Shared<class Shader> &shader,

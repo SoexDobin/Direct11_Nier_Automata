@@ -191,22 +191,18 @@ HRESULT GraphicDevice::OnResize(uint32 width, uint32 height, uint32 screenIndex)
 }
 
 HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {
-  if (screenIndex >= m_Offscreens.size()) {
-    LOG_CRITICAL(L"Invalid Offscreen Index: {}", screenIndex);
-    return E_FAIL;
-  }
+    if (screenIndex >= m_Offscreens.size()) {
+      LOG_CRITICAL(L"Invalid Offscreen Index: {}", screenIndex);
+      return E_FAIL;
+    }
 
-  ID3D11ShaderResourceView *nullSRV[1] = {nullptr};
-  m_Context->PSSetShaderResources(0, 1, nullSRV);
+    auto &rt = m_Offscreens[screenIndex];
 
-  auto &rt = m_Offscreens[screenIndex];
-
-  Float clearColor[4] = { 0.f, 0.f, 0.f, 1.f };
-  m_Context->ClearRenderTargetView(rt.RTV.Get(), clearColor);
-
-  m_Context->ClearDepthStencilView(
-      rt.DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0.f);
-  ID3D11RenderTargetView *RTVs[] = {rt.RTV.Get()};
+    Float clearColor[4] = { 0.f, 0.f, 0.f, 1.f };
+    m_Context->ClearRenderTargetView(rt.RTV.Get(), clearColor);
+    m_Context->ClearDepthStencilView(
+        rt.DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0.f);
+    ID3D11RenderTargetView *RTVs[] = {rt.RTV.Get()};
   m_Context->OMSetRenderTargets(1, RTVs, rt.DSV.Get()); // rt.DSV 사용!
   m_Context->RSSetViewports(1, &rt.viewport);
 
@@ -214,11 +210,11 @@ HRESULT GraphicDevice::Begin_RenderOffScreen(uint32 screenIndex) {
 }
 
 HRESULT GraphicDevice::End_RenderOffScreen() {
-  ID3D11RenderTargetView *RTVs[] = {m_RTV.Get()};
-  m_Context->OMSetRenderTargets(1, RTVs, m_DSV.Get());
-  m_Context->RSSetViewports(1, &m_ViewPort);
+	ID3D11RenderTargetView *RTVs[] = { m_RTV.Get() };
+    m_Context->OMSetRenderTargets(1, RTVs, m_DSV.Get());
+    m_Context->RSSetViewports(1, &m_ViewPort);
 
-  return S_OK;
+    return S_OK;
 }
 
 ComPtr<ID3D11ShaderResourceView>
@@ -329,60 +325,60 @@ HRESULT GraphicDevice::Ready_DepthStencilView(uint32 winSizeX,
 }
 
 HRESULT GraphicDevice::Create_OffScreenTarget(uint32 width, uint32 height) {
-  OffscreenRenderTarget rt = {};
-  D3D11_TEXTURE2D_DESC textureDesc = {};
-  {
-    textureDesc.Width = width;
-    textureDesc.Height = height;
-    textureDesc.MipLevels = 1;
-    textureDesc.ArraySize = 1;
-    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    textureDesc.SampleDesc.Count = 1;
-    textureDesc.SampleDesc.Quality = 0;
-    textureDesc.Usage = D3D11_USAGE_DEFAULT;
-    textureDesc.BindFlags =
-        D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-    textureDesc.CPUAccessFlags = 0;
-  }
+    OffscreenRenderTarget rt = {};
+    D3D11_TEXTURE2D_DESC textureDesc = {};
+    {
+      textureDesc.Width = width;
+      textureDesc.Height = height;
+      textureDesc.MipLevels = 1;
+      textureDesc.ArraySize = 1;
+      textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+      textureDesc.SampleDesc.Count = 1;
+      textureDesc.SampleDesc.Quality = 0;
+      textureDesc.Usage = D3D11_USAGE_DEFAULT;
+      textureDesc.BindFlags =
+          D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+      textureDesc.CPUAccessFlags = 0;
+    }
 
-  if (FAILED(m_Device->CreateTexture2D(&textureDesc, nullptr,
-                                       rt.texture.GetAddressOf())))
-    return E_FAIL;
+    if (FAILED(m_Device->CreateTexture2D(&textureDesc, nullptr,
+                                         rt.texture.GetAddressOf())))
+      return E_FAIL;
 
-  if (FAILED(m_Device->CreateRenderTargetView(rt.texture.Get(), nullptr,
-                                              rt.RTV.GetAddressOf())))
-    return E_FAIL;
+    if (FAILED(m_Device->CreateRenderTargetView(rt.texture.Get(), nullptr,
+                                                rt.RTV.GetAddressOf())))
+      return E_FAIL;
 
-  if (FAILED(m_Device->CreateShaderResourceView(rt.texture.Get(), nullptr,
-                                                rt.SRV.GetAddressOf())))
-    return E_FAIL;
+    if (FAILED(m_Device->CreateShaderResourceView(rt.texture.Get(), nullptr,
+                                                  rt.SRV.GetAddressOf())))
+      return E_FAIL;
 
-  D3D11_TEXTURE2D_DESC dsDesc = {};
-  dsDesc.Width = width;
-  dsDesc.Height = height;
-  dsDesc.MipLevels = 1;
-  dsDesc.ArraySize = 1;
-  dsDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-  dsDesc.SampleDesc.Count = 1;
-  dsDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-  ComPtr<ID3D11Texture2D> depthStencilTex;
-  if (FAILED(m_Device->CreateTexture2D(&dsDesc, nullptr,
-                                       depthStencilTex.GetAddressOf())))
-    return E_FAIL;
-  if (FAILED(m_Device->CreateDepthStencilView(depthStencilTex.Get(), nullptr,
-                                              rt.DSV.GetAddressOf())))
-    return E_FAIL;
+    D3D11_TEXTURE2D_DESC dsDesc = {};
+    dsDesc.Width = width;
+    dsDesc.Height = height;
+    dsDesc.MipLevels = 1;
+    dsDesc.ArraySize = 1;
+    dsDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsDesc.SampleDesc.Count = 1;
+    dsDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    ComPtr<ID3D11Texture2D> depthStencilTex;
+    if (FAILED(m_Device->CreateTexture2D(&dsDesc, nullptr,
+                                         depthStencilTex.GetAddressOf())))
+      return E_FAIL;
+    if (FAILED(m_Device->CreateDepthStencilView(depthStencilTex.Get(), nullptr,
+                                                rt.DSV.GetAddressOf())))
+      return E_FAIL;
 
-  rt.viewport.TopLeftX = 0.f;
-  rt.viewport.TopLeftY = 0.f;
-  rt.viewport.Width = static_cast<Float>(width);
-  rt.viewport.Height = static_cast<Float>(height);
-  rt.viewport.MinDepth = 0.f;
-  rt.viewport.MaxDepth = 1.f;
+    rt.viewport.TopLeftX = 0.f;
+    rt.viewport.TopLeftY = 0.f;
+    rt.viewport.Width = static_cast<Float>(width);
+    rt.viewport.Height = static_cast<Float>(height);
+    rt.viewport.MinDepth = 0.f;
+    rt.viewport.MaxDepth = 1.f;
 
-  m_Offscreens.push_back(rt);
+    m_Offscreens.push_back(rt);
 
-  return S_OK;
+    return S_OK;
 }
 
 Unique<GraphicDevice>

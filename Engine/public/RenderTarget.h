@@ -13,6 +13,9 @@ public:
 	~RenderTarget() override = default;
 
 public:
+	HRESULT OnResize(uint32 sizeX, uint32 sizeY);
+
+public:
 	HRESULT Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
 	HRESULT Begin() override;
 	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; };
@@ -23,6 +26,7 @@ public:
 	void Clear_RenderTarget() const;
 
 private:
+	DXGI_FORMAT m_PixelFormat{};
 	Color m_ClearColor{};
 	ComPtr<ID3D11Device> m_Device{ nullptr };
 	ComPtr<ID3D11DeviceContext> m_Context{ nullptr };
@@ -33,7 +37,7 @@ private:
 public:
 	static Shared<RenderTarget> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, 
 		uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
-	
+
 #ifdef _DEBUG
 private:
 	Matrix		m_WorldMatrix = {};

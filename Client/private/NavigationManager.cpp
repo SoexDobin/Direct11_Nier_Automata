@@ -5,35 +5,43 @@
 #include <Navigation.h>
 
 #include "GameObject.h"
+#include "NavigationSector.h"
 
 IMPLEMENT_SINGLETON(NavigationManager)
 
 NavigationManager::~NavigationManager()
 {
-	for (auto mapping : m_NavMapping)
-		mapping.second.clear();
 
-	m_NavMapping.clear();
 }
 
-vector<Shared<Navigation>> NavigationManager::Get_LinkedNodeNavigations(const wstring& navTag)
+HRESULT NavigationManager::Setting_NavigationSector(LEVEL level)
 {
-	auto iter = m_NavMapping.find(navTag);
-	if (iter != m_NavMapping.end())
-		return iter->second;
+	if (level == LEVEL::GAMEPLAY)
+	{
+		return 	Setting_GamePlay();
+	}
 
-	vector<Shared<Navigation>> empty;
-	return empty;
+
+	return E_FAIL;
 }
 
-void NavigationManager::Mapping_NavigationTable()
+HRESULT NavigationManager::Setting_GamePlay()
 {
-	// TODO : 이거 누수 코드임 DestroyInstance하셈
-	//Navigation::NAVIGATION_DESC desc{  };
-	//m_NavMapping[L"CityOfRuinEntry"].push_back(
-	//	static_pointer_cast<Navigation>(GAME_INSTANCE->Instantiate<Navigation>(L"CityOfRuinBridge", ETOI(LEVEL::STATIC), &desc))
-	//);
-	//m_NavMapping[L"CityOfRuinBridge"].push_back(
-	//	static_pointer_cast<Navigation>(GAME_INSTANCE->Instantiate<Navigation>(L"CityOfRuinEntry", ETOI(LEVEL::STATIC), &desc))
-	//);
+	Navigation::NAVIGATION_DESC desc{ };
+
+	auto bridge = GAME_INSTANCE->Instantiate<Navigation>(L"CityOfRuinBridge", ETOI(LEVEL::STATIC), &desc);
+	NavigationSector::NAVIGATION_COLLISION_DESC bridgeSectorDesc{};
+	bridgeSectorDesc.TargetCollider = bridge;
+	bridgeSectorDesc.worldPosition = Vector3::Zero;
+	bridgeSectorDesc.collisionExtends = Vector3::Zero;
+	auto bridgeSector = GAME_INSTANCE->Instantiate<NavigationSector>(L"NavigationSector", ETOI(LEVEL::GAMEPLAY), &bridgeSectorDesc);
+	
+	NavigationSector::NAVIGATION_COLLISION_DESC entrySectorDesc{};
+	auto entry = GAME_INSTANCE->Instantiate<Navigation>(L"CityOfRuinEntry", ETOI(LEVEL::STATIC), &desc);
+	entrySectorDesc.TargetCollider = entry;
+	entrySectorDesc.worldPosition = Vector3::Zero;
+	entrySectorDesc.collisionExtends = Vector3::Zero;
+	auto entrySector = GAME_INSTANCE->Instantiate<NavigationSector>(L"NavigationSector", ETOI(LEVEL::GAMEPLAY), &entrySectorDesc);
+
+	return S_OK;
 }

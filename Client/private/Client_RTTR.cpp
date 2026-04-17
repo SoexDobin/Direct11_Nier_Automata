@@ -45,6 +45,7 @@
 #include "Em3003.h"
 #include "SheathWP0070Body.h"
 #include "SheathWP0220Body.h"
+#include "NavigationSector.h"
 
 using rttr::registration;
 
@@ -302,6 +303,12 @@ void Register_Client_Reflection() {
         .method("Clone", &HpBarWorldUI::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return HpBarWorldUI::Create(device, context); })
 		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+
+    rttr::registration::class_<NavigationSector>("NavigationSector")
+        .constructor<>()
+        .method("Clone", &NavigationSector::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return NavigationSector::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가

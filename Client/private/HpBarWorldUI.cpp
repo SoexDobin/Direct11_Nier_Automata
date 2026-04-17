@@ -87,7 +87,7 @@ void HpBarWorldUI::Late_Update(Float timeDelta)
 	);
 
 	m_TargetInBack = false;
-	m_Transform->Set_LocalPosition(screenPos.x, screenPos.y, 0.f);
+	m_Transform->Set_Position(screenPos.x, screenPos.y, 0.5f);
 	Update_UITransform();
 }
 
@@ -96,7 +96,7 @@ void HpBarWorldUI::Submit_RenderGroup()
 	if (m_Target.expired() || m_Target.lock()->Is_Destroy())
 		return;
 
-	if (m_TargetInBack) return;
+	//if (m_TargetInBack) return;
 
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::WORLDUI, shared_from_this());
 }
@@ -108,6 +108,10 @@ HRESULT HpBarWorldUI::Render()
 
 	Float hpRatio = m_Target.lock()->Get_HP() / m_Target.lock()->Get_MaxHP();
 	if (FAILED(m_Shader->Bind_RawValue(HpRatio, &hpRatio, sizeof(Float))))
+		return E_FAIL;
+
+	Vector3 targetWorldPos = m_Target.lock()->Get_Transform()->Get_Position() + m_WorldOffset;
+	if (FAILED(m_Shader->Bind_RawValue(TargetPosition, &targetWorldPos, sizeof(Vector3))))
 		return E_FAIL;
 
 	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))

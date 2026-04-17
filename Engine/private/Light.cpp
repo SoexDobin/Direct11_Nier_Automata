@@ -29,12 +29,12 @@ HRESULT Light::Render(const Shared<Shader>& shader, const Shared<VIBuffer_Rect>&
 			return E_FAIL;
 		}
 
-		shaderPass = ETOI(LIGHT::DIRECTIONAL);
+		shaderPass = ETOI(DEFERRED::DIRECTIONAL);
 	}
 	else if (m_LightDesc.type == LIGHT::POINT)
 	{
 		
-		shaderPass = ETOI(LIGHT::POINT);
+		shaderPass = ETOI(DEFERRED::POINT);
 	}
 
 	shader->Begin(shaderPass);

@@ -12,14 +12,10 @@ namespace Engine
 	constexpr const Char* NormalMap = "g_NormalTexture";
 	constexpr const Char* ShadeMap = "g_ShadeTexture";
 
-
-	constexpr const Char* DirectionLight = "g_LightDir";
+	constexpr const Char* LightDirection = "g_LightDirection";
 	constexpr const Char* DiffuseLight = "g_LightDiffuse";
 	constexpr const Char* SpecularLight = "g_LightSpecular";
 	constexpr const Char* AmbientLight = "g_LightAmbient";
-
-	constexpr const Char* LightDirection = "g_LightDirection";
-
 
 	const std::wstring RT_DIFFUSE = L"RenderTargetDiffuse";
 	const std::wstring RT_NORMAL = L"RenderTargetNormal";

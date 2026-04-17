@@ -2,6 +2,7 @@
 #include "InspectorCollider.h"
 #include "OBBCollider.h"
 #include "SphereCollider.h"
+#include "AABBCollider.h"
 
 using namespace Engine;
 using namespace Editor;
@@ -20,6 +21,7 @@ void InspectorCollider::RenderComponent(const std::shared_ptr<Engine::Component>
 
 	if (type == COMPONENT_TYPE::OBB_COLLIDER) headerTitle = "OBB Collider##";
 	else if (type == COMPONENT_TYPE::SPHERE_COLLIDER) headerTitle = "Sphere Collider##";
+	else if (type == COMPONENT_TYPE::AABB_COLLIDER) headerTitle = "AABB Collider##";
 
 	// 다중 콜라이더의 ImGui ID 충돌을 방지하기 위해 메모리 주소를 ID로 사용
 	headerTitle += std::to_string(reinterpret_cast<uint64_t>(pCollider.get()));
@@ -32,6 +34,8 @@ void InspectorCollider::RenderComponent(const std::shared_ptr<Engine::Component>
 			RenderOBB(static_pointer_cast<OBBCollider>(pCollider));
 		else if (type == COMPONENT_TYPE::SPHERE_COLLIDER)
 			RenderSphere(static_pointer_cast<SphereCollider>(pCollider));
+		else if (type == COMPONENT_TYPE::AABB_COLLIDER)
+			RenderAABB(static_pointer_cast<AABBCollider>(pCollider));
 	}
 
 	ImGui::PopID();
@@ -43,12 +47,12 @@ void InspectorCollider::RenderOBB(const std::shared_ptr<Engine::OBBCollider>& pO
 	ImGui::Separator();
 
 	Vector3 offset = pOBB->Get_Offset();
-	if (ImGui::DragFloat3("Offset", (float*)&offset, 0.05f)) {
+	if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
 		pOBB->Set_Offset(offset);
 	}
 
 	Vector3 extents = pOBB->Get_Extents();
-	if (ImGui::DragFloat3("Extents(Half-Size)", (float*)&extents, 0.05f, 0.01f, 1000.f)) {
+	if (ImGui::DragFloat3("Extents(Half-Size)", reinterpret_cast<Float*>(&extents), 0.05f, 0.01f, 1000.f)) {
 		pOBB->Set_Extents(extents);
 	}
 }
@@ -59,13 +63,29 @@ void InspectorCollider::RenderSphere(const std::shared_ptr<Engine::SphereCollide
 	ImGui::Separator();
 
 	Vector3 offset = pSphere->Get_Offset();
-	if (ImGui::DragFloat3("Offset", (float*)&offset, 0.05f)) {
+	if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
 		pSphere->Set_Offset(offset);
 	}
 
 	Float radius = pSphere->Get_Radius();
 	if (ImGui::DragFloat("Radius", &radius, 0.05f, 0.01f, 1000.f)) {
 		pSphere->Set_Radius(radius);
+	}
+}
+
+void InspectorCollider::RenderAABB(const std::shared_ptr<Engine::AABBCollider>& pAABB)
+{
+	ImGui::TextDisabled("Type: AABB");
+	ImGui::Separator();
+
+	Vector3 offset = pAABB->Get_Offset();
+	if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
+		pAABB->Set_Offset(offset);
+	}
+
+	Vector3 extents = pAABB->Get_Extents();
+	if (ImGui::DragFloat3("Extents(Half-Size)", reinterpret_cast<Float*>(&extents), 0.05f, 0.01f, 1000.f)) {
+		pAABB->Set_Extents(extents);
 	}
 }
 

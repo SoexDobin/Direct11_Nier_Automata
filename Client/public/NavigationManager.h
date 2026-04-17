@@ -15,11 +15,10 @@ public:
 	~NavigationManager();
 
 public:
-	vector<Shared<Navigation>> Get_LinkedNodeNavigations(const wstring& navTag);
-	void Mapping_NavigationTable();
+	HRESULT Setting_NavigationSector(LEVEL level);
 
-public:
-	map<wstring, vector<Shared<Navigation>>> m_NavMapping;
+private:
+	HRESULT Setting_GamePlay();
 
 };
 

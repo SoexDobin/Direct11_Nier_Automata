@@ -41,6 +41,8 @@ private:
 
 private:
 	int32 Get_BoneIndex(const Char* boneName);
+	void Dump_MaterialProperties(const aiMaterial* aiMat);
+	void InjectFallbackTextures(Shared<MODEL_MATERIAL>& mat);
 
 private:
 	Shared<Assimp::Importer>		m_Importer{nullptr};

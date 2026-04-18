@@ -2,6 +2,8 @@
 
 namespace Engine
 {
+	constexpr const Char* DefaultColor = "g_DefaultColor";
+
 	constexpr const Char* WorldMatrix = "g_WorldMatrix";
 	constexpr const Char* ViewMatrix = "g_ViewMatrix";
 	constexpr const Char* ProjMatrix = "g_ProjMatrix";

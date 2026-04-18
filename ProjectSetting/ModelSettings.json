@@ -279,6 +279,26 @@
                 "z": 1.0
             },
             "tag": "CityOfRuinEntry1"
+        },
+        {
+            "level": "3",
+            "path": "Models/World/CityOfRuinCentral/CityOfRuinCentral.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "CityOfRuinCentral"
         }
     ]
 }

@@ -6,11 +6,11 @@
 #include "Navigation.h"
 #include <SpdLogger.h>
 
-CityOfRuinEntry::CityOfRuinEntry() : GameObject{} {}
+
 CityOfRuinEntry::CityOfRuinEntry(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: GameObject{ device, context } {}
+	: WorldObject{ device, context } {}
 CityOfRuinEntry::CityOfRuinEntry(const CityOfRuinEntry& rhs)
-	: GameObject{ rhs } {}
+	: WorldObject{ rhs } {}
 
 HRESULT CityOfRuinEntry::Initialize_Prototype()
 {
@@ -19,13 +19,12 @@ HRESULT CityOfRuinEntry::Initialize_Prototype()
 
 HRESULT CityOfRuinEntry::Initialize(void* arg)
 {
-	if (FAILED(GameObject::Initialize(arg)))
-	{
-		LOG_ERROR(L"Failed to Initialize CityOfRuins {}", m_ObjectName);
-		return E_FAIL;
-	}
+	WorldObject::WORLD_OBJECT_DESC desc;
+	desc.vertexTag = VTXMESH::Tag;
+	desc.modelTag = L"CityOfRuinEntry";
+	desc.navTag = L"CityOfRuinEntry";
 
-	if (FAILED(Ready_Components()))
+	if (FAILED(WorldObject::Initialize(&desc)))
 	{
 		LOG_ERROR(L"Failed to Ready Components {}", m_ObjectName);
 		return E_FAIL;
@@ -49,13 +48,9 @@ void CityOfRuinEntry::On_Disable()
 	GameObject::On_Disable();
 }
 
-void CityOfRuinEntry::Priority_Update(Float timeDelta)
-{
-
-}
-
 HRESULT CityOfRuinEntry::Render()
 {
+	
 #ifdef _DEBUG
 	m_Navigation->Render_Debug();
 #endif
@@ -80,43 +75,6 @@ HRESULT CityOfRuinEntry::Render()
 void CityOfRuinEntry::Submit_RenderGroup()
 {
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
-}
-
-HRESULT CityOfRuinEntry::Ready_Components()
-{
-	Shader::SHADER_DESC shaderDesc{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
-	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
-	if (nullptr == m_Shader)
-		return E_FAIL;
-
-	Model::MODEL_DESC modelDesc{ L"CityOfRuinEntry1" };
-	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
-	if (nullptr == m_Model)
-		return E_FAIL;
-
-	{
-		Navigation::NAVIGATION_DESC navDesc{};
-		m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
-		if (m_Navigation == nullptr) {
-			LOG_ERROR("Failed to hook pre-baked Navigation Mesh!");
-		}
-	}
-
-	return S_OK;
-}
-
-HRESULT CityOfRuinEntry::Bind_ShaderResources()
-{
-	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
-		return E_FAIL;
-
-	return S_OK;
 }
 
 Shared<CityOfRuinEntry> CityOfRuinEntry::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

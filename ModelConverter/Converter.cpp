@@ -228,6 +228,9 @@ void Tool::Converter::ReadMaterialData()
 		aiMat->Get(AI_MATKEY_NAME, name);
 		mat->name = name.C_Str();
 
+		// ★ 모든 매터리얼 프로퍼티 덤프 (디버깅용)
+		Dump_MaterialProperties(aiMat);
+
 		for (uint32 t = 0; t < AI_TEXTURE_TYPE_MAX; ++t)
 		{
 			const aiTextureType texType = static_cast<aiTextureType>(t);
@@ -259,6 +262,12 @@ void Tool::Converter::ReadMaterialData()
 
 				mat->textures.push_back(entry);
 			}
+		}
+
+		// ★ Assimp가 텍스처를 못 읽어왔을 경우 하드코딩 Fallback
+		if (mat->textures.empty())
+		{
+			InjectFallbackTextures(mat);
 		}
 
 		m_Material.push_back(mat);
@@ -572,5 +581,69 @@ void Tool::Converter::WriteJsonFile(const wstring& path)
 		out << root.dump(4);
 		out.close();
 		std::cout << "  [JSON] Export Success: " << string(path.begin(), path.end()) << "\n";
+	}
+}
+
+void Tool::Converter::Dump_MaterialProperties(const aiMaterial* aiMat)
+{
+	aiString matName;
+	aiMat->Get(AI_MATKEY_NAME, matName);
+
+	std::cout << "  --------------------------------------------------\n";
+	std::cout << "  [Material Property Dump] Name: " << matName.C_Str() << "\n";
+	std::cout << "  NumProperties: " << aiMat->mNumProperties << "\n";
+
+	for (unsigned int i = 0; i < aiMat->mNumProperties; ++i)
+	{
+		aiMaterialProperty* prop = aiMat->mProperties[i];
+		std::cout << "    Key: " << prop->mKey.C_Str();
+		std::cout << " | Type: " << prop->mType;
+		std::cout << " | Length: " << prop->mDataLength;
+
+		// 문자열인 경우 값 출력 시도
+		if (prop->mType == aiPTI_String)
+		{
+			aiString str;
+			if (AI_SUCCESS == aiMat->Get(prop->mKey.C_Str(), prop->mSemantic, prop->mIndex, str))
+			{
+				std::cout << " | Value: " << str.C_Str();
+			}
+		}
+		// 실수인 경우
+		else if (prop->mType == aiPTI_Float && prop->mDataLength >= sizeof(float))
+		{
+			float val;
+			memcpy(&val, prop->mData, sizeof(float));
+			std::cout << " | Value: " << val;
+		}
+
+		std::cout << "\n";
+	}
+	std::cout << "  --------------------------------------------------\n";
+}
+
+void Tool::Converter::InjectFallbackTextures(Shared<MODEL_MATERIAL>& mat)
+{
+	// ★ Assimp가 FBX로부터 텍스처 정보를 읽지 못하는 특정 매터리얼에 대한 하드코딩 Fallback
+	// Blender의 셰이더 노드 구성이 FBX Export와 호환되지 않아 발생하는 문제 우회
+
+	if (mat->name == "DRY_ground_grass")
+	{
+		std::cout << "  [Fallback] Injecting textures for: " << mat->name << "\n";
+
+		mat->textures.push_back({ 1, "5B9FFB4B.dds" });
+		mat->textures.push_back({ 1, "07E7E861.dds" });
+		mat->textures.push_back({ 1, "14AE81FF.dds" });
+
+		mat->textures.push_back({ 6, "72AE9D20.dds" });
+		mat->textures.push_back({ 6, "47157233.dds" });
+		mat->textures.push_back({ 6, "5C917F8C.dds" });
+	}
+	else if (mat->name == "DRY_yo_asphalt_01")
+	{
+		std::cout << "  [Fallback] Injecting textures for: " << mat->name << "\n";
+
+		mat->textures.push_back({ 1, "277C0B89.dds" });
+		mat->textures.push_back({ 6, "0E4D6DE2.dds" });
 	}
 }

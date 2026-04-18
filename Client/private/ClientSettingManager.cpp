@@ -456,6 +456,7 @@ HRESULT ClientSettingManager::Load_Shader() const
 
 				std::wstring tex = L"vtxtex";
 				std::wstring normTex = L"vtxnormtex";
+				std::wstring staticWorldMesh = L"vtxworldmesh";
 				std::wstring staticMesh = L"vtxmesh";
 				std::wstring animMesh = L"vtxanimmesh";
 				std::wstring cube = L"vtxcube";
@@ -473,8 +474,12 @@ HRESULT ClientSettingManager::Load_Shader() const
 						normTex.begin(), normTex.end(), CaseInsensitiveCompare
 					);
 				auto itMeshTex = std::search(
-						tagName.begin(), tagName.end(),
-						staticMesh.begin(), staticMesh.end(), CaseInsensitiveCompare
+					tagName.begin(), tagName.end(),
+					staticMesh.begin(), staticMesh.end(), CaseInsensitiveCompare
+					);
+				auto itWorldMeshTex = std::search(
+					tagName.begin(), tagName.end(),
+					staticWorldMesh.begin(), staticWorldMesh.end(), CaseInsensitiveCompare
 					);
 				auto itAnimTex = std::search(
 						tagName.begin(), tagName.end(),
@@ -505,6 +510,11 @@ HRESULT ClientSettingManager::Load_Shader() const
 				else if (itMeshTex != tagName.end())
 				{
 					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXMESH::Tag)))
+						LOG_ERROR(L"Failed to Load Shader {}", VTXMESH::Tag);
+				}
+				else if (itWorldMeshTex != tagName.end())
+				{
+					if (FAILED(GAME_INSTANCE->Load_Shader(ETOI(LEVEL::STATIC), (m_ShaderPath + tagName).c_str(), VTXMESH::Elements, VTXMESH::numElements, VTXWORLDMESH)))
 						LOG_ERROR(L"Failed to Load Shader {}", VTXMESH::Tag);
 				}
 				else if (itNormTex != tagName.end())

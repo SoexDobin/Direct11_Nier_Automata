@@ -6,11 +6,11 @@
 #include "Navigation.h"
 #include <SpdLogger.h>
 
-CityOfRuinBridge::CityOfRuinBridge() : GameObject{} {}
+CityOfRuinBridge::CityOfRuinBridge() : WorldObject{} {}
 CityOfRuinBridge::CityOfRuinBridge(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: GameObject{ device, context } {}
+	: WorldObject{ device, context } {}
 CityOfRuinBridge::CityOfRuinBridge(const CityOfRuinBridge& rhs)
-	: GameObject{ rhs } {}
+	: WorldObject{ rhs } {}
 
 HRESULT CityOfRuinBridge::Initialize_Prototype()
 {
@@ -19,13 +19,13 @@ HRESULT CityOfRuinBridge::Initialize_Prototype()
 
 HRESULT CityOfRuinBridge::Initialize(void* arg)
 {
-	if (FAILED(GameObject::Initialize(arg)))
-	{
-		LOG_ERROR(L"Failed to Initialize CityOfRuins {}", m_ObjectName);
-		return E_FAIL;
-	}
+	// 210 185
+	WorldObject::WORLD_OBJECT_DESC desc;
+	desc.vertexTag = VTXWORLDMESH;
+	desc.modelTag = L"CityOfRuinBridge";
+	desc.navTag = L"CityOfRuinBridge";
 
-	if (FAILED(Ready_Components()))
+	if (FAILED(WorldObject::Initialize(&desc)))
 	{
 		LOG_ERROR(L"Failed to Ready Components {}", m_ObjectName);
 		return E_FAIL;
@@ -49,11 +49,6 @@ void CityOfRuinBridge::On_Disable()
 	GameObject::On_Disable();
 }
 
-void CityOfRuinBridge::Priority_Update(Float timeDelta)
-{
-
-}
-
 HRESULT CityOfRuinBridge::Render()
 {
 #ifdef _DEBUG
@@ -66,11 +61,35 @@ HRESULT CityOfRuinBridge::Render()
 	size_t numMeshes = m_Model->Get_NumMeshes();
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
+		if (i <= 21)
+		{
+			auto w = Vector4{ 0.1f, 0.45f, 0.45f, 10.f };
+			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
+		}
+		else
+		{
+			auto w = Vector4{ 0.33f, 0.33f, 0.34f, 1.f };
+			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
+		}
+			
+
 		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
+		
+		HRESULT h1 = m_Model->Bind_Material(m_Shader, DiffuseMap1, i, 1, 1);
+		HRESULT h2 = m_Model->Bind_Material(m_Shader, DiffuseMap2, i, 1, 2);
+		Bool isBlend = SUCCEEDED(h1) && SUCCEEDED(h2);
+		uint32 passIndex = isBlend ? 0 : 1;
+	
+		m_Model->Bind_Material(m_Shader, NormalMap, i, 6, 0);
+		if (isBlend)
+		{
+			m_Model->Bind_Material(m_Shader, NormalMap1, i, 6, 1);
+			m_Model->Bind_Material(m_Shader, NormalMap2, i, 6, 2);
+		}
 
-		if (FAILED(m_Shader->Begin(0)))
+		if (FAILED(m_Shader->Begin(passIndex)))
 			return E_FAIL;
-
+	
 		m_Model->Render(i);
 	}
 
@@ -80,44 +99,6 @@ HRESULT CityOfRuinBridge::Render()
 void CityOfRuinBridge::Submit_RenderGroup()
 {
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
-}
-
-HRESULT CityOfRuinBridge::Ready_Components()
-{
-	Shader::SHADER_DESC shaderDesc{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
-	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
-	if (nullptr == m_Shader)
-		return E_FAIL;
-
-	Model::MODEL_DESC modelDesc{ L"CityOfRuinBridge" };
-	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
-	if (nullptr == m_Model)
-		return E_FAIL;
-
-	{
-		Navigation::NAVIGATION_DESC navDesc{};
-		m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinBridge", &navDesc);
-		if (m_Navigation == nullptr) {
-			LOG_ERROR("Failed to hook pre-baked Navigation Mesh!");
-		}
-	}
-	
-
-	return S_OK;
-}
-
-HRESULT CityOfRuinBridge::Bind_ShaderResources()
-{
-	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
-		return E_FAIL;
-
-	return S_OK;
 }
 
 Shared<CityOfRuinBridge> CityOfRuinBridge::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

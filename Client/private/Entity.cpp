@@ -18,8 +18,27 @@ Entity::Entity(const Entity& rhs)
 
 void Entity::Set_Navigation(const Shared<Navigation>& navigation)
 {
-	uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
-	m_Navigation = Add_Component<Navigation>(levIndex, navigation->Get_ObjectDesc());
+	uint32 navTypeID = static_cast<uint32>(rttr::type::get<Navigation>().get_id());
+	for (auto it = m_Components.begin(); it != m_Components.end(); ++it)
+	{
+		if (it->second->Get_TypeID() == navTypeID)
+		{
+			it->second->On_Destroy();
+			m_Components.erase(it);
+			break;
+		}
+	}
+
+	Navigation::NAVIGATION_DESC navDesc;
+	navDesc.startCellIndex = 0;
+
+	Shared<Component> clonedNav = navigation->Clone(&navDesc);
+	if (clonedNav)
+	{
+		m_Navigation = static_pointer_cast<Navigation>(clonedNav);
+		m_Navigation->Compute_CurrentCellByPosition(m_Transform->Get_Position());
+		Add_Component(m_Navigation);
+	}
 }
 
 void Entity::TakeDamage(const DAMAGE_INFO& dmgInfo)

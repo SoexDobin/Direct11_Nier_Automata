@@ -11,7 +11,8 @@
 NavigationSector::NavigationSector(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: GameObject{device, context} {}
 NavigationSector::NavigationSector(const NavigationSector& rhs)
-	: GameObject{rhs} {}
+	: GameObject{ rhs }, m_TargetLayerIndex{rhs.m_TargetLayerIndex} {
+}
 
 HRESULT NavigationSector::Initialize_Prototype()
 {
@@ -74,7 +75,8 @@ void NavigationSector::OnCollisionEnter(const Shared<Collider>& ownCollider, con
 	auto target = targetCollider->Get_Owner();
 
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::CONTAINER) return;
-	if (m_TargetLayerIndex.contains(ETOI(target->Get_LayerMask().Get_Layer()) == false)) return;
+	uint32 layerIndex = ETOI(target->Get_LayerMask().Get_Layer());
+	if (m_TargetLayerIndex.contains(layerIndex) == false) return;
 
 	if (auto entity = static_pointer_cast<Entity>(target))
 	{

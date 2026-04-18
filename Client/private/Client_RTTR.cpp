@@ -55,7 +55,6 @@ using rttr::registration;
 // 자동으로 Client/public 내부의 헤더를 스캔하여 포함시킵니다.
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
-#include "CityOfRuinCentral.h"
 #include "FreeCamera.h"
 #include "MonsterStateMachine.h"
 #include "SkyBox.h"
@@ -202,6 +201,11 @@ void Register_Client_Reflection() {
         .method("Clone", &CityOfRuinBridge::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuinBridge::Create(device, context); })
 	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<CityOfRuinCentral>("CityOfRuinCentral")
+        .constructor<>()
+        .method("Clone", &CityOfRuinCentral::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuinCentral::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
 
     // MONSTER
     rttr::registration::class_<Em3100>("Em3100")
@@ -317,11 +321,6 @@ void Register_Client_Reflection() {
   // 자동으로 GameObject 및 Script 파생 객체의 RTTR 블록을 채웁니다.
   // ==============================================================
   // <AUTO_GENERATED_RTTR>
-    rttr::registration::class_<CityOfRuinCentral>("CityOfRuinCentral")
-        .constructor<>()
-        .method("Clone", &CityOfRuinCentral::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuinCentral::Create(device, context); })(rttr::metadata("Level", 0));
-
     rttr::registration::class_<FreeCamera>("FreeCamera")
         .constructor<>()
         .method("Clone", &FreeCamera::Clone)

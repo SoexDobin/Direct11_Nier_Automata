@@ -33,6 +33,9 @@ public:
 	} EM0010_MOVEMENT_DATA;
 
 public:
+	void Set_TargetNavigation(const Shared<Navigation>& navigation);
+
+public:
 	void Set_MovementData(const EM0010_MOVEMENT_DATA& data) { m_CurrentMoveData = data; Reset_RootMotionStop(); }
 	const EM0010_MOVEMENT_DATA& Get_MovementData() const { return m_CurrentMoveData; }
 

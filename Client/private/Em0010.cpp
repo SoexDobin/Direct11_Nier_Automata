@@ -124,6 +124,17 @@ void Em0010::Submit_RenderGroup()
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
+void Em0010::Set_Navigation(const Shared<Navigation>& navigation)
+{
+	Entity::Set_Navigation(navigation);
+	m_Em0010Movement->Set_TargetNavigation(m_Navigation);
+
+	if (m_Navigation->Has_NeighborCell(m_Transform->Get_Position()))
+	{
+		LOG_ERROR(L"There is no cell!!");
+	}
+}
+
 void Em0010::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
 	if (Is_Dead()) return;
@@ -241,7 +252,9 @@ HRESULT Em0010::Ready_Components()
 {
 	Navigation::NAVIGATION_DESC navDesc;
 	navDesc.startCellIndex = 0;
-	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
+	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinBridge", &navDesc);
+	if (nullptr == m_Navigation)
+		return E_FAIL;
 
 	Em0010Movement::EM0010_MOVEMENT_DESC movementDesc{};
 	movementDesc.velocity = Vector3{ 0.f, 0.f, 0.f };

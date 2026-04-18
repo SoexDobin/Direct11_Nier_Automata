@@ -149,8 +149,6 @@ void Pl0000Movement::Update_Movement(Float timeDelta)
 			}
 			else
 			{
-				// 공중에서 점프하여 NavMesh 구역을 벗어난 경우 (또는 다른 섬으로 건너뛰는 경우)
-				// 밑에 유효한 셀이 있는지 글로벌 탐색 시도
 				nav->Compute_CurrentCellByPosition(nextPosition);
 				if (nav->Get_CurrentCellIndex() != -1)
 				{

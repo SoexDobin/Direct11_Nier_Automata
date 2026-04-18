@@ -3,6 +3,7 @@
 #include <Shader.h>
 #include <Model.h>
 #include <Navigation.h>
+#include <SpdLogger.h>
 
 CityOfRuinCentral::CityOfRuinCentral(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: WorldObject{ device, context } { }

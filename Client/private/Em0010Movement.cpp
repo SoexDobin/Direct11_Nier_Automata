@@ -57,6 +57,12 @@ HRESULT Em0010Movement::Begin()
 }
 
 
+void Em0010Movement::Set_TargetNavigation(const Shared<Navigation>& navigation)
+{
+	m_Navigation.reset();
+	m_Navigation = navigation;
+}
+
 Bool Em0010Movement::Has_ReachedTarget(Float threshold) const
 {
 	if (!m_HasWalkTarget) return true;

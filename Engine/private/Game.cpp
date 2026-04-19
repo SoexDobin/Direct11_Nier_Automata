@@ -428,6 +428,11 @@ HRESULT Game::Set_MainCamera(const Shared<Camera> &camera) const
 }
 Shared<Camera> Game::Get_MainCamera() const { return m_CameraManager->Get_MainCamera(); }
 
+Bool Game::IsInFrustum(const BoundingSphere& worldSphere) const
+{
+    return m_CameraManager->IsInFrustum(worldSphere);
+}
+
 HRESULT Game::Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const
 {
     return m_ResourceManager->Load_Shader(levIndex, shaderFilePath, elements, numElements, descriptionTag);

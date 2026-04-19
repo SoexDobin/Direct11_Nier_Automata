@@ -155,6 +155,9 @@ HRESULT Mesh::Ready_VertexBuffer_For_NonAnim(const MODEL_MESH& meshData, const M
 	}
 
 	delete[] vertices;
+
+	Compute_CullingSphere();
+
 	return S_OK;
 }
 
@@ -179,6 +182,14 @@ HRESULT Mesh::Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData)
 
 	m_NumBones = meshData.boneIndices.size();
 
+	m_RawPosition.reserve(m_NumVertices * 3);
+	for (uint32 i = 0; i < m_NumVertices; ++i)
+	{
+		m_RawPosition.push_back(vertices[i].position.x);
+		m_RawPosition.push_back(vertices[i].position.y);
+		m_RawPosition.push_back(vertices[i].position.z);
+	}
+
 	D3D11_SUBRESOURCE_DATA vertexInitialData{};
 	vertexInitialData.pSysMem = vertices;
 
@@ -191,7 +202,15 @@ HRESULT Mesh::Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData)
 	}
 
 	delete[] vertices;
+
+	Compute_CullingSphere();
+
 	return S_OK;
+}
+
+void Mesh::Compute_CullingSphere()
+{
+	BoundingSphere::CreateFromPoints(m_LocalCullingSphere, m_NumVertices, reinterpret_cast<XMFLOAT3*>(m_RawPosition.data()), sizeof(XMFLOAT3));
 }
 
 Shared<Mesh> Mesh::CreatePrototype()

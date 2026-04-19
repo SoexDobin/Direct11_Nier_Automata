@@ -53,7 +53,7 @@ private:
 	Entity::DAMAGE_INFO			m_DamageInfo{};
 	Shared<SphereCollider>		m_AttackCollider{ nullptr };
 	unordered_set<uint32>		m_HitEntities; 
-
+	uint32						m_PlayerLayer{};
 	
 public:
 	static Shared<MonsterAOE> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

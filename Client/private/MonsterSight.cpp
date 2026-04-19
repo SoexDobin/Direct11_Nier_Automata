@@ -2,6 +2,7 @@
 #include "MonsterSight.h"
 
 #include <ContainerObject.h>
+#include <Game.h>
 
 #include "Monster.h"
 #include "SphereCollider.h"
@@ -46,6 +47,8 @@ HRESULT MonsterSight::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	m_PlayerPhysicalLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"PlayerPhysical"));
+
 	return S_OK;
 }
 
@@ -81,8 +84,8 @@ void MonsterSight::OnCollisionEnter(const Shared<Collider>& ownCollider, const S
 	auto target = targetCollider->Get_Owner();
 	if (nullptr == target) return;
 
-	wstring targetLayerName = target->Get_LayerMask().Get_LayerName();
-	if (L"PlayerPhysical" != targetLayerName) return;
+	uint32 targetLayer = target->Get_LayerMask().Get_Layer();
+	if (m_PlayerPhysicalLayerIndex != targetLayer) return;
 	auto monster = static_pointer_cast<Monster>(m_Owner.lock());
 	monster->Set_Target(target);
 }

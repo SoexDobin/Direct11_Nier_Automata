@@ -55,6 +55,9 @@ HRESULT WP0070Body::Initialize(void* arg)
 	
 	m_Model->Set_LocalRootNode(m_RootBoneIndex);
 	m_Pl0000 = static_pointer_cast<Pl0000>(m_Owner.lock());
+
+	m_MonsterLayer = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"Monster"));
+
 	return S_OK;
 }
 
@@ -177,7 +180,7 @@ void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 
 	auto target = targetCollider->Get_Owner();
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
-	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
+	if (target->Get_LayerMask().Get_Layer() != m_MonsterLayer) return;
 
 	uint32 targetID = target->Get_InstanceID();
 	if (m_HitEntities.contains(targetID) == false)

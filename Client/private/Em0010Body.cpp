@@ -161,7 +161,12 @@ HRESULT Em0010Body::Render()
 
 void Em0010Body::Submit_RenderGroup()
 {
-	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	auto& sphere = m_Model->Get_LocalCullingSphere();
+	BoundingSphere worldSphere;
+	sphere.Transform(worldSphere, m_CombinedWorldMatrix);
+	
+	if (GAME_INSTANCE->IsInFrustum(worldSphere))
+		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
 void Em0010Body::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)

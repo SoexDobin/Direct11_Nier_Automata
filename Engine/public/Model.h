@@ -86,6 +86,10 @@ public:
 	const wstring& Get_ModelTag() const { return m_ModelTag; }
 	void Set_ModelTag(const wstring& tag);
 
+public:
+	Bool IsInFrustum_PreMesh(uint32 meshIndex, const Matrix& worldMatrix) const;
+	const BoundingSphere& Get_LocalCullingSphere() const { return m_LocalCullingSphere; }
+
 private:
 	HRESULT Ready_Bones(ifstream& in);
 	HRESULT Ready_Meshes(ifstream& in, Bool isAnim);
@@ -98,6 +102,7 @@ private:
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
 	int32	m_RootLocalNode{ -1 };
+	BoundingSphere m_LocalCullingSphere{};
 
 private:
 	Bool	m_IsAnimLoop{ false };

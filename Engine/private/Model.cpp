@@ -81,6 +81,15 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	
 	Update_ModelAnimation(0.f);
 
+	if (!m_Meshes.empty())
+	{
+		m_LocalCullingSphere = m_Meshes[0]->Get_CullingSphere();
+		for (size_t i = 1; i < m_Meshes.size(); ++i)
+		{
+			BoundingSphere::CreateMerged(m_LocalCullingSphere, m_LocalCullingSphere, m_Meshes[i]->Get_CullingSphere());
+		}
+	}
+
 	return Component::Initialize_Prototype();
 }
 
@@ -139,6 +148,7 @@ void Model::Set_ModelTag(const wstring& tag)
 	m_AnimationNames = prototype->m_AnimationNames;
 	m_NumBones = prototype->m_NumBones;
 	m_NumAnimation = prototype->m_NumAnimation;
+	m_LocalCullingSphere = prototype->m_LocalCullingSphere;
 
 	// 본과 애니메이션은 상태를 가지므로 클론(Clone) 필수
 	m_Bones.clear();
@@ -154,6 +164,17 @@ void Model::Set_ModelTag(const wstring& tag)
 
 	// 애니메이션 초기 바인딩 업데이트
 	Update_ModelAnimation(0.f);
+}
+
+Bool Model::IsInFrustum_PreMesh(uint32 meshIndex, const Matrix& worldMatrix) const
+{
+	if (meshIndex >= m_NumMeshes) return false;
+
+	const auto& localSphere = m_Meshes[meshIndex]->Get_CullingSphere();
+	BoundingSphere worldSphere{};
+	localSphere.Transform(worldSphere, worldMatrix);
+
+	return GAME_INSTANCE->IsInFrustum(worldSphere);
 }
 
 void Model::On_Destroy()

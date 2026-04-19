@@ -101,6 +101,7 @@ void CameraManager::Bind_MainCamera_Transform()
 
 		GAME_INSTANCE->Set_Transform(D3DTS::VIEW, viewMat);
 		GAME_INSTANCE->Set_Transform(D3DTS::PROJ, projMat);
+		Update_Frustum();
 	}
 	else
 		LOG_ERROR(L"There is no MainCamera");
@@ -123,6 +124,22 @@ HRESULT CameraManager::Clear_AllCameras()
 	m_MainCamera.reset();
 
 	return S_OK;
+}
+
+Bool CameraManager::IsInFrustum(const BoundingSphere& worldSphere)
+{
+	return m_Frustum.Contains(worldSphere) != DISJOINT;
+}
+
+void CameraManager::Update_Frustum()
+{
+	BoundingFrustum localFrustum{};
+	BoundingFrustum::CreateFromMatrix(localFrustum, GAME_INSTANCE->Get_Transform(D3DTS::PROJ));
+
+	if (auto mainCamera = m_MainCamera.lock())
+	{
+		localFrustum.Transform(m_Frustum, mainCamera->Get_Transform()->Get_WorldMatrix());
+	}
 }
 
 Unique<CameraManager> CameraManager::Create(uint32 levCount)

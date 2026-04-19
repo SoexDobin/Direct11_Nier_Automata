@@ -67,6 +67,7 @@ private:
 	Bool m_IsHitTheGround{ false };
 	Vector3 m_LocalLightPosition{};
 
+	uint32 m_MonsterLayer{};
 
 public:
 	static Shared<WP0070Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "Pl0000MonsterChecker.h"
+
+#include <Game.h>
+
 #include "Pl0000.h"
 #include <SpdLogger.h>
 #include "SphereCollider.h"
@@ -90,6 +93,8 @@ HRESULT Pl0000MonsterChecker::Initialize(void* arg)
 		return E_FAIL;
 	m_Pl0000 = static_pointer_cast<Pl0000>(m_Owner.lock());
 
+	m_TargetLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"MonsterPhysical"));
+
 	return S_OK;
 }
 
@@ -120,7 +125,7 @@ void Pl0000MonsterChecker::OnCollisionEnter(const Shared<Collider>& ownCollider,
 
 	auto target = targetCollider->Get_Owner();
 
-	if (target->Get_LayerMask().Get_LayerName() != L"MonsterPhysical") return;
+	if (target->Get_LayerMask().Get_Layer() != m_TargetLayerIndex) return;
 
 	for (auto& monster : m_CheckedMonsters)
 	{

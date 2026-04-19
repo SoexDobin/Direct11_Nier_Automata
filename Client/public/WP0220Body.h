@@ -62,6 +62,8 @@ private:
 	Shared<OBBCollider> m_AttackCollider{nullptr};
 	unordered_set<uint32> m_HitEntities;
 
+	uint32 m_MonsterLayer{};
+
 public:
 	enum class WP0220_STATE {
 		SHEATHE_LIGHT = 0,

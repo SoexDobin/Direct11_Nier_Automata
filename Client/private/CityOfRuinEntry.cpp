@@ -58,10 +58,15 @@ HRESULT CityOfRuinEntry::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
+	const Matrix& worldMat = m_Transform->Get_WorldMatrix();
 	size_t numMeshes = m_Model->Get_NumMeshes();
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
-		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
+		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
+			continue;
+
+		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
+			continue;
 
 		if (FAILED(m_Shader->Begin(0)))
 			return E_FAIL;
@@ -74,6 +79,11 @@ HRESULT CityOfRuinEntry::Render()
 
 void CityOfRuinEntry::Submit_RenderGroup()
 {
+	auto& sphere = m_Model->Get_LocalCullingSphere();
+
+	BoundingSphere worldSphere;
+	sphere.Transform(worldSphere, m_Transform->Get_WorldMatrix());
+
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 

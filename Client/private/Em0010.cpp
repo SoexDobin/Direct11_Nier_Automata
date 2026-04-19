@@ -121,18 +121,13 @@ HRESULT Em0010::Render()
 
 void Em0010::Submit_RenderGroup()
 {
-	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	
 }
 
 void Em0010::Set_Navigation(const Shared<Navigation>& navigation)
 {
 	Entity::Set_Navigation(navigation);
 	m_Em0010Movement->Set_TargetNavigation(m_Navigation);
-
-	if (m_Navigation->Has_NeighborCell(m_Transform->Get_Position()))
-	{
-		LOG_ERROR(L"There is no cell!!");
-	}
 }
 
 void Em0010::TakeDamage(const DAMAGE_INFO& dmgInfo)

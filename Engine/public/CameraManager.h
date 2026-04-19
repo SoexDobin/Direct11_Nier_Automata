@@ -27,10 +27,18 @@ public:
 	HRESULT Clear_Cameras(uint32 levIndex);
 	HRESULT Clear_AllCameras();
 
+public:
+	Bool IsInFrustum(const BoundingSphere& worldSphere);
+
+private:
+	void Update_Frustum();
+
 private:
 	uint32 m_LevCount{};
 	vector<vector<Shared<Camera>>> m_Cameras;
 	Weak<Camera> m_MainCamera{};
+
+	BoundingFrustum m_Frustum{};
 
 public:
   static Unique<CameraManager> Create(uint32 levCount);

@@ -51,6 +51,13 @@ private:
 	vector<int32> m_RawIndices;
 
 public:
+	const BoundingSphere& Get_CullingSphere() const { return m_LocalCullingSphere; }
+
+private:
+	BoundingSphere m_LocalCullingSphere{};
+	void Compute_CullingSphere();
+
+public:
 	static Shared<Mesh> CreatePrototype();
 	static Shared<Mesh> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, Bool isAnim, const MODEL_MESH& meshData, const Matrix& preTransformMatrix);
 	Shared<Component> Clone(void* arg = nullptr) override { return nullptr; };

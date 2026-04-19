@@ -59,6 +59,9 @@ protected:
 	Shared<MonsterStateMachine> m_States;
 	Weak<GameObject> m_TargetPlayer{};
 
+	uint32 m_PlayerPhysicalLayer{};
+	uint32 m_MonsterPhysicalLayer{};
+
 public:
 	virtual Shared<GameObject> Clone(void* arg) override PURE;
 };

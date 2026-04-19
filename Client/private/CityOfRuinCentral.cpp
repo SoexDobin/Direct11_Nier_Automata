@@ -58,8 +58,12 @@ HRESULT CityOfRuinCentral::Render()
 		return E_FAIL;
 
 	size_t numMeshes = m_Model->Get_NumMeshes();
+	Matrix worldMat = m_Transform->Get_WorldMatrix();
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
+		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
+			continue;
+
 		if (i <= 22)
 		{
 			auto w = Vector4{ 0.1f, 0.45f, 0.45f, 10.f };
@@ -72,7 +76,8 @@ HRESULT CityOfRuinCentral::Render()
 		}
 
 
-		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
+		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
+			continue;
 
 		HRESULT h1 = m_Model->Bind_Material(m_Shader, DiffuseMap1, i, 1, 1);
 		HRESULT h2 = m_Model->Bind_Material(m_Shader, DiffuseMap2, i, 1, 2);

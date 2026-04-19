@@ -41,6 +41,7 @@ private:
 
 private:
 	Shared<SphereCollider> m_Sight{ nullptr };
+	uint32 m_PlayerPhysicalLayerIndex{};
 
 public:
 	static Shared<MonsterSight> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

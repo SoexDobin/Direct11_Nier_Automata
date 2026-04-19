@@ -31,6 +31,9 @@ HRESULT Monster::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	m_PlayerPhysicalLayer = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"PlayerPhysical"));
+	m_MonsterPhysicalLayer = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"MonsterPhysical"));
+
 	return S_OK;
 }
 
@@ -89,13 +92,13 @@ void Monster::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<
 
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::CONTAINER) return;
 
-	auto targetLayerName = target->Get_LayerMask().Get_LayerName();
-	if (targetLayerName == L"PlayerPhysical")
+	auto targetLayer = target->Get_LayerMask().Get_Layer();
+	if (targetLayer == m_PlayerPhysicalLayer)
 	{
 		Vector3 pushDir = PushoutDelta(ownCollider, targetCollider, 1.0f);
 		Apply_PushoutCorrection(pushDir);
 	}
-	if (targetLayerName == L"MonsterPhysical")
+	if (targetLayer == m_MonsterPhysicalLayer)
 	{
 		Vector3 pushDir = PushoutDelta(ownCollider, targetCollider, 0.5f);
 		Apply_PushoutCorrection(pushDir);

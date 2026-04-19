@@ -639,11 +639,20 @@ void Tool::Converter::InjectFallbackTextures(Shared<MODEL_MATERIAL>& mat)
 		mat->textures.push_back({ 6, "47157233.dds" });
 		mat->textures.push_back({ 6, "5C917F8C.dds" });
 	}
-	else if (mat->name == "DRY_yo_asphalt_01")
+	else if (mat->name == "DRY_yo_asphalt_01" || mat->name == "yo_asphalt_01_aaa4")
 	{
 		std::cout << "  [Fallback] Injecting textures for: " << mat->name << "\n";
 
 		mat->textures.push_back({ 1, "277C0B89.dds" });
 		mat->textures.push_back({ 6, "0E4D6DE2.dds" });
 	}
+	else if (mat->name == "mas_concretefloor03_AAA3_tga" || mat->name == "mas_concretewall01_aaax_tga" ||
+		mat->name == "mas_concretefloor02_AAA3_tga" || mat->name == "mas_concretefloor01_AAA3_tga")
+	{
+		std::cout << "  [Fallback] Injecting textures for: " << mat->name << "\n";
+
+		mat->textures.push_back({ 1, "5BFBDFD3.dds" });
+		mat->textures.push_back({ 6, "13C421A0.dds" });
+	}
+	
 }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "MonsterAOE.h"
 
+#include <Game.h>
 #include <SpdLogger.h>
 #include <SphereCollider.h>
 
@@ -39,6 +40,8 @@ HRESULT MonsterAOE::Initialize(void* arg)
 	m_AttackCollider = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereColDesc);
 	if (nullptr == m_AttackCollider)
 		return E_FAIL;
+
+	m_PlayerLayer = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"Player"));
 
 	return S_OK;
 }
@@ -89,7 +92,7 @@ void MonsterAOE::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 	if (!m_AttackCollider->Is_Active()) return;
 	auto target = targetCollider->Get_Owner();
 	
-	if (target->Get_LayerMask().Get_LayerName() != L"Player") return;
+	if (target->Get_LayerMask().Get_Layer() != m_PlayerLayer) return;
 	uint32 targetID = target->Get_ObjectID();
 
 	if (!m_HitEntities.contains(targetID))

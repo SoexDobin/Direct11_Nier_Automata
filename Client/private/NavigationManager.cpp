@@ -44,5 +44,11 @@ HRESULT NavigationManager::Setting_GamePlay()
 	entrySectorDesc.collisionExtends = Vector3{ 100.f, 50.f, 70.f };
 	auto entrySector = GAME_INSTANCE->Instantiate<NavigationSector>(L"NavigationSector", ETOI(LEVEL::GAMEPLAY), &entrySectorDesc);
 
+	NavigationSector::NAVIGATION_COLLISION_DESC centralSectorDesc{};
+	centralSectorDesc.navTag = L"CityOfRuinCentral";
+	centralSectorDesc.worldPosition = Vector3{ 360.f, 0.f, 98.5f };
+	centralSectorDesc.collisionExtends = Vector3{ 100.f, 50.f, 90.f };
+	auto centralSector = GAME_INSTANCE->Instantiate<NavigationSector>(L"NavigationSector", ETOI(LEVEL::GAMEPLAY), &centralSectorDesc);
+
 	return S_OK;
 }

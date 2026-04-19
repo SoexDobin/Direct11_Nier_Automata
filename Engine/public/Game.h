@@ -69,7 +69,7 @@ public: /* For GraphicDevice */
     ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
     void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref) const;
 
-public:
+public: /* For Input */
     Byte Get_DIKeyState(uByte byKeyID) const;
     Byte Get_DIMouseState(DIMB mouseInput) const;
     Long Get_DIMouseMove(DIMM mouseState) const;
@@ -113,6 +113,7 @@ public: /* For CameraManager */
     vector<Shared<class Camera>> Get_Cameras(uint32 levIndex) const;
     HRESULT Set_MainCamera(const Shared<class Camera>& camera) const;
     Shared<class Camera> Get_MainCamera() const;
+    Bool IsInFrustum(const BoundingSphere& worldSphere) const;
 
 public: /* For ResourceManager */
     HRESULT Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const;

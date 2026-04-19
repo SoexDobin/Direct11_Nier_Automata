@@ -74,6 +74,7 @@ void NavigationSector::OnCollisionEnter(const Shared<Collider>& ownCollider, con
 
 	auto target = targetCollider->Get_Owner();
 
+	if (target->Get_LayerMask().Get_Layer() == m_LayerMask.Get_Layer()) return;
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::CONTAINER) return;
 	uint32 layerIndex = ETOI(target->Get_LayerMask().Get_Layer());
 	if (m_TargetLayerIndex.contains(layerIndex) == false) return;

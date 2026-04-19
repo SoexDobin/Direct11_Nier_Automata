@@ -39,6 +39,7 @@ private:
 	Float m_CheckDistance{ 12.5f };
 
 	list<Weak<GameObject>> m_CheckedMonsters;
+	uint32 m_TargetLayerIndex{};
 
 public:
 	static Shared<Pl0000MonsterChecker> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

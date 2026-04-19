@@ -61,9 +61,6 @@
     <ClInclude Include="..\public\State2B_Walk.h">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\CityOfRuinEntry.h">
-      <Filter>02. GameObject\World</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Pl0000.h">
       <Filter>02. GameObject\Entity\2B</Filter>
     </ClInclude>
@@ -239,9 +236,6 @@
     <ClInclude Include="..\public\NavigationManager.h">
       <Filter>00. MainApp</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\CityOfRuinBridge.h">
-      <Filter>02. GameObject\World</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\SheathWP0070Body.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
     </ClInclude>
@@ -254,10 +248,21 @@
     <ClInclude Include="..\public\WorldObject.h">
       <Filter>02. GameObject\World</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\CityOfRuinCentral.h">
-      <Filter>02. GameObject\World</Filter>
+    <ClInclude Include="..\public\CityOfRuinBridge.h">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\CityOfRuinManHole.h" />
+    <ClInclude Include="..\public\CityOfRuinBuilding.h">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CityOfRuinCentral.h">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CityOfRuinEntry.h">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CityOfRuinManHole.h">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -316,9 +321,6 @@
     </ClCompile>
     <ClCompile Include="..\private\State2B_Walk.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\CityOfRuinEntry.cpp">
-      <Filter>02. GameObject\World</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000.cpp">
       <Filter>02. GameObject\Entity\2B</Filter>
@@ -492,9 +494,6 @@
     <ClCompile Include="..\private\NavigationManager.cpp">
       <Filter>00. MainApp</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\CityOfRuinBridge.cpp">
-      <Filter>02. GameObject\World</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\SheathWP0070Body.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
     </ClCompile>
@@ -507,10 +506,21 @@
     <ClCompile Include="..\private\WorldObject.cpp">
       <Filter>02. GameObject\World</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\CityOfRuinCentral.cpp">
-      <Filter>02. GameObject\World</Filter>
+    <ClCompile Include="..\private\CityOfRuinBridge.cpp">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\CityOfRuinManHole.cpp" />
+    <ClCompile Include="..\private\CityOfRuinBuilding.cpp">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CityOfRuinCentral.cpp">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CityOfRuinEntry.cpp">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CityOfRuinManHole.cpp">
+      <Filter>02. GameObject\World\CityOfRuin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -674,6 +684,9 @@
     </Filter>
     <Filter Include="02. GameObject\NavigationCollision">
       <UniqueIdentifier>{39b54fc0-86f9-4c2f-8008-a696a843c49a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\World\CityOfRuin">
+      <UniqueIdentifier>{513f29aa-4701-4a98-83ff-fa1465724fe0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

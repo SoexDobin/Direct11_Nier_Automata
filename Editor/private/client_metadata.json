@@ -1483,6 +1483,19 @@
                                        "has_clone":  true,
                                        "category":  "other"
                                    },
+                    "CityOfRuinBuilding":  {
+                                               "members":  [
+
+                                                           ],
+                                               "base_class":  "WorldObject",
+                                               "inherited_members":  {
+
+                                                                     },
+                                               "namespace":  "Engine",
+                                               "has_create":  true,
+                                               "has_clone":  true,
+                                               "category":  "other"
+                                           },
                     "LevelTitle":  {
                                        "members":  [
 

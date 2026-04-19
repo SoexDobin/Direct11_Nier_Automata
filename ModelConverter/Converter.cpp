@@ -627,7 +627,7 @@ void Tool::Converter::InjectFallbackTextures(Shared<MODEL_MATERIAL>& mat)
 	// ★ Assimp가 FBX로부터 텍스처 정보를 읽지 못하는 특정 매터리얼에 대한 하드코딩 Fallback
 	// Blender의 셰이더 노드 구성이 FBX Export와 호환되지 않아 발생하는 문제 우회
 
-	if (mat->name == "DRY_ground_grass")
+	if (mat->name == "DRY_ground_grass" || mat->name == "WET_ground_grass")
 	{
 		std::cout << "  [Fallback] Injecting textures for: " << mat->name << "\n";
 

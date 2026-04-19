@@ -57,6 +57,45 @@
               "typeName": "Navigation"
             }
           ],
+          "name": "Em0010_4",
+          "objectID": 4214124745,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              360.0,
+              0.0,
+              50.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
           "name": "Em0010_6",
           "objectID": 4214503195,
           "parentObjectID": 0,
@@ -132,11 +171,11 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Navigation"
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "SphereCollider"
             }
           ],
           "name": "Em0010_7",
@@ -202,11 +241,11 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Navigation"
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "SphereCollider"
             }
           ],
           "name": "Pl0000",
@@ -241,11 +280,50 @@
             },
             {
               "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
               "typeName": "Navigation"
+            }
+          ],
+          "name": "Em0010_2",
+          "objectID": 4215260095,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              71.69999694824219,
+              -18.0,
+              47.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
             },
             {
               "properties": null,
               "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
             }
           ],
           "name": "Em0010_3",
@@ -284,11 +362,11 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Navigation"
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "Model"
             }
           ],
           "name": "CityOfRuinBridge",
@@ -362,45 +440,6 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "Em0010_2",
-          "objectID": 4215260095,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em0010",
-          "transform": {
-            "position": [
-              71.69999694824219,
-              -18.0,
-              47.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em0010"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
               "typeName": "Navigation"
             },
             {
@@ -440,11 +479,11 @@
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "SphereCollider"
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Navigation"
             }
           ],
           "name": "Em0010",
@@ -479,15 +518,15 @@
             },
             {
               "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
               "typeName": "Model"
             },
             {
               "properties": null,
               "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
             }
           ],
           "name": "CityOfRuinCentral",
@@ -526,23 +565,27 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
             }
           ],
-          "name": "Em0010_4",
-          "objectID": 4214124745,
+          "name": "CityOfRuinManHole",
+          "objectID": 2490088034,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Em0010",
+          "prototypeTag": "CityOfRuinManHole",
           "transform": {
             "position": [
-              360.0,
+              510.0,
               0.0,
-              50.0
+              183.0
             ],
             "rotation": [
               0.0,
-              0.0,
+              179.99998474121094,
               0.0
             ],
             "scale": [
@@ -551,7 +594,50 @@
               1.0
             ]
           },
-          "typeName": "Em0010"
+          "typeName": "CityOfRuinManHole"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "name": "CityOfRuinBuilding",
+          "objectID": 2239175146,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "CityOfRuinBuilding",
+          "transform": {
+            "position": [
+              290.0,
+              0.0,
+              -41.5
+            ],
+            "rotation": [
+              0.0,
+              -89.99999237060547,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "CityOfRuinBuilding"
         }
       ]
     }

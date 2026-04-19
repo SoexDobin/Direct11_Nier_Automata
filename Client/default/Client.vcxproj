@@ -183,6 +183,7 @@
   <ItemGroup>
     <ClInclude Include="..\public\Bullet.h" />
     <ClInclude Include="..\public\CityOfRuinBridge.h" />
+    <ClInclude Include="..\public\CityOfRuinBuilding.h" />
     <ClInclude Include="..\public\CityOfRuinCentral.h" />
     <ClInclude Include="..\public\CityOfRuinEntry.h" />
     <ClInclude Include="..\public\CityOfRuinManHole.h" />
@@ -272,6 +273,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\CityOfRuinBridge.cpp" />
+    <ClCompile Include="..\private\CityOfRuinBuilding.cpp" />
     <ClCompile Include="..\private\CityOfRuinCentral.cpp" />
     <ClCompile Include="..\private\CityOfRuinEntry.cpp" />
     <ClCompile Include="..\private\CityOfRuinManHole.cpp" />

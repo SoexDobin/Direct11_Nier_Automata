@@ -1,33 +1,34 @@
 #include "pch.h"
-#include "CityOfRuinManHole.h"
+#include "CityOfRuinBuilding.h"
 #include "Shader.h"
 #include "Model.h"
 #include "Game.h"
 #include "Navigation.h"
 #include <SpdLogger.h>
 
-CityOfRuinManHole::CityOfRuinManHole(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+
+
+CityOfRuinBuilding::CityOfRuinBuilding(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: WorldObject{ device, context } {
 }
 
-CityOfRuinManHole::CityOfRuinManHole(const CityOfRuinManHole& rhs)
+CityOfRuinBuilding::CityOfRuinBuilding(const CityOfRuinBuilding& rhs)
 	: WorldObject{ rhs } {
 }
 
-HRESULT CityOfRuinManHole::Initialize_Prototype()
+HRESULT CityOfRuinBuilding::Initialize_Prototype()
 {
 	return WorldObject::Initialize_Prototype();
 }
 
-HRESULT CityOfRuinManHole::Initialize(void* arg)
+HRESULT CityOfRuinBuilding::Initialize(void* arg)
 {
-	// 510 0 183
-	// 0 -180 0
-
+	// 290 0 -41.5
+	// 0 - 90 0
 	WorldObject::WORLD_OBJECT_DESC desc;
 	desc.vertexTag = VTXWORLDMESH;
-	desc.modelTag = L"CityOfRuinManHole";
-	desc.navTag = L"CityOfRuinManHole";
+	desc.modelTag = L"CityOfRuinBuilding";
+	desc.navTag = L"CityOfRuinBuilding";
 
 	if (FAILED(WorldObject::Initialize(&desc)))
 	{
@@ -38,22 +39,22 @@ HRESULT CityOfRuinManHole::Initialize(void* arg)
 	return S_OK;
 }
 
-void CityOfRuinManHole::On_Destroy()
+void CityOfRuinBuilding::On_Destroy()
 {
 	WorldObject::On_Destroy();
 }
 
-void CityOfRuinManHole::On_Enable()
+void CityOfRuinBuilding::On_Enable()
 {
 	WorldObject::On_Enable();
 }
 
-void CityOfRuinManHole::On_Disable()
+void CityOfRuinBuilding::On_Disable()
 {
 	WorldObject::On_Disable();
 }
 
-HRESULT CityOfRuinManHole::Render()
+HRESULT CityOfRuinBuilding::Render()
 {
 #ifdef _DEBUG
 	m_Navigation->Render_Debug();
@@ -69,7 +70,10 @@ HRESULT CityOfRuinManHole::Render()
 		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
 			continue;
 
-		if (i <= 99 && i >= 117)
+		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
+			continue;
+
+		if (i <= 7)
 		{
 			auto w = Vector4{ 0.1f, 0.45f, 0.45f, 10.f };
 			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
@@ -79,7 +83,6 @@ HRESULT CityOfRuinManHole::Render()
 			auto w = Vector4{ 0.33f, 0.33f, 0.34f, 1.f };
 			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
 		}
-		
 
 		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
 			continue;
@@ -106,34 +109,36 @@ HRESULT CityOfRuinManHole::Render()
 	return S_OK;
 }
 
-void CityOfRuinManHole::Submit_RenderGroup()
+void CityOfRuinBuilding::Submit_RenderGroup()
 {
 	WorldObject::Submit_RenderGroup();
 }
 
-Shared<CityOfRuinManHole> CityOfRuinManHole::Create(const ComPtr<ID3D11Device>& device,
-	const ComPtr<ID3D11DeviceContext>& context)
+Shared<CityOfRuinBuilding> CityOfRuinBuilding::Create(const ComPtr<ID3D11Device>& device,
+                                                      const ComPtr<ID3D11DeviceContext>& context)
 {
-	auto prototype = make_shared<CityOfRuinManHole>(device, context);
+	auto prototype = make_shared<CityOfRuinBuilding>(device, context);
 
 	if (FAILED(prototype->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CityOfRuinManHole");
+		MSG_BOX("Failed to Created : CityOfRuinBuilding");
 		return nullptr;
 	}
 
 	return prototype;
 }
 
-Shared<GameObject> CityOfRuinManHole::Clone(void* arg)
+Shared<GameObject> CityOfRuinBuilding::Clone(void* arg)
 {
-	auto instance = make_shared<CityOfRuinManHole>(*this);
+	auto instance = make_shared<CityOfRuinBuilding>(*this);
 
 	if (FAILED(instance->Initialize(arg)))
 	{
-		MSG_BOX("Failed to Clone : CityOfRuinManHole");
+		MSG_BOX("Failed to Clone : CityOfRuinBuilding");
 		return nullptr;
 	}
 
 	return instance;
 }
+
+

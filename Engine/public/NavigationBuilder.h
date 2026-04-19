@@ -3,6 +3,7 @@
 #include "NavCell.h"
 
 struct rcPolyMesh;
+struct rcPolyMeshDetail;
 
 NS_BEGIN(Engine)
 
@@ -65,6 +66,7 @@ private:
 	static void ExtractCells_FromPolyMesh(
 		const rcPolyMesh& mesh,
 		const rcConfig& cfg,
+		const rcPolyMeshDetail* detailMesh,
 		_Out_ vector<NavCell>& outCells
 	);
 

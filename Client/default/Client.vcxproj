@@ -185,6 +185,7 @@
     <ClInclude Include="..\public\CityOfRuinBridge.h" />
     <ClInclude Include="..\public\CityOfRuinCentral.h" />
     <ClInclude Include="..\public\CityOfRuinEntry.h" />
+    <ClInclude Include="..\public\CityOfRuinManHole.h" />
     <ClInclude Include="..\public\ClientSettingManager.h" />
     <ClInclude Include="..\public\Client_Define.h" />
     <ClInclude Include="..\public\Client_Function.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="..\private\CityOfRuinBridge.cpp" />
     <ClCompile Include="..\private\CityOfRuinCentral.cpp" />
     <ClCompile Include="..\private\CityOfRuinEntry.cpp" />
+    <ClCompile Include="..\private\CityOfRuinManHole.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
     <ClCompile Include="..\private\Client_RTTR.cpp" />
     <ClCompile Include="..\private\Em0010.cpp" />

@@ -257,6 +257,7 @@
     <ClInclude Include="..\public\CityOfRuinCentral.h">
       <Filter>02. GameObject\World</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\CityOfRuinManHole.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -509,6 +510,7 @@
     <ClCompile Include="..\private\CityOfRuinCentral.cpp">
       <Filter>02. GameObject\World</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\CityOfRuinManHole.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">

@@ -50,7 +50,19 @@
         },
         {
             "count": 30,
+            "level": "GAMEPLAY2",
+            "path": "Texture/Effect/Spark/Spark_%d.dds",
+            "tag": "Effect_Spark"
+        },
+        {
+            "count": 30,
             "level": "GAMEPLAY",
+            "path": "Texture/Effect/Spark2/Spark2_%d.dds",
+            "tag": "Effect_Spark2"
+        },
+        {
+            "count": 30,
+            "level": "GAMEPLAY2",
             "path": "Texture/Effect/Spark2/Spark2_%d.dds",
             "tag": "Effect_Spark2"
         },
@@ -62,7 +74,19 @@
         },
         {
             "count": 1,
+            "level": "GAMEPLAY2",
+            "path": "UI/HUD/UI_Hp_Bar.png",
+            "tag": "UI_Hp_Bar"
+        },
+        {
+            "count": 1,
             "level": "GAMEPLAY",
+            "path": "Texture/Effect/FireFlash/FireFlash.dds",
+            "tag": "Fire_Flash"
+        },
+        {
+            "count": 1,
+            "level": "GAMEPLAY2",
             "path": "Texture/Effect/FireFlash/FireFlash.dds",
             "tag": "Fire_Flash"
         }

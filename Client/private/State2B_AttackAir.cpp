@@ -29,7 +29,7 @@ Bool State2B_AttackAir::StateEnterInvoke()
 {
 	auto pl0000 = m_Owner.lock();
 	auto pl0000Body = m_Body.lock();
-	auto prevState = m_States.lock()->Get_CurP10000State();
+	auto prevState = m_States.lock()->Get_CurPl0000State();
 	if (prevState != Pl0000::PL0000_STATE::JUMP)
 	{
 		LOG_ERROR(L"[ ENTER BY WRONG STATE, PREV State is not JUMP! it's {} ]", Helper::To_wString(magic_enum::enum_name(prevState)));

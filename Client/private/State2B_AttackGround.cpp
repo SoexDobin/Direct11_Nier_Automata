@@ -37,7 +37,7 @@ Bool State2B_AttackGround::StateEnterInvoke()
 	auto pl0000Body = m_Body.lock();
 	auto lightWeapon = m_LightWeapon.lock();
 	auto heavyWeapon = m_HeavyWeapon.lock();
-	auto prevState = m_States.lock()->Get_CurP10000State();
+	auto prevState = m_States.lock()->Get_CurPl0000State();
 
 	m_ComboDelta = 0.f;
 	m_ComboStep = 0;

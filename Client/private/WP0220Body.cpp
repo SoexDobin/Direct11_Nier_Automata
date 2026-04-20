@@ -31,7 +31,7 @@ HRESULT WP0220Body::Initialize(void* arg)
 
 	if (FAILED(Ready_Components()))
 	{
-		LOG_ERROR(L"Failed To Ready_Components : P10000Body");
+		LOG_ERROR(L"Failed To Ready_Components : Pl0000Body");
 		return E_FAIL;
 	}
 
@@ -199,7 +199,9 @@ void WP0220Body::Impact_Shockwave(const Vector3& offset)
 	desc.damageInfo = dmgInfo;
 	desc.position = truePos;
 	desc.radius = 3.f;
-	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", ETOI(LEVEL::GAMEPLAY), &desc);
+
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", levIndex, &desc);
 }
 
 void WP0220Body::Set_Sheathing()

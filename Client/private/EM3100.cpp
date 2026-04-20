@@ -49,7 +49,8 @@ HRESULT Em3100::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Add_HpBar", [this]()
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	GAME_INSTANCE->Add_Instance_Event(levIndex, L"Add_HpBar", [this, levIndex]()
 		{
 			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
 			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
@@ -59,7 +60,7 @@ HRESULT Em3100::Initialize(void* arg)
 			UI_hpDesc.sizeY = 10.f;
 			UI_hpDesc.x = 0.f;
 			UI_hpDesc.y = 0.f;
-			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", ETOI(LEVEL::GAMEPLAY), &UI_hpDesc);
+			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", levIndex, &UI_hpDesc);
 		});
 
 
@@ -127,7 +128,7 @@ HRESULT Em3100::Ready_PartObjects()
 	em3100BodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 	em3100BodyDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
 
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3100Body", L"Em3100Body", &em3100BodyDesc)))
+	if (FAILED(Add_PartObject(GAME_INSTANCE->Get_TargetLevelIndex(), L"Em3100Body", L"Em3100Body", &em3100BodyDesc)))
 		return E_FAIL;
 
 	return S_OK;

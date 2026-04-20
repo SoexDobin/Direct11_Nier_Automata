@@ -84,6 +84,8 @@ HRESULT Loader::Loading() {
         case LEVEL::GAMEPLAY:
             hr = Loading_For_GamePlayLevel();
             break;
+        case LEVEL::GAMEPLAY2:
+        	hr = Loading_For_GamePlayLevel2();
         default:
             hr = E_FAIL;
         }
@@ -159,6 +161,46 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
     if (!m_OwnerLevel.expired())
         m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
 	return S_OK;
+}
+
+HRESULT Loader::Loading_For_GamePlayLevel2()
+{
+    m_isFinished = false;
+
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
+        return E_FAIL;
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::GAMEPLAY2))) {
+            LOG_ERROR(L"Failed to Load GAMEPLAY2 Textures");
+            return E_FAIL;
+        }
+    }
+    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
+        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::GAMEPLAY2))) {
+            LOG_ERROR(L"Failed to Load GAMEPLAY2 Model");
+            return E_FAIL;
+        }
+    }
+
+    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY2))) {
+        LOG_ERROR(L"Failed to Ready Client GAMEPLAY2 Prototypes");
+        return E_FAIL;
+    }
+
+    LIGHT_DESC			LightDesc{};
+    LightDesc.type = LIGHT::DIRECTIONAL;
+    LightDesc.direction = Vector4(0.f, -1.f, 0.f, 0.f);
+    LightDesc.diffuse = Vector4(1.f, 0.5f, 1.f, 1.f);
+    LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
+
+    if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
+        return E_FAIL;
+
+    m_isFinished = true;
+    if (!m_OwnerLevel.expired())
+        m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
+    return S_OK;
 }
 
 HRESULT Loader::Loading_Global_Prototype()

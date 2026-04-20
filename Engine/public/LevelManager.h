@@ -20,6 +20,8 @@ public:
 			return false;
 	}
 	uint32 Get_CurrentLevelIndex() const { return m_CurrentLevelIndex; }
+	uint32 Get_TargetLevelIndex() const { return m_TargetLevelIndex; }
+	void Set_TargetLevelIndex(uint32 levIndex) { m_TargetLevelIndex = levIndex; }
 	Shared<Level> Get_CurrentLevel() const { return m_CurrentLevel; }
 
 public:
@@ -34,6 +36,7 @@ public:
 private:
 	Shared<Level> m_CurrentLevel = {nullptr};
 	uint32 m_CurrentLevelIndex{};
+	uint32 m_TargetLevelIndex{};
 
 public:
 	static Unique<LevelManager> Create();

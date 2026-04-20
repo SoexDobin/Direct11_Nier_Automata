@@ -224,11 +224,11 @@ Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {
 }
 
 Bool PrototypeManager::Validate_Level(uint32 levIndex) const {
-  if (levIndex >= m_LevelCount) {
-    LOG_ERROR(L"{}: Out Of Level", m_ObjectName);
-    MSG_BOX("Out Of Level Count");
-    return false;
-  }
+    if (levIndex >= m_LevelCount) {
+        LOG_ERROR(L"{}: Out Of Level", m_ObjectName);
+        MSG_BOX("Out Of Level Count");
+        return false;
+    }
 
-  return true;
+    return true;
 }

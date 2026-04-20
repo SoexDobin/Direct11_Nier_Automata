@@ -9,6 +9,7 @@
 
 #include "ClientSettingManager.h"
 #include "LevelGamePlay.h"
+#include "LevelGamePlay2.h"
 #include "LevelTitle.h"
 #include "LoadingBackground.h"
 #include "LoadingLogo.h"
@@ -29,6 +30,7 @@ HRESULT LevelLoading::Initialize(void *arg) {
     LEVEL_LOADING_DESC desc = *static_cast<LEVEL_LOADING_DESC*>(arg);
     m_NextLevel = desc.nextLevelID;
     m_IsLoadStatic = desc.loadStatic;
+    GAME_INSTANCE->Set_TargetLevelIndex(ETOI(m_NextLevel));
 
     if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
         if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::LOADING)))
@@ -116,6 +118,9 @@ void LevelLoading::Transition_To_NextLevel(Float timeDelta)
 			case ETOI(LEVEL::GAMEPLAY):
 				GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), LevelGamePlay::Create(m_Device, m_Context));
 				break;
+            case ETOI(LEVEL::GAMEPLAY2):
+                GAME_INSTANCE->Change_Level(ETOI(m_NextLevel), LevelGamePlay2::Create(m_Device, m_Context));
+                break;
 			default:
 				break;
 			}

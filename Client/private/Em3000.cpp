@@ -42,7 +42,8 @@ HRESULT Em3000::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Add_HpBar", [this]()
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	GAME_INSTANCE->Add_Instance_Event(levIndex, L"Add_HpBar", [this, levIndex]()
 		{
 			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
 			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
@@ -52,7 +53,7 @@ HRESULT Em3000::Initialize(void* arg)
 			UI_hpDesc.sizeY = 10.f;
 			UI_hpDesc.x = 0.f;
 			UI_hpDesc.y = 0.f;
-			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", ETOI(LEVEL::GAMEPLAY), &UI_hpDesc);
+			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", levIndex, &UI_hpDesc);
 		});
 
 	m_IsStatic = true;
@@ -148,12 +149,13 @@ void Em3000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<C
 
 HRESULT Em3000::Ready_PartObjects()
 {
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
 	auto em3000 = static_pointer_cast<Em3000>(shared_from_this());
 
 	PartObject::PARTOBJECT_DESC bodyDesc{};
 	bodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 	bodyDesc.Owner = em3000;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3000Body", L"Em3000Body", &bodyDesc)))
+	if (FAILED(Add_PartObject(levIndex, L"Em3000Body", L"Em3000Body", &bodyDesc)))
 		return E_FAIL;
 	m_MainBody = static_pointer_cast<Em3000Body>(Find_PartObject(L"Em3000Body"));
 
@@ -168,19 +170,19 @@ HRESULT Em3000::Ready_PartObjects()
 	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3001";
 	partsDesc.targetBoneName = "bone0";
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3001", L"Em3001", &partsDesc))) 
+	if (FAILED(Add_PartObject(levIndex, L"Em3001", L"Em3001", &partsDesc))) 
 		return E_FAIL;
 	
 	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3002";
 	partsDesc.targetBoneName = "bone0";
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3002", L"Em3002", &partsDesc))) 
+	if (FAILED(Add_PartObject(levIndex, L"Em3002", L"Em3002", &partsDesc))) 
 		return E_FAIL;
 
 	partsDesc.shaderDesc = animMesh;
 	partsDesc.modelResourceTag = L"em3003";
 	partsDesc.targetBoneName = "bone0";
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3003", L"Em3003", &partsDesc))) 
+	if (FAILED(Add_PartObject(levIndex, L"Em3003", L"Em3003", &partsDesc))) 
 		return E_FAIL;
 
 	return S_OK;
@@ -188,6 +190,8 @@ HRESULT Em3000::Ready_PartObjects()
 
 HRESULT Em3000::Ready_Components()
 {
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+
 	Navigation::NAVIGATION_DESC navDesc;
 	navDesc.startCellIndex = 0;
 	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
@@ -197,7 +201,7 @@ HRESULT Em3000::Ready_Components()
 	movementDesc.moveSpeed = 0.f;
 	movementDesc.targetDirection = Vector3::Zero;
 	movementDesc.turnSpeed = 7.5f;
-	m_Em3000Movement = Add_Component<Em3000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
+	m_Em3000Movement = Add_Component<Em3000Movement>(levIndex, &movementDesc);
 	if (nullptr == m_Em3000Movement)
 		return E_FAIL;
 

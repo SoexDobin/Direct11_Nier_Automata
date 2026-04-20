@@ -18,6 +18,7 @@ HRESULT LevelManager::Change_Level(uint32 levIndex,const Shared<Level>& level) {
 
     m_CurrentLevel = level;
     m_CurrentLevelIndex = levIndex;
+    
     return S_OK;
 }
 

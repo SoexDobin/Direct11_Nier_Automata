@@ -30,7 +30,8 @@ namespace Client
 
 	HRESULT State2B::Initialize()
 	{
-		GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"State_Need_Camera", [&]()
+		uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+		GAME_INSTANCE->Add_Instance_Event(levIndex, L"State_Need_Camera", [&]()
 			{
 				auto camera = GAME_INSTANCE->Get_MainCamera();
 

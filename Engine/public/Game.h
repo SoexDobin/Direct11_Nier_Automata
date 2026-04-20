@@ -88,6 +88,8 @@ public: /* For LevelManager */
     Bool LevelLoad_Finished() const { return m_LevelManager->Is_LoadFinished(); }
     uint32 Get_CurrentLevelIndex() const { return m_LevelManager->Get_CurrentLevelIndex(); }
     HRESULT Change_Level(uint32 levIndex, const Shared<class Level>& newLevel);
+    uint32 Get_TargetLevelIndex() const { return m_LevelManager->Get_TargetLevelIndex(); }
+    void Set_TargetLevelIndex(uint32 levIndex) const { return m_LevelManager->Set_TargetLevelIndex(levIndex); }
 
 public: /* For PrototypeManager */
     const unordered_map<uint32, Shared<GameObject>>& Get_Prototypes(uint32 levIndex) const;

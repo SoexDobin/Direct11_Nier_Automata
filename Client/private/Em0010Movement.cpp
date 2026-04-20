@@ -26,7 +26,7 @@ HRESULT Em0010Movement::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Set_RootPos", [this]()
+	GAME_INSTANCE->Add_Instance_Event(GAME_INSTANCE->Get_TargetLevelIndex(), L"Set_RootPos", [this]()
 		{
 			m_RootPosition = m_Owner.lock()->Get_Transform()->Get_Position();
 		});

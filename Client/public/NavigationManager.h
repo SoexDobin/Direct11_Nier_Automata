@@ -15,10 +15,13 @@ public:
 	~NavigationManager();
 
 public:
+	void Reset_NavigationSettingFlag();
 	HRESULT Setting_NavigationSector(LEVEL level);
+	HRESULT UpdateNextSceneTrigger();
 
 private:
 	HRESULT Setting_GamePlay();
+	HRESULT Setting_GamePlay2();
 
 	Bool m_InitialFinished{ false };
 

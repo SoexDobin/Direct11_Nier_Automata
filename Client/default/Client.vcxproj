@@ -181,6 +181,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\AmusementParkDome.h" />
+    <ClInclude Include="..\public\AmusementParkEntry.h" />
+    <ClInclude Include="..\public\AmusementParkMiddle.h" />
+    <ClInclude Include="..\public\AmusementParkBackGround.h" />
     <ClInclude Include="..\public\Bullet.h" />
     <ClInclude Include="..\public\CityOfRuinBridge.h" />
     <ClInclude Include="..\public\CityOfRuinBuilding.h" />
@@ -201,6 +205,7 @@
     <ClInclude Include="..\public\Em3002.h" />
     <ClInclude Include="..\public\Em3003.h" />
     <ClInclude Include="..\public\FireFlashEffect.h" />
+    <ClInclude Include="..\public\LevelGamePlay2.h" />
     <ClInclude Include="..\public\MonsterAOE.h" />
     <ClInclude Include="..\public\MonsterSight.h" />
     <ClInclude Include="..\public\Em3100.h" />
@@ -263,6 +268,7 @@
     <ClInclude Include="..\public\Terrain.h" />
     <ClInclude Include="..\public\ThirdPersonCamera.h" />
     <ClInclude Include="..\public\TitleBackground.h" />
+    <ClInclude Include="..\public\TriggerObject.h" />
     <ClInclude Include="..\public\WorldObject.h" />
     <ClInclude Include="..\public\WP0070Body.h" />
     <ClInclude Include="..\public\WP0220Body.h" />
@@ -271,6 +277,10 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\AmusementParkDome.cpp" />
+    <ClCompile Include="..\private\AmusementParkEntry.cpp" />
+    <ClCompile Include="..\private\AmusementParkMiddle.cpp" />
+    <ClCompile Include="..\private\AmusementParkBackGround.cpp" />
     <ClCompile Include="..\private\Bullet.cpp" />
     <ClCompile Include="..\private\CityOfRuinBridge.cpp" />
     <ClCompile Include="..\private\CityOfRuinBuilding.cpp" />
@@ -290,6 +300,7 @@
     <ClCompile Include="..\private\Em3002.cpp" />
     <ClCompile Include="..\private\Em3003.cpp" />
     <ClCompile Include="..\private\FireFlashEffect.cpp" />
+    <ClCompile Include="..\private\LevelGamePlay2.cpp" />
     <ClCompile Include="..\private\MonsterAOE.cpp" />
     <ClCompile Include="..\private\MonsterSight.cpp" />
     <ClCompile Include="..\private\Em3100.cpp" />
@@ -352,6 +363,7 @@
     <ClCompile Include="..\private\Terrain.cpp" />
     <ClCompile Include="..\private\ThirdPersonCamera.cpp" />
     <ClCompile Include="..\private\TitleBackground.cpp" />
+    <ClCompile Include="..\private\TriggerObject.cpp" />
     <ClCompile Include="..\private\WorldObject.cpp" />
     <ClCompile Include="..\private\WP0070Body.cpp" />
     <ClCompile Include="..\private\WP0220Body.cpp" />

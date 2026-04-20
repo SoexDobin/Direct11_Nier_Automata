@@ -72,7 +72,7 @@ HRESULT Em0010::Initialize(void* arg)
 			UI_hpDesc.sizeY = 10.f;
 			UI_hpDesc.x = 0.f;
 			UI_hpDesc.y = 0.f;
-			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", ETOI(LEVEL::GAMEPLAY), &UI_hpDesc);
+			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", GAME_INSTANCE->Get_TargetLevelIndex(), &UI_hpDesc);
 		});
 
 
@@ -174,12 +174,13 @@ void Em0010::OnAttackHit(const Shared<GameObject>& target)
 
 HRESULT Em0010::Ready_PartObjects()
 {
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
 	auto thisObject = static_pointer_cast<ContainerObject>(shared_from_this());
 
 	Em0010Body::EM0010BODY_DESC em0010BodyDesc{};
 	em0010BodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 	em0010BodyDesc.Owner = thisObject;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em0010Body", L"Em0010Body", &em0010BodyDesc)))
+	if (FAILED(Add_PartObject(levIndex, L"Em0010Body", L"Em0010Body", &em0010BodyDesc)))
 		return E_FAIL;
 
 	MonsterSight::MONSTER_SIGHT_DESC em0010SightDesc{};
@@ -187,7 +188,7 @@ HRESULT Em0010::Ready_PartObjects()
 	em0010SightDesc.Owner = thisObject;
 	em0010SightDesc.radius = 8.f;
 	em0010SightDesc.offset = Vector3::Zero;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterSight", L"Em0010Sight", &em0010SightDesc)))
+	if (FAILED(Add_PartObject(levIndex, L"MonsterSight", L"Em0010Sight", &em0010SightDesc)))
 		return E_FAIL;
 
 	m_MainBody = static_pointer_cast<Em0010Body>(Find_PartObject(L"Em0010Body"));
@@ -209,7 +210,7 @@ HRESULT Em0010::Ready_PartObjects()
 	leftArmDesc.radius = 0.75f;
 	leftArmDesc.targetBoneName = "bone304";
 	leftArmDesc.dmgInfo = em0010DamageInfo;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010LeftArm", &leftArmDesc)))
+	if (FAILED(Add_PartObject(levIndex, L"MonsterAOE", L"Em0010LeftArm", &leftArmDesc)))
 		return E_FAIL;
 	
 	MonsterAOE::MONSTER_AOE_DESC rightArmDesc{};
@@ -220,7 +221,7 @@ HRESULT Em0010::Ready_PartObjects()
 	rightArmDesc.radius = 0.75f;
 	rightArmDesc.targetBoneName = "bone560";
 	rightArmDesc.dmgInfo = em0010DamageInfo;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010RightArm", &rightArmDesc)))
+	if (FAILED(Add_PartObject(levIndex, L"MonsterAOE", L"Em0010RightArm", &rightArmDesc)))
 		return E_FAIL;
 	
 	MonsterAOE::MONSTER_AOE_DESC footDesc{};
@@ -231,7 +232,7 @@ HRESULT Em0010::Ready_PartObjects()
 	footDesc.radius = 2.5f;
 	footDesc.targetBoneName = "bone4094";
 	footDesc.dmgInfo = em0010DamageInfo;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010Foot", &footDesc)))
+	if (FAILED(Add_PartObject(levIndex, L"MonsterAOE", L"Em0010Foot", &footDesc)))
 		return E_FAIL;
 
 	if (FAILED(m_MainBody->Begin()))
@@ -245,6 +246,8 @@ HRESULT Em0010::Ready_PartObjects()
 
 HRESULT Em0010::Ready_Components()
 {
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+
 	Navigation::NAVIGATION_DESC navDesc;
 	navDesc.startCellIndex = 0;
 	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinBridge", &navDesc);
@@ -256,7 +259,7 @@ HRESULT Em0010::Ready_Components()
 	movementDesc.moveSpeed = 0.f;
 	movementDesc.targetDirection = Vector3::Zero;
 	movementDesc.turnSpeed = 7.5f;
-	m_Em0010Movement = Add_Component<Em0010Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
+	m_Em0010Movement = Add_Component<Em0010Movement>(levIndex, &movementDesc);
 	if (nullptr == m_Em0010Movement)
 		return E_FAIL;
 

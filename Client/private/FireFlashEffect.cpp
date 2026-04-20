@@ -95,8 +95,10 @@ HRESULT FireFlashEffect::Render()
 
 HRESULT FireFlashEffect::Ready_Components(const Matrix& parentMatrix)
 {
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+
 	Shader::SHADER_DESC shaderDesc{ VTXPARTICLE_POINT_DESC::Tag, VTXPARTICLE_POINT_DESC::Elements, VTXPARTICLE_POINT_DESC::numElements };
-	m_Shader = Add_Component<Shader>(ETOI(LEVEL::GAMEPLAY), &shaderDesc);
+	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)
 		return S_OK;
 
@@ -110,12 +112,12 @@ HRESULT FireFlashEffect::Ready_Components(const Matrix& parentMatrix)
 	instanceDesc.speed = Vector2::Zero;
 	instanceDesc.lifeTime = Vector2{ 0.1f, 0.25f };
 
-	m_Buffer = Add_Component<VIBuffer_Particle_Point>(ETOI(LEVEL::GAMEPLAY), &instanceDesc);
+	m_Buffer = Add_Component<VIBuffer_Particle_Point>(levIndex, &instanceDesc);
 	if (nullptr == m_Buffer)
 		return S_OK;
 
-	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::GAMEPLAY), L"Fire_Flash" };
-	m_Texture = Add_Component<Texture>(ETOI(LEVEL::GAMEPLAY), &textureDesc);
+	auto textureDesc = Texture::TEXTURE_DESC{ levIndex, L"Fire_Flash" };
+	m_Texture = Add_Component<Texture>(levIndex, &textureDesc);
 	if (nullptr == m_Texture)
 		return E_FAIL;
 

@@ -96,7 +96,8 @@ HRESULT Pl0000::Initialize_Prototype()
 
 HRESULT Pl0000::Initialize(void* arg)
 {
-	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Add_Owner_To_Camera", [&]()
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	GAME_INSTANCE->Add_Instance_Event(levIndex, L"Add_Owner_To_Camera", [&]()
 		{
 			auto camera = GAME_INSTANCE->Get_MainCamera();
 			
@@ -128,7 +129,7 @@ HRESULT Pl0000::Initialize(void* arg)
 			//	for (int z = -1; z <= 2; ++z)
 			//	{
 			//		desc.initialPosition = Vector3(static_cast<Float>(x), spawnHeight, static_cast<Float>(z));
-			//		GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", ETOI(LEVEL::GAMEPLAY), &desc);
+			//		GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", levIndex, &desc);
 			//	}
 			//}
 #endif
@@ -159,7 +160,7 @@ void Pl0000::On_Destroy()
 
 void Pl0000::Priority_Update(Float timeDelta)
 {
-	m_Pl0000Input->Update_P10000_InputState(timeDelta);
+	m_Pl0000Input->Update_Pl0000_InputState(timeDelta);
 }
 
 void Pl0000::Update(Float timeDelta)
@@ -274,7 +275,7 @@ void Pl0000::OnAttackHit(const Shared<GameObject>& target)
 
 Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
 {
-	if (m_Pl0000States->Get_CurP10000State() != PL0000_STATE::EVADE)
+	if (m_Pl0000States->Get_CurPl0000State() != PL0000_STATE::EVADE)
 		return false;
 
 	auto dashState = static_pointer_cast<State2B_Evade>(
@@ -302,24 +303,25 @@ Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
 HRESULT Pl0000::Ready_PartObjects()
 {	
 	Pl0000Body::Pl0000BODY_DESC desc{};
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
 	desc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 	desc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
 
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000Body", L"Pl0000Body", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"Pl0000Body", L"Pl0000Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0070Body", L"WP0070Body", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"WP0070Body", L"WP0070Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"SheathWP0070Body", L"SheathWP0070Body", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"SheathWP0070Body", L"SheathWP0070Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"WP0220Body", L"WP0220Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"SheathWP0220Body", L"SheathWP0220Body", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"SheathWP0220Body", L"SheathWP0220Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP3000Body", L"WP3000Body", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"WP3000Body", L"WP3000Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000EvadeChecker", L"Pl0000EvadeChecker", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"Pl0000EvadeChecker", L"Pl0000EvadeChecker", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000MonsterChecker", L"Pl0000MonsterChecker", &desc)))
+	if (FAILED(Add_PartObject(levIndex, L"Pl0000MonsterChecker", L"Pl0000MonsterChecker", &desc)))
 		return E_FAIL;
 
 	m_MainBody = static_pointer_cast<Pl0000Body>(Find_PartObject(L"Pl0000Body"));
@@ -339,7 +341,8 @@ HRESULT Pl0000::Ready_PartObjects()
 
 HRESULT Pl0000::Ready_Components()
 {
-	m_Pl0000Input = Add_Component<Pl0000Input>(ETOI(LEVEL::GAMEPLAY));
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	m_Pl0000Input = Add_Component<Pl0000Input>(levIndex);
 	if (nullptr == m_Pl0000Input)
 		return E_FAIL;
 
@@ -348,7 +351,7 @@ HRESULT Pl0000::Ready_Components()
 	movementDesc.moveSpeed = 0.f;
 	movementDesc.targetDirection = Vector3::Zero;
 	movementDesc.turnSpeed = 7.5f;
-	m_Pl0000Movement = Add_Component<Pl0000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
+	m_Pl0000Movement = Add_Component<Pl0000Movement>(levIndex, &movementDesc);
 	if (nullptr == m_Pl0000Movement)
 		return E_FAIL;
 
@@ -357,7 +360,7 @@ HRESULT Pl0000::Ready_Components()
 	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
 
 	// StateMachine은 마지막에 처리
-	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(ETOI(LEVEL::GAMEPLAY))))
+	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(levIndex)))
 	{
 		auto pl0000 = static_pointer_cast<Pl0000>(shared_from_this());
 

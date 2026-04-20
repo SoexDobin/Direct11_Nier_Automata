@@ -1,33 +1,32 @@
 #include "pch.h"
-#include "CityOfRuinManHole.h"
+#include "AmusementParkDome.h"
 #include "Shader.h"
 #include "Model.h"
 #include "Game.h"
 #include "Navigation.h"
 #include <SpdLogger.h>
 
-CityOfRuinManHole::CityOfRuinManHole(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
+AmusementParkDome::AmusementParkDome(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: WorldObject{ device, context } {
 }
 
-CityOfRuinManHole::CityOfRuinManHole(const CityOfRuinManHole& rhs)
+AmusementParkDome::AmusementParkDome(const AmusementParkDome& rhs)
 	: WorldObject{ rhs } {
 }
 
-HRESULT CityOfRuinManHole::Initialize_Prototype()
+HRESULT AmusementParkDome::Initialize_Prototype()
 {
 	return WorldObject::Initialize_Prototype();
 }
 
-HRESULT CityOfRuinManHole::Initialize(void* arg)
+HRESULT AmusementParkDome::Initialize(void* arg)
 {
-	// 510 0 183
-	// 0 -180 0
+	// 301 0 86.5
 
 	WorldObject::WORLD_OBJECT_DESC desc;
 	desc.vertexTag = VTXWORLDMESH;
-	desc.modelTag = L"CityOfRuinManHole";
-	desc.navTag = L"CityOfRuinManHole";
+	desc.modelTag = L"AmusementParkDome";
+	desc.navTag = L"AmusementParkDome";
 
 	if (FAILED(WorldObject::Initialize(&desc)))
 	{
@@ -38,22 +37,22 @@ HRESULT CityOfRuinManHole::Initialize(void* arg)
 	return S_OK;
 }
 
-void CityOfRuinManHole::On_Destroy()
+void AmusementParkDome::On_Destroy()
 {
 	WorldObject::On_Destroy();
 }
 
-void CityOfRuinManHole::On_Enable()
+void AmusementParkDome::On_Enable()
 {
 	WorldObject::On_Enable();
 }
 
-void CityOfRuinManHole::On_Disable()
+void AmusementParkDome::On_Disable()
 {
 	WorldObject::On_Disable();
 }
 
-HRESULT CityOfRuinManHole::Render()
+HRESULT AmusementParkDome::Render()
 {
 #ifdef _DEBUG
 	m_Navigation->Render_Debug();
@@ -68,18 +67,6 @@ HRESULT CityOfRuinManHole::Render()
 	{
 		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
 			continue;
-
-		if (i >= 99 && i <= 117)
-		{
-			auto w = Vector4{ 0.1f, 0.45f, 0.45f, 10.f };
-			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
-		}
-		else
-		{
-			auto w = Vector4{ 0.33f, 0.33f, 0.34f, 1.f };
-			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
-		}
-		
 
 		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
 			continue;
@@ -106,34 +93,36 @@ HRESULT CityOfRuinManHole::Render()
 	return S_OK;
 }
 
-void CityOfRuinManHole::Submit_RenderGroup()
+void AmusementParkDome::Submit_RenderGroup()
 {
 	WorldObject::Submit_RenderGroup();
 }
 
-Shared<CityOfRuinManHole> CityOfRuinManHole::Create(const ComPtr<ID3D11Device>& device,
-	const ComPtr<ID3D11DeviceContext>& context)
+Shared<AmusementParkDome> AmusementParkDome::Create(const ComPtr<ID3D11Device>& device,
+                                                    const ComPtr<ID3D11DeviceContext>& context)
 {
-	auto prototype = make_shared<CityOfRuinManHole>(device, context);
+	auto prototype = make_shared<AmusementParkDome>(device, context);
 
 	if (FAILED(prototype->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CityOfRuinManHole");
+		MSG_BOX("Failed to Created : AmusementParkDome");
 		return nullptr;
 	}
 
 	return prototype;
 }
 
-Shared<GameObject> CityOfRuinManHole::Clone(void* arg)
+Shared<GameObject> AmusementParkDome::Clone(void* arg)
 {
-	auto instance = make_shared<CityOfRuinManHole>(*this);
+	auto instance = make_shared<AmusementParkDome>(*this);
 
 	if (FAILED(instance->Initialize(arg)))
 	{
-		MSG_BOX("Failed to Clone : CityOfRuinManHole");
+		MSG_BOX("Failed to Clone : AmusementParkDome");
 		return nullptr;
 	}
 
 	return instance;
 }
+
+

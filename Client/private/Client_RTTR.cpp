@@ -49,6 +49,10 @@
 #include "CityOfRuinCentral.h"
 #include "CityOfRuinBuilding.h"
 #include "CityOfRuinManHole.h"
+#include "AmusementParkMiddle.h"
+#include "AmusementParkEntry.h"
+#include "AmusementParkBackGround.h"
+#include "AmusementParkDome.h"
 
 using rttr::registration;
 
@@ -62,6 +66,7 @@ using rttr::registration;
 #include "SkyBox.h"
 #include "SkySphere.h"
 #include "Terrain.h"
+#include "TriggerObject.h"
 
 // </AUTO_GENERATED_INCLUDES>
 
@@ -117,32 +122,32 @@ void Register_Client_Reflection() {
 		.constructor<>()
         .method("Clone", &Pl0000::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000Body>("Pl0000Body")
         .constructor<>()
         .method("Clone", &Pl0000Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000Body::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<WP0070Body>("WP0070Body")
         .constructor<>()
         .method("Clone", &WP0070Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP0070Body::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<WP0220Body>("WP0220Body")
         .constructor<>()
         .method("Clone", &WP0220Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP0220Body::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<WP3000Body>("WP3000Body")
         .constructor<>()
         .method("Clone", &WP3000Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return WP3000Body::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000EvadeChecker>("Pl0000EvadeChecker")
         .constructor<>()
         .method("Clone", &Pl0000EvadeChecker::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000EvadeChecker::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
 
     rttr::registration::class_<ThirdPersonCamera>("ThirdPersonCamera")
@@ -153,46 +158,45 @@ void Register_Client_Reflection() {
         (rttr::metadata(Meta_Key_Type::DataType, Data_Type_Key::uint32),
         rttr::metadata(Meta_Key_Type::TypeTag, Data_Tag::ObjectID),
         rttr::metadata(Meta_Key_Type::SaveData, Save_Data_Key::TargetObjectID))
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000StateMachine>("Pl0000StateMachine")
         .constructor<>()
         .method("Clone", &Pl0000StateMachine::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000StateMachine::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000Input>("Pl0000Input")
         .constructor<>()
         .method("Clone", &Pl0000Input::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000Input::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000Movement>("Pl0000Movement")
         .constructor<>()
         .method("Clone", &Pl0000Movement::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Pl0000Movement::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000Shockwave>("Pl0000Shockwave")
         .constructor<>()
         .method("Clone", &Pl0000Shockwave::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000Shockwave::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000MonsterChecker>("Pl0000MonsterChecker")
         .constructor<>()
         .method("Clone", &Pl0000MonsterChecker::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000MonsterChecker::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<SheathWP0070Body>("SheathWP0070Body")
         .constructor<>()
         .method("Clone", &SheathWP0070Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SheathWP0070Body::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
-
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<SheathWP0220Body>("SheathWP0220Body")
         .constructor<>()
         .method("Clone", &SheathWP0220Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SheathWP0220Body::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
 
-
+    // World
     rttr::registration::class_<CityOfRuinEntry>("CityOfRuinEntry")
         .constructor<>()
         .method("Clone", &CityOfRuinEntry::Clone)
@@ -218,115 +222,134 @@ void Register_Client_Reflection() {
         .method("Clone", &CityOfRuinManHole::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CityOfRuinManHole::Create(device, context); })
 	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+    rttr::registration::class_<AmusementParkBackGround>("AmusementParkBackGround")
+        .constructor<>()
+        .method("Clone", &AmusementParkBackGround::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return AmusementParkBackGround::Create(device, context); })
+	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY2)));
+    rttr::registration::class_<AmusementParkDome>("AmusementParkDome")
+        .constructor<>()
+        .method("Clone", &AmusementParkDome::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return AmusementParkDome::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY2)));
+    rttr::registration::class_<AmusementParkEntry>("AmusementParkEntry")
+        .constructor<>()
+        .method("Clone", &AmusementParkEntry::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return AmusementParkEntry::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY2)));
+    rttr::registration::class_<AmusementParkMiddle>("AmusementParkMiddle")
+        .constructor<>()
+        .method("Clone", &AmusementParkMiddle::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return AmusementParkMiddle::Create(device, context); })
+        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY2)));
 
     // MONSTER
     rttr::registration::class_<Em3100>("Em3100")
         .constructor<>()
         .method("Clone", &Em3100::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3100::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Em3100Body>("Em3100Body")
         .constructor<>()
         .method("Clone", &Em3100Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3100Body::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em0010>("Em0010")
         .constructor<>()
         .method("Clone", &Em0010::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em0010::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em0010Body>("Em0010Body")
         .constructor<>()
         .method("Clone", &Em0010Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em0010Body::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<MonsterSight>("MonsterSight")
         .constructor<>()
         .method("Clone", &MonsterSight::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return MonsterSight::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<MonsterAOE>("MonsterAOE")
         .constructor<>()
         .method("Clone", &MonsterAOE::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return MonsterAOE::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em0010Movement>("Em0010Movement")
         .constructor<>()
         .method("Clone", &Em0010Movement::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em0010Movement::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em3000>("Em3000")
         .constructor<>()
         .method("Clone", &Em3000::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em3000Body>("Em3000Body")
         .constructor<>()
         .method("Clone", &Em3000Body::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000Body::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em3000Movement>("Em3000Movement")
         .constructor<>()
         .method("Clone", &Em3000Movement::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em3000Movement::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em3001>("Em3001")
         .constructor<>()
         .method("Clone", &Em3001::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3001::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
-
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Em3002>("Em3002")
         .constructor<>()
         .method("Clone", &Em3002::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3002::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<Em3003>("Em3003")
         .constructor<>()
         .method("Clone", &Em3003::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3003::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     // Projectile
     rttr::registration::class_<Bullet>("Bullet")
         .constructor<>()
         .method("Clone", &Bullet::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Bullet::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     // Effect
     rttr::registration::class_<FireFlashEffect>("FireFlashEffect")
         .constructor<>()
         .method("Clone", &FireFlashEffect::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return FireFlashEffect::Create(device, context); })
-        (rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<SparkEffect>("SparkEffect")
         .constructor<>()
         .method("Clone", &SparkEffect::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SparkEffect::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     // IN GAME UI
     rttr::registration::class_<HpBarWorldUI>("HpBarWorldUI")
         .constructor<>()
         .method("Clone", &HpBarWorldUI::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return HpBarWorldUI::Create(device, context); })
-		(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
     rttr::registration::class_<NavigationSector>("NavigationSector")
         .constructor<>()
         .method("Clone", &NavigationSector::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return NavigationSector::Create(device, context); })
-	(rttr::metadata("Level", ETOI(LEVEL::GAMEPLAY)));
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
@@ -357,6 +380,11 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Terrain::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Terrain::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<TriggerObject>("TriggerObject")
+        .constructor<>()
+        .method("Clone", &TriggerObject::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return TriggerObject::Create(device, context); })(rttr::metadata("Level", 0));
 
 
 // </AUTO_GENERATED_RTTR>

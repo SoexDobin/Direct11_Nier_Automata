@@ -84,6 +84,28 @@ HRESULT ClientSettingManager::Load_Textures_FromJson(LEVEL baseLevel) const
 
 HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
 {
+	auto ParseCSVRow = [](const string& line) -> vector<string>
+		{
+			vector<string> result;
+			bool inQuotes = false;
+			string currentToken;
+			for (char c : line)
+			{
+				if (c == '\"') {
+					inQuotes = !inQuotes;
+				}
+				else if (c == ',' && !inQuotes) {
+					result.push_back(currentToken);
+					currentToken.clear();
+				}
+				else {
+					currentToken += c;
+				}
+			}
+			result.push_back(currentToken);
+			return result;
+		};
+
 	wstring csvPath = m_ResourcePath + L"TextureSettings.csv";
 
 	// CSV가 없을 경우 템플릿 생성
@@ -91,7 +113,6 @@ HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
 	{
 		std::ofstream outFile(csvPath);
 		if (outFile.is_open()) {
-			// 헤더 및 템플릿 행 작성
 			outFile << "Level, Tag, Path, Count" << std::endl;
 			outFile << "STATIC, Prototype_Component_Texture_Default, Default/Default.dds, 1" << std::endl;
 			outFile.close();
@@ -109,20 +130,26 @@ HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
 	while (getline(csvFile, line))
 	{
 		if (line.empty()) continue;
-
-		stringstream stream(line);
-		string level, tag, path, count;
-		getline(stream, level, ',');
-		getline(stream, tag, ',');
-		getline(stream, path, ',');
-		getline(stream, count);
-
-		jsonRoot["TextureSettings"].push_back({
-			{"level", Helper::Trim(level)},
-			{"tag", Helper::Trim(tag)},
-			{"path", Helper::Trim(path)},
-			{"count", stoi(Helper::Trim(count))},
-			});
+		
+		vector<string> columns = ParseCSVRow(line);
+		if (columns.size() < 4) continue; // 데이터 열 부족 시 스킵
+		string levelStr = columns[0];
+		string tag = columns[1];
+		string path = columns[2];
+		string count = columns[3];
+		
+		stringstream levelStream(levelStr);
+		string singleLevel;
+		// 3. 쉼표(,)로 레벨을 쪼갠 뒤 각각 JSON에 push_back
+		while (getline(levelStream, singleLevel, ','))
+		{
+			jsonRoot["TextureSettings"].push_back({
+				{"level", Helper::Trim(singleLevel)},
+				{"tag", Helper::Trim(tag)},
+				{"path", Helper::Trim(path)},
+				{"count", stoi(Helper::Trim(count))}
+				});
+		}
 	}
 
 	ofstream jsonFile(m_ProjectSettingPath + L"TextureSettings.json");
@@ -223,6 +250,28 @@ HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 
 HRESULT ClientSettingManager::Sync_ModelJson_FromCSV() const
 {
+	auto ParseCSVRow = [](const string& line) -> vector<string>
+		{
+			vector<string> result;
+			bool inQuotes = false;
+			string currentToken;
+			for (char c : line)
+			{
+				if (c == '\"') {
+					inQuotes = !inQuotes;
+				}
+				else if (c == ',' && !inQuotes) {
+					result.push_back(currentToken);
+					currentToken.clear();
+				}
+				else {
+					currentToken += c;
+				}
+			}
+			result.push_back(currentToken);
+			return result;
+		};
+
 	wstring csvPath = m_ResourcePath + L"ModelSettings.csv";
 
 	if (!filesystem::exists(csvPath))
@@ -248,51 +297,40 @@ HRESULT ClientSettingManager::Sync_ModelJson_FromCSV() const
 	while (getline(csvFile, line))
 	{
 		if (line.empty()) continue;
-
-		stringstream stream(line);
-		string level, tag, path;
-		string px, py, pz, rx, ry, rz, sx, sy, sz;
-
-		getline(stream, level, ',');
-		getline(stream, tag, ',');
-		getline(stream, path, ',');
-		getline(stream, px, ','); getline(stream, py, ','); getline(stream, pz, ','); // Position
-		getline(stream, rx, ','); getline(stream, ry, ','); getline(stream, rz, ','); // Rotation (Euler)
-		getline(stream, sx, ','); getline(stream, sy, ','); getline(stream, sz, ','); // Scale
-
-		// 빈 문자열 및 기본값 처리 람다 (Sync 시 적용)
-		auto GetFloat = [](string str, float defaultValue) {
-			string trimmed = Helper::Trim(str);
-			// 따옴표 제거 (혹시 포함될 경우)
-			trimmed.erase(remove(trimmed.begin(), trimmed.end(), '\"'), trimmed.end());
-			if (trimmed.empty()) return defaultValue;
-			try { return stof(trimmed); } catch (...) { return defaultValue; }
-		};
-
-		auto CleanString = [](string str) {
-			string trimmed = Helper::Trim(str);
-			// 앞뒤 따옴표 제거
-			if (trimmed.size() >= 2 && trimmed.front() == '\"' && trimmed.back() == '\"')
-				trimmed = trimmed.substr(1, trimmed.size() - 2);
-			return Helper::Trim(trimmed); // 따옴표 제거 후 한 번 더 트림
-		};
-
-		string cleanLevel = CleanString(level);
-		string cleanTag = CleanString(tag);
-		string cleanPath = CleanString(path);
-
+		// 1. 안전 파서 사용
+		vector<string> columns = ParseCSVRow(line);
+		if (columns.size() < 12) continue;
+		string levelStr = columns[0];
+		string tag = columns[1];
+		string path = columns[2];
+		string px = columns[3], py = columns[4], pz = columns[5];
+		string rx = columns[6], ry = columns[7], rz = columns[8];
+		string sx = columns[9], sy = columns[10], sz = columns[11];
+	
+		auto GetFloat = [](string str, Float defaultValue)
+			{
+				string trimmed = Helper::Trim(str);
+				if (trimmed.empty()) return defaultValue;
+				try { return stof(trimmed); }
+				catch (...) { return defaultValue; }
+			};
 		Float fPx = GetFloat(px, 0.f); Float fPy = GetFloat(py, 0.f); Float fPz = GetFloat(pz, 0.f);
 		Float fRx = GetFloat(rx, 0.f); Float fRy = GetFloat(ry, 0.f); Float fRz = GetFloat(rz, 0.f);
 		Float fSx = GetFloat(sx, 1.f); Float fSy = GetFloat(sy, 1.f); Float fSz = GetFloat(sz, 1.f);
-
-		jsonRoot["ModelSettings"].push_back({
-			{"level", cleanLevel},
-			{"tag", cleanTag},
-			{"path", cleanPath},
-			{"position", {{"x", fPx}, {"y", fPy}, {"z", fPz}}},
-			{"rotation", {{"x", fRx}, {"y", fRy}, {"z", fRz}}},
-			{"scale", {{"x", fSx}, {"y", fSy}, {"z", fSz}}}
-			});
+		// 2. 레벨 분리 및 각각 푸쉬
+		stringstream levelStream(levelStr);
+		string singleLevel;
+		while (getline(levelStream, singleLevel, ','))
+		{
+			jsonRoot["ModelSettings"].push_back({
+				{"level", Helper::Trim(singleLevel)},
+				{"tag", Helper::Trim(tag)},
+				{"path", Helper::Trim(path)},
+				{"position", {{"x", fPx}, {"y", fPy}, {"z", fPz}}},
+				{"rotation", {{"x", fRx}, {"y", fRy}, {"z", fRz}}},
+				{"scale", {{"x", fSx}, {"y", fSy}, {"z", fSz}}}
+				});
+		}
 	}
 
 	ofstream jsonFile(m_ProjectSettingPath + L"ModelSettings.json");
@@ -367,26 +405,72 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
             if (createMethod.is_valid())
             {
                 // 3. 메타데이터 파싱 (기본값: STATIC 0번 레벨)
-                uint32 targetLevel = 0; 
-                rttr::variant metaLevel = createMethod.get_metadata("Level");
-                if (metaLevel.is_valid())
-                {
-                    if (metaLevel.is_type<uint32>())
-                        targetLevel = metaLevel.get_value<uint32>();
-                    else if (metaLevel.is_type<int>()) 
-                        targetLevel = static_cast<uint32>(metaLevel.get_value<int>());
-                    else if (metaLevel.is_type<int32>()) 
-                        targetLevel = static_cast<uint32>(metaLevel.get_value<int32>());
-                    else if (metaLevel.is_type<LEVEL>()) 
-                        targetLevel = ETOI(metaLevel.get_value<LEVEL>());
-                }
-                
-                // 0번(STATIC)이더라도 현재 baseLevel과 일치할 때만 진행 (중복 등록 방지)
-                if (targetLevel != ETOI(baseLevel))
-                    continue;
+				std::vector<uint32> targetLevels;
+				rttr::variant metaLevel = createMethod.get_metadata("Level");
+				if (metaLevel.is_valid())
+				{
+					// [단일 데이터] 파싱 (기존 호환성)
+					if (metaLevel.is_type<uint32>())
+					{
+						targetLevels.push_back(metaLevel.get_value<uint32>());
+					}
+					else if (metaLevel.is_type<int>())
+					{
+						targetLevels.push_back(static_cast<uint32>(metaLevel.get_value<int>()));
+					}
+					else if (metaLevel.is_type<int32>())
+					{
+						targetLevels.push_back(static_cast<uint32>(metaLevel.get_value<int32>()));
+					}
+					else if (metaLevel.is_type<LEVEL>())
+					{
+						targetLevels.push_back(ETOI(metaLevel.get_value<LEVEL>()));
+					}
+					// [복수 데이터 (배열/벡터)] 파싱
+					else if (metaLevel.is_type<std::vector<uint32>>())
+					{
+						targetLevels = metaLevel.get_value<std::vector<uint32>>();
+					}
+					else if (metaLevel.is_type<std::vector<int>>())
+					{
+						auto arr = metaLevel.get_value<std::vector<int>>();
+						for (int lv : arr)
+						{
+							targetLevels.push_back(static_cast<uint32>(lv));
+						}
+					}
+					else if (metaLevel.is_type<std::vector<LEVEL>>())
+					{
+						auto arr = metaLevel.get_value<std::vector<LEVEL>>();
+						for (LEVEL lv : arr)
+						{
+							targetLevels.push_back(ETOI(lv));
+						}
+					}
+				}
+				else
+				{
+					// 메타데이터가 아예 없으면 기본값(STATIC : 0) 취급
+					targetLevels.push_back(0);
+				}
+				// 현재 등록 시점인 baseLevel이 등록 허가 리스트(targetLevels)에 포함되어 있는지 판별
+				bool bMatched = false;
+				for (uint32 lv : targetLevels)
+				{
+					if (lv == ETOI(baseLevel))
+					{
+						bMatched = true;
+						break;
+					}
+				}
+				// 허가된 레벨이 아니라면 생성 및 PrototypeManager 등록 건너뛰기
+				if (!bMatched)
+				{
+					continue;
+				}
 
 
-                LOG_INFO(L"[RTTR-Debug] Try Reg: {}, Target: {}, Current: {}", Helper::To_wString(typeName), targetLevel, ETOI(baseLevel));
+                //LOG_INFO(L"[RTTR-Debug] Try Reg: {}, Target: {}, Current: {}", Helper::To_wString(typeName), targetLevel, ETOI(baseLevel));
 
                 // 4. Create Invoke (매개변수: Device, Context)
                 rttr::variant result = createMethod.invoke({}, GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());

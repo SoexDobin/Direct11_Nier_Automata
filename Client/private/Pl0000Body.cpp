@@ -39,7 +39,13 @@ HRESULT Pl0000Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	m_RootBoneIndex = m_Model->Get_BoneIndexByName("pl0000");
+	string boneName{};
+	if (GAME_INSTANCE->Get_TargetLevelIndex() == ETOI(LEVEL::GAMEPLAY))
+		boneName = "pl0000";
+	else
+		boneName = "pl0100";
+
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName(boneName);
 	
 	if (m_RootBoneIndex == -1)
 	{
@@ -131,7 +137,13 @@ HRESULT Pl0000Body::Ready_Components()
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	Model::MODEL_DESC modelDesc{ L"p10000" };
+	wstring modelTag{};
+	if (GAME_INSTANCE->Get_TargetLevelIndex() == ETOI(LEVEL::GAMEPLAY))
+		modelTag = L"pl0000";
+	else
+		modelTag = L"pl0100";
+
+	Model::MODEL_DESC modelDesc{ modelTag };
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;

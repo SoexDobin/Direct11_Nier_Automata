@@ -9,7 +9,7 @@
 
 namespace Client
 {
-	enum class LEVEL { STATIC, LOADING, TITLE, GAMEPLAY, LEVEL_END };
+	enum class LEVEL { STATIC, LOADING, TITLE, GAMEPLAY, GAMEPLAY2, LEVEL_END };
 	enum class ATK_TYPE { LIGHT, HEAVY, POD, END };
 
 	constexpr const Char* DiffuseMap1 = "g_DiffuseTexture1";

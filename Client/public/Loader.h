@@ -39,6 +39,7 @@ private:
 	HRESULT Loading_Global_Prototype();
 	HRESULT Loading_For_TitleLevel();
 	HRESULT Loading_For_GamePlayLevel();
+	HRESULT Loading_For_GamePlayLevel2();
 	
 
 private:

@@ -5,7 +5,7 @@ namespace Engine
 {
 #define ETOI(ENUM)              static_cast<unsigned int>(ENUM)
 #define GAME_INSTANCE                    Engine::Game::GetInstance()
-
+#define LEVELS(...) std::vector<uint32>{ __VA_ARGS__ }
 
 #define KEY_MAX                 256
 #define UBYTE(UINT32)           static_cast<unsigned char>(UINT32)

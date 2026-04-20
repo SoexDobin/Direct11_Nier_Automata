@@ -13,6 +13,7 @@ LevelGamePlay::LevelGamePlay(const ComPtr<ID3D11Device>& device, const ComPtr<ID
 
 HRESULT LevelGamePlay::Initialize(void* arg)
 {
+	NavigationManager::GetInstance()->Reset_NavigationSettingFlag();
 
 	if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(LEVEL::GAMEPLAY)))
 	{

@@ -37,7 +37,7 @@ wstring Pl0000StateMachine::Get_StateTag(Pl0000::PL0000_STATE state)
 	return L"";
 }
 
-Pl0000::PL0000_STATE Pl0000StateMachine::Get_CurP10000State()
+Pl0000::PL0000_STATE Pl0000StateMachine::Get_CurPl0000State()
 {
 	if (nullptr == m_CurrentState)
 		return static_cast<Pl0000::PL0000_STATE>(0);

@@ -34,7 +34,7 @@ Bool State2B_Idle::StateEnterInvoke()
 {
 	auto pl0000 = m_Body.lock();
 
-	switch (auto prevState = m_States.lock()->Get_CurP10000State())
+	switch (auto prevState = m_States.lock()->Get_CurPl0000State())
 	{
 	case Pl0000::PL0000_STATE::RUN:
 		{

@@ -12,10 +12,10 @@ class CLIENT_DLL Pl0000StateMachine final : public StateMachine
 {
 	RTTR_ENABLE(StateMachine)
 public:
-	typedef struct tagP10000StateMachine : public STATEMACHINE_DESC
+	typedef struct tagPl0000StateMachine : public STATEMACHINE_DESC
 	{
 			
-	} P10000_STATEMACHINE_DESC;
+	} Pl0000_STATEMACHINE_DESC;
 
 public:
 	explicit Pl0000StateMachine();
@@ -27,7 +27,7 @@ public:
 	Bool Change_State(Pl0000::PL0000_STATE state);
 	Shared<State2B> Find_2BState(Pl0000::PL0000_STATE state);
 	wstring Get_StateTag(Pl0000::PL0000_STATE state);
-	Pl0000::PL0000_STATE Get_CurP10000State();
+	Pl0000::PL0000_STATE Get_CurPl0000State();
 
 public:
 	HRESULT Initialize_Prototype() override;

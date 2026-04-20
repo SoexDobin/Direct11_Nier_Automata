@@ -15,7 +15,7 @@ class CLIENT_DLL Pl0000Body final : public Pl0000Parts
 {
 	RTTR_ENABLE(Pl0000Parts)
 public:
-	typedef struct tagP10000BodyDesc : public PL0000PART_DESC
+	typedef struct tagPl0000BodyDesc : public PL0000PART_DESC
 	{} Pl0000BODY_DESC ;
 
 public:

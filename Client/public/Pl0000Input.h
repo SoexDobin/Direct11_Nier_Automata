@@ -127,10 +127,10 @@ public:
 	// 매 프레임 갱신
 	// ===================================================================
 public:
-	void Update_P10000_InputState(Float timeDelta);
+	void Update_Pl0000_InputState(Float timeDelta);
 
 private:
-	void Update_P10000_KeyState(Byte rawState, INPUT_INFO &outInfo, Float timeDelta);
+	void Update_Pl0000_KeyState(Byte rawState, INPUT_INFO &outInfo, Float timeDelta);
 
 	// ===================================================================
 	// 컴포넌트 라이프사이클

@@ -163,13 +163,15 @@ HRESULT HpBarWorldUI::Render()
 
 HRESULT HpBarWorldUI::Ready_Components()
 {
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+
 	auto shaderDesc = Shader::SHADER_DESC{ VTXTEX::Tag, VTXTEX::Elements, VTXTEX::numElements };
 	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::GAMEPLAY), L"UI_Hp_Bar" };
-	m_Texture = Add_Component<Texture>(ETOI(LEVEL::GAMEPLAY), &textureDesc);
+	auto textureDesc = Texture::TEXTURE_DESC{ levIndex, L"UI_Hp_Bar" };
+	m_Texture = Add_Component<Texture>(levIndex, &textureDesc);
 	if (nullptr == m_Texture)
 		return E_FAIL;
 

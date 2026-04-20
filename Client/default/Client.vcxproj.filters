@@ -83,7 +83,7 @@
       <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Pl0000Body.h">
-      <Filter>02. GameObject\Entity\2B\2BPartObject\P10000</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\Pl0000</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WP0070Body.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
@@ -263,6 +263,22 @@
     <ClInclude Include="..\public\CityOfRuinManHole.h">
       <Filter>02. GameObject\World\CityOfRuin</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\TriggerObject.h" />
+    <ClInclude Include="..\public\AmusementParkEntry.h">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AmusementParkMiddle.h">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AmusementParkBackGround.h">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\AmusementParkDome.h">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LevelGamePlay2.h">
+      <Filter>01. Level\GamePlay</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -344,7 +360,7 @@
       <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000Body.cpp">
-      <Filter>02. GameObject\Entity\2B\2BPartObject\P10000</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\Pl0000</Filter>
     </ClCompile>
     <ClCompile Include="..\private\WP0070Body.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
@@ -521,6 +537,22 @@
     <ClCompile Include="..\private\CityOfRuinManHole.cpp">
       <Filter>02. GameObject\World\CityOfRuin</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\TriggerObject.cpp" />
+    <ClCompile Include="..\private\AmusementParkEntry.cpp">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AmusementParkMiddle.cpp">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AmusementParkBackGround.cpp">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\AmusementParkDome.cpp">
+      <Filter>02. GameObject\World\Amusement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LevelGamePlay2.cpp">
+      <Filter>01. Level\GamePlay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -585,9 +617,6 @@
     </Filter>
     <Filter Include="02. GameObject\Entity\2B\2BPartObject">
       <UniqueIdentifier>{860aeb7a-a17a-405c-af57-46faf234f476}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\Entity\2B\2BPartObject\P10000">
-      <UniqueIdentifier>{7099d284-19b5-4ec7-85c0-7a5e1e9b45b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\Entity\2B\2BPartObject\WP0070">
       <UniqueIdentifier>{76bad4f2-11f8-4f5d-9074-da2549d47d54}</UniqueIdentifier>
@@ -687,6 +716,15 @@
     </Filter>
     <Filter Include="02. GameObject\World\CityOfRuin">
       <UniqueIdentifier>{513f29aa-4701-4a98-83ff-fa1465724fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Trigger">
+      <UniqueIdentifier>{9c68192b-e96f-41e5-8c57-162d2876964e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\World\Amusement">
+      <UniqueIdentifier>{ca243213-3291-4a63-8143-0c540f4417ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\2B\2BPartObject\Pl0000">
+      <UniqueIdentifier>{7099d284-19b5-4ec7-85c0-7a5e1e9b45b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

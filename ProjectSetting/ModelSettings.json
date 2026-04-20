@@ -2,7 +2,7 @@
     "ModelSettings": [
         {
             "level": "3",
-            "path": "Models/p10000/p10000.model",
+            "path": "Models/pl0000/pl0000.model",
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -18,7 +18,67 @@
                 "y": 0.009999999776482582,
                 "z": 0.009999999776482582
             },
-            "tag": "p10000"
+            "tag": "pl0000"
+        },
+        {
+            "level": "4",
+            "path": "Models/pl0000/pl0000.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "pl0000"
+        },
+        {
+            "level": "3",
+            "path": "Models/pl0100/pl0100.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "pl0100"
+        },
+        {
+            "level": "4",
+            "path": "Models/pl0100/pl0100.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "pl0100"
         },
         {
             "level": "3",
@@ -81,7 +141,47 @@
             "tag": "wp0070"
         },
         {
+            "level": "4",
+            "path": "Models/wp0070/wp0070.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "wp0070"
+        },
+        {
             "level": "3",
+            "path": "Models/wp0220/wp0220.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "wp0220"
+        },
+        {
+            "level": "4",
             "path": "Models/wp0220/wp0220.model",
             "position": {
                 "x": 0.0,
@@ -121,7 +221,47 @@
             "tag": "wp3000"
         },
         {
+            "level": "4",
+            "path": "Models/wp3000/wp3000.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "wp3000"
+        },
+        {
             "level": "3",
+            "path": "Models/em3100/em3100.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "em3100"
+        },
+        {
+            "level": "4",
             "path": "Models/em3100/em3100.model",
             "position": {
                 "x": 0.0,
@@ -161,7 +301,47 @@
             "tag": "candy"
         },
         {
+            "level": "4",
+            "path": "Models/Candy/Candy.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "candy"
+        },
+        {
             "level": "3",
+            "path": "Models/em0010/em0010.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "em0010"
+        },
+        {
+            "level": "4",
             "path": "Models/em0010/em0010.model",
             "position": {
                 "x": 0.0,
@@ -201,7 +381,47 @@
             "tag": "em3000"
         },
         {
+            "level": "4",
+            "path": "Models/em3000/em3000.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "em3000"
+        },
+        {
             "level": "3",
+            "path": "Models/em3000/em3001.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "em3001"
+        },
+        {
+            "level": "4",
             "path": "Models/em3000/em3001.model",
             "position": {
                 "x": 0.0,
@@ -241,7 +461,47 @@
             "tag": "em3002"
         },
         {
+            "level": "4",
+            "path": "Models/em3000/em3002.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "em3002"
+        },
+        {
             "level": "3",
+            "path": "Models/em3000/em3003.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.009999999776482582,
+                "y": 0.009999999776482582,
+                "z": 0.009999999776482582
+            },
+            "tag": "em3003"
+        },
+        {
+            "level": "4",
             "path": "Models/em3000/em3003.model",
             "position": {
                 "x": 0.0,
@@ -339,6 +599,86 @@
                 "z": 1.0
             },
             "tag": "CityOfRuinBuilding"
+        },
+        {
+            "level": "4",
+            "path": "Models/World/AmusementParkBackGround/AmusementParkBackGround.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "AmusementParkBackGround"
+        },
+        {
+            "level": "4",
+            "path": "Models/World/AmusementParkEntry/AmusementParkEntry.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "AmusementParkEntry"
+        },
+        {
+            "level": "4",
+            "path": "Models/World/AmusementParkMiddle/AmusementParkMiddle.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "AmusementParkMiddle"
+        },
+        {
+            "level": "4",
+            "path": "Models/World/AmusementParkDome/AmusementParkDome.model",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "tag": "AmusementParkDome"
         }
     ]
 }

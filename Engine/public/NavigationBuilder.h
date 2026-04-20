@@ -48,11 +48,13 @@ public:
 	HRESULT Begin() override;
 
 public:
-	vector<NavCellBinary> Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
-	HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
+	vector<NavCellBinary> Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config, 
+		Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax);
+	HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config,
+		Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax);
 	vector<NavCell> Import_Binary(const string& filePath);
 private:
-	static vector<NavCellBinary> Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors);
+	static vector<NavCellBinary> Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors, Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax);
 
 public:
 	NAV_BUILD_RESULT Build(

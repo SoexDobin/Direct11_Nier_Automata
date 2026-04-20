@@ -13,10 +13,11 @@ class TriggerObject final : public GameObject
 public:
 	struct TRIGGER_DESC : public GAMEOBJECT_DESC
 	{
+		wstring								targetLayerName{};
 		Vector3								position{ 0.f, 0.f, 0.f };
 		Float								radius{ 1.f };
 		uint32								levelIndex{ 0 };
-		initializer_list<function<void()>>	callbacks;
+		vector<function<void()>>			callbacks;
 	};
 
 public:
@@ -37,6 +38,7 @@ private:
 	std::vector<std::function<void()>>		m_Callbacks;
 	Shared<SphereCollider>					m_SphereCollider { nullptr };
 	uint32									m_LevelIndex { 0 };
+	uint32									m_TargetLayerIndex{ 0 };
 	Bool									m_IsTriggered{ false };
 
 public:

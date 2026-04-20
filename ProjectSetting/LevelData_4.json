@@ -8,6 +8,45 @@
             {
               "properties": null,
               "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "Pl0000",
+          "objectID": 4267756554,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Pl0000",
+          "transform": {
+            "position": [
+              -50.0,
+              0.0,
+              51.0
+            ],
+            "rotation": [
+              0.0,
+              89.99995422363281,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Pl0000"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
             }
           ],
           "name": "ThirdPersonCamera",
@@ -46,23 +85,23 @@
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "Shader"
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Navigation"
             }
           ],
-          "name": "AmusementParkMiddle",
-          "objectID": 1203705154,
+          "name": "AmusementParkDome",
+          "objectID": 1397792786,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "AmusementParkMiddle",
+          "prototypeTag": "AmusementParkDome",
           "transform": {
             "position": [
-              151.0,
+              301.0,
               0.0,
-              0.0
+              86.5
             ],
             "rotation": [
               0.0,
@@ -75,7 +114,7 @@
               1.0
             ]
           },
-          "typeName": "AmusementParkMiddle"
+          "typeName": "AmusementParkDome"
         },
         {
           "components": [
@@ -89,11 +128,11 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Model"
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Shader"
             }
           ],
           "name": "AmusementParkEntry",
@@ -128,21 +167,25 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Navigation"
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
             }
           ],
-          "name": "Pl0000",
-          "objectID": 4267756554,
+          "name": "AmusementParkMiddle",
+          "objectID": 1203705154,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Pl0000",
+          "prototypeTag": "AmusementParkMiddle",
           "transform": {
             "position": [
-              0.0,
+              151.0,
               0.0,
               0.0
             ],
@@ -157,7 +200,42 @@
               1.0
             ]
           },
-          "typeName": "Pl0000"
+          "typeName": "AmusementParkMiddle"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "AABBCollider"
+            }
+          ],
+          "name": "NavigationSector",
+          "objectID": 3826940858,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "NavigationSector",
+          "transform": {
+            "position": [
+              301.0,
+              0.0,
+              86.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "NavigationSector"
         }
       ]
     }

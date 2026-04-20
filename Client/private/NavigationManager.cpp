@@ -134,7 +134,7 @@ HRESULT NavigationManager::Setting_GamePlay2()
 
 	NavigationSector::NAVIGATION_COLLISION_DESC parkDomeSectorDesc{};
 	parkDomeSectorDesc.navTag = L"AmusementParkDome";
-	parkDomeSectorDesc.worldPosition = Vector3{ 151.f, 0.f, 0.f };
+	parkDomeSectorDesc.worldPosition = Vector3{ 301.f, 0.f, 86.5f };
 	parkDomeSectorDesc.collisionExtends = Vector3{ 74.f, 50.f, 80.f };
 	auto parkDomeSector = GAME_INSTANCE->Instantiate<NavigationSector>(L"NavigationSector", ETOI(LEVEL::GAMEPLAY2), &parkDomeSectorDesc);
 

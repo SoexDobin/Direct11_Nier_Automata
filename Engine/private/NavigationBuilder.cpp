@@ -25,14 +25,14 @@ HRESULT NavigationBuilder::Begin()
 	return EngineManager::Begin();
 }
 
-vector<NavCellBinary> NavigationBuilder::Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
+vector<NavCellBinary> NavigationBuilder::Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config, Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax)
 {
-	return Bake_Internal(model, worldMatrix, config, false);
+	return Bake_Internal(model, worldMatrix, config, false, useBBoxLimit, limitBMin, limitBMax);
 }
 
-HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
+HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config, Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax)
 {
-	vector<NavCellBinary> bakedData = Bake_Internal(model, worldMatrix, config, true);
+	vector<NavCellBinary> bakedData = Bake_Internal(model, worldMatrix, config, true, useBBoxLimit, limitBMin, limitBMax);
 	if (bakedData.empty())
 	{
 		MSG_BOX("[ NavMesh Builder Export ] There is no vertex or just failed");
@@ -68,17 +68,20 @@ HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> m
 	return S_OK;
 }
 
-vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors)
+vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors, Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax)
 {
 	vector<NavCellBinary> resultData;
 	if (model == nullptr) return resultData;
 	vector<Float> rawPos;
 	vector<int32_t> rawIndices;
 	model->Extract_RawMeshData(rawPos, rawIndices);
+
 	int32 numVertices = static_cast<int32>(rawPos.size() / 3);
 	int32 numTris = static_cast<int32>(rawIndices.size() / 3);
+
 	if (numVertices == 0 || numTris == 0) return resultData;
 	vector<Float> worldVertices(rawPos.size());
+
 	for (int32 i = 0; i < numVertices; ++i)
 	{
 		Vector3 localPos(rawPos[i * 3], rawPos[i * 3 + 1], rawPos[i * 3 + 2]);
@@ -87,9 +90,22 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 		worldVertices[i * 3 + 1] = worldPos.y;
 		worldVertices[i * 3 + 2] = worldPos.z;
 	}
+
 	rcContext ctx;
 	config.maxVertsPerPoly = 3;
 	rcCalcBounds(worldVertices.data(), numVertices, config.bmin, config.bmax);
+
+	// ------------ [추가] BBox 클램핑 처리 시작 ------------
+	if (useBBoxLimit)
+	{
+		config.bmin[0] = max(config.bmin[0], limitBMin.x);
+		config.bmin[1] = max(config.bmin[1], limitBMin.y);
+		config.bmin[2] = max(config.bmin[2], limitBMin.z);
+		config.bmax[0] = min(config.bmax[0], limitBMax.x);
+		config.bmax[1] = min(config.bmax[1], limitBMax.y);
+		config.bmax[2] = min(config.bmax[2], limitBMax.z);
+	}
+
 	rcCalcGridSize(config.bmin, config.bmax, config.cs, &config.width, &config.height);
 	rcHeightfield* solid = nullptr;
 	rcCompactHeightfield* chf = nullptr;

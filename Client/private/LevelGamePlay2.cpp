@@ -5,6 +5,7 @@
 
 #include "ClientSettingManager.h"
 #include "NavigationManager.h"
+#include "WorldTriggerManager.h"
 
 LevelGamePlay2::LevelGamePlay2(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Level{ device, context }
@@ -13,6 +14,7 @@ LevelGamePlay2::LevelGamePlay2(const ComPtr<ID3D11Device>& device, const ComPtr<
 
 HRESULT LevelGamePlay2::Initialize(void* arg)
 {
+	WorldTriggerManager::GetInstance()->Reset_NavigationSettingFlag();
 	NavigationManager::GetInstance()->Reset_NavigationSettingFlag();
 
 	if (FAILED(ClientSettingManager::GetInstance()->Load_LevelData(LEVEL::GAMEPLAY2)))
@@ -32,6 +34,7 @@ void LevelGamePlay2::On_Destroy()
 void LevelGamePlay2::Update_Level(Float timeDelta)
 {
 	NavigationManager::GetInstance()->Setting_NavigationSector(LEVEL::GAMEPLAY2);
+	WorldTriggerManager::GetInstance()->Setting_Trigger(LEVEL::GAMEPLAY2);
 
 	Level::Update_Level(timeDelta);
 }

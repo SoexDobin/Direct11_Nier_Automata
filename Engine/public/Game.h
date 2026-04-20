@@ -182,8 +182,10 @@ public: /* CollisionManager */
 
 public: /* NavigationBuilder */
     NavigationBuilder::NAV_BUILD_RESULT Build_Navigation(const Float* vertices, int32 numVertices, const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params);
-    vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
-    HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
+    vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config,
+        Bool useBBoxLimit = false, const Vector3& limitBMin = Vector3{ 0.f, 0.f, 0.f }, const Vector3& limitBMax = Vector3{ 0.f, 0.f, 0.f }) const;
+    HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config,
+        Bool useBBoxLimit = false, const Vector3& limitBMin = Vector3{ 0.f, 0.f, 0.f }, const Vector3& limitBMax = Vector3{ 0.f, 0.f, 0.f }) const;
     vector<NavCell> Import_Navigation(const string& filePath) const;
 
 public:

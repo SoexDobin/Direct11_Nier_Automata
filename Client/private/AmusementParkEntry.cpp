@@ -67,6 +67,9 @@ HRESULT AmusementParkEntry::Render()
 		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
 			continue;
 
+		auto w = Vector4{ 0.33f, 0.33f, 0.34f, 1.f };
+		m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
+	
 		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
 			continue;
 

@@ -227,6 +227,18 @@ void NavHelper::Render_ConfigPanel()
 		ImGui::Checkbox("Auto-Bake", &m_AutoBake);
 		ImGui::Separator();
 
+		{
+			if (ImGui::Checkbox("Use BBox Limit", &m_UseBBoxLimit)) changed = true;
+			if (m_UseBBoxLimit)
+			{
+				ImGui::DragFloat3("BBox Min", &m_BBoxMin.x, 1.0f);
+				if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
+				ImGui::DragFloat3("BBox Max", &m_BBoxMax.x, 1.0f);
+				if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
+			}
+			ImGui::Separator();
+		}
+
 		ImGui::DragFloat("Cell Size (cs)", &m_CellSize, 0.01f, 0.05f, 2.f);
 		if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
 		ImGui::DragFloat("Cell Height (ch)", &m_CellHeight, 0.01f, 0.05f, 2.f);
@@ -477,7 +489,7 @@ void NavHelper::BakePreview()
 	rcConfig cfg = Build_RcConfig();
 	Matrix worldMat = Build_WorldMatrix();
 
-	m_PreviewCells = GAME_INSTANCE->Bake_Navigation(m_pSelectedModel, worldMat, cfg);
+	m_PreviewCells = GAME_INSTANCE->Bake_Navigation(m_pSelectedModel, worldMat, cfg, m_UseBBoxLimit, m_BBoxMin, m_BBoxMax);
 	m_HasPreview = !m_PreviewCells.empty();
 
 	if (m_HasPreview)
@@ -510,7 +522,7 @@ void NavHelper::SaveBinary()
 
 	string fileName = Helper::To_String(navDataDir) + string(m_SaveName) + ".nnav";
 
-	if (SUCCEEDED(GAME_INSTANCE->Export_Navigation(fileName, m_pSelectedModel, worldMat, cfg)))
+	if (SUCCEEDED(GAME_INSTANCE->Export_Navigation(fileName, m_pSelectedModel, worldMat, cfg, m_UseBBoxLimit, m_BBoxMin, m_BBoxMax)))
 	{
 		string msg = "NavMesh exported: " + fileName;
 		LOG_INFO(L"[NavHelper] {}", Helper::To_wString(msg));

@@ -34,6 +34,7 @@ HRESULT TriggerObject::Initialize(void* arg)
 	m_Transform->Set_Position(desc.position);
 
 	m_LevelIndex = desc.levelIndex;
+	m_TargetLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(desc.targetLayerName));
 	for (const auto& callback : desc.callbacks)
 	{
 		m_Callbacks.push_back(callback);
@@ -62,7 +63,7 @@ void TriggerObject::OnCollisionEnter(const Shared<Collider>& ownCollider, const 
 
 	if (ownCollider == m_SphereCollider && !m_IsTriggered)
 	{
-		// TODO: targetCollider->Get_Owner() 등을 통해 특정 대상(예: 플레이어)인지 확인하는 로직 추가 권장
+		if (m_TargetLayerIndex != targetCollider->Get_Owner()->Get_LayerMask().Get_Layer()) return;
 		
 		int32 callbackIndex = 0;
 		for (const auto& callback : m_Callbacks)
@@ -71,7 +72,7 @@ void TriggerObject::OnCollisionEnter(const Shared<Collider>& ownCollider, const 
 			{
 				std::wstring eventTag = L"TriggerEvent_Instance_" + std::to_wstring(reinterpret_cast<uint64_t>(this)) + L"_" + std::to_wstring(callbackIndex++);
 
-				if (FAILED(GAME_INSTANCE->Add_Instance_Event(m_LevelIndex, eventTag, callback)))
+				if (FAILED(GAME_INSTANCE->Add_Instance_Event(GAME_INSTANCE->Get_CurrentLevelIndex(), eventTag, callback)))
 				{
 					Destroy(shared_from_this());
 					return;

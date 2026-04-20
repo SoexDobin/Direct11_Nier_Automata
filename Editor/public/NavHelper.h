@@ -32,6 +32,9 @@ private:
 	Float	m_DetailSampleDist{ 6.f };
 	Float	m_DetailSampleMaxError{ 1.f };
 	Float	m_MaxSimplError{ 1.3f };
+	Bool	m_UseBBoxLimit{ false };
+	Vector3 m_BBoxMin{ -1000.f, -1000.f, -1000.f };
+	Vector3 m_BBoxMax{ 1000.f, 1000.f, 1000.f };
 
 	// ── 타겟 모델 ──
 	bool m_AutoBake{ true };

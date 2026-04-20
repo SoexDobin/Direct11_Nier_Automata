@@ -279,6 +279,9 @@
     <ClInclude Include="..\public\LevelGamePlay2.h">
       <Filter>01. Level\GamePlay</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\WorldTriggerManager.h">
+      <Filter>00. MainApp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -552,6 +555,9 @@
     </ClCompile>
     <ClCompile Include="..\private\LevelGamePlay2.cpp">
       <Filter>01. Level\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WorldTriggerManager.cpp">
+      <Filter>00. MainApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

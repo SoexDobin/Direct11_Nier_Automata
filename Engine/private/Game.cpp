@@ -639,14 +639,14 @@ NavigationBuilder::NAV_BUILD_RESULT Game::Build_Navigation(const Float* vertices
     return m_NavigationBuilder->Build(vertices, numVertices, triangles, numTriangles, params);
 }
 
-vector<NavCellBinary> Game::Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+vector<NavCellBinary> Game::Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config, Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax) const
 {
-    return m_NavigationBuilder->Bake_Navigation(model, worldMatrix, config);
+    return m_NavigationBuilder->Bake_Navigation(model, worldMatrix, config, useBBoxLimit, limitBMin, limitBMax);
 }
 
-HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config, Bool useBBoxLimit, const Vector3& limitBMin, const Vector3& limitBMax) const
 {
-    return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config);
+    return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config, useBBoxLimit, limitBMin, limitBMax);
 }
 
 vector<NavCell> Game::Import_Navigation(const string& filePath) const

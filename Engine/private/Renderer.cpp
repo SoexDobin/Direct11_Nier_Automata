@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "VIBuffer_Rect.h"
 #include "SpdLogger.h"
+#include "../../Client/public/Client_Define.h"
 
 Renderer::Renderer(const ComPtr<ID3D11Device> &device,
                    const ComPtr<ID3D11DeviceContext> &context)
@@ -56,10 +57,6 @@ void Renderer::Draw_NoClearing() {
 	Render_Group(ETOI(RENDERGROUP::BLEND));
 	Render_Group(ETOI(RENDERGROUP::WORLDUI));
 	Render_Group(ETOI(RENDERGROUP::UI));
-	//for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i)
-	//{
-	//	m_RenderGroup[i].clear();
-	//}
 }
 
 // TODO : draw call check clear group all frame
@@ -102,6 +99,12 @@ HRESULT Renderer::Initialize(void *arg) {
 	if (FAILED(GAME_INSTANCE->Add_RenderTarget(RT_NORMAL, viewportDesc.Width, viewportDesc.Height,
 		DXGI_FORMAT_R16G16B16A16_UNORM, Vector4::Zero)))
 	return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Add_RenderTarget(RT_DEPTH, viewportDesc.Width, viewportDesc.Height,
+		DXGI_FORMAT_R32G32B32A32_FLOAT, Vector4::Zero)))
+		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Add_RenderTarget(RT_SPECULAR, viewportDesc.Width, viewportDesc.Height,
+		DXGI_FORMAT_R16G16B16A16_UNORM, Vector4::Zero)))
+		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Add_RenderTarget(RT_SHADE, viewportDesc.Width, viewportDesc.Height,
 		DXGI_FORMAT_R16G16B16A16_UNORM, Vector4::Zero)))
 	return E_FAIL;
@@ -110,7 +113,13 @@ HRESULT Renderer::Initialize(void *arg) {
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_GameObject, RT_NORMAL)))
 		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_GameObject, RT_DEPTH)))
+		return E_FAIL;
+
+	// Light Acc
 	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_LIGHT, RT_SHADE)))
+		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_LIGHT, RT_SPECULAR)))
 		return E_FAIL;
 
 	m_Buffer = VIBuffer_Rect::Create(m_Device, m_Context);
@@ -125,7 +134,12 @@ HRESULT Renderer::Initialize(void *arg) {
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_NORMAL, 150.f, 450.f, 300.f, 300.f)))
 		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_DEPTH, 150.f, 750.f, 300.f, 300.f)))
+		return E_FAIL;
+
 	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SHADE, 450.f, 150.f, 300.f, 300.f)))
+		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SPECULAR, 450.f, 450.f, 300.f, 300.f)))
 		return E_FAIL;
 #endif
 
@@ -158,13 +172,17 @@ void Renderer::Render_Combined() const
 		return;
 	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, ShadeMap, RT_SHADE)))
 		return;
+	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, SpecularMap, RT_SPECULAR)))
+		return;
 
 	m_Shader->Begin(ETOI(DEFERRED::COMBINED));
 	m_Buffer->Bind_Resources();
 	m_Buffer->Render();
 
+	
 	m_Shader->Bind_SRV(DiffuseMap, nullptr);
 	m_Shader->Bind_SRV(ShadeMap, nullptr);
+	m_Shader->Bind_SRV(SpecularMap, nullptr);
 	m_Shader->Begin(ETOI(DEFERRED::COMBINED));
 }
 
@@ -175,14 +193,21 @@ void Renderer::Render_Lights() const
 
 	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_WorldMatrix)))
 		return;
-
 	if (FAILED(m_Shader->Bind_Matrix(ViewMatrix, &m_ViewMatrix)))
 		return;
-
 	if (FAILED(m_Shader->Bind_Matrix(ProjMatrix, &m_ProjMatrix)))
+		return;
+	if (FAILED(m_Shader->Bind_Matrix(InverseViewMatrix, GAME_INSTANCE->Get_RawInvTransform(D3DTS::VIEW))))
+		return;
+	if (FAILED(m_Shader->Bind_Matrix(InverseProjMatrix, GAME_INSTANCE->Get_RawInvTransform(D3DTS::PROJ))))
+		return;
+
+	if (FAILED(m_Shader->Bind_RawValue(CameraPosition, GAME_INSTANCE->Get_RawCamTransform(), sizeof(Vector4))))
 		return;
 
 	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, NormalMap, RT_NORMAL)))
+		return;
+	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, DepthMap, RT_DEPTH)))
 		return;
 
 	if (FAILED(m_Buffer->Bind_Resources()))
@@ -195,6 +220,7 @@ void Renderer::Render_Lights() const
 		return;
 
 	m_Shader->Bind_SRV(NormalMap, nullptr);
+	m_Shader->Bind_SRV(DepthMap, nullptr);
 	m_Shader->Begin(0);
 }
 

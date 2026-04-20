@@ -17,7 +17,11 @@ namespace Engine
 	constexpr const Char* ShadeMap = "g_ShadeTexture";
 	constexpr const Char* DepthMap = "g_DepthTexture";
 
+	constexpr const Char* FarPlane = "g_FarPlane";
 	constexpr const Char* LightDirection = "g_LightDirection";
+	constexpr const Char* LightPosition = "g_LightPosition";
+	constexpr const Char* LightRange = "g_LightRange";
+
 	constexpr const Char* DiffuseLight = "g_LightDiffuse";
 	constexpr const Char* SpecularLight = "g_LightSpecular";
 	constexpr const Char* AmbientLight = "g_LightAmbient";

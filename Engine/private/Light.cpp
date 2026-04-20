@@ -28,12 +28,15 @@ HRESULT Light::Render(const Shared<Shader>& shader, const Shared<VIBuffer_Rect>&
 		{
 			return E_FAIL;
 		}
+		if (FAILED(shader->Bind_RawValue(DiffuseLight, &m_LightDesc.diffuse, sizeof(m_LightDesc.diffuse)))) return E_FAIL;
+		if (FAILED(shader->Bind_RawValue(AmbientLight, &m_LightDesc.ambient, sizeof(m_LightDesc.ambient)))) return E_FAIL;
+		if (FAILED(shader->Bind_RawValue(SpecularLight, &m_LightDesc.specular, sizeof(m_LightDesc.specular)))) return E_FAIL;
 
 		shaderPass = ETOI(DEFERRED::DIRECTIONAL);
 	}
 	else if (m_LightDesc.type == LIGHT::POINT)
 	{
-		
+			
 		shaderPass = ETOI(DEFERRED::POINT);
 	}
 

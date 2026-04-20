@@ -12,14 +12,10 @@ public:
 	~Pipeline() override = default;
 	
 public:
-	Matrix Get_Transform(D3DTS transformState) const
-	{
-		return m_TransformStateMatrices[ETOI(transformState)];
-	}
-	Matrix Get_InvTransform(D3DTS transformState) const
-	{
-		return m_TransformStateInverseMatrices[ETOI(transformState)];
-	}
+	Matrix Get_Transform(D3DTS transformState) const { return m_TransformStateMatrices[ETOI(transformState)]; }
+	Matrix* Get_RawTransform(D3DTS transformState) { return &m_TransformStateMatrices[ETOI(transformState)]; }
+	Matrix Get_InvTransform(D3DTS transformState) const { return m_TransformStateInverseMatrices[ETOI(transformState)]; }
+	Matrix* Get_RawInvTransform(D3DTS transformState) { return &m_TransformStateInverseMatrices[ETOI(transformState)]; }
 	void Set_Transform(D3DTS transformState, Matrix transformStateMatrix)
 	{
 		m_TransformStateMatrices[ETOI(transformState)] = transformStateMatrix;
@@ -29,6 +25,12 @@ public:
 		Vector4 v4 = Vector4(m_TransformStateMatrices[ETOI(D3DTS::VIEW)].Translation());
 		v4.w = 1.f;
 		return v4;
+	}
+	Vector4* Get_RawCamTransform() const
+	{
+		Vector4 v4 = Vector4(m_TransformStateMatrices[ETOI(D3DTS::VIEW)].Translation());
+		v4.w = 1.f;
+		return &v4;
 	}
 
 public:

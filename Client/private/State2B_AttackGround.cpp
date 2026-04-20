@@ -51,7 +51,7 @@ Bool State2B_AttackGround::StateEnterInvoke()
 			pl0000->Draw_LightWeapon();
 			pl0000->Sheathe_HeavyWeapon();
 			pl0000Body->Set_Animation(LIGHT_BODY[m_ComboStep], 0.05f, false);
-			lightWeapon->Set_Animation(LIGHT_WP[m_ComboStep], 0.f, false);
+			lightWeapon->Set_Animation(LIGHT_WP[m_ComboStep], 0.05f, false);
 			m_LastOrderedAnimIndex = LIGHT_BODY[m_ComboStep];
 			
 			++m_ComboStep;
@@ -62,7 +62,7 @@ Bool State2B_AttackGround::StateEnterInvoke()
 			pl0000->Sheathe_LightWeapon();
 			pl0000->Draw_HeavyWeapon();
 			pl0000Body->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
-			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.f, false);
+			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.05f, false);
 			m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
 			
 			++m_ComboStep;
@@ -75,7 +75,7 @@ Bool State2B_AttackGround::StateEnterInvoke()
 			pl0000->Draw_LightWeapon();
 			pl0000->Sheathe_HeavyWeapon();
 			pl0000Body->Set_Animation(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN), 0.05f, false);
-			lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_GROUND_RUN), 0.f, false);
+			lightWeapon->Set_Animation(ETOI(WP0070Body::WP0070_STATE::LIGHT_GROUND_RUN), 0.05f, false);
 			m_LastOrderedAnimIndex = ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND_RUN);
 
 			++m_ComboStep;
@@ -86,7 +86,7 @@ Bool State2B_AttackGround::StateEnterInvoke()
 			pl0000->Sheathe_LightWeapon();
 			pl0000->Draw_HeavyWeapon();
 			pl0000Body->Set_Animation(HEAVY_BODY[m_ComboStep], 0.05f, false);
-			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.f, false);
+			heavyWeapon->Set_Animation(HEAVY_WP[m_ComboStep], 0.05f, false);
 			m_LastOrderedAnimIndex = HEAVY_BODY[m_ComboStep];
 
 			++m_ComboStep;

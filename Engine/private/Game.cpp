@@ -512,8 +512,23 @@ Matrix Game::Get_InvTransform(D3DTS transformState) const {
     return m_Pipeline->Get_InvTransform(transformState);
 }
 
+Matrix* Game::Get_RawTransform(D3DTS transformState) const
+{
+    return m_Pipeline->Get_RawTransform(transformState);
+}
+
+Matrix* Game::Get_RawInvTransform(D3DTS transformState) const
+{
+    return m_Pipeline->Get_RawInvTransform(transformState);
+}
+
 Vector4 Game::Get_CamTransform() const {
 	return m_Pipeline->Get_CamTransform();
+}
+
+Vector4* Game::Get_RawCamTransform() const
+{
+    return m_Pipeline->Get_RawCamTransform();
 }
 
 void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix) {

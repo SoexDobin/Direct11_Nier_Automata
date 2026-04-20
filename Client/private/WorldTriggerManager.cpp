@@ -54,16 +54,16 @@ HRESULT WorldTriggerManager::Setting_GamePlay()
 		[levelIndex = triggerDesc.levelIndex]()
 		{
 			LoadingFadeIn::FADE_IN_DESC fadeDesc;
-			fadeDesc.fadeSpeed = 1.f;
+			fadeDesc.fadeSpeed = 1.5f;
 
 			auto fadeUI = GAME_INSTANCE->Instantiate<LoadingFadeIn>(L"LoadingFadeIn", levelIndex, &fadeDesc);
 			fadeUI->Set_Active(true);
-			std::wstring observerTag = L"Event_WaitFadeAndChangeScene";
+
+			wstring observerTag = L"Event_WaitFadeAndChangeScene";
 			GAME_INSTANCE->Add_Permanent_Event(levelIndex, observerTag, [fadeUI, levelIndex, observerTag]()
 				{
 					if (fadeUI->Is_FadeFinished())
 					{
-						// 현재 루프를 돌고 있는 자신(영구 이벤트)을 제거하여 더 이상 감시되지 않도록 함
 						if (SUCCEEDED(GAME_INSTANCE->Remove_Event(levelIndex, observerTag)))
 						{
 							LevelLoading::LEVEL_LOADING_DESC  loadingDesc{};
@@ -80,6 +80,7 @@ HRESULT WorldTriggerManager::Setting_GamePlay()
 				});
 			}
 	};
+
 	Shared<TriggerObject> triggerObject = GAME_INSTANCE->Instantiate<TriggerObject>(L"TriggerObject", ETOI(LEVEL::GAMEPLAY), &triggerDesc);
 
 	if (triggerObject == nullptr)

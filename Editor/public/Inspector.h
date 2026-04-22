@@ -13,6 +13,7 @@ class InspectorModel;
 class InspectorTexture;
 class InspectorCamera;
 class InspectorCollider;
+class InspectorLight;
 
 class Inspector : public EditorObject
 {
@@ -36,6 +37,7 @@ private:
     Shared<InspectorModel> m_InspectorModel{ nullptr };
     Shared<InspectorTexture> m_InspectorTexture{ nullptr };
     Shared<InspectorCamera> m_InspectorCamera{ nullptr };
+	Shared<InspectorLight> m_InspectorLight{ nullptr };
 	Shared<InspectorCollider> m_InspectorCollider{ nullptr };
     uint32 m_iPrevSelectedID{ 0 };
 

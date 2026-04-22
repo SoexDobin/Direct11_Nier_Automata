@@ -24,6 +24,7 @@
 #include "State2B_Sprint.h"
 #include "State2B_Walk.h"
 #include "State2B_Evade.h"
+#include "WeaponHalo.h"
 
 namespace Client {
 
@@ -43,6 +44,7 @@ void Pl0000::Draw_LightWeapon()
 	if (m_SheathLightWeapon)
 	{
 		m_SheathLightWeapon->Set_Active(false);
+		m_LightHalo->Set_Active(false);
 	}
 }
 void Pl0000::Sheathe_LightWeapon()
@@ -56,6 +58,7 @@ void Pl0000::Sheathe_LightWeapon()
 	if (m_SheathLightWeapon)
 	{
 		m_SheathLightWeapon->Set_Active(true);
+		m_LightHalo->Set_Active(true);
 	}
 }
 
@@ -70,6 +73,7 @@ void Pl0000::Draw_HeavyWeapon()
 	if (m_SheathHeavyWeapon)
 	{
 		m_SheathHeavyWeapon->Set_Active(false);
+		m_HeavyHalo->Set_Active(false);
 	}
 }
 
@@ -84,6 +88,7 @@ void Pl0000::Sheathe_HeavyWeapon()
 	if (m_SheathHeavyWeapon)
 	{
 		m_SheathHeavyWeapon->Set_Active(true);
+		m_HeavyHalo->Set_Active(true);
 	}
 }
 
@@ -335,6 +340,29 @@ HRESULT Pl0000::Ready_PartObjects()
 	auto wp3000 = static_pointer_cast<WP3000Body>(Find_PartObject(L"WP3000Body"));
 	wp3000->Set_Pl0000Container(static_pointer_cast<Pl0000>(shared_from_this()));
 	wp3000->Set_Pl0000Body(m_MainBody);
+
+	WeaponHalo::WEAPON_HALO_DESC haloHeavyDesc{};
+	haloHeavyDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
+	haloHeavyDesc.parentMatrix = m_SheathHeavyWeapon->Get_CombinedWorldMatrix();
+	haloHeavyDesc.targetSheath = m_SheathHeavyWeapon; 
+	if (FAILED(Add_PartObject(levIndex, L"WeaponHalo", L"WeaponHalo_Heavy", &haloHeavyDesc))) return E_FAIL;
+	m_HeavyHalo = static_pointer_cast<WeaponHalo>(Find_PartObject(L"WeaponHalo_Heavy"));
+	m_HeavyHalo->Get_Transform()->Set_WorldMatrix(
+		Matrix::CreateRotationX(XMConvertToRadians(90.f)) *
+		Matrix::CreateRotationZ(XMConvertToRadians(-25.f)) *
+		Matrix::CreateTranslation(Vector3{ 0.15f, 0.f, 0.35f }));
+
+	WeaponHalo::WEAPON_HALO_DESC haloLightDesc{};
+	haloLightDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
+	haloLightDesc.parentMatrix = m_SheathLightWeapon->Get_CombinedWorldMatrix();
+	haloLightDesc.targetSheath = m_SheathLightWeapon;
+	if (FAILED(Add_PartObject(levIndex, L"WeaponHalo", L"WeaponHalo_Light", &haloHeavyDesc))) return E_FAIL;
+	m_LightHalo = static_pointer_cast<WeaponHalo>(Find_PartObject(L"WeaponHalo_Light"));
+	m_LightHalo->Get_Transform()->Set_WorldMatrix(
+		Matrix::CreateScale(0.75f, 0.75f, 0.75f) *
+		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * 
+		Matrix::CreateRotationZ(XMConvertToRadians(-35.f)) *
+		Matrix::CreateTranslation(Vector3{ 0.25f, 0.1f, 0.1f }));
 
 	return S_OK;
 }

@@ -129,6 +129,9 @@
     <ClInclude Include="..\public\NavHelper.h">
       <Filter>01. EditorObject\NavHelper</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\InspectorLight.h">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\EditorApp.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="..\private\NavHelper.cpp">
       <Filter>01. EditorObject\NavHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\InspectorLight.cpp">
+      <Filter>01. EditorObject\Inspector\InspectorObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

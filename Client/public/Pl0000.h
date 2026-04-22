@@ -23,6 +23,7 @@ NS_BEGIN(Client)
     class Pl0000Body;
     class WP0070Body;
     class WP0220Body;
+    class WeaponHalo;
 
 class CLIENT_DLL Pl0000 final : public Entity
 {
@@ -92,6 +93,9 @@ private:
     Shared<WP0220Body> m_HeavyWeapon{ nullptr };
     Shared<SheathWP0070Body> m_SheathLightWeapon{ nullptr };
     Shared<SheathWP0220Body> m_SheathHeavyWeapon{ nullptr };
+
+    Shared<WeaponHalo> m_LightHalo{ nullptr };
+	Shared<WeaponHalo> m_HeavyHalo{ nullptr };
 
     Shared<Pl0000StateMachine> m_Pl0000States{ nullptr };
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };

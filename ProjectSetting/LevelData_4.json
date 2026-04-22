@@ -15,21 +15,21 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Shader"
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Model"
             }
           ],
-          "name": "AmusementParkEntry",
-          "objectID": 1172218866,
+          "name": "AmusementParkDome",
+          "objectID": 1397792786,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "AmusementParkEntry",
+          "prototypeTag": "AmusementParkDome",
           "transform": {
             "position": [
-              0.0,
+              301.0,
               0.0,
               86.5
             ],
@@ -44,7 +44,7 @@
               1.0
             ]
           },
-          "typeName": "AmusementParkEntry"
+          "typeName": "AmusementParkDome"
         },
         {
           "components": [
@@ -86,30 +86,22 @@
             {
               "properties": null,
               "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
             }
           ],
-          "name": "Pl0000",
-          "objectID": 4267756554,
+          "name": "ThirdPersonCamera",
+          "objectID": 4249569602,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Pl0000",
+          "prototypeTag": "ThirdPersonCamera",
           "transform": {
             "position": [
-              -50.0,
               0.0,
-              51.0
+              10.0,
+              -10.0
             ],
             "rotation": [
+              44.99999237060547,
               0.0,
-              89.99994659423828,
               0.0
             ],
             "scale": [
@@ -118,7 +110,7 @@
               1.0
             ]
           },
-          "typeName": "Pl0000"
+          "typeName": "ThirdPersonCamera"
         },
         {
           "components": [
@@ -128,11 +120,11 @@
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "SphereCollider"
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Navigation"
             }
           ],
           "name": "Em3000",
@@ -171,50 +163,7 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
               "typeName": "Navigation"
-            }
-          ],
-          "name": "AmusementParkDome",
-          "objectID": 1397792786,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "AmusementParkDome",
-          "transform": {
-            "position": [
-              301.0,
-              0.0,
-              86.5
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "AmusementParkDome"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
             },
             {
               "properties": null,
@@ -250,21 +199,33 @@
             {
               "properties": null,
               "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
             }
           ],
-          "name": "ThirdPersonCamera",
-          "objectID": 4249569602,
+          "name": "AmusementParkEntry",
+          "objectID": 1172218866,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "ThirdPersonCamera",
+          "prototypeTag": "AmusementParkEntry",
           "transform": {
             "position": [
               0.0,
-              10.0,
-              -10.0
+              0.0,
+              86.5
             ],
             "rotation": [
-              44.99999237060547,
+              0.0,
               0.0,
               0.0
             ],
@@ -274,7 +235,46 @@
               1.0
             ]
           },
-          "typeName": "ThirdPersonCamera"
+          "typeName": "AmusementParkEntry"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "Pl0000",
+          "objectID": 4267756554,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Pl0000",
+          "transform": {
+            "position": [
+              -50.0,
+              0.0,
+              51.0
+            ],
+            "rotation": [
+              0.0,
+              89.99994659423828,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Pl0000"
         }
       ]
     }

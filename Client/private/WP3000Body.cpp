@@ -271,7 +271,7 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			if (m_FlashEffect != nullptr)
 			{
 				m_FlashEffect->Set_Active(true);
-				m_FlashEffectTimer = m_FireRate; // 약 0.1초 세팅으로 반짝거리며 등장
+				m_FlashEffectTimer = m_FireRate * 2.f; // 약 0.1초 세팅으로 반짝거리며 등장
 			}
 
 			uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();

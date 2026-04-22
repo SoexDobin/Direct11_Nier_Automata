@@ -14,30 +14,19 @@
                                    "has_clone":  true,
                                    "category":  "other"
                                },
-                    "State2B_Sprint":  {
-                                           "members":  [
-                                                           {
-                                                               "access":  "private",
-                                                               "default":  "",
-                                                               "name":  "m_EnterAnim",
-                                                               "type":  "unordered_set\u003cuint32\u003e"
-                                                           },
-                                                           {
-                                                               "access":  "private",
-                                                               "default":  "",
-                                                               "name":  "m_ToSprint",
-                                                               "type":  "unordered_set\u003cuint32\u003e"
-                                                           }
-                                                       ],
-                                           "base_class":  "State2B",
-                                           "inherited_members":  {
+                    "AmusementParkLight":  {
+                                               "members":  [
 
-                                                                 },
-                                           "namespace":  "Client",
-                                           "has_create":  true,
-                                           "has_clone":  false,
-                                           "category":  "other"
-                                       },
+                                                           ],
+                                               "base_class":  "LightGameObject",
+                                               "inherited_members":  {
+
+                                                                     },
+                                               "namespace":  "Client",
+                                               "has_create":  true,
+                                               "has_clone":  true,
+                                               "category":  "other"
+                                           },
                     "FreeCamera":  {
                                        "members":  [
 
@@ -100,6 +89,12 @@
                                                            "default":  "POD_STATE::IDLE",
                                                            "name":  "m_PodState",
                                                            "type":  "POD_STATE"
+                                                       },
+                                                       {
+                                                           "access":  "private",
+                                                           "default":  "0.f",
+                                                           "name":  "m_FlashEffectTimer",
+                                                           "type":  "Float"
                                                        }
                                                    ],
                                        "base_class":  "Pl0000Parts",
@@ -185,19 +180,6 @@
                                                 "has_clone":  true,
                                                 "category":  "other"
                                             },
-                    "Em3000":  {
-                                   "members":  [
-
-                                               ],
-                                   "base_class":  "Monster",
-                                   "inherited_members":  {
-
-                                                         },
-                                   "namespace":  "Engine",
-                                   "has_create":  true,
-                                   "has_clone":  true,
-                                   "category":  "other"
-                               },
                     "State2B_Walk":  {
                                          "members":  [
 
@@ -1049,6 +1031,19 @@
                                                 "has_clone":  true,
                                                 "category":  "other"
                                             },
+                    "WeaponHalo":  {
+                                       "members":  [
+
+                                                   ],
+                                       "base_class":  "PartObject",
+                                       "inherited_members":  {
+
+                                                             },
+                                       "namespace":  "Engine",
+                                       "has_create":  true,
+                                       "has_clone":  true,
+                                       "category":  "other"
+                                   },
                     "Pl0000Movement":  {
                                            "members":  [
 
@@ -1213,24 +1208,19 @@
                                              "has_clone":  true,
                                              "category":  "other"
                                          },
-                    "StateEm0010_Dead":  {
-                                             "members":  [
-                                                             {
-                                                                 "access":  "private",
-                                                                 "default":  "",
-                                                                 "name":  "m_DeadAnim",
-                                                                 "type":  "unordered_set\u003cuint32\u003e"
-                                                             }
-                                                         ],
-                                             "base_class":  "StateEm0010",
-                                             "inherited_members":  {
+                    "Em3000":  {
+                                   "members":  [
 
-                                                                   },
-                                             "namespace":  "Client",
-                                             "has_create":  true,
-                                             "has_clone":  false,
-                                             "category":  "other"
-                                         },
+                                               ],
+                                   "base_class":  "Monster",
+                                   "inherited_members":  {
+
+                                                         },
+                                   "namespace":  "Engine",
+                                   "has_create":  true,
+                                   "has_clone":  true,
+                                   "category":  "other"
+                               },
                     "Em3000Body":  {
                                        "members":  [
 
@@ -1583,6 +1573,30 @@
                                                "has_clone":  true,
                                                "category":  "other"
                                            },
+                    "State2B_Sprint":  {
+                                           "members":  [
+                                                           {
+                                                               "access":  "private",
+                                                               "default":  "",
+                                                               "name":  "m_EnterAnim",
+                                                               "type":  "unordered_set\u003cuint32\u003e"
+                                                           },
+                                                           {
+                                                               "access":  "private",
+                                                               "default":  "",
+                                                               "name":  "m_ToSprint",
+                                                               "type":  "unordered_set\u003cuint32\u003e"
+                                                           }
+                                                       ],
+                                           "base_class":  "State2B",
+                                           "inherited_members":  {
+
+                                                                 },
+                                           "namespace":  "Client",
+                                           "has_create":  true,
+                                           "has_clone":  false,
+                                           "category":  "other"
+                                       },
                     "State2B_Run":  {
                                         "members":  [
                                                         {
@@ -1884,6 +1898,24 @@
                                                  "has_clone":  false,
                                                  "category":  "other"
                                              },
+                    "StateEm0010_Dead":  {
+                                             "members":  [
+                                                             {
+                                                                 "access":  "private",
+                                                                 "default":  "",
+                                                                 "name":  "m_DeadAnim",
+                                                                 "type":  "unordered_set\u003cuint32\u003e"
+                                                             }
+                                                         ],
+                                             "base_class":  "StateEm0010",
+                                             "inherited_members":  {
+
+                                                                   },
+                                             "namespace":  "Client",
+                                             "has_create":  true,
+                                             "has_clone":  false,
+                                             "category":  "other"
+                                         },
                     "Pl0000Input":  {
                                         "members":  [
                                                         {

@@ -38,6 +38,26 @@ HRESULT LightManager::Remove_Light(uint32 index)
 	return S_OK;
 }
 
+HRESULT LightManager::Add_Light(const Shared<Light>& light)
+{
+	if (!light)
+		return E_FAIL;
+	m_Lights.push_back(light);
+	return S_OK;
+}
+
+HRESULT LightManager::Remove_Light(const Shared<Light>& light)
+{
+	if (!light)
+		return E_FAIL;
+	
+	std::erase_if(m_Lights, [&light](const Shared<Light>& pListLight) {
+		return pListLight == light;
+		});
+
+	return S_OK;
+}
+
 HRESULT LightManager::Clear_Lights()
 {
 	m_Lights.shrink_to_fit(); 

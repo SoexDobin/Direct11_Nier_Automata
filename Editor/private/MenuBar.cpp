@@ -227,12 +227,12 @@ void MenuBar::Render_Debug()
     {
         Bool colDebug = GAME_INSTANCE->Toggle_RenderDebug();
 
-        if (ImGui::MenuItem("Toggle DebugRender Collider", "F1", &colDebug))
-			;
-
-        Bool navDebug = Navigation::Get_DebugRender();
-        if (ImGui::MenuItem("Toggle DebugRender Navigation", "F2", &navDebug))
-            ;
+        //if (ImGui::MenuItem("Toggle DebugRender Collider", "F1", &colDebug))
+		//	;
+        //
+        //Bool navDebug = Navigation::Get_DebugRender();
+        //if (ImGui::MenuItem("Toggle DebugRender Navigation", "F2", &navDebug))
+        //    ;
         
 
         ImGui::EndMenu();

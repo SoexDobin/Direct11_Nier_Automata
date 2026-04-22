@@ -231,6 +231,7 @@ void WP0070Body::Set_Sheathing()
 	m_AttackCollider->Set_Active(false);
 	m_IsSheathing = true;
 	m_IsActive = false;
+	Set_Animation(0, 0.f, false);
 }
 
 void WP0070Body::DrawWP0070()

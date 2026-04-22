@@ -40,6 +40,7 @@ public:
 	virtual void Submit_RenderGroup() override {}
 
 public:
+	Matrix* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
 	void Update_CombineWorldMatrix(const Matrix& childMatrix) {
 		m_CombinedWorldMatrix = childMatrix * *m_ParentMatrix;
 	}

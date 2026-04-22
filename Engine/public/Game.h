@@ -157,7 +157,9 @@ public: /* For.LightManager */
     HRESULT Clear_Lights() const;
     const LIGHT_DESC *Get_LightDesc(uint32 index) const;
     HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
+    HRESULT Add_Light(const Shared<Light>& light) const;
     HRESULT Remove_Light(uint32 index) const;
+    HRESULT Remove_Light(const Shared<Light>& light) const;
     HRESULT Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const;
 
 public: /* For LevelSerialize */

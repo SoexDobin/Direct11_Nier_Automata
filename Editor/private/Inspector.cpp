@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "Editor_Define.h"
 #include "Inspector.h"
+
+#include <LightGameObject.h>
+
 #include "EditorManager.h"
 #include "Component.h"
 #include "GameObject.h"
@@ -14,6 +17,7 @@
 #include "InspectorTexture.h"
 #include "InspectorCamera.h"
 #include "InspectorCollider.h"
+#include "InspectorLight.h"
 
 using namespace Engine;
 using namespace Editor;
@@ -33,6 +37,7 @@ HRESULT Inspector::Initialize() {
     m_InspectorTexture = InspectorTexture::Create();
     m_InspectorCamera = InspectorCamera::Create();
     m_InspectorCollider = InspectorCollider::Create();
+    m_InspectorLight = InspectorLight::Create();
 
     return EditorObject::Initialize();
 }
@@ -148,6 +153,12 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
     if (obj->Get_GameObjectType() == GAMEOBJECTTYPE::CAMERA && m_InspectorCamera) {
         m_InspectorCamera->RenderCamera(obj);
         ImGui::Separator();
+    }
+    else if (obj->Get_GameObjectType() == GAMEOBJECTTYPE::LIGHT || dynamic_pointer_cast<LightGameObject>(obj))
+    {
+        // [신규] 방금 만든 InspectorLight 호출
+        if (m_InspectorLight)
+            m_InspectorLight->RenderLight(obj);
     }
 
     // 모델, 텍스처 등 기타 컴포넌트 렌더링

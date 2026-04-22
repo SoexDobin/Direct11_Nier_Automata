@@ -663,4 +663,10 @@ void Tool::Converter::InjectFallbackTextures(Shared<MODEL_MATERIAL>& mat)
 		mat->textures.push_back({ 6, "22C4FB01.dds" });
 		mat->textures.push_back({ 6, "22C4FB01.dds" });
 	}
+	else if (mat->name == "HaloMaterial")
+	{
+		mat->textures.push_back({ 1, "0_00425457.dds" });
+		mat->textures.push_back({ 1, "1_00000003.dds" });
+		mat->textures.push_back({ 1, "7_000000e0.dds" });
+	}
 }

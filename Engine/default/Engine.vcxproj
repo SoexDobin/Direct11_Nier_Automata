@@ -240,6 +240,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\LevelManager.h" />
     <ClInclude Include="..\public\EngineManager.h" />
     <ClInclude Include="..\public\Light.h" />
+    <ClInclude Include="..\public\LightGameObject.h" />
     <ClInclude Include="..\public\LightManager.h" />
     <ClInclude Include="..\public\Material.h" />
     <ClInclude Include="..\public\Mesh.h" />
@@ -307,6 +308,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\LevelManager.cpp" />
     <ClCompile Include="..\private\EngineManager.cpp" />
     <ClCompile Include="..\private\Light.cpp" />
+    <ClCompile Include="..\private\LightGameObject.cpp" />
     <ClCompile Include="..\private\LightManager.cpp" />
     <ClCompile Include="..\private\Material.cpp" />
     <ClCompile Include="..\private\Mesh.cpp" />

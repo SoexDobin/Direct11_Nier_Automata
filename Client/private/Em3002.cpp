@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Em3002.h"
 #include <SpdLogger.h>
+#include "Model.h"
 
 Em3002::Em3002(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Em3000Parts{ device, context } { }
@@ -46,7 +47,9 @@ void Em3002::Update(Float timeDelta)
 
 void Em3002::Late_Update(Float timeDelta)
 {
-	Em3000Parts::Late_Update(timeDelta);
+	m_Transform->Update_WorldMatrix();
+	Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
+	m_Model->Update_ModelAnimation(timeDelta); 
 }
 
 void Em3002::Fixed_Update(Float fixedDelta)

@@ -14,7 +14,8 @@ public:
 	~Light() override = default;
 
 public:
-	const LIGHT_DESC& Get_LightDesc() const { return m_LightDesc; }
+	const LIGHT_DESC& Get_LightDesc() const { return m_LightDesc; } 
+	LIGHT_DESC& Get_LightDesc_Ref() { return m_LightDesc; }
 
 public:
 	HRESULT Initialize_Prototype(const LIGHT_DESC& desc);

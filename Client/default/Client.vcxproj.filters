@@ -284,6 +284,15 @@
     <ClInclude Include="..\public\TriggerObject.h">
       <Filter>02. GameObject\Trigger</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\AmusementParkLight.h">
+      <Filter>02. GameObject\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RedDot.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WeaponHalo.h">
+      <Filter>02. GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -563,6 +572,12 @@
     <ClCompile Include="..\private\TriggerObject.cpp">
       <Filter>02. GameObject\Trigger</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\AmusementParkLight.cpp">
+      <Filter>02. GameObject\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WeaponHalo.cpp">
+      <Filter>02. GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -735,6 +750,9 @@
     </Filter>
     <Filter Include="02. GameObject\Entity\2B\2BPartObject\Pl0000">
       <UniqueIdentifier>{7099d284-19b5-4ec7-85c0-7a5e1e9b45b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Light">
+      <UniqueIdentifier>{d29ad09f-7d19-4f82-b9bc-9ee77bb302b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

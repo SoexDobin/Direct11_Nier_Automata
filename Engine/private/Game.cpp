@@ -552,14 +552,25 @@ HRESULT Game::Clear_Lights() const
 }
 
 const LIGHT_DESC *Game::Get_LightDesc(uint32 index) const {
-  return m_LightManager->Get_LightDesc(index);
+	return m_LightManager->Get_LightDesc(index);
 }
 HRESULT Game::Add_Light(const LIGHT_DESC &lightDesc) const {
-  return m_LightManager->Add_Light(lightDesc);
+	return m_LightManager->Add_Light(lightDesc);
 }
+
+HRESULT Game::Add_Light(const Shared<Light>& light) const
+{
+    return m_LightManager->Add_Light(light);
+}
+
 HRESULT Game::Remove_Light(uint32 index) const {
-  return m_LightManager->Remove_Light(index);
+    return m_LightManager->Remove_Light(index);
 }
+
+HRESULT Game::Remove_Light(const Shared<Light>& light) const {
+    return m_LightManager->Remove_Light(light);
+}
+
 HRESULT Game::Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const
 {
     return m_LightManager->Render_Lights(shader, buffer);

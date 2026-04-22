@@ -3,6 +3,8 @@
 
 NS_BEGIN(Client)
 
+class WeaponHalo;
+
 class CLIENT_DLL SheathWP0220Body final : public Pl0000Parts
 {
 	RTTR_ENABLE(Pl0000Parts)
@@ -30,6 +32,7 @@ private:
 	HRESULT Bind_ShaderResources();
 
 private:
+	Shared<WeaponHalo> m_Halo{ nullptr };
 	int32 m_RootBoneIndex{};
 	Matrix m_HeavySheathMatrix{};
 

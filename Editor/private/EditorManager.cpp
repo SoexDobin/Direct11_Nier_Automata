@@ -15,6 +15,10 @@
 #include "NavHelper.h"
 #include "Transform.h"
 
+#ifdef _DEBUG
+#include "RedDot.h"
+#endif
+
 IMPLEMENT_SINGLETON(EditorManager)
 
 EditorManager::EditorManager()
@@ -66,6 +70,9 @@ HRESULT EditorManager::Initialize()
 }
 
 void EditorManager::Update(Bool IsResetView) {
+#ifdef _DEBUG
+    Client::RedDot::Debug_TeleportPlayer_F1();
+#endif
     Float timeDelta = GAME_INSTANCE->Compute_UnscaledTimeDelta();
     EDITOR_STATE state = EDITOR->Get_State();
 

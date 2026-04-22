@@ -193,6 +193,9 @@
     <Filter Include="01. Utility\05. Component\Navigation\Builder">
       <UniqueIdentifier>{39a3bc1e-3dc6-4d80-88ee-aa64b2945dc8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. GameObject\LightObject">
+      <UniqueIdentifier>{2a31e3db-34cf-48ed-b76d-026b8a66e152}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -437,6 +440,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Engine_Rendering_Const.h">
       <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LightGameObject.h">
+      <Filter>01. Utility\04. GameObject\LightObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -701,6 +707,9 @@
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Navigation_rttr.cpp">
       <Filter>96. RTTR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LightGameObject.cpp">
+      <Filter>01. Utility\04. GameObject\LightObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

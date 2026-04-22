@@ -195,6 +195,7 @@
     <ClInclude Include="..\public\Inspector.h" />
     <ClInclude Include="..\public\InspectorCamera.h" />
     <ClInclude Include="..\public\InspectorCollider.h" />
+    <ClInclude Include="..\public\InspectorLight.h" />
     <ClInclude Include="..\public\InspectorModel.h" />
     <ClInclude Include="..\public\InspectorTexture.h" />
     <ClInclude Include="..\public\InspectorTransform.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="..\private\Inspector.cpp" />
     <ClCompile Include="..\private\InspectorCamera.cpp" />
     <ClCompile Include="..\private\InspectorCollider.cpp" />
+    <ClCompile Include="..\private\InspectorLight.cpp" />
     <ClCompile Include="..\private\InspectorModel.cpp" />
     <ClCompile Include="..\private\InspectorTexture.cpp" />
     <ClCompile Include="..\private\InspectorTransform.cpp" />

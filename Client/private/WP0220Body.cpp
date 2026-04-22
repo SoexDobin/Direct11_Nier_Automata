@@ -194,7 +194,7 @@ void WP0220Body::Impact_Shockwave(const Vector3& offset)
 	dmgInfo.attackType = ATK_TYPE::HEAVY;
 	dmgInfo.hitPosition = truePos;
 	dmgInfo.hitRotation = Quaternion::Identity;
-	dmgInfo.knockbackForce = 3.5f;
+	dmgInfo.knockbackForce = 3.f;
 
 	Pl0000Shockwave::PLAYER_SHOCKWAVE_DESC desc{};
 	desc.damageInfo = dmgInfo;
@@ -207,9 +207,13 @@ void WP0220Body::Impact_Shockwave(const Vector3& offset)
 
 void WP0220Body::Set_Sheathing()
 {
+
 	if (m_IsSheathing) return;
+
 	m_AttackCollider->Set_Active(false);
 	m_IsSheathing = true;
+	m_IsActive = false;
+	Set_Animation(0, 0.f, false);
 }
 
 void WP0220Body::DrawWP0220()

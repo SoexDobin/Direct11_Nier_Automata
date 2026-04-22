@@ -4,6 +4,7 @@
 NS_BEGIN(Client)
 
 class Pl0000Body;
+class FireFlashEffect;
 
 class CLIENT_DLL WP3000Body final : public Pl0000Parts
 {
@@ -54,10 +55,13 @@ private:
 	int32 m_RootBoneIndex = -1;
 	Float m_HoverTime = 0.f;
 	Float m_HoverAmplitude = 0.2f;   // 상하 진폭
-	Float m_HoverSpeed = 2.0f;       // 상하 이동 속도
+	Float m_HoverSpeed = 2.0f;       
 	Float m_FollowSpeed = 5.0f;      // 플레이어를 따라가는 보간 속도
 	Vector3 m_TargetOffset = Vector3(0.8f, 1.5f, 0.f); // 옵셋 (우측, 위, 뒤)
 	POD_STATE m_PodState = POD_STATE::IDLE;
+
+	Shared<FireFlashEffect>			m_FlashEffect{ nullptr };
+	Float							m_FlashEffectTimer = 0.f;
 
 	Weak<Pl0000Body> m_Pl0000Body{};
 

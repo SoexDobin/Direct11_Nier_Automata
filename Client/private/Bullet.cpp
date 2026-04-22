@@ -17,11 +17,14 @@ Bullet::Bullet() : Projectile{} {}
 Bullet::Bullet(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Projectile{device, context} {}
 Bullet::Bullet(const Bullet& rhs)
-	: Projectile{rhs} {}
+	: Projectile{ rhs }, m_MonsterLayerIndex{ rhs.m_MonsterLayerIndex }, m_PlayerLayerIndex{rhs.m_PlayerLayerIndex} {
+}
 
 HRESULT Bullet::Initialize_Prototype()
 {
 	m_LayerMask.Set_Layer(L"Bullet");
+	m_MonsterLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"Monster"));
+	m_PlayerLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"Player"));
 
 	return Projectile::Initialize_Prototype();
 }
@@ -36,6 +39,8 @@ HRESULT Bullet::Initialize(void* arg)
 
 	if (arg != nullptr)
 		m_Desc = *static_cast<BULLET_DESC*>(arg);
+
+	m_TargetLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(m_Desc.targetLayer));
 
 	m_DamageInfo = m_Desc.damageInfo;
 	m_Transform->Set_Position(m_Desc.initialPosition);
@@ -59,7 +64,6 @@ void Bullet::Update(Float timeDelta)
 		Object::Destroy(shared_from_this());
 		return;
 	}
-	// 직진 이동
 	
 	m_Transform->Move_Forward(timeDelta, m_Speed);
 	m_Collider->Update(m_Transform->Get_WorldMatrix());
@@ -81,8 +85,32 @@ HRESULT Bullet::Render()
 	{
 		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
 
-		if (FAILED(m_Shader->Begin(0)))
-			return E_FAIL;
+		if (m_TargetLayerIndex == m_PlayerLayerIndex)
+		{
+			Color defaultColor{};
+			if (Is_Permanent())
+			{
+				defaultColor = Color{ 0.9f, 0.f, 0.f, 1.0f };
+				m_Shader->Bind_RawValue(DefaultColor, &defaultColor, sizeof(Color));
+			}
+			else
+			{
+				defaultColor = Color{ 0.4f, 0.0f, 0.7f, 1.0f };
+				m_Shader->Bind_RawValue(DefaultColor, &defaultColor, sizeof(Color));
+			}
+
+			if (FAILED(m_Shader->Begin(2)))
+				return E_FAIL;
+		}
+		else if (m_TargetLayerIndex == m_MonsterLayerIndex)
+		{
+			Color defaultColor = Color{ 1.f, 0.4f, 0.f, 1.0f };
+			m_Shader->Bind_RawValue(DefaultColor, &defaultColor, sizeof(Color));
+
+			if (FAILED(m_Shader->Begin(3)))
+				return E_FAIL;
+		}
+		
 
 		m_Model->Render(i);
 	}
@@ -92,7 +120,7 @@ HRESULT Bullet::Render()
 
 void Bullet::Submit_RenderGroup()
 {
-	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONLIGHT, shared_from_this());
 }
 
 void Bullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -114,7 +142,7 @@ void Bullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 	
 	auto entity = static_pointer_cast<PartObject>(target)->Get_Owner();
 	const wstring& layerTag = target->Get_LayerMask().Get_LayerName();
-	if (m_Desc.targetLayer == L"Monster" &&
+	if (m_TargetLayerIndex == m_MonsterLayerIndex &&
 		m_Desc.targetLayer == layerTag)
 	{
 
@@ -126,7 +154,7 @@ void Bullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 		return;
 	}
 	
-	if (m_Desc.targetLayer == L"Player")
+	if (m_TargetLayerIndex == m_PlayerLayerIndex)
 	{
 		if (layerTag == L"PlayerWeapon"
 			&& false == m_Desc.isPermanent)
@@ -178,7 +206,6 @@ HRESULT Bullet::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
 		return E_FAIL;
-
 	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
 		return E_FAIL;
 

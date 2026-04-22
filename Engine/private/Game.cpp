@@ -108,7 +108,7 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_EventManager = EventManager::Create(engineDesc.levelCount)))
         return E_FAIL;
 
-    if (nullptr == (m_CollisionManager = CollisionManager::Create()))
+    if (nullptr == (m_CollisionManager = CollisionManager::Create(engineDesc.levelCount)))
         return E_FAIL;
 
     if (nullptr == (m_NavigationBuilder = NavigationBuilder::Create()))
@@ -196,13 +196,12 @@ void Game::Clear_Resource(uint32 levIndex) const {
 
 	if (FAILED(m_CameraManager->Clear_Cameras(levIndex)))
       LOG_CRITICAL(L"Failed To Clear Cameras");
-
-	if (FAILED(m_LightManager->Clear_Lights())) 
-		LOG_CRITICAL(L"Failed To Clear Lights");
 	
     if (FAILED(m_EventManager->Clear_Events(levIndex)))
         LOG_CRITICAL(L"Failed To Clear Events");
 
+    if (FAILED(m_CollisionManager->Clear_Colliders(levIndex)))
+        LOG_CRITICAL(L"Failed To Clear Colliders");
 }
 
 void Game::Update_Input() const { m_InputDevice->Update(); }
@@ -306,6 +305,16 @@ HRESULT Game::Add_Timer(const wstring &timerTag) const {
 
 void Game::Set_TimeScale(Float timeScale) const {
   return m_TimeManager->Get_MainTimer()->SetTimeScale(timeScale);
+}
+
+void Game::Set_MaxFPS(Float maxfps) const
+{
+    m_TimeManager->Set_TargetFPS(maxfps);
+}
+
+void Game::Set_MinFPS(Float minfps) const
+{
+    m_TimeManager->Set_MainTimer_MaxDeltaByFPS(minfps);
 }
 
 Float Game::Get_FPS() const { return m_TimeManager->Get_MainTimer()->GetFPS(); }
@@ -537,6 +546,11 @@ void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix) {
 
 void Game::Update_Pipeline() const { m_Pipeline->Update_Pipeline(); }
 
+HRESULT Game::Clear_Lights() const
+{
+    return m_LightManager->Clear_Lights();
+}
+
 const LIGHT_DESC *Game::Get_LightDesc(uint32 index) const {
   return m_LightManager->Get_LightDesc(index);
 }
@@ -633,14 +647,14 @@ HRESULT Game::Remove_Event(uint32 levIndex, const wstring& eventTag) const
     return m_EventManager->Remove_Event(levIndex, eventTag);
 }
 
-void Game::Add_Collider(const Shared<class Collider>& collider) const
+void Game::Add_Collider(uint32 levIndex, const Shared<class Collider>& collider) const
 {
-    m_CollisionManager->Add_Collider(collider);
+    m_CollisionManager->Add_Collider(levIndex, collider);
 }
 
-void Game::Remove_Collider(const Shared<class Collider>& collider) const
+void Game::Remove_Collider(uint32 levIndex, const Shared<class Collider>& collider) const
 {
-    m_CollisionManager->Remove_Collider(collider);
+    m_CollisionManager->Remove_Collider(levIndex, collider);
 }
 
 void Game::Update_Collision() const

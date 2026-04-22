@@ -86,6 +86,7 @@ HRESULT Loader::Loading() {
             break;
         case LEVEL::GAMEPLAY2:
         	hr = Loading_For_GamePlayLevel2();
+            break;
         default:
             hr = E_FAIL;
         }
@@ -125,6 +126,10 @@ HRESULT Loader::Loading_For_TitleLevel() {
 }
 
 HRESULT Loader::Loading_For_GamePlayLevel() {
+    if (FAILED(GAME_INSTANCE->Clear_Lights()))
+    {
+        return E_FAIL;
+    }
     m_isFinished = false;
 
     if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
@@ -165,6 +170,10 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
 
 HRESULT Loader::Loading_For_GamePlayLevel2()
 {
+    if (FAILED(GAME_INSTANCE->Clear_Lights()))
+    {
+        return E_FAIL;
+    }
     m_isFinished = false;
 
     if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
@@ -189,10 +198,10 @@ HRESULT Loader::Loading_For_GamePlayLevel2()
 
     LIGHT_DESC			LightDesc{};
     LightDesc.type = LIGHT::DIRECTIONAL;
-    LightDesc.direction = Vector4(0.f, -1.f, 0.f, 0.f);
-    LightDesc.diffuse = Vector4(1.f, 0.5f, 1.f, 1.f);
-    LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
+    LightDesc.diffuse = Vector4(0.4f, 0.2f, 1.f, 1.f);
+    LightDesc.ambient = Vector4(0.5, 0.5, 0.5, 1.f);
+    LightDesc.specular = Vector4(0.5f, 0.5f, 0.5f, 1.f);
 
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
         return E_FAIL;
@@ -200,6 +209,7 @@ HRESULT Loader::Loading_For_GamePlayLevel2()
     m_isFinished = true;
     if (!m_OwnerLevel.expired())
         m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
+
     return S_OK;
 }
 

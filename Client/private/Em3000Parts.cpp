@@ -29,8 +29,6 @@ HRESULT Em3000Parts::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-
-
 	auto desc = static_cast<tagEm3000PartsDesc*>(arg);
 
 	if (FAILED(Ready_Components(desc->shaderDesc, desc->modelResourceTag)))
@@ -95,9 +93,6 @@ void Em3000Parts::Late_Update(Float timeDelta)
 	if (m_TargetBoneIndex == -1 || m_BodyModel.expired()) return;
 
 	m_Transform->Update_WorldMatrix();
-
-	Matrix boneMatrix = m_BodyModel.lock()->Get_BoneMatrix(m_TargetBoneIndex);
-
 	Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
 	m_Model->Update_ModelAnimation(timeDelta);
 }
@@ -106,13 +101,17 @@ HRESULT Em3000Parts::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
+
 	size_t numMeshes = m_Model->Get_NumMeshes();
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
 		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
-		//m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
-		if (FAILED(m_Shader->Begin(0)))
+		m_Model->Bind_Material(m_Shader, NormalMap, i, 6, 0);
+		m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
+
+		if (FAILED(m_Shader->Begin(1)))
 			return E_FAIL;
+
 		m_Model->Render(i);
 	}
 	return S_OK;

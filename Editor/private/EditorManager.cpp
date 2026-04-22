@@ -37,7 +37,7 @@ HRESULT EditorManager::Initialize()
         desc.fovY = XMConvertToRadians(60.f);
         desc.aspect = static_cast<Float>(g_projectSettings.viewportWidth) / static_cast<Float>(g_projectSettings.viewportHeight);
         desc.nearPlane = 0.1f;
-        desc.farPlane = 500.f;
+        desc.farPlane = 250.f;
     }
 
     m_EditorCamera = EditorCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),desc);
@@ -133,7 +133,6 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         // 인게임 카메라가 전혀 없는 경우: 검은 화면 출력을 위해 뷰포트 클리어 및 바인딩 건너뜀
         Shared<Float4> vBlack = make_shared<Float4>(0.f, 0.f, 0.f, 1.f);
         GAME_INSTANCE->Clear_BackBufferView(vBlack);
-        // Bind_CameraTransform을 호출하지 않아 렌더링 결과가 나타나지 않음 (검은 화면)
     }
 
     GAME_INSTANCE->Update_Pipeline();

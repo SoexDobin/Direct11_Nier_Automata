@@ -50,6 +50,11 @@ HRESULT Em3000Movement::Begin()
 	return S_OK;
 }
 
+void Em3000Movement::Set_TargetNavigation(const Shared<Navigation>& navigation)
+{
+	m_Navigation.reset();
+	m_Navigation = navigation;
+}
 
 Bool Em3000Movement::Has_ReachedTarget(Float threshold) const
 {

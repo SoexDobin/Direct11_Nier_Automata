@@ -24,6 +24,10 @@ public:
 	Bool Has_FixedUpdate();
 	Bool Is_FixedUpdate() const { return m_HasFixedUpdate; }
 
+	void Set_TargetFPS(uint32 targetFPS) const;
+	void Set_MainTimer_MaxDelta(Float maxDelta) const;
+	void Set_MainTimer_MaxDeltaByFPS(uint32 minFPS) const;
+
 private:
 	Shared<Timer> m_MainTimer = { nullptr };
 	unordered_map<wstring, Shared<Timer>> m_Timers;

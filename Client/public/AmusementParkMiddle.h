@@ -26,6 +26,7 @@ public:
 	void On_Disable() override;
 
 public:
+	void Update(Float timeDelta) override;
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 

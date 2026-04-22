@@ -90,7 +90,7 @@ Shared<Component> SphereCollider::Clone(void* arg)
 	auto clone = make_shared<SphereCollider>(*this);
 	if (FAILED(clone->Initialize(arg))) return nullptr;
 	
-	GAME_INSTANCE->Add_Collider(clone);
+	GAME_INSTANCE->Add_Collider(GAME_INSTANCE->Get_TargetLevelIndex(), clone);
 
 	return clone;
 }

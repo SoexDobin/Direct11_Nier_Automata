@@ -25,6 +25,10 @@ void Pipeline::Update_Pipeline()
 {
 	for (uint32 i = 0; i < ETOI(D3DTS::END); ++i)
 		m_TransformStateInverseMatrices[i] = m_TransformStateMatrices[i].Invert();
+
+	auto inv = m_TransformStateInverseMatrices[ETOI(D3DTS::VIEW)].Translation();
+
+	m_CameraPosition = Vector4{ inv.x, inv.y, inv.z, 1.f };
 }
 
 Unique<Pipeline> Pipeline::Create()

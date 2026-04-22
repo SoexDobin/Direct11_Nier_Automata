@@ -654,5 +654,13 @@ void Tool::Converter::InjectFallbackTextures(Shared<MODEL_MATERIAL>& mat)
 		mat->textures.push_back({ 1, "5BFBDFD3.dds" });
 		mat->textures.push_back({ 6, "13C421A0.dds" });
 	}
-	
+	else if (mat->name == "kaj_bark4_aaa3_" || mat->name == "kaj_bark4_aaa33_" || mat->name == "kaj_bark4_aaa34_")
+	{
+		mat->textures.push_back({ 1, "16F0ADD2.dds" });
+		mat->textures.push_back({ 1, "797287D5.dds" });
+		mat->textures.push_back({ 1, "797287D5.dds" });
+		mat->textures.push_back({ 6, "3FC1CBB9.dds" });
+		mat->textures.push_back({ 6, "22C4FB01.dds" });
+		mat->textures.push_back({ 6, "22C4FB01.dds" });
+	}
 }

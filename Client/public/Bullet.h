@@ -44,7 +44,6 @@ public:
     HRESULT Render() override;
     void Submit_RenderGroup() override;
 
-    // 충돌 처리 (상쇄 로직 핵심)
     void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 private:
@@ -52,6 +51,10 @@ private:
     HRESULT Bind_ShaderResources();
 
 private:
+    uint32                      m_TargetLayerIndex{};
+    uint32                      m_MonsterLayerIndex{};
+    uint32                      m_PlayerLayerIndex{};
+
     BULLET_DESC                 m_Desc{};
     Entity::DAMAGE_INFO	        m_DamageInfo{};
     Float                       m_TravelDistance{};

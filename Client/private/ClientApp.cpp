@@ -25,6 +25,8 @@ ClientApp::~ClientApp()
 HRESULT ClientApp::Initialize(const ENGINE_DESC& desc) 
 {
     Client::Register_Client_Reflection();
+    GAME_INSTANCE->Set_MaxFPS(70.f);
+    GAME_INSTANCE->Set_MinFPS(50.f);
 
     ClientSettingManager::g_EngineDesc = desc;
 

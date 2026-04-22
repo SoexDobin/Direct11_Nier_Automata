@@ -25,8 +25,7 @@ HRESULT SkyBox::Initialize(void* arg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	// 스카이박스는 Near Plane에 짤리지 않게 스케일을 충분히 키웁니다.
-	m_Transform->Set_LocalScale({ 1000.f, 1000.f, 1000.f });
+	m_Transform->Set_LocalScale({ 10.f, 10.f, 10.f });
 
 	return S_OK;
 }
@@ -38,19 +37,12 @@ void SkyBox::Priority_Update(Float timeDelta)
 
 void SkyBox::Update(Float timeDelta)
 {
-	Vector3 camPos{ 
-		GAME_INSTANCE->Get_CamTransform().x, 
-		GAME_INSTANCE->Get_CamTransform().y, 
-		GAME_INSTANCE->Get_CamTransform().z 
-	};
 
-	m_Transform->Set_LocalPosition(camPos);
-	m_Transform->Update_WorldMatrix();
 }
 
 void SkyBox::Late_Update(Float timeDelta)
 {
-	
+
 }
 
 void SkyBox::Fixed_Update(Float fixedDelta)
@@ -63,7 +55,7 @@ HRESULT SkyBox::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_Shader->Begin(0)))
+	if (FAILED(m_Shader->Begin(1)))
 		return E_FAIL;
 
 	if (FAILED(m_CubeBuffer->Bind_Resources()))
@@ -71,12 +63,6 @@ HRESULT SkyBox::Render()
 
 	if (FAILED(m_CubeBuffer->Render()))
 		return E_FAIL;
-
-	// Render State 복구 (State Leak으로 인한 다른 오브젝트 꼬임 방지)
-	auto context = GAME_INSTANCE->Get_Context();
-	context->RSSetState(nullptr);
-	context->OMSetDepthStencilState(nullptr, 0);
-	context->OMSetBlendState(nullptr, nullptr, 0xffffffff);
 
 	return S_OK;
 }
@@ -97,7 +83,7 @@ HRESULT SkyBox::Bind_ShaderResources()
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
 		return E_FAIL;
 
-	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, "g_Texture", 0)))
+	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DefaultMap, 0)))
 		return E_FAIL;
 
 	return S_OK;

@@ -49,11 +49,28 @@ HRESULT WP3000Body::Initialize(void* arg)
 
 void WP3000Body::On_Destroy()
 {
+	if (m_FlashEffect != nullptr)
+	{
+		Destroy(m_FlashEffect);
+		m_FlashEffect.reset();
+	}
+
 	PartObject::On_Destroy();
 }
 
 void WP3000Body::Priority_Update(Float timeDelta)
 {
+	if (m_FlashEffect == nullptr)
+	{
+		FireFlashEffect::FIRE_FLASH_EFFECT_DESC effectDesc{};
+		effectDesc.parentMatrix = m_Transform->Get_WorldMatrix();
+		uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+		if ((m_FlashEffect = GAME_INSTANCE->Instantiate<FireFlashEffect>(L"FireFlashEffect", levIndex, &effectDesc)))
+		{
+			m_FlashEffect->Set_Active(false);
+		}
+	}
+
 }
 
 void WP3000Body::Update(Float timeDelta)
@@ -65,13 +82,13 @@ void WP3000Body::Update(Float timeDelta)
 		if (animIndex == ETOI(POD_STATE::IDLE))
 		{
 			m_PodState = POD_STATE::SHOOT_START;
-			Set_Animation(ETOI(POD_STATE::SHOOT_START), 0.2f, false);
+			Set_Animation(ETOI(POD_STATE::SHOOT_START), 0.1f, false);
 		}
 		else if (animIndex == ETOI(POD_STATE::SHOOT_START) &&
 			Is_AnimationFinished())
 		{
 			m_PodState = POD_STATE::SHOOT_LOOP;
-			Set_Animation(ETOI(POD_STATE::SHOOT_LOOP), 0.2f, false);
+			Set_Animation(ETOI(POD_STATE::SHOOT_LOOP), 0.1f, false);
 		}
 	}
 	else
@@ -79,13 +96,22 @@ void WP3000Body::Update(Float timeDelta)
 		if (animIndex == ETOI(POD_STATE::SHOOT_LOOP))
 		{
 			m_PodState = POD_STATE::SHOOT_END;
-			Set_Animation(ETOI(POD_STATE::SHOOT_END), 0.2f, false);
+			Set_Animation(ETOI(POD_STATE::SHOOT_END), 0.1f, false);
 		}
 		else if (animIndex == ETOI(POD_STATE::SHOOT_END) &&
 			Is_AnimationFinished())
 		{
 			m_PodState = POD_STATE::IDLE;
-			Set_Animation(ETOI(POD_STATE::IDLE), 0.2f, false);
+			Set_Animation(ETOI(POD_STATE::IDLE), 0.1f, false);
+		}
+	}
+
+	if (m_FlashEffect != nullptr && m_FlashEffect->Is_Active())
+	{
+		m_FlashEffectTimer -= timeDelta;
+		if (m_FlashEffectTimer <= 0.f)
+		{
+			m_FlashEffect->Set_Active(false); // 시간이 다 되면 이펙트를 다시 끕니다
 		}
 	}
 
@@ -132,6 +158,23 @@ void WP3000Body::Late_Update(Float timeDelta)
 		}
 	}
 
+	if (m_FlashEffect != nullptr && m_FlashEffect->Is_Active())
+	{
+		Vector3 worldScale{}, worldPosition{};
+		Quaternion worldRot{};
+		m_CombinedWorldMatrix.Decompose(worldScale, worldRot, worldPosition);
+		// WP3000의 Look 모델 방향 (뒤쪽 Backward 기준)으로 0.5f 앞 배치
+		Vector3 lookDir = m_CombinedWorldMatrix.Backward();
+		lookDir.Normalize();
+		// WP의 Y축 총구 보정 위치로 살짝 조정 (원하시는 높이/거리 조절 가능)
+		Vector3 effectPos = worldPosition + (lookDir * 0.5f) + Vector3(0.f, 0.25f, 0.f);
+		auto effectTransform = m_FlashEffect->Get_Transform();
+		if (effectTransform != nullptr)
+		{
+			effectTransform->Set_Position(effectPos);
+			effectTransform->Set_Rotation(worldRot);
+		}
+	}
 }
 
 void WP3000Body::Fixed_Update(Float fixedDelta)
@@ -217,7 +260,7 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 
 			Bullet::BULLET_DESC desc{};
 			desc.damageInfo = dmgInfo;
-			desc.resourceTag = L"candy";
+			desc.resourceTag = L"pill";
 			desc.targetLayer = L"Monster";
 			desc.isPermanent = false;
 			desc.speed = 30.0f; // 탄속
@@ -225,14 +268,17 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			desc.initialPosition = worldPosition;
 			desc.direction = m_CombinedWorldMatrix.Backward() + Vector3{ 0.f, 0.25f, 0.f };
 
-			FireFlashEffect::FIRE_FLASH_EFFECT_DESC effectDesc{};
-			effectDesc.parentMatrix = m_Transform->Get_WorldMatrix();
+			if (m_FlashEffect != nullptr)
+			{
+				m_FlashEffect->Set_Active(true);
+				m_FlashEffectTimer = m_FireRate; // 약 0.1초 세팅으로 반짝거리며 등장
+			}
 
-			// TODO : 샷 이펙트는 매트릭스 줘서 따라다니게 해야함
-			GAME_INSTANCE->Instantiate<FireFlashEffect>(L"FireFlashEffect", ETOI(LEVEL::GAMEPLAY), &effectDesc);
-			GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", ETOI(LEVEL::GAMEPLAY), &desc);
+			uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+			auto bullet = GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", levIndex, &desc);
 			GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_14);
 			GAME_INSTANCE->PlaySoundFXOnce(L"Wp3000_Shot", SOUNDCHANNEL::CHANNEL_14, 0.4f);
+			bullet->Get_Transform()->Set_Scale(Vector3{ 0.1f, 0.1f, 0.1f });
 		}
 	}
 }

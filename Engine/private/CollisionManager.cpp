@@ -19,6 +19,13 @@ CollisionManager::~CollisionManager()
 #endif
 }
 
+HRESULT CollisionManager::Initialize_Prototype(uint32 levCount)
+{
+	m_LevelCount = levCount;
+	m_Colliders.resize(m_LevelCount);
+	return EngineManager::Initialize_Prototype();
+}
+
 HRESULT CollisionManager::Initialize(void* arg)
 {
 	return EngineManager::Initialize(arg);
@@ -29,42 +36,56 @@ void CollisionManager::On_Disable() { EngineManager::On_Disable(); }
 void CollisionManager::On_Enable() { EngineManager::On_Enable(); }
 void CollisionManager::Set_Active(Bool isActive) { EngineManager::Set_Active(isActive); }
 
-void CollisionManager::Add_Collider(const Shared<Collider>& collider)
+void CollisionManager::Add_Collider(uint32 levIndex, const Shared<Collider>& collider)
 {
-	m_Colliders.push_back(collider);
+	if (levIndex >= m_LevelCount) return;
+
+	m_Colliders[levIndex].push_back(collider);
 }
 
-void CollisionManager::Remove_Collider(const Shared<Collider>& collider)
+void CollisionManager::Remove_Collider(uint32 levIndex, const Shared<Collider>& collider)
 {
-	if (nullptr == collider) return;
+	if (nullptr == collider || levIndex >= m_LevelCount) return;
 
-	for (auto& col : m_Colliders)
+	for (auto& col : m_Colliders[levIndex])
 	{
 		if (col && col != collider)
 			col->Release_OverlapMember(collider);
 	}
 
-	auto iter = ranges::find_if(m_Colliders.begin(), m_Colliders.end(), [collider](const Shared<Collider>& col) {
+	auto iter = ranges::find_if(m_Colliders[levIndex].begin(), m_Colliders[levIndex].end(), [collider](const Shared<Collider>& col) {
 		return col == collider;
 	});
-	if (iter != m_Colliders.end())
+	if (iter != m_Colliders[levIndex].end())
 	{
-		m_Colliders.erase(iter);
+		m_Colliders[levIndex].erase(iter);
 	}
+}
+
+HRESULT CollisionManager::Clear_Colliders(uint32 levIndex)
+{
+	if (levIndex >= m_LevelCount)
+	{
+		return E_FAIL;
+	}
+	m_Colliders[levIndex].clear();
+	return S_OK;
 }
 
 void CollisionManager::Update_Collision() const
 {
-	for (size_t i = 0; i < m_Colliders.size(); ++i)
+	uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+
+	for (size_t i = 0; i < m_Colliders[levIndex].size(); ++i)
 	{
-		auto srcCol = m_Colliders[i];
+		auto srcCol = m_Colliders[levIndex][i];
 		if (!srcCol || srcCol->Is_Destroy() || !srcCol->Is_Active()) continue;
 		auto srcOwner = srcCol->Get_Owner();
 		if (!srcOwner || srcOwner->Is_Destroy() || !srcOwner->Is_Active()) continue;
 
-		for (size_t j = i + 1; j < m_Colliders.size(); ++j)
+		for (size_t j = i + 1; j < m_Colliders[levIndex].size(); ++j)
 		{
-			auto dstCol = m_Colliders[j];
+			auto dstCol = m_Colliders[levIndex][j];
 			if (!dstCol || dstCol->Is_Destroy() || !dstCol->Is_Active()) continue;
 			auto dstOwner = dstCol->Get_Owner();
 			if (!dstOwner || dstOwner->Is_Destroy() || !dstOwner->Is_Active()) continue;
@@ -154,7 +175,8 @@ void CollisionManager::Render_Debug() const
 
 	m_Batch->Begin();
 
-	for (auto& collider : m_Colliders)
+	uint32 levIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+	for (auto& collider : m_Colliders[levIndex])
 	{
 		if (collider && collider->Is_Active() && !collider->Is_Destroy())
 		{
@@ -169,7 +191,7 @@ void CollisionManager::Render_Debug() const
 
 #endif
 
-Unique<CollisionManager> CollisionManager::Create()
+Unique<CollisionManager> CollisionManager::Create(uint32 levCount)
 {
 	auto collisionManager = make_unique<CollisionManager>();
 
@@ -181,8 +203,7 @@ Unique<CollisionManager> CollisionManager::Create()
 	}
 #endif
 
-
-	if (collisionManager->Initialize_Prototype())
+	if (collisionManager->Initialize_Prototype(levCount))
 	{
 		MSG_BOX("Failed to Create CollisionManager");
 		return nullptr;

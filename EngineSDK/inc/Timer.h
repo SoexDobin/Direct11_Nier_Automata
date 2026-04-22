@@ -55,6 +55,26 @@ private:
   Bool m_IsActive = {true};
 
 public:
+	void Set_TargetFPS(uint32 targetFPS)
+	{
+		if (targetFPS > 0)
+			m_TargetDeltaTime = 1.0f / static_cast<Float>(targetFPS);
+		else
+			m_TargetDeltaTime = 0.0f;
+	}
+
+	void Set_MaxDeltaTime(Float maxDelta) { m_MaxDeltaTime = maxDelta; }
+	void Set_MaxDeltaTimeByFPS(uint32 minFPS) 
+	{
+		if (minFPS > 0)
+			m_MaxDeltaTime = 1.0f / static_cast<Float>(minFPS);
+	}
+
+private:
+	Float m_TargetDeltaTime = 0.0f;
+	Float m_MaxDeltaTime = 0.1f;
+
+public:
   static Shared<Timer> Create();
 };
 

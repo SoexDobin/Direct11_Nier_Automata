@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "Em3003.h"
+
+#include <Game.h>
 #include <SpdLogger.h>
+
+#include "Model.h"
 
 Em3003::Em3003(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Em3000Parts{device, context} { }
@@ -41,12 +45,13 @@ void Em3003::Priority_Update(Float timeDelta)
 
 void Em3003::Update(Float timeDelta)
 {
-	Em3000Parts::Update(timeDelta);
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void Em3003::Late_Update(Float timeDelta)
 {
-	Em3000Parts::Late_Update(timeDelta);
+	m_Transform->Update_WorldMatrix();
+	Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
 }
 
 void Em3003::Fixed_Update(Float fixedDelta)
@@ -56,12 +61,37 @@ void Em3003::Fixed_Update(Float fixedDelta)
 
 HRESULT Em3003::Render()
 {
-	return Em3000Parts::Render();
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	size_t numMeshes = m_Model->Get_NumMeshes();
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
+		{
+			LOG_ERROR(L"err 1");
+		}
+		if (FAILED(m_Model->Bind_Material(m_Shader, NormalMap, i, 6, 0)))
+		{
+			LOG_ERROR(L"err 2");
+		}
+		if (FAILED(m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i)))
+		{
+			LOG_ERROR(L"err 3");
+		}
+
+		if (FAILED(m_Shader->Begin(1)))
+			return E_FAIL;
+
+		m_Model->Render(i);
+	}
+
+	return S_OK;
 }
 
 void Em3003::Submit_RenderGroup()
 {
-	Em3000Parts::Submit_RenderGroup();
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
 Shared<Em3003> Em3003::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

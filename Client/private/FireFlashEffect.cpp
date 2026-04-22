@@ -27,7 +27,7 @@ HRESULT FireFlashEffect::Initialize(void* arg)
 	if (nullptr == arg)
 	{
 		LOG_ERROR(L"There is no ParticleEffect Desc");
-		return E_FAIL;
+		return S_OK;
 	}
 
 	if (FAILED(ParticleEffect::Initialize(arg)))
@@ -54,14 +54,6 @@ void FireFlashEffect::Priority_Update(Float timeDelta)
 
 void FireFlashEffect::Update(Float timeDelta)
 {
-	m_Acc += timeDelta;
-	
-	if (m_Acc >= 0.25f)
-	{
-		Object::Destroy(shared_from_this());
-		return; 
-	}
-
 	m_Buffer->Update_Spread(timeDelta);
 	m_Transform->Update_WorldMatrix();
 }
@@ -103,8 +95,8 @@ HRESULT FireFlashEffect::Ready_Components(const Matrix& parentMatrix)
 		return S_OK;
 
 	VIBuffer_Particle_Point::VIBUFFER_INSTANCE_POINT_DESC instanceDesc{};
-	instanceDesc.numInstances = 30;
-	instanceDesc.isLoop = false;
+	instanceDesc.numInstances = 10;
+	instanceDesc.isLoop = true;
 	instanceDesc.center = Vector3::Zero;
 	instanceDesc.pivot = Vector3::Zero;
 	instanceDesc.range = Vector3::Zero;
@@ -143,7 +135,7 @@ HRESULT FireFlashEffect::Bind_ShaderResources()
 
 	if (FAILED(m_Shader->Bind_RawValue("g_LockUpRight", &isLocked, sizeof(uint32))))
 		return E_FAIL;
-	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DiffuseMap, Helper::Random_Int(0, 29))))
+	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DiffuseMap, 0)))
 		return E_FAIL;
 
 	return S_OK;

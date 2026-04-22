@@ -41,6 +41,7 @@ public:
 	void Set_RootPosition(const Vector3& rootPos) { m_RootPosition = rootPos; }
 
 public:
+	void Set_TargetNavigation(const Shared<Navigation>& navigation);
 	void Set_TargetPosition(const Vector3& targetPos) {
 		m_TargetPosition = targetPos; m_HasWalkTarget = true;
 	}

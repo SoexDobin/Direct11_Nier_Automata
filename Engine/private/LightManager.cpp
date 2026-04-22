@@ -41,6 +41,7 @@ HRESULT LightManager::Remove_Light(uint32 index)
 HRESULT LightManager::Clear_Lights()
 {
 	m_Lights.shrink_to_fit(); 
+	m_Lights.clear();
 	return S_OK; 
 }
 

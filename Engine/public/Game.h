@@ -29,10 +29,10 @@ NS_BEGIN(Engine)
 class TagRegistry;
 
 class ENGINE_DLL Game {
-  DECLARE_SINGLETON(Game)
+	DECLARE_SINGLETON(Game)
 protected:
-  explicit Game() = default;
-  ~Game();
+    explicit Game() = default;
+    ~Game();
 
 public:
     HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
@@ -77,6 +77,8 @@ public: /* For Input */
 public: /* For TimeManager */
     HRESULT Add_Timer(const wstring &timerTag) const;
     void Set_TimeScale(Float timeScale) const;
+    void Set_MaxFPS(Float maxfps) const;
+    void Set_MinFPS(Float minfps) const;
     Float Get_FPS() const;
     Float Compute_TimeDelta() const;
     Float Compute_UnscaledTimeDelta() const;
@@ -152,6 +154,7 @@ public: /* For Pipeline */
     void Update_Pipeline() const;
 
 public: /* For.LightManager */
+    HRESULT Clear_Lights() const;
     const LIGHT_DESC *Get_LightDesc(uint32 index) const;
     HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
     HRESULT Remove_Light(uint32 index) const;
@@ -179,8 +182,8 @@ public: /* For EventManager*/
     HRESULT Remove_Event(uint32 levIndex, const wstring& eventTag) const;
 
 public: /* CollisionManager */
-    void Add_Collider(const Shared<class Collider>& collider) const;
-    void Remove_Collider(const Shared<class Collider>& collider) const;
+    void Add_Collider(uint32 levIndex, const Shared<class Collider>& collider) const;
+    void Remove_Collider(uint32 levIndex, const Shared<class Collider>& collider) const;
     void Update_Collision() const;
 
 public: /* NavigationBuilder */

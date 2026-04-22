@@ -13,6 +13,7 @@ public:
 	~CollisionManager() override;
 
 public: 
+	HRESULT Initialize_Prototype(uint32 levCount);
 	HRESULT Initialize(void* arg) override;
 	void On_Destroy() override;
 	void On_Disable() override;
@@ -20,8 +21,9 @@ public:
 	void Set_Active(Bool isActive) override;
 
 public: 
-	void Add_Collider(const Shared<Collider>& collider);
-	void Remove_Collider(const Shared<Collider>& collider);
+	void Add_Collider(uint32 levIndex, const Shared<Collider>& collider);
+	void Remove_Collider(uint32 levIndex, const Shared<Collider>& collider);
+	HRESULT Clear_Colliders(uint32 levIndex);
 
 public: 
 	void Update_Collision() const;
@@ -39,7 +41,8 @@ public: /* 디버그 렌더링 */
 #endif
 
 private:
-	vector<Shared<Collider>> m_Colliders;
+	vector<vector<Shared<Collider>>> m_Colliders;
+	uint32 m_LevelCount{};
 #ifdef _DEBUG
 	Bool m_DebugMode = { false };
 	ComPtr<ID3D11Device> m_Device{ nullptr }; 
@@ -49,7 +52,7 @@ private:
 	Shared<BasicEffect> m_Effect{ nullptr };
 #endif
 public:
-	static Unique<CollisionManager> Create();
+	static Unique<CollisionManager> Create(uint32 levCount);
 };
 
 NS_END

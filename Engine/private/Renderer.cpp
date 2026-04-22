@@ -130,17 +130,17 @@ HRESULT Renderer::Initialize(void *arg) {
 	m_ProjMatrix = Matrix::CreateOrthographic(viewportDesc.Width, viewportDesc.Height, 0.f, 1.f);
 
 #ifdef _DEBUG
-	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_DIFFUSE, 150.f, 150.f, 300.f, 300.f)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_NORMAL, 150.f, 450.f, 300.f, 300.f)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_DEPTH, 150.f, 750.f, 300.f, 300.f)))
-		return E_FAIL;
-
-	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SHADE, 450.f, 150.f, 300.f, 300.f)))
-		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SPECULAR, 450.f, 450.f, 300.f, 300.f)))
-		return E_FAIL;
+	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_DIFFUSE, 150.f, 150.f, 300.f, 300.f)))
+	//	return E_FAIL;
+	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_NORMAL, 150.f, 450.f, 300.f, 300.f)))
+	//	return E_FAIL;
+	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_DEPTH, 150.f, 750.f, 300.f, 300.f)))
+	//	return E_FAIL;
+	//
+	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SHADE, 450.f, 150.f, 300.f, 300.f)))
+	//	return E_FAIL;
+	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SPECULAR, 450.f, 450.f, 300.f, 300.f)))
+	//	return E_FAIL;
 #endif
 
 	return S_OK;

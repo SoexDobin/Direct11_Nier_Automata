@@ -26,7 +26,7 @@ HRESULT AmusementParkEntry::Initialize(void* arg)
 	desc.vertexTag = VTXWORLDMESH;
 	desc.modelTag = L"AmusementParkEntry";
 	desc.navTag = L"AmusementParkEntry";
-
+	
 	if (FAILED(WorldObject::Initialize(&desc)))
 	{
 		LOG_ERROR(L"Failed to Ready Components {}", m_ObjectName);
@@ -67,8 +67,16 @@ HRESULT AmusementParkEntry::Render()
 		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
 			continue;
 
-		auto w = Vector4{ 0.33f, 0.33f, 0.34f, 1.f };
-		m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
+		if (i == 10 || i == 12 || i == 39)
+		{
+			auto w = Vector4{ 0.20f, 0.4f, 0.4f, 1.f };
+			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
+		}
+		else
+		{
+			auto w = Vector4{ 0.33f, 0.33f, 0.34f, 1.f };
+			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));
+		}
 	
 		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
 			continue;
@@ -93,6 +101,11 @@ HRESULT AmusementParkEntry::Render()
 	}
 
 	return S_OK;
+}
+
+void AmusementParkEntry::Update(Float timeDelta)
+{
+	m_Transform->Update_WorldMatrix();
 }
 
 void AmusementParkEntry::Submit_RenderGroup()

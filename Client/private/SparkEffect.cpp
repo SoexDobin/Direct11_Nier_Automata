@@ -96,7 +96,7 @@ HRESULT SparkEffect::Render()
 HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPosition, const Quaternion& initialRotation)
 {
 	Shader::SHADER_DESC shaderDesc{ VTXPARTICLE_POINT_DESC::Tag, VTXPARTICLE_POINT_DESC::Elements, VTXPARTICLE_POINT_DESC::numElements };
-	m_Shader = Add_Component<Shader>(ETOI(LEVEL::GAMEPLAY), &shaderDesc);
+	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
 	if (nullptr == m_Shader)
 		return S_OK;
 
@@ -110,7 +110,8 @@ HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPo
 	instanceDesc.speed = Vector2::Zero;
 	instanceDesc.lifeTime = Vector2{ 0.1f, 0.25f };
 
-	m_Buffer = Add_Component<VIBuffer_Particle_Point>(ETOI(LEVEL::GAMEPLAY), &instanceDesc);
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	m_Buffer = Add_Component<VIBuffer_Particle_Point>(levIndex, &instanceDesc);
 	if (nullptr == m_Buffer)
 		return S_OK;
 
@@ -124,8 +125,8 @@ HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPo
 		textureTag = L"Effect_Spark";
 	}
 
-	auto textureDesc = Texture::TEXTURE_DESC{ ETOI(LEVEL::GAMEPLAY), textureTag };
-	m_Texture = Add_Component<Texture>(ETOI(LEVEL::GAMEPLAY), &textureDesc);
+	auto textureDesc = Texture::TEXTURE_DESC{ levIndex, textureTag };
+	m_Texture = Add_Component<Texture>(levIndex, &textureDesc);
 	if (nullptr == m_Texture)
 		return E_FAIL;
 

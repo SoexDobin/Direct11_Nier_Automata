@@ -20,18 +20,8 @@ public:
 	{
 		m_TransformStateMatrices[ETOI(transformState)] = transformStateMatrix;
 	}
-	Vector4 Get_CamTransform() const
-	{
-		Vector4 v4 = Vector4(m_TransformStateMatrices[ETOI(D3DTS::VIEW)].Translation());
-		v4.w = 1.f;
-		return v4;
-	}
-	Vector4* Get_RawCamTransform() const
-	{
-		Vector4 v4 = Vector4(m_TransformStateMatrices[ETOI(D3DTS::VIEW)].Translation());
-		v4.w = 1.f;
-		return &v4;
-	}
+	Vector4 Get_CamTransform() const { return m_CameraPosition; }
+	Vector4* Get_RawCamTransform() { return &m_CameraPosition; }
 
 public:
 	HRESULT Bind_CameraPosition(const Shared<Shader>& shader, const Char* constantName);
@@ -40,6 +30,7 @@ public:
 	void Update_Pipeline();
 
 private:
+	Vector4 m_CameraPosition{};
 	Matrix m_TransformStateMatrices[ETOI(D3DTS::END)] = {};
 	Matrix m_TransformStateInverseMatrices[ETOI(D3DTS::END)] = {};
 

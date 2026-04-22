@@ -51,6 +51,11 @@ void AmusementParkMiddle::On_Disable()
 	WorldObject::On_Disable();
 }
 
+void AmusementParkMiddle::Update(Float timeDelta)
+{
+	m_Transform->Update_WorldMatrix();
+}
+
 HRESULT AmusementParkMiddle::Render()
 {
 #ifdef _DEBUG

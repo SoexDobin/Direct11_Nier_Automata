@@ -69,7 +69,7 @@ HRESULT CityOfRuinManHole::Render()
 		if (!m_Model->IsInFrustum_PreMesh(i, worldMat))
 			continue;
 
-		if (i >= 99 && i <= 117)
+		if (i >= 92 && i <= 106)
 		{
 			auto w = Vector4{ 0.1f, 0.45f, 0.45f, 10.f };
 			m_Shader->Bind_RawValue(BlendWeight, &w, sizeof(Vector4));

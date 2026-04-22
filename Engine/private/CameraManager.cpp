@@ -128,7 +128,20 @@ HRESULT CameraManager::Clear_AllCameras()
 
 Bool CameraManager::IsInFrustum(const BoundingSphere& worldSphere)
 {
-	return m_Frustum.Contains(worldSphere) != DISJOINT;
+	for (int i = 0; i < 6; ++i)
+	{
+		Float dotProduct =
+			worldSphere.Center.x * m_FrustumPlanes[i].x +
+			worldSphere.Center.y * m_FrustumPlanes[i].y +
+			worldSphere.Center.z * m_FrustumPlanes[i].z +
+			m_FrustumPlanes[i].w;
+		// 평면으로부터 구의 중심까지의 거리가 반경의 음수값보다 작으면 완전히 뒤(화면 밖)에 있는 것
+		if (dotProduct < -worldSphere.Radius)
+		{
+			return false; // 컬링!
+		}
+	}
+	return true; // 렌더링
 }
 
 void CameraManager::Update_Frustum()
@@ -140,6 +153,31 @@ void CameraManager::Update_Frustum()
 	{
 		localFrustum.Transform(m_Frustum, mainCamera->Get_Transform()->Get_WorldMatrix());
 	}
+
+	Matrix viewMat = GAME_INSTANCE->Get_Transform(D3DTS::VIEW);
+	Matrix projMat = GAME_INSTANCE->Get_Transform(D3DTS::PROJ);
+	Matrix vp = viewMat * projMat;
+
+	m_FrustumPlanes[0] = Vector4{ vp._14 + vp._11, vp._24 + vp._21, vp._34 + vp._31, vp._44 + vp._41 }; // Left
+	m_FrustumPlanes[1] = Vector4{ vp._14 - vp._11, vp._24 - vp._21, vp._34 - vp._31, vp._44 - vp._41 }; // Right
+	m_FrustumPlanes[2] = Vector4{ vp._14 + vp._12, vp._24 + vp._22, vp._34 + vp._32, vp._44 + vp._42 }; // Top
+	m_FrustumPlanes[3] = Vector4{ vp._14 - vp._12, vp._24 - vp._22, vp._34 - vp._32, vp._44 - vp._42 }; // Bottom
+	m_FrustumPlanes[4] = Vector4{ vp._14 + vp._13, vp._24 + vp._23, vp._34 + vp._33, vp._44 + vp._43 }; // Near
+	m_FrustumPlanes[5] = Vector4{ vp._14 - vp._13, vp._24 - vp._23, vp._34 - vp._33, vp._44 - vp._43 }; // Far
+
+	for (uint32 i = 0; i < 6; ++i)
+	{
+		Float length = sqrtf(
+			m_FrustumPlanes[i].x * m_FrustumPlanes[i].x +
+			m_FrustumPlanes[i].y * m_FrustumPlanes[i].y +
+			m_FrustumPlanes[i].z * m_FrustumPlanes[i].z
+		);
+		m_FrustumPlanes[i].x /= length;
+		m_FrustumPlanes[i].y /= length;
+		m_FrustumPlanes[i].z /= length;
+		m_FrustumPlanes[i].w /= length;
+	}
+
 }
 
 Unique<CameraManager> CameraManager::Create(uint32 levCount)

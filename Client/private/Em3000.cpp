@@ -47,7 +47,7 @@ HRESULT Em3000::Initialize(void* arg)
 		{
 			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
 			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
-			UI_hpDesc.worldOffset = Vector3{ 0.f, 1.f, 0.f };
+			UI_hpDesc.worldOffset = Vector3{ 0.f, 5.f, 0.f };
 			UI_hpDesc.anchor = UI_ANCHOR::TOP_LEFT;
 			UI_hpDesc.sizeX = 200.f;
 			UI_hpDesc.sizeY = 10.f;
@@ -109,6 +109,12 @@ void Em3000::Submit_RenderGroup()
 const TRANSFORM_FRAME& Em3000::Get_BodyModelTransform() const
 {
 	return m_MainBody->Get_ModelTransform();
+}
+
+void Em3000::Set_Navigation(const Shared<Navigation>& navigation)
+{
+	Entity::Set_Navigation(navigation);
+	m_Em3000Movement->Set_TargetNavigation(m_Navigation);
 }
 
 void Em3000::TakeDamage(const DAMAGE_INFO& dmgInfo)
@@ -179,7 +185,7 @@ HRESULT Em3000::Ready_PartObjects()
 	if (FAILED(Add_PartObject(levIndex, L"Em3002", L"Em3002", &partsDesc))) 
 		return E_FAIL;
 
-	partsDesc.shaderDesc = animMesh;
+	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3003";
 	partsDesc.targetBoneName = "bone0";
 	if (FAILED(Add_PartObject(levIndex, L"Em3003", L"Em3003", &partsDesc))) 
@@ -194,7 +200,7 @@ HRESULT Em3000::Ready_Components()
 
 	Navigation::NAVIGATION_DESC navDesc;
 	navDesc.startCellIndex = 0;
-	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
+	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"AmusementParkDome", &navDesc);
 
 	Em3000Movement::EM3000_MOVEMENT_DESC movementDesc{};
 	movementDesc.velocity = Vector3{ 0.f, 0.f, 0.f };

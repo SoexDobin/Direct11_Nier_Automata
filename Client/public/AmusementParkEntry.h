@@ -27,6 +27,7 @@ public:
 
 public:
 	HRESULT Render() override;
+	void Update(Float timeDelta) override;
 	void Submit_RenderGroup() override;
 
 public:

@@ -39,6 +39,7 @@ private:
 	Weak<Camera> m_MainCamera{};
 
 	BoundingFrustum m_Frustum{};
+	Vector4 m_FrustumPlanes[6] = {};
 
 public:
   static Unique<CameraManager> Create(uint32 levCount);

@@ -23,31 +23,50 @@ HRESULT Timer::Initialize() {
 }
 
 Float Timer::Update_Timer() {
-    QueryPerformanceCounter(&m_CurrentTime);
-    m_UnscaledDeltaTime =
-        static_cast<Float>(m_CurrentTime.QuadPart - m_PrevTime.QuadPart) /
-        static_cast<Float>(m_Frequency.QuadPart);
+	if (m_TargetDeltaTime > 0.0f)
+	{
+		while (true)
+		{
+			QueryPerformanceCounter(&m_CurrentTime);
+			m_UnscaledDeltaTime =
+				static_cast<Float>(m_CurrentTime.QuadPart - m_PrevTime.QuadPart) /
+				static_cast<Float>(m_Frequency.QuadPart);
 
-    m_UnscaledDeltaTime = min(m_UnscaledDeltaTime, 0.1f);
+			if (m_UnscaledDeltaTime >= m_TargetDeltaTime)
+			{
+				break;
+			}
+		}
+	}
+	else
+	{
+		QueryPerformanceCounter(&m_CurrentTime);
+		m_UnscaledDeltaTime =
+			static_cast<Float>(m_CurrentTime.QuadPart - m_PrevTime.QuadPart) /
+			static_cast<Float>(m_Frequency.QuadPart);
+	}
 
-    m_DeltaTime = m_UnscaledDeltaTime * m_TimeScale;
-    m_DeltaAcc += m_DeltaTime;
+	m_UnscaledDeltaTime = min(m_UnscaledDeltaTime, m_MaxDeltaTime);
 
-    m_FixedAcc += m_DeltaTime;
+	m_DeltaTime = m_UnscaledDeltaTime * m_TimeScale;
+	m_DeltaAcc += m_DeltaTime;
 
-    ++m_FrameAcc;
-    ++m_TempFPS;
+	m_FixedAcc += m_DeltaTime;
 
-    m_FPSTimeElapsed += m_DeltaTime;
-    if (m_FPSTimeElapsed >= 1.f) {
-      m_FPS = m_TempFPS;
-      m_TempFPS = 0;
-      m_FPSTimeElapsed = 0.f;
-    }
+	++m_FrameAcc;
+	++m_TempFPS;
 
-    m_PrevTime = m_CurrentTime;
+	m_FPSTimeElapsed += m_DeltaTime;
+	if (m_FPSTimeElapsed >= 1.f)
+	{
+		m_FPS = m_TempFPS;
+		m_TempFPS = 0;
+		m_FPSTimeElapsed -= 1.0f;
+	}
 
-    return m_DeltaTime;
+	m_PrevTime = m_CurrentTime;
+
+	return m_DeltaTime;
 }
 
 Bool Timer::IsFixedUpdate() const { return m_FixedAcc >= m_FixedDeltaTime; }

@@ -35,7 +35,7 @@ namespace Engine
 		LIGHT type = {};
 		Vector4 direction = {};
 		Vector4 position = {};
-		float range = {};
+		Float range = {};
 
 		Vector4 diffuse = {};
 		Vector4 ambient = {};

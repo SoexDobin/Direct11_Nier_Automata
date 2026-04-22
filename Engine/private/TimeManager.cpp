@@ -81,6 +81,30 @@ Bool TimeManager::Has_FixedUpdate()
 	return hasFixedUpdate;
 }
 
+void TimeManager::Set_TargetFPS(uint32 targetFPS) const
+{
+	if (m_MainTimer)
+	{
+		m_MainTimer->Set_TargetFPS(targetFPS);
+	}
+}
+
+void TimeManager::Set_MainTimer_MaxDelta(Float maxDelta) const
+{
+	if (m_MainTimer)
+	{
+		m_MainTimer->Set_MaxDeltaTime(maxDelta);
+	}
+}
+
+void TimeManager::Set_MainTimer_MaxDeltaByFPS(uint32 minFPS) const
+{
+	if (m_MainTimer)
+	{
+		m_MainTimer->Set_MaxDeltaTimeByFPS(minFPS);
+	}
+}
+
 Unique<TimeManager> TimeManager::Create()
 {
 	auto timeManager = std::make_unique<TimeManager>();

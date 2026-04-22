@@ -41,7 +41,7 @@ void Em3002::Priority_Update(Float timeDelta)
 
 void Em3002::Update(Float timeDelta)
 {
-	Em3000Parts::Update(timeDelta);
+	
 }
 
 void Em3002::Late_Update(Float timeDelta)

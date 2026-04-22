@@ -263,7 +263,6 @@
     <ClInclude Include="..\public\CityOfRuinManHole.h">
       <Filter>02. GameObject\World\CityOfRuin</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\TriggerObject.h" />
     <ClInclude Include="..\public\AmusementParkEntry.h">
       <Filter>02. GameObject\World\Amusement</Filter>
     </ClInclude>
@@ -281,6 +280,9 @@
     </ClInclude>
     <ClInclude Include="..\public\WorldTriggerManager.h">
       <Filter>00. MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TriggerObject.h">
+      <Filter>02. GameObject\Trigger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -540,7 +542,6 @@
     <ClCompile Include="..\private\CityOfRuinManHole.cpp">
       <Filter>02. GameObject\World\CityOfRuin</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\TriggerObject.cpp" />
     <ClCompile Include="..\private\AmusementParkEntry.cpp">
       <Filter>02. GameObject\World\Amusement</Filter>
     </ClCompile>
@@ -558,6 +559,9 @@
     </ClCompile>
     <ClCompile Include="..\private\WorldTriggerManager.cpp">
       <Filter>00. MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TriggerObject.cpp">
+      <Filter>02. GameObject\Trigger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

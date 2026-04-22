@@ -137,7 +137,7 @@ void Em0010::TakeDamage(const DAMAGE_INFO& dmgInfo)
 	Play_HitSFX(dmgInfo);
 	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
 		
-	if (dmgInfo.attackType != ATK_TYPE::POD)
+	if (dmgInfo.attackType != ATK_TYPE::POD && m_States->Get_CurMonsterState() != MonsterStateMachine::MONSTER_STATE::ATTACK)
 		m_States->Change_State(MonsterStateMachine::MONSTER_STATE::Hit);
 
 	Monster::TakeDamage(dmgInfo);

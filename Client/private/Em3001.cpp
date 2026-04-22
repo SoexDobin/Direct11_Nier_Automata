@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "Em3001.h"
 
+#include <Game.h>
 #include <SpdLogger.h>
 
 #include "Em3000Parts.h"
+#include "Model.h"
 
 Em3001::Em3001(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Em3000Parts{device, context} {}
@@ -44,7 +46,7 @@ void Em3001::Priority_Update(Float timeDelta)
 
 void Em3001::Update(Float timeDelta)
 {
-	Em3000Parts::Update(timeDelta);
+	
 }
 
 void Em3001::Late_Update(Float timeDelta)
@@ -59,12 +61,28 @@ void Em3001::Fixed_Update(Float fixedDelta)
 
 HRESULT Em3001::Render()
 {
-	return Em3000Parts::Render();
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	size_t numMeshes = m_Model->Get_NumMeshes();
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
+		m_Model->Bind_Material(m_Shader, NormalMap, i, 6, 0);
+		m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
+
+		if (FAILED(m_Shader->Begin(1)))
+			return E_FAIL;
+
+		m_Model->Render(i);
+	}
+
+	return S_OK;
 }
 
 void Em3001::Submit_RenderGroup()
 {
-	Em3000Parts::Submit_RenderGroup();
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }
 
 Shared<Em3001> Em3001::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

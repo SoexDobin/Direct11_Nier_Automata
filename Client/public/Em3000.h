@@ -40,6 +40,7 @@ public:
 
 public:
 	const TRANSFORM_FRAME& Get_BodyModelTransform() const;
+	void Set_Navigation(const Shared<Navigation>& navigation) override;
 	void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
 	void OnDeath() override;
 

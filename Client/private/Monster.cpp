@@ -213,10 +213,11 @@ void Monster::Play_HitSFX(const DAMAGE_INFO& dmgInfo) const
 
 void Monster::DisplaySparkEffect(ATK_TYPE atkType, Vector3 position, Quaternion rotation) const
 {
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
 	SparkEffect::SPARK_EFFECT_DESC sparkDesc{};
 	sparkDesc.atkType = atkType;
 	sparkDesc.position = position;
 	sparkDesc.rotation = rotation;
-	GAME_INSTANCE->Instantiate<SparkEffect>(L"SparkEffect", ETOI(LEVEL::GAMEPLAY), &sparkDesc);
+	GAME_INSTANCE->Instantiate<SparkEffect>(L"SparkEffect", levIndex, &sparkDesc);
 }
 

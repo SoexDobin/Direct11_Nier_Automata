@@ -11,15 +11,50 @@
             },
             {
               "properties": null,
+              "typeName": "AABBCollider"
+            }
+          ],
+          "name": "NavigationSector",
+          "objectID": 3826940858,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "NavigationSector",
+          "transform": {
+            "position": [
+              301.0,
+              0.0,
+              86.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "NavigationSector"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
               "typeName": "Navigation"
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Model"
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Shader"
             }
           ],
           "name": "AmusementParkDome",
@@ -54,17 +89,25 @@
             },
             {
               "properties": null,
-              "typeName": "AABBCollider"
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
             }
           ],
-          "name": "NavigationSector",
-          "objectID": 3826940858,
+          "name": "AmusementParkEntry",
+          "objectID": 1172218866,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "NavigationSector",
+          "prototypeTag": "AmusementParkEntry",
           "transform": {
             "position": [
-              301.0,
+              0.0,
               0.0,
               86.5
             ],
@@ -79,7 +122,7 @@
               1.0
             ]
           },
-          "typeName": "NavigationSector"
+          "typeName": "AmusementParkEntry"
         },
         {
           "components": [
@@ -159,15 +202,15 @@
             },
             {
               "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
               "typeName": "Shader"
             },
             {
               "properties": null,
               "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
             }
           ],
           "name": "AmusementParkMiddle",
@@ -193,49 +236,6 @@
             ]
           },
           "typeName": "AmusementParkMiddle"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            }
-          ],
-          "name": "AmusementParkEntry",
-          "objectID": 1172218866,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "AmusementParkEntry",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              86.5
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "AmusementParkEntry"
         },
         {
           "components": [

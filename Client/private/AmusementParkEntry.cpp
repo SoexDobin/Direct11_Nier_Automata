@@ -6,6 +6,8 @@
 #include "Navigation.h"
 #include <SpdLogger.h>
 
+#include "AmusementParkLight.h"
+
 AmusementParkEntry::AmusementParkEntry(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: WorldObject{ device, context } {
 }
@@ -13,6 +15,64 @@ AmusementParkEntry::AmusementParkEntry(const ComPtr<ID3D11Device>& device, const
 AmusementParkEntry::AmusementParkEntry(const AmusementParkEntry& rhs)
 	: WorldObject{ rhs } {
 }
+
+void AmusementParkEntry::SetUp_EntryLight()
+{
+	if (m_IsEntry) return;
+
+	uint32 levIndex = ETOI(LEVEL::GAMEPLAY2);
+	wstring protoTag = L"AmusementParkLight";
+
+	AmusementParkLight::AMUSEMENT_LIGHT_DESC desc{};
+	auto& lDesc = desc.lightDesc;
+	lDesc.type = LIGHT::POINT;
+	lDesc.range = 10.f;
+	lDesc.diffuse = Vector4{ 255.f, 255.f, 255.f, 255.f };
+	lDesc.ambient = Vector4{55.f, 55.f, 55.f, 55.f };
+	lDesc.specular = Vector4{ 25.f, 25.f, 25.f, 255.f };
+	lDesc.direction = Vector4::Zero;
+
+	lDesc.position = {-15.f, 6.f, 52.f };
+	lDesc.diffuse = Vector4{ 255.f, 255.f, 255.f, 255.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { -15.f, 6.f, 45.f};
+	lDesc.diffuse = Vector4{ 70.f, 230.f, 170.f, 255.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { -15.f, 6.f, 59.f, };
+	lDesc.diffuse = Vector4{ 50.f, 255.f, 255.f, 255.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+
+
+	lDesc.diffuse = Vector4{ 255.f, 255.f, 255.f, 255.f };
+	lDesc.position = { 25.f, 0.f, 52.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { 40.f, 0.f, 52.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { 30.f, 0.f, 45.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { 30.f, 0.f, 55.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { 36.5f, 0.f, 45.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { 36.5f, 0.f, 55.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+
+	lDesc.range = 30.f;
+	lDesc.diffuse = Vector4{ 200.f, 125.f, 234.f, 255.f };
+	lDesc.position = { 25.f, 15.f, 90.f};
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { 25.f, 15.f, 15.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+
+	lDesc.diffuse = Vector4{ 255.f, 100.f, 0.f, 255.f };
+	lDesc.position = { 50.f, 15.f, 90.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	lDesc.position = { 50.f, 15.f, 15.f};
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+
+	m_IsEntry = true;
+}
+
 
 HRESULT AmusementParkEntry::Initialize_Prototype()
 {
@@ -105,6 +165,7 @@ HRESULT AmusementParkEntry::Render()
 
 void AmusementParkEntry::Update(Float timeDelta)
 {
+	SetUp_EntryLight();
 	m_Transform->Update_WorldMatrix();
 }
 

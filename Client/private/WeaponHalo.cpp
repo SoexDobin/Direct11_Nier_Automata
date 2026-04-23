@@ -6,6 +6,7 @@
 #include <SpdLogger.h>
 #include <Shader.h>
 #include <Model.h>
+#include <Random_Helper.h>
 
 #include "Pl0000Parts.h"
 
@@ -28,11 +29,16 @@ HRESULT WeaponHalo::Initialize(void* arg)
 
 	auto& desc = *static_cast<WEAPON_HALO_DESC*>(arg);
 
+	m_localMatrix = desc.localMatrix;
+
 	if (FAILED(Ready_Components()))
 	{
 		LOG_ERROR(L"Failed to Ready_Components Halo");
 		return E_FAIL;
 	}
+
+	Float randomStartAngle = static_cast<Float>(Helper::Random_Double(0.0, 360.0));
+	m_Transform->Set_LocalRotation(Vector3(0.f, randomStartAngle, 0.f));
 
 	return S_OK;
 }
@@ -44,12 +50,16 @@ void WeaponHalo::Update(Float timeDelta)
 		Destroy(shared_from_this());
 		return;
 	}
+
+	m_Transform->Turn(Vector3(0.f, 22.5f, 0.f), timeDelta);
 }
 
 void WeaponHalo::Late_Update(Float timeDelta)
 {
-	m_Transform->Update_WorldMatrix();
-	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
+	m_Transform->Update_WorldMatrix(); // 회전값이 행렬에 반영되도록 업데이트
+
+	Matrix matrix = m_Transform->Get_WorldMatrix() * m_localMatrix;
+	Update_CombineWorldMatrix(matrix);
 }
 
 HRESULT WeaponHalo::Render()

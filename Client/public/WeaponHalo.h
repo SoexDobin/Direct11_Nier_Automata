@@ -16,7 +16,7 @@ class CLIENT_DLL WeaponHalo final : public PartObject
 public:
     typedef struct tagWeaponHaloDesc :public PARTOBJECT_DESC
     {
-        Shared<Pl0000Parts> targetSheath; // 쫓아다닐 타겟 검집
+        Matrix localMatrix{};
     } WEAPON_HALO_DESC;
 public:
     explicit WeaponHalo() = default;
@@ -41,8 +41,7 @@ private:
 private:
     Shared<Model>               m_Model{ nullptr };
     Shared<Shader>              m_Shader{ nullptr };
-    Weak<Pl0000Parts>           m_TargetSheath{};
-    int32                       m_BoneIndex{-1};
+    Matrix                      m_localMatrix{};
 
 
 public:

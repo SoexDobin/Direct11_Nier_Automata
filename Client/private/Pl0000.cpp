@@ -344,26 +344,26 @@ HRESULT Pl0000::Ready_PartObjects()
 	WeaponHalo::WEAPON_HALO_DESC haloHeavyDesc{};
 	haloHeavyDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
 	haloHeavyDesc.parentMatrix = m_SheathHeavyWeapon->Get_CombinedWorldMatrix();
-	haloHeavyDesc.targetSheath = m_SheathHeavyWeapon; 
+	haloHeavyDesc.localMatrix = Matrix::CreateRotationX(XMConvertToRadians(90.f)) *
+		Matrix::CreateRotationZ(XMConvertToRadians(-25.f)) *
+		Matrix::CreateTranslation(Vector3{ 0.15f, 0.f, 0.35f });
 	if (FAILED(Add_PartObject(levIndex, L"WeaponHalo", L"WeaponHalo_Heavy", &haloHeavyDesc))) return E_FAIL;
 	m_HeavyHalo = static_pointer_cast<WeaponHalo>(Find_PartObject(L"WeaponHalo_Heavy"));
-	m_HeavyHalo->Get_Transform()->Set_WorldMatrix(
-		Matrix::CreateRotationX(XMConvertToRadians(90.f)) *
-		Matrix::CreateRotationZ(XMConvertToRadians(-25.f)) *
-		Matrix::CreateTranslation(Vector3{ 0.15f, 0.f, 0.35f }));
+
 
 	WeaponHalo::WEAPON_HALO_DESC haloLightDesc{};
 	haloLightDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
 	haloLightDesc.parentMatrix = m_SheathLightWeapon->Get_CombinedWorldMatrix();
-	haloLightDesc.targetSheath = m_SheathLightWeapon;
-	if (FAILED(Add_PartObject(levIndex, L"WeaponHalo", L"WeaponHalo_Light", &haloHeavyDesc))) return E_FAIL;
+	haloLightDesc.localMatrix = Matrix::CreateScale(0.75f, 0.75f, 0.75f) *
+		Matrix::CreateRotationX(XMConvertToRadians(90.f)) *
+		Matrix::CreateRotationY(XMConvertToRadians(20.f)) *
+		Matrix::CreateTranslation(Vector3{ 0.1f, -0.05f, 0.075f });
+	if (FAILED(Add_PartObject(levIndex, L"WeaponHalo", L"WeaponHalo_Light", &haloLightDesc))) return E_FAIL;
 	m_LightHalo = static_pointer_cast<WeaponHalo>(Find_PartObject(L"WeaponHalo_Light"));
-	m_LightHalo->Get_Transform()->Set_WorldMatrix(
-		Matrix::CreateScale(0.75f, 0.75f, 0.75f) *
-		Matrix::CreateRotationX(XMConvertToRadians(90.f)) * 
-		Matrix::CreateRotationZ(XMConvertToRadians(-35.f)) *
-		Matrix::CreateTranslation(Vector3{ 0.25f, 0.1f, 0.1f }));
 
+	
+	// 
+	
 	return S_OK;
 }
 

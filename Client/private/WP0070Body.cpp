@@ -280,11 +280,12 @@ void WP0070Body::Impact_Shockwave(const Vector3& offset)
 	dmgInfo.hitRotation = Quaternion::Identity;
 	dmgInfo.knockbackForce = 2.f;
 
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
 	Pl0000Shockwave::PLAYER_SHOCKWAVE_DESC desc{};
 	desc.damageInfo = dmgInfo;
 	desc.position = truePos;
 	desc.radius = 2.f;
-	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", ETOI(LEVEL::GAMEPLAY), &desc);
+	GAME_INSTANCE->Instantiate<Pl0000Shockwave>(L"Pl0000Shockwave", levIndex, &desc);
 }
 
 HRESULT WP0070Body::Bind_ShaderResources()

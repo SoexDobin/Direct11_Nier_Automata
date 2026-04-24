@@ -16,10 +16,6 @@ ENGINE_DESC g_EngineDesc;
 WCHAR szTitle[MAX_LOADSTRING];      
 WCHAR szWindowClass[MAX_LOADSTRING];
 
-static bool  g_ResizePending = { false };
-static uint32 g_PendingWidth = { 0 };
-static uint32 g_PendingHeight = { 0 };
-
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -63,12 +59,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         if (quit)
             break;
-
-        if (g_ResizePending && GAME_INSTANCE)
-        {
-            GAME_INSTANCE->OnResize(g_PendingWidth, g_PendingHeight);
-            g_ResizePending = false;
-        }
 
         App->Update();
         App->Render();
@@ -161,14 +151,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_KEYDOWN:
         break;
     case WM_SIZE: {
-        if (wParam != SIZE_MINIMIZED)
-        {
-            RECT rc{};
-            GetClientRect(g_hWnd, &rc);
-            g_PendingWidth = rc.right - rc.left;
-            g_PendingHeight = rc.bottom - rc.top;
-            g_ResizePending = true;
-        }
+        //if (wParam != SIZE_MINIMIZED)
+        //{
+        //    RECT rc{};
+        //    GetClientRect(g_hWnd, &rc);
+        //    g_PendingWidth = rc.right - rc.left;
+        //    g_PendingHeight = rc.bottom - rc.top;
+        //    g_ResizePending = true;
+        //}
     } break;
     case WM_DESTROY:
         PostQuitMessage(0);

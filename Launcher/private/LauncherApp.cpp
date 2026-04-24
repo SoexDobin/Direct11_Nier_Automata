@@ -18,7 +18,7 @@ LauncherApp::~LauncherApp()
 HRESULT LauncherApp::Initialize()
 {
 	ClientSettingManager::GetInstance()->Load_EngineDesc(g_EngineDesc);
-	g_EngineDesc.winMode = WINMODE::WIN;
+	g_EngineDesc.winMode = WINMODE::FULL;
 	g_EngineDesc.levelCount = ClientSettingManager::GetInstance()->Get_LevelCount();
 	g_EngineDesc.startLevel = ETOI(LEVEL::TITLE);
 	g_EngineDesc.hInst = g_hInst;
@@ -49,7 +49,7 @@ HRESULT LauncherApp::Initialize()
 	}
 
 
-	GAME_INSTANCE->OnResize(g_EngineDesc.viewportWidth, g_EngineDesc.viewportHeight);
+	//GAME_INSTANCE->OnResize(g_EngineDesc.viewportWidth, g_EngineDesc.viewportHeight);
 
 	m_BackgroundColor = make_shared<Color>(Color(0.f, 0.f, 0.05f, 1.f));
 

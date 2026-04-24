@@ -196,6 +196,9 @@
     <Filter Include="01. Utility\04. GameObject\LightObject">
       <UniqueIdentifier>{2a31e3db-34cf-48ed-b76d-026b8a66e152}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\12. Shadow">
+      <UniqueIdentifier>{1bf4487c-ca0b-47c1-9676-b74fb749cdee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -444,6 +447,7 @@
     <ClInclude Include="..\public\LightGameObject.h">
       <Filter>01. Utility\04. GameObject\LightObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Shadow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -711,6 +715,7 @@
     <ClCompile Include="..\private\LightGameObject.cpp">
       <Filter>01. Utility\04. GameObject\LightObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Shadow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\bin\shaders\DeferredShader.hlsl">

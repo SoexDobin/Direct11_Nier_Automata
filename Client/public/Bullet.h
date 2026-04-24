@@ -12,7 +12,7 @@ NS_BEGIN(Client)
 
 class Entity;
 
-class CLIENT_DLL Bullet final : public Projectile
+class CLIENT_DLL Bullet : public Projectile
 {
     RTTR_ENABLE(Projectile)
 public:
@@ -30,7 +30,7 @@ public:
     explicit Bullet();
     explicit Bullet(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
     explicit Bullet(const Bullet& rhs);
-    ~Bullet() override = default;
+    virtual ~Bullet() override = default;
 
 public:
     Bool Is_Permanent() const { return m_Desc.isPermanent; }
@@ -50,7 +50,7 @@ private:
     HRESULT Ready_Components();
     HRESULT Bind_ShaderResources();
 
-private:
+protected:
     uint32                      m_TargetLayerIndex{};
     uint32                      m_MonsterLayerIndex{};
     uint32                      m_PlayerLayerIndex{};

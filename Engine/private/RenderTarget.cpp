@@ -15,10 +15,10 @@ HRESULT RenderTarget::OnResize(uint32 sizeX, uint32 sizeY)
 	m_RenderTargetView.Reset();
 	m_Texture2D.Reset();
 
-	return Initialize(sizeX, sizeY, m_PixelFormat, m_ClearColor);
+	return Initialize(sizeX, sizeY, m_PixelFormat, m_ClearColor, m_IsResizable);
 }
 
-HRESULT RenderTarget::Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor)
+HRESULT RenderTarget::Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor, Bool isResizable)
 {
 	D3D11_TEXTURE2D_DESC texDesc{};
 	texDesc.Width = sizeX;
@@ -45,6 +45,8 @@ HRESULT RenderTarget::Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFo
 	m_ClearColor = clearColor;
 	m_PixelFormat = pixelFormat;
 
+	m_IsResizable = isResizable;
+
 	return S_OK;
 }
 
@@ -60,14 +62,15 @@ HRESULT RenderTarget::Bind_ShaderResource(const Shared<Shader>& shader, const Ch
 
 void RenderTarget::Clear_RenderTarget() const
 {
-	m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), m_ClearColor);
+	if (m_RenderTargetView)
+		m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), m_ClearColor);
 }
 
-Shared<RenderTarget> RenderTarget::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor)
+Shared<RenderTarget> RenderTarget::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor, Bool isResizable)
 {
 	auto renderTarget = make_shared<RenderTarget>(device, context);
 
-	if (FAILED(renderTarget->Initialize(sizeX, sizeY, pixelFormat, clearColor)))
+	if (FAILED(renderTarget->Initialize(sizeX, sizeY, pixelFormat, clearColor, isResizable)))
 	{
 		LOG_CRITICAL(L"Failed to Create Render Target");
 		return nullptr;

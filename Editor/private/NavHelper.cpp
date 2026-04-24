@@ -39,7 +39,7 @@ HRESULT NavHelper::Initialize()
 
 	m_PreviewTarget = Engine::RenderTarget::Create(pDevice, pContext, 
 		static_cast<uint32>(m_ViewportSize.x), static_cast<uint32>(m_ViewportSize.y), 
-		DXGI_FORMAT_R8G8B8A8_UNORM, Vector4(0.12f, 0.12f, 0.15f, 1.f));
+		DXGI_FORMAT_R8G8B8A8_UNORM, Vector4(0.12f, 0.12f, 0.15f, 1.f), false);
 
 	D3D11_TEXTURE2D_DESC depthDesc;
 	ZeroMemory(&depthDesc, sizeof(D3D11_TEXTURE2D_DESC));

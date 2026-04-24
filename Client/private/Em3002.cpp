@@ -27,6 +27,8 @@ HRESULT Em3002::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	m_OffsetMatrix = Matrix::CreateRotationY(XMConvertToRadians(180.f)) * Matrix::CreateTranslation({ 0.f, 0.5f, 0.125f });
+
 	return S_OK;
 }
 
@@ -47,8 +49,10 @@ void Em3002::Update(Float timeDelta)
 
 void Em3002::Late_Update(Float timeDelta)
 {
+	
 	m_Transform->Update_WorldMatrix();
-	Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
+	Matrix matrix = m_OffsetMatrix * m_Transform->Get_WorldMatrix();
+	Update_CombineWorldMatrix(matrix);
 	m_Model->Update_ModelAnimation(timeDelta); 
 }
 

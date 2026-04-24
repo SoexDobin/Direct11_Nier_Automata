@@ -114,6 +114,8 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_NavigationBuilder = NavigationBuilder::Create()))
         return E_FAIL;
 
+    if (nullptr == (m_Shadow = Shadow::Create()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -695,9 +697,9 @@ vector<NavCell> Game::Import_Navigation(const string& filePath) const
 }
 
 
-HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color) const
+HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color, Bool isResizable) const
 {
-    return m_RenderTargetManager->Add_RenderTarget(renderTargetTag, sizeX, sizeY, pixelFormat, color);
+    return m_RenderTargetManager->Add_RenderTarget(renderTargetTag, sizeX, sizeY, pixelFormat, color, isResizable);
 }
 
 HRESULT Game::Add_MultiRenderTarget(const wstring& multiRenderTargetTag, const wstring& renderTargetTag) const
@@ -705,9 +707,10 @@ HRESULT Game::Add_MultiRenderTarget(const wstring& multiRenderTargetTag, const w
     return m_RenderTargetManager->Add_MultiRenderTarget(multiRenderTargetTag, renderTargetTag);
 }
 
-HRESULT Game::Begin_MultiRenderTarget(const wstring& multiRenderTargetTag) const
+
+HRESULT Game::Begin_MultiRenderTarget(const wstring& multiRenderTargetTag, const ComPtr<ID3D11DepthStencilView>& customDSV) const
 {
-    return m_RenderTargetManager->Begin_MultiRenderTarget(multiRenderTargetTag);
+    return m_RenderTargetManager->Begin_MultiRenderTarget(multiRenderTargetTag, customDSV);
 }
 
 HRESULT Game::End_MultiRenderTarget() const
@@ -718,6 +721,16 @@ HRESULT Game::End_MultiRenderTarget() const
 HRESULT Game::Bind_RenderTarget_ShaderResource(const Shared<Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const
 {
     return m_RenderTargetManager->Bind_ShaderResource(shader, constantName, renderTargetTag);
+}
+
+HRESULT Game::Add_ShadowLight(const SHADOW_LIGHT_DESC& desc) const
+{
+    return m_Shadow->Add_ShadowLight(desc);
+}
+
+HRESULT Game::Bind_Shadow_TransformMatrix(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState) const
+{
+    return m_Shadow->Bind_TransformMatrix(shader, constantName, transformState);
 }
 
 

@@ -63,9 +63,13 @@ using rttr::registration;
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
 #include "AmusementParkLight.h"
+#include "Em3000StateMachine.h"
+#include "ExplodeEffect.h"
 #include "FreeCamera.h"
+#include "HowitzerBullet.h"
 #include "MonsterStateMachine.h"
 #include "SkyBox.h"
+#include "SkyBoxLayer.h"
 #include "SkySphere.h"
 #include "Terrain.h"
 #include "TriggerObject.h"
@@ -369,10 +373,25 @@ void Register_Client_Reflection() {
         .method("Clone", &AmusementParkLight::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return AmusementParkLight::Create(device, context); })(rttr::metadata("Level", 0));
 
+    rttr::registration::class_<Em3000StateMachine>("Em3000StateMachine")
+        .constructor<>()
+        .method("Clone", &Em3000StateMachine::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em3000StateMachine::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<ExplodeEffect>("ExplodeEffect")
+        .constructor<>()
+        .method("Clone", &ExplodeEffect::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return ExplodeEffect::Create(device, context); })(rttr::metadata("Level", 0));
+
     rttr::registration::class_<FreeCamera>("FreeCamera")
         .constructor<>()
         .method("Clone", &FreeCamera::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return FreeCamera::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<HowitzerBullet>("HowitzerBullet")
+        .constructor<>()
+        .method("Clone", &HowitzerBullet::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return HowitzerBullet::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<MonsterStateMachine>("MonsterStateMachine")
         .constructor<>()
@@ -383,6 +402,11 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &SkyBox::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SkyBox::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<SkyBoxLayer>("SkyBoxLayer")
+        .constructor<>()
+        .method("Clone", &SkyBoxLayer::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return SkyBoxLayer::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<SkySphere>("SkySphere")
         .constructor<>()

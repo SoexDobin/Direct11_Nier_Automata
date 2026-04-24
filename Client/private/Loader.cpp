@@ -162,6 +162,17 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
         return E_FAIL;
 
+
+    SHADOW_LIGHT_DESC		shadowLightDesc{};
+    shadowLightDesc.at = Vector4(250.f, 0.f, 100.f, 1.f);
+    shadowLightDesc.eye = Vector4(250.f, 400.f, -150.f, 1.f);
+    shadowLightDesc.fovy = XMConvertToRadians(60.f);
+    shadowLightDesc.aspect = 2.5f;
+    shadowLightDesc.nearPlane = 0.1f;
+    shadowLightDesc.farPlane = 1000.f;
+    if (FAILED(GAME_INSTANCE->Add_ShadowLight(shadowLightDesc)))
+        return E_FAIL;
+
     m_isFinished = true;
     if (!m_OwnerLevel.expired())
         m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);
@@ -204,6 +215,16 @@ HRESULT Loader::Loading_For_GamePlayLevel2()
     LightDesc.specular = Vector4(0.5f, 0.5f, 0.5f, 1.f);
 
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
+        return E_FAIL;
+
+    SHADOW_LIGHT_DESC		shadowLightDesc{};
+    shadowLightDesc.eye = Vector4(0.f, 35.f, 30.f, 1.f);
+    shadowLightDesc.at = Vector4(10.f, 0.f, 50.f, 1.f);
+    shadowLightDesc.fovy = XMConvertToRadians(100.f);
+    shadowLightDesc.aspect = GAME_INSTANCE->Get_ViewportDesc().Width / GAME_INSTANCE->Get_ViewportDesc().Height;
+    shadowLightDesc.nearPlane = 0.1f;
+    shadowLightDesc.farPlane = 1000.f;
+    if (FAILED(GAME_INSTANCE->Add_ShadowLight(shadowLightDesc)))
         return E_FAIL;
 
     m_isFinished = true;

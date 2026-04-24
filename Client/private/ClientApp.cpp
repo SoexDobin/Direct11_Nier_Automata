@@ -56,15 +56,21 @@ HRESULT ClientApp::Ready_StartLevel(LEVEL startLevel)
 
 HRESULT ClientApp::Ready_InitialObject()
 {
-    GAME_INSTANCE->Add_Font(L"Nier_16", L"../../Client/bin/resources/Font/NierFont_16.spritefont");
-    GAME_INSTANCE->Add_Font(L"Nier_32", L"../../Client/bin/resources/Font/NierFont_32.spritefont");
-    GAME_INSTANCE->Add_Font(L"Nier_64", L"../../Client/bin/resources/Font/NierFont_64.spritefont");
+    if (FAILED(GAME_INSTANCE->Add_Font(L"Nier_16", L"../../Client/bin/resources/Font/NierFont_16.spritefont")))
+        return E_FAIL;
+    if (FAILED(GAME_INSTANCE->Add_Font(L"Nier_32", L"../../Client/bin/resources/Font/NierFont_32.spritefont")))
+        return E_FAIL;
+    if (FAILED(GAME_INSTANCE->Add_Font(L"Nier_64", L"../../Client/bin/resources/Font/NierFont_64.spritefont")))
+        return E_FAIL;
 
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), StaticCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"StaticCamera");
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeIn::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeIn");
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeOut::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeOut");
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), VISphere::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"VISphere");
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), SkySphere::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"SkySphere");
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), StaticCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"StaticCamera")))
+        return E_FAIL;
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeIn::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeIn")))
+        return E_FAIL;
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), LoadingFadeOut::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"LoadingFadeOut")))
+        return E_FAIL;
+    if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), VISphere::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"VISphere")))
+        return E_FAIL;
 
     return S_OK;
 }

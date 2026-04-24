@@ -110,10 +110,36 @@ HRESULT Pl0000Body::Render()
 	return S_OK;
 }
 
+HRESULT Pl0000Body::Render_Shadow()
+{
+	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
+		return E_FAIL;
+
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
+		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
+		return E_FAIL;
+
+	size_t numMeshes = m_Model->Get_NumMeshes();
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+		m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
+
+		if (FAILED(m_Shader->Begin(2)))
+			return E_FAIL;
+
+		m_Model->Render(i);
+	}
+	return S_OK;
+}
+
 void Pl0000Body::Submit_RenderGroup()
 {
 	if (Is_Active())
+	{
 		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::SHADOW, shared_from_this());
+	}
 }
 
 HRESULT Pl0000Body::Bind_ShaderResources()

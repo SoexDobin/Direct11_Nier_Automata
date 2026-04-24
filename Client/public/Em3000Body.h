@@ -17,6 +17,14 @@ public:
 	} EM3000BODY_DESC;
 
 public:
+	typedef struct tagProjectilePortDesc
+	{
+		Vector3 localPosition{};
+		Vector3 direction{};
+		Vector3 muzzlePosition{};
+	} EM3000_PROJECTILE_PORT;
+
+public:
 	explicit Em3000Body();
 	explicit Em3000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	explicit Em3000Body(const Em3000Body& rhs);
@@ -54,6 +62,11 @@ private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Ready_Components();
 	HRESULT Ready_AnimationNotify();
+	HRESULT Ready_Ports(Float radius, Float muzzleOffset);
+
+private:
+	void Set_IsFiring(Bool isFiring) { m_IsFiring = isFiring; }
+	void Fire_Projectile(Float timeDelta);
 
 private:
 	Weak<Em3000>			m_Em3000{};
@@ -61,6 +74,12 @@ private:
 	Shared<Shader>			m_Shader{ nullptr };
 	Shared<Model>			m_Model{ nullptr };
 	Shared<SphereCollider>	m_HitBox{ nullptr };
+
+	vector<EM3000_PROJECTILE_PORT> m_Ports;
+	Float m_CannonFireAccTime{ 0.f };
+	Float m_CannonFireRate{ 0.1f }; 
+	Bool  m_IsFiring{ false };
+
 
 public:
 	static Shared<Em3000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

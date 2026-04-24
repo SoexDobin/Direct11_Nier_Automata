@@ -6,12 +6,38 @@
 #include "Navigation.h"
 #include <SpdLogger.h>
 
+#include "AmusementParkLight.h"
+
 AmusementParkDome::AmusementParkDome(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: WorldObject{ device, context } {
 }
 
 AmusementParkDome::AmusementParkDome(const AmusementParkDome& rhs)
 	: WorldObject{ rhs } {
+}
+
+void AmusementParkDome::SetUp_Light()
+{
+	if (m_IsEntry) return;
+
+	uint32 levIndex = ETOI(LEVEL::GAMEPLAY2);
+	wstring protoTag = L"AmusementParkLight";
+
+	AmusementParkLight::AMUSEMENT_LIGHT_DESC desc{};
+	auto& lDesc = desc.lightDesc;
+	lDesc.type = LIGHT::POINT;
+	lDesc.range = 10.f;
+	lDesc.diffuse = Vector4{ 255.f, 255.f, 255.f, 255.f };
+	lDesc.ambient = Vector4{ 100.f, 100.f, 100.f, 255.f };
+	lDesc.specular = Vector4{ 25.f, 25.f, 25.f, 255.f };
+	lDesc.direction = Vector4::Zero;
+
+	lDesc.position = { 400.f, 40.f, 52.f };
+	lDesc.range = 50.f;
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	
+
+	m_IsEntry = true;
 }
 
 HRESULT AmusementParkDome::Initialize_Prototype()
@@ -50,6 +76,11 @@ void AmusementParkDome::On_Enable()
 void AmusementParkDome::On_Disable()
 {
 	WorldObject::On_Disable();
+}
+
+void AmusementParkDome::Update(Float timeDelta)
+{
+	SetUp_Light();
 }
 
 HRESULT AmusementParkDome::Render()

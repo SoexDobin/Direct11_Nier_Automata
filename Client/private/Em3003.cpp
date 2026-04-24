@@ -19,6 +19,8 @@ HRESULT Em3003::Initialize_Prototype()
 		return E_FAIL;
 	}
 
+	m_OffsetMatrix = Matrix::CreateRotationY(XMConvertToRadians(45.f)) * Matrix::CreateTranslation({ 0.f, 0.5f, 0.f });
+
 	return S_OK;
 }
 
@@ -45,13 +47,15 @@ void Em3003::Priority_Update(Float timeDelta)
 
 void Em3003::Update(Float timeDelta)
 {
-	m_Model->Update_ModelAnimation(timeDelta);
+
 }
 
 void Em3003::Late_Update(Float timeDelta)
 {
 	m_Transform->Update_WorldMatrix();
-	Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
+	Matrix matrix = m_OffsetMatrix * m_Transform->Get_WorldMatrix();
+	Update_CombineWorldMatrix(matrix);
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void Em3003::Fixed_Update(Float fixedDelta)
@@ -61,32 +65,7 @@ void Em3003::Fixed_Update(Float fixedDelta)
 
 HRESULT Em3003::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
-
-	size_t numMeshes = m_Model->Get_NumMeshes();
-	for (uint32 i = 0; i < numMeshes; ++i)
-	{
-		if (FAILED(m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0)))
-		{
-			LOG_ERROR(L"err 1");
-		}
-		if (FAILED(m_Model->Bind_Material(m_Shader, NormalMap, i, 6, 0)))
-		{
-			LOG_ERROR(L"err 2");
-		}
-		if (FAILED(m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i)))
-		{
-			LOG_ERROR(L"err 3");
-		}
-
-		if (FAILED(m_Shader->Begin(1)))
-			return E_FAIL;
-
-		m_Model->Render(i);
-	}
-
-	return S_OK;
+	return Em3000Parts::Render();
 }
 
 void Em3003::Submit_RenderGroup()

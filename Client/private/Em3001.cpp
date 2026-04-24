@@ -31,6 +31,8 @@ HRESULT Em3001::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	m_OffsetMatrix = Matrix::CreateRotationY(XMConvertToRadians(180.f)) * Matrix::CreateTranslation({ 0.f, 0.5f, 0.125f });
+
 	return S_OK;
 }
 
@@ -51,7 +53,10 @@ void Em3001::Update(Float timeDelta)
 
 void Em3001::Late_Update(Float timeDelta)
 {
-	Em3000Parts::Late_Update(timeDelta);
+	m_Transform->Update_WorldMatrix();
+	Matrix matrix = m_OffsetMatrix * m_Transform->Get_WorldMatrix();
+	Update_CombineWorldMatrix(matrix);
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void Em3001::Fixed_Update(Float fixedDelta)

@@ -34,6 +34,9 @@ public:
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
 
+private:
+	Matrix m_OffsetMatrix{};
+
 public:
 	static Shared<Em3002> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;

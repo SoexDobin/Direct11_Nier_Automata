@@ -7,8 +7,9 @@ GraphicDevice::~GraphicDevice() {}
 HRESULT GraphicDevice::Initialize(const ENGINE_DESC &engineDesc) {
   uint32 flag = {};
 
-  if constexpr (_DEBUG)
-    flag |= D3D11_CREATE_DEVICE_DEBUG;
+#ifdef _DEBUG
+  flag |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 
   D3D_FEATURE_LEVEL feature_Level = {};
   if (FAILED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flag,
@@ -57,18 +58,18 @@ HRESULT GraphicDevice::Initialize(const ENGINE_DESC &engineDesc) {
 }
 
 void GraphicDevice::On_Destroy() {
-  if (m_SwapChain) {
-      m_SwapChain->SetFullscreenState(FALSE, nullptr);
-  }
-  
-  // D3D11 Context가 지연 삭제용으로 들고 있는 타겟 뷰들의 레퍼런스 카운트를 강제로 비워냅니다.
-  if (m_Context) {
-      m_Context->ClearState();
-      m_Context->Flush();
-  }
+    if (m_SwapChain) {
+        m_SwapChain->SetFullscreenState(FALSE, nullptr);
+    }
+    
+    // D3D11 Context가 지연 삭제용으로 들고 있는 타겟 뷰들의 레퍼런스 카운트를 강제로 비워냅니다.
+    if (m_Context) {
+        m_Context->ClearState();
+        m_Context->Flush();
+    }
 
-  m_Offscreens.clear();
-  Object::On_Destroy();
+    m_Offscreens.clear();
+    Object::On_Destroy();
 }
 
 HRESULT

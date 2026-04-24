@@ -2,7 +2,9 @@
 #include "framework.h"
 #include "Launcher.h"
 
-#include "MainApp.h"
+#include <Game.h>
+
+#include "LauncherApp.h"
 
 #define MAX_LOADSTRING 100
 
@@ -13,6 +15,10 @@ ENGINE_DESC g_EngineDesc;
 
 WCHAR szTitle[MAX_LOADSTRING];      
 WCHAR szWindowClass[MAX_LOADSTRING];
+
+static bool  g_ResizePending = { false };
+static uint32 g_PendingWidth = { 0 };
+static uint32 g_PendingHeight = { 0 };
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -38,20 +44,37 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LAUNCHER));
     MSG msg{};
+    Bool quit = { false };
 
-    Unique<MainApp> App = MainApp::Create();
-    
-    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+    Unique<Launcher::LauncherApp> App = Launcher::LauncherApp::Create();
+    while (true) {
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (WM_QUIT == msg.message)
+            {
+                quit = true;
+                break;
+            }
+
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+
+        if (quit)
+            break;
+
+        if (g_ResizePending && GAME_INSTANCE)
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            GAME_INSTANCE->OnResize(g_PendingWidth, g_PendingHeight);
+            g_ResizePending = false;
         }
 
         App->Update();
         App->Render();
     }
+
+    App.reset();
 
     return static_cast<int>(msg.wParam);
 }
@@ -98,40 +121,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    g_EngineDesc.hInst = g_hInst;
    g_EngineDesc.windowTitle = L"NieRAutomata";
 
+
+
    return TRUE;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
-}
-
-// 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
@@ -149,4 +143,38 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+
+    switch (message) {
+    case WM_COMMAND: {
+        int wmId = LOWORD(wParam);
+        switch (wmId) {
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+    } break;
+    case WM_KEYDOWN:
+        break;
+    case WM_SIZE: {
+        if (wParam != SIZE_MINIMIZED)
+        {
+            RECT rc{};
+            GetClientRect(g_hWnd, &rc);
+            g_PendingWidth = rc.right - rc.left;
+            g_PendingHeight = rc.bottom - rc.top;
+            g_ResizePending = true;
+        }
+    } break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
 }

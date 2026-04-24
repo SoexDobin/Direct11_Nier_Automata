@@ -16,7 +16,7 @@ public:
 	HRESULT OnResize(uint32 sizeX, uint32 sizeY);
 
 public:
-	HRESULT Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
+	HRESULT Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor, Bool isResizable);
 	HRESULT Begin() override;
 	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; };
 
@@ -24,6 +24,9 @@ public:
 	ComPtr<ID3D11ShaderResourceView> Get_ShaderResourceView() const { return m_ShaderResourceView; }
 	HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const;
 	void Clear_RenderTarget() const;
+
+	Bool Is_Resizable() const { return m_IsResizable; }
+	void Set_Resizable(Bool IsResizable) { m_IsResizable = IsResizable ; }
 
 private:
 	DXGI_FORMAT m_PixelFormat{};
@@ -33,10 +36,11 @@ private:
 	ComPtr<ID3D11Texture2D> m_Texture2D{ nullptr };
 	ComPtr<ID3D11RenderTargetView> m_RenderTargetView{ nullptr };
 	ComPtr<ID3D11ShaderResourceView> m_ShaderResourceView{ nullptr };
+	Bool m_IsResizable{ true };
 
 public:
 	static Shared<RenderTarget> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, 
-		uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
+		uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor, Bool isResizable);
 
 #ifdef _DEBUG
 private:

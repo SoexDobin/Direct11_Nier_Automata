@@ -47,6 +47,7 @@ public:
     virtual void Late_Update(Float timeDelta);
     virtual void Fixed_Update(Float fixedDelta);
     virtual HRESULT Render();
+    virtual HRESULT Render_Shadow() { return S_OK; }
     virtual void Submit_RenderGroup();
     virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) final;
 

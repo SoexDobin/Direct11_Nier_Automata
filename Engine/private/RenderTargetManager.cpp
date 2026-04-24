@@ -18,12 +18,12 @@ RenderTargetManager::~RenderTargetManager()
 	m_MultiRenderTargets.clear();
 }
 
-HRESULT RenderTargetManager::Add_RenderTarget(const wstring& rtTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor)
+HRESULT RenderTargetManager::Add_RenderTarget(const wstring& rtTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor, Bool isResizable)
 {
 	if (nullptr != Find_RenderTarget(rtTag))
 		return E_FAIL;
 
-	auto renderTarget = RenderTarget::Create(m_Device, m_Context, sizeX, sizeY, pixelFormat, clearColor);
+	auto renderTarget = RenderTarget::Create(m_Device, m_Context, sizeX, sizeY, pixelFormat, clearColor, isResizable);
 	if (nullptr == renderTarget)
 		return E_FAIL;
 
@@ -45,6 +45,8 @@ HRESULT RenderTargetManager::Resize_RenderTargets(uint32 sizeX, uint32 sizeY)
 {
 	for (auto target: m_RenderTargets)
 	{
+		if (!target.second->Is_Resizable()) continue;
+
 		if (FAILED(target.second->OnResize(sizeX, sizeY)))
 		{
 			LOG_CRITICAL(L"Failed to Resize RenderTarget: {}", target.first);
@@ -94,6 +96,35 @@ HRESULT RenderTargetManager::Begin_MultiRenderTarget(const wstring& mrtTag)
 	}
 
 	m_Context->OMSetRenderTargets(numRenderTargets, renderTargets, m_OriginalDepthStencil.Get());
+
+	return S_OK;
+}
+
+HRESULT RenderTargetManager::Begin_MultiRenderTarget(const wstring& mrtTag, const ComPtr<ID3D11DepthStencilView>& customDSV)
+{
+	auto mrtList = Find_MultiRenderTarget(mrtTag);
+	if (!mrtList)
+		return E_FAIL;
+
+	m_Context->OMGetRenderTargets(1, m_BackBuffer.GetAddressOf(), m_OriginalDepthStencil.GetAddressOf());
+
+	ID3D11RenderTargetView* renderTargets[8] = { nullptr };
+	uint32 numRenderTargets{ 0 };
+
+
+	for (auto& renderTarget : *mrtList)
+	{
+		renderTarget->Clear_RenderTarget();
+		renderTargets[numRenderTargets++] = renderTarget->Get_RenderTargetView().Get();
+	}
+
+	if (customDSV)
+	{
+		m_Context->ClearDepthStencilView(customDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+		m_Context->OMSetRenderTargets(numRenderTargets, renderTargets, customDSV.Get());
+	}
+	else
+		m_Context->OMSetRenderTargets(numRenderTargets, renderTargets, m_OriginalDepthStencil.Get());
 
 	return S_OK;
 }

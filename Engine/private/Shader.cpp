@@ -14,10 +14,11 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
 {
     uint32 hlslFlag = {};
 
-    if constexpr (_DEBUG)
+#ifdef _DEBUG
         hlslFlag |= D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG;
-    else
+#else
 		hlslFlag |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
+#endif
 
 	if (FAILED(D3DX11CompileEffectFromFile(
         shaderFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, hlslFlag,

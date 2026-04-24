@@ -42,6 +42,13 @@ namespace Engine
 		Vector4 specular = {};
 	} LIGHT_DESC;
 
+	typedef struct tagShadowDesc
+	{
+		Vector4		eye, at;
+		Float		fovy, aspect, nearPlane, farPlane;
+
+	}SHADOW_LIGHT_DESC;
+
 	typedef struct tagTransformFrame
 	{
 		Vector3 scale;

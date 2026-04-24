@@ -69,7 +69,6 @@ Bool OBBCollider::Intersect(const Shared<Collider>& target)
 	}
 }
 
-#ifdef _DEBUG
 Vector3 OBBCollider::ClosestPoint(const Vector3& point)
 {
 	Vector3 center = m_Transformed.Center;
@@ -88,6 +87,7 @@ Vector3 OBBCollider::ClosestPoint(const Vector3& point)
 	return Vector3::Transform(localPoint, orientation);
 }
 
+#ifdef _DEBUG
 HRESULT OBBCollider::Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color)
 {
 	DX::Draw(batch.get(), m_Transformed, color);

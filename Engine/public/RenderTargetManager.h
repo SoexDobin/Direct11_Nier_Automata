@@ -16,13 +16,14 @@ public:
 	~RenderTargetManager() override;
 
 public:
-	HRESULT Add_RenderTarget(const wstring& rtTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
+	HRESULT Add_RenderTarget(const wstring& rtTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor, Bool isResizable);
 	HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName, const wstring& rtTag);
 
 public:
 	HRESULT Resize_RenderTargets(uint32 sizeX, uint32 sizeY);
 	HRESULT Add_MultiRenderTarget(const wstring& mrtTag, const wstring& rtTag);
 	HRESULT Begin_MultiRenderTarget(const wstring& mrtTag);
+	HRESULT Begin_MultiRenderTarget(const wstring& mrtTag, const ComPtr<ID3D11DepthStencilView>& customDSV);
 	HRESULT End_MultiRenderTarget();
 
 private:

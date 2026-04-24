@@ -18,6 +18,8 @@ void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject>
 void Renderer::Draw() {
 	Render_Group(ETOI(RENDERGROUP::PRIORITY));
 
+	Render_Shadow();
+
 	Render_Group(ETOI(RENDERGROUP::NONLIGHT));
 
 	if (FAILED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_GameObject)))
@@ -44,6 +46,9 @@ void Renderer::Draw() {
 
 void Renderer::Draw_NoClearing() {
 	Render_Group(ETOI(RENDERGROUP::PRIORITY));
+
+	Render_Shadow();
+
 	Render_Group(ETOI(RENDERGROUP::NONLIGHT));
 	
 	if (FAILED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_GameObject)))
@@ -108,6 +113,9 @@ HRESULT Renderer::Initialize(void *arg) {
 	if (FAILED(GAME_INSTANCE->Add_RenderTarget(RT_SHADE, viewportDesc.Width, viewportDesc.Height,
 		DXGI_FORMAT_R16G16B16A16_UNORM, Vector4::Zero)))
 	return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Add_RenderTarget(RT_LIGHT_DEPTH, g_MaxWidth, g_MaxHeight,
+		DXGI_FORMAT_R32G32B32A32_FLOAT, Vector4::One, false)))
+		return E_FAIL;
 
 	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_GameObject, RT_DIFFUSE)))
 		return E_FAIL;
@@ -121,9 +129,13 @@ HRESULT Renderer::Initialize(void *arg) {
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_LIGHT, RT_SPECULAR)))
 		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Add_MultiRenderTarget(MRT_SHADOW, RT_LIGHT_DEPTH)))
+		return E_FAIL;
 
 	m_Buffer = VIBuffer_Rect::Create(m_Device, m_Context);
 	m_Shader = Shader::Create(m_Device, m_Context, L"../../Engine/bin/shaders/DeferredShader.hlsl", VTXTEX::Elements, VTXTEX::numElements);
+	if (FAILED(Ready_ShadowDSV()))
+		return E_FAIL;
 
 	m_WorldMatrix = Matrix::CreateScale(viewportDesc.Width, viewportDesc.Height, 1.f);
 	m_ViewMatrix = Matrix::Identity;
@@ -141,6 +153,8 @@ HRESULT Renderer::Initialize(void *arg) {
 	//	return E_FAIL;
 	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SPECULAR, 450.f, 450.f, 300.f, 300.f)))
 	//	return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_LIGHT_DEPTH, 450.f, 750.f, 300.f, 300.f)))
+		return E_FAIL;
 #endif
 
 	return S_OK;
@@ -157,6 +171,47 @@ void Renderer::On_Enable() { EngineManager::On_Enable(); }
 
 void Renderer::Set_Active(Bool isActive) { EngineManager::Set_Active(isActive); }
 
+void Renderer::Render_Shadow()
+{
+	if (FAILED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_SHADOW, m_ShadowDSV)))
+		return;
+
+	Change_ViewportDesc(g_MaxWidth, g_MaxHeight);
+
+	for (auto& object : m_RenderGroup[ETOI(RENDERGROUP::SHADOW)])
+	{
+		uint32 objLayer = object->Get_LayerMask().Get_Layer();
+		if (objLayer != 0 && !(m_LayerMask & objLayer))
+			continue;
+
+		if (!object->Is_Active() || object->Is_Destroy())
+			continue;
+
+		object->Render_Shadow();
+	}
+
+
+	if (FAILED(GAME_INSTANCE->End_MultiRenderTarget()))
+		return;
+
+	const auto& vp = GAME_INSTANCE->Get_ViewportDesc();
+
+	Change_ViewportDesc(static_cast<uint32>(vp.Width), static_cast<uint32>(vp.Height));
+}
+
+void Renderer::Change_ViewportDesc(uint32 width, uint32 height)
+{
+	D3D11_VIEWPORT viewportDesc{};
+	viewportDesc.TopLeftX = 0;
+	viewportDesc.TopLeftY = 0;
+	viewportDesc.Width = static_cast<Float>(width);
+	viewportDesc.Height = static_cast<Float>(height);
+	viewportDesc.MinDepth = 0.f;
+	viewportDesc.MaxDepth = 1.f;
+
+	m_Context->RSSetViewports(1, &viewportDesc);
+}
+
 void Renderer::Render_Combined() const
 {
 	if(FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_WorldMatrix)))
@@ -168,11 +223,24 @@ void Renderer::Render_Combined() const
 	if (FAILED(m_Shader->Bind_Matrix(ProjMatrix, &m_ProjMatrix)))
 		return;
 
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, LightViewMatrix, D3DTS::VIEW)))
+		return;
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, LightProjMatrix, D3DTS::PROJ)))
+		return;
+	if (FAILED(m_Shader->Bind_Matrix(InverseViewMatrix, GAME_INSTANCE->Get_RawInvTransform(D3DTS::VIEW))))
+		return;
+	if (FAILED(m_Shader->Bind_Matrix(InverseProjMatrix, GAME_INSTANCE->Get_RawInvTransform(D3DTS::PROJ))))
+		return;
+
 	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, DiffuseMap, RT_DIFFUSE)))
 		return;
 	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, ShadeMap, RT_SHADE)))
 		return;
 	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, SpecularMap, RT_SPECULAR)))
+		return;
+	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, DepthMap, RT_DEPTH)))
+		return;
+	if (FAILED(GAME_INSTANCE->Bind_RenderTarget_ShaderResource(m_Shader, LightDepthMap, RT_LIGHT_DEPTH)))
 		return;
 
 	m_Shader->Begin(ETOI(DEFERRED::COMBINED));
@@ -183,6 +251,8 @@ void Renderer::Render_Combined() const
 	m_Shader->Bind_SRV(DiffuseMap, nullptr);
 	m_Shader->Bind_SRV(ShadeMap, nullptr);
 	m_Shader->Bind_SRV(SpecularMap, nullptr);
+	m_Shader->Bind_SRV(DepthMap, nullptr);
+	m_Shader->Bind_SRV(LightDepthMap, nullptr);
 	m_Shader->Begin(ETOI(DEFERRED::COMBINED));
 }
 
@@ -249,6 +319,35 @@ void Renderer::Render_Recursive(const Shared<GameObject>& object) const
 	}
 }
 
+HRESULT Renderer::Ready_ShadowDSV()
+{
+	ID3D11Texture2D* depthStencilTexture = nullptr;
+	D3D11_TEXTURE2D_DESC textureDesc{};
+	textureDesc.Width = g_MaxWidth;
+	textureDesc.Height = g_MaxHeight;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
+
+	if (FAILED(m_Device->CreateTexture2D(&textureDesc, nullptr, &depthStencilTexture)))
+		return E_FAIL;
+
+	if (FAILED(m_Device->CreateDepthStencilView(depthStencilTexture, nullptr, m_ShadowDSV.GetAddressOf())))
+	{
+		depthStencilTexture->Release();
+		return E_FAIL;
+	}
+
+	depthStencilTexture->Release();
+	return S_OK;
+}
+
 Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context) {
 	auto renderer = make_unique<Renderer>(device, context);
 
@@ -274,6 +373,9 @@ void Renderer::Render_Debug()
 		return;
 
 	if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_LIGHT)))
+		return;
+
+	if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_SHADOW)))
 		return;
 }
 #endif

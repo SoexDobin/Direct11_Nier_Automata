@@ -16,8 +16,8 @@ echo.
 echo ===== [2/4] Copying Engine headers to EngineSDK\inc ===== 
 xcopy /Y /I		"..\public\*.h*"					"..\..\EngineSDK\inc\"
 xcopy /Y /I		"..\private\*.inl"					"..\..\EngineSDK\inc\"
-xcopy /Y /I		"..\bin\shaders\*.hlsli*"		"..\..\EngineSDK\inc\"
-xcopy /Y /I		"..\bin\shaders\*.hlsl*"		"..\..\EngineSDK\inc\"
+xcopy /Y /I		"..\bin\shaders\*.hlsli*"			"..\..\EngineSDK\inc\"
+xcopy /Y /I		"..\bin\shaders\*.hlsl*"			"..\..\EngineSDK\inc\"
 xcopy /Y /I /E "..\external\FMOD"					"..\..\EngineSDK\inc\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\include" "..\..\EngineSDK\inc\"
 echo =================================================
@@ -26,20 +26,25 @@ echo.
 echo ===== [3/4] Copying Engine.dll to Client\bin ===== 
 xcopy /Y /I "..\bin\Engine.dll"						"..\..\Client\bin\"
 xcopy /Y /I "..\bin\Engine.dll"						"..\..\Editor\bin\"
+xcopy /Y /I "..\bin\Engine.dll"						"..\..\Launcher\bin\"
 xcopy /Y /I	"..\bin\shaders\*.hlsli*"				"..\..\Client\shaders\bin\"
 xcopy /Y /I	"..\bin\shaders\*.hlsl*"				"..\..\Client\shaders\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Client\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Editor\bin\"
+xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Launcher\bin\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Client\bin\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Editor\bin\"
+xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Launcher\bin\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\bin\*.dll*"  "..\..\Client\bin\"
 xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\bin\*.dll*"  "..\..\Editor\bin\"
+xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\bin\*.dll*"  "..\..\Launcher\bin\"
 echo =================================================
 echo.
 
 echo ===== [4/4] Copying Engine.pdb to Client\bin =====
 xcopy /Y /I "..\bin\Engine.pdb"            "..\..\Client\bin\"
 xcopy /Y /I "..\bin\Engine.pdb"            "..\..\Editor\bin\"
+xcopy /Y /I "..\bin\Engine.pdb"            "..\..\Launcher\bin\"
 echo =================================================
 echo.
 

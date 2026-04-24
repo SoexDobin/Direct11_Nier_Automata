@@ -7,6 +7,7 @@
 #include <Shader.h>
 #include <SphereCollider.h>
 
+#include "Bullet.h"
 #include "Entity.h"
 
 Em3000Body::Em3000Body() : PartObject{} {}
@@ -81,6 +82,9 @@ HRESULT Em3000Body::Initialize(void* arg)
 
 	m_Model->Set_LocalRootNode(m_RootBoneIndex);
 
+	if (FAILED(Ready_Ports(3.f, 3.f)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -114,6 +118,9 @@ void Em3000Body::Late_Update(Float timeDelta)
 	m_Transform->Update_WorldMatrix();
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 	m_HitBox->Update(m_CombinedWorldMatrix);
+
+
+	Fire_Projectile(timeDelta);
 }
 
 void Em3000Body::Fixed_Update(Float fixedDelta)
@@ -203,6 +210,63 @@ HRESULT Em3000Body::Ready_AnimationNotify()
 
 
 	return S_OK;
+}
+
+HRESULT Em3000Body::Ready_Ports(Float radius, Float muzzleOffset)
+{
+	uint32 numPorts{ 13 };
+	Float angle = 20.f;
+
+	Float startAngleDeg = -((numPorts - 1) / 2.0f) * angle;
+	for (uint32 i = 0; i < numPorts; ++i)
+	{
+		Float currentAngleRad = XMConvertToRadians(startAngleDeg + i * angle);
+		EM3000_PROJECTILE_PORT data;
+
+		Vector3 dirVec = Vector3{ sinf(currentAngleRad), 0.0f, cosf(currentAngleRad) };
+		data.direction = dirVec;
+		data.localPosition = dirVec * radius;
+		data.muzzlePosition = data.localPosition + (dirVec * muzzleOffset);
+		m_Ports.push_back(data);
+	}
+
+	return S_OK;
+}
+
+void Em3000Body::Fire_Projectile(Float timeDelta)
+{
+	if (false == m_IsFiring)
+		return;
+
+	m_CannonFireAccTime += timeDelta;
+	if (m_CannonFireAccTime < m_CannonFireRate)
+		return;
+
+	Matrix worldMatrix = m_CombinedWorldMatrix;
+
+	for (const auto& port : m_Ports)
+	{
+		Vector3 muzzleWorldPos = Vector3::Transform(port.muzzlePosition, worldMatrix);
+
+		Vector3 muzzleWorldDir = Vector3::TransformNormal(port.direction, worldMatrix);
+		muzzleWorldDir.Normalize();
+		// [곡사포 Bullet 구조체 할당]
+		Bullet::BULLET_DESC bulletDesc{};
+		bulletDesc.initialPosition = muzzleWorldPos;
+		bulletDesc.direction = muzzleWorldDir;
+		bulletDesc.speed = 40.f;           // 전방으로 나아가는 힘
+		bulletDesc.maxDistance = 50.f;          // 수명 또는 사거리
+		bulletDesc.resourceTag = L"candy";
+		bulletDesc.targetLayer = L"Player";      // 맞출 대상
+		bulletDesc.damage = 10.f;
+		bulletDesc.isPermanent = false;
+
+		// [신규 멤버 변수들]
+		//bulletDesc.useCurvedFlight = true;           // 중력 영향(포물선)을 받을지 여부`
+		//bulletDesc.gravityStrength = 30.f;           // 땅으로 당겨질 중력 가속도`
+		// 발사! (Engine/게임 인스턴스에 따라 랩핑해서 사용하시면 됩니다.)
+		GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", GAME_INSTANCE->Get_TargetLevelIndex(), &bulletDesc);
+	}
 }
 
 Shared<Em3000Body> Em3000Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

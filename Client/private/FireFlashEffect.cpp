@@ -95,14 +95,14 @@ HRESULT FireFlashEffect::Ready_Components(const Matrix& parentMatrix)
 		return S_OK;
 
 	VIBuffer_Particle_Point::VIBUFFER_INSTANCE_POINT_DESC instanceDesc{};
-	instanceDesc.numInstances = 10;
+	instanceDesc.numInstances = 3;
 	instanceDesc.isLoop = true;
 	instanceDesc.center = Vector3::Zero;
 	instanceDesc.pivot = Vector3::Zero;
 	instanceDesc.range = Vector3::Zero;
-	instanceDesc.scale = Vector2{ 1.f, 2.f };
+	instanceDesc.scale = Vector2{ 0.5f, 1.f };
 	instanceDesc.speed = Vector2::Zero;
-	instanceDesc.lifeTime = Vector2{ 0.1f, 0.25f };
+	instanceDesc.lifeTime = Vector2{ 0.1f, 0.2f };
 
 	m_Buffer = Add_Component<VIBuffer_Particle_Point>(levIndex, &instanceDesc);
 	if (nullptr == m_Buffer)

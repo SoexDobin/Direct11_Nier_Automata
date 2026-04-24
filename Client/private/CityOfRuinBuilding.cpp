@@ -109,9 +109,35 @@ HRESULT CityOfRuinBuilding::Render()
 	return S_OK;
 }
 
+HRESULT CityOfRuinBuilding::Render_Shadow()
+{
+	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, m_Transform->Get_WorldMatrixPtr())))
+		return E_FAIL;
+
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
+		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
+		return E_FAIL;
+
+	size_t numMeshes = m_Model->Get_NumMeshes();
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+		if (!m_Model->IsInFrustum_PreMesh(i, m_Transform->Get_WorldMatrix()))
+			continue;
+
+		if (FAILED(m_Shader->Begin(2)))
+			return E_FAIL;
+
+		m_Model->Render(i);
+	}
+
+	return S_OK;
+}
+
 void CityOfRuinBuilding::Submit_RenderGroup()
 {
 	WorldObject::Submit_RenderGroup();
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::SHADOW, shared_from_this());
 }
 
 Shared<CityOfRuinBuilding> CityOfRuinBuilding::Create(const ComPtr<ID3D11Device>& device,

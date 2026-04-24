@@ -2,6 +2,10 @@
 
 namespace Engine
 {
+	constexpr unsigned int g_MaxWidth = 8192;
+	constexpr unsigned int g_MaxHeight = 8192;
+
+
 	constexpr const Char* DefaultColor = "g_DefaultColor";
 
 	constexpr const Char* WorldMatrix = "g_WorldMatrix";
@@ -26,7 +30,9 @@ namespace Engine
 	constexpr const Char* SpecularLight = "g_LightSpecular";
 	constexpr const Char* AmbientLight = "g_LightAmbient";
 
-
+	constexpr const Char* LightViewMatrix = "g_LightViewMatrix";
+	constexpr const Char* LightProjMatrix = "g_LightProjMatrix";
+	constexpr const Char* LightDepthMap = "g_LightDepthTexture";
 
 
 	const std::wstring RT_DIFFUSE = L"RenderTargetDiffuse";
@@ -34,7 +40,9 @@ namespace Engine
 	const std::wstring RT_SHADE = L"RenderTargetShade";
 	const std::wstring RT_SPECULAR = L"RenderTargetSpecular";
 	const std::wstring RT_DEPTH = L"RenderTargetDepth";
+	const std::wstring RT_LIGHT_DEPTH = L"RenderTargetLightDepth";
 
 	const std::wstring MRT_GameObject = L"MultiRenderTargetGameObjects";
 	const std::wstring MRT_LIGHT = L"MultiRenderTargetLights";
+	const std::wstring MRT_SHADOW = L"MultiRenderTargetShadow";
 }

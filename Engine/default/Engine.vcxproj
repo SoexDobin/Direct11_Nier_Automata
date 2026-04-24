@@ -262,6 +262,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\ScriptComponent.h" />
     <ClInclude Include="..\public\LevelSerializer.h" />
     <ClInclude Include="..\public\Shader.h" />
+    <ClInclude Include="..\public\Shadow.h" />
     <ClInclude Include="..\public\SoundManager.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
     <ClInclude Include="..\public\SphereCollider.h" />
@@ -360,6 +361,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\VISphere_rttr.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
+    <ClCompile Include="..\private\Shadow.cpp" />
     <ClCompile Include="..\private\SoundManager.cpp" />
     <ClCompile Include="..\private\SpdLogger.cpp" />
     <ClCompile Include="..\private\SphereCollider.cpp" />

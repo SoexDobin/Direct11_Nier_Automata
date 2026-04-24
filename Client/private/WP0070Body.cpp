@@ -273,8 +273,8 @@ void WP0070Body::Impact_Shockwave(const Vector3& offset)
 
 	Entity::DAMAGE_INFO dmgInfo{};
 	dmgInfo.attacker = m_Owner.lock();
-	dmgInfo.damage = 125.f;
-	dmgInfo.groggyWeight = 125.f;
+	dmgInfo.damage = 150.f;
+	dmgInfo.groggyWeight = 150.f;
 	dmgInfo.attackType = ATK_TYPE::LIGHT;
 	dmgInfo.hitPosition = truePos;
 	dmgInfo.hitRotation = Quaternion::Identity;

@@ -43,7 +43,8 @@ void SpdLogger::Initialize() {
 
 void SpdLogger::Shutdown() {
     if (g_Logger) {
-        spdlog::drop_all();
+        // [수정] drop_all() 이 문제를 일으킬 수 있으므로 포인터만 먼저 해제합니다.
+        g_Logger.reset();
         spdlog::shutdown();
     }
     g_LogCallback = nullptr;

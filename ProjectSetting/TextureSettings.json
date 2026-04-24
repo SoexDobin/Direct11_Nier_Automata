@@ -43,6 +43,12 @@
             "tag": "Skybox_Default"
         },
         {
+            "count": 1,
+            "level": "STATIC",
+            "path": "Sky/CubeMap3.dds",
+            "tag": "Skybox_Layer"
+        },
+        {
             "count": 30,
             "level": "GAMEPLAY",
             "path": "Texture/Effect/Spark/Spark_%d.dds",
@@ -89,6 +95,30 @@
             "level": "GAMEPLAY2",
             "path": "Texture/Effect/FireFlash/FireFlash.dds",
             "tag": "Fire_Flash"
+        },
+        {
+            "count": 30,
+            "level": "GAMEPLAY",
+            "path": "Texture/Effect/Explode/Explode_%d.dds",
+            "tag": "Effect_Explode"
+        },
+        {
+            "count": 30,
+            "level": "GAMEPLAY2",
+            "path": "Texture/Effect/Explode/Explode_%d.dds",
+            "tag": "Effect_Explode"
+        },
+        {
+            "count": 21,
+            "level": "GAMEPLAY",
+            "path": "Texture/Effect/Explode2/Explode2_%d.dds",
+            "tag": "Effect_Explode2"
+        },
+        {
+            "count": 21,
+            "level": "GAMEPLAY2",
+            "path": "Texture/Effect/Explode2/Explode2_%d.dds",
+            "tag": "Effect_Explode2"
         }
     ]
 }

@@ -293,6 +293,22 @@
     <ClInclude Include="..\public\WeaponHalo.h">
       <Filter>02. GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Em3000StateMachine.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine\EM3000State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Idle.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine\EM3000State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ExplodeEffect.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HowitzerBullet.h" />
+    <ClInclude Include="..\public\SkyBoxLayer.h">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -400,7 +416,7 @@
     <ClCompile Include="..\private\State2B.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000StateMachine.cpp">
+    <ClCompile Include="..\private\Pl0000StateMachine.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000Parts.cpp">
@@ -578,6 +594,22 @@
     <ClCompile Include="..\private\WeaponHalo.cpp">
       <Filter>02. GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Em3000StateMachine.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine\EM3000State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Idle.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine\EM3000State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ExplodeEffect.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HowitzerBullet.cpp" />
+    <ClCompile Include="..\private\SkyBoxLayer.cpp">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00. MainApp">
@@ -753,6 +785,9 @@
     </Filter>
     <Filter Include="02. GameObject\Light">
       <UniqueIdentifier>{d29ad09f-7d19-4f82-b9bc-9ee77bb302b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Entity\Monster\EM3000\EM3000StateMachine\EM3000State">
+      <UniqueIdentifier>{0265240f-2815-4e6c-bf56-dabd3211c706}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

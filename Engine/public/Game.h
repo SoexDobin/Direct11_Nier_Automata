@@ -19,6 +19,7 @@
 #include "EventManager.h"
 #include "CollisionManager.h"
 #include "RenderTargetManager.h"
+#include "Shadow.h"
 
 #include "GameObject.h"
 #include "Component.h"
@@ -196,12 +197,17 @@ public: /* NavigationBuilder */
         Bool useBBoxLimit = false, const Vector3& limitBMin = Vector3{ 0.f, 0.f, 0.f }, const Vector3& limitBMax = Vector3{ 0.f, 0.f, 0.f }) const;
     vector<NavCell> Import_Navigation(const string& filePath) const;
 
-public:
-    HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;
+public: /* RenderTarget Manager */
+    HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One, Bool isResizable = true) const;
     HRESULT Add_MultiRenderTarget(const wstring& multiRenderTargetTag, const wstring& renderTargetTag) const;
-    HRESULT Begin_MultiRenderTarget(const wstring& multiRenderTargetTag) const;
+    HRESULT Begin_MultiRenderTarget(const wstring& multiRenderTargetTag, const ComPtr<ID3D11DepthStencilView>& customDSV = nullptr) const;
     HRESULT End_MultiRenderTarget() const;
     HRESULT Bind_RenderTarget_ShaderResource(const Shared<class Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const;
+
+public: /* Shadow Management */
+    HRESULT Add_ShadowLight(const SHADOW_LIGHT_DESC& desc) const;
+    HRESULT Bind_Shadow_TransformMatrix(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState) const;
+
 
 public: /* Prototype & Instantiate Facade */
     template <typename T>
@@ -251,6 +257,7 @@ private:
     Unique<CollisionManager> m_CollisionManager = { nullptr };
     Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
     Unique<NavigationBuilder> m_NavigationBuilder = { nullptr };
+    Unique<Shadow> m_Shadow = { nullptr };
 
 
 #ifdef _DEBUG /* For Debug Function */

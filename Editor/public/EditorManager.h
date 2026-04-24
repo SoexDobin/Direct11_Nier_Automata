@@ -98,6 +98,9 @@ public: /* Auto Load Settings */
     Bool Is_AutoLoadRequested() const { return m_IsAutoLoadRequested; }
     void Request_AutoLoad(Bool isRequested) { m_IsAutoLoadRequested = isRequested; }
 
+    Bool Is_IgnoreEditorRender() const { return m_IgnoreEditor; }
+    void Set_IgnoreEditorRender(Bool bIgnore) {m_IgnoreEditor = bIgnore; }
+
 private:
     Bool m_IsResizeView{ false };
     Float m_ResizeWidth{}, m_ResizeHeight{};
@@ -113,6 +116,8 @@ private:
 
     Bool m_IsAutoLoad{ true };
     Bool m_IsAutoLoadRequested{ false };
+
+    Bool m_IgnoreEditor{ false };
 
 private:
     Shared<Inspector> m_Inspector = {nullptr};

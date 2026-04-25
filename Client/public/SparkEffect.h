@@ -50,6 +50,7 @@ private:
 	Shared<Texture> m_Texture{ nullptr };
 	Shared<VIBuffer_Particle_Point>  m_Buffer{ nullptr };
 	Float m_Acc{ 0.f };
+	Float m_DiscardBlack{ 0.f };
 
 public:
 	static Shared<SparkEffect> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

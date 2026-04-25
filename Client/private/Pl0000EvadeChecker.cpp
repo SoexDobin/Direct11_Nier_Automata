@@ -66,6 +66,7 @@ void Pl0000EvadeChecker::OnCollisionStay(const Shared<Collider>& ownCollider, co
 
 	auto attacker = targetCollider->Get_Owner();
 
+	if (attacker->Get_LayerMask().Get_LayerName() == L"Bullet") return;
 	if (attacker->Get_LayerMask().Get_LayerName() != L"MonsterAttack") return;
 	m_Pl0000.lock()->TryEvade(attacker);
 }

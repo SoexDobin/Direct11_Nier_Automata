@@ -11,6 +11,7 @@ NS_BEGIN(Client)
 class Em3000Body;
 class Em3000Movement;
 class Em3000StateMachine;
+class MonsterSight;
 
 class CLIENT_DLL Em3000 final : public Monster
 {
@@ -60,6 +61,10 @@ private:
     Shared<SphereCollider> m_PhysicalZone{ nullptr };
     Shared<Navigation> m_Navigation{ nullptr };
 
+    Shared<MonsterSight> m_RangeSight{ nullptr };
+    Shared<MonsterSight> m_MeleeSight{ nullptr };
+    
+
 public:
     static Shared<Em3000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
     Shared<GameObject> Clone(void* arg) override;
@@ -74,6 +79,7 @@ public:
         PHASE1_RANGE,
         PHASE2_ATTACK,
         PHASE2_CHASE, 
+        DEAD, 
 
 
         MOVE_START = 1,         // EM3000_0010
@@ -97,12 +103,14 @@ public:
         DANMAK_START_1 = 29,    // EM3000_05A0
         DANMAK_LOOP_1 = 30,     // EM3000_05A1
         DANMAK_END_1 = 31,      // EM3000_05A2
-        DANMAK_END_2 = 32,      // EM3000_05A5
-        DANMAK_END_3 = 33,      // EM3000_05A6
-        DANMAK_END_4 = 34,      // EM3000_05A7
-        DANMAK_START_2 = 35,    // EM3000_05C0
-        DANMAK_LOOP_2 = 36,     // EM3000_05C1
-        DANMAK_END_5 = 37,      // EM3000_05C2
+
+        DANMAK_START_2 = 32,      // EM3000_05A5
+        DANMAK_LOOP_2 = 33,      // EM3000_05A6
+        DANMAK_END_2 = 34,      // EM3000_05A7
+
+        DANMAK_START_3 = 35,    // EM3000_05C0
+        DANMAK_LOOP_3 = 36,     // EM3000_05C1
+        DANMAK_END_3 = 37,      // EM3000_05C2
 
         PHASE_CHANGE1 = 38,          // EM3000_0600 (예시의 PHASE1과 동일한 인덱스)
         PHASE_CHANGE2 = 39,          // EM3000_0610

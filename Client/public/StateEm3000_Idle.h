@@ -23,6 +23,8 @@ private:
 	Bool m_InitializeState{ true };
 	unordered_set<uint32> m_EnterAnim;
 
+	Float m_delayAcc{};
+
 public:
 	static Shared<StateEm3000_Idle> Create(const wstring& tag, const Shared<Em3000>& owner);
 };

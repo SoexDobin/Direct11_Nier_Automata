@@ -8,7 +8,9 @@
 #include <SphereCollider.h>
 
 #include "Bullet.h"
+#include "Em3000.h"
 #include "Entity.h"
+#include "HowitzerBullet.h"
 
 Em3000Body::Em3000Body() : PartObject{} {}
 Em3000Body::Em3000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -82,7 +84,7 @@ HRESULT Em3000Body::Initialize(void* arg)
 
 	m_Model->Set_LocalRootNode(m_RootBoneIndex);
 
-	if (FAILED(Ready_Ports(3.f, 3.f)))
+	if (FAILED(Ready_Ports(2.f, 2.f)))
 		return E_FAIL;
 
 	return S_OK;
@@ -207,15 +209,21 @@ HRESULT Em3000Body::Ready_Components()
 
 HRESULT Em3000Body::Ready_AnimationNotify()
 {
-
+	using em3000State = Em3000::EM3000_STATE;
+	using notify = AnimationTracker::ANIMATION_NOTIFY;
+	
+	m_Model->Add_AnimNotify(ETOI(em3000State::DANMAK_START_3), { 
+		notify{L"Howitzer1", 1.f, [this]() { Fire_Howitzer(); }},
+		notify{L"Howitzer2", 2.f, [this]() { Fire_Howitzer(); }}
+	});
 
 	return S_OK;
 }
 
 HRESULT Em3000Body::Ready_Ports(Float radius, Float muzzleOffset)
 {
-	uint32 numPorts{ 13 };
-	Float angle = 20.f;
+	uint32 numPorts{ 10 };
+	Float angle = 36.f;
 
 	Float startAngleDeg = -((numPorts - 1) / 2.0f) * angle;
 	for (uint32 i = 0; i < numPorts; ++i)
@@ -233,40 +241,96 @@ HRESULT Em3000Body::Ready_Ports(Float radius, Float muzzleOffset)
 	return S_OK;
 }
 
-void Em3000Body::Fire_Projectile(Float timeDelta)
+void Em3000Body::Fire_Bullet()
 {
-	if (false == m_IsFiring)
-		return;
+	m_IsFiring = true;
+	m_PortFireAccTime = 0.f;
+	m_PermanentCount = 0;
+	m_ModelMatrixAcc = Matrix::Identity;
+}
 
-	m_CannonFireAccTime += timeDelta;
-	if (m_CannonFireAccTime < m_CannonFireRate)
-		return;
+void Em3000Body::Stop_Bullet()
+{
+	m_IsFiring = false;
+	m_PortFireAccTime = 0.f;
+	m_PermanentCount = 0;
+	m_ModelMatrixAcc = Matrix::Identity;
+}
 
+void Em3000Body::Fire_Howitzer()
+{
 	Matrix worldMatrix = m_CombinedWorldMatrix;
 
 	for (const auto& port : m_Ports)
 	{
 		Vector3 muzzleWorldPos = Vector3::Transform(port.muzzlePosition, worldMatrix);
-
 		Vector3 muzzleWorldDir = Vector3::TransformNormal(port.direction, worldMatrix);
+		muzzleWorldDir.Normalize();
+
+		HowitzerBullet::HOWITZER_BULLET_DESC howitzerDesc{};
+		howitzerDesc.initialPosition = muzzleWorldPos;
+		howitzerDesc.direction = muzzleWorldDir;
+		howitzerDesc.speed = 3.f;
+		howitzerDesc.maxDistance = 50.f;
+		howitzerDesc.resourceTag = L"candy";
+		howitzerDesc.targetLayer = L"Player";
+		howitzerDesc.damage = 30.f;
+		howitzerDesc.isPermanent = true;
+		howitzerDesc.useCurvedFlight = true;
+		howitzerDesc.gravityStrength = 5.f;
+		howitzerDesc.targetY = 20.f; // 지면 높이
+
+		GAME_INSTANCE->Instantiate<HowitzerBullet>(
+			L"HowitzerBullet",
+			GAME_INSTANCE->Get_TargetLevelIndex(),
+			&howitzerDesc);
+	}
+}
+
+void Em3000Body::Fire_Projectile(Float timeDelta)
+{
+	if (false == m_IsFiring)
+	{
+		return;
+	}
+
+	m_PortFireAccTime += timeDelta;
+	if (m_PortFireAccTime < m_PortFireRate)
+		return;
+
+	m_PortFireAccTime = 0.f;
+	Matrix worldMatrix = m_CombinedWorldMatrix;
+
+	Bool isPermanent{ false };
+	if (m_PermanentCount == 3)
+	{
+		isPermanent = true;
+		m_PermanentCount = 0;
+	}
+	else
+		isPermanent = false;
+	
+	for (const auto& port : m_Ports)
+	{
+		Vector3 muzzleWorldPos = Vector3::Transform(port.muzzlePosition, worldMatrix);
+		Vector3 muzzleWorldDir = Vector3::TransformNormal(port.direction, worldMatrix);
+
 		muzzleWorldDir.Normalize();
 		// [곡사포 Bullet 구조체 할당]
 		Bullet::BULLET_DESC bulletDesc{};
-		bulletDesc.initialPosition = muzzleWorldPos;
+		bulletDesc.initialPosition = muzzleWorldPos + Vector3{ 0.f, 0.75f, 0.f };
 		bulletDesc.direction = muzzleWorldDir;
-		bulletDesc.speed = 40.f;           // 전방으로 나아가는 힘
-		bulletDesc.maxDistance = 50.f;          // 수명 또는 사거리
+		bulletDesc.speed = 10.f;           // 전방으로 나아가는 힘
+		bulletDesc.maxDistance = 18.5f;          // 수명 또는 사거리
 		bulletDesc.resourceTag = L"candy";
 		bulletDesc.targetLayer = L"Player";      // 맞출 대상
 		bulletDesc.damage = 10.f;
-		bulletDesc.isPermanent = false;
+		bulletDesc.isPermanent = isPermanent;
 
-		// [신규 멤버 변수들]
-		//bulletDesc.useCurvedFlight = true;           // 중력 영향(포물선)을 받을지 여부`
-		//bulletDesc.gravityStrength = 30.f;           // 땅으로 당겨질 중력 가속도`
-		// 발사! (Engine/게임 인스턴스에 따라 랩핑해서 사용하시면 됩니다.)
-		GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", GAME_INSTANCE->Get_TargetLevelIndex(), &bulletDesc);
+		auto bullet = GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", GAME_INSTANCE->Get_TargetLevelIndex(), &bulletDesc);
+		bullet->Get_Transform()->Set_Scale(Vector3{ 0.5f, 0.5f, 0.5f });
 	}
+	++m_PermanentCount;
 }
 
 Shared<Em3000Body> Em3000Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

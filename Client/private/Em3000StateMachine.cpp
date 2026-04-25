@@ -65,6 +65,11 @@ Em3000::EM3000_STATE Em3000StateMachine::Get_CurEm3000State()
 	return magic_enum::enum_cast<Em3000::EM3000_STATE>(Helper::To_String(Get_CurrentState()->Get_StateTag())).value();
 }
 
+void Em3000StateMachine::Update_State(Float timeDelta)
+{
+	StateMachine::Update_State(timeDelta);
+}
+
 Shared<Em3000StateMachine> Em3000StateMachine::Create(const ComPtr<ID3D11Device>& device,
                                                       const ComPtr<ID3D11DeviceContext>& context)
 {

@@ -253,7 +253,9 @@ void Renderer::Render_Combined() const
 	m_Shader->Bind_SRV(SpecularMap, nullptr);
 	m_Shader->Bind_SRV(DepthMap, nullptr);
 	m_Shader->Bind_SRV(LightDepthMap, nullptr);
-	m_Shader->Begin(ETOI(DEFERRED::COMBINED));
+
+	ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
+	m_Context->PSSetShaderResources(0, 8, nullSRVs);
 }
 
 void Renderer::Render_Lights() const

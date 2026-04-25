@@ -200,9 +200,12 @@
     <ClInclude Include="..\public\Em0010Movement.h" />
     <ClInclude Include="..\public\Em3000.h" />
     <ClInclude Include="..\public\Em3000Body.h" />
+    <ClInclude Include="..\public\MonsterShockWave.h" />
+    <ClInclude Include="..\public\StateEm3000_Range.h" />
     <ClInclude Include="..\public\ExplodeEffect.h" />
     <ClInclude Include="..\public\HowitzerBullet.h" />
     <ClInclude Include="..\public\SkyBoxLayer.h" />
+    <ClInclude Include="..\public\StateEm3000_Groggy.h" />
     <ClInclude Include="..\public\StateEm3000_Idle.h" />
     <ClInclude Include="..\public\Em3000Movement.h" />
     <ClInclude Include="..\public\Em3000Parts.h" />
@@ -270,6 +273,7 @@
     <ClInclude Include="..\public\StateEm0010_Idle.h" />
     <ClInclude Include="..\public\StateEm0010_Walk.h" />
     <ClInclude Include="..\public\StateEm3000.h" />
+    <ClInclude Include="..\public\StateEm3000_Melee.h" />
     <ClInclude Include="..\public\StateMachine.h" />
     <ClInclude Include="..\public\StateMonster.h" />
     <ClInclude Include="..\public\StaticCamera.h" />
@@ -305,9 +309,12 @@
     <ClCompile Include="..\private\Em0010Movement.cpp" />
     <ClCompile Include="..\private\Em3000.cpp" />
     <ClCompile Include="..\private\Em3000Body.cpp" />
+    <ClCompile Include="..\private\MonsterShockWave.cpp" />
+    <ClCompile Include="..\private\StateEm3000_Range.cpp" />
     <ClCompile Include="..\private\ExplodeEffect.cpp" />
     <ClCompile Include="..\private\HowitzerBullet.cpp" />
     <ClCompile Include="..\private\SkyBoxLayer.cpp" />
+    <ClCompile Include="..\private\StateEm3000_Groggy.cpp" />
     <ClCompile Include="..\private\StateEm3000_Idle.cpp" />
     <ClCompile Include="..\private\Em3000Movement.cpp" />
     <ClCompile Include="..\private\Em3000Parts.cpp" />
@@ -374,6 +381,7 @@
     <ClCompile Include="..\private\StateEm0010_Idle.cpp" />
     <ClCompile Include="..\private\StateEm0010_Walk.cpp" />
     <ClCompile Include="..\private\StateEm3000.cpp" />
+    <ClCompile Include="..\private\StateEm3000_Melee.cpp" />
     <ClCompile Include="..\private\StateMachine.cpp" />
     <ClCompile Include="..\private\StateMonster.cpp" />
     <ClCompile Include="..\private\StaticCamera.cpp" />

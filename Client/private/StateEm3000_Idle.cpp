@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "StateEm3000_Idle.h"
 
+#include "Em3000.h"
+#include "Em3000Body.h"
+#include "Em3000StateMachine.h"
+#include "Random_Helper.h"
+
 StateEm3000_Idle::StateEm3000_Idle(const wstring& tag, const Shared<Em3000>& owner)
 	: StateEm3000{tag, owner} {}
 
@@ -11,22 +16,53 @@ HRESULT StateEm3000_Idle::Initialize()
 
 Bool StateEm3000_Idle::StateEnterInvoke()
 {
-	return StateEm3000::StateEnterInvoke();
+	auto em3000 = m_Owner.lock();
+	auto em3000Body = m_Body.lock();
+	
+	em3000Body->Set_Animation(ETOI(Em3000::EM3000_STATE::IDLE), 0.1f, true);
+
+	
+	m_delayAcc = Helper::Random_Float(0.5f, 2.0f);
+
+
+	return true;
 }
 
 void StateEm3000_Idle::Update(Float timeDelta)
 {
-	StateEm3000::Update(timeDelta);
+	if (m_delayAcc > 0.f) return;
+
+	auto em3000Body = m_Body.lock();
+	auto state = m_States.lock();
+
+	auto goMelee = Helper::Random_Bool(0.3);
+
+
+	if (goMelee)
+	{
+		// TODO 근접 검사
+	/*
+		Monster의 Target 가져와서 Player가 MonsterMelee Sight 안에 있으면
+		3/1 확률로 근접 공격
+
+	 */
+	}
+	else
+	{
+		state->Change_State(Em3000::EM3000_STATE::PHASE1_RANGE);
+	}
+
+
 }
 
 void StateEm3000_Idle::Late_Update(Float timeDelta)
 {
-	StateEm3000::Late_Update(timeDelta);
+	m_delayAcc -= timeDelta;
 }
 
 void StateEm3000_Idle::StateExitInvoke()
 {
-	StateEm3000::StateExitInvoke();
+	m_delayAcc = 0.f;
 }
 
 Shared<StateEm3000_Idle> StateEm3000_Idle::Create(const wstring& tag, const Shared<Em3000>& owner)

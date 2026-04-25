@@ -1,4 +1,5 @@
 #pragma once
+#include "MonsterSight.h"
 #include "State.h"
 
 NS_BEGIN(Client)
@@ -26,6 +27,7 @@ protected:
 	Weak<Em3000Body> m_Body{};
 	Weak<Em3000Movement> m_Movement;
 	Weak<Em3000StateMachine> m_States{};
+
 };
 
 NS_END

@@ -71,19 +71,19 @@ Bool Em3000Movement::Has_ReachedTarget(Float threshold) const
 void Em3000Movement::Update_Movement(Float timeDelta)
 {
 	if (m_Owner.expired()) return;
-
 	Shared<Transform> ownerTransform = m_Owner.lock()->Get_Transform();
-
+	// ── 기존 중력/물리 처리 (유지) ──────────────────────────────
 	if (false == m_IsGrounded)
 	{
 		m_Velocity.y -= m_Gravity * timeDelta;
 	}
-
-	Vector3 physicalDelta = m_Velocity * timeDelta; // y이동
-
+	Vector3 physicalDelta = m_Velocity * timeDelta;
+	// ── 애니메이션 루트 본 TransformFrame 획득 ─────────────────
+	// Get_BodyModelTransform()은 Em3000Body::Get_ModelTransform()
+	// → m_Model->Get_RootTransformVelocity(m_RootBoneIndex) 반환
 	TRANSFORM_FRAME transformFrame = m_OwnerContainer.lock()->Get_BodyModelTransform();
+	// ── Position 속도 (기존 패턴 유지) ─────────────────────────
 	Vector3 rootPositionVelocity = transformFrame.position;
-
 	if (m_IsGrounded)
 	{
 		m_LastGroundedRootPositionVelocity = rootPositionVelocity;
@@ -91,47 +91,53 @@ void Em3000Movement::Update_Movement(Float timeDelta)
 	}
 	else
 	{
-		if (m_CurrentMoveData.isMove)
+		rootPositionVelocity = m_CurrentMoveData.isMove
+			? m_LastGroundedRootPositionVelocity
+			: Vector3::Zero;
+	}
+	// ── [★ 핵심 추가] Velocity Quaternion → Y축 누적 회전 ──────
+	if (m_CurrentMoveData.canRotation)
+	{
+		// 1순위: State에서 명시적으로 direction/lookDirection을 지정한 경우 (기존 Slerp 방식)
+		Vector3 targetRotDir = m_CurrentMoveData.lookDirection.LengthSquared() > 0.f
+			? m_CurrentMoveData.lookDirection
+			: m_CurrentMoveData.direction;
+		if (targetRotDir.LengthSquared() > 0.f)
 		{
-			rootPositionVelocity = m_LastGroundedRootPositionVelocity;
+			// 기존 패턴 그대로: 목표 방향으로 Slerp
+			Float targetYaw = atan2f(targetRotDir.x, targetRotDir.z);
+			Quaternion targetQuat = Quaternion::CreateFromYawPitchRoll(targetYaw, 0.f, 0.f);
+			Quaternion currentQuat = ownerTransform->Get_Quaternion();
+			Quaternion nextQuat = Quaternion::Slerp(currentQuat, targetQuat, m_TurnSpeed * timeDelta);
+			ownerTransform->Set_Rotation(nextQuat);
 		}
 		else
 		{
-			rootPositionVelocity = Vector3::Zero;
-		}
-	}
-
-	if (m_CurrentMoveData.canRotation)
-	{
-		// 기본 이동 방향
-		Vector3 targetRotDir = m_CurrentMoveData.direction;
-
-		// 명시된 look이 있으면 덮음
-		if (m_CurrentMoveData.lookDirection.LengthSquared() > 0.f)
-		{
-			targetRotDir = m_CurrentMoveData.lookDirection;
-		}
-
-		if (targetRotDir.LengthSquared() > 0.f)
-		{
-			Float targetYaw = atan2f(targetRotDir.x, targetRotDir.z);
-			Quaternion targetQuat = Quaternion::CreateFromYawPitchRoll(targetYaw, 0.f, 0.f);
-
-			Float turnDelta = m_TurnSpeed * timeDelta;
+			// 2순위: direction 없으면 Velocity Quaternion의 Y축으로 직접 회전
+			// transformFrame.rotation = qtCurr * qtInvPrev (프레임 간 델타 Quaternion)
+			Quaternion qtDelta = transformFrame.rotation;
+			// 델타 Quaternion에서 Yaw(Y축 회전량)만 추출
+			Float yaw = 2.f * atan2f(
+				2.f * (qtDelta.w * qtDelta.y + qtDelta.x * qtDelta.z),
+				1.f - 2.f * (qtDelta.y * qtDelta.y + qtDelta.z * qtDelta.z)
+			);
+			// timeDelta로 보상: 델타는 "지난 프레임 1회분"이므로
+			// Animation이 TickPerSecond*timeDelta로 이미 이동한 양임
+			// → 그대로 누적 (timeDelta 추가 곱셈 불필요)
 			Quaternion currentQuat = ownerTransform->Get_Quaternion();
-			Quaternion nextQuat = Quaternion::Slerp(currentQuat, targetQuat, turnDelta);
-			ownerTransform->Set_Rotation(nextQuat);
+			Quaternion deltaQuat = Quaternion::CreateFromYawPitchRoll(yaw, 0.f, 0.f);
+			ownerTransform->Set_Rotation(currentQuat * deltaQuat);
 		}
 	}
-
-	Vector3 worldMoveVelocity{}; // x이동
-
+	// ── 위치 이동 (기존 패턴 유지) ─────────────────────────────
+	Vector3 worldMoveVelocity{};
 	if (m_CurrentMoveData.isMove || m_CurrentMoveData.isAttack)
 	{
 		if (m_CurrentMoveData.useRootMotionDir)
 		{
-			worldMoveVelocity = Vector3::Transform(rootPositionVelocity * -1.f, ownerTransform->Get_Quaternion());
-
+			worldMoveVelocity = Vector3::Transform(
+				rootPositionVelocity * -1.f,
+				ownerTransform->Get_Quaternion());
 			worldMoveVelocity *= m_CurrentMoveData.rootMotionScale;
 		}
 		else
@@ -140,39 +146,31 @@ void Em3000Movement::Update_Movement(Float timeDelta)
 			worldMoveVelocity = m_CurrentMoveData.direction * rootSpeed * m_CurrentMoveData.rootMotionScale;
 		}
 	}
-
 	worldMoveVelocity *= m_RootMotionScale;
-
-	Vector3 nextPosition = ownerTransform->Get_Position() + worldMoveVelocity * timeDelta + physicalDelta;
-
+	Vector3 nextPosition = ownerTransform->Get_Position()
+		+ worldMoveVelocity * timeDelta
+		+ physicalDelta;
 	nextPosition += m_CorrectionDelta;
 	Reset_Correction();
-
+	// ── Navigation 처리 (기존 유지) ────────────────────────────
 	if (auto nav = m_Navigation.lock())
 	{
-		Float groundHeight = -FLT_MAX;
-		Bool validNav = nav->Has_NeighborCell(nextPosition);
-
-		if (validNav)
+		if (nav->Has_NeighborCell(nextPosition))
 		{
-			groundHeight = nav->Get_HeightAtPoint(nextPosition);
-			nextPosition.y = groundHeight;
-
+			nextPosition.y = nav->Get_HeightAtPoint(nextPosition);
 			m_IsGrounded = true;
 			ownerTransform->Set_Position(nextPosition);
 		}
 		else
 		{
 			Vector3 rollbackPos = ownerTransform->Get_Position();
-
-			groundHeight = nav->Get_HeightAtPoint(rollbackPos);
-
-			if (rollbackPos.y <= groundHeight) {
+			Float groundHeight = nav->Get_HeightAtPoint(rollbackPos);
+			if (rollbackPos.y <= groundHeight)
+			{
 				rollbackPos.y = groundHeight;
 				m_IsGrounded = true;
 				m_Velocity = Vector3::Zero;
 			}
-
 			ownerTransform->Set_Position(rollbackPos);
 		}
 	}

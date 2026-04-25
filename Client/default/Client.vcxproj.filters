@@ -305,9 +305,17 @@
     <ClInclude Include="..\public\ExplodeEffect.h">
       <Filter>02. GameObject\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\HowitzerBullet.h" />
     <ClInclude Include="..\public\SkyBoxLayer.h">
       <Filter>02. GameObject\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Groggy.h" />
+    <ClInclude Include="..\public\StateEm3000_Melee.h" />
+    <ClInclude Include="..\public\StateEm3000_Range.h" />
+    <ClInclude Include="..\public\HowitzerBullet.h">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterShockWave.h">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -606,9 +614,17 @@
     <ClCompile Include="..\private\ExplodeEffect.cpp">
       <Filter>02. GameObject\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\HowitzerBullet.cpp" />
     <ClCompile Include="..\private\SkyBoxLayer.cpp">
       <Filter>02. GameObject\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Groggy.cpp" />
+    <ClCompile Include="..\private\StateEm3000_Melee.cpp" />
+    <ClCompile Include="..\private\StateEm3000_Range.cpp" />
+    <ClCompile Include="..\private\HowitzerBullet.cpp">
+      <Filter>02. GameObject\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterShockWave.cpp">
+      <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

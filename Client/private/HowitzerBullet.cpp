@@ -7,6 +7,9 @@
 #include <Model.h>
 
 #include "Bullet.h"
+#include "ExplodeEffect.h"
+#include "MonsterShockWave.h"
+#include "Pl0000.h"
 
 HowitzerBullet::HowitzerBullet(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Bullet{device, context} {}
@@ -27,59 +30,50 @@ HRESULT HowitzerBullet::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	m_TargetLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(m_Desc.targetLayer));
-	m_DamageInfo = m_Desc.damageInfo;
-	m_Transform->Set_Position(m_Desc.initialPosition);
-	m_Transform->LookAt(m_Desc.initialPosition + m_Desc.direction);
-	// 곡선 비행을 사용한다면 초기 3D Velocity 벡터를 생성해 줍니다.
-	m_CurvedVelocity = m_Desc.direction * (m_Desc.speed * 0.5f); // 발사방향 + 초기속도
-	m_CurvedVelocity.y += 10.0f; // 조금 띄워주려면 이처럼 Up Vector 힘을 줍니다.
-
-
-	if (FAILED(Ready_Components()))
+	if (arg != nullptr)
 	{
-		LOG_ERROR(L"Failed to Ready_Components HowitzerBullet");
-		return E_FAIL;
+		auto* howitzerArg = static_cast<HOWITZER_BULLET_DESC*>(arg);
+		m_GravityStrength = howitzerArg->gravityStrength;
+		m_TargetY = howitzerArg->targetY;
 	}
+
+	// 초기 속도 = 수평 발사방향 * 속력 + 초기 상승력
+	// 상승력은 중력의 일정 배수로 설정 (중력의 약 1.5배면 자연스러운 포물선)
+
+	m_CurvedVelocity = m_Desc.direction * m_Desc.speed;
+	m_CurvedVelocity.y += m_GravityStrength * 1.5f;
+
 	return S_OK;
 }
 void HowitzerBullet::Update(Float timeDelta)
 {
-	if (m_TargetY <= m_Transform->Get_Position().y)
-	{
-		// TODO : 플레이어 타겟 충격파존
-		// TODO Destroy 
-
-		return;
-	}
-	auto howitzerDesc = static_cast<HOWITZER_BULLET_DESC>(m_Desc);
-
-	// 포물선 이동: Y축 속도를 중력 가속도만큼 빼줍니다. (V = Vo + at)
-	m_CurvedVelocity.y -= howitzerDesc.gravityStrength * timeDelta;
-	// 포지션 업데이트 (프레임마다의 현재 이동속도 벡터 적용)
+	m_CurvedVelocity.y -= m_GravityStrength * timeDelta;
 	Vector3 currentPos = m_Transform->Get_Position();
 	currentPos += m_CurvedVelocity * timeDelta;
 	m_Transform->Set_Position(currentPos);
-	// 진행하는 방향을 자연스럽게 바라보게 하려면 LookAt을 업데이트합니다.
-	m_Transform->LookAt(currentPos + m_CurvedVelocity);
-	// 지면에 닿았다면 폭발 (예시: y가 0.f 이하, 혹은 물리엔진 Raycast)
-	if (currentPos.y <= 0.0f)
+	// 진행 방향으로 자연스럽게 회전
+	if (m_CurvedVelocity.LengthSquared() > 0.001f)
+		m_Transform->LookAt(currentPos + m_CurvedVelocity);
+	// 지면(targetY) 도달 시 폭발/소멸
+	if (currentPos.y <= m_TargetY)
 	{
-		currentPos.y = 0.0f;
+		currentPos.y = m_TargetY;
 		m_Transform->Set_Position(currentPos);
 
-		//Explode();
+		// TODO: Explode()
+
+		InstanceExplodeEffect();
+
 		Object::Destroy(shared_from_this());
 		return;
 	}
-	
 	m_Collider->Update(m_Transform->Get_WorldMatrix());
 	m_Transform->Update_WorldMatrix();
 }
 
 void HowitzerBullet::Late_Update(Float timeDelta)
 {
-	Bullet::Late_Update(timeDelta);
+
 }
 
 HRESULT HowitzerBullet::Render()
@@ -94,36 +88,49 @@ void HowitzerBullet::Submit_RenderGroup()
 
 void HowitzerBullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	Bullet::OnCollisionEnter(ownCollider, targetCollider);
+	auto target = targetCollider->Get_Owner();
+
+	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
+	auto entity = static_pointer_cast<PartObject>(target)->Get_Owner();
+
+	if (m_TargetLayerIndex == m_PlayerLayerIndex)
+	{
+		m_DamageInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
+		auto player = static_pointer_cast<Pl0000>(entity);
+		player->TakeDamage(m_DamageInfo);
+		Destroy(shared_from_this());
+	}
 }
-
-HRESULT HowitzerBullet::Ready_Components()
+void HowitzerBullet::InstanceExplodeEffect()
 {
-	Shader::SHADER_DESC shaderDesc{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
-	m_Shader = Add_Component<Shader>(ETOI(LEVEL::STATIC), &shaderDesc);
-	if (nullptr == m_Shader)
-		return E_FAIL;
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
 
-	Model::MODEL_DESC modelDesc{ m_Desc.resourceTag };
-	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
-	if (nullptr == m_Model)
-		return E_FAIL;
 
-	SphereCollider::SPHERE_COLLIDER_DESC sphereColliderDesc{};
-	sphereColliderDesc.radius = 0.5f;
-	sphereColliderDesc.offset = Vector3::Zero;
-	m_Collider = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereColliderDesc);
-	if (nullptr == m_Collider)
-		return E_FAIL;
+	ExplodeEffect::EXPLODE_EFFECT_DESC explodeDesc{};
+	explodeDesc.textureTag = L"Effect_Explode";
+	explodeDesc.position = m_Transform->Get_Position();
+	explodeDesc.scale = Vector3{ 1.f, 1.f, 1.f };
+	explodeDesc.threshold = 0.5f;
+	GAME_INSTANCE->Instantiate<ExplodeEffect>(L"ExplodeEffect", levIndex, &explodeDesc);
 
-	m_Transform->Set_Scale(0.3f, 0.3f, 0.3f);
+	{
+		Entity::DAMAGE_INFO dmgInfo{};
+		dmgInfo.attacker = m_Desc.damageInfo.attacker;
+		dmgInfo.damage = 20.f;
+		dmgInfo.groggyWeight = 20.f;
+		dmgInfo.attackType = ATK_TYPE::HEAVY;
+		dmgInfo.hitPosition = m_Transform->Get_Position();
+		dmgInfo.hitRotation = Quaternion::Identity;
+		dmgInfo.knockbackForce = 1.f;
 
-	return S_OK;
-}
+		MonsterShockWave::MONSTER_SHOCKWAVE_DESC desc{};
+		desc.damageInfo = dmgInfo;
+		desc.position = m_Transform->Get_Position();
+		desc.radius = 1.f;
 
-HRESULT HowitzerBullet::Bind_ShaderResources()
-{
-	return S_OK;
+		GAME_INSTANCE->Instantiate<MonsterShockWave>(L"MonsterShockWave", levIndex, &desc);
+	}
+	
 }
 
 Shared<HowitzerBullet> HowitzerBullet::Create(const ComPtr<ID3D11Device>& device,

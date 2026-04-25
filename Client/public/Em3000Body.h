@@ -64,8 +64,13 @@ private:
 	HRESULT Ready_AnimationNotify();
 	HRESULT Ready_Ports(Float radius, Float muzzleOffset);
 
+public:
+	void Fire_Bullet();
+	void Stop_Bullet();
+
+	void Fire_Howitzer();
+
 private:
-	void Set_IsFiring(Bool isFiring) { m_IsFiring = isFiring; }
 	void Fire_Projectile(Float timeDelta);
 
 private:
@@ -75,11 +80,14 @@ private:
 	Shared<Model>			m_Model{ nullptr };
 	Shared<SphereCollider>	m_HitBox{ nullptr };
 
+	Bool m_IsFiring{ false };
 	vector<EM3000_PROJECTILE_PORT> m_Ports;
-	Float m_CannonFireAccTime{ 0.f };
-	Float m_CannonFireRate{ 0.1f }; 
-	Bool  m_IsFiring{ false };
+	Float m_PortFireAccTime{ 0.f };
+	Float m_PortFireRate{ 0.15f }; 
+	
+	int32 m_PermanentCount{};
 
+	Matrix m_ModelMatrixAcc{};
 
 public:
 	static Shared<Em3000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

@@ -26,7 +26,7 @@ public:
                     Shared<Engine::GameObject> player = GAME_INSTANCE->Find_ObjectByObjectTag(levIndex, L"Pl0000");
                     if (player)
                     {
-                        player->Get_Transform()->Set_Position(Vector3(370.f, 25.f, 50.f));
+                        player->Get_Transform()->Set_Position(Vector3(370.f, 25.f, 52.f));
                         player->Get_Transform()->Update_WorldMatrix();
                     }
                 }

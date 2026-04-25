@@ -20,6 +20,7 @@ public:
 
 private:
 	void SetUp_Light();
+	void SetUp_Trigger();
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -35,6 +36,7 @@ public:
 
 private:
 	Bool m_IsEntry{ false };
+	Bool m_IsTriggerEntry{ false };
 
 public:
 	static Shared<AmusementParkDome> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -42,3 +44,4 @@ public:
 };
 
 NS_END
+

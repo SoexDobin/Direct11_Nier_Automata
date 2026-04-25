@@ -37,14 +37,14 @@ public:
     wstring Get_TargetLayerName() const { return m_Desc.targetLayer; }
 
 public:
-    HRESULT Initialize_Prototype() override;
-    HRESULT Initialize(void* arg) override;
-    void Update(Float timeDelta) override;
-    void Late_Update(Float timeDelta) override;
-    HRESULT Render() override;
-    void Submit_RenderGroup() override;
-
-    void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
+    virtual HRESULT Initialize_Prototype() override;
+    virtual HRESULT Initialize(void* arg) override;
+    virtual void Update(Float timeDelta) override;
+    virtual void Late_Update(Float timeDelta) override;
+    virtual HRESULT Render() override;
+    virtual void Submit_RenderGroup() override;
+    
+    virtual void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 private:
     HRESULT Ready_Components();

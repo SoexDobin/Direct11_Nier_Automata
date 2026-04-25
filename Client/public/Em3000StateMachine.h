@@ -29,7 +29,8 @@ public:
 	wstring Get_StateTag(Em3000::EM3000_STATE state);
 	Em3000::EM3000_STATE Get_CurEm3000State();
 
-
+public:
+	void Update_State(Float timeDelta) override;
 
 public:
 	static Shared<Em3000StateMachine> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

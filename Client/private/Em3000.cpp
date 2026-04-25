@@ -11,7 +11,10 @@
 #include "Navigation.h"
 #include "HpBarWorldUI.h"
 #include "Em3000StateMachine.h"
+#include "MonsterSight.h"
 #include "StateEm3000_Idle.h"
+#include "StateEm3000_Range.h"
+#include "StateEm3000_Melee.h"
 
 Em3000::Em3000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Monster{device, context} {}
@@ -58,8 +61,8 @@ HRESULT Em3000::Initialize(void* arg)
 		});
 
 	m_IsStatic = true;
-	m_MaxHp = 100000.f;
-	m_Hp = 100000.f;
+	m_MaxHp = 10000.f;
+	m_Hp = 10000.f;
 
 	return S_OK;
 }
@@ -85,6 +88,7 @@ void Em3000::Update(Float timeDelta)
 	m_Transform->Update_WorldMatrix();
 	m_Em3000Movement->Update_Movement(timeDelta);
 	m_PhysicalZone->Update(*m_Transform->Get_WorldMatrixPtr());
+	m_States->Update_State(timeDelta);
 }
 
 void Em3000::Late_Update(Float timeDelta)
@@ -189,6 +193,21 @@ HRESULT Em3000::Ready_PartObjects()
 	if (FAILED(Add_PartObject(levIndex, L"Em3003", L"Em3003", &partsDesc))) 
 		return E_FAIL;
 
+	MonsterSight::MONSTER_SIGHT_DESC sightDesc{};
+	sightDesc.Owner = em3000;
+	sightDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
+
+	sightDesc.offset = Vector3::Zero;
+	sightDesc.radius = 3.f;
+	if (FAILED(Add_PartObject(levIndex, L"MonsterSight", L"MeleeSight", &sightDesc)))
+		return E_FAIL;
+
+	sightDesc.offset = Vector3::Zero;
+	sightDesc.radius = 7.f;
+	if (FAILED(Add_PartObject(levIndex, L"MonsterSight", L"RangeSight", &sightDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -215,25 +234,14 @@ HRESULT Em3000::Ready_Components()
 	if ((m_States = Add_Component<Em3000StateMachine>()))
 	{
 		auto stateMachine = static_pointer_cast<Em3000StateMachine>(m_States);
-		//if (FAILED(m_States->Add_State(State::Create(
-		//	Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::IDLE)), em0010))))
-		//	return E_FAIL;
 		if (FAILED(stateMachine->Add_State(StateEm3000_Idle::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::IDLE)), em3000))))
 			return E_FAIL;
-		//if (FAILED(m_States->Add_State(StateEm0010_Chase::Create(
-		//	Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::CHASE)), em0010))))
-		//	return E_FAIL;
-		//if (FAILED(m_States->Add_State(StateEm0010_Attack::Create(
-		//	Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::ATTACK)), em0010))))
-		//	return E_FAIL;
-		//if (FAILED(m_States->Add_State(StateEm0010_Walk::Create(
-		//	Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::WALK)), em0010))))
-		//	return E_FAIL;
-		//if (FAILED(m_States->Add_State(StateEm0010_Dead::Create(
-		//	Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::DEAD)), em0010))))
-		//	return E_FAIL;
-		
-		//stateMachine->Change_State(EM3000_STATE::IDLE);
+		if (FAILED(stateMachine->Add_State(StateEm3000_Range::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE1_RANGE)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Melee::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE1_MELEE)), em3000))))
+			return E_FAIL;
+
+		stateMachine->Change_State(EM3000_STATE::IDLE);
 	}
 	else
 		return E_FAIL;

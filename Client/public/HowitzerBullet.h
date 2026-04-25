@@ -40,11 +40,11 @@ public:
     void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 private:
-    HRESULT Ready_Components();
-    HRESULT Bind_ShaderResources();
+    void InstanceExplodeEffect();
 
 private:
     Float m_TargetY{ 0.f };
+    Float m_GravityStrength{ 20.f };
     Vector3 m_CurvedVelocity{};
 
 public:

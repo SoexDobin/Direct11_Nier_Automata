@@ -77,6 +77,9 @@ GraphicDevice::Clear_BackBufferView(const Shared<Float4> &clearColor) const {
   if (nullptr == m_Context)
     return E_FAIL;
 
+  ID3D11RenderTargetView* rtvs[] = { m_RTV.Get() };
+  m_Context->OMSetRenderTargets(1, rtvs, m_DSV.Get());
+
   m_Context->ClearRenderTargetView(
       m_RTV.Get(), reinterpret_cast<const Float *>(clearColor.get()));
 

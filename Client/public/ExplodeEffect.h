@@ -15,7 +15,10 @@ class CLIENT_DLL ExplodeEffect final : public ParticleEffect
 public:
 	typedef struct tagExplodeEffectDesc : public PARTICLE_EFFECT_DESC
 	{
-		
+		wstring textureTag{ L"Effect_Explosion" };
+		Vector3 position{};
+		Vector3 scale{ 1.f, 1.f, 1.f };
+		Float threshold{ 0.05f };
 	} EXPLODE_EFFECT_DESC;
 
 public:
@@ -41,13 +44,15 @@ public:
 	HRESULT Render() override;
 
 private:
-	HRESULT Ready_Components();
+	HRESULT Ready_Components(const EXPLODE_EFFECT_DESC& desc);
 	HRESULT Bind_ShaderResources();
 
 private:
 	Shared<Shader> m_Shader{ nullptr };
 	Shared<Texture> m_Texture{ nullptr };
 	Shared<VIBuffer_Rect>  m_Buffer{ nullptr };
+
+	uint32 m_CurIndex{ 0 };
 	Float m_Acc{ 0.f };
 	Float m_ThreshHold{ 0.f };
 

@@ -11,27 +11,19 @@
             },
             {
               "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
+              "typeName": "AABBCollider"
             }
           ],
-          "name": "AmusementParkMiddle",
-          "objectID": 1203705154,
+          "name": "NavigationSector",
+          "objectID": 3826940858,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "AmusementParkMiddle",
+          "prototypeTag": "NavigationSector",
           "transform": {
             "position": [
-              151.0,
+              301.0,
               0.0,
-              0.0
+              86.5
             ],
             "rotation": [
               0.0,
@@ -44,7 +36,7 @@
               1.0
             ]
           },
-          "typeName": "AmusementParkMiddle"
+          "typeName": "NavigationSector"
         },
         {
           "components": [
@@ -54,7 +46,7 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
+              "typeName": "Navigation"
             },
             {
               "properties": null,
@@ -62,7 +54,7 @@
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "Shader"
             }
           ],
           "name": "AmusementParkDome",
@@ -128,6 +120,88 @@
             },
             {
               "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "name": "AmusementParkEntry",
+          "objectID": 1172218866,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "AmusementParkEntry",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              86.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "AmusementParkEntry"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "Em3000",
+          "objectID": 2943248738,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em3000",
+          "transform": {
+            "position": [
+              400.0,
+              20.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              -89.99994659423828,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em3000"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
               "typeName": "Shader"
             },
             {
@@ -171,11 +245,11 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Navigation"
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "SphereCollider"
             }
           ],
           "name": "Pl0000",
@@ -185,9 +259,9 @@
           "prototypeTag": "Pl0000",
           "transform": {
             "position": [
-              -50.0,
+              -30.0,
               0.0,
-              51.0
+              52.0
             ],
             "rotation": [
               0.0,
@@ -210,27 +284,27 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
               "typeName": "Shader"
             },
             {
               "properties": null,
               "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
             }
           ],
-          "name": "AmusementParkEntry",
-          "objectID": 1172218866,
+          "name": "AmusementParkMiddle",
+          "objectID": 1203705154,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "AmusementParkEntry",
+          "prototypeTag": "AmusementParkMiddle",
           "transform": {
             "position": [
+              151.0,
               0.0,
-              0.0,
-              86.5
+              0.0
             ],
             "rotation": [
               0.0,
@@ -243,81 +317,7 @@
               1.0
             ]
           },
-          "typeName": "AmusementParkEntry"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "AABBCollider"
-            }
-          ],
-          "name": "NavigationSector",
-          "objectID": 3826940858,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "NavigationSector",
-          "transform": {
-            "position": [
-              301.0,
-              0.0,
-              86.5
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "NavigationSector"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            }
-          ],
-          "name": "Em3000",
-          "objectID": 2943248738,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em3000",
-          "transform": {
-            "position": [
-              397.5,
-              20.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              -89.99994659423828,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em3000"
+          "typeName": "AmusementParkMiddle"
         }
       ]
     }

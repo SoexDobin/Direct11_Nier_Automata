@@ -7,6 +7,7 @@
 #include <SpdLogger.h>
 
 #include "AmusementParkLight.h"
+#include "TriggerObject.h"
 
 AmusementParkDome::AmusementParkDome(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: WorldObject{ device, context } {
@@ -38,6 +39,36 @@ void AmusementParkDome::SetUp_Light()
 	
 
 	m_IsEntry = true;
+}
+
+void AmusementParkDome::SetUp_Trigger()
+{
+	if (m_IsTriggerEntry) return;
+
+	uint32 levIndex = ETOI(LEVEL::GAMEPLAY2);
+	wstring triggerProtoTag = L"TriggerObject"; // 트리거 프로토타입 태그 (프로젝트 내 태그명과 일치해야 함)
+
+	TriggerObject::TRIGGER_DESC triggerDesc{};
+	triggerDesc.position = Vector3(370.f, 25.f, 52.f); // 요청하신 위치
+	triggerDesc.radius = 2.f;               
+	triggerDesc.levelIndex = levIndex;
+	triggerDesc.targetLayerName = L"Player";
+
+	triggerDesc.callbacks.push_back([this, levIndex]()
+		{
+			auto entryObj = GAME_INSTANCE->Find_ObjectByObjectTag(levIndex, L"AmusementParkEntry");
+			if (entryObj)
+				Destroy(entryObj);
+
+			auto middleObj = GAME_INSTANCE->Find_ObjectByObjectTag(levIndex, L"AmusementParkMiddle");
+			if (middleObj)
+				Destroy(middleObj);
+		});
+
+	// 트리거 인스턴스화
+	GAME_INSTANCE->Instantiate<TriggerObject>(triggerProtoTag, levIndex, &triggerDesc);
+
+	m_IsTriggerEntry = true;
 }
 
 HRESULT AmusementParkDome::Initialize_Prototype()
@@ -81,6 +112,7 @@ void AmusementParkDome::On_Disable()
 void AmusementParkDome::Update(Float timeDelta)
 {
 	SetUp_Light();
+	SetUp_Trigger();
 }
 
 HRESULT AmusementParkDome::Render()

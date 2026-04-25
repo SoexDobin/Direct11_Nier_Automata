@@ -81,7 +81,7 @@ HRESULT SparkEffect::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_Shader->Begin(0)))
+	if (FAILED(m_Shader->Begin(1)))
 		return E_FAIL;
 
 	if (FAILED(m_Buffer->Bind_Resources()))
@@ -118,11 +118,13 @@ HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPo
 	wstring textureTag{};
 	if (atkType == ATK_TYPE::POD)
 	{
-		textureTag = L"Effect_Spark2";
+		textureTag = L"Effect_Spark";
+		m_DiscardBlack = 0.75f;
 	}
 	else
 	{
-		textureTag = L"Effect_Spark";
+		textureTag = L"Effect_Spark2";
+		m_DiscardBlack = 0.75f;
 	}
 
 	auto textureDesc = Texture::TEXTURE_DESC{ levIndex, textureTag };
@@ -149,8 +151,8 @@ HRESULT SparkEffect::Bind_ShaderResources()
 	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
 		return E_FAIL;
 
-
-
+	if (FAILED(m_Shader->Bind_RawValue("g_DiscardBlack", &m_DiscardBlack, sizeof(Float))))
+		return E_FAIL;
 	if (FAILED(m_Shader->Bind_RawValue("g_LockUpRight", &isLocked, sizeof(uint32))))
 		return E_FAIL;
 	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DiffuseMap, Helper::Random_Int(0, 29))))

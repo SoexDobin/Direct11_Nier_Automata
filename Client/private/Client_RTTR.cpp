@@ -55,6 +55,7 @@
 #include "AmusementParkDome.h"
 #include "WeaponHalo.h"
 #include "MonsterShockWave.h"
+#include "Em3000StateMachine.h"
 
 using rttr::registration;
 
@@ -64,7 +65,7 @@ using rttr::registration;
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
 #include "AmusementParkLight.h"
-#include "Em3000StateMachine.h"
+#include "Em3000MeleeSight.h"
 #include "ExplodeEffect.h"
 #include "FreeCamera.h"
 #include "HowitzerBullet.h"
@@ -370,6 +371,12 @@ void Register_Client_Reflection() {
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return MonsterShockWave::Create(device, context); })
         (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
 
+    rttr::registration::class_<Em3000StateMachine>("Em3000StateMachine")
+        .constructor<>()
+        .method("Clone", &Em3000StateMachine::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em3000StateMachine::Create(device, context); })
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
+
 
   // ==============================================================
   // 샌드박싱 구역: 아래 태그 사이 공간은 파이썬 스크립트가
@@ -381,10 +388,10 @@ void Register_Client_Reflection() {
         .method("Clone", &AmusementParkLight::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return AmusementParkLight::Create(device, context); })(rttr::metadata("Level", 0));
 
-    rttr::registration::class_<Em3000StateMachine>("Em3000StateMachine")
+    rttr::registration::class_<Em3000MeleeSight>("Em3000MeleeSight")
         .constructor<>()
-        .method("Clone", &Em3000StateMachine::Clone)
-        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return Em3000StateMachine::Create(device, context); })(rttr::metadata("Level", 0));
+        .method("Clone", &Em3000MeleeSight::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Em3000MeleeSight::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<ExplodeEffect>("ExplodeEffect")
         .constructor<>()

@@ -34,7 +34,7 @@ Bool StateEm3000_Range::StateEnterInvoke()
 	auto em3000Body = m_Body.lock();
 	auto state = m_States.lock();
 	
-	m_EntryAnimIndex = Helper::Random_Int(2, 2);
+	m_EntryAnimIndex = Helper::Random_Int(0, 2);
 	em3000Body->Set_Animation(m_RangeEnter[m_EntryAnimIndex], 0.1f, false);
 
 	return true;
@@ -52,12 +52,13 @@ void StateEm3000_Range::Update(Float timeDelta)
 
 	if (IsFinished && m_EnterAnim.contains(animIndex))
 	{
+		
 		em3000Body->Set_Animation(m_RangeAttack[m_EntryAnimIndex], 0.1f, false);
 
-		if (m_EntryAnimIndex == 0 || m_EntryAnimIndex == 1)
-			em3000Body->Fire_Bullet();
-
-		// TODO : StartShoot 
+		if (m_EntryAnimIndex == 0)
+			em3000Body->Fire_Bullet(true);
+		else if (m_EntryAnimIndex == 1)
+			em3000Body->Fire_Bullet(false);
 
 		return;
 	}
@@ -65,12 +66,10 @@ void StateEm3000_Range::Update(Float timeDelta)
 	if (IsFinished && m_AttackAnim.contains(animIndex))
 	{
 
-		em3000Body->Set_Animation(ETOI(em3000state::DANMAK_END_1), 0.1f, false);
+		em3000Body->Set_Animation(m_RangeEnd[m_EntryAnimIndex], 0.1f, false);
 
 		if (m_EntryAnimIndex == 0 || m_EntryAnimIndex == 1)
 			em3000Body->Stop_Bullet();
-
-		// TODO : EndShoot 
 
 		return;
 	}

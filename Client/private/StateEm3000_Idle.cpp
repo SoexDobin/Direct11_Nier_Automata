@@ -21,7 +21,6 @@ Bool StateEm3000_Idle::StateEnterInvoke()
 	
 	em3000Body->Set_Animation(ETOI(Em3000::EM3000_STATE::IDLE), 0.1f, true);
 
-	
 	m_delayAcc = Helper::Random_Float(0.5f, 2.0f);
 
 
@@ -35,17 +34,19 @@ void StateEm3000_Idle::Update(Float timeDelta)
 	auto em3000Body = m_Body.lock();
 	auto state = m_States.lock();
 
-	auto goMelee = Helper::Random_Bool(0.3);
+	if (Has_MeleeTarget())
+	{
+		state->Change_State(Em3000::EM3000_STATE::PHASE1_MELEE);
+		return;
+	}
 
-
-	if (goMelee)
+	if (auto goMelee = Helper::Random_Bool(0.3))
 	{
 		// TODO 근접 검사
-	/*
-		Monster의 Target 가져와서 Player가 MonsterMelee Sight 안에 있으면
-		3/1 확률로 근접 공격
-
-	 */
+		if (Has_MeleeTarget())
+		{
+			state->Change_State(Em3000::EM3000_STATE::PHASE1_MELEE);
+		}
 	}
 	else
 	{

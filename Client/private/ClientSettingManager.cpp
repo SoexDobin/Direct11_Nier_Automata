@@ -500,7 +500,7 @@ HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
                     // 현재 준비 중인 레벨(baseLevel)에 등록
                     if (SUCCEEDED(GAME_INSTANCE->Add_Prototype(ETOI(baseLevel), prototype, tag)))
                     {
-                        LOG_INFO(L"Auto-Registered Client Prototype: {} (Level: {})", tag, ETOI(baseLevel));
+                        LOG_INFO(L"Auto-Registered Client Prototype: {} (Level: {}) {}", tag, ETOI(baseLevel), prototype->Get_ObjectID());
                     }
                     else
                     {

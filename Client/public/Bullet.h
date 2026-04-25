@@ -24,6 +24,8 @@ public:
         Bool  isPermanent{ false };
         Float maxDistance{};       
         Float damage{};           
+
+        Bool useUpperSin{ false };
     } BULLET_DESC;
 
 public:
@@ -62,6 +64,9 @@ protected:
     Shared<SphereCollider>      m_Collider{ nullptr };
     Shared<Model>               m_Model{ nullptr };
     Shared<Shader>              m_Shader{ nullptr };
+
+    Bool                        m_IsUpperSin{ false };
+    Float                       m_AccTime{0.f};
     
 public:
     static Shared<Bullet> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

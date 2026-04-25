@@ -19,9 +19,9 @@ public:
 	void StateExitInvoke() override;
 
 private:
-	unordered_set<uint32> m_EnterAnim;
-	unordered_set<uint32> m_AttackAnim;
-	unordered_set<uint32> m_EndAnim;
+	Vector3 m_OriginalPosition{};      
+	Float m_MixerTime{ 0.f };     
+	Float m_MixerDuration{ 5.f }; 
 
 public:
 	static Shared<StateEm3000_Melee> Create(const wstring& tag, const Shared<Em3000>& owner);

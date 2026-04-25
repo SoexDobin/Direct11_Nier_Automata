@@ -6,8 +6,9 @@ class SphereCollider;
 NS_END
 
 NS_BEGIN(Client)
+	class MonsterAOE;
 
-class CLIENT_DLL Em3000Body final : public PartObject
+	class CLIENT_DLL Em3000Body final : public PartObject
 {
 	RTTR_ENABLE(PartObject)
 public:
@@ -65,10 +66,10 @@ private:
 	HRESULT Ready_Ports(Float radius, Float muzzleOffset);
 
 public:
-	void Fire_Bullet();
+	void Fire_Bullet(Bool useSin);
 	void Stop_Bullet();
 
-	void Fire_Howitzer();
+	void Fire_Howitzer(Float speed, Float gravity);
 
 private:
 	void Fire_Projectile(Float timeDelta);
@@ -81,13 +82,16 @@ private:
 	Shared<SphereCollider>	m_HitBox{ nullptr };
 
 	Bool m_IsFiring{ false };
+	Bool m_IsCurveBullet{ false };
 	vector<EM3000_PROJECTILE_PORT> m_Ports;
 	Float m_PortFireAccTime{ 0.f };
 	Float m_PortFireRate{ 0.15f }; 
 	
 	int32 m_PermanentCount{};
-
 	Matrix m_ModelMatrixAcc{};
+
+private:
+	Weak<MonsterAOE> m_CenterAoe{};
 
 public:
 	static Shared<Em3000Body> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

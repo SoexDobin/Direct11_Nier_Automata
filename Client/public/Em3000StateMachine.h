@@ -32,6 +32,13 @@ public:
 public:
 	void Update_State(Float timeDelta) override;
 
+	Bool Is_SecondPhase() const { return m_IsSecondPhase; }
+	void Set_SecondPhase();
+	
+
+private:
+	Bool m_IsSecondPhase{ false };
+
 public:
 	static Shared<Em3000StateMachine> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<Component> Clone(void* arg = nullptr) override;

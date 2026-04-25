@@ -9,27 +9,29 @@ Em3000StateMachine::Em3000StateMachine(const Em3000StateMachine& rhs)
 
 HRESULT Em3000StateMachine::Initialize_Prototype()
 {
-	return StateMachine::Initialize_Prototype();
+	return MonsterStateMachine::Initialize_Prototype();
 }
 
 HRESULT Em3000StateMachine::Initialize(void* arg)
+
 {
-	return StateMachine::Initialize(arg);
+	m_IsSecondPhase = false;
+	return MonsterStateMachine::Initialize(arg);
 }
 
 void Em3000StateMachine::On_Destroy()
 {
-	StateMachine::On_Destroy();
+	MonsterStateMachine::On_Destroy();
 }
 
 void Em3000StateMachine::On_Disable()
 {
-	StateMachine::On_Disable();
+	MonsterStateMachine::On_Disable();
 }
 
 void Em3000StateMachine::On_Enable()
 {
-	StateMachine::On_Enable();
+	MonsterStateMachine::On_Enable();
 }
 
 Bool Em3000StateMachine::Change_State(Em3000::EM3000_STATE state)
@@ -68,6 +70,14 @@ Em3000::EM3000_STATE Em3000StateMachine::Get_CurEm3000State()
 void Em3000StateMachine::Update_State(Float timeDelta)
 {
 	StateMachine::Update_State(timeDelta);
+}
+
+void Em3000StateMachine::Set_SecondPhase()
+{
+	if (m_IsSecondPhase == true) 
+		return;
+
+	m_IsSecondPhase = Change_State(Em3000::EM3000_STATE::GROGGY);
 }
 
 Shared<Em3000StateMachine> Em3000StateMachine::Create(const ComPtr<ID3D11Device>& device,

@@ -215,6 +215,78 @@
         {
             "path": "Sound/em0000/Tele2.wav",
             "tag": "Em_Tele2"
+        },
+        {
+            "path": "Sound/em3000/Skirt_Open.wav",
+            "tag": "Skirt_Open"
+        },
+        {
+            "path": "Sound/em3000/Skirt_Close.wav",
+            "tag": "Skirt_Close"
+        },
+        {
+            "path": "Sound/em3000/Skirt_Close_Round.wav",
+            "tag": "Skirt_Close_Round"
+        },
+        {
+            "path": "Sound/em3000/Default_Shot.wav",
+            "tag": "Default_Shot"
+        },
+        {
+            "path": "Sound/em3000/Howitzer_Explode.wav",
+            "tag": "Howitzer_Explode"
+        },
+        {
+            "path": "Sound/em3000/Howitzer_Explode2.wav",
+            "tag": "Howitzer_Explode2"
+        },
+        {
+            "path": "Sound/em3000/Howitzer1.wav",
+            "tag": "Howitzer1"
+        },
+        {
+            "path": "Sound/em3000/Howitzer2.wav",
+            "tag": "Howitzer2"
+        },
+        {
+            "path": "Sound/em3000/Howitzer3.wav",
+            "tag": "Howitzer3"
+        },
+        {
+            "path": "Sound/em3000/Stomp_Start.wav",
+            "tag": "Stomp_Start"
+        },
+        {
+            "path": "Sound/em3000/Stomp_Impact.wav",
+            "tag": "Stomp_Impact"
+        },
+        {
+            "path": "Sound/em3000/Stomp_End.wav",
+            "tag": "Stomp_End"
+        },
+        {
+            "path": "Sound/em3000/Stomp_End.wav",
+            "tag": "JumpStomp_Start"
+        },
+        {
+            "path": "Sound/em3000/JumpStomp_Fall.wav",
+            "tag": "JumpStomp_Fall"
+        },
+        {
+            "path": "Sound/em3000/JumpStomp_Impact.wav",
+            "tag": "JumpStomp_Impact"
+        },
+        {
+            "path": "Sound/em3000/JumpStomp_End.wav",
+            "tag": "JumpStomp_End"
+        },
+        {
+            "path": "Sound/em3000/Mix_Start.wav",
+            "tag": "Mix_Start"
+        },
+        {
+            "path": "Sound/em3000/Mix_End.wav",
+            "tag": "Mix_End"
         }
     ]
 }

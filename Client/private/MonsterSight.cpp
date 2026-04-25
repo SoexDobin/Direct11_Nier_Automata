@@ -39,7 +39,7 @@ HRESULT MonsterSight::Initialize(void* arg)
 	SphereCollider::SPHERE_COLLIDER_DESC sphereColDesc{};
 	sphereColDesc.radius = sightDesc.radius;
 	sphereColDesc.offset = sightDesc.offset;
-	m_Sight = Add_Component<SphereCollider>(ETOI(LEVEL::GAMEPLAY), &sphereColDesc);
+	m_Sight = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereColDesc);
 
 	if (nullptr == m_Sight)
 	{

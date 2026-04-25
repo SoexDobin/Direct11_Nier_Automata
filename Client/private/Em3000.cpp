@@ -5,12 +5,14 @@
 #include <SpdLogger.h>
 
 #include "Em3000Body.h"
+#include "Em3000MeleeSight.h"
 #include "Em3000Movement.h"
 #include "Em3001.h"
 #include "SphereCollider.h"
 #include "Navigation.h"
 #include "HpBarWorldUI.h"
 #include "Em3000StateMachine.h"
+#include "MonsterAOE.h"
 #include "MonsterSight.h"
 #include "StateEm3000_Idle.h"
 #include "StateEm3000_Range.h"
@@ -51,7 +53,7 @@ HRESULT Em3000::Initialize(void* arg)
 		{
 			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
 			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
-			UI_hpDesc.worldOffset = Vector3{ 0.f, 5.f, 0.f };
+			UI_hpDesc.worldOffset = Vector3{ 0.f, 4.f, 0.f };
 			UI_hpDesc.anchor = UI_ANCHOR::TOP_LEFT;
 			UI_hpDesc.sizeX = 200.f;
 			UI_hpDesc.sizeY = 10.f;
@@ -74,7 +76,9 @@ void Em3000::On_Destroy()
 
 void Em3000::Priority_Update(Float timeDelta)
 {
-	
+	Float ratio = m_Hp / m_MaxHp;
+	if (ratio <= 0.4f)
+		static_pointer_cast<Em3000StateMachine>(m_States)->Set_SecondPhase();
 }
 
 void Em3000::Update(Float timeDelta)
@@ -198,15 +202,35 @@ HRESULT Em3000::Ready_PartObjects()
 	sightDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 
 	sightDesc.offset = Vector3::Zero;
-	sightDesc.radius = 3.f;
-	if (FAILED(Add_PartObject(levIndex, L"MonsterSight", L"MeleeSight", &sightDesc)))
+	sightDesc.radius = 6.f;
+	if (FAILED(Add_PartObject(levIndex, L"Em3000MeleeSight", L"Em3000MeleeSight", &sightDesc)))
 		return E_FAIL;
+	m_MeleeSight = static_pointer_cast<Em3000MeleeSight>(Find_PartObject(L"Em3000MeleeSight"));
 
 	sightDesc.offset = Vector3::Zero;
-	sightDesc.radius = 7.f;
-	if (FAILED(Add_PartObject(levIndex, L"MonsterSight", L"RangeSight", &sightDesc)))
+	sightDesc.radius = 20.f;
+	if (FAILED(Add_PartObject(levIndex, L"MonsterSight", L"Sight", &sightDesc)))
 		return E_FAIL;
+	m_Sight = static_pointer_cast<MonsterSight>(Find_PartObject(L"Sight"));
 
+	DAMAGE_INFO em3000DamageInfo{};
+	em3000DamageInfo.attacker = shared_from_this();
+	em3000DamageInfo.attackType = ATK_TYPE::HEAVY;
+	em3000DamageInfo.damage = 30.f;
+	em3000DamageInfo.groggyWeight = 10.f;
+	em3000DamageInfo.knockbackForce = 1.f;
+
+	auto thisObject = static_pointer_cast<ContainerObject>(shared_from_this());
+	MonsterAOE::MONSTER_AOE_DESC centerDesc{};
+	centerDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
+	centerDesc.Owner = thisObject;
+	centerDesc.model = m_MainBody->Get_ModelComponent();
+	centerDesc.offset = Vector3::Zero;
+	centerDesc.radius = 3.f;
+	centerDesc.targetBoneName = "bone774";
+	centerDesc.dmgInfo = em3000DamageInfo;
+	if (FAILED(Add_PartObject(levIndex, L"MonsterAOE", L"Em3000CenterAoe", &centerDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -230,8 +254,7 @@ HRESULT Em3000::Ready_Components()
 
 
 	auto em3000 = static_pointer_cast<Em3000>(shared_from_this());
-	// StateMachine은 마지막에 처리
-	if ((m_States = Add_Component<Em3000StateMachine>()))
+	if ((m_States = Add_Component<Em3000StateMachine>(levIndex)))
 	{
 		auto stateMachine = static_pointer_cast<Em3000StateMachine>(m_States);
 		if (FAILED(stateMachine->Add_State(StateEm3000_Idle::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::IDLE)), em3000))))
@@ -239,6 +262,10 @@ HRESULT Em3000::Ready_Components()
 		if (FAILED(stateMachine->Add_State(StateEm3000_Range::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE1_RANGE)), em3000))))
 			return E_FAIL;
 		if (FAILED(stateMachine->Add_State(StateEm3000_Melee::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE1_MELEE)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Melee::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::GROGGY)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Melee::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE2_TRANSFORM)), em3000))))
 			return E_FAIL;
 
 		stateMachine->Change_State(EM3000_STATE::IDLE);

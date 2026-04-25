@@ -7,8 +7,9 @@ class Navigation;
 NS_END
 
 NS_BEGIN(Client)
+	class Em3000MeleeSight;
 
-class Em3000Body;
+	class Em3000Body;
 class Em3000Movement;
 class Em3000StateMachine;
 class MonsterSight;
@@ -61,8 +62,8 @@ private:
     Shared<SphereCollider> m_PhysicalZone{ nullptr };
     Shared<Navigation> m_Navigation{ nullptr };
 
-    Shared<MonsterSight> m_RangeSight{ nullptr };
-    Shared<MonsterSight> m_MeleeSight{ nullptr };
+    Shared<Em3000MeleeSight> m_MeleeSight{ nullptr };
+    Shared<MonsterSight> m_Sight{ nullptr };
     
 
 public:
@@ -77,6 +78,7 @@ public:
         GROGGY, 
         PHASE1_MELEE,
         PHASE1_RANGE,
+        PHASE2_TRANSFORM,
         PHASE2_ATTACK,
         PHASE2_CHASE, 
         DEAD, 

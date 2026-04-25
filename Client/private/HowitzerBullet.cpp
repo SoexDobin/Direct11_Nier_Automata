@@ -37,30 +37,29 @@ HRESULT HowitzerBullet::Initialize(void* arg)
 		m_TargetY = howitzerArg->targetY;
 	}
 
-	// 초기 속도 = 수평 발사방향 * 속력 + 초기 상승력
-	// 상승력은 중력의 일정 배수로 설정 (중력의 약 1.5배면 자연스러운 포물선)
-
 	m_CurvedVelocity = m_Desc.direction * m_Desc.speed;
-	m_CurvedVelocity.y += m_GravityStrength * 1.5f;
+	m_CurvedVelocity.y += m_GravityStrength * 0.75f;
+
+	m_Transform->Set_Scale(0.75f, 0.75f, 0.75f);
 
 	return S_OK;
 }
 void HowitzerBullet::Update(Float timeDelta)
 {
+	if (m_IsDestroy) return;
+
 	m_CurvedVelocity.y -= m_GravityStrength * timeDelta;
 	Vector3 currentPos = m_Transform->Get_Position();
 	currentPos += m_CurvedVelocity * timeDelta;
 	m_Transform->Set_Position(currentPos);
-	// 진행 방향으로 자연스럽게 회전
+	
 	if (m_CurvedVelocity.LengthSquared() > 0.001f)
 		m_Transform->LookAt(currentPos + m_CurvedVelocity);
-	// 지면(targetY) 도달 시 폭발/소멸
+	
 	if (currentPos.y <= m_TargetY)
 	{
 		currentPos.y = m_TargetY;
 		m_Transform->Set_Position(currentPos);
-
-		// TODO: Explode()
 
 		InstanceExplodeEffect();
 
@@ -98,6 +97,7 @@ void HowitzerBullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const
 		m_DamageInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
 		auto player = static_pointer_cast<Pl0000>(entity);
 		player->TakeDamage(m_DamageInfo);
+		InstanceExplodeEffect();
 		Destroy(shared_from_this());
 	}
 }
@@ -109,8 +109,8 @@ void HowitzerBullet::InstanceExplodeEffect()
 	ExplodeEffect::EXPLODE_EFFECT_DESC explodeDesc{};
 	explodeDesc.textureTag = L"Effect_Explode";
 	explodeDesc.position = m_Transform->Get_Position();
-	explodeDesc.scale = Vector3{ 1.f, 1.f, 1.f };
-	explodeDesc.threshold = 0.5f;
+	explodeDesc.scale = Vector3{ 4.f, 4.f, 4.f };
+	explodeDesc.threshold = 0.04f;
 	GAME_INSTANCE->Instantiate<ExplodeEffect>(L"ExplodeEffect", levIndex, &explodeDesc);
 
 	{
@@ -121,7 +121,7 @@ void HowitzerBullet::InstanceExplodeEffect()
 		dmgInfo.attackType = ATK_TYPE::HEAVY;
 		dmgInfo.hitPosition = m_Transform->Get_Position();
 		dmgInfo.hitRotation = Quaternion::Identity;
-		dmgInfo.knockbackForce = 1.f;
+		dmgInfo.knockbackForce = 1.25f;
 
 		MonsterShockWave::MONSTER_SHOCKWAVE_DESC desc{};
 		desc.damageInfo = dmgInfo;
@@ -130,7 +130,9 @@ void HowitzerBullet::InstanceExplodeEffect()
 
 		GAME_INSTANCE->Instantiate<MonsterShockWave>(L"MonsterShockWave", levIndex, &desc);
 	}
-	
+
+	GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26);
+	GAME_INSTANCE->PlaySoundFXOnce(L"Howitzer_Explode", SOUNDCHANNEL::CHANNEL_26, 0.4f);
 }
 
 Shared<HowitzerBullet> HowitzerBullet::Create(const ComPtr<ID3D11Device>& device,

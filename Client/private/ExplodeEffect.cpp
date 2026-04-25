@@ -73,6 +73,8 @@ void ExplodeEffect::Update(Float timeDelta)
 
 void ExplodeEffect::Late_Update(Float timeDelta)
 {
+	m_Transform->Update_WorldMatrix();
+
 	Matrix viewMatrixInv = GAME_INSTANCE->Get_InvTransform(D3DTS::VIEW);
 
 	Matrix worldMatrix = m_Transform->Get_WorldMatrix();
@@ -85,7 +87,6 @@ void ExplodeEffect::Late_Update(Float timeDelta)
 	worldMatrix.Translation(position);
 
 	m_Transform->Set_WorldMatrix(worldMatrix);
-	m_Transform->Update_WorldMatrix();
 }
 
 void ExplodeEffect::Fixed_Update(Float fixedDelta)
@@ -95,7 +96,7 @@ void ExplodeEffect::Fixed_Update(Float fixedDelta)
 
 void ExplodeEffect::Submit_RenderGroup()
 {
-	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONLIGHT, shared_from_this());
 }
 
 HRESULT ExplodeEffect::Render()

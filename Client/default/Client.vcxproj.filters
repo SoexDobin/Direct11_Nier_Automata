@@ -308,14 +308,26 @@
     <ClInclude Include="..\public\SkyBoxLayer.h">
       <Filter>02. GameObject\Sky</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\StateEm3000_Groggy.h" />
-    <ClInclude Include="..\public\StateEm3000_Melee.h" />
-    <ClInclude Include="..\public\StateEm3000_Range.h" />
     <ClInclude Include="..\public\HowitzerBullet.h">
       <Filter>02. GameObject\Bullet</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MonsterShockWave.h">
       <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Groggy.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Melee.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Range.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3000MeleeSight.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Transform.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -617,14 +629,26 @@
     <ClCompile Include="..\private\SkyBoxLayer.cpp">
       <Filter>02. GameObject\Sky</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\StateEm3000_Groggy.cpp" />
-    <ClCompile Include="..\private\StateEm3000_Melee.cpp" />
-    <ClCompile Include="..\private\StateEm3000_Range.cpp" />
     <ClCompile Include="..\private\HowitzerBullet.cpp">
       <Filter>02. GameObject\Bullet</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MonsterShockWave.cpp">
       <Filter>02. GameObject\Entity\Monster\ForMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Groggy.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Melee.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Range.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000MeleeSight.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Transform.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

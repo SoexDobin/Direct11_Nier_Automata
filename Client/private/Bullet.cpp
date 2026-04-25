@@ -45,6 +45,7 @@ HRESULT Bullet::Initialize(void* arg)
 	m_DamageInfo = m_Desc.damageInfo;
 	m_Transform->Set_Position(m_Desc.initialPosition);
 	m_Transform->LookAt(m_Desc.initialPosition + m_Desc.direction);
+	m_IsUpperSin = m_Desc.useUpperSin;
 
 	if (FAILED(Ready_Components()))
 	{
@@ -64,8 +65,32 @@ void Bullet::Update(Float timeDelta)
 		Object::Destroy(shared_from_this());
 		return;
 	}
+
 	
-	m_Transform->Move_Forward(timeDelta, m_Speed);
+
+	if (m_IsUpperSin)
+	{
+		m_AccTime += timeDelta;
+		
+		auto pos = m_Transform->Get_Position();
+		pos +=  m_Desc.direction * timeDelta * m_Speed;
+
+		Float ascendSpeed = 0.5f;    // 초당 0.3만큼 상승
+		Float waveFrequency = 10.0f; // 진동 속도 (숫자가 클수록 빠름)
+		Float waveAmplitude = 0.5f;  // 진동 폭 (숫자가 클수록 높게 뜀)
+		
+		pos.y += ascendSpeed * timeDelta;
+		pos.y += cosf(m_AccTime * waveFrequency) * waveAmplitude * timeDelta * waveFrequency;
+		
+		m_Transform->Set_Position(pos);
+	}
+	else
+	{
+		auto pos = m_Transform->Get_Position();
+		pos += m_Desc.direction * timeDelta * m_Speed;
+		m_Transform->Set_Position(pos);
+	}
+
 	m_Collider->Update(m_Transform->Get_WorldMatrix());
 	m_Transform->Update_WorldMatrix();
 }

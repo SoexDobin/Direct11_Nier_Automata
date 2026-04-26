@@ -7,6 +7,7 @@
 
 #include "AABBCollider.h"
 #include "Entity.h"
+#include "Pl0000.h"
 
 Pl0000Body::Pl0000Body() : Pl0000Parts{} {}
 Pl0000Body::Pl0000Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -181,7 +182,20 @@ HRESULT Pl0000Body::Ready_Components()
 
 HRESULT Pl0000Body::Ready_AnimationNotify()
 {
-	using notify = 
+	using notify = AnimationTracker::ANIMATION_NOTIFY;
+
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::RUN_CYCLE), {
+		notify{L"Run_Stop_Sound", 15.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Run_Stop_Sound", 15.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"StepWL",SOUNDCHANNEL::CHANNEL_5, 0.35f); }},
+		notify{L"Run_Stop_Sound", 30.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Run_Stop_Sound", 30.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"StepWR",SOUNDCHANNEL::CHANNEL_5, 0.35f); }},
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::SPRINT_CYCLE), {
+		notify{L"Run_Stop_Sound", 8.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Run_Stop_Sound", 8.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"StepDL",SOUNDCHANNEL::CHANNEL_5, 0.35f); }},
+		notify{L"Run_Stop_Sound", 22.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Run_Stop_Sound", 22.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"StepDR",SOUNDCHANNEL::CHANNEL_5, 0.35f); }},
+		});
 
 	return S_OK;
 }

@@ -42,11 +42,171 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em0010_2",
+          "objectID": 4215260095,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              195.0,
+              10.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Texture"
             },
             {
               "properties": null,
               "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "VICube"
+            }
+          ],
+          "name": "SkyBoxLayer",
+          "objectID": 1853007010,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "SkyBoxLayer",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              10.0,
+              10.0,
+              10.0
+            ]
+          },
+          "typeName": "SkyBoxLayer"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "Em0010_1",
+          "objectID": 4214692420,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              205.0,
+              10.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "Em0010",
+          "objectID": 4160192466,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              200.0,
+              10.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
             },
             {
               "properties": null,
@@ -76,45 +236,6 @@
             ]
           },
           "typeName": "AmusementParkDome"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "Em0010_2",
-          "objectID": 4215260095,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em0010",
-          "transform": {
-            "position": [
-              195.0,
-              10.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em0010"
         },
         {
           "components": [
@@ -163,62 +284,23 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
               "typeName": "Navigation"
-            }
-          ],
-          "name": "AmusementParkMiddle",
-          "objectID": 1203705154,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "AmusementParkMiddle",
-          "transform": {
-            "position": [
-              151.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "AmusementParkMiddle"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
             },
             {
               "properties": null,
-              "typeName": "AABBCollider"
+              "typeName": "SphereCollider"
             }
           ],
-          "name": "NavigationSector",
-          "objectID": 3826940858,
+          "name": "Em0010_3",
+          "objectID": 4215070870,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "NavigationSector",
+          "prototypeTag": "Em0010",
           "transform": {
             "position": [
-              301.0,
-              0.0,
-              86.5
+              200.0,
+              10.0,
+              46.0
             ],
             "rotation": [
               0.0,
@@ -231,7 +313,7 @@
               1.0
             ]
           },
-          "typeName": "NavigationSector"
+          "typeName": "Em0010"
         },
         {
           "components": [
@@ -248,8 +330,47 @@
               "typeName": "Navigation"
             }
           ],
-          "name": "Em0010",
-          "objectID": 4160192466,
+          "name": "Em3000",
+          "objectID": 2943248738,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em3000",
+          "transform": {
+            "position": [
+              402.5,
+              20.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              -89.99994659423828,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em3000"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em0010_4",
+          "objectID": 4214124745,
           "parentObjectID": 0,
           "properties": null,
           "prototypeTag": "Em0010",
@@ -257,7 +378,7 @@
             "position": [
               200.0,
               10.0,
-              52.0
+              57.0
             ],
             "rotation": [
               0.0,
@@ -323,23 +444,19 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
+              "typeName": "AABBCollider"
             }
           ],
-          "name": "Em0010_4",
-          "objectID": 4214124745,
+          "name": "NavigationSector",
+          "objectID": 3826940858,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Em0010",
+          "prototypeTag": "NavigationSector",
           "transform": {
             "position": [
-              200.0,
-              10.0,
-              57.0
+              301.0,
+              0.0,
+              86.5
             ],
             "rotation": [
               0.0,
@@ -352,7 +469,7 @@
               1.0
             ]
           },
-          "typeName": "Em0010"
+          "typeName": "NavigationSector"
         },
         {
           "components": [
@@ -362,142 +479,25 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Model"
             },
             {
               "properties": null,
               "typeName": "Navigation"
-            }
-          ],
-          "name": "Em0010_1",
-          "objectID": 4214692420,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em0010",
-          "transform": {
-            "position": [
-              205.0,
-              10.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em0010"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            }
-          ],
-          "name": "Em3000",
-          "objectID": 2943248738,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em3000",
-          "transform": {
-            "position": [
-              402.5,
-              20.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              -89.99994659423828,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em3000"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "Em0010_3",
-          "objectID": 4215070870,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em0010",
-          "transform": {
-            "position": [
-              200.0,
-              10.0,
-              46.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em0010"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "VICube"
             },
             {
               "properties": null,
               "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "Texture"
             }
           ],
-          "name": "SkyBoxLayer",
-          "objectID": 1853007010,
+          "name": "AmusementParkMiddle",
+          "objectID": 1203705154,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "SkyBoxLayer",
+          "prototypeTag": "AmusementParkMiddle",
           "transform": {
             "position": [
-              0.0,
+              151.0,
               0.0,
               0.0
             ],
@@ -507,12 +507,12 @@
               0.0
             ],
             "scale": [
-              10.0,
-              10.0,
-              10.0
+              1.0,
+              1.0,
+              1.0
             ]
           },
-          "typeName": "SkyBoxLayer"
+          "typeName": "AmusementParkMiddle"
         }
       ]
     }

@@ -347,6 +347,30 @@
         {
             "path": "Sound/Alert.wav",
             "tag": "Alert"
+        },
+        {
+            "path": "Sound/em0000/WalkL.wav",
+            "tag": "WalkL"
+        },
+        {
+            "path": "Sound/em0000/WalkR.wav",
+            "tag": "WalkR"
+        },
+        {
+            "path": "Sound/pl0000/step/StepDL.wav",
+            "tag": "StepDL"
+        },
+        {
+            "path": "Sound/pl0000/step/StepDL.wav",
+            "tag": "StepDR"
+        },
+        {
+            "path": "Sound/pl0000/step/StepWL.wav",
+            "tag": "StepWL"
+        },
+        {
+            "path": "Sound/pl0000/step/StepWR.wav",
+            "tag": "StepWR"
         }
     ]
 }

@@ -43,7 +43,13 @@ HRESULT Em0010Body::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	m_RootBoneIndex = m_Model->Get_BoneIndexByName("em0010");
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	string boneName{};
+	if (levIndex == ETOI(LEVEL::GAMEPLAY))
+		boneName = "em0010";
+	else if (levIndex == ETOI(LEVEL::GAMEPLAY2))
+		boneName = "em0013";
+	m_RootBoneIndex = m_Model->Get_BoneIndexByName(boneName);
 
 	if (m_RootBoneIndex == -1)
 	{
@@ -256,6 +262,12 @@ HRESULT Em0010Body::Ready_AnimationNotify()
 		notify{L"Swing", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em_Tele1", SOUNDCHANNEL::CHANNEL_19, 0.5f); }},
 		notify{L"LeftSwing", 75.f, 85.f, activeLeftArm, deActiveLeftArm},
 		notify{L"RightSwing", 120.f, 130.f, activeRightArm, deActiveRightArm},
+		});
+	m_Model->Add_AnimNotify(ETOI(em0010State::SWING_TWICE), {
+		notify{L"Sprint1_Stop", 20.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_19); }},
+		notify{L"Sprint1", 20.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"WalkL", SOUNDCHANNEL::CHANNEL_19, 0.5f); }},
+		notify{L"Sprint2_Stop", 45.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_19); }},
+		notify{L"Sprint2", 45.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"WalkR", SOUNDCHANNEL::CHANNEL_19, 0.5f); }},
 		});
 
 	return S_OK;

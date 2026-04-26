@@ -115,11 +115,12 @@ HRESULT Pl0000::Initialize(void* arg)
 			{
 				camera->Set_Target(shared_from_this());
 			}
+			camera->Get_Transform()->Set_Rotation(Vector3{20.f, 90.f, 0.f});
 		});
 	Pl0000HpBar::PL0000_HP_BAR_DESC desc{};
 	desc.target = static_pointer_cast<Entity>(shared_from_this());
-	desc.sizeX = 250.f;
-	desc.sizeY = 20.f;
+	desc.sizeX = 400.f;
+	desc.sizeY = 15.f;
 	desc.anchor = UI_ANCHOR::TOP_LEFT;
 	desc.x = 300.f;
 	desc.y = 80.f;

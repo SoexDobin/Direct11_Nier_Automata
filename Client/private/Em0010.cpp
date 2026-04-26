@@ -62,11 +62,12 @@ HRESULT Em0010::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	GAME_INSTANCE->Add_Instance_Event(ETOI(LEVEL::GAMEPLAY), L"Add_HpBar", [this]()
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	GAME_INSTANCE->Add_Instance_Event(levIndex, L"Add_HpBar", [this]()
 		{
 			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
 			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
-			UI_hpDesc.worldOffset = Vector3{ 0.f, 2.f, 0.f };
+			UI_hpDesc.worldOffset = Vector3{ 0.f, 3.f, 0.f };
 			UI_hpDesc.anchor = UI_ANCHOR::TOP_LEFT;
 			UI_hpDesc.sizeX = 200.f;
 			UI_hpDesc.sizeY = 10.f;
@@ -131,7 +132,9 @@ void Em0010::TakeDamage(const DAMAGE_INFO& dmgInfo)
 	Play_HitSFX(dmgInfo);
 	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
 		
-	if (dmgInfo.attackType != ATK_TYPE::POD && m_States->Get_CurMonsterState() != MonsterStateMachine::MONSTER_STATE::ATTACK)
+	Bool attackDesc = m_States->Get_CurMonsterState() == MonsterStateMachine::MONSTER_STATE::ATTACK && m_MainBody->Get_AnimationProgress() <= 0.3f;
+
+	if (dmgInfo.attackType != ATK_TYPE::POD && attackDesc)
 		m_States->Change_State(MonsterStateMachine::MONSTER_STATE::Hit);
 
 	Monster::TakeDamage(dmgInfo);
@@ -140,6 +143,7 @@ void Em0010::TakeDamage(const DAMAGE_INFO& dmgInfo)
 void Em0010::OnDeath()
 {
 	m_MainBody->OffHitBox();
+	m_PhysicalZone->Set_Active(false);
 	m_States->Change_State(MonsterStateMachine::MONSTER_STATE::DEAD);
 }
 
@@ -180,7 +184,7 @@ HRESULT Em0010::Ready_PartObjects()
 	MonsterSight::MONSTER_SIGHT_DESC em0010SightDesc{};
 	em0010SightDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
 	em0010SightDesc.Owner = thisObject;
-	em0010SightDesc.radius = 8.f;
+	em0010SightDesc.radius = 10.f;
 	em0010SightDesc.offset = Vector3::Zero;
 	if (FAILED(Add_PartObject(levIndex, L"MonsterSight", L"Em0010Sight", &em0010SightDesc)))
 		return E_FAIL;
@@ -192,7 +196,7 @@ HRESULT Em0010::Ready_PartObjects()
 	DAMAGE_INFO em0010DamageInfo{};
 	em0010DamageInfo.attacker = shared_from_this();
 	em0010DamageInfo.attackType = ATK_TYPE::HEAVY;
-	em0010DamageInfo.damage = 10.f;
+	em0010DamageInfo.damage = 30.f;
 	em0010DamageInfo.groggyWeight = 10.f;
 	em0010DamageInfo.knockbackForce = 1.f;
 

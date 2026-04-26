@@ -181,6 +181,7 @@ HRESULT Pl0000Body::Ready_Components()
 
 HRESULT Pl0000Body::Ready_AnimationNotify()
 {
+	using notify = 
 
 	return S_OK;
 }

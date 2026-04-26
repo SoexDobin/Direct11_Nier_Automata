@@ -173,7 +173,7 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
     if (FAILED(GAME_INSTANCE->Add_ShadowLight(shadowLightDesc)))
         return E_FAIL;
 
-    GAME_INSTANCE->PlaySoundFX(L"CityRuins", SOUNDCHANNEL::CHANNEL_1, 0.3f);
+    GAME_INSTANCE->PlaySoundFX(L"CityRuins", SOUNDCHANNEL::CHANNEL_1, 0.2f);
 
     m_isFinished = true;
     if (!m_OwnerLevel.expired())
@@ -229,7 +229,7 @@ HRESULT Loader::Loading_For_GamePlayLevel2()
     if (FAILED(GAME_INSTANCE->Add_ShadowLight(shadowLightDesc)))
         return E_FAIL;
 
-    GAME_INSTANCE->PlaySoundFX(L"AmusementPark", SOUNDCHANNEL::CHANNEL_1, 0.3f);
+    GAME_INSTANCE->PlaySoundFX(L"AmusementPark", SOUNDCHANNEL::CHANNEL_1, 0.2f);
 
     m_isFinished = true;
     if (!m_OwnerLevel.expired())

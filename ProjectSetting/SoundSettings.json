@@ -343,6 +343,10 @@
         {
             "path": "Sound/em3000/SpotLight.wav",
             "tag": "SpotLight"
+        },
+        {
+            "path": "Sound/Alert.wav",
+            "tag": "Alert"
         }
     ]
 }

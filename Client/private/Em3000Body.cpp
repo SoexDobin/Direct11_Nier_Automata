@@ -458,7 +458,7 @@ void Em3000Body::Fire_Howitzer(Float speed, Float gravity)
 		howitzerDesc.maxDistance = 50.f;
 		howitzerDesc.resourceTag = L"candy";
 		howitzerDesc.targetLayer = L"Player";
-		howitzerDesc.damage = 20.f;
+		howitzerDesc.damage = 30.f;
 		howitzerDesc.isPermanent = true;
 		howitzerDesc.useCurvedFlight = true;
 		howitzerDesc.gravityStrength = gravity;

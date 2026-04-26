@@ -48,12 +48,17 @@ void AmusementParkDome::SetUp_Light()
 		GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
 	}
 
-	// 중앙 큰 라이트 (기존 유지하되 좌표 보정 필요 시 수정)
+
 	lDesc.position = { 400.f, 40.f, 52.f };
 	lDesc.range = 50.f;
 	lDesc.diffuse = Vector4{ 55.f, 55.f, 55.f, 55.f };
 	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
 	
+	lDesc.position = { 440.f, 40.f, 52.f };
+	lDesc.range = 35.f;
+	lDesc.diffuse = Vector4{ 155.f, 155.f, 155.f, 255.f };
+	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+
 	m_IsEntry = true;
 }
 
@@ -81,7 +86,7 @@ void AmusementParkDome::SetUp_Trigger()
 				Destroy(middleObj);
 		});
 
-	// 트리거 인스턴스화
+	
 	GAME_INSTANCE->Instantiate<TriggerObject>(triggerProtoTag, levIndex, &triggerDesc);
 
 	m_IsTriggerEntry = true;

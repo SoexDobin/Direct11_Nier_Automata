@@ -15,8 +15,8 @@ StateEm3000_Intro::StateEm3000_Intro(const wstring& tag, const Shared<Em3000>& o
 HRESULT StateEm3000_Intro::Initialize()
 {
 	CinematicCamera::CINEMATIC_CAMERA_DESC cineDesc{};
-	cineDesc.startPosition = Vector3(396.f, 28.f, 52.f);
-	cineDesc.targetPosition = Vector3(386.f, 28.f, 52.f);
+	cineDesc.startPosition = Vector3(399.f, 28.f, 52.f);
+	cineDesc.targetPosition = Vector3(390.f, 28.f, 52.f);
 	cineDesc.startRotation = Vector3(0.f, 1.5f, 0.f);
 	cineDesc.targetRotation = Vector3(0.f, 1.5f, 0.f);
 	cineDesc.startFov = 60.f;
@@ -71,7 +71,7 @@ void StateEm3000_Intro::Update(Float timeDelta)
 		lightDesc.offset = Vector3(0.f, 7.f, 0.f); 
 
 		lightDesc.lightDesc.type = LIGHT::POINT;
-		lightDesc.lightDesc.range = 9.f;
+		lightDesc.lightDesc.range = 10.f;
 		lightDesc.lightDesc.diffuse = Vector4(1.0f, 0.8f, 0.6f, 1.0f); // 따뜻한 빛
 		lightDesc.lightDesc.ambient = Vector4(0.2f, 0.2f, 0.2f, 1.0f);
 		lightDesc.lightDesc.specular = Vector4(1.0f, 1.0f, 1.0f, 1.0f);

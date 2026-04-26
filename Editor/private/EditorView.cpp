@@ -42,6 +42,24 @@ void EditorView::RenderView(Bool isResize) {
 		else
 			ImGui::Text("Selected: None");
 
+		auto camera = EDITOR->Get_EditorCamera();
+		if (camera)
+		{
+			ImGui::Separator();
+			Vector3 eye = camera->Get_Transform()->Get_Position();
+			Vector3 look = camera->Get_Transform()->Get_Look();
+			Vector3 rot = camera->Get_Transform()->Get_Rotation();
+			Float fov = XMConvertToDegrees(camera->Get_FovY());
+
+			ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "[Editor Camera]");
+			ImGui::Text("Eye : (%.2f, %.2f, %.2f)", eye.x, eye.y, eye.z);
+			ImGui::Text("At  : (%.2f, %.2f, %.2f)", eye.x + look.x, eye.y + look.y, eye.z + look.z);
+			ImGui::Text("Look: (%.2f, %.2f, %.2f)", look.x, look.y, look.z);
+			ImGui::Text("Rot : (%.2f, %.2f, %.2f)", rot.x, rot.y, rot.z);
+			ImGui::Text("FOV : %.1f", fov);
+			ImGui::Separator();
+		}
+
 		if (srvScene && !isResize)
 		{
 			ImVec2 currentSize = ImGui::GetContentRegionAvail();

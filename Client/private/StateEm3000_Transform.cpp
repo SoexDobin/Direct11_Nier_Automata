@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "StateEm3000_Transform.h"
 
+#include <Game.h>
+
 #include "Em3000.h"
 #include "Em3000Body.h"
 #include "Em3000StateMachine.h"
@@ -28,6 +30,9 @@ void StateEm3000_Transform::Update(Float timeDelta)
 	{
 		m_Owner.lock()->SummonPuppet(4);
 		m_States.lock()->Change_State(Em3000::EM3000_STATE::PHASE2_CHASE);
+
+		m_Owner.lock()->Get_IntroLight()->Set_Diffuse(Vector4{ 102.f, 4.f, 4.f, 255.f });
+		GAME_INSTANCE->PlaySoundFXOnce(L"SpotLight", SOUNDCHANNEL::CHANNEL_32, 0.5f);
 	}
 }
 

@@ -26,6 +26,9 @@ public:
     void On_Enable() override;
     void On_Disable() override;
 
+    void Set_Diffuse(const Vector4& diffuse);
+    Vector4 Get_Diffuse() const;
+
 public:
     void Priority_Update(Float timeDelta) override;
     void Update(Float timeDelta) override;
@@ -34,7 +37,7 @@ public:
     const LIGHT_DESC& Get_LightDesc() const;
     LIGHT_DESC& Get_LightDesc_Ref();
 
-private:
+protected:
     Shared<Light> m_Light{ nullptr };
 
 public:

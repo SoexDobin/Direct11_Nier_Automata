@@ -194,6 +194,7 @@ void Em3100::TakeDamage(const DAMAGE_INFO& dmgInfo)
 void Em3100::OnDeath()
 {
 	Start_Death();
+	m_MainBody->Off_Collider();
 }
 
 void Em3100::Start_Death()
@@ -249,6 +250,7 @@ HRESULT Em3100::Ready_PartObjects()
 
 	if (FAILED(Add_PartObject(GAME_INSTANCE->Get_TargetLevelIndex(), L"Em3100Body", L"Em3100Body", &em3100BodyDesc)))
 		return E_FAIL;
+	m_MainBody = static_pointer_cast<Em3100Body>(Find_PartObject(L"Em3100Body"));
 
 	return S_OK;
 }

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Em3000State_Groogy2.h"
 
+#include <Game.h>
+
 #include "Em3000.h"
 #include "Em3000Body.h"
 #include "Em3000StateMachine.h"
@@ -23,7 +25,8 @@ Bool Em3000State_Groogy2::StateEnterInvoke()
 	m_Body.lock()->Set_Animation(ETOI(Em3000::EM3000_STATE::PHASE2_IDLE), 0.1f, true);
 	m_GroggyDelta = 0.f;
 
-
+	m_Owner.lock()->Get_IntroLight()->Set_Diffuse(Vector4{ 4.f, 4.f, 102.f, 255.f });
+	GAME_INSTANCE->PlaySoundFXOnce(L"SpotLight", SOUNDCHANNEL::CHANNEL_32, 0.5f);
 
 	return true;
 }
@@ -44,6 +47,8 @@ void Em3000State_Groogy2::Late_Update(Float timeDelta)
 void Em3000State_Groogy2::StateExitInvoke()
 {
 	m_GroggyDelta = 0.f;
+	m_Owner.lock()->Get_IntroLight()->Set_Diffuse(Vector4{ 102.f, 4.f, 4.f, 255.f });
+	GAME_INSTANCE->PlaySoundFXOnce(L"SpotLight", SOUNDCHANNEL::CHANNEL_32, 0.5f);
 }
 
 Shared<Em3000State_Groogy2> Em3000State_Groogy2::Create(const wstring& tag, const Shared<Em3000>& owner)

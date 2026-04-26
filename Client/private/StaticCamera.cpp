@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "StaticCamera.h"
+
+#include <SpdLogger.h>
+#include "Game.h"
 #include "ClientSettingManager.h"
 
 StaticCamera::StaticCamera() : Camera{} {}
@@ -36,6 +39,7 @@ void StaticCamera::Update(Float timeDelta)
 {
 	Camera::Update(timeDelta);
 }
+
 
 Shared<StaticCamera> StaticCamera::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {

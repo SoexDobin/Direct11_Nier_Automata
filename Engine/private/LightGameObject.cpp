@@ -101,3 +101,15 @@ LIGHT_DESC& LightGameObject::Get_LightDesc_Ref()
 {
 	return m_Light->Get_LightDesc_Ref();
 }
+
+void LightGameObject::Set_Diffuse(const Vector4& diffuse)
+{
+	if (m_Light)
+		m_Light->Get_LightDesc_Ref().diffuse = diffuse;
+}
+Vector4 LightGameObject::Get_Diffuse() const
+{
+	if (m_Light)
+		return m_Light->Get_LightDesc().diffuse;
+	return Vector4::Zero;
+}

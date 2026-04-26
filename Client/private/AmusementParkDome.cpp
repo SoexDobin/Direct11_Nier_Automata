@@ -27,17 +27,33 @@ void AmusementParkDome::SetUp_Light()
 	AmusementParkLight::AMUSEMENT_LIGHT_DESC desc{};
 	auto& lDesc = desc.lightDesc;
 	lDesc.type = LIGHT::POINT;
-	lDesc.range = 10.f;
+	lDesc.range = 15.f;
 	lDesc.diffuse = Vector4{ 255.f, 255.f, 255.f, 255.f };
 	lDesc.ambient = Vector4{ 100.f, 100.f, 100.f, 255.f };
 	lDesc.specular = Vector4{ 25.f, 25.f, 25.f, 255.f };
 	lDesc.direction = Vector4::Zero;
 
+	struct LightPos { Float x; Float z; };
+	vector<LightPos> positions = {
+		{ 225.f, 46.5f }, { 225.f, 56.5f }, 
+		{ 240.f, 56.5f },
+		{ 255.f, 46.5f },
+		{ 272.f, 46.5f },
+		{ 289.f, 46.5f }, { 289.f, 56.5f }  
+	};
+
+	for (const auto& pos : positions)
+	{
+		lDesc.position = Vector4(pos.x, 15.f, pos.z, 1.f);
+		GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
+	}
+
+	// 중앙 큰 라이트 (기존 유지하되 좌표 보정 필요 시 수정)
 	lDesc.position = { 400.f, 40.f, 52.f };
 	lDesc.range = 50.f;
+	lDesc.diffuse = Vector4{ 55.f, 55.f, 55.f, 55.f };
 	GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc);
 	
-
 	m_IsEntry = true;
 }
 

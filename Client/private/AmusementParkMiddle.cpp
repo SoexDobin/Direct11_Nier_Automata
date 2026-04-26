@@ -6,12 +6,59 @@
 #include "Navigation.h"
 #include <SpdLogger.h>
 
+#include "AmusementParkLight.h"
+
 AmusementParkMiddle::AmusementParkMiddle(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: WorldObject{ device, context } {
 }
 
 AmusementParkMiddle::AmusementParkMiddle(const AmusementParkMiddle& rhs)
 	: WorldObject{ rhs } {
+}
+
+void AmusementParkMiddle::SetUp_EntryLight()
+{
+	if (m_IsEntry) return;
+
+	uint32 levIndex = ETOI(LEVEL::GAMEPLAY2);
+	wstring protoTag = L"AmusementParkLight";
+
+	AmusementParkLight::AMUSEMENT_LIGHT_DESC desc{};
+	auto& lDesc = desc.lightDesc;
+	lDesc.type = LIGHT::POINT;
+	lDesc.range = 12.f;
+	lDesc.ambient = Vector4{ 55.f, 55.f, 55.f, 255.f };
+	lDesc.specular = Vector4{ 25.f, 25.f, 25.f, 255.f };
+	lDesc.direction = Vector4::Zero;
+
+	Float xValues[] = { 80.f, 90.f, 97.f, 86.f, 100.f, 121.f, 142.f, 163 };
+	Float zValues[] = { 42.f, 62.f };
+	Vector4 colors[] = {
+		Vector4(230.f, 30.f, 40.f, 255.f),  // Red
+		Vector4(0.f, 150.f, 70.f, 255.f),   // Green
+		Vector4(255.f, 200.f, 0.f, 255.f)   // Yellow
+	};
+
+	int colorIndex = 0;
+	for (auto x : xValues)
+	{
+		for (auto z : zValues)
+		{
+			lDesc.position = Vector4(x, 10.f, z, 1.f);
+			lDesc.diffuse = colors[colorIndex % 3];
+			m_Lights.push_back(GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc));
+			colorIndex++;
+		}
+	}
+
+	lDesc.range = 30.f;
+	lDesc.diffuse = Vector4{ 255.f, 255.f, 255.f, 255.f };
+	lDesc.ambient = Vector4{ 55.f, 55.f, 55.f, 255.f };
+	lDesc.specular = Vector4{ 25.f, 25.f, 25.f, 255.f };
+	lDesc.position = Vector4{ 200.f, 20.f, 52.f, 1.f };
+	m_Lights.push_back(GAME_INSTANCE->Instantiate<AmusementParkLight>(protoTag, levIndex, &desc));
+
+	m_IsEntry = true;
 }
 
 HRESULT AmusementParkMiddle::Initialize_Prototype()
@@ -38,6 +85,12 @@ HRESULT AmusementParkMiddle::Initialize(void* arg)
 
 void AmusementParkMiddle::On_Destroy()
 {
+	for (auto light : m_Lights)
+	{
+		Destroy(light);
+	}
+	m_Lights.clear();
+
 	WorldObject::On_Destroy();
 }
 
@@ -53,6 +106,7 @@ void AmusementParkMiddle::On_Disable()
 
 void AmusementParkMiddle::Update(Float timeDelta)
 {
+	SetUp_EntryLight();
 	m_Transform->Update_WorldMatrix();
 }
 

@@ -51,12 +51,10 @@ void FreeCamera::Priority_Update(Float timeDelta)
 	Long mouseWheel = GAME_INSTANCE->Get_DIMouseMove(DIMM::WHEEL);
 	if (mouseWheel != 0)
 	{
-		// 휠은 Y축 제약 없이 부드럽게 시선 방향으로 빨려 들어가야 줌 효과가 납니다.
 		Vector3 zoomDir = m_Transform->Get_WorldMatrix().Backward();
 		zoomDir.Normalize();
 		m_Transform->Set_Position(m_Transform->Get_Position() + zoomDir * static_cast<Float>(mouseWheel) * timeDelta * 0.5f);
 	}
-	// 3. 우클릭 드래그 시 회전 (Turn)
 	if (GAME_INSTANCE->Get_DIMouseState(DIMB::RBUTTON) & 0x80)
 	{
 		Long mouseMoveX = GAME_INSTANCE->Get_DIMouseMove(DIMM::X);
@@ -88,6 +86,16 @@ void FreeCamera::Update(Float timeDelta) {}
 void FreeCamera::Late_Update(Float timeDelta) {}
 void FreeCamera::Fixed_Update(Float fixedDelta){}
 HRESULT FreeCamera::Render() { return S_OK; }
+
+void FreeCamera::Log_Transform()
+{
+	Vector3 pos = m_Transform->Get_Position();
+	Vector3 rot = m_Transform->Get_Rotation();
+	Float fov = XMConvertToDegrees(m_FovY);
+
+	LOG_INFO(L"[StaticCamera Log] Pos: ({}, {}, {}), Rot: ({}, {}, {}), FOV: {}",
+		pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, fov);
+}
 
 Shared<FreeCamera> FreeCamera::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {

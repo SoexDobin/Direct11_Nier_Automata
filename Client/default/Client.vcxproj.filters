@@ -356,6 +356,9 @@
     <ClInclude Include="..\public\Em3000State_Dead.h">
       <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\CinematicCamera.h">
+      <Filter>02. GameObject\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -703,6 +706,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Em3000State_Intro.cpp">
       <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CinematicCamera.cpp">
+      <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

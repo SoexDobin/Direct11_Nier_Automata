@@ -3,8 +3,9 @@
 
 
 NS_BEGIN(Client)
+	class CinematicCamera;
 
-class CLIENT_DLL StateEm3000_Intro final : public StateEm3000
+	class CLIENT_DLL StateEm3000_Intro final : public StateEm3000
 {
 public:
 	explicit StateEm3000_Intro(const wstring& tag, const Shared<Em3000>& owner);
@@ -21,6 +22,7 @@ public:
 
 private:
 	Bool m_IsIntroStart{false};
+	Shared<CinematicCamera> m_CinematicCamera{ nullptr };
 
 public:
 	static Shared<StateEm3000_Intro> Create(const wstring& tag, const Shared<Em3000>& owner);

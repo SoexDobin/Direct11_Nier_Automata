@@ -1,4 +1,5 @@
 #pragma once
+#include "AmusementParkLight.h"
 #include "Monster.h"
 
 NS_BEGIN(Engine)
@@ -56,6 +57,12 @@ public:
     const list<Shared<Entity>>& Get_Puppets() { return m_Puppets; }
     void SummonPuppet(uint32 summonCount = 1);
 
+public:
+    void Set_IntroLight(const Shared<class AmusementParkLight>& light) { m_light = light; }
+    Shared<class AmusementParkLight> Get_IntroLight() const { return m_light; }
+    Shared<GameObject> Get_Target() const { return m_TargetPlayer.lock(); }
+
+
 private:
     HRESULT Ready_PartObjects();
     HRESULT Ready_Components();
@@ -68,6 +75,8 @@ private:
 
     Shared<Em3000MeleeSight> m_MeleeSight{ nullptr };
     Shared<MonsterSight> m_Sight{ nullptr };
+
+    Shared<AmusementParkLight> m_light{ nullptr };
     
     std::list<Shared<Entity>> m_Puppets;
     Bool m_IsDestroying{ false };

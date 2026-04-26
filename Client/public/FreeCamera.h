@@ -34,6 +34,10 @@ public:
 private:
 	Float m_MouseSensitive{};
 
+private:
+	void Log_Transform();
+	Byte m_PrevF4State{ 0 };
+
 public:
 	static Shared<FreeCamera> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg = nullptr) override;

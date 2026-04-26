@@ -26,6 +26,7 @@ public:
 
 private:
 	void PlayEvadeSFX(EVADE_PHASE evadePhase) const;
+	void SpawnGhost();
 
 public:
 	Bool TryEvade_FromDash();
@@ -38,6 +39,11 @@ private:
 	DASH_DIR m_DashDir{ DASH_DIR::NONE };
 	Float m_OriginalFov{ 0.f };
 	EVADE_PHASE m_EvadePhase{ EVADE_PHASE::ENTER };
+
+	Float m_GhostSpawnTimer{ 0.f };
+	uint32 m_GhostSpawnCount{ 0 };
+	Float m_GhostSpawnInterval{ 0.06f };
+	uint32 m_GhostMaxCount{ 5 };
 
 public:
 	static Shared<State2B_Evade> Create(const wstring& tag, const Shared<Pl0000>& owner);

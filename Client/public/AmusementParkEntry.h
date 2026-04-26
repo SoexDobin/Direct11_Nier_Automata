@@ -34,6 +34,7 @@ public:
 	void Submit_RenderGroup() override;
 
 private:
+	vector<Shared<GameObject>> m_Lights;
 	Bool m_IsEntry{ false };
 
 public:

@@ -56,6 +56,7 @@
 #include "WeaponHalo.h"
 #include "MonsterShockWave.h"
 #include "Em3000StateMachine.h"
+#include "Pl0000EvadeGhost.h"
 
 using rttr::registration;
 
@@ -65,6 +66,7 @@ using rttr::registration;
 // ==============================================================
 // <AUTO_GENERATED_INCLUDES>
 #include "AmusementParkLight.h"
+#include "CinematicCamera.h"
 #include "Em3000MeleeSight.h"
 #include "ExplodeEffect.h"
 #include "ExplodeEffect_Instance.h"
@@ -188,6 +190,11 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &Pl0000Shockwave::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000Shockwave::Create(device, context); })
+        (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
+    rttr::registration::class_<Pl0000EvadeGhost>("Pl0000EvadeGhost")
+        .constructor<>()
+        .method("Clone", &Pl0000EvadeGhost::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000EvadeGhost::Create(device, context); })
         (rttr::metadata("Level", LEVELS(ETOI(LEVEL::GAMEPLAY), ETOI(LEVEL::GAMEPLAY2))));
     rttr::registration::class_<Pl0000MonsterChecker>("Pl0000MonsterChecker")
         .constructor<>()
@@ -389,6 +396,11 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &AmusementParkLight::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return AmusementParkLight::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<CinematicCamera>("CinematicCamera")
+        .constructor<>()
+        .method("Clone", &CinematicCamera::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return CinematicCamera::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<Em3000MeleeSight>("Em3000MeleeSight")
         .constructor<>()

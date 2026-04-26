@@ -23,6 +23,7 @@ public:
 	void Priority_Update(Float timeDelta) override;
 	void Update(Float timeDelta) override;
 
+
 public:
 	static Shared<StaticCamera> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;

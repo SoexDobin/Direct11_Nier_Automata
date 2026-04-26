@@ -1,4 +1,6 @@
 #pragma once
+#include <AABBCollider.h>
+
 #include "PartObject.h"
 
 NS_BEGIN(Engine)
@@ -37,6 +39,8 @@ public:
 	void Fixed_Update(Float fixedDelta) override;
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
+
+	void Off_Collider() const { m_HitBox->Set_Active(false); }
 
 private:
 	HRESULT Bind_ShaderResources();

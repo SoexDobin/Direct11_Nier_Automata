@@ -32,6 +32,7 @@ public:
 
 public:
 	Shared<Model> Get_ModelComponent() { return m_Model; }
+	Shared<Shader> Get_ShaderComponent() { return m_Shader; }
 	virtual void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop);
 	uint32 Get_CurrentAnimationIndex() const { return m_Model->Get_AnimationIndex(); }
 	uint32 Get_NextAnimationIndex() const { return m_Model->Get_NextAnimationIndex(); }

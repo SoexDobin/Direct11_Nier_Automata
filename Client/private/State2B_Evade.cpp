@@ -13,6 +13,7 @@
 #include "Model.h"
 #include "Pl0000Movement.h"
 #include "Random_Helper.h"
+#include "Pl0000EvadeGhost.h"
 
 State2B_Evade::State2B_Evade(const wstring& tag, const Shared<Pl0000>& owner)
 	: State2B{tag, owner}
@@ -68,7 +69,6 @@ Bool State2B_Evade::StateEnterInvoke()
 		LOG_ERROR(L"Wrong Input At DashState Enter");
 		return false;
 	}
-	/* (이전 시간에 구성한 MovementData 방향 연산 및 주입은 필요시 Update나 여기서 1회 수행) */
 
 	return true;
 
@@ -84,6 +84,18 @@ void State2B_Evade::Update(Float timeDelta)
 
 	if (m_EvadePhase == EVADE_PHASE::EVADE)
 	{
+		/* ── Ghost Trail: 일정 간격으로 추가 잔상 스폰 ── */
+		if (m_GhostSpawnCount < m_GhostMaxCount)
+		{
+			m_GhostSpawnTimer += timeDelta;
+			if (m_GhostSpawnTimer >= m_GhostSpawnInterval)
+			{
+				m_GhostSpawnTimer -= m_GhostSpawnInterval;
+				SpawnGhost();
+				++m_GhostSpawnCount;
+			}
+		}
+
 		Pl0000Movement::PL0000_MOVEMENT_DATA moveData{};
 		moveData.direction = Calculate_Direction();
 		moveData.isMove = (moveData.direction.LengthSquared() > 0.f);
@@ -274,7 +286,34 @@ Bool State2B_Evade::TryEvade_FromDash()
 	auto owner = m_Owner.lock();
 	owner->Set_InvincibleTime(1.0f);
 	m_Owner.lock()->Trigger_GlobalLag(0.2f, 0.75f);
+
+	/* ── Ghost Trail: 첫 잔상 스폰 + 타이머 리셋 ── */
+	m_GhostSpawnTimer = 0.f;
+	m_GhostSpawnCount = 1;
+	SpawnGhost();
+
 	return true; 
+}
+
+void State2B_Evade::SpawnGhost()
+{
+	auto body = m_Body.lock();
+	if (!body) return;
+
+	auto model = body->Get_ModelComponent();
+	auto shader = body->Get_ShaderComponent();
+	if (!model || !shader) return;
+
+	Pl0000EvadeGhost::EVADE_GHOST_DESC desc{};
+	desc.snapShots = model->Get_SnapShot_BoneMatrices();
+	desc.worldMatrix = *body->Get_CombinedWorldMatrix();
+	desc.lifeTime = 0.4f;
+	desc.ghostColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 투명한 흰색
+	desc.model = model;
+	desc.shader = shader;
+
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	GAME_INSTANCE->Instantiate<Pl0000EvadeGhost>(L"Pl0000EvadeGhost", levIndex, &desc);
 }
 
 Shared<State2B_Evade> State2B_Evade::Create(const wstring& tag, const Shared<Pl0000>& owner)

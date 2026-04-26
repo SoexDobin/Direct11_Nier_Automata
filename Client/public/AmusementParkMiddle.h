@@ -18,6 +18,9 @@ public:
 	explicit AmusementParkMiddle(const AmusementParkMiddle& rhs);
 	~AmusementParkMiddle() override = default;
 
+private:
+	void SetUp_EntryLight();
+
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
@@ -29,6 +32,10 @@ public:
 	void Update(Float timeDelta) override;
 	HRESULT Render() override;
 	void Submit_RenderGroup() override;
+
+private:
+	vector<Shared<GameObject>> m_Lights;
+	Bool m_IsEntry{ false };
 
 public:
 	static Shared<AmusementParkMiddle> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

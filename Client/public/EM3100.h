@@ -52,6 +52,7 @@ private:
 	HRESULT Ready_Components();
 
 private:
+	Shared<class Em3100Body> m_MainBody{ nullptr };
 	Shared<SphereCollider> m_InteractionZone{ nullptr };
 	Shared<MonsterStateMachine> m_States{ nullptr };
 

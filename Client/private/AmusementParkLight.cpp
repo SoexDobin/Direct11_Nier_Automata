@@ -14,6 +14,13 @@ HRESULT AmusementParkLight::Initialize_Prototype()
 
 HRESULT AmusementParkLight::Initialize(void* arg)
 {
+	if (arg)
+	{
+		auto& desc = *static_cast<AMUSEMENT_LIGHT_DESC*>(arg);
+		m_Target = desc.target;
+		m_Offset = desc.offset;
+	}
+
 	return LightGameObject::Initialize(arg);
 }
 
@@ -39,11 +46,18 @@ void AmusementParkLight::Priority_Update(Float timeDelta)
 
 void AmusementParkLight::Update(Float timeDelta)
 {
-	
+		
 }
 
 void AmusementParkLight::Late_Update(Float timeDelta)
 {
+	if (!m_Target.expired())
+	{
+		
+		auto targetPos = m_Target.lock()->Get_Transform()->Get_Position();
+		m_Transform->Set_Position(targetPos + m_Offset);
+	}
+	
 	LightGameObject::Late_Update(timeDelta);
 }
 

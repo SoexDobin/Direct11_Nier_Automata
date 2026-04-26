@@ -187,6 +187,7 @@
     <ClInclude Include="..\public\AmusementParkMiddle.h" />
     <ClInclude Include="..\public\AmusementParkBackGround.h" />
     <ClInclude Include="..\public\Bullet.h" />
+    <ClInclude Include="..\public\CinematicCamera.h" />
     <ClInclude Include="..\public\CityOfRuinBridge.h" />
     <ClInclude Include="..\public\CityOfRuinBuilding.h" />
     <ClInclude Include="..\public\CityOfRuinCentral.h" />
@@ -308,6 +309,7 @@
     <ClCompile Include="..\private\AmusementParkMiddle.cpp" />
     <ClCompile Include="..\private\AmusementParkBackGround.cpp" />
     <ClCompile Include="..\private\Bullet.cpp" />
+    <ClCompile Include="..\private\CinematicCamera.cpp" />
     <ClCompile Include="..\private\CityOfRuinBridge.cpp" />
     <ClCompile Include="..\private\CityOfRuinBuilding.cpp" />
     <ClCompile Include="..\private\CityOfRuinCentral.cpp" />

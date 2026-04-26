@@ -11,7 +11,46 @@
             },
             {
               "properties": null,
+              "typeName": "VICube"
+            },
+            {
+              "properties": null,
               "typeName": "Shader"
+            },
+            {
+              "properties": null,
+              "typeName": "Texture"
+            }
+          ],
+          "name": "SkyBoxLayer",
+          "objectID": 1853007010,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "SkyBoxLayer",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              10.0,
+              10.0,
+              10.0
+            ]
+          },
+          "typeName": "SkyBoxLayer"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
             },
             {
               "properties": null,
@@ -19,19 +58,54 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "SphereCollider"
             }
           ],
-          "name": "AmusementParkMiddle",
-          "objectID": 1203705154,
+          "name": "Pl0000",
+          "objectID": 4267756554,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "AmusementParkMiddle",
+          "prototypeTag": "Pl0000",
           "transform": {
             "position": [
-              151.0,
+              -30.0,
               0.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              89.99994659423828,
               0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Pl0000"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "AABBCollider"
+            }
+          ],
+          "name": "NavigationSector",
+          "objectID": 3826940858,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "NavigationSector",
+          "transform": {
+            "position": [
+              301.0,
+              0.0,
+              86.5
             ],
             "rotation": [
               0.0,
@@ -44,7 +118,7 @@
               1.0
             ]
           },
-          "typeName": "AmusementParkMiddle"
+          "typeName": "NavigationSector"
         },
         {
           "components": [
@@ -97,25 +171,68 @@
             },
             {
               "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
+            }
+          ],
+          "name": "AmusementParkEntry",
+          "objectID": 1172218866,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "AmusementParkEntry",
+          "transform": {
+            "position": [
+              0.0,
+              0.0,
+              86.5
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "AmusementParkEntry"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
               "typeName": "Shader"
             },
             {
               "properties": null,
-              "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "VICube"
+              "typeName": "Model"
             }
           ],
-          "name": "SkyBoxLayer",
-          "objectID": 1853007010,
+          "name": "AmusementParkMiddle",
+          "objectID": 1203705154,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "SkyBoxLayer",
+          "prototypeTag": "AmusementParkMiddle",
           "transform": {
             "position": [
-              0.0,
+              151.0,
               0.0,
               0.0
             ],
@@ -125,12 +242,12 @@
               0.0
             ],
             "scale": [
-              10.0,
-              10.0,
-              10.0
+              1.0,
+              1.0,
+              1.0
             ]
           },
-          "typeName": "SkyBoxLayer"
+          "typeName": "AmusementParkMiddle"
         },
         {
           "components": [
@@ -171,54 +288,11 @@
             },
             {
               "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
               "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "Model"
-            }
-          ],
-          "name": "AmusementParkEntry",
-          "objectID": 1172218866,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "AmusementParkEntry",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              86.5
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "AmusementParkEntry"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
             },
             {
               "properties": null,
               "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
             }
           ],
           "name": "Em3000",
@@ -244,80 +318,6 @@
             ]
           },
           "typeName": "Em3000"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "AABBCollider"
-            }
-          ],
-          "name": "NavigationSector",
-          "objectID": 3826940858,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "NavigationSector",
-          "transform": {
-            "position": [
-              301.0,
-              0.0,
-              86.5
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "NavigationSector"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "Pl0000",
-          "objectID": 4267756554,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Pl0000",
-          "transform": {
-            "position": [
-              -30.0,
-              0.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              89.99994659423828,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Pl0000"
         }
       ]
     }

@@ -287,6 +287,62 @@
         {
             "path": "Sound/em3000/Mix_End.wav",
             "tag": "Mix_End"
+        },
+        {
+            "path": "Sound/em3000/Mix_Loop.wav",
+            "tag": "Mix_Loop"
+        },
+        {
+            "path": "Sound/em3000/Event_Howling.wav",
+            "tag": "Event_Howling"
+        },
+        {
+            "path": "Sound/em3000/Event_Emp.wav",
+            "tag": "Event_Emp"
+        },
+        {
+            "path": "Sound/em3000/Skirt_Open_Short.wav",
+            "tag": "Skirt_Open_Short"
+        },
+        {
+            "path": "Sound/em3000/Nack_Appear.wav",
+            "tag": "Nack_Appear"
+        },
+        {
+            "path": "Sound/em3000/Em3000_Step1.wav",
+            "tag": "Em3000_Step1"
+        },
+        {
+            "path": "Sound/em3000/Em3000_Step2.wav",
+            "tag": "Em3000_Step2"
+        },
+        {
+            "path": "Sound/ABeautifulSong.mp3",
+            "tag": "ABeautifulSong"
+        },
+        {
+            "path": "Sound/AmusementPark.mp3",
+            "tag": "AmusementPark"
+        },
+        {
+            "path": "Sound/CityRuins.mp3",
+            "tag": "CityRuins"
+        },
+        {
+            "path": "Sound/em3000/Dizzy.wav",
+            "tag": "Dizzy"
+        },
+        {
+            "path": "Sound/em3000/Explode1.wav",
+            "tag": "Explode1"
+        },
+        {
+            "path": "Sound/em3000/Explode2.wav",
+            "tag": "Explode2"
+        },
+        {
+            "path": "Sound/em3000/SpotLight.wav",
+            "tag": "SpotLight"
         }
     ]
 }

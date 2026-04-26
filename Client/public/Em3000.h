@@ -52,6 +52,10 @@ public:
     void OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
     void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
+public:
+    const list<Shared<Entity>>& Get_Puppets() { return m_Puppets; }
+    void SummonPuppet(uint32 summonCount = 1);
+
 private:
     HRESULT Ready_PartObjects();
     HRESULT Ready_Components();
@@ -65,6 +69,8 @@ private:
     Shared<Em3000MeleeSight> m_MeleeSight{ nullptr };
     Shared<MonsterSight> m_Sight{ nullptr };
     
+    std::list<Shared<Entity>> m_Puppets;
+    Bool m_IsDestroying{ false };
 
 public:
     static Shared<Em3000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
@@ -75,12 +81,15 @@ public:
     {
         CENEMATIC = 500,
         IDLE = 0,               // EM3000_0000,
-        GROGGY, 
+        PHASE1_INTRO,
+        PHASE1_GROGGY, 
         PHASE1_MELEE,
         PHASE1_RANGE,
         PHASE2_TRANSFORM,
-        PHASE2_ATTACK,
+        PHASE2_STOMP,
         PHASE2_CHASE, 
+        PHASE2_PUPPET,
+        PHASE2_GROGGY,
         DEAD, 
 
 
@@ -102,6 +111,8 @@ public:
         MIXER_END = 23,         // EM3000_0512
         FRONT_STOMP = 24,       // EM3000_0520
 
+        INTRO = 26, // EM3000_0556
+
         DANMAK_START_1 = 29,    // EM3000_05A0
         DANMAK_LOOP_1 = 30,     // EM3000_05A1
         DANMAK_END_1 = 31,      // EM3000_05A2
@@ -118,6 +129,8 @@ public:
         PHASE_CHANGE2 = 39,          // EM3000_0610
         PHASE_CHANGE3 = 42,          // EM3000_100A
 
+        PHASE2_IDLE = 41,       // EM3000_1000
+
         CHASE = 43,             // EM3000_1010
         READY_CHASE = 44,       // EM3000_101A
 
@@ -125,6 +138,9 @@ public:
         SCREAMING = 52,         // EM3000_1550
 
         FLOATING = 53,          // EM3000_E000
+        // EM3000_E001
+        // EM3000_E005
+        SHOUTING  = 56, //// EM3000_E008
 
         END
     };

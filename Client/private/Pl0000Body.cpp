@@ -70,11 +70,7 @@ void Pl0000Body::Priority_Update(Float timeDelta)
 
 void Pl0000Body::Update(Float timeDelta)
 {
-	Float actualTimeDelta = timeDelta;
-	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
-		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
-	}
-	m_Model->Update_ModelAnimation(actualTimeDelta);
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void Pl0000Body::Late_Update(Float timeDelta)

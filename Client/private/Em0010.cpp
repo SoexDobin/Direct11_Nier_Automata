@@ -92,12 +92,6 @@ void Em0010::Priority_Update(Float timeDelta)
 
 void Em0010::Update(Float timeDelta)
 {
-	if (m_LagDuration > 0.f)
-	{
-		m_LagDuration -= timeDelta;
-		timeDelta *= 0.05f;
-	}
-
 	m_States->Update_State(timeDelta);
 	m_Em0010Movement->Update_Movement(timeDelta);
 	m_Transform->Update_WorldMatrix();

@@ -73,12 +73,7 @@ void WP0070Body::Priority_Update(Float timeDelta)
 
 void WP0070Body::Update(Float timeDelta)
 {
-	Float actualTimeDelta = timeDelta;
-	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
-		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
-	}
-
-	m_Model->Update_ModelAnimation(actualTimeDelta);
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void WP0070Body::Late_Update(Float timeDelta)
@@ -208,11 +203,10 @@ void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 		auto monster = static_pointer_cast<Monster>(static_pointer_cast<PartObject>(target)->Get_Owner());
 		monster->TakeDamage(dmgInfo);
 		monster->OnAttackHit(shared_from_this());
-		monster->Add_HitLag(0.05f);
 
 		auto attackerEntity = static_pointer_cast<Entity>(dmgInfo.attacker.lock());
 		attackerEntity->OnAttackHit(monster);
-		attackerEntity->Add_HitLag(0.05f);
+		m_Pl0000.lock()->Trigger_GlobalLag(0.2f, 0.05f);
 	}
 }
 

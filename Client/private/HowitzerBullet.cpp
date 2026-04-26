@@ -92,7 +92,7 @@ void HowitzerBullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
 	auto entity = static_pointer_cast<PartObject>(target)->Get_Owner();
 
-	if (m_TargetLayerIndex == m_PlayerLayerIndex)
+	if (target->Get_LayerMask().Get_Layer() == m_PlayerLayerIndex)
 	{
 		m_DamageInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
 		auto player = static_pointer_cast<Pl0000>(entity);

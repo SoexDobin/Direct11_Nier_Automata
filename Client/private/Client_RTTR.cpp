@@ -67,9 +67,11 @@ using rttr::registration;
 #include "AmusementParkLight.h"
 #include "Em3000MeleeSight.h"
 #include "ExplodeEffect.h"
+#include "ExplodeEffect_Instance.h"
 #include "FreeCamera.h"
 #include "HowitzerBullet.h"
 #include "MonsterStateMachine.h"
+#include "Pl0000HpBar.h"
 #include "SkyBox.h"
 #include "SkyBoxLayer.h"
 #include "SkySphere.h"
@@ -398,6 +400,11 @@ void Register_Client_Reflection() {
         .method("Clone", &ExplodeEffect::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return ExplodeEffect::Create(device, context); })(rttr::metadata("Level", 0));
 
+    rttr::registration::class_<ExplodeEffect_Instance>("ExplodeEffect_Instance")
+        .constructor<>()
+        .method("Clone", &ExplodeEffect_Instance::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return ExplodeEffect_Instance::Create(device, context); })(rttr::metadata("Level", 0));
+
     rttr::registration::class_<FreeCamera>("FreeCamera")
         .constructor<>()
         .method("Clone", &FreeCamera::Clone)
@@ -412,6 +419,11 @@ void Register_Client_Reflection() {
         .constructor<>()
         .method("Clone", &MonsterStateMachine::Clone)
         .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<Component> { return MonsterStateMachine::Create(device, context); })(rttr::metadata("Level", 0));
+
+    rttr::registration::class_<Pl0000HpBar>("Pl0000HpBar")
+        .constructor<>()
+        .method("Clone", &Pl0000HpBar::Clone)
+        .method("Create", [](const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context) -> Shared<GameObject> { return Pl0000HpBar::Create(device, context); })(rttr::metadata("Level", 0));
 
     rttr::registration::class_<SkyBox>("SkyBox")
         .constructor<>()

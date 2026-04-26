@@ -4,6 +4,8 @@
 #include "Em3000.h"
 #include "Em3000Body.h"
 #include "Em3000StateMachine.h"
+#include "ExplodeEffect.h"
+#include <Game.h>
 
 StateEm3000_Groggy::StateEm3000_Groggy(const wstring& tag, const Shared<Em3000>& owner)
 	: StateEm3000{tag, owner} {}
@@ -32,6 +34,33 @@ void StateEm3000_Groggy::Update(Float timeDelta)
 
 	if (isFinished && animIndex == ETOI(em3000State::GROGGY_END))
 	{
+		auto owner = m_Owner.lock();
+		uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+
+		ExplodeEffect::EXPLODE_EFFECT_DESC effectDesc{};
+		effectDesc.position = owner->Get_Transform()->Get_Position();
+		effectDesc.scale = Vector3(20.f, 20.f, 20.f);
+		effectDesc.textureTag = L"Effect_Explode2";
+		effectDesc.threshold = 0.05f;
+		GAME_INSTANCE->Instantiate<ExplodeEffect>(L"ExplodeEffect", levIndex, &effectDesc);
+		effectDesc.position = effectDesc.position + Vector3{ 0.02f, 0.02f, 0.02f };
+		effectDesc.scale = Vector3(15.f, 15.f, 15.f);
+		GAME_INSTANCE->Instantiate<ExplodeEffect>(L"ExplodeEffect", levIndex, &effectDesc);
+		effectDesc.position = effectDesc.position + Vector3{ 0.01f, 0.01f, 0.01f };
+		effectDesc.scale = Vector3(17.5f, 17.5f, 17.5f);
+		GAME_INSTANCE->Instantiate<ExplodeEffect>(L"ExplodeEffect", levIndex, &effectDesc);
+
+		GAME_INSTANCE->PlaySoundFXOnce(L"Explode1", SOUNDCHANNEL::CHANNEL_27, 0.4f);
+
+		const wstring partTags[] = { L"Em3001", L"Em3002", L"Em3003" };
+		for (const auto& tag : partTags)
+		{
+			if (auto part = owner->Find_PartObject(tag))
+			{
+				Object::Destroy(part);
+			}
+		}
+
 		m_States.lock()->Change_State(em3000State::PHASE2_TRANSFORM);
 	}
 

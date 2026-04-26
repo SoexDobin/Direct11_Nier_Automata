@@ -60,6 +60,7 @@ private:
 	unordered_map<uint32, vector<ANIMATION_TRACKER_NOTIFY>> m_Notifies;
 	unordered_map<uint32, vector<Bool>> m_States;
 	uint32 m_PrevAnimIndex{ UINT_MAX };
+	Float  m_PrevProgress{ -1.f };
 
 public:
 	static Shared<AnimationTracker> CreatePrototype();

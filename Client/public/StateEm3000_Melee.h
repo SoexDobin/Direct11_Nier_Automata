@@ -21,7 +21,7 @@ public:
 private:
 	Vector3 m_OriginalPosition{};      
 	Float m_MixerTime{ 0.f };     
-	Float m_MixerDuration{ 5.f }; 
+	Float m_MixerDuration{ 10.f }; 
 
 public:
 	static Shared<StateEm3000_Melee> Create(const wstring& tag, const Shared<Em3000>& owner);

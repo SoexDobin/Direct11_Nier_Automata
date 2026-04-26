@@ -23,6 +23,8 @@ protected:
 public:
 	Bool Has_MeleeTarget() const;
 	Bool Has_FrontMeleeTarget() const;
+	Float Get_DistanceToTarget() const;
+	Vector3 Get_DirectionToTarget() const;
 
 protected:
 	Weak<Em3000> m_Owner{};
@@ -30,6 +32,9 @@ protected:
 	Weak<Em3000Movement> m_Movement;
 	Weak<Em3000StateMachine> m_States{};
 	Weak<Em3000MeleeSight> m_MeleeSight{};
+
+	Float m_TargetDistance{ 4.125f };
+	Float m_Phase2GroggyDeltaTime{ 7.f };
 	
 };
 

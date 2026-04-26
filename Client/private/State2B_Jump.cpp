@@ -34,7 +34,7 @@ Bool State2B_Jump::StateEnterInvoke()
 
 	switch (auto prevState = m_States.lock()->Get_CurPl0000State())
 	{
-	case Pl0000::PL0000_STATE::IDLE:
+	case Pl0000::PL0000_STATE::IDLE: case Pl0000::PL0000_STATE::HIT:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::STAND_TO_JUMP), 0.2f, false);
 		return true;
 	case Pl0000::PL0000_STATE::RUN:

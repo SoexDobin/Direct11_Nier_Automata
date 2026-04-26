@@ -247,7 +247,7 @@ Bool State2B_Evade::TryEvade_FromDash()
 	auto pl0000 = m_Body.lock();
 	Float progress = pl0000->Get_AnimationProgress();
 
-	if (progress >= 0.9f)
+	if (progress >= 0.75f)
 		return false;
 
 	m_EvadePhase = EVADE_PHASE::EVADE;
@@ -272,8 +272,8 @@ Bool State2B_Evade::TryEvade_FromDash()
 	}
 
 	auto owner = m_Owner.lock();
-	owner->Set_Invincible(true);
-	owner->Add_HitLag(0.08f);
+	owner->Set_InvincibleTime(1.0f);
+	m_Owner.lock()->Trigger_GlobalLag(0.2f, 0.75f);
 	return true; 
 }
 

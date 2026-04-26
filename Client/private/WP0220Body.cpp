@@ -9,6 +9,7 @@
 #include "OBBCollider.h"
 #include "Pl0000Shockwave.h"
 #include "Entity.h"
+#include "Pl0000.h"
 
 WP0220Body::WP0220Body() : Pl0000Parts{} {}
 WP0220Body::WP0220Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -68,17 +69,7 @@ void WP0220Body::Priority_Update(Float timeDelta)
 
 void WP0220Body::Update(Float timeDelta)
 {
-	Float actualTimeDelta = timeDelta;
-	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
-		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
-	}
-	m_Model->Update_ModelAnimation(actualTimeDelta);
-
-	if (m_IsSheathing == false)
-	{
-		TRANSFORM_FRAME rootVelocity = m_Model->Get_RootTransformVelocity(m_WeaponBoneIndex);
-
-	}
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void WP0220Body::Late_Update(Float timeDelta)
@@ -154,12 +145,10 @@ void WP0220Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 		auto monster = static_pointer_cast<Monster>(static_pointer_cast<PartObject>(target)->Get_Owner());
 		monster->TakeDamage(dmgInfo);
 		monster->OnAttackHit(shared_from_this());
-		monster->Add_HitLag(0.2f);
 
 		auto attackerEntity = static_pointer_cast<Entity>(dmgInfo.attacker.lock());
 		attackerEntity->OnAttackHit(monster);
-		attackerEntity->Add_HitLag(0.2f);
-
+		m_Pl0000.lock()->Trigger_GlobalLag(0.2f, 0.2f);
 	}
 }
 

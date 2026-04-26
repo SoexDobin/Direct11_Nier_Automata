@@ -119,12 +119,7 @@ void Em0010Body::Priority_Update(Float timeDelta)
 
 void Em0010Body::Update(Float timeDelta)
 {
-	Float actualTimeDelta = timeDelta;
-	if (auto entity = static_pointer_cast<Entity>(m_Owner.lock())) {
-		if (entity->Get_LagDuration() > 0.f) 
-			actualTimeDelta *= 0.05f;
-	}
-	m_Model->Update_ModelAnimation(actualTimeDelta);
+	m_Model->Update_ModelAnimation(timeDelta);
 }
 
 void Em0010Body::Late_Update(Float timeDelta)
@@ -205,7 +200,14 @@ HRESULT Em0010Body::Ready_Components()
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	Model::MODEL_DESC modelDesc{ L"em0010" };
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	wstring modelTag{};
+	if (levIndex == ETOI(LEVEL::GAMEPLAY))
+		modelTag = L"em0010";
+	else if (levIndex == ETOI(LEVEL::GAMEPLAY2))
+		modelTag = L"em0013";
+
+	Model::MODEL_DESC modelDesc{ modelTag };
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;

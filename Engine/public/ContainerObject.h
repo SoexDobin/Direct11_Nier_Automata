@@ -9,7 +9,7 @@ class ENGINE_DLL ContainerObject abstract : public GameObject
 {
 	RTTR_ENABLE(GameObject)
 public:
-	typedef struct tagContainerObjectDesc : public GameObject {} CONTAINEROBJECT_DESC;
+	typedef struct tagContainerObjectDesc : public GAMEOBJECT_DESC {} CONTAINEROBJECT_DESC;
 public:
 	explicit ContainerObject();	
 	explicit ContainerObject(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& rhs);

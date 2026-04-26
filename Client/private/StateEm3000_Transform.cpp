@@ -17,7 +17,7 @@ HRESULT StateEm3000_Transform::Initialize()
 
 Bool StateEm3000_Transform::StateEnterInvoke()
 {
-	m_Body.lock()->Set_Animation(ETOI(Em3000::EM3000_STATE::PHASE_CHANGE1), 0.1f, false);
+	m_Body.lock()->Set_Animation(ETOI(Em3000::EM3000_STATE::PHASE_CHANGE3), 0.1f, false);
 
 	return true;
 }
@@ -26,8 +26,8 @@ void StateEm3000_Transform::Update(Float timeDelta)
 {
 	if (Bool isFinished = m_Body.lock()->Is_AnimationFinished())
 	{
-		// TODO : 2페이즈
-		//m_States.lock()->Change_State();
+		m_Owner.lock()->SummonPuppet(4);
+		m_States.lock()->Change_State(Em3000::EM3000_STATE::PHASE2_CHASE);
 	}
 }
 

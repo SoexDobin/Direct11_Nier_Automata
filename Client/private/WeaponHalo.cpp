@@ -72,9 +72,9 @@ HRESULT WeaponHalo::Render()
 		size_t numMeshes = m_Model->Get_NumMeshes();
 		for (uint32 i = 0; i < numMeshes; ++i)
 		{
-			m_Model->Bind_Material(m_Shader, DiffuseMap, i, 0);
-			m_Model->Bind_Material(m_Shader, DiffuseMap1, i, 0);
-			m_Model->Bind_Material(m_Shader, DiffuseMap2, i, 0);
+			m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
+			m_Model->Bind_Material(m_Shader, DiffuseMap1, i, 1, 0);
+			m_Model->Bind_Material(m_Shader, DiffuseMap2, i, 1, 0);
 
 			if (FAILED(m_Shader->Begin(4)))
 				return E_FAIL;

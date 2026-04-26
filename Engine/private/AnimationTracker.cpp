@@ -36,7 +36,26 @@ void AnimationTracker::Update(uint32 animIndex, Float progress)
 {
 	if (m_IsDestroy || !m_IsActive) return;
 
-	if (m_PrevAnimIndex != animIndex)
+	//if (m_PrevAnimIndex != animIndex)
+	//{
+	//	if (m_PrevAnimIndex != UINT_MAX && m_Notifies.contains(m_PrevAnimIndex))
+	//	{
+	//		auto& prevNotifies = m_Notifies[m_PrevAnimIndex];
+	//		auto& prevStates = m_States[m_PrevAnimIndex];
+	//		for (uint32 i = 0; i < prevNotifies.size(); ++i)
+	//		{
+	//			if (prevNotifies[i].type == NOTIFY_TYPE::RANGE && prevStates[i])
+	//			{
+	//				if (prevNotifies[i].onEndNotify)
+	//					prevNotifies[i].onEndNotify();
+	//			}
+	//			prevStates[i] = false;
+	//		}
+	//	}
+	//	m_PrevAnimIndex = animIndex;
+	//}
+
+	if (m_PrevAnimIndex != animIndex || progress < m_PrevProgress)
 	{
 		if (m_PrevAnimIndex != UINT_MAX && m_Notifies.contains(m_PrevAnimIndex))
 		{
@@ -54,6 +73,8 @@ void AnimationTracker::Update(uint32 animIndex, Float progress)
 		}
 		m_PrevAnimIndex = animIndex;
 	}
+	
+	m_PrevProgress = progress;
 
 	if (false == m_Notifies.contains(animIndex)) return;
 
@@ -114,6 +135,7 @@ void AnimationTracker::Reset()
 		}
 	}
 	m_PrevAnimIndex = UINT32_MAX;
+	m_PrevProgress = -1.f; 
 }
 
 void AnimationTracker::Clear()

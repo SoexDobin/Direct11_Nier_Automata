@@ -45,7 +45,7 @@ Bool State2B_AttackGround::StateEnterInvoke()
 
 	switch (prevState)
 	{
-	case Pl0000::PL0000_STATE::IDLE: case Pl0000::PL0000_STATE::ATTACK_AIR:
+	case Pl0000::PL0000_STATE::IDLE: case Pl0000::PL0000_STATE::ATTACK_AIR: case Pl0000::PL0000_STATE::HIT:
 		if (clickLeft)
 		{
 			pl0000->Draw_LightWeapon();

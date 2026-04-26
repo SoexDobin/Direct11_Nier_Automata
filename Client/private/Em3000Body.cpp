@@ -115,12 +115,7 @@ void Em3000Body::Priority_Update(Float timeDelta)
 
 void Em3000Body::Update(Float timeDelta)
 {
-	Float actualTimeDelta = timeDelta;
-	if (auto entity = static_pointer_cast<Entity>(m_Owner.lock())) {
-		if (entity->Get_LagDuration() > 0.f)
-			actualTimeDelta *= 0.05f;
-	}
-	m_Model->Update_ModelAnimation(actualTimeDelta);
+	m_Model->Update_ModelAnimation(timeDelta * m_AnimSpeed);
 }
 
 void Em3000Body::Late_Update(Float timeDelta)
@@ -206,7 +201,7 @@ HRESULT Em3000Body::Ready_Components()
 		return E_FAIL;
 
 	SphereCollider::SPHERE_COLLIDER_DESC sphereDesc{};
-	sphereDesc.radius = 3.f;
+	sphereDesc.radius = 3.5f;
 	sphereDesc.offset = Vector3::UnitY;
 	m_HitBox = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereDesc);
 	if (nullptr == m_HitBox)
@@ -219,6 +214,10 @@ HRESULT Em3000Body::Ready_AnimationNotify()
 {
 	using em3000State = Em3000::EM3000_STATE;
 	using notify = AnimationTracker::ANIMATION_NOTIFY;
+
+	auto activeCenterAoe = [this]() { m_CenterAoe.lock()->Active_Attack(); };
+	auto deActiveCenterAoe = [this]() { m_CenterAoe.lock()->DeActive_Attack(); };
+
 	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
 
 	m_Model->Add_AnimNotify(ETOI(em3000State::DANMAK_START_1), {
@@ -259,14 +258,14 @@ HRESULT Em3000Body::Ready_AnimationNotify()
 			dmgInfo.damage = 30.f;
 			dmgInfo.groggyWeight = 20.f;
 			dmgInfo.attackType = ATK_TYPE::HEAVY;
-			dmgInfo.hitPosition = m_Transform->Get_Position();
+			dmgInfo.hitPosition = m_Owner.lock()->Get_Transform()->Get_Position();
 			dmgInfo.hitRotation = Quaternion::Identity;
 			dmgInfo.knockbackForce = 1.25f;
 
 			MonsterShockWave::MONSTER_SHOCKWAVE_DESC desc{};
 			desc.damageInfo = dmgInfo;
 			desc.radius = 3.f;
-			desc.position = m_Transform->Get_Position() + m_Transform->Get_Look() * desc.radius;
+			desc.position = dmgInfo.hitPosition + m_Owner.lock()->Get_Transform()->Get_Look() * desc.radius;
 			GAME_INSTANCE->Instantiate<MonsterShockWave>(L"MonsterShockWave", levIndex, &desc);
 		}},
 
@@ -278,9 +277,15 @@ HRESULT Em3000Body::Ready_AnimationNotify()
 		notify{L"Stop_Sound", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
 		notify{L"Play_Sound", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Mix_Start", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
 		});
+	m_Model->Add_AnimNotify(ETOI(em3000State::MIXING), {
+		notify{L"Play_Sound", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Mix_Loop", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		notify{L"Mix_Attack", 0.f, 75.f, activeCenterAoe, deActiveCenterAoe},
+		notify{L"Mix_Attack", 37.5f, activeCenterAoe},
+		});
 	m_Model->Add_AnimNotify(ETOI(em3000State::MIXER_END), {
 		notify{L"Stop_Sound", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
 		notify{L"Play_Sound", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Mix_End", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		notify{L"Mix_Attack_End", 0.f, [this, deActiveCenterAoe]() { deActiveCenterAoe(); }}
 		});
 
 	m_Model->Add_AnimNotify(ETOI(em3000State::DANMAK_LOOP_3), {
@@ -311,8 +316,87 @@ HRESULT Em3000Body::Ready_AnimationNotify()
 		notify{L"Howitzer7_Stop_Sound", 320.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
 		notify{L"Howitzer7_Play_Sound", 320.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Howitzer3", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
 		notify{L"Howitzer7", 320.f, [this]() { Fire_Howitzer(12.f, 30.f); }}
-
 	});
+
+	m_Model->Add_AnimNotify(ETOI(em3000State::PHASE_CHANGE3), {
+		notify{L"Transform1_Stop_Sound", 5.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Transform1_Sound", 5.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Skirt_Open_Short", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Transform2_Stop_Sound", 45.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Transform2_Sound", 45.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Skirt_Open_Short", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Transform3_Stop_Sound", 90.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
+		notify{L"Transform3_Sound", 90.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Nack_Appear", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		notify{L"Transform4_Stop_Sound", 140.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Transform4_Sound", 140.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Event_Howling", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		});
+
+	m_Model->Add_AnimNotify(ETOI(em3000State::READY_CHASE), {
+		notify{L"Back1_Stop_Sound", 20.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Back1_Sound", 20.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step1", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Back2_Stop_Sound", 25.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
+		notify{L"Back2_Sound", 25.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step2", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		notify{L"Back3_Stop_Sound", 30.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Back3_Sound", 30.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step1", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Back4_Stop_Sound", 35.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
+		notify{L"Back4_Sound", 35.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step2", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+
+		notify{L"Chase1_Stop_Sound", 80.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Chase1_Sound", 80.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step1", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Chase2_Stop_Sound", 85.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
+		notify{L"Chase2_Sound", 85.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step2", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		});
+
+
+	m_Model->Add_AnimNotify(ETOI(em3000State::CHASE), {
+		notify{L"Chase1_Stop_Sound", 10.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Chase1_Sound", 10.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step1", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Chase2_Stop_Sound", 25.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
+		notify{L"Chase2_Sound", 25.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step2", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		notify{L"Chase3_Stop_Sound", 40.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Chase3_Sound", 40.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step1", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Chase4_Stop_Sound", 55.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
+		notify{L"Chase4_Sound", 55.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step2", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		notify{L"Chase5_Stop_Sound", 70.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Chase5_Sound", 70.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step1", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Chase6_Stop_Sound", 85.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_26); }},
+		notify{L"Chase6_Sound", 85.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Em3000_Step2", SOUNDCHANNEL::CHANNEL_26, 0.5f); }},
+		});
+
+	m_Model->Add_AnimNotify(ETOI(em3000State::JUMP_STOMP), {
+		notify{L"Stomp1_Stop_Sound", 10.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Stomp1_Sound", 10.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"JumpStomp_Start", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Stomp2_Stop_Sound", 80.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Stomp2_Sound", 80.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"JumpStomp_Fall", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Stomp3_Stop_Sound", 90.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Stomp3_Sound", 90.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"JumpStomp_Impact", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		notify{L"Stomp3_Sound", 90.f,[this, levIndex]() {
+			Entity::DAMAGE_INFO dmgInfo{};
+			dmgInfo.attacker = m_Owner.lock();
+			dmgInfo.damage = 30.f;
+			dmgInfo.groggyWeight = 20.f;
+			dmgInfo.attackType = ATK_TYPE::HEAVY;
+			dmgInfo.hitPosition = m_Owner.lock()->Get_Transform()->Get_Position();
+			dmgInfo.hitRotation = Quaternion::Identity;
+			dmgInfo.knockbackForce = 1.25f;
+
+			MonsterShockWave::MONSTER_SHOCKWAVE_DESC desc{};
+			desc.damageInfo = dmgInfo;
+			desc.radius = 3.5f;
+			desc.position = dmgInfo.hitPosition + m_Owner.lock()->Get_Transform()->Get_Look() * desc.radius;
+			GAME_INSTANCE->Instantiate<MonsterShockWave>(L"MonsterShockWave", levIndex, &desc);
+		}},
+		notify{L"Stomp4_Stop_Sound", 120.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Stomp4_Sound", 120.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"JumpStomp_End", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		});
+
+	m_Model->Add_AnimNotify(ETOI(em3000State::SCREAMING), {
+		notify{L"Screaming_Stop_Sound", 80.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Screaming_Sound", 80.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Event_Howling", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		});
+
+	m_Model->Add_AnimNotify(ETOI(em3000State::PHASE2_IDLE), {
+		notify{L"Stop_Sound", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_25); }},
+		notify{L"Play_Sound", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Dizzy", SOUNDCHANNEL::CHANNEL_25, 0.5f); }},
+		});
 
 	return S_OK;
 }
@@ -379,6 +463,7 @@ void Em3000Body::Fire_Howitzer(Float speed, Float gravity)
 		howitzerDesc.useCurvedFlight = true;
 		howitzerDesc.gravityStrength = gravity;
 		howitzerDesc.targetY = 21.f; // 지면 높이
+		howitzerDesc.damageInfo = Projectile_DamageInfo();
 
 		GAME_INSTANCE->Instantiate<HowitzerBullet>(
 			L"HowitzerBullet",
@@ -430,11 +515,26 @@ void Em3000Body::Fire_Projectile(Float timeDelta)
 		bulletDesc.damage = 10.f;
 		bulletDesc.isPermanent = isPermanent;
 		bulletDesc.useUpperSin = m_IsCurveBullet;
+		bulletDesc.damageInfo = Projectile_DamageInfo();
+		bulletDesc.scale = Vector3{ 0.5f, 0.5f, 0.5f };
 
 		auto bullet = GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", GAME_INSTANCE->Get_TargetLevelIndex(), &bulletDesc);
-		bullet->Get_Transform()->Set_Scale(Vector3{ 0.5f, 0.5f, 0.5f });
 	}
 	++m_PermanentCount;
+}
+
+Entity::DAMAGE_INFO Em3000Body::Projectile_DamageInfo()
+{
+	Entity::DAMAGE_INFO dmgInfo{};
+	dmgInfo.attackType = ATK_TYPE::HEAVY;
+	dmgInfo.attacker = Get_Owner();
+	dmgInfo.damage = 10.f;
+	dmgInfo.groggyWeight = 1.f;
+	dmgInfo.hitPosition = Get_Owner()->Get_Transform()->Get_Position();
+	dmgInfo.hitRotation = Get_Owner()->Get_Transform()->Get_Quaternion();
+	dmgInfo.knockbackForce = 1.f;
+	
+	return dmgInfo;
 }
 
 Shared<Em3000Body> Em3000Body::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

@@ -43,7 +43,6 @@ public:
 	virtual void Set_Navigation(const Shared<Navigation>& navigation);
 	virtual void Apply_PushoutCorrection(const Vector3& correction) {};
 	virtual void OnAttackHit(const Shared<GameObject>& target) {};
-	virtual void Add_HitLag(Float duration) { m_LagDuration = duration; }
 
 public: /* Entity interface */
 	virtual void TakeDamage(const DAMAGE_INFO& dmgInfo);
@@ -54,7 +53,6 @@ public: /* Entity interface */
 public:
 	Float Get_HP() const { return m_Hp; }
 	Float Get_MaxHP() const { return m_MaxHp; }
-	Float Get_LagDuration() const { return m_LagDuration; }
 	Bool Is_Static() const { return m_IsStatic; }
 	Bool Is_Dead() const { return m_Hp <= 0.f; }
 	Bool Is_Invincible() const { return m_IsInvincible; }
@@ -70,7 +68,6 @@ protected:
 
 	Float m_Hp{ 1000.f };
 	Float m_MaxHp{ 1000.f };
-	Float m_LagDuration{ 0.f };
 	Bool m_IsInvincible{ false };
 	Bool m_IsStatic{ false };
 	DAMAGE_INFO m_LastDamageInfo{};

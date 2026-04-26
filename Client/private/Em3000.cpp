@@ -12,11 +12,20 @@
 #include "Navigation.h"
 #include "HpBarWorldUI.h"
 #include "Em3000StateMachine.h"
+#include "Em3000State_Chase.h"
+#include "Em3000State_Groogy2.h"
+#include "Em3000State_Intro.h"
+#include "Em3100.h"
 #include "MonsterAOE.h"
 #include "MonsterSight.h"
+#include "StateEm3000_Groggy.h"
 #include "StateEm3000_Idle.h"
 #include "StateEm3000_Range.h"
 #include "StateEm3000_Melee.h"
+#include "StateEm3000_Puppet.h"
+#include "StateEm3000_Stomp.h"
+#include "StateEm3000_Transform.h"
+#include "StateEm3000_Dead.h"
 
 Em3000::Em3000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Monster{device, context} {}
@@ -71,33 +80,63 @@ HRESULT Em3000::Initialize(void* arg)
 
 void Em3000::On_Destroy()
 {
+	m_Puppets.clear();
 	Monster::On_Destroy();
 }
 
 void Em3000::Priority_Update(Float timeDelta)
 {
+	if (m_IsDestroying) return;
+
 	Float ratio = m_Hp / m_MaxHp;
-	if (ratio <= 0.4f)
+	if (ratio <= 0.5f)
 		static_pointer_cast<Em3000StateMachine>(m_States)->Set_SecondPhase();
 }
 
 void Em3000::Update(Float timeDelta)
 {
-	if (m_LagDuration > 0.f)
-	{
-		m_LagDuration -= timeDelta;
-		timeDelta *= 0.05f;
-	}
-
 	m_Transform->Update_WorldMatrix();
 	m_Em3000Movement->Update_Movement(timeDelta);
 	m_PhysicalZone->Update(*m_Transform->Get_WorldMatrixPtr());
 	m_States->Update_State(timeDelta);
+
+	if (m_IsDestroying) return;
+
+	auto stateMachine = static_pointer_cast<Em3000StateMachine>(m_States);
+
+	if (stateMachine->Get_CurEm3000State() == EM3000_STATE::PHASE1_GROGGY) return;
+
+	if (stateMachine->Is_SecondPhase())
+	{
+		if (stateMachine->Get_CurEm3000State() == EM3000_STATE::PHASE2_TRANSFORM ||
+			stateMachine->Get_CurEm3000State() == EM3000_STATE::PHASE2_STOMP ||
+			stateMachine->Get_CurEm3000State() == EM3000_STATE::PHASE2_PUPPET)
+			return;
+
+		m_Puppets.remove_if([](const Shared<Entity>& puppet) {
+			return puppet == nullptr || puppet->Is_Destroy();
+			});
+	
+		if (m_Puppets.empty())
+		{
+			stateMachine->Change_State(EM3000_STATE::PHASE2_GROGGY);
+		}
+	}
 }
 
 void Em3000::Late_Update(Float timeDelta)
 {
+	if (m_IsDestroying) return;
 
+	if (m_Hp <= 0.f)
+	{
+		auto stateMachine = static_pointer_cast<Em3000StateMachine>(m_States);
+		if (stateMachine->Get_CurEm3000State() != EM3000_STATE::DEAD)
+		{
+			stateMachine->Change_State(EM3000_STATE::DEAD);
+			m_IsDestroying = true;
+		}
+	}
 }
 
 void Em3000::Fixed_Update(Float fixedDelta)
@@ -133,18 +172,38 @@ void Em3000::TakeDamage(const DAMAGE_INFO& dmgInfo)
 	Play_HitSFX(dmgInfo);
 	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
 
-	// TODO : 스테이트 구성하면 키기
-	if (dmgInfo.attackType != ATK_TYPE::POD)
-		//m_States->Change_State(MonsterStateMachine::MONSTER_STATE::Hit);
-
 	Monster::TakeDamage(dmgInfo);
 }
 
 void Em3000::OnDeath()
 {
-	//m_MainBody->OffHitBox();
-	// TODO : 콜라이더 끄기
-	//m_States->Change_State(MonsterStateMachine::MONSTER_STATE::DEAD);
+	if (m_PhysicalZone)
+		m_PhysicalZone->Set_Active(false);
+
+	if (m_HpBarUI)
+		m_HpBarUI->Set_Active(false);
+
+	// 모든 파트 오브젝트(시야 등) 비활성화
+	for (auto& pair : m_PartObjects)
+	{
+		if (pair.second->Get_InstanceID() == m_MainBody->Get_InstanceID())
+			continue;
+
+		pair.second->Set_Active(false);
+	}
+
+	for (auto& puppet : m_Puppets)
+	{
+		if (puppet)
+		{
+			auto em3100 = static_pointer_cast<Em3100>(puppet);
+			em3100->Start_Death();
+		}
+	}
+	m_Puppets.clear();
+
+	static_pointer_cast<Em3000StateMachine>(m_States)->Change_State(EM3000_STATE::DEAD);
+	m_IsDestroying = true;
 }
 
 void Em3000::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -160,6 +219,24 @@ void Em3000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<C
 void Em3000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
 	
+}
+
+void Em3000::SummonPuppet(uint32 summonCount)
+{
+	Em3100::EM3100_CONTAINER_DESC desc{};
+	desc.targetY = m_Transform->Get_Position().y;
+	desc.playerInstanceID = m_TargetPlayer.lock()->Get_InstanceID();
+
+	m_Puppets.clear();
+	for (uint32 i = 0; i < summonCount; ++i)
+	{
+		auto em3100 = GAME_INSTANCE->Instantiate<Em3100>(L"Em3100", GAME_INSTANCE->Get_TargetLevelIndex(), &desc);
+		if (em3100)
+		{
+			em3100->Set_Target(m_TargetPlayer.lock());
+			m_Puppets.push_back(em3100);
+		}
+	}
 }
 
 HRESULT Em3000::Ready_PartObjects()
@@ -184,16 +261,20 @@ HRESULT Em3000::Ready_PartObjects()
 
 	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3001";
+	partsDesc.targetBoneName = "bone16"; 
 	if (FAILED(Add_PartObject(levIndex, L"Em3001", L"Em3001", &partsDesc))) 
 		return E_FAIL;
+	Find_PartObject(L"Em3001")->Get_Transform()->Set_Position(0.f, -6.75f, 0.f);
 	
 	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3002";
+	partsDesc.targetBoneName = "bone16";
 	if (FAILED(Add_PartObject(levIndex, L"Em3002", L"Em3002", &partsDesc))) 
 		return E_FAIL;
 
 	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3003";
+	partsDesc.targetBoneName = "bone1";
 	if (FAILED(Add_PartObject(levIndex, L"Em3003", L"Em3003", &partsDesc))) 
 		return E_FAIL;
 
@@ -226,12 +307,13 @@ HRESULT Em3000::Ready_PartObjects()
 	centerDesc.Owner = thisObject;
 	centerDesc.model = m_MainBody->Get_ModelComponent();
 	centerDesc.offset = Vector3::Zero;
-	centerDesc.radius = 3.f;
+	centerDesc.radius = 4.25f;
 	centerDesc.targetBoneName = "bone774";
 	centerDesc.dmgInfo = em3000DamageInfo;
 	if (FAILED(Add_PartObject(levIndex, L"MonsterAOE", L"Em3000CenterAoe", &centerDesc)))
 		return E_FAIL;
 
+	m_MainBody->Begin();
 	return S_OK;
 }
 
@@ -247,11 +329,10 @@ HRESULT Em3000::Ready_Components()
 	movementDesc.velocity = Vector3{ 0.f, 0.f, 0.f };
 	movementDesc.moveSpeed = 0.f;
 	movementDesc.targetDirection = Vector3::Zero;
-	movementDesc.turnSpeed = 0.f;
+	movementDesc.turnSpeed = 3.f;
 	m_Em3000Movement = Add_Component<Em3000Movement>(levIndex, &movementDesc);
 	if (nullptr == m_Em3000Movement)
 		return E_FAIL;
-
 
 	auto em3000 = static_pointer_cast<Em3000>(shared_from_this());
 	if ((m_States = Add_Component<Em3000StateMachine>(levIndex)))
@@ -263,12 +344,25 @@ HRESULT Em3000::Ready_Components()
 			return E_FAIL;
 		if (FAILED(stateMachine->Add_State(StateEm3000_Melee::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE1_MELEE)), em3000))))
 			return E_FAIL;
-		if (FAILED(stateMachine->Add_State(StateEm3000_Melee::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::GROGGY)), em3000))))
+		if (FAILED(stateMachine->Add_State(StateEm3000_Groggy::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE1_GROGGY)), em3000))))
 			return E_FAIL;
-		if (FAILED(stateMachine->Add_State(StateEm3000_Melee::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE2_TRANSFORM)), em3000))))
+		if (FAILED(stateMachine->Add_State(StateEm3000_Transform::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE2_TRANSFORM)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Chase::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE2_CHASE)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Stomp::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE2_STOMP)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Puppet::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE2_PUPPET)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(Em3000State_Groogy2::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE2_GROGGY)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Dead::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::DEAD)), em3000))))
+			return E_FAIL;
+		if (FAILED(stateMachine->Add_State(StateEm3000_Intro::Create(Helper::To_wString(magic_enum::enum_name(EM3000_STATE::PHASE1_INTRO)), em3000))))
 			return E_FAIL;
 
-		stateMachine->Change_State(EM3000_STATE::IDLE);
+		m_MainBody->Set_Animation(ETOI(EM3000_STATE::IDLE), 0.1f, true);
+		stateMachine->Change_State(EM3000_STATE::PHASE1_INTRO);
 	}
 	else
 		return E_FAIL;
@@ -281,7 +375,7 @@ HRESULT Em3000::Ready_Components()
 
 	SphereCollider::SPHERE_COLLIDER_DESC physicalZoneDesc{};
 	physicalZoneDesc.offset = Vector3::UnitY;
-	physicalZoneDesc.radius = 3.f;
+	physicalZoneDesc.radius = 3.25f;
 	m_PhysicalZone = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &physicalZoneDesc);
 	if (nullptr == m_PhysicalZone)
 		return E_FAIL;

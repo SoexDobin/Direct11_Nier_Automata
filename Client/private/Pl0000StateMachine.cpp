@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Pl0000StateMachine.h"
 
+#include <SpdLogger.h>
+
 #include "Pl0000.h"
 #include "Pl0000Input.h"
 #include "State2B.h"
@@ -42,7 +44,10 @@ Pl0000::PL0000_STATE Pl0000StateMachine::Get_CurPl0000State()
 	if (nullptr == m_CurrentState)
 		return static_cast<Pl0000::PL0000_STATE>(0);
 
-	return magic_enum::enum_cast<Pl0000::PL0000_STATE>(Helper::To_String(Get_CurrentState()->Get_StateTag())).value();
+	auto state = Get_CurrentState();
+	wstring stateTag = state->Get_StateTag();
+
+	return magic_enum::enum_cast<Pl0000::PL0000_STATE>(Helper::To_String(stateTag)).value();
 }
 	
 

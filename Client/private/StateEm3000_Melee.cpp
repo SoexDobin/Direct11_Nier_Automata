@@ -59,12 +59,18 @@ void StateEm3000_Melee::Update(Float timeDelta)
 	else if (animIndex == ETOI(em3000state::MIXING))
 	{
 		m_MixerTime += timeDelta;
-		Float rotationSpeed = 10.f;
-		Float radius = 5.f;
+		Float rotationSpeed = 4.f;
+		Float radius = 10.f;
+
+		Float progress = m_MixerTime / m_MixerDuration;
+		if (progress > 1.f) 
+			progress = 1.f;
+
+		Float currentRadius = radius * sinf(progress * XM_PI);
 
 		Vector3 nextPos = m_OriginalPosition;
-		nextPos.x += cosf(m_MixerTime * rotationSpeed) * radius;
-		nextPos.z += sinf(m_MixerTime * rotationSpeed) * radius;
+		nextPos.x += cosf(m_MixerTime * rotationSpeed) * currentRadius;
+		nextPos.z += sinf(m_MixerTime * rotationSpeed) * currentRadius;
 
 		em3000->Get_Transform()->Set_Position(nextPos);
 

@@ -82,6 +82,11 @@ public:
     void Set_LockOnTarget(const Shared<GameObject>& target) { m_LockOnTarget = target; }
     Weak<GameObject> Get_LockOnTarget() const { return m_LockOnTarget; }
 
+public:
+    void Trigger_GlobalLag(Float timeScale, Float duration);
+    void Set_InvincibleTime(Float duration) { m_InvincibleTimer = duration; }
+    Bool Is_Invincible_Active() const { return m_IsInvincible || (m_InvincibleTimer > 0.f); }
+
 private:
     Weak<GameObject> m_LockOnTarget{};
 
@@ -102,6 +107,13 @@ private:
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
     Shared<SphereCollider> m_PhysicalZone{ nullptr };
 
+private: /* Lag */
+    Float m_GlobalLagTimer{ 0.f };
+    Bool  m_IsGlobalLagActive{ false };
+    Float m_InvincibleTimer{ 0.f };
+
+    uint32 m_BulletLayerIndex{};
+
 public:
 	static Shared<Pl0000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
@@ -116,6 +128,7 @@ public:
         JUMP                = 895,
         ATTACK_GROUND       = 894,
         ATTACK_AIR          = 893,
+        HIT                 = 892,
 
         // IDLE
         IDLE_Neutral            = 46,
@@ -207,6 +220,8 @@ public:
         HEAVY_AIR_DOWN_END      = 204,
 
         LIGHT_HEAVY_COMBO       = 329,
+
+        HIT1 = 366, HIT2 = 367, HIT3 = 368, HIT4 = 369,
     };
 };
 

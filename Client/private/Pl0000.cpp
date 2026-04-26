@@ -7,8 +7,10 @@
 #include <Navigation.h>
 
 #include "Bullet.h"
+#include "LoadingFadeOut.h"
 #include "Monster.h"
 #include "Pl0000Body.h"
+#include "Pl0000HpBar.h"
 #include "Pl0000Movement.h"
 #include "Pl0000StateMachine.h"
 #include "SheathWP0070Body.h"
@@ -24,6 +26,7 @@
 #include "State2B_Sprint.h"
 #include "State2B_Walk.h"
 #include "State2B_Evade.h"
+#include "State2B_Hit.h"
 #include "WeaponHalo.h"
 
 namespace Client {
@@ -96,6 +99,8 @@ HRESULT Pl0000::Initialize_Prototype()
 {
 	m_LayerMask.Set_Layer(L"PlayerPhysical");
 
+	
+
 	return ContainerObject::Initialize_Prototype();
 }
 
@@ -110,35 +115,21 @@ HRESULT Pl0000::Initialize(void* arg)
 			{
 				camera->Set_Target(shared_from_this());
 			}
+		});
+	Pl0000HpBar::PL0000_HP_BAR_DESC desc{};
+	desc.target = static_pointer_cast<Entity>(shared_from_this());
+	desc.sizeX = 250.f;
+	desc.sizeY = 20.f;
+	desc.anchor = UI_ANCHOR::TOP_LEFT;
+	desc.x = 300.f;
+	desc.y = 80.f;
+	// desc.anchor, x, y 등을 직접 줘도 되고 비워두면 자동 좌상단 세팅
+	GAME_INSTANCE->Add_Instance_Event(levIndex, L"SpawnPl0000HpBar", [=]() mutable {
+		GAME_INSTANCE->Instantiate<Pl0000HpBar>(L"Pl0000HpBar", levIndex, &desc);
+		});
 
-#ifdef _DEBUG
-			//Entity::DAMAGE_INFO dmgInfo{};
-			//dmgInfo.attackType = ATK_TYPE::LIGHT;
-			//dmgInfo.attackerPos = m_Transform->Get_Position() + Vector3{ 0.f, 0.f, -10.f };
-			//dmgInfo.damage = 25.f;
-			//dmgInfo.groggyWeight = 10;
-			//dmgInfo.knockbackForce = 0.5f;
-			//// 2. 총알 공통 속성 세팅 (정지 상태 고정)
-			//Bullet::BULLET_DESC desc{};
-			//desc.isPermanent = false;
-			//desc.damageInfo = dmgInfo;
-			//desc.resourceTag = L"candy";         // 💡 테스트용 모델이 잘 뜨는지 확인
-			//desc.targetLayer = L"Player";
-			//desc.speed = 0.0f;                   // 스피드 0
-			//desc.maxDistance = 9999.f;
-			//desc.direction = m_Transform->Get_Look();
-			//
-			//Float spawnHeight = m_Transform->Get_Position().y + 1.f; // 공중에 깔려면 y값을 적절히 조절하세요 (ex: 1.0f)
-			//for (int x = -1; x <= 2; ++x)
-			//{
-			//	for (int z = -1; z <= 2; ++z)
-			//	{
-			//		desc.initialPosition = Vector3(static_cast<Float>(x), spawnHeight, static_cast<Float>(z));
-			//		GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", levIndex, &desc);
-			//	}
-			//}
-#endif
-
+	GAME_INSTANCE->Add_Instance_Event(levIndex, L"Fade_Out", [=]() mutable {
+		GAME_INSTANCE->Instantiate<LoadingFadeOut>(L"LoadingFadeOut", levIndex);
 		});
 
 	if (FAILED(ContainerObject::Initialize(arg))) {
@@ -153,6 +144,8 @@ HRESULT Pl0000::Initialize(void* arg)
 		LOG_ERROR(L"Failed to Ready Components {}", m_ObjectName);
 		return E_FAIL;
 	}
+
+	m_BulletLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"Bullet"));
 
 	return S_OK;
 }
@@ -170,10 +163,22 @@ void Pl0000::Priority_Update(Float timeDelta)
 
 void Pl0000::Update(Float timeDelta)
 {
-	if (m_LagDuration > 0.f)
+	if (m_IsGlobalLagActive)
 	{
-		m_LagDuration -= timeDelta;
-		timeDelta *= 0.05f; 
+		Float unscaledDelta = GAME_INSTANCE->Compute_UnscaledTimeDelta();
+
+		m_GlobalLagTimer -= unscaledDelta;
+
+		if (m_GlobalLagTimer <= 0.f)
+		{
+			m_IsGlobalLagActive = false;
+			GAME_INSTANCE->Set_TimeScale(1.0f); // 정상 속도로 복귀
+		}
+	}
+
+	if (m_InvincibleTimer > 0.f)
+	{
+		m_InvincibleTimer -= GAME_INSTANCE->Compute_UnscaledTimeDelta();
 	}
 
 	if (auto target = m_LockOnTarget.lock())
@@ -206,9 +211,6 @@ void Pl0000::Update(Float timeDelta)
 
 void Pl0000::Late_Update(Float timeDelta)
 {
-	if (m_LagDuration > 0.f)
-		timeDelta *= 0.05f;
-
 	m_Pl0000Movement->Update_Movement(timeDelta);
 	m_Transform->Update_WorldMatrix();
 	m_PhysicalZone->Update(m_Transform->Get_WorldMatrix());
@@ -265,9 +267,13 @@ void Pl0000::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {
 	if (TryEvade(dmgInfo.attacker.lock())) return;
 
-	LOG_INFO(L"Hit ---------------------");
+	LOG_INFO(L"{}", m_Hp);
+
+	if (Is_Invincible_Active()) return;
 
 	Entity::TakeDamage(dmgInfo);
+	if (dmgInfo.damage >= 30.f)
+		m_Pl0000States->Change_State(PL0000_STATE::HIT);
 }
 
 void Pl0000::OnAttackHit(const Shared<GameObject>& target)
@@ -280,6 +286,9 @@ void Pl0000::OnAttackHit(const Shared<GameObject>& target)
 
 Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
 {
+	if (attacker == nullptr) return false;
+	if (attacker->Get_LayerMask().Get_Layer() == m_BulletLayerIndex) return false;
+
 	if (m_Pl0000States->Get_CurPl0000State() != PL0000_STATE::EVADE)
 		return false;
 
@@ -413,6 +422,9 @@ HRESULT Pl0000::Ready_Components()
 		if (FAILED(m_Pl0000States->Add_State(State2B_AttackAir::Create(
 			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::ATTACK_AIR)), pl0000))))
 			return E_FAIL;
+		if (FAILED(m_Pl0000States->Add_State(State2B_Hit::Create(
+			Helper::To_wString(magic_enum::enum_name(PL0000_STATE::HIT)), pl0000))))
+			return E_FAIL;
 
 		m_Pl0000States->Change_State(PL0000_STATE::IDLE);
 	}
@@ -430,6 +442,17 @@ HRESULT Pl0000::Ready_Components()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void Pl0000::Trigger_GlobalLag(Float timeScale, Float duration)
+{
+	if (m_IsGlobalLagActive && m_GlobalLagTimer >= duration)
+		return;
+
+	m_GlobalLagTimer = duration;
+	m_IsGlobalLagActive = true;
+
+	GAME_INSTANCE->Set_TimeScale(timeScale);
 }
 
 Shared<Pl0000> Pl0000::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

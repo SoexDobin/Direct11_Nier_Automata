@@ -163,7 +163,7 @@ void WP3000Body::Late_Update(Float timeDelta)
 		Vector3 worldScale{}, worldPosition{};
 		Quaternion worldRot{};
 		m_CombinedWorldMatrix.Decompose(worldScale, worldRot, worldPosition);
-		// WP3000의 Look 모델 방향 (뒤쪽 Backward 기준)으로 0.5f 앞 배치
+		
 		Vector3 lookDir = m_CombinedWorldMatrix.Backward();
 		lookDir.Normalize();
 		// WP의 Y축 총구 보정 위치로 살짝 조정 (원하시는 높이/거리 조절 가능)
@@ -267,6 +267,7 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			desc.maxDistance = 100.f; 
 			desc.initialPosition = worldPosition;
 			desc.direction = m_CombinedWorldMatrix.Backward() + Vector3{ 0.f, 0.25f, 0.f };
+			desc.scale = Vector3{ 0.1f, 0.1f, 0.1f };
 
 			if (m_FlashEffect != nullptr)
 			{
@@ -278,7 +279,6 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			auto bullet = GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", levIndex, &desc);
 			GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_14);
 			GAME_INSTANCE->PlaySoundFXOnce(L"Wp3000_Shot", SOUNDCHANNEL::CHANNEL_14, 0.4f);
-			bullet->Get_Transform()->Set_Scale(Vector3{ 0.1f, 0.1f, 0.1f });
 		}
 	}
 }

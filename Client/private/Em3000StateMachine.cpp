@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Em3000StateMachine.h"
 #include "StateEm3000.h"
+#include "StateEm3000_Groggy.h"
 
 Em3000StateMachine::Em3000StateMachine(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: MonsterStateMachine{device, context} {}
@@ -77,11 +78,13 @@ void Em3000StateMachine::Set_SecondPhase()
 	if (m_IsSecondPhase == true) 
 		return;
 
-	m_IsSecondPhase = Change_State(Em3000::EM3000_STATE::GROGGY);
+	if (Change_State(Em3000::EM3000_STATE::PHASE1_GROGGY))
+	{
+		m_IsSecondPhase = true;
+	}
 }
 
-Shared<Em3000StateMachine> Em3000StateMachine::Create(const ComPtr<ID3D11Device>& device,
-                                                      const ComPtr<ID3D11DeviceContext>& context)
+Shared<Em3000StateMachine> Em3000StateMachine::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 {
 	auto prototype = make_shared<Em3000StateMachine>(device, context);
 

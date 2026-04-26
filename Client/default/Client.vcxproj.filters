@@ -329,6 +329,33 @@
     <ClInclude Include="..\public\StateEm3000_Transform.h">
       <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Em3000State_Chase.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Stomp.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\StateEm3000_Puppet.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3000State_Groogy2.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ExplodeEffect_Instance.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pl0000HpBar.h">
+      <Filter>02. GameObject\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State2B_Hit.h">
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3000State_Intro.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Em3000State_Dead.h">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\ClientApp.cpp">
@@ -648,6 +675,33 @@
       <Filter>02. GameObject\Entity\Monster\EM3000\EM3000Parts</Filter>
     </ClCompile>
     <ClCompile Include="..\private\StateEm3000_Transform.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000State_Chase.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Stomp.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\StateEm3000_Puppet.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000State_Groogy2.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ExplodeEffect_Instance.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pl0000HpBar.cpp">
+      <Filter>02. GameObject\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State2B_Hit.cpp">
+      <Filter>02. GameObject\Entity\2B\2BStates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000State_Dead.cpp">
+      <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Em3000State_Intro.cpp">
       <Filter>02. GameObject\Entity\Monster\EM3000\EM3000StateMachine</Filter>
     </ClCompile>
   </ItemGroup>

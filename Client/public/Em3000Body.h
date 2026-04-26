@@ -1,8 +1,9 @@
 #pragma once
 #include "Em3000Parts.h"
+#include "Entity.h"
 
 NS_BEGIN(Engine)
-class SphereCollider;
+	class SphereCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -71,8 +72,12 @@ public:
 
 	void Fire_Howitzer(Float speed, Float gravity);
 
+	Float Get_AnimationSpeed() const { return m_AnimSpeed; }
+	void Set_AnimationSpeed(Float speed) { m_AnimSpeed = speed; }
+
 private:
 	void Fire_Projectile(Float timeDelta);
+	Entity::DAMAGE_INFO Projectile_DamageInfo();
 
 private:
 	Weak<Em3000>			m_Em3000{};
@@ -89,6 +94,8 @@ private:
 	
 	int32 m_PermanentCount{};
 	Matrix m_ModelMatrixAcc{};
+
+	Float m_AnimSpeed{ 1.f };
 
 private:
 	Weak<MonsterAOE> m_CenterAoe{};

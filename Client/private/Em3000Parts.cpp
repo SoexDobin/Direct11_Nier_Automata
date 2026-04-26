@@ -90,10 +90,20 @@ void Em3000Parts::Update(Float timeDelta)
 
 void Em3000Parts::Late_Update(Float timeDelta)
 {
-	if (m_TargetBoneIndex == -1 || m_BodyModel.expired()) return;
+	if (m_BodyModel.expired()) return;
 
 	m_Transform->Update_WorldMatrix();
-	Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
+
+	if (m_TargetBoneIndex == -1)
+	{
+		Update_CombineWorldMatrix(m_Transform->Get_WorldMatrix());
+	}
+	else
+	{
+		Matrix boneMatrix = m_BodyModel.lock()->Get_BoneMatrix(m_TargetBoneIndex);
+		m_CombinedWorldMatrix = m_Transform->Get_WorldMatrix() * boneMatrix * *m_ParentMatrix;
+	}
+
 	m_Model->Update_ModelAnimation(timeDelta);
 }
 

@@ -8,6 +8,7 @@
 #include "Em3100Body.h"
 #include "HpBarWorldUI.h"
 #include "SphereCollider.h"
+#include "ExplodeEffect_Instance.h"
 #include "SpdLogger.h"
 #include "Random_Helper.h"
 
@@ -63,6 +64,21 @@ HRESULT Em3100::Initialize(void* arg)
 			m_HpBarUI = GAME_INSTANCE->Instantiate<HpBarWorldUI>(L"HpBarWorldUI", levIndex, &UI_hpDesc);
 		});
 
+	if (arg != nullptr)
+	{
+		EM3100_CONTAINER_DESC* desc = static_cast<EM3100_CONTAINER_DESC*>(arg);
+		m_TargetY = desc->targetY;
+		m_TargetPlayer = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_TargetLevelIndex(), desc->playerInstanceID);
+	}
+	
+	Float randX = Helper::Random_Float(390.f, 420.f);
+	Float randZ = Helper::Random_Float(34.f, 70.f);
+	m_Transform->Set_Position(Vector3(randX, 50.f, randZ));
+	Vector3 lookTarget = Vector3(400.f, 50.f, 52.f);
+	m_Transform->LookAt(lookTarget);
+
+	m_Hp = 500.f;
+	m_MaxHp = 500.f;
 
 	return S_OK;
 }
@@ -74,6 +90,75 @@ void Em3100::Priority_Update(Float timeDelta)
 
 void Em3100::Update(Float timeDelta)
 {
+	if (Is_Dead() && !m_IsStartingDeath)
+	{
+		OnDeath();
+		return;
+	}
+
+	if (m_IsStartingDeath)
+	{
+		Vector3 pos = m_Transform->Get_Position();
+		Float downSpeed = 2.f;
+		Float deltaY = downSpeed * timeDelta;
+		pos.y -= deltaY;
+		m_DeathTotalDownY += deltaY;
+
+		m_Transform->Set_Position(pos);
+
+		if (m_DeathTotalDownY >= 10.f)
+		{
+			Destroy(shared_from_this());
+		}
+		
+		m_Transform->Update_WorldMatrix();
+		return;
+	}
+
+	if (!m_IsLanded)
+	{
+		Vector3 curPos = m_Transform->Get_Position();
+		curPos.y -= 30.f * timeDelta; // 떨어지는 속도 (필요에 따라 조절)
+		if (curPos.y <= m_TargetY)
+		{
+			curPos.y = m_TargetY;
+			m_IsLanded = true;
+		}
+		m_Transform->Set_Position(curPos);
+	}
+	else
+	{
+		m_AttackTimer += timeDelta;
+		if (m_AttackTimer >= 5.f)
+		{
+			m_AttackTimer = 0.f;
+			if (auto target = m_TargetPlayer.lock())
+			{
+				Vector3 pos = m_Transform->Get_Position() + Vector3{0.f, 1.75f, 0.f};
+				Vector3 bulletSpawnPos = pos;
+				bulletSpawnPos.y += 1.5f;
+				// 총알 조준: 플레이어의 실제 높이를 반영 (기울어짐과 무관함)
+				Vector3 targetHitPos = target->Get_Transform()->Get_Position();
+				targetHitPos.y = pos.y;
+
+				Vector3 dir = targetHitPos - bulletSpawnPos;
+				dir.Normalize();
+				
+				Bullet::BULLET_DESC bulletDesc{};
+				bulletDesc.initialPosition = pos;
+				bulletDesc.direction = dir;
+				bulletDesc.maxDistance = 50.f;
+				bulletDesc.targetLayer = L"Player";
+				bulletDesc.damageInfo.damage = 10.f; 
+				bulletDesc.damageInfo.attacker = shared_from_this();
+				bulletDesc.resourceTag = L"candy"; 
+				bulletDesc.speed = 10.f;
+				bulletDesc.scale = Vector3{ 0.5f, 0.5f, 0.5f };
+				
+				GAME_INSTANCE->Instantiate<Bullet>(L"Bullet", GAME_INSTANCE->Get_TargetLevelIndex(), &bulletDesc);
+			}
+		}
+	}
 	m_Transform->Update_WorldMatrix();
 	m_InteractionZone->Update(m_Transform->Get_WorldMatrix());
 }
@@ -104,6 +189,40 @@ void Em3100::TakeDamage(const DAMAGE_INFO& dmgInfo)
 	DisplaySparkEffect(dmgInfo.attackType, dmgInfo.hitPosition, dmgInfo.hitRotation);
 
 	Entity::TakeDamage(dmgInfo);
+}
+
+void Em3100::OnDeath()
+{
+	Start_Death();
+}
+
+void Em3100::Start_Death()
+{
+	if (m_IsStartingDeath) return;
+
+	m_IsStartingDeath = true;
+
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+
+	ExplodeEffect_Instance::EXPLODE_EFFECT_INSTANCE_DESC effectDesc{};
+	effectDesc.position = m_Transform->Get_Position();
+	effectDesc.instanceCount = 5;
+	effectDesc.range = Vector3{ 0.02f, 0.02f, 0.02f }; 
+	effectDesc.scaleRange = Vector2{ 5.f, 8.f }; 
+	effectDesc.textureTag = L"Effect_Explode2";
+	
+	auto explode = GAME_INSTANCE->Instantiate<ExplodeEffect_Instance>(L"ExplodeEffect_Instance", levIndex, &effectDesc);
+	if (explode == nullptr)
+		LOG_ERROR(L"Failed Create explode At Em3100");
+
+	GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_27);
+	GAME_INSTANCE->PlaySoundFXOnce(L"Explode1", SOUNDCHANNEL::CHANNEL_27, 0.4f);
+
+	if (m_InteractionZone)
+		m_InteractionZone->Set_Active(false);
+
+	if (m_HpBarUI)
+		m_HpBarUI->Set_Active(false);
 }
 
 void Em3100::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
@@ -143,7 +262,7 @@ HRESULT Em3100::Ready_Components()
 		return E_FAIL;
 
 	SphereCollider::SPHERE_COLLIDER_DESC sphereDesc{};
-	sphereDesc.radius = 3.f;
+	sphereDesc.radius = 2.f;
 	sphereDesc.offset = Vector3::UnitY;
 	m_InteractionZone = Add_Component<SphereCollider>(ETOI(LEVEL::STATIC), &sphereDesc);
 	if (nullptr == m_InteractionZone)

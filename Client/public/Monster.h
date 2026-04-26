@@ -10,7 +10,10 @@ class CLIENT_DLL Monster abstract : public Entity
 {
 	RTTR_ENABLE(Entity)
 public:
-	typedef struct tagMonsterObjectDesc : public ENTITY_CONTAINER_DESC {} MONSTER_CONTAINER_DESC;
+	typedef struct tagMonsterObjectDesc : public ENTITY_CONTAINER_DESC
+	{
+		
+	} MONSTER_CONTAINER_DESC;
 
 public:
 	explicit Monster();

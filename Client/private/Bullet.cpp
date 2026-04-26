@@ -53,6 +53,8 @@ HRESULT Bullet::Initialize(void* arg)
 		return E_FAIL;
 	}
 
+	m_Transform->Update_WorldMatrix();
+
 	return S_OK;
 }
 
@@ -218,7 +220,7 @@ HRESULT Bullet::Ready_Components()
 	if (nullptr == m_Collider)
 		return E_FAIL;
 
-	m_Transform->Set_Scale(0.3f, 0.3f, 0.3f);
+	m_Transform->Set_Scale(m_Desc.scale);
 
 	return S_OK;
 }

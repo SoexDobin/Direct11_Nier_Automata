@@ -52,10 +52,7 @@ void Em3003::Update(Float timeDelta)
 
 void Em3003::Late_Update(Float timeDelta)
 {
-	m_Transform->Update_WorldMatrix();
-	Matrix matrix = m_Transform->Get_WorldMatrix();
-	Update_CombineWorldMatrix(matrix);
-	m_Model->Update_ModelAnimation(timeDelta);
+	Em3000Parts::Late_Update(timeDelta);
 }
 
 void Em3003::Fixed_Update(Float fixedDelta)

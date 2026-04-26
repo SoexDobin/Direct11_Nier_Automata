@@ -41,6 +41,20 @@ Bool StateEm3000::Has_FrontMeleeTarget() const
 	return m_MeleeSight.lock()->Is_TargetFront();
 }
 
+Float StateEm3000::Get_DistanceToTarget() const
+{
+	if (m_Owner.expired()) return FLT_MAX;
+	return m_Owner.lock()->Get_DistanceToTarget();
+
+}
+
+Vector3 StateEm3000::Get_DirectionToTarget() const
+{
+	if (m_Owner.expired()) return Vector3::Zero;
+	return m_Owner.lock()->Get_DirectionToTarget();
+
+}
+
 Bool StateEm3000::Has_MeleeTarget() const
 {
 	if (m_MeleeSight.expired()) return false;

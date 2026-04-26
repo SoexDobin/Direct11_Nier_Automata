@@ -15,6 +15,8 @@ class CLIENT_DLL Em3100 final : public Monster
 public:
 	typedef struct tagEm3100Desc : public MONSTER_CONTAINER_DESC
 	{
+		Float targetY{ 0.f };
+		uint32 playerInstanceID{};
 	} EM3100_CONTAINER_DESC;
 public:
 	explicit Em3100();
@@ -36,6 +38,9 @@ public:
 
 public:
 	void TakeDamage(const DAMAGE_INFO& dmgInfo) override;
+	void OnDeath() override;
+
+	void Start_Death();
 
 public:
 	void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
@@ -49,6 +54,13 @@ private:
 private:
 	Shared<SphereCollider> m_InteractionZone{ nullptr };
 	Shared<MonsterStateMachine> m_States{ nullptr };
+
+	Float m_TargetY{ 0.f };
+	Bool  m_IsLanded{ false };
+	Float m_AttackTimer{ 0.f };
+
+	Bool  m_IsStartingDeath{ false };
+	Float m_DeathTotalDownY{ 0.f };
 
 public:
 	static Shared<Em3100> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

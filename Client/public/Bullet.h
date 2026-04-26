@@ -18,6 +18,7 @@ class CLIENT_DLL Bullet : public Projectile
 public:
     typedef struct tagBulletDesc : public PROJECTILE_DESC
     {
+        Vector3 scale{};
         Entity::DAMAGE_INFO damageInfo{};
         wstring resourceTag{};
         wstring targetLayer{};

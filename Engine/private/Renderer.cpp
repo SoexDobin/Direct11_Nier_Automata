@@ -153,8 +153,8 @@ HRESULT Renderer::Initialize(void *arg) {
 	//	return E_FAIL;
 	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SPECULAR, 450.f, 450.f, 300.f, 300.f)))
 	//	return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_LIGHT_DEPTH, 450.f, 750.f, 300.f, 300.f)))
-		return E_FAIL;
+	//if (FAILED(GAME_INSTANCE->Ready_RenderTarget_Debug(RT_LIGHT_DEPTH, 450.f, 750.f, 300.f, 300.f)))
+	//	return E_FAIL;
 #endif
 
 	return S_OK;
@@ -365,19 +365,19 @@ Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device> &device, const ComP
 #ifdef _DEBUG
 void Renderer::Render_Debug()
 {
-	if (FAILED(m_Shader->Bind_Matrix(ViewMatrix, &m_ViewMatrix)))
-		return;
-
-	if (FAILED(m_Shader->Bind_Matrix(ProjMatrix, &m_ProjMatrix)))
-		return;
-
-	if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_GameObject)))
-		return;
-
-	if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_LIGHT)))
-		return;
-
-	if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_SHADOW)))
-		return;
+	//if (FAILED(m_Shader->Bind_Matrix(ViewMatrix, &m_ViewMatrix)))
+	//	return;
+	//
+	//if (FAILED(m_Shader->Bind_Matrix(ProjMatrix, &m_ProjMatrix)))
+	//	return;
+	//
+	//if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_GameObject)))
+	//	return;
+	//
+	//if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_LIGHT)))
+	//	return;
+	//
+	//if (FAILED(GAME_INSTANCE->Render_RenderTarget_Debug(m_Buffer, m_Shader, MRT_SHADOW)))
+	//	return;
 }
 #endif

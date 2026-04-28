@@ -108,10 +108,38 @@ HRESULT WP0220Body::Render()
 	return S_OK;
 }
 
+HRESULT WP0220Body::Render_Shadow()
+{
+	if (m_IsActive == false) return S_OK;
+
+	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_CombinedWorldMatrix)))
+		return E_FAIL;
+
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
+		return E_FAIL;
+
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
+		return E_FAIL;
+
+	size_t numMeshes = m_Model->Get_NumMeshes();
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+		m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
+
+		if (FAILED(m_Shader->Begin(2)))
+			return E_FAIL;
+
+		m_Model->Render(i);
+	}
+
+	return S_OK;
+}
+
 void WP0220Body::Submit_RenderGroup()
 {
 	if (m_IsActive == false) return;
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
+	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::SHADOW, shared_from_this());
 }
 
 void WP0220Body::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)

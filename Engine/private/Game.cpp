@@ -134,6 +134,12 @@ void Game::Update_Engine() {
     m_CameraManager->Bind_MainCamera_Transform();
     m_Pipeline->Update_Pipeline();
 
+    const LIGHT_DESC *MainLight = m_LightManager->Get_LightDesc(0);
+    if (MainLight != nullptr)
+    {
+        m_Shadow->Update_ShadowLight(MainLight->direction);
+    }
+
 
     while (m_TimeManager->Is_FixedUpdate()) {
         Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
@@ -731,6 +737,11 @@ HRESULT Game::Add_ShadowLight(const SHADOW_LIGHT_DESC& desc) const
 HRESULT Game::Bind_Shadow_TransformMatrix(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState) const
 {
     return m_Shadow->Bind_TransformMatrix(shader, constantName, transformState);
+}
+
+void Game::Set_ShadowTarget(const Shared<class Transform> &TargetTransform) const
+{
+    m_Shadow->Set_ShadowTarget(TargetTransform);
 }
 
 

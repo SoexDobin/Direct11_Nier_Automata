@@ -207,6 +207,7 @@ public: /* RenderTarget Manager */
 public: /* Shadow Management */
     HRESULT Add_ShadowLight(const SHADOW_LIGHT_DESC& desc) const;
     HRESULT Bind_Shadow_TransformMatrix(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState) const;
+    void Set_ShadowTarget(const Shared<class Transform> &TargetTransform) const;
 
 
 public: /* Prototype & Instantiate Facade */

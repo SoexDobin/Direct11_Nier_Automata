@@ -8,119 +8,6 @@
             {
               "properties": null,
               "typeName": "Transform"
-            }
-          ],
-          "name": "ThirdPersonCamera",
-          "objectID": 4249569602,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "ThirdPersonCamera",
-          "transform": {
-            "position": [
-              0.0,
-              10.0,
-              -10.0
-            ],
-            "rotation": [
-              44.99999237060547,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "ThirdPersonCamera"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            }
-          ],
-          "name": "Em0010_2",
-          "objectID": 4215260095,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em0010",
-          "transform": {
-            "position": [
-              195.0,
-              10.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em0010"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "Texture"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
-            },
-            {
-              "properties": null,
-              "typeName": "VICube"
-            }
-          ],
-          "name": "SkyBoxLayer",
-          "objectID": 1853007010,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "SkyBoxLayer",
-          "transform": {
-            "position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "rotation": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "scale": [
-              10.0,
-              10.0,
-              10.0
-            ]
-          },
-          "typeName": "SkyBoxLayer"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
             },
             {
               "properties": null,
@@ -163,23 +50,27 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "VICube"
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "Texture"
+            },
+            {
+              "properties": null,
+              "typeName": "Shader"
             }
           ],
-          "name": "Em0010",
-          "objectID": 4160192466,
+          "name": "SkyBoxLayer",
+          "objectID": 1853007010,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Em0010",
+          "prototypeTag": "SkyBoxLayer",
           "transform": {
             "position": [
-              200.0,
-              10.0,
-              52.0
+              0.0,
+              0.0,
+              0.0
             ],
             "rotation": [
               0.0,
@@ -187,12 +78,12 @@
               0.0
             ],
             "scale": [
-              1.0,
-              1.0,
-              1.0
+              10.0,
+              10.0,
+              10.0
             ]
           },
-          "typeName": "Em0010"
+          "typeName": "SkyBoxLayer"
         },
         {
           "components": [
@@ -206,11 +97,11 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Navigation"
             },
             {
               "properties": null,
-              "typeName": "Navigation"
+              "typeName": "Model"
             }
           ],
           "name": "AmusementParkDome",
@@ -245,42 +136,7 @@
             },
             {
               "properties": null,
-              "typeName": "Navigation"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            }
-          ],
-          "name": "Pl0000",
-          "objectID": 4267756554,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Pl0000",
-          "transform": {
-            "position": [
-              -30.0,
-              0.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              89.99994659423828,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Pl0000"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
+              "typeName": "Model"
             },
             {
               "properties": null,
@@ -288,19 +144,19 @@
             },
             {
               "properties": null,
-              "typeName": "SphereCollider"
+              "typeName": "Shader"
             }
           ],
-          "name": "Em0010_3",
-          "objectID": 4215070870,
+          "name": "AmusementParkEntry",
+          "objectID": 1172218866,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "Em0010",
+          "prototypeTag": "AmusementParkEntry",
           "transform": {
             "position": [
-              200.0,
-              10.0,
-              46.0
+              0.0,
+              0.0,
+              86.5
             ],
             "rotation": [
               0.0,
@@ -313,46 +169,7 @@
               1.0
             ]
           },
-          "typeName": "Em0010"
-        },
-        {
-          "components": [
-            {
-              "properties": null,
-              "typeName": "Transform"
-            },
-            {
-              "properties": null,
-              "typeName": "SphereCollider"
-            },
-            {
-              "properties": null,
-              "typeName": "Navigation"
-            }
-          ],
-          "name": "Em3000",
-          "objectID": 2943248738,
-          "parentObjectID": 0,
-          "properties": null,
-          "prototypeTag": "Em3000",
-          "transform": {
-            "position": [
-              402.5,
-              20.0,
-              52.0
-            ],
-            "rotation": [
-              0.0,
-              -89.99994659423828,
-              0.0
-            ],
-            "scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Em3000"
+          "typeName": "AmusementParkEntry"
         },
         {
           "components": [
@@ -405,23 +222,19 @@
             },
             {
               "properties": null,
-              "typeName": "Model"
-            },
-            {
-              "properties": null,
-              "typeName": "Shader"
+              "typeName": "SphereCollider"
             }
           ],
-          "name": "AmusementParkEntry",
-          "objectID": 1172218866,
+          "name": "Em0010_2",
+          "objectID": 4215260095,
           "parentObjectID": 0,
           "properties": null,
-          "prototypeTag": "AmusementParkEntry",
+          "prototypeTag": "Em0010",
           "transform": {
             "position": [
-              0.0,
-              0.0,
-              86.5
+              195.0,
+              10.0,
+              52.0
             ],
             "rotation": [
               0.0,
@@ -434,7 +247,46 @@
               1.0
             ]
           },
-          "typeName": "AmusementParkEntry"
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Em0010_3",
+          "objectID": 4215070870,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              200.0,
+              10.0,
+              46.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
         },
         {
           "components": [
@@ -476,14 +328,123 @@
             {
               "properties": null,
               "typeName": "Transform"
-            },
+            }
+          ],
+          "name": "ThirdPersonCamera",
+          "objectID": 4249569602,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "ThirdPersonCamera",
+          "transform": {
+            "position": [
+              0.0,
+              10.0,
+              -10.0
+            ],
+            "rotation": [
+              44.99999237060547,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "ThirdPersonCamera"
+        },
+        {
+          "components": [
             {
               "properties": null,
-              "typeName": "Model"
+              "typeName": "Transform"
             },
             {
               "properties": null,
               "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            }
+          ],
+          "name": "Pl0000",
+          "objectID": 4267756554,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Pl0000",
+          "transform": {
+            "position": [
+              -30.0,
+              0.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              89.99994659423828,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Pl0000"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "Em0010",
+          "objectID": 4160192466,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em0010",
+          "transform": {
+            "position": [
+              200.0,
+              10.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em0010"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            },
+            {
+              "properties": null,
+              "typeName": "Model"
             },
             {
               "properties": null,
@@ -513,6 +474,45 @@
             ]
           },
           "typeName": "AmusementParkMiddle"
+        },
+        {
+          "components": [
+            {
+              "properties": null,
+              "typeName": "Transform"
+            },
+            {
+              "properties": null,
+              "typeName": "SphereCollider"
+            },
+            {
+              "properties": null,
+              "typeName": "Navigation"
+            }
+          ],
+          "name": "Em3000",
+          "objectID": 2943248738,
+          "parentObjectID": 0,
+          "properties": null,
+          "prototypeTag": "Em3000",
+          "transform": {
+            "position": [
+              402.5,
+              20.0,
+              52.0
+            ],
+            "rotation": [
+              0.0,
+              -89.99994659423828,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Em3000"
         }
       ]
     }

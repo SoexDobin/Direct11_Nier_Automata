@@ -15,7 +15,7 @@ StateEm3000_Intro::StateEm3000_Intro(const wstring& tag, const Shared<Em3000>& o
 HRESULT StateEm3000_Intro::Initialize()
 {
 	CinematicCamera::CINEMATIC_CAMERA_DESC cineDesc{};
-	cineDesc.startPosition = Vector3(399.f, 28.f, 52.f);
+	cineDesc.startPosition = Vector3(399.5f, 28.f, 52.f);
 	cineDesc.targetPosition = Vector3(390.f, 28.f, 52.f);
 	cineDesc.startRotation = Vector3(0.f, 1.5f, 0.f);
 	cineDesc.targetRotation = Vector3(0.f, 1.5f, 0.f);

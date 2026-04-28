@@ -77,26 +77,6 @@ HRESULT CityOfRuinEntry::Render()
 	return S_OK;
 }
 
-HRESULT CityOfRuinEntry::Render_Shadow()
-{
-	//if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, m_Transform->Get_WorldMatrixPtr())))
-	//	return E_FAIL;
-	//
-	//size_t numMeshes = m_Model->Get_NumMeshes();
-	//for (uint32 i = 0; i < numMeshes; ++i)
-	//{
-	//	if (!m_Model->IsInFrustum_PreMesh(i, m_Transform->Get_WorldMatrix()))
-	//		continue;
-	//
-	//	if (FAILED(m_Shader->Begin(2)))
-	//		return E_FAIL;
-	//
-	//	m_Model->Render(i);
-	//}
-	//
-	return S_OK;
-}
-
 void CityOfRuinEntry::Submit_RenderGroup()
 {
 	auto& sphere = m_Model->Get_LocalCullingSphere();
@@ -105,7 +85,6 @@ void CityOfRuinEntry::Submit_RenderGroup()
 	sphere.Transform(worldSphere, m_Transform->Get_WorldMatrix());
 
 	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
-	GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::SHADOW, shared_from_this());
 }
 
 Shared<CityOfRuinEntry> CityOfRuinEntry::Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)

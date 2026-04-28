@@ -217,7 +217,7 @@ void Em3100::Start_Death()
 		LOG_ERROR(L"Failed Create explode At Em3100");
 
 	GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_27);
-	GAME_INSTANCE->PlaySoundFXOnce(L"Explode1", SOUNDCHANNEL::CHANNEL_27, 0.4f);
+	GAME_INSTANCE->PlaySoundFXOnce(L"Explode1", SOUNDCHANNEL::CHANNEL_27, 0.3f);
 
 	if (m_InteractionZone)
 		m_InteractionZone->Set_Active(false);

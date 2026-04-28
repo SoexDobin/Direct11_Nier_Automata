@@ -308,7 +308,7 @@ void State2B_Evade::SpawnGhost()
 	desc.snapShots = model->Get_SnapShot_BoneMatrices();
 	desc.worldMatrix = *body->Get_CombinedWorldMatrix();
 	desc.lifeTime = 0.4f;
-	desc.ghostColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 투명한 흰색
+	desc.ghostColor = Vector4(255.f/ 255.f, 215.f/ 255.f, 0, 200.f/ 255.f); 
 	desc.model = model;
 	desc.shader = shader;
 

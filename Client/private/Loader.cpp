@@ -219,16 +219,7 @@ HRESULT Loader::Loading_For_GamePlayLevel2()
     if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
         return E_FAIL;
 
-    SHADOW_LIGHT_DESC		shadowLightDesc{};
-    shadowLightDesc.eye = Vector4(0.f, 35.f, 30.f, 1.f);
-    shadowLightDesc.at = Vector4(10.f, 0.f, 50.f, 1.f);
-    shadowLightDesc.fovy = XMConvertToRadians(100.f);
-    shadowLightDesc.aspect = GAME_INSTANCE->Get_ViewportDesc().Width / GAME_INSTANCE->Get_ViewportDesc().Height;
-    shadowLightDesc.nearPlane = 0.1f;
-    shadowLightDesc.farPlane = 1000.f;
-    if (FAILED(GAME_INSTANCE->Add_ShadowLight(shadowLightDesc)))
-        return E_FAIL;
-
+    GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_1);
     GAME_INSTANCE->PlaySoundFX(L"AmusementPark", SOUNDCHANNEL::CHANNEL_1, 0.2f);
 
     m_isFinished = true;

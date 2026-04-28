@@ -148,6 +148,8 @@ HRESULT Pl0000::Initialize(void* arg)
 
 	m_BulletLayerIndex = ETOI(GAME_INSTANCE->Get_LayerRegister()->Get_LayerByName(L"Bullet"));
 
+	GAME_INSTANCE->Set_ShadowTarget(m_Transform);
+
 	return S_OK;
 }
 

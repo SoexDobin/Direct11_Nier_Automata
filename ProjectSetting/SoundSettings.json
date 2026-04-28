@@ -371,6 +371,38 @@
         {
             "path": "Sound/pl0000/step/StepWR.wav",
             "tag": "StepWR"
+        },
+        {
+            "path": "Sound/pl0000/Pl0000Hit1.wav",
+            "tag": "Pl0000Hit1"
+        },
+        {
+            "path": "Sound/pl0000/Pl0000Hit2.wav",
+            "tag": "Pl0000Hit2"
+        },
+        {
+            "path": "Sound/pl0000/AttackJ.wav",
+            "tag": "AttackJ"
+        },
+        {
+            "path": "Sound/pl0000/AttackY.wav",
+            "tag": "AttackY"
+        },
+        {
+            "path": "Sound/pl0000/AttackHap.wav",
+            "tag": "AttackHap"
+        },
+        {
+            "path": "Sound/pl0000/AttackHup.wav",
+            "tag": "AttackHup"
+        },
+        {
+            "path": "Sound/pl0000/AttackCharge.wav",
+            "tag": "AttackCharge"
+        },
+        {
+            "path": "Sound/pl0000/Start_Run.wav",
+            "tag": "Start_Run"
         }
     ]
 }

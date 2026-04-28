@@ -59,6 +59,10 @@ HRESULT WorldTriggerManager::Setting_GamePlay()
 			auto fadeUI = GAME_INSTANCE->Instantiate<LoadingFadeIn>(L"LoadingFadeIn", levelIndex, &fadeDesc);
 			fadeUI->Set_Active(true);
 
+			auto skyBox = GAME_INSTANCE->Find_ObjectByObjectTag(levelIndex, L"SkyBox");
+			if (skyBox)
+				Object::Destroy(skyBox);
+
 			wstring observerTag = L"Event_WaitFadeAndChangeScene";
 			GAME_INSTANCE->Add_Permanent_Event(levelIndex, observerTag, [fadeUI, levelIndex, observerTag]()
 				{

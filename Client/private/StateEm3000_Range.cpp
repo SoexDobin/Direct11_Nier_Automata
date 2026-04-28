@@ -34,7 +34,16 @@ Bool StateEm3000_Range::StateEnterInvoke()
 	auto em3000Body = m_Body.lock();
 	auto state = m_States.lock();
 	
-	m_EntryAnimIndex = Helper::Random_Int(0, 2);
+	if (m_RangeCount > 0)
+	{
+		m_EntryAnimIndex = 3 - m_RangeCount;
+		m_RangeCount--;
+	}
+	else
+	{
+		m_EntryAnimIndex = Helper::Random_Int(0, 2);
+	}
+
 	em3000Body->Set_Animation(m_RangeEnter[m_EntryAnimIndex], 0.1f, false);
 
 	return true;

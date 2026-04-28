@@ -21,6 +21,9 @@ Bool StateEm3000_Dead::StateEnterInvoke()
 {
 	m_TotalSunkY = 0.f;
 	m_ExplosionTimer = 0.f;
+
+	GAME_INSTANCE->PlaySoundFXOnce(L"Event_Howling", SOUNDCHANNEL::CHANNEL_28, 0.5f);
+
 	return true;
 }
 void StateEm3000_Dead::Update(Float timeDelta)

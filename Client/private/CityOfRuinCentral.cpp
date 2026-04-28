@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "CityOfRuinCentral.h"
+
+#include <Game.h>
 #include <Shader.h>
 #include <Model.h>
 #include <Navigation.h>
@@ -49,11 +51,7 @@ void CityOfRuinCentral::On_Disable()
 }
 
 HRESULT CityOfRuinCentral::Render()
-{
-#ifdef _DEBUG
-	m_Navigation->Render_Debug();
-#endif
-
+{	
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -98,8 +96,35 @@ HRESULT CityOfRuinCentral::Render()
 		m_Model->Render(i);
 	}
 
+
 	return S_OK;
 }
+
+HRESULT CityOfRuinCentral::Render_Shadow()
+{
+	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
+		return E_FAIL;
+
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ViewMatrix, D3DTS::VIEW)))
+		return E_FAIL;
+	if (FAILED(GAME_INSTANCE->Bind_Shadow_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
+		return E_FAIL;
+
+
+	size_t numMeshes = m_Model->Get_NumMeshes();
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+
+		m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
+
+		if (FAILED(m_Shader->Begin(2)))
+			return E_FAIL;
+
+		m_Model->Render(i);
+	}
+	return S_OK;
+}
+
 
 void CityOfRuinCentral::Submit_RenderGroup()
 {

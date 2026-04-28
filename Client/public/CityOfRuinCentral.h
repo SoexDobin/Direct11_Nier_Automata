@@ -24,6 +24,7 @@ public:
 
 public:
 	HRESULT Render() override;
+	HRESULT Render_Shadow() override;
 	void Submit_RenderGroup() override;
 
 public:

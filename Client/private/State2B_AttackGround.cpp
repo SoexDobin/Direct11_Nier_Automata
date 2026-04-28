@@ -5,6 +5,7 @@
 #include <SpdLogger.h>
 
 #include "Pl0000.h"
+#include "Pl0000EvadeGhost.h"
 #include "Pl0000StateMachine.h"
 #include "Pl0000Movement.h"
 #include "WP0070Body.h"
@@ -154,6 +155,7 @@ void State2B_AttackGround::Late_Update(Float timeDelta)
 		if (!m_IsChargeEnd && m_HeavyChargeDelta >= n_ChargeDelta)
 		{
 			m_IsChargeEnd = true;
+			SpawnGhost();
 			GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_8);
 			GAME_INSTANCE->PlaySoundFXOnce(L"Pl_Charge_End", SOUNDCHANNEL::CHANNEL_8, 0.5f);
 		}
@@ -383,6 +385,25 @@ void State2B_AttackGround::Set_AnimationExitProgress()
 	m_CanComboProgress.emplace(ETOI(pl::HEAVY_GROUND_HOLD_NO_CONTACT), 0.5f); m_CanExitProgress.emplace(ETOI(pl::HEAVY_GROUND_HOLD_NO_CONTACT), 0.25f);
 
 	m_CanComboProgress.emplace(ETOI(pl::LIGHT_HEAVY_COMBO), 0.5f); m_CanExitProgress.emplace(ETOI(pl::LIGHT_HEAVY_COMBO), 0.4f);
+}
+
+void State2B_AttackGround::SpawnGhost()
+{
+	auto body = m_Body.lock();
+	if (!body) return;
+
+	auto model = body->Get_ModelComponent();
+	auto shader = body->Get_ShaderComponent();
+	if (!model || !shader) return;
+	Pl0000EvadeGhost::EVADE_GHOST_DESC desc{};
+	desc.snapShots = model->Get_SnapShot_BoneMatrices();
+	desc.worldMatrix = *body->Get_CombinedWorldMatrix();
+	desc.lifeTime = 0.5f; // Evade보다 약간 더 길게 설정 가능
+	desc.ghostColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f); // 선명한 흰색 실루엣
+	desc.model = model;
+	desc.shader = shader;
+	uint32 levIndex = GAME_INSTANCE->Get_TargetLevelIndex();
+	GAME_INSTANCE->Instantiate<Pl0000EvadeGhost>(L"Pl0000EvadeGhost", levIndex, &desc);
 }
 
 Shared<State2B_AttackGround> State2B_AttackGround::Create(const wstring& tag, const Shared<Pl0000>& owner)

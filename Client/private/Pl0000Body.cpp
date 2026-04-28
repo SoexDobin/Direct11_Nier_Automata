@@ -197,6 +197,71 @@ HRESULT Pl0000Body::Ready_AnimationNotify()
 		notify{L"Run_Stop_Sound", 22.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"StepWR",SOUNDCHANNEL::CHANNEL_6, 0.35f); }},
 		});
 
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::HIT1), {
+		notify{L"Hit_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Hit", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Pl0000Hit1", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::HIT2), {
+		notify{L"Hit_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Hit", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Pl0000Hit1", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::HIT3), {
+		notify{L"Hit_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Hit", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Pl0000Hit2", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::HIT4), {
+		notify{L"Hit_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Hit", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"Pl0000Hit2", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND1), {
+		notify{L"Light_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Light", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackHap", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND2), {
+		notify{L"Light_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Light", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackY", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND3), {
+		notify{L"Light_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Light", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackJ", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND4), {
+		notify{L"Light_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Light", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackHup", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND5), {
+		notify{L"Light_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Light", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackJ", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND6), {
+		notify{L"Light_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Light", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackY", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_GROUND7), {
+		notify{L"Light_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Light", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackJ", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::LIGHT_HEAVY_COMBO), {
+		notify{L"Combo_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Combo", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackHap", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND1), {
+		notify{L"Combo_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Combo", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackHup", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND1), {
+		notify{L"Combo_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Combo", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackHap", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+	m_Model->Add_AnimNotify(ETOI(Pl0000::PL0000_STATE::HEAVY_GROUND1), {
+		notify{L"Combo_Stop", 0.f, [this]() { GAME_INSTANCE->StopSound(SOUNDCHANNEL::CHANNEL_5); }},
+		notify{L"Combo", 0.f, [this]() { GAME_INSTANCE->PlaySoundFXOnce(L"AttackJ", SOUNDCHANNEL::CHANNEL_5, 0.35f); }}
+		});
+
+
 	return S_OK;
 }
 

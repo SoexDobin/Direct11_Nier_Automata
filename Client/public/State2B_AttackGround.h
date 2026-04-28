@@ -27,6 +27,7 @@ public:
 private:
 	void Execute_Attack();
 	void Set_AnimationExitProgress();
+	void SpawnGhost();
 
 private:
 	uint32 m_ComboStep{};

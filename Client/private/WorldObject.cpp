@@ -51,9 +51,6 @@ void WorldObject::On_Disable()
 
 HRESULT WorldObject::Render()
 {
-#ifdef _DEBUG
-	m_Navigation->Render_Debug();
-#endif
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;

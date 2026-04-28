@@ -38,6 +38,10 @@ HRESULT SparkEffect::Initialize(void* arg)
 
 	SPARK_EFFECT_DESC& desc = *static_cast<SPARK_EFFECT_DESC*>(arg);
 
+	m_ThreshHold = desc.threshold;
+	m_Acc = 0.f;
+	m_CurIndex = 0;
+
 	if (FAILED(Ready_Components(desc.atkType, desc.position, desc.rotation)))
 	{
 		LOG_ERROR(L"Failed to Ready_Components ParticleEffect");
@@ -54,12 +58,22 @@ void SparkEffect::Priority_Update(Float timeDelta)
 
 void SparkEffect::Update(Float timeDelta)
 {
+	if (nullptr == m_Texture)
+		return;
+
+	uint32 size = static_cast<uint32>(m_Texture->Get_Textures().size());
+
 	m_Acc += timeDelta;
-	
-	if (m_Acc >= 0.25f)
+	if (m_Acc >= m_ThreshHold)
 	{
-		Object::Destroy(shared_from_this());
-		return; 
+		m_Acc -= m_ThreshHold;
+		++m_CurIndex;
+
+		if (m_CurIndex >= size)
+		{
+			Object::Destroy(shared_from_this());
+			return;
+		}
 	}
 
 	m_Buffer->Update_Spread(timeDelta);
@@ -101,7 +115,7 @@ HRESULT SparkEffect::Ready_Components(ATK_TYPE atkType, const Vector3& initialPo
 		return S_OK;
 
 	VIBuffer_Particle_Point::VIBUFFER_INSTANCE_POINT_DESC instanceDesc{};
-	instanceDesc.numInstances = 70;
+	instanceDesc.numInstances = 20;
 	instanceDesc.isLoop = false;
 	instanceDesc.center = Vector3::Zero;
 	instanceDesc.pivot = Vector3::Zero;
@@ -155,7 +169,7 @@ HRESULT SparkEffect::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_Shader->Bind_RawValue("g_LockUpRight", &isLocked, sizeof(uint32))))
 		return E_FAIL;
-	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DiffuseMap, Helper::Random_Int(0, 29))))
+	if (FAILED(m_Texture->Bind_ShaderResourceView(m_Shader, DiffuseMap, m_CurIndex)))
 		return E_FAIL;
 
 	return S_OK;

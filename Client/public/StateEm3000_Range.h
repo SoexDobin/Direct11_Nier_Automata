@@ -42,6 +42,11 @@ private:
 	unordered_set<uint32> m_AttackAnim;
 	unordered_set<uint32> m_EndAnim;
 
+
+	uint32 m_RangeCount{ 3 }; 
+
+
+
 public:
 	static Shared<StateEm3000_Range> Create(const wstring& tag, const Shared<Em3000>& owner);
 };

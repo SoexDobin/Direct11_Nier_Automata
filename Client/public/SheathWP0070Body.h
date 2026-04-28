@@ -23,6 +23,7 @@ public:
 	void Late_Update(Float timeDelta) override;
 	void Fixed_Update(Float fixedDelta) override;
 	HRESULT Render() override;
+	HRESULT Render_Shadow() override;
 	void Submit_RenderGroup() override;
 
 private:

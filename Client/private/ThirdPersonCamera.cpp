@@ -27,9 +27,9 @@ HRESULT ThirdPersonCamera::Initialize(void* arg)
 	localDesc.nearPlane = 0.1f;
 	localDesc.farPlane = 250.f;
 	
-	localDesc.distance = 4.f;
-	localDesc.minDistance = 3.f;
-	localDesc.maxDistance = 30.f;
+	localDesc.distance = 5.f;
+	localDesc.minDistance = 5.f;
+	localDesc.maxDistance = 5.f;
 	localDesc.offset = Vector3{ 0.f, 1.f, 0.f };
 	localDesc.mouseSensitive = 0.1f;
 	localDesc.wheelSensitive = 0.01f;

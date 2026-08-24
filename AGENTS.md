@@ -39,7 +39,10 @@ Do not treat generated files, copied SDK outputs, project data, or external reso
 ## Build and Verification
 
 - The solution entry point is `NieRAutomata.sln`.
-- A verified build command and supported configurations are not registered yet.
+- Verified on 2026-08-24 with Visual Studio 2022, Debug|x64:
+  - Engine: `MSBuild.exe NieRAutomata.sln /t:Engine /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
+  - Client (after Engine): `MSBuild.exe Client\default\Client.vcxproj /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
+- Building `Engine\default\Engine.vcxproj` directly is unsupported because its pre-build event requires the solution-level `$(SolutionDir)` value.
 - Do not claim build success until the exact Visual Studio/MSBuild command, configuration, and platform have run successfully.
 - When a build command is verified, record it in both this file and the Vault project hub.
 

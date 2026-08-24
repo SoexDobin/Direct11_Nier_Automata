@@ -6,6 +6,8 @@
 # User-specific files
 .agent
 vcpkg_installed/
+/Directory.Build.user.props
+/ModelConverter/*.dll
 EngineSDK/
 *.rsuser
 *.suo

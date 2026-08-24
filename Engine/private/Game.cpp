@@ -87,6 +87,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_CameraManager = CameraManager::Create(engineDesc.levelCount)))
 		return E_FAIL;
 
+    if (nullptr == (m_RenderTargetManager = RenderTargetManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
+        return E_FAIL;
+
     if (nullptr == (m_Renderer = Renderer::Create(m_GraphicDevice->Get_Device(),m_GraphicDevice->Get_Context())))
 		return E_FAIL;
 
@@ -108,42 +111,44 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_CollisionManager = CollisionManager::Create()))
         return E_FAIL;
 
-    if (nullptr == (m_RenderTargetManager = RenderTargetManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
+    if (nullptr == (m_NavigationBuilder = NavigationBuilder::Create()))
         return E_FAIL;
+
 
     return S_OK;
 }
 
 void Game::Update_Engine() {
-  const Float delta = m_TimeManager->Update_Timers();
+    const Float delta = m_TimeManager->Update_Timers();
 
-  m_InputDevice->Update();
+    m_InputDevice->Update();
 
-  m_ObjectManager->PriorityUpdate(delta);
+    m_ObjectManager->PriorityUpdate(delta);
 
-  m_ObjectManager->Update(delta);
+    m_ObjectManager->Update(delta);
 
-  m_ObjectManager->LateUpdate(delta);
+    m_ObjectManager->LateUpdate(delta);
 
-  m_CameraManager->Bind_MainCamera_Transform();
-  m_Pipeline->Update_Pipeline();
+    m_CameraManager->Bind_MainCamera_Transform();
+    m_Pipeline->Update_Pipeline();
 
-  while (m_TimeManager->Is_FixedUpdate()) {
-    Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
-    m_ObjectManager->FixedUpdate(fixedDelta);
-    m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
-    m_TimeManager->Has_FixedUpdate();
-  }
 
-  m_ObjectManager->Submit_RenderGroup();
+    while (m_TimeManager->Is_FixedUpdate()) {
+        Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
+        m_ObjectManager->FixedUpdate(fixedDelta);
+        m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
+        m_TimeManager->Has_FixedUpdate();
+    }
 
-  m_ObjectManager->Cleanup_GameObjects(0);
-  m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
+    m_ObjectManager->Submit_RenderGroup();
 
-  m_CollisionManager->Update_Collision();
+    m_ObjectManager->Cleanup_GameObjects(0);
+    m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
 
-  m_LevelManager->Update(delta);
-  m_EventManager->Execute_Events();
+    m_CollisionManager->Update_Collision();
+
+    m_LevelManager->Update(delta);
+    m_EventManager->Execute_Events();
 }
 
 HRESULT Game::Draw() const {
@@ -359,6 +364,11 @@ Shared<GameObject> Game::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID)
     return pObj;
 }
 
+Shared<GameObject> Game::Find_ObjectByObjectTag(uint32 levIndex, const wstring& tag) const
+{
+    return m_ObjectManager->Find_ObjectByObjectTag(levIndex, tag);
+}
+
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
 
 const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects(uint32 levIndex) const {
@@ -493,6 +503,10 @@ HRESULT Game::Add_Light(const LIGHT_DESC &lightDesc) const {
 HRESULT Game::Remove_Light(uint32 index) const {
   return m_LightManager->Remove_Light(index);
 }
+HRESULT Game::Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const
+{
+    return m_LightManager->Render_Lights(shader, buffer);
+}
 
 Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const {
     uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
@@ -591,16 +605,46 @@ void Game::Update_Collision() const
     m_CollisionManager->Update_Collision();
 }
 
-#ifdef _DEBUG
-void Game::Render_CollisionDebug() const
+NavigationBuilder::NAV_BUILD_RESULT Game::Build_Navigation(const Float* vertices, int32 numVertices,
+	const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params)
 {
-    m_CollisionManager->Render_Debug();
+    return m_NavigationBuilder->Build(vertices, numVertices, triangles, numTriangles, params);
 }
-#endif
+
+vector<NavCellBinary> Game::Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+{
+    return m_NavigationBuilder->Bake_Navigation(model, worldMatrix, config);
+}
+
+HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+{
+    return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config);
+}
+
+vector<NavCell> Game::Import_Navigation(const string& filePath) const
+{
+    return m_NavigationBuilder->Import_Binary(filePath);
+}
+
 
 HRESULT Game::Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color) const
 {
     return m_RenderTargetManager->Add_RenderTarget(renderTargetTag, sizeX, sizeY, pixelFormat, color);
+}
+
+HRESULT Game::Add_MultiRenderTarget(const wstring& multiRenderTargetTag, const wstring& renderTargetTag) const
+{
+    return m_RenderTargetManager->Add_MultiRenderTarget(multiRenderTargetTag, renderTargetTag);
+}
+
+HRESULT Game::Begin_MultiRenderTarget(const wstring& multiRenderTargetTag) const
+{
+    return m_RenderTargetManager->Begin_MultiRenderTarget(multiRenderTargetTag);
+}
+
+HRESULT Game::End_MultiRenderTarget() const
+{
+    return m_RenderTargetManager->End_MultiRenderTarget();
 }
 
 HRESULT Game::Bind_RenderTarget_ShaderResource(const Shared<Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const
@@ -672,3 +716,26 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& pr
 
     return Instantiate_Internal(protoType, objectID, levIndex, arg);
 }
+
+#ifdef _DEBUG
+void Game::Render_CollisionDebug() const
+{
+    m_CollisionManager->Render_Debug();
+}
+
+Bool Game::Toggle_RenderDebug() const
+{
+    return m_CollisionManager->Toggle_DebugMode();
+}
+
+HRESULT Game::Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const
+{
+    return m_RenderTargetManager->Ready_RenderTarget_Debug(renderTargetTag, x, y, sizeX, sizeY);
+}
+
+HRESULT Game::Render_RenderTarget_Debug(const Shared<class VIBuffer_Rect>& buffer, const Shared<class Shader>& shader, const wstring& multiRenderTargetTag) const
+{
+    return m_RenderTargetManager->Render_RenderTarget_Debug(buffer, shader, multiRenderTargetTag);
+}
+
+#endif

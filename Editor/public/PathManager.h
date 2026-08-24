@@ -17,6 +17,7 @@ public:
     m_TagSettingsPath = m_ProjectSettingDir + L"TagSettings.json";
     m_EngineDescSettingsPath = m_ProjectSettingDir + L"EngineDesc.json";
     m_SceneDataPath = m_ProjectSettingDir + L"SceneData.json";
+    m_NavDataDir = m_ProjectSettingDir + L"NavData/";
     m_AssetsDir = m_ProjectRoot + L"Assets/";
     m_ShadersDir = m_AssetsDir + L"Shaders/";
     m_TexturesDir = m_AssetsDir + L"Textures/";
@@ -40,6 +41,7 @@ public:
   const wstring& GetTexturesDir() const { return m_TexturesDir; }
   const wstring& GetModelsDir() const { return m_ModelsDir; }
   const wstring& GetPrefabSettingsDir() const { return m_PrefabSettingsDir; }
+  const wstring& GetNavDataDir() const { return m_NavDataDir; }
   const wstring& GetClientProjectDir() const { return m_ClientProjectDir; }
   const wstring& GetClientPublicDir() const { return m_ClientPublicDir; }
   const wstring& GetClientMetadataPath() const { return m_ClientMetadataPath; }
@@ -60,6 +62,7 @@ private:
   wstring m_TexturesDir = L"../../Assets/Textures/";
   wstring m_ModelsDir = L"../../Assets/Models/";
   wstring m_PrefabSettingsDir = L"../../ProjectSetting/Prefab/";
+  wstring m_NavDataDir = L"../../ProjectSetting/NavData/";
   wstring m_ClientProjectDir = L"../../Client/";
   wstring m_ClientPublicDir = L"../../Client/public/";
   wstring m_ClientMetadataPath = L"../../ProjectSetting/client_metadata.json";

@@ -89,3 +89,15 @@ Shared<PartObject> ContainerObject::Find_PartObject(const wstring& partTag)
 
 	return nullptr;
 }
+
+vector<Shared<PartObject>> ContainerObject::Get_PartObjects()
+{
+	vector<Shared<PartObject>> parts;
+
+	for (auto& part : m_PartObjects)
+	{
+		parts.push_back(part.second);
+	}
+
+	return parts;
+}

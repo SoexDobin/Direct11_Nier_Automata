@@ -120,19 +120,6 @@ HRESULT Pl0000Body::Bind_ShaderResources()
 	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
 		return E_FAIL;
 
-	const LIGHT_DESC* lightDesc = GAME_INSTANCE->Get_LightDesc(0);
-	if (nullptr == lightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_Shader->Bind_RawValue(DirectionLight, &lightDesc->direction, sizeof(Float4))))
-		return E_FAIL;
-	if (FAILED(m_Shader->Bind_RawValue(DiffuseLight, &lightDesc->diffuse, sizeof(Float4))))
-		return E_FAIL;
-	if (FAILED(m_Shader->Bind_RawValue(AmbientLight, &lightDesc->ambient, sizeof(Float4))))
-		return E_FAIL;
-	if (FAILED(m_Shader->Bind_RawValue(SpecularLight, &lightDesc->specular, sizeof(Float4))))
-		return E_FAIL;
-
 	return S_OK;
 }
 

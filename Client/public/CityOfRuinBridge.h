@@ -4,18 +4,19 @@
 NS_BEGIN(Engine)
 	class Shader;
 	class Model;
+	class Navigation;
 NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CityOfRuins final : public GameObject
+class CLIENT_DLL CityOfRuinBridge final : public GameObject
 {
 	RTTR_ENABLE(GameObject)
 public:
-	explicit CityOfRuins();
-	explicit CityOfRuins(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
-	explicit CityOfRuins(const CityOfRuins& rhs);
-	virtual ~CityOfRuins() override = default;
+	explicit CityOfRuinBridge();
+	explicit CityOfRuinBridge(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	explicit CityOfRuinBridge(const CityOfRuinBridge& rhs);
+	virtual ~CityOfRuinBridge() override = default;
 
 public:
 	HRESULT Initialize_Prototype() override;
@@ -41,9 +42,10 @@ protected:
 private:
 	Shared<Shader> m_Shader{ nullptr };
 	Shared<Model> m_Model{ nullptr };
+	Shared<Navigation> m_Navigation{ nullptr };
 
 public:
-	static Shared<CityOfRuins> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
+	static Shared<CityOfRuinBridge> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);
 	Shared<GameObject> Clone(void* arg) override;
 };
 

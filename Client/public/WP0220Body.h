@@ -41,7 +41,7 @@ private:
 	void Impact_Shockwave(const Vector3& offset);
 
 public:
-	void Set_Sheathing(const Matrix& sheathMatrix);
+	void Set_Sheathing();
 	void DrawWP0220();
 	Bool Is_Sheathing() const { return m_IsSheathing; }
 	void Set_Animation(uint32 animIndex, Float blendDuration, Bool isLoop) override;

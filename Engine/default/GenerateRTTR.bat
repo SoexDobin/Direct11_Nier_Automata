@@ -20,9 +20,9 @@ echo.
 :: Try multiple python aliases (Prioritize vcpkg Python)
 set "PYTHON_CMD="
 
-:: 0. Try vcpkg's internal python (Recommended)
-if exist "C:\vcpkg\installed\x64-windows\tools\python3\python.exe" (
-    set "PYTHON_CMD=C:\vcpkg\installed\x64-windows\tools\python3\python.exe"
+:: 0. Try the solution-local vcpkg Python (Recommended)
+if exist "%~dp0..\..\vcpkg_installed\x64-windows\tools\python3\python.exe" (
+    set "PYTHON_CMD=%~dp0..\..\vcpkg_installed\x64-windows\tools\python3\python.exe"
 ) else (
     :: 1. Try 'python' in PATH
     python --version >nul 2>&1

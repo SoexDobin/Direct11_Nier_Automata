@@ -47,6 +47,7 @@ public:
 	Float Get_HP() const { return m_Hp; }
 	Float Get_MaxHP() const { return m_MaxHp; }
 	Float Get_LagDuration() const { return m_LagDuration; }
+	Bool Is_Static() const { return m_IsStatic; }
 	Bool Is_Dead() const { return m_Hp <= 0.f; }
 	Bool Is_Invincible() const { return m_IsInvincible; }
 	void Set_Invincible(Bool isInvincible) { m_IsInvincible = isInvincible; }

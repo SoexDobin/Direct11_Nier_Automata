@@ -37,6 +37,7 @@ public:
 	const vector<Shared<GameObject>>& Find_ObjectsByObjectID(uint32 levIndex, uint32 objectID);
 	Shared<GameObject> Find_ByInstanceID(uint32 levIndex, uint32 instanceID);
 	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects(uint32 levIndex);
+	Shared<GameObject> Find_ObjectByObjectTag(uint32 levIndex, const wstring& tagName);
 
 private:
 	uint32 m_LevelCount{};

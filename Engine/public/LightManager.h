@@ -4,6 +4,8 @@
 NS_BEGIN(Engine)
 
 class Light;
+class Shader;
+class VIBuffer_Rect;
 
 class LightManager final : public EngineManager
 {
@@ -17,6 +19,9 @@ public:
 	HRESULT Add_Light(const LIGHT_DESC& desc);
 	HRESULT Remove_Light(uint32 index);
 	HRESULT Clear_Lights();
+
+public:
+	HRESULT Render_Lights(const Shared<Shader>& shader, const Shared<VIBuffer_Rect>& buffer);
 
 public:
 	HRESULT Initialize_Prototype() override;

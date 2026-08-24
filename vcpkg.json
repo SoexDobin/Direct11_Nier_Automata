@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "direct11-nier-automata",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "assimp",
+    {
+      "name": "directxtk",
+      "features": [
+        "tools"
+      ]
+    },
+    "effects11",
+    "magic-enum",
+    "nlohmann-json",
+    "python3",
+    "recastnavigation",
+    "rttr",
+    "spdlog",
+    {
+      "name": "imgui",
+      "features": [
+        "docking-experimental",
+        "dx11-binding",
+        "win32-binding"
+      ]
+    },
+    "imguizmo"
+  ]
+}

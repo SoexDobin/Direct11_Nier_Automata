@@ -2,6 +2,7 @@
 #include "Em0010.h"
 
 #include <Game.h>
+#include <Navigation.h>
 #include <SpdLogger.h>
 #include <SphereCollider.h>
 
@@ -17,6 +18,7 @@
 #include "StateEm0010_Dead.h"
 #include "StateEm0010_Hit.h"
 #include "StateEm0010_Idle.h"
+#include "StateEm0010_Walk.h"
 
 Em0010::Em0010() : Monster{} {}
 Em0010::Em0010(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
@@ -64,7 +66,7 @@ HRESULT Em0010::Initialize(void* arg)
 		{
 			HpBarWorldUI::HP_BAR_WORLD_UI_DESC UI_hpDesc{};
 			UI_hpDesc.target = static_pointer_cast<Entity>(shared_from_this());
-			UI_hpDesc.worldOffset = Vector3{ 0.f, 1.f, 0.f };
+			UI_hpDesc.worldOffset = Vector3{ 0.f, 2.f, 0.f };
 			UI_hpDesc.anchor = UI_ANCHOR::TOP_LEFT;
 			UI_hpDesc.sizeX = 200.f;
 			UI_hpDesc.sizeY = 10.f;
@@ -237,6 +239,10 @@ HRESULT Em0010::Ready_PartObjects()
 
 HRESULT Em0010::Ready_Components()
 {
+	Navigation::NAVIGATION_DESC navDesc;
+	navDesc.startCellIndex = 0;
+	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
+
 	Em0010Movement::EM0010_MOVEMENT_DESC movementDesc{};
 	movementDesc.velocity = Vector3{ 0.f, 0.f, 0.f };
 	movementDesc.moveSpeed = 0.f;
@@ -262,6 +268,9 @@ HRESULT Em0010::Ready_Components()
 			return E_FAIL;
 		if (FAILED(m_States->Add_State(StateEm0010_Attack::Create(
 			Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::ATTACK)), em0010))))
+			return E_FAIL;
+		if (FAILED(m_States->Add_State(StateEm0010_Walk::Create(
+			Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::WALK)), em0010))))
 			return E_FAIL;
 		if (FAILED(m_States->Add_State(StateEm0010_Dead::Create(
 			Helper::To_wString(magic_enum::enum_name(MonsterStateMachine::MONSTER_STATE::DEAD)), em0010))))

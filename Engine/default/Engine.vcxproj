@@ -74,26 +74,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\bin\</OutDir>
-    <ExternalIncludePath>$(ProjectDir)..\external\vcpkg_installed\x64-windows\include\;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\bin\</OutDir>
-    <ExternalIncludePath>$(ProjectDir)..\external\vcpkg_installed\x64-windows\include\;$(ExternalIncludePath)</ExternalIncludePath>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgUseStatic>false</VcpkgUseStatic>
-    <VcpkgTriplet>x64-windows</VcpkgTriplet>
-    <VcpkgHostTriplet>x64-windows</VcpkgHostTriplet>
-    <VcpkgInstalledDir>$(ProjectDir)..\external\vcpkg_installed\</VcpkgInstalledDir>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgUseStatic>false</VcpkgUseStatic>
-    <VcpkgTriplet>x64-windows</VcpkgTriplet>
-    <VcpkgHostTriplet>x64-windows</VcpkgHostTriplet>
-    <VcpkgInstalledDir>$(ProjectDir)..\external\vcpkg_installed\</VcpkgInstalledDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -140,7 +123,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>d3d11.lib;fmod_vc.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;$(ProjectDir)..\external\vcpkg_installed\x64-windows\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)
@@ -153,6 +136,11 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
       <Message>Reflection Engine Class</Message>
     </PreBuildEvent>
+    <FxCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShaderModel>5.0</ShaderModel>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -173,7 +161,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>d3d11.lib;fmod_vc.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;$(ProjectDir)..\external\vcpkg_installed\x64-windows\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(Solutiondir)Engine\external\FMOD\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)
@@ -186,10 +174,14 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <Command>call "$(Solutiondir)Engine\default\GenerateRTTR.bat" "$(Solutiondir)Engine\public" "$(Solutiondir)Engine\private\rttr_generated"</Command>
       <Message>Reflection Engine Class</Message>
     </PreBuildEvent>
+    <FxCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShaderModel>5.0</ShaderModel>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\public\EngineShaderDefine.hlsli" />
-    <None Include="..\vcpkg.json" />
+    <None Include="..\bin\shaders\EngineShaderDefine.hlsli" />
     <None Include="ExportBuildArtifacts.bat" />
     <None Include="GenerateRTTR.bat" />
     <None Include="RTTRGenerator.py" />
@@ -212,6 +204,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Engine_Function.h" />
     <ClInclude Include="..\public\Engine_Macro.h" />
     <ClInclude Include="..\public\Engine_ModelStruct.h" />
+    <ClInclude Include="..\public\Engine_NavStruct.h" />
+    <ClInclude Include="..\public\Engine_Rendering_Const.h" />
     <ClInclude Include="..\public\Engine_RTTR_Metadata.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
@@ -232,6 +226,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Material.h" />
     <ClInclude Include="..\public\Mesh.h" />
     <ClInclude Include="..\public\Model.h" />
+    <ClInclude Include="..\public\NavCell.h" />
+    <ClInclude Include="..\public\Navigation.h" />
+    <ClInclude Include="..\public\NavigationBuilder.h" />
     <ClInclude Include="..\public\OBBCollider.h" />
     <ClInclude Include="..\public\Object.h" />
     <ClInclude Include="..\public\ObjectManager.h" />
@@ -296,6 +293,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Material.cpp" />
     <ClCompile Include="..\private\Mesh.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
+    <ClCompile Include="..\private\NavCell.cpp" />
+    <ClCompile Include="..\private\Navigation.cpp" />
+    <ClCompile Include="..\private\NavigationBuilder.cpp" />
     <ClCompile Include="..\private\OBBCollider.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
     <ClCompile Include="..\private\ObjectManager.cpp" />
@@ -318,6 +318,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\Navigation_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\OBBCollider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Object_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp" />
@@ -358,6 +359,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\VICube.cpp" />
     <ClCompile Include="..\private\VISphere.cpp" />
     <ClCompile Include="..\private\WorldUIObject.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\shaders\DeferredShader.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

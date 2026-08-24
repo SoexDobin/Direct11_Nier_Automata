@@ -22,10 +22,10 @@
 
 #include "GameObject.h"
 #include "Component.h"
+#include "NavigationBuilder.h"
 
 NS_BEGIN(Engine)
-
-class LayerRegistry;
+	class LayerRegistry;
 class TagRegistry;
 
 class ENGINE_DLL Game {
@@ -105,6 +105,7 @@ public: /* For ObjectManager */
 	HRESULT Clear_AllGameObjects() const;
     Shared<GameObject> Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const;
     Shared<GameObject> Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const;
+    Shared<GameObject> Find_ObjectByObjectTag(uint32 levIndex, const wstring& tag) const;
     void Clearing_ObjectManager(uint32 levIndex) const;
 
 public: /* For CameraManager */
@@ -148,6 +149,7 @@ public: /* For.LightManager */
     const LIGHT_DESC *Get_LightDesc(uint32 index) const;
     HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
     HRESULT Remove_Light(uint32 index) const;
+    HRESULT Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const;
 
 public: /* For LevelSerialize */
     HRESULT SerializeLevel(uint32 levIndex, const wstring& path) const;
@@ -174,12 +176,18 @@ public: /* CollisionManager */
     void Add_Collider(const Shared<class Collider>& collider) const;
     void Remove_Collider(const Shared<class Collider>& collider) const;
     void Update_Collision() const;
-#ifdef _DEBUG
-    void Render_CollisionDebug() const;
-#endif
+
+public: /* NavigationBuilder */
+    NavigationBuilder::NAV_BUILD_RESULT Build_Navigation(const Float* vertices, int32 numVertices, const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params);
+    vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
+    HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
+    vector<NavCell> Import_Navigation(const string& filePath) const;
 
 public:
     HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;
+    HRESULT Add_MultiRenderTarget(const wstring& multiRenderTargetTag, const wstring& renderTargetTag) const;
+    HRESULT Begin_MultiRenderTarget(const wstring& multiRenderTargetTag) const;
+    HRESULT End_MultiRenderTarget() const;
     HRESULT Bind_RenderTarget_ShaderResource(const Shared<class Shader>& shader, const Char* constantName, const wstring& renderTargetTag) const;
 
 public: /* Prototype & Instantiate Facade */
@@ -229,6 +237,18 @@ private:
     Unique<EventManager> m_EventManager = { nullptr };
     Unique<CollisionManager> m_CollisionManager = { nullptr };
     Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
+    Unique<NavigationBuilder> m_NavigationBuilder = { nullptr };
+
+
+#ifdef _DEBUG /* For Debug Function */
+public:
+    void Render_CollisionDebug() const;
+    Bool Toggle_RenderDebug() const;
+    HRESULT Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const;
+	HRESULT Render_RenderTarget_Debug(const Shared<class VIBuffer_Rect>& buffer, const Shared<class Shader>& shader, const wstring& multiRenderTargetTag) const;
+
+#endif
+
 };
 
 NS_END

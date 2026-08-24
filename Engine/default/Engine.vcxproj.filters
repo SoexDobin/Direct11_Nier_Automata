@@ -184,6 +184,15 @@
     <Filter Include="00. System\04. RenderTarget\Manager">
       <UniqueIdentifier>{37f69072-1107-4dae-be93-94d0cf636a47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\05. Component\Navigation">
+      <UniqueIdentifier>{3086f2b5-7de3-4e3d-a6c4-ec4282a459fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Navigation\NavCell">
+      <UniqueIdentifier>{bfbebe06-4cdf-402a-a958-27ab20b4bd6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\05. Component\Navigation\Builder">
+      <UniqueIdentifier>{39a3bc1e-3dc6-4d80-88ee-aa64b2945dc8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExportBuildArtifacts.bat">
@@ -198,7 +207,7 @@
     <None Include="RTTRGenerator.py">
       <Filter>99. SystemFiles</Filter>
     </None>
-    <None Include="..\public\EngineShaderDefine.hlsli">
+    <None Include="..\bin\shaders\EngineShaderDefine.hlsli">
       <Filter>02. ShaderFiles</Filter>
     </None>
   </ItemGroup>
@@ -411,7 +420,24 @@
     <ClInclude Include="..\public\RenderTarget.h">
       <Filter>00. System\04. RenderTarget</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\RenderTargetManager.h" />
+    <ClInclude Include="..\public\RenderTargetManager.h">
+      <Filter>00. System\04. RenderTarget\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\NavCell.h">
+      <Filter>01. Utility\05. Component\Navigation\NavCell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Navigation.h">
+      <Filter>01. Utility\05. Component\Navigation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\NavigationBuilder.h">
+      <Filter>01. Utility\05. Component\Navigation\Builder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_NavStruct.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Engine_Rendering_Const.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GraphicDevice.cpp">
@@ -661,6 +687,25 @@
     <ClCompile Include="..\private\RenderTarget.cpp">
       <Filter>00. System\04. RenderTarget</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\RenderTargetManager.cpp" />
+    <ClCompile Include="..\private\RenderTargetManager.cpp">
+      <Filter>00. System\04. RenderTarget\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\NavCell.cpp">
+      <Filter>01. Utility\05. Component\Navigation\NavCell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Navigation.cpp">
+      <Filter>01. Utility\05. Component\Navigation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\NavigationBuilder.cpp">
+      <Filter>01. Utility\05. Component\Navigation\Builder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\rttr_generated\Navigation_rttr.cpp">
+      <Filter>96. RTTR</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\shaders\DeferredShader.hlsl">
+      <Filter>02. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

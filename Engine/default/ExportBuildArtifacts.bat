@@ -8,8 +8,8 @@ echo.
 
 echo ===== [1/4] Copying Engine.lib to EngineSDK\lib =====
 xcopy /Y /I "..\bin\Engine.lib"				"..\..\EngineSDK\lib\"
-xcopy /Y /I "..\external\vcpkg_installed\x64-windows\debug\lib\*.lib*"  "..\..\EngineSDK\lib\"
-xcopy /Y /I "..\external\vcpkg_installed\x64-windows\lib\*.lib*"        "..\..\EngineSDK\lib\"
+xcopy /Y /I "..\..\vcpkg_installed\x64-windows\debug\lib\*.lib*"  "..\..\EngineSDK\lib\"
+xcopy /Y /I "..\..\vcpkg_installed\x64-windows\lib\*.lib*"        "..\..\EngineSDK\lib\"
 echo =================================================
 echo.
 
@@ -19,7 +19,7 @@ xcopy /Y /I		"..\private\*.inl"					"..\..\EngineSDK\inc\"
 xcopy /Y /I		"..\bin\shaders\*.hlsli*"		"..\..\EngineSDK\inc\"
 xcopy /Y /I		"..\bin\shaders\*.hlsl*"		"..\..\EngineSDK\inc\"
 xcopy /Y /I /E "..\external\FMOD"					"..\..\EngineSDK\inc\"
-xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\include" "..\..\EngineSDK\inc\"
+xcopy /Y /I /E "..\..\vcpkg_installed\x64-windows\include" "..\..\EngineSDK\inc\"
 echo =================================================
 echo.
 
@@ -30,10 +30,6 @@ xcopy /Y /I	"..\bin\shaders\*.hlsli*"				"..\..\Client\shaders\bin\"
 xcopy /Y /I	"..\bin\shaders\*.hlsl*"				"..\..\Client\shaders\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Client\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Editor\bin\"
-xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Client\bin\"
-xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\debug\bin\*.dll*"  "..\..\Editor\bin\"
-xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\bin\*.dll*"  "..\..\Client\bin\"
-xcopy /Y /I /E "..\external\vcpkg_installed\x64-windows\bin\*.dll*"  "..\..\Editor\bin\"
 echo =================================================
 echo.
 

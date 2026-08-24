@@ -21,7 +21,8 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 	m_Animation.clear();
 	m_Channels.clear();
 
-	string modelFilePath(path.begin(), path.end());
+	const std::u8string utf8Path = filesystem::path(path).u8string();
+	const string modelFilePath{ utf8Path.begin(), utf8Path.end() };
 
 	m_AiScene = m_Importer->ReadFile(
 		modelFilePath,
@@ -571,6 +572,8 @@ void Tool::Converter::WriteJsonFile(const wstring& path)
 	{
 		out << root.dump(4);
 		out.close();
-		std::cout << "  [JSON] Export Success: " << string(path.begin(), path.end()) << "\n";
+		const std::u8string utf8Path = filesystem::path(path).u8string();
+		std::cout << "  [JSON] Export Success: "
+			<< string{ utf8Path.begin(), utf8Path.end() } << "\n";
 	}
 }

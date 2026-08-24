@@ -1,86 +1,179 @@
 #include "pch.h"
 #include "Converter.h"
 
-#include <iostream>
+#include <cwctype>
 #include <filesystem>
-#include <algorithm>
-#include <vector>
+#include <iostream>
 #include <string>
+#include <vector>
 
-int main(int argc, char* argv[])
+namespace
 {
-	SetConsoleOutputCP(CP_UTF8);
 	namespace fs = std::filesystem;
 
-	fs::path resourcesDir;
-	if (argc >= 2) resourcesDir = argv[1];
-	else resourcesDir = fs::current_path() / "../Client/bin/resources";
+	const std::vector<std::wstring> SupportedExtensions{
+		L".fbx", L".obj", L".gltf", L".glb"
+	};
 
-	resourcesDir = fs::weakly_canonical(resourcesDir);
-
-	if (!fs::exists(resourcesDir))
+	std::string ToUtf8(const fs::path& path)
 	{
-		std::cerr << "[Error] Path not found : " << resourcesDir << "\n";
-		std::cerr << "[CWD]                  : " << fs::current_path() << "\n";
-		std::cerr << "Usage: ModelConverter.exe <resources_path>\n";
+		const std::u8string utf8 = path.u8string();
+		return { utf8.begin(), utf8.end() };
+	}
+
+	Bool IsSupportedAsset(const fs::path& path)
+	{
+		std::wstring extension = path.extension().wstring();
+		std::transform(extension.begin(), extension.end(), extension.begin(),
+			[](wchar_t ch) { return static_cast<wchar_t>(std::towlower(ch)); });
+
+		return std::find(SupportedExtensions.begin(), SupportedExtensions.end(), extension)
+			!= SupportedExtensions.end();
+	}
+
+	void AddAssetFile(const fs::path& path, std::vector<fs::path>& assetFiles)
+	{
+		if (!IsSupportedAsset(path))
+			return;
+
+		if (std::find(assetFiles.begin(), assetFiles.end(), path) == assetFiles.end())
+			assetFiles.push_back(path);
+	}
+
+	Bool CollectAssetFiles(const fs::path& inputPath, std::vector<fs::path>& assetFiles)
+	{
+		std::error_code errorCode;
+		fs::path normalizedPath = fs::weakly_canonical(inputPath, errorCode);
+		if (errorCode)
+			normalizedPath = fs::absolute(inputPath, errorCode).lexically_normal();
+
+		if (errorCode || !fs::exists(normalizedPath))
+		{
+			std::cerr << "[Error] Path not found: " << ToUtf8(inputPath) << "\n";
+			return false;
+		}
+
+		if (fs::is_regular_file(normalizedPath))
+		{
+			if (!IsSupportedAsset(normalizedPath))
+			{
+				std::cerr << "[Skip] Unsupported file: " << ToUtf8(normalizedPath) << "\n";
+				return false;
+			}
+
+			AddAssetFile(normalizedPath, assetFiles);
+			return true;
+		}
+
+		if (!fs::is_directory(normalizedPath))
+		{
+			std::cerr << "[Error] Unsupported path type: " << ToUtf8(normalizedPath) << "\n";
+			return false;
+		}
+
+		fs::recursive_directory_iterator iterator{
+			normalizedPath,
+			fs::directory_options::skip_permission_denied,
+			errorCode
+		};
+		const fs::recursive_directory_iterator end{};
+
+		while (!errorCode && iterator != end)
+		{
+			if (iterator->is_regular_file(errorCode) && !errorCode)
+				AddAssetFile(iterator->path(), assetFiles);
+
+			iterator.increment(errorCode);
+		}
+
+		if (errorCode)
+		{
+			std::cerr << "[Error] Failed to scan directory: " << ToUtf8(normalizedPath)
+				<< " (" << errorCode.message() << ")\n";
+			return false;
+		}
+
+		return true;
+	}
+}
+
+int wmain(int argc, wchar_t* argv[])
+{
+	SetConsoleOutputCP(CP_UTF8);
+
+	std::vector<fs::path> assetFiles;
+	int32 inputFailures = 0;
+
+	if (argc >= 2)
+	{
+		for (int32 i = 1; i < argc; ++i)
+		{
+			if (!CollectAssetFiles(fs::path{ argv[i] }, assetFiles))
+				++inputFailures;
+		}
+	}
+	else
+	{
+		const fs::path defaultResourcesPath = fs::current_path() / L"../Client/bin/resources";
+		if (!CollectAssetFiles(defaultResourcesPath, assetFiles))
+			++inputFailures;
+	}
+
+	if (assetFiles.empty())
+	{
+		std::cerr << "[Error] No supported asset files were found.\n";
+		std::cerr << "Usage: Drag FBX files onto ModelConverter.exe\n";
+		std::cerr << "   or: ModelConverter.exe <asset_file_or_directory> [...]\n";
 		std::cin.get();
 		return -1;
 	}
 
 	std::cout << "========================================\n";
 	std::cout << " ModelConverter\n";
-	std::cout << " Scan: " << resourcesDir << "\n";
+	std::cout << " Files: " << assetFiles.size() << "\n";
 	std::cout << "========================================\n\n";
 
-	const std::vector<std::string> validExts = { ".fbx", ".obj", ".gltf", ".glb" };
-	int32 success = 0, fail = 0;
+	int32 success = 0;
+	int32 fail = inputFailures;
 
-	for (const auto& entry : fs::recursive_directory_iterator(resourcesDir))
+	for (const fs::path& assetPath : assetFiles)
 	{
-		if (!entry.is_regular_file()) continue;
+		fs::path outputPath = assetPath;
+		outputPath.replace_extension(L".model");
 
-		std::string ext = entry.path().extension().string();
-		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		std::cout << "[Convert] " << ToUtf8(assetPath) << "\n";
 
-		Bool supported = std::any_of(validExts.begin(), validExts.end(),
-			[&ext](const std::string& e) { return e == ext; });
-		if (!supported) continue;
+		Tool::Converter converter;
+		converter.Initialize();
 
-		fs::path outPath = entry.path().parent_path() / entry.path().stem();
-		outPath += ".model";
-
-		std::cout << "[Convert] " << entry.path().filename().string() << "\n";
-
-		Tool::Converter conv;
-		conv.Initialize();
-
-		if (!conv.ReadAssetFile(entry.path().wstring()))
+		if (!converter.ReadAssetFile(assetPath.wstring()))
 		{
 			std::cerr << "  [FAIL] ReadAssetFile\n\n";
-			++fail; continue;
+			++fail;
+			continue;
 		}
 
-		// ★ 변환 결과 출력
-		std::cout << "  Meshes		: " << conv.GetMeshCount() << "\n";
-		std::cout << "  Materials		: " << conv.GetMaterialCount() << "\n";
-		std::cout << "  Bones			: " << conv.GetBoneCount() << "\n";
-		std::cout << "  Animations		: " << conv.GetAnimationCount() << "\n";
+		std::cout << "  Meshes       : " << converter.GetMeshCount() << "\n";
+		std::cout << "  Materials    : " << converter.GetMaterialCount() << "\n";
+		std::cout << "  Bones        : " << converter.GetBoneCount() << "\n";
+		std::cout << "  Animations   : " << converter.GetAnimationCount() << "\n";
 
-		if (!conv.ExportModel(outPath.wstring()))
+		if (!converter.ExportModel(outputPath.wstring()))
 		{
 			std::cerr << "  [FAIL] ExportModel\n\n";
-			++fail; continue;
+			++fail;
+			continue;
 		}
 
-		std::cout << "  [OK] -> " << outPath.filename().string() << "\n\n";
+		std::cout << "  [OK] -> " << ToUtf8(outputPath) << "\n\n";
 		++success;
 	}
 
-	// ★ 최종 요약
 	std::cout << "========================================\n";
 	std::cout << " Result\n";
-	std::cout << "   Files     : " << success << " OK / " << fail << " FAIL / " << " SKIP\n";
+	std::cout << "   Files     : " << success << " OK / " << fail << " FAIL\n";
 	std::cout << "========================================\n";
 	std::cin.get();
-	return (fail > 0) ? -1 : 0;
+
+	return fail > 0 ? -1 : 0;
 }

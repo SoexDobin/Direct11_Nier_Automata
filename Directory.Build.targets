@@ -1,0 +1,28 @@
+<Project>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(VcpkgInstalledDir)$(VcpkgTriplet)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(VcpkgInstalledDir)$(VcpkgTriplet)\debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(VcpkgInstalledDir)$(VcpkgTriplet)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">$(VcpkgInstalledDir)$(VcpkgTriplet)\debug\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">$(VcpkgInstalledDir)$(VcpkgTriplet)\lib\*.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <Target Name="CopyVcpkgRuntimeBinaries" AfterTargets="Build" Condition="'$(Platform)'=='x64'">
+    <ItemGroup Condition="'$(Configuration)'=='Debug'">
+      <VcpkgRuntimeBinaries Include="$(VcpkgInstalledDir)$(VcpkgTriplet)\debug\bin\*.dll" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)'=='Release'">
+      <VcpkgRuntimeBinaries Include="$(VcpkgInstalledDir)$(VcpkgTriplet)\bin\*.dll" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(VcpkgRuntimeBinaries)"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="true"
+      Condition="'@(VcpkgRuntimeBinaries)' != '' and '$(OutDir)' != ''" />
+  </Target>
+</Project>

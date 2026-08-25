@@ -21,11 +21,17 @@ HRESULT EditorApp::Initialize() {
     ENGINE_DESC desc = {};
     desc.hWnd = g_hWnd;
     desc.hInst = g_hInst;
+#ifdef _DEBUG
+    desc.winMode = WINMODE::WIN;
+    desc.viewportWidth = 1600;
+    desc.viewportHeight = 900;
+#else
     desc.winMode = WINMODE::FULL;
-    desc.levelCount = ClientSettingManager::GetInstance()->Get_LevelCount();
-    desc.startLevel = 3;
     desc.viewportWidth = 1920;
     desc.viewportHeight = 1080;
+#endif
+    desc.levelCount = ClientSettingManager::GetInstance()->Get_LevelCount();
+    desc.startLevel = 3;
     desc.useOffscreenRendering = true;
     desc.renderTargetCount = 2;
     m_StartLevelIndex = desc.startLevel;

@@ -50,6 +50,12 @@ HRESULT Object::Initialize_Prototype(const wstring& prototypeTag)
 
 void Object::Destroy(const Shared<Object>& object)
 {
+	if (nullptr == object)
+	{
+		LOG_WARN(L"Ignored destroy request for a null object");
+		return;
+	}
+
 	object->m_IsDestroy = true;
 }
 

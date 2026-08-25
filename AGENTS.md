@@ -7,6 +7,7 @@
 - Vault root: `C:\Users\a9018\Desktop\Project_Vault`
 - Vault project hub: `AI-Sessions/wiki/projects/Direct11_Nier_Automata.md`
 - External resource workspace: `D:\NierRes`
+- Resource research notebook: `https://notebook.google.com/notebook/88617913-333a-42b4-82bb-6eeb6bac60ea`
 
 This repository uses the Project Vault as its durable project memory. This file defines repository-local entry and safety rules; the Vault root `AGENTS.md` remains the source of truth for Vault routing, save, index, log, and lint rules.
 
@@ -53,6 +54,14 @@ Do not treat generated files, copied SDK outputs, project data, or external reso
 - Keep large extracted resources and generated extraction output out of this repository and the Vault.
 - Prefer existing tools under `D:\NierRes` before proposing downloads or installations.
 - Do not edit generated RTTR files or `EngineSDK` copies until their source/generation relationship is identified.
+
+## NotebookLM Resource Reference
+
+- Use the project resource notebook through the NotebookLM MCP when resource work requires discovering, identifying, or validating information that is not already available from explicit user-provided paths or locally verifiable files.
+- Routine resource operations with known inputs and known procedures do not require a NotebookLM query. Use it as a discovery and reference aid, not as a mandatory gate for every resource task.
+- Use notebook ID `direct11-nier-automata`, registered from `https://notebook.google.com/notebook/88617913-333a-42b4-82bb-6eeb6bac60ea`.
+- Treat NotebookLM answers as reference context, not as a replacement for checking repository source, extracted files, tool output, and build or runtime evidence.
+- If a needed NotebookLM lookup is unavailable or unauthenticated, report that limitation and continue with locally verifiable evidence unless the missing reference context is required for a safe decision.
 
 ## Durable Project Memory
 

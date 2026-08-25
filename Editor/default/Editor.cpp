@@ -107,8 +107,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
   g_hInst = hInstance;
 
-  RECT rc = {0, 0, static_cast<int32>(g_projectSettings.viewportWidth),
-             static_cast<int32>(g_projectSettings.viewportHeight)};
+  uint32 windowWidth = g_projectSettings.viewportWidth;
+  uint32 windowHeight = g_projectSettings.viewportHeight;
+#ifdef _DEBUG
+  if (windowWidth > 1600u)
+    windowWidth = 1600u;
+  if (windowHeight > 900u)
+    windowHeight = 900u;
+#endif
+
+  RECT rc = {0, 0, static_cast<int32>(windowWidth),
+             static_cast<int32>(windowHeight)};
   AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,

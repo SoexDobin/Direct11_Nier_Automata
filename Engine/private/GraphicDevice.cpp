@@ -233,6 +233,12 @@ GraphicDevice::Get_OffscreenSRV(uint32 screenIndex) {
 
 HRESULT GraphicDevice::Ready_SwapChain(HWND hWnd, WINMODE isWindowed,
                                        uint32 winSizeX, uint32 winSizeY) {
+#ifdef _DEBUG
+  // Keep debug sessions in a normal desktop window so Visual Studio can take
+  // focus immediately when the native debugger breaks on an exception.
+  isWindowed = WINMODE::WIN;
+#endif
+
   ComPtr<IDXGIDevice> device = {nullptr};
   if (FAILED(m_Device->QueryInterface(
           __uuidof(IDXGIDevice),
@@ -271,6 +277,11 @@ HRESULT GraphicDevice::Ready_SwapChain(HWND hWnd, WINMODE isWindowed,
   fullScreenSwapChain.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
   fullScreenSwapChain.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
   fullScreenSwapChain.Windowed = static_cast<Bool>(isWindowed);
+
+#ifdef _DEBUG
+  if (FAILED(factory2->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER)))
+    return E_FAIL;
+#endif
 
   return factory2->CreateSwapChainForHwnd(m_Device.Get(), hWnd, &swapChain,
                                           &fullScreenSwapChain, nullptr,

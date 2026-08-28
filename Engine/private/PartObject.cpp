@@ -12,17 +12,8 @@ HRESULT PartObject::Initialize_Prototype()
 
 HRESULT PartObject::Initialize(void* arg)
 {
-
-	GameObject::Initialize(arg);
-
-	if (arg)
-	{
-		auto desc = *static_cast<PARTOBJECT_DESC*>(arg);
-		m_Owner = desc.Owner;
-		m_ParentMatrix = desc.parentMatrix;
-	}
-	else return E_FAIL;
-
+	if (FAILED(GameObject::Initialize(arg)))
+		return E_FAIL;
 
 	return S_OK;
 }

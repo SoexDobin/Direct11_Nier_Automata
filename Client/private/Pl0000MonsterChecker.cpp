@@ -12,9 +12,8 @@ Pl0000MonsterChecker::Pl0000MonsterChecker(const Pl0000MonsterChecker& rhs)
 
 Shared<GameObject> Pl0000MonsterChecker::Get_ClosestTarget()
 {
-	if (m_Pl0000.expired()) return nullptr;
-
-	auto player = m_Pl0000.lock();
+	auto player = static_pointer_cast<Pl0000>(Get_Parent());
+	if (!player) return nullptr;
 	Vector3 pos = player->Get_Transform()->Get_Position();
 	Vector3 look = player->Get_Transform()->Get_Look();
 	look.y = 0.f;
@@ -86,10 +85,6 @@ HRESULT Pl0000MonsterChecker::Initialize(void* arg)
 	if (m_EvadeChecker == nullptr)
 		return E_FAIL;
 
-	if (m_Owner.expired())
-		return E_FAIL;
-	m_Pl0000 = static_pointer_cast<Pl0000>(m_Owner.lock());
-
 	return S_OK;
 }
 
@@ -116,7 +111,7 @@ void Pl0000MonsterChecker::Update(Float timeDelta)
 
 void Pl0000MonsterChecker::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	if (m_Pl0000.expired()) return;
+	if (!Get_Parent()) return;
 
 	auto target = targetCollider->Get_Owner();
 
@@ -140,7 +135,7 @@ void Pl0000MonsterChecker::OnCollisionStay(const Shared<Collider>& ownCollider, 
 
 void Pl0000MonsterChecker::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	if (m_Pl0000.expired()) return;
+	if (!Get_Parent()) return;
 
 	auto target = targetCollider->Get_Owner();
 

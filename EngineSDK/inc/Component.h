@@ -37,7 +37,6 @@ protected:
 
 public:
   constexpr virtual Shared<Component> Clone(void *arg = nullptr) PURE;
-  virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) {}
 
 private:
   using Object::m_DescID;

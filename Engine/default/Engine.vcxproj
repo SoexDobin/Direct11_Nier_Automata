@@ -181,6 +181,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\bin\shaders\EngineShaderConstantBuffer.hlsli" />
     <None Include="..\bin\shaders\EngineShaderDefine.hlsli" />
     <None Include="ExportBuildArtifacts.bat" />
     <None Include="GenerateRTTR.bat" />
@@ -197,9 +198,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Collider.h" />
     <ClInclude Include="..\public\CollisionManager.h" />
     <ClInclude Include="..\public\Component.h" />
-    <ClInclude Include="..\public\ContainerObject.h" />
     <ClInclude Include="..\public\DebugDraw.h" />
     <ClInclude Include="..\public\Engine_Define.h" />
+    <ClInclude Include="..\public\Engine_ID.h" />
     <ClInclude Include="..\public\Engine_Enum.h" />
     <ClInclude Include="..\public\Engine_Function.h" />
     <ClInclude Include="..\public\Engine_Macro.h" />
@@ -241,7 +242,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\RenderTargetManager.h" />
     <ClInclude Include="..\public\ResourceManager.h" />
     <ClInclude Include="..\public\ScriptComponent.h" />
+    <ClInclude Include="..\public\Shader_CBuffer_Define.h" />
     <ClInclude Include="..\public\LevelSerializer.h" />
+	<ClInclude Include="..\public\PrefabManager.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\public\SoundManager.h" />
     <ClInclude Include="..\public\SpdLogger.h" />
@@ -253,6 +256,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\TimeManager.h" />
     <ClInclude Include="..\public\Timer.h" />
     <ClInclude Include="..\public\Transform.h" />
+    <ClInclude Include="..\private\TypeCatalog.h" />
     <ClInclude Include="..\public\UIObject.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
     <ClInclude Include="..\public\VIBuffer_Instance.h" />
@@ -275,9 +279,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Collider.cpp" />
     <ClCompile Include="..\private\CollisionManager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
-    <ClCompile Include="..\private\ContainerObject.cpp" />
     <ClCompile Include="..\private\DebugDraw.cpp" />
     <ClCompile Include="..\private\EventManager.cpp" />
+    <ClCompile Include="..\private\Engine_ID.cpp" />
     <ClCompile Include="..\private\Font.cpp" />
     <ClCompile Include="..\private\FontManager.cpp" />
     <ClCompile Include="..\private\Game.cpp" />
@@ -298,6 +302,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\NavigationBuilder.cpp" />
     <ClCompile Include="..\private\OBBCollider.cpp" />
     <ClCompile Include="..\private\Object.cpp" />
+    <ClCompile Include="..\private\TypeCatalog.cpp" />
     <ClCompile Include="..\private\ObjectManager.cpp" />
     <ClCompile Include="..\private\PartObject.cpp" />
     <ClCompile Include="..\private\Pipeline.cpp" />
@@ -307,21 +312,27 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\RenderTargetManager.cpp" />
     <ClCompile Include="..\private\ResourceManager.cpp" />
     <ClCompile Include="..\private\rttr_generated\AABBCollider_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\Animation_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\AnimationTracker_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\Bone_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Camera_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Collider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Component_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
-    <ClCompile Include="..\private\rttr_generated\ContainerObject_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\Channel_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\GameObject_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
+	<ClCompile Include="..\private\rttr_generated\Material_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\Mesh_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Navigation_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\NavCell_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\OBBCollider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Object_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\PartObject_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\ScriptComponent_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Shader_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\SphereCollider_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\TextUI_rttr.cpp" />
@@ -329,15 +340,19 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\rttr_generated\Transform_rttr.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
     </ClCompile>
+	<ClCompile Include="..\private\rttr_generated\UIObject_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Point_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Particle_Rect_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Rect_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VIBuffer_Terrain_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\VIBuffer_Instance_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Font_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\VICube_rttr.cpp" />
     <ClCompile Include="..\private\LevelSerializer.cpp" />
+	<ClCompile Include="..\private\PrefabManager.cpp" />
     <ClCompile Include="..\private\rttr_generated\VISphere_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\WorldUIObject_rttr.cpp" />
     <ClCompile Include="..\private\ScriptComponent.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\private\SoundManager.cpp" />

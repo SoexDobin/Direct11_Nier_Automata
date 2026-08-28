@@ -99,18 +99,17 @@ def main():
     processed_classes: Set[str] = set()
     new_includes = ""
     new_rttr_blocks = ""
-    
-    # Pre-scan output file for already manually registered classes
+
+    # Existing registrations are immutable schema keys. Keep their source blocks
+    # intact and append only newly discovered classes; a C++ rename must therefore
+    # be handled explicitly instead of silently changing the persisted RTTR name.
     if output_file.exists():
         try:
             existing_content = output_file.read_text(encoding='utf-8')
-            manual_content = re.sub(r'(?s)//\s*<AUTO_GENERATED_RTTR>.*?//\s*</AUTO_GENERATED_RTTR>', '', existing_content)
-            for match in re.finditer(r'rttr::registration::class_<([A-Za-z0-9_]+)>', manual_content):
-                manual_class = match.group(1)
-                processed_classes.add(manual_class)
-                # print(f"==========      [Info] Found manual registration: {manual_class}")
+            for match in re.finditer(r'rttr::registration::class_<([A-Za-z0-9_]+)>', existing_content):
+                processed_classes.add(match.group(1))
         except Exception as e:
-            print(f"==========      [Warning] Could not pre-scan manual registrations: {e}")
+            print(f"==========      [Warning] Could not pre-scan registrations: {e}")
     
     for header_file in sorted(input_dir.glob("*.h")):
         class_name, rttr_block = process_header_file(header_file, processed_classes)
@@ -123,34 +122,16 @@ def main():
         print("==========      [INFO] No Target RTTR classes found.")
         return
 
-    # 파일 읽기 및 정규식 교체 (샌드박싱)
-    try:
-        content = output_file.read_text(encoding='utf-8')
-    except Exception as e:
-        print(f"===== [ERROR] Could not read {output_file}: {e}")
+    final_code = existing_content
+    include_end = re.search(r'//\s*</AUTO_GENERATED_INCLUDES>', final_code)
+    rttr_end = re.search(r'//\s*</AUTO_GENERATED_RTTR>', final_code)
+    if not include_end or not rttr_end:
+        print("===== [ERROR] Auto-generated markers are missing")
         sys.exit(1)
-        
-    print(f"========== [DEBUG] Content length: {len(content)}")
-    
-    include_pattern = r'(//\s*<AUTO_GENERATED_INCLUDES>).*?(//\s*</AUTO_GENERATED_INCLUDES>)'
-    if re.search(include_pattern, content, flags=re.DOTALL):
-        print("========== [DEBUG] Found Includes Marker")
-    else:
-        print("========== [DEBUG] Includes Marker NOT FOUND")
 
-    final_code = re.sub(include_pattern,
-                        r'\g<1>\n' + new_includes + r'\g<2>',
-                        content, flags=re.DOTALL)
-                        
-    rttr_pattern = r'(//\s*<AUTO_GENERATED_RTTR>).*?(//\s*</AUTO_GENERATED_RTTR>)'
-    if re.search(rttr_pattern, final_code, flags=re.DOTALL):
-        print("========== [DEBUG] Found RTTR Marker")
-    else:
-        print("========== [DEBUG] RTTR Marker NOT FOUND")
-
-    final_code = re.sub(rttr_pattern,
-                        r'\g<1>\n' + new_rttr_blocks + r'\g<2>',
-                        final_code, flags=re.DOTALL)
+    final_code = final_code[:include_end.start()] + new_includes + final_code[include_end.start():]
+    rttr_end = re.search(r'//\s*</AUTO_GENERATED_RTTR>', final_code)
+    final_code = final_code[:rttr_end.start()] + new_rttr_blocks + final_code[rttr_end.start():]
                         
     try:
         # 모든 줄바꿈을 LF(\n)로 통일 (기존에 섞여있을 수 있는 \r\n 제거)

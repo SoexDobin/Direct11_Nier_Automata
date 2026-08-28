@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace
@@ -101,18 +102,20 @@ int wmain(int argc, wchar_t* argv[])
 {
 	SetConsoleOutputCP(CP_UTF8);
 
+	const Bool animationOnly = argc >= 2 && std::wstring_view{ argv[1] } == L"--animation-only";
+	const int32 firstInputIndex = animationOnly ? 2 : 1;
 	std::vector<fs::path> assetFiles;
 	int32 inputFailures = 0;
 
-	if (argc >= 2)
+	if (argc > firstInputIndex)
 	{
-		for (int32 i = 1; i < argc; ++i)
+		for (int32 i = firstInputIndex; i < argc; ++i)
 		{
 			if (!CollectAssetFiles(fs::path{ argv[i] }, assetFiles))
 				++inputFailures;
 		}
 	}
-	else
+	else if (!animationOnly)
 	{
 		const fs::path defaultResourcesPath = fs::current_path() / L"../Client/bin/resources";
 		if (!CollectAssetFiles(defaultResourcesPath, assetFiles))
@@ -124,12 +127,14 @@ int wmain(int argc, wchar_t* argv[])
 		std::cerr << "[Error] No supported asset files were found.\n";
 		std::cerr << "Usage: Drag FBX files onto ModelConverter.exe\n";
 		std::cerr << "   or: ModelConverter.exe <asset_file_or_directory> [...]\n";
+		std::cerr << "   or: ModelConverter.exe --animation-only <asset_file_or_directory> [...]\n";
 		std::cin.get();
 		return -1;
 	}
 
 	std::cout << "========================================\n";
 	std::cout << " ModelConverter\n";
+	std::cout << " Mode : " << (animationOnly ? "Animation Only" : "Model + Animation") << "\n";
 	std::cout << " Files: " << assetFiles.size() << "\n";
 	std::cout << "========================================\n\n";
 
@@ -158,14 +163,28 @@ int wmain(int argc, wchar_t* argv[])
 		std::cout << "  Bones        : " << converter.GetBoneCount() << "\n";
 		std::cout << "  Animations   : " << converter.GetAnimationCount() << "\n";
 
-		if (!converter.ExportModel(outputPath.wstring()))
+		const Bool exported = animationOnly
+			? converter.ExportAnimations(outputPath.wstring())
+			: converter.ExportModel(outputPath.wstring());
+
+		if (!exported)
 		{
-			std::cerr << "  [FAIL] ExportModel\n\n";
+			std::cerr << "  [FAIL] "
+				<< (animationOnly ? "ExportAnimations" : "ExportModel") << "\n\n";
 			++fail;
 			continue;
 		}
 
-		std::cout << "  [OK] -> " << ToUtf8(outputPath) << "\n\n";
+		if (animationOnly)
+		{
+			const fs::path animationDirectory =
+				outputPath.parent_path() / (outputPath.stem().wstring() + L" Animation");
+			std::cout << "  [OK] -> " << ToUtf8(animationDirectory) << "\n\n";
+		}
+		else
+		{
+			std::cout << "  [OK] -> " << ToUtf8(outputPath) << "\n\n";
+		}
 		++success;
 	}
 

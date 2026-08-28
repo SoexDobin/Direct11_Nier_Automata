@@ -34,10 +34,6 @@ HRESULT Pl0000EvadeChecker::Initialize(void* arg)
 	if (m_EvadeChecker == nullptr)
 		return E_FAIL;
 
-	if (m_Owner.expired())
-		return E_FAIL;
-	m_Pl0000 = static_pointer_cast<Pl0000>(m_Owner.lock());
-
 	return S_OK;
 }
 
@@ -62,12 +58,13 @@ void Pl0000EvadeChecker::OnCollisionEnter(const Shared<Collider>& ownCollider, c
 
 void Pl0000EvadeChecker::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)
 {
-	if (m_Pl0000.expired()) return;
+	const auto pl0000 = static_pointer_cast<Pl0000>(Get_Parent());
+	if (!pl0000) return;
 
 	auto attacker = targetCollider->Get_Owner();
 
 	if (attacker->Get_LayerMask().Get_LayerName() != L"MonsterAttack") return;
-	m_Pl0000.lock()->TryEvade(attacker);
+	pl0000->TryEvade(attacker);
 }
 
 void Pl0000EvadeChecker::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider)

@@ -67,7 +67,7 @@ void WP0220Body::Priority_Update(Float timeDelta)
 void WP0220Body::Update(Float timeDelta)
 {
 	Float actualTimeDelta = timeDelta;
-	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
+	if (auto entity = dynamic_pointer_cast<Entity>(Get_Owner())) {
 		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
 	}
 	m_Model->Update_ModelAnimation(actualTimeDelta);
@@ -140,7 +140,7 @@ void WP0220Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 		m_HitEntities.insert(targetID);
 
 		Entity::DAMAGE_INFO dmgInfo{};
-		dmgInfo.attacker = m_Owner.lock();
+		dmgInfo.attacker = Get_Owner();
 		dmgInfo.damage = 175.f;
 		dmgInfo.groggyWeight = 175.f;
 		dmgInfo.attackType = ATK_TYPE::HEAVY;
@@ -185,7 +185,7 @@ void WP0220Body::Impact_Shockwave(const Vector3& offset)
 	Vector3 truePos = Vector3::Transform(offset, worldMatrix);
 
 	Entity::DAMAGE_INFO dmgInfo{};
-	dmgInfo.attacker = m_Owner.lock();
+	dmgInfo.attacker = Get_Owner();
 	dmgInfo.damage = 225.f;
 	dmgInfo.groggyWeight = 225.f;
 	dmgInfo.attackType = ATK_TYPE::HEAVY;

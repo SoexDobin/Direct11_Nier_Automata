@@ -2,7 +2,6 @@
 #include "Em0010Body.h"
 
 #include <AABBCollider.h>
-#include <ContainerObject.h>
 #include <Game.h>
 #include <Model.h>
 #include <Shader.h>
@@ -58,17 +57,17 @@ HRESULT Em0010Body::Initialize(void* arg)
 
 HRESULT Em0010Body::Begin()
 {
-	m_LeftArm = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010LeftArm"));
+	m_LeftArm = static_pointer_cast<MonsterAOE>(Get_Owner()->Find_Child(L"Em0010LeftArm"));
 	if (m_LeftArm.expired())
 		return E_FAIL;
 	m_LeftArm.lock()->DeActive_Attack();
 
-	m_RightArm = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010RightArm"));
+	m_RightArm = static_pointer_cast<MonsterAOE>(Get_Owner()->Find_Child(L"Em0010RightArm"));
 	if (m_RightArm.expired())
 		return E_FAIL;
 	m_RightArm.lock()->DeActive_Attack();
 
-	m_Foot = static_pointer_cast<MonsterAOE>(m_Owner.lock()->Find_PartObject(L"Em0010Foot"));
+	m_Foot = static_pointer_cast<MonsterAOE>(Get_Owner()->Find_Child(L"Em0010Foot"));
 	if (m_Foot.expired())
 		return E_FAIL;
 	m_Foot.lock()->DeActive_Attack();
@@ -120,7 +119,7 @@ void Em0010Body::Priority_Update(Float timeDelta)
 void Em0010Body::Update(Float timeDelta)
 {
 	Float actualTimeDelta = timeDelta;
-	if (auto entity = static_pointer_cast<Entity>(m_Owner.lock())) {
+	if (auto entity = static_pointer_cast<Entity>(Get_Owner())) {
 		if (entity->Get_LagDuration() > 0.f) 
 			actualTimeDelta *= 0.05f;
 	}

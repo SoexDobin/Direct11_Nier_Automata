@@ -1,5 +1,6 @@
 #pragma once
 #include <assimp/Importer.hpp>
+#include <filesystem>
 
 
 NS_BEGIN(Engine)
@@ -28,6 +29,7 @@ public:
 public:
 	Bool ReadAssetFile(const wstring& path);
 	Bool ExportModel(const wstring& outPath);
+	Bool ExportAnimations(const wstring& modelPath);
 
 private:
 	void ReadBoneData(aiNode* node, int32_t parentIndex);
@@ -36,7 +38,9 @@ private:
 	void ReadAnimation();
 
 private:
-	void WriteModelFile(const wstring& path);
+	Bool WriteModelFile(const wstring& path);
+	Bool WriteAnimationFiles(const wstring& modelPath);
+	Bool WriteAnimationFile(const std::filesystem::path& path, uint32 animationIndex);
 	void WriteJsonFile(const wstring& path);
 
 private:

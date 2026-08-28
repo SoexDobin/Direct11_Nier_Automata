@@ -13,7 +13,6 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "TimeManager.h"
-#include "LevelSerializer.h"
 #include "FontManager.h"
 #include "SoundManager.h"
 #include "EventManager.h"
@@ -25,13 +24,16 @@
 #include "NavigationBuilder.h"
 
 NS_BEGIN(Engine)
-	class LayerRegistry;
+class LayerRegistry;
 class TagRegistry;
+class Registry;
+class LevelSerializer;
+class PrefabManager;
 
 class ENGINE_DLL Game {
   DECLARE_SINGLETON(Game)
 protected:
-  explicit Game() = default;
+  explicit Game();
   ~Game();
 
 public:
@@ -95,6 +97,10 @@ public: /* For PrototypeManager */
     wstring Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
 	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const;
+	HRESULT Refresh_ReflectionRegistry() const;
+	HRESULT Register_ReflectedPrototypes(uint32 levIndex) const;
+	string Find_RegisteredName(RuntimeTypeId runtimeTypeId) const;
+	RuntimeTypeId Find_RuntimeTypeId(std::string_view registeredName) const;
 
 private: /* For ObjectManager */
 	HRESULT Add_GameObject(const Shared<GameObject>& GameObject, uint32 levIndex) const;
@@ -106,7 +112,32 @@ public: /* For ObjectManager */
     Shared<GameObject> Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const;
     Shared<GameObject> Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const;
     Shared<GameObject> Find_ObjectByObjectTag(uint32 levIndex, const wstring& tag) const;
+    Shared<GameObject> Find(ObjectGuid objectGuid) const;
+    Shared<GameObject> Find(RuntimeObjectId runtimeObjectId) const;
+    HRESULT Destroy(ObjectGuid objectGuid) const;
     void Clearing_ObjectManager(uint32 levIndex) const;
+
+    template <typename T> requires is_base_of_v<GameObject, T>
+    Shared<T> Find(ObjectGuid objectGuid) const {
+        return dynamic_pointer_cast<T>(Find(objectGuid));
+    }
+
+    template <typename T> requires is_base_of_v<GameObject, T>
+    vector<Shared<T>> FindAll() const {
+        const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id());
+        vector<Shared<T>> typedObjects;
+        for (const Shared<GameObject>& object : FindAll_Internal(runtimeTypeId)) {
+            if (Shared<T> typedObject = dynamic_pointer_cast<T>(object))
+                typedObjects.push_back(std::move(typedObject));
+        }
+        return typedObjects;
+    }
+
+    template <typename T> requires is_base_of_v<Component, T>
+    Shared<T> Add_Component(ObjectGuid ownerGuid, uint32 levIndex = 0, void* arg = nullptr) {
+        const Shared<GameObject> owner = Find(ownerGuid);
+        return owner ? owner->Add_Component<T>(levIndex, arg) : nullptr;
+    }
 
 public: /* For CameraManager */
     HRESULT Add_Camera(uint32 levIndex, const Shared<class Camera> &camera) const;
@@ -123,8 +154,9 @@ public: /* For ResourceManager */
     vector<wstring> Get_TextureTags(uint32 levIndex) const;
     const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
-    HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;
-    Shared<Model> Get_Model(uint32 levIndex, const tChar *modelFilePath) const;
+	HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;
+	HRESULT Load_ModelAnimations(uint32 levIndex, const wstring& modelTag, const vector<wstring>& animationFilePaths) const;
+	Shared<Model> Get_Model(uint32 levIndex, const tChar *modelFilePath) const;
     int32 Get_ContainLevelByModelTag(const wstring &modelTag) const;
     vector<Shared<Model>> Get_Models(uint32 levIndex) const;
 
@@ -154,6 +186,12 @@ public: /* For.LightManager */
 public: /* For LevelSerialize */
     HRESULT SerializeLevel(uint32 levIndex, const wstring& path) const;
     HRESULT DeSerializeLevel(const wstring& path) const;
+	HRESULT Register_Prefab(PrefabGuid prefabGuid, const wstring& path) const;
+	HRESULT Unregister_Prefab(PrefabGuid prefabGuid) const;
+	wstring Find_PrefabPath(PrefabGuid prefabGuid) const;
+	HRESULT SerializePrefabDocument(PrefabGuid prefabGuid, uint32 levIndex) const;
+	HRESULT DeSerializePrefabDocument(PrefabGuid prefabGuid) const;
+	ObjectGuid Consume_RestoredObjectGuid() const;
 
 public: /* For FontManager */
     HRESULT Add_Font(const wstring& fontTag, const tChar* fontFilePath);
@@ -207,14 +245,29 @@ public: /* Prototype & Instantiate Facade */
         Shared<Object> cloned = Instantiate_Internal(protoType, prototypeTag, levIndex, arg);
         return std::static_pointer_cast<T>(cloned);
     }
+    template <typename T>
+    Shared<T> Instantiate(uint32 levIndex = UINT_MAX, void* arg = nullptr) {
+        PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
+        const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id());
+        Shared<Object> cloned = Instantiate_ByRuntimeTypeId(protoType, runtimeTypeId, levIndex, arg);
+        return std::static_pointer_cast<T>(cloned);
+    }
+    Shared<GameObject> Instantiate_GameObject(std::string_view registeredName,
+        uint32 levIndex = UINT_MAX, void* arg = nullptr, ObjectGuid objectGuid = {}) const;
+	Bool Can_Instantiate(PROTOTYPE prototypeType, std::string_view registeredName,
+		uint32 levIndex = UINT_MAX) const;
     Shared<Object> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) const {
         Shared<Object> cloned = Instantiate_Internal(PROTOTYPE::COMPONENT, prototypeTag, levIndex, arg);
         return cloned;
     }
 private: /* Internal Implementation (Non-Template) */
     HRESULT Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag = L"") const;
-    Shared<Object> Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg = nullptr) const;
+    Shared<Object> Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex,
+        void* arg = nullptr, ObjectGuid objectGuid = {}) const;
+    Shared<Object> Instantiate_ByRuntimeTypeId(PROTOTYPE protoType, RuntimeTypeId runtimeTypeId,
+        uint32 levIndex, void* arg = nullptr, ObjectGuid objectGuid = {}) const;
     Shared<Object> Instantiate_Internal(PROTOTYPE protoType, const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) const;
+    vector<Shared<GameObject>> FindAll_Internal(RuntimeTypeId runtimeTypeId) const;
 
 private:
     Shared<LayerRegistry> m_LayerRegistry = {nullptr};
@@ -226,12 +279,14 @@ private:
     Unique<Pipeline> m_Pipeline = {nullptr};
     Unique<LevelManager> m_LevelManager = {nullptr};
     Unique<PrototypeManager> m_PrototypeManager = {nullptr};
+    Unique<Registry> m_Registry = {nullptr};
     Unique<ObjectManager> m_ObjectManager = {nullptr};
     Unique<CameraManager> m_CameraManager = {nullptr};
     Unique<ResourceManager> m_ResourceManager = {nullptr};
     Unique<Renderer> m_Renderer = {nullptr};
     Unique<LightManager> m_LightManager = {nullptr};
     Unique<LevelSerializer> m_LevelSerializer = {nullptr};
+	Unique<PrefabManager> m_PrefabManager = {nullptr};
     Unique<FontManager> m_FontManager = { nullptr };
     Unique<SoundManager> m_SoundManager = { nullptr };
     Unique<EventManager> m_EventManager = { nullptr };

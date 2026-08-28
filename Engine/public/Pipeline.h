@@ -26,13 +26,14 @@ public:
 	}
 	Vector4 Get_CamTransform() const
 	{
-		Vector4 v4 = Vector4(m_TransformStateMatrices[ETOI(D3DTS::VIEW)].Translation());
+		Vector4 v4 = Vector4(m_TransformStateInverseMatrices[ETOI(D3DTS::VIEW)].Translation());
 		v4.w = 1.f;
 		return v4;
 	}
 
 public:
 	HRESULT Bind_CameraPosition(const Shared<Shader>& shader, const Char* constantName);
+	HRESULT Bind_CameraBuffer(const Shared<Shader>& shader);
 	HRESULT Bind_TransformMatrix(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState);
 	HRESULT Bind_TransformMatrix_Inverse(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState);
 	void Update_Pipeline();

@@ -79,9 +79,11 @@
 #include "Engine_Struct.h"
 #include "Engine_RTTR_Metadata.h"
 #include "Engine_Typedef.h"
+#include "Engine_ID.h"
 #include "Engine_ModelStruct.h"
 #include "Engine_NavStruct.h"
 #include "Engine_Rendering_Const.h"
+#include "Shader_CBuffer_Define.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

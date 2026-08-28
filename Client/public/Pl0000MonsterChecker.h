@@ -34,7 +34,6 @@ private:
 	void OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) override;
 
 private:
-	Weak<Pl0000> m_Pl0000{};
 	Shared<SphereCollider> m_EvadeChecker{ nullptr };
 	Float m_CheckDistance{ 12.5f };
 

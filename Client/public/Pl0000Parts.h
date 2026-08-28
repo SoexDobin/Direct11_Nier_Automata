@@ -28,7 +28,6 @@ public:
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
-	void Set_Pl0000Container(const Shared<Pl0000>& pl0000) { m_Pl0000 = pl0000; }
 
 public:
 	Shared<Model> Get_ModelComponent() { return m_Model; }
@@ -41,7 +40,6 @@ public:
 protected:
 	Shared<Shader>	m_Shader{ nullptr };
 	Shared<Model>	m_Model{ nullptr };
-	Weak<Pl0000>	m_Pl0000{};
 
 public:
 	Shared<GameObject> Clone(void* arg) override PURE;

@@ -53,9 +53,7 @@ def process_header_file(header_path: Path, output_dir: Path, processed_classes: 
 
 		# Check if the class is actually registered via RTTR_ENABLE or has RTTR logic
 		if "RTTR_ENABLE" not in content and "rttr::registration" not in content:
-			# If it doesn't have RTTR_ENABLE, we might still want to generate if it's a known class type
-			# But for now, let's keep it safe.
-			pass
+			return False
 
 		has_clone = bool(re.search(r'\bClone\s*\(', content))
 		has_create = bool(re.search(r'\bstatic\s+.*\bCreate\s*\(', content))

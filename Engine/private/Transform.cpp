@@ -333,12 +333,13 @@ void Transform::Update_WorldMatrix() {
     return;
   if (m_IsActive == false)
     return;
-  if (m_IsDirty == false)
+  const Shared<GameObject> owner = m_Owner.lock();
+  if (m_IsDirty == false && (!owner || !owner->Has_Parent()))
     return;
 
   Matrix localMatrix = Get_LocalMatrix();
 
-  if (!m_Owner.lock() || !m_Owner.lock()->Has_Parent())
+  if (!owner || !owner->Has_Parent())
     m_WorldMatrix = localMatrix;
   else {
     auto parent = Get_Parent();

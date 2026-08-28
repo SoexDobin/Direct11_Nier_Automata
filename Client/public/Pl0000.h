@@ -28,9 +28,9 @@ class CLIENT_DLL Pl0000 final : public Entity
 {
 	RTTR_ENABLE(Entity)
 public:
-    typedef struct tagPl0000Container : public ENTITY_CONTAINER_DESC {
+	typedef struct tagPl0000Desc : public ENTITY_DESC {
 
-    } PL0000_CONTAINER_DESC;
+	} PL0000_DESC;
 
 public:
 	explicit Pl0000();

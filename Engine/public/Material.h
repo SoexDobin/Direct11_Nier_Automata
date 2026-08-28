@@ -32,6 +32,7 @@ public:
 
 private:
 	uint32 m_TextureTypeMax{};
+	uint32 m_TextureMask{};
 	Shared<vector<ComPtr<ID3D11ShaderResourceView>>[]> m_MaterialTextures;
 
 

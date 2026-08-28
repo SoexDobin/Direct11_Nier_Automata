@@ -20,9 +20,6 @@ private:
 	static string ToUtf8(const wstring& ws);
 	static wstring FromUtf8(const string& s);
 
-private:
-	Bool DoNotSerialize(const Shared<GameObject>& object);
-
 public:
 	HRESULT Initialize_Prototype() override { return EngineManager::Initialize_Prototype(); }
 	HRESULT Initialize(void* arg) override { return EngineManager::Initialize(arg); }

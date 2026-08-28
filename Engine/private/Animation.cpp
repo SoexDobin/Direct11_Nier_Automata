@@ -170,6 +170,7 @@ Shared<Animation> Animation::Create(const ComPtr<ID3D11Device>& device, const Co
 	{
 		LOG_ERROR(L"Failed to Created : Animation {}", Helper::To_wString(animationData.name));
 		MSG_BOX("Failed to Created : Animation");
+		return nullptr;
 	}
 
 	return animation;

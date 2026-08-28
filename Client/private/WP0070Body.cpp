@@ -54,7 +54,6 @@ HRESULT WP0070Body::Initialize(void* arg)
 	}
 	
 	m_Model->Set_LocalRootNode(m_RootBoneIndex);
-	m_Pl0000 = static_pointer_cast<Pl0000>(m_Owner.lock());
 	return S_OK;
 }
 
@@ -71,7 +70,7 @@ void WP0070Body::Priority_Update(Float timeDelta)
 void WP0070Body::Update(Float timeDelta)
 {
 	Float actualTimeDelta = timeDelta;
-	if (auto entity = dynamic_pointer_cast<Entity>(m_Owner.lock())) {
+	if (auto entity = dynamic_pointer_cast<Entity>(Get_Owner())) {
 		if (entity->Get_LagDuration() > 0.f) actualTimeDelta *= 0.05f;
 	}
 
@@ -101,7 +100,10 @@ void WP0070Body::Late_Update(Float timeDelta)
 		{
 			Float speed = 50.f;
 		
-			Vector3 lookDir = m_Pl0000.lock()->Get_Body()->Get_Transform()->Get_Look();
+			const auto pl0000 = static_pointer_cast<Pl0000>(Get_Parent());
+			if (!pl0000)
+				return;
+			Vector3 lookDir = pl0000->Get_Body()->Get_Transform()->Get_Look();
 			lookDir.y = 0.f;
 			lookDir.Normalize();
 
@@ -112,7 +114,7 @@ void WP0070Body::Late_Update(Float timeDelta)
 			m_CombinedWorldMatrix *= Matrix::CreateTranslation(lookDir * speed * timeDelta);
 			Vector3 worldNextPos = m_CombinedWorldMatrix.Translation();
 
-			if (worldNextPos.y <= m_Owner.lock()->Get_Transform()->Get_Position().y - 1.5f)
+			if (worldNextPos.y <= Get_Owner()->Get_Transform()->Get_Position().y - 1.5f)
 			{
 				m_IsHitTheGround = true;
 
@@ -190,7 +192,7 @@ void WP0070Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 		m_Model->Get_BoneMatrix(m_WeaponBoneIndex).Decompose(boneScale, boneQuat, boneTranslation);
 
 		Entity::DAMAGE_INFO dmgInfo{};
-		dmgInfo.attacker = m_Owner.lock();
+		dmgInfo.attacker = Get_Owner();
 		dmgInfo.damage = 100.f;
 		dmgInfo.groggyWeight = 100;
 		dmgInfo.attackType = ATK_TYPE::LIGHT;
@@ -267,7 +269,7 @@ void WP0070Body::Impact_Shockwave(const Vector3& offset)
 	Vector3 truePos = Vector3::Transform(offset, worldMatrix);
 
 	Entity::DAMAGE_INFO dmgInfo{};
-	dmgInfo.attacker = m_Owner.lock();
+	dmgInfo.attacker = Get_Owner();
 	dmgInfo.damage = 125.f;
 	dmgInfo.groggyWeight = 125.f;
 	dmgInfo.attackType = ATK_TYPE::LIGHT;

@@ -20,11 +20,6 @@ HRESULT Pl0000Parts::Initialize_Prototype()
 
 HRESULT Pl0000Parts::Initialize(void* arg)
 {
-	if (nullptr == arg) return E_FAIL;
-
-	auto pl0000 = static_cast<PARTOBJECT_DESC*>(arg)->Owner;
-	m_Pl0000 = static_pointer_cast<Pl0000>(pl0000);
-
 	return PartObject::Initialize(arg);
 }
 

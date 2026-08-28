@@ -3,7 +3,8 @@
 #include "SpdLogger.h"
 #include "String_Helper.h"
 
-Object::Object() {}
+Object::Object()
+    : m_RuntimeObjectId(Create_RuntimeObjectId()) {}
 
 Object::~Object()
 {
@@ -12,19 +13,22 @@ Object::~Object()
 
 HRESULT Object::Initialize_Prototype()
 {
-    m_DescID.m_typeID = rttr::type::get(*this).get_id();
-    if (m_DescID.m_typeID == 0) {
+    const rttr::type runtimeType = rttr::type::get(*this);
+    m_RuntimeTypeId = runtimeType.get_id();
+    if (m_RuntimeTypeId == 0) {
         LOG_ERROR(L"GameObject Initialize Failed By Set TypeID");
         MSG_BOX("GameObject Initialize Failed By Set TypeID");
         return E_FAIL;
     }
 
-    m_ObjectName = Helper::To_wString(rttr::type::get(*this).get_name().to_string());
+    const string canonicalTypeKey = runtimeType.get_name().to_string();
+    m_ObjectName = Helper::To_wString(canonicalTypeKey);
     if (m_ObjectName.empty()) {
         LOG_ERROR(L"GameObject Initialize Failed By Set Object Name");
         MSG_BOX("GameObject Initialize Failed By Set Object Name");
         return E_FAIL;
     }
+    m_DescID.m_typeID = static_cast<uint32>(m_RuntimeTypeId);
 
     m_DescID.m_objectID = Helper::CreateInstanceID();
     if (m_DescID.m_objectID == 0) {

@@ -85,8 +85,14 @@ void Hierarchy::Render(Bool isResize) {
             Shared<GameObject> draggedObj = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_CurrentLevelIndex(), draggedID);
             if (draggedObj)
             {
-                draggedObj->Remove_Parent();
-                LOG_INFO(L"[Hierarchy] Moved {} to Root", draggedObj->Get_Name());
+                if (!draggedObj->Get_StableChildKey().empty())
+                {
+                    LOG_WARN(L"[Hierarchy] Code-defined child cannot be moved to Root: {}", draggedObj->Get_Name());
+                }
+                else if (SUCCEEDED(draggedObj->Remove_Parent()))
+                {
+                    LOG_INFO(L"[Hierarchy] Moved {} to Root", draggedObj->Get_Name());
+                }
             }
         }
         ImGui::EndDragDropTarget();
@@ -97,6 +103,15 @@ void Hierarchy::Render(Bool isResize) {
 
 void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
     const auto& children = pObj->Get_Children();
+    Bool hasCodeDefinedStructure = !pObj->Get_StableChildKey().empty();
+    for (const auto& child : children)
+    {
+        if (child && !child->Get_StableChildKey().empty())
+        {
+            hasCodeDefinedStructure = true;
+            break;
+        }
+    }
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -121,7 +136,7 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
         flags, "%s", name.c_str());
 
     // ── 노드 단위 드롭 수신 (객체 이동) ───────────────────────────
-    if (ImGui::BeginDragDropSource())
+    if (pObj->Get_StableChildKey().empty() && ImGui::BeginDragDropSource())
     {
         uint32 instanceID = pObj->Get_InstanceID();
         ImGui::SetDragDropPayload(ObjectMove_PayLoadKey.c_str(), &instanceID, sizeof(uint32));
@@ -137,28 +152,35 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
             const wchar_t *rawTag = static_cast<const wchar_t *>(payload->Data);
             wstring prototypeTag(rawTag);
 
-            // [핵심] 현재 노드(pObj)를 부모로 하여 생성
-            Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
-            if (cloned)
+            if (hasCodeDefinedStructure)
             {
-                auto allObjs = GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
-                int suffix = 0;
-                wstring baseName = cloned->Get_Name();
-                wstring uniqueName = baseName;
-                while (true) {
-                    uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
-                    bool overlap = false;
-                    for (auto& [id, obj] : allObjs) {
-                        if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
+                LOG_WARN(L"[Hierarchy] Cannot add Editor child to code-defined hierarchy: {}", pObj->Get_Name());
+            }
+            else
+            {
+                // [핵심] 현재 노드(pObj)를 부모로 하여 생성
+                Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
+                if (cloned)
+                {
+                    auto allObjs = GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
+                    int suffix = 0;
+                    wstring baseName = cloned->Get_Name();
+                    wstring uniqueName = baseName;
+                    while (true) {
+                        uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
+                        bool overlap = false;
+                        for (auto& [id, obj] : allObjs) {
+                            if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
+                        }
+                        if (!overlap) break;
+                        suffix++;
                     }
-                    if (!overlap) break;
-                    suffix++;
-                }
-                cloned->Set_Name(uniqueName);
-                cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
+                    cloned->Set_Name(uniqueName);
+                    cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
 
-                cloned->Set_Parent(pObj);
-                LOG_INFO(L"[Hierarchy] Spawned {} as child of {}", prototypeTag, pObj->Get_Name());
+                    cloned->Set_Parent(pObj);
+                    LOG_INFO(L"[Hierarchy] Spawned {} as child of {}", prototypeTag, pObj->Get_Name());
+                }
             }
         }
 
@@ -170,25 +192,36 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
             // 순환 참조 방지 로직 (자신이 부모가 되거나, 조상을 자신의 자식으로 넣는 경우 방지)
             if (draggedObj && draggedObj != pObj)
             {
-                // 단순 체크: pObj가 draggedObj의 자손인지 확인
-                bool isDescendant = false;
-                Shared<GameObject> current = pObj;
-                while (current) {
-                    if (current == draggedObj) {
-                        isDescendant = true;
-                        break;
-                    }
-                    current = current->Get_Parent();
-                }
-
-                if (!isDescendant)
+                if (!draggedObj->Get_StableChildKey().empty())
                 {
-                    draggedObj->Set_Parent(pObj);
-                    LOG_INFO(L"[Hierarchy] Moved {} to child of {}", draggedObj->Get_Name(), pObj->Get_Name());
+                    LOG_WARN(L"[Hierarchy] Code-defined child cannot be moved: {}", draggedObj->Get_Name());
+                }
+                else if (hasCodeDefinedStructure)
+                {
+                    LOG_WARN(L"[Hierarchy] Cannot modify code-defined hierarchy: {}", pObj->Get_Name());
                 }
                 else
                 {
-                    LOG_WARN(L"[Hierarchy] Cannot move ancestor as child of descendant!");
+                    // 단순 체크: pObj가 draggedObj의 자손인지 확인
+                    bool isDescendant = false;
+                    Shared<GameObject> current = pObj;
+                    while (current) {
+                        if (current == draggedObj) {
+                            isDescendant = true;
+                            break;
+                        }
+                        current = current->Get_Parent();
+                    }
+
+                    if (!isDescendant)
+                    {
+                        draggedObj->Set_Parent(pObj);
+                        LOG_INFO(L"[Hierarchy] Moved {} to child of {}", draggedObj->Get_Name(), pObj->Get_Name());
+                    }
+                    else
+                    {
+                        LOG_WARN(L"[Hierarchy] Cannot move ancestor as child of descendant!");
+                    }
                 }
             }
         }
@@ -213,6 +246,12 @@ void Hierarchy::Delete_Selected() {
     Shared<GameObject> selected = EDITOR->Get_SelectedObject();
     if (!selected)
       return;
+
+    if (!selected->Get_StableChildKey().empty())
+    {
+      LOG_WARN(L"[Hierarchy] Code-defined child cannot be deleted: {}", selected->Get_Name());
+      return;
+    }
 
     Object::Destroy(selected);
     EDITOR->Clear_SelectedObject();

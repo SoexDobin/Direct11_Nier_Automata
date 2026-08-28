@@ -102,7 +102,7 @@ void Em3000Body::Priority_Update(Float timeDelta)
 void Em3000Body::Update(Float timeDelta)
 {
 	Float actualTimeDelta = timeDelta;
-	if (auto entity = static_pointer_cast<Entity>(m_Owner.lock())) {
+	if (auto entity = static_pointer_cast<Entity>(Get_Owner())) {
 		if (entity->Get_LagDuration() > 0.f)
 			actualTimeDelta *= 0.05f;
 	}

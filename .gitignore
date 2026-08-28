@@ -424,3 +424,17 @@ FodyWeavers.xsd
 # Keep these final so they override every build-output rule above.
 !**/[Bb]in/
 !**/[Bb]in/**
+
+# Ignore reproducible build products without hiding runtime resources, shader
+# sources, or third-party runtime DLLs stored under bin.
+**/[Bb]in/**/*.pdb
+**/[Bb]in/**/*.exp
+**/[Bb]in/**/*.lib
+**/[Bb]in/**/*.ilk
+**/[Bb]in/**/*.ipdb
+**/[Bb]in/**/*.iobj
+**/[Bb]in/**/*.cso
+**/[Bb]in/**/Client.dll
+**/[Bb]in/**/Engine.dll
+**/[Bb]in/**/Editor.exe
+**/[Bb]in/**/Launcher.exe

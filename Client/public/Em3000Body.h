@@ -56,7 +56,6 @@ private:
 	HRESULT Ready_AnimationNotify();
 
 private:
-	Weak<Em3000>			m_Em3000{};
 	int32					m_RootBoneIndex{ -1 };
 	Shared<Shader>			m_Shader{ nullptr };
 	Shared<Model>			m_Model{ nullptr };

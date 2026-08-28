@@ -97,7 +97,7 @@ HRESULT Pl0000::Initialize_Prototype()
 {
 	m_LayerMask.Set_Layer(L"PlayerPhysical");
 
-	return ContainerObject::Initialize_Prototype();
+	return GameObject::Initialize_Prototype();
 }
 
 HRESULT Pl0000::Initialize(void* arg)
@@ -141,7 +141,7 @@ HRESULT Pl0000::Initialize(void* arg)
 
 		});
 
-	if (FAILED(ContainerObject::Initialize(arg))) {
+	if (FAILED(GameObject::Initialize(arg))) {
 		LOG_ERROR(L"Failed to Initialize GameObject {}", m_ObjectName);
 		return E_FAIL;
 	}
@@ -160,7 +160,7 @@ HRESULT Pl0000::Initialize(void* arg)
 void Pl0000::On_Destroy()
 {
 	
-	ContainerObject::On_Destroy();
+	GameObject::On_Destroy();
 }
 
 void Pl0000::Priority_Update(Float timeDelta)
@@ -239,7 +239,7 @@ void Pl0000::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<C
 	auto target = targetCollider->Get_Owner();
 	auto targetLayerName = target->Get_LayerMask().Get_LayerName();
 
-	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::CONTAINER ||
+	if (!dynamic_pointer_cast<Entity>(target) ||
 		targetLayerName != L"MonsterPhysical")
 		return;
 	
@@ -290,7 +290,7 @@ Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
 		{
 			m_LockOnTarget = static_pointer_cast<PartObject>(attacker)->Get_Owner();
 		}
-		else if (attacker->Get_GameObjectType() == GAMEOBJECTTYPE::CONTAINER)
+		else if (dynamic_pointer_cast<Entity>(attacker))
 		{
 			m_LockOnTarget = attacker;
 		}
@@ -302,36 +302,33 @@ Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
 HRESULT Pl0000::Ready_PartObjects()
 {	
 	Pl0000Body::Pl0000BODY_DESC desc{};
-	desc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	desc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
 
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000Body", L"Pl0000Body", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Pl0000Body", L"Pl0000Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0070Body", L"WP0070Body", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"WP0070Body", L"WP0070Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"SheathWP0070Body", L"SheathWP0070Body", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"SheathWP0070Body", L"SheathWP0070Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"WP0220Body", L"WP0220Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"SheathWP0220Body", L"SheathWP0220Body", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"SheathWP0220Body", L"SheathWP0220Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"WP3000Body", L"WP3000Body", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"WP3000Body", L"WP3000Body", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000EvadeChecker", L"Pl0000EvadeChecker", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Pl0000EvadeChecker", L"Pl0000EvadeChecker", &desc)))
 		return E_FAIL;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Pl0000MonsterChecker", L"Pl0000MonsterChecker", &desc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Pl0000MonsterChecker", L"Pl0000MonsterChecker", &desc)))
 		return E_FAIL;
 
-	m_MainBody = static_pointer_cast<Pl0000Body>(Find_PartObject(L"Pl0000Body"));
-	m_MonsterChecker = static_pointer_cast<Pl0000MonsterChecker>(Find_PartObject(L"Pl0000MonsterChecker"));
+	m_MainBody = static_pointer_cast<Pl0000Body>(Find_Child(L"Pl0000Body"));
+	m_MonsterChecker = static_pointer_cast<Pl0000MonsterChecker>(Find_Child(L"Pl0000MonsterChecker"));
 
-	m_LightWeapon = static_pointer_cast<WP0070Body>(Find_PartObject(L"WP0070Body"));
-	m_SheathLightWeapon = static_pointer_cast<SheathWP0070Body>(Find_PartObject(L"SheathWP0070Body"));
-	m_HeavyWeapon = static_pointer_cast<WP0220Body>(Find_PartObject(L"WP0220Body"));
-	m_SheathHeavyWeapon = static_pointer_cast<SheathWP0220Body>(Find_PartObject(L"SheathWP0220Body"));
+	m_LightWeapon = static_pointer_cast<WP0070Body>(Find_Child(L"WP0070Body"));
+	m_SheathLightWeapon = static_pointer_cast<SheathWP0070Body>(Find_Child(L"SheathWP0070Body"));
+	m_HeavyWeapon = static_pointer_cast<WP0220Body>(Find_Child(L"WP0220Body"));
+	m_SheathHeavyWeapon = static_pointer_cast<SheathWP0220Body>(Find_Child(L"SheathWP0220Body"));
 
-	auto wp3000 = static_pointer_cast<WP3000Body>(Find_PartObject(L"WP3000Body"));
-	wp3000->Set_Pl0000Container(static_pointer_cast<Pl0000>(shared_from_this()));
+	auto wp3000 = static_pointer_cast<WP3000Body>(Find_Child(L"WP3000Body"));
 	wp3000->Set_Pl0000Body(m_MainBody);
 
 	return S_OK;

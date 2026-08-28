@@ -73,7 +73,6 @@ private:
 	Bool m_HasWalkTarget{ false };
 
 private:
-	Weak<Em3000> m_OwnerContainer{};
 	Weak<Navigation> m_Navigation{};
 
 public:

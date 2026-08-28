@@ -14,11 +14,18 @@
 #include "Level.h"
 #include "SpdLogger.h"
 #include "LevelSerializer.h"
+#include "PrefabManager.h"
 #include "Timer.h"
+#include "TypeCatalog.h"
 
 IMPLEMENT_SINGLETON(Game);
 
+Game::Game() = default;
+
 Game::~Game() {
+	m_PrefabManager.reset();
+	m_LevelSerializer.reset();
+
     m_TimeManager.reset();
     m_InputDevice.reset();
 
@@ -40,6 +47,10 @@ Game::~Game() {
     m_PrototypeManager->On_Destroy();
     m_PrototypeManager.reset();
 
+	if (m_Registry)
+		m_Registry->On_Destroy();
+	m_Registry.reset();
+
     m_CameraManager->On_Destroy();
     m_CameraManager.reset();
 
@@ -59,6 +70,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
 
     m_LayerRegistry = make_shared<LayerRegistry>();
     m_TagRegistry = make_shared<TagRegistry>();
+	m_Registry = make_unique<Registry>();
+	if (FAILED(m_Registry->Initialize(nullptr)))
+		return E_FAIL;
 
     if (nullptr == (m_GraphicDevice = GraphicDevice::Create(engineDesc)))
 		return E_FAIL;
@@ -98,6 +112,7 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
 
     if (nullptr == (m_LevelSerializer = LevelSerializer::Create()))
         return E_FAIL;
+	m_PrefabManager = make_unique<PrefabManager>();
 
     if (nullptr == (m_FontManager = FontManager::Create(m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context())))
         return E_FAIL;
@@ -369,6 +384,26 @@ Shared<GameObject> Game::Find_ObjectByObjectTag(uint32 levIndex, const wstring& 
     return m_ObjectManager->Find_ObjectByObjectTag(levIndex, tag);
 }
 
+Shared<GameObject> Game::Find(ObjectGuid objectGuid) const
+{
+    return m_ObjectManager->Find_ByObjectGuid(objectGuid);
+}
+
+Shared<GameObject> Game::Find(RuntimeObjectId runtimeObjectId) const
+{
+    return m_ObjectManager->Find_ByRuntimeObjectId(runtimeObjectId);
+}
+
+HRESULT Game::Destroy(ObjectGuid objectGuid) const
+{
+    return m_ObjectManager->Destroy(objectGuid);
+}
+
+vector<Shared<GameObject>> Game::FindAll_Internal(RuntimeTypeId runtimeTypeId) const
+{
+    return m_ObjectManager->Find_AllByRuntimeTypeId(runtimeTypeId);
+}
+
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
 
 const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects(uint32 levIndex) const {
@@ -438,6 +473,12 @@ const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(uint32 levIndex, const
 HRESULT Game::Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const
 {
     return m_ResourceManager->Load_Model(levIndex, modelFilePath, descriptionTag, preTransformMatrix);
+}
+
+HRESULT Game::Load_ModelAnimations(uint32 levIndex, const wstring& modelTag,
+	const vector<wstring>& animationFilePaths) const
+{
+	return m_ResourceManager->Load_ModelAnimations(levIndex, modelTag, animationFilePaths);
 }
 
 Shared<Model> Game::Get_Model(uint32 levIndex, const tChar* modelFilePath) const
@@ -518,6 +559,78 @@ Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 objectID, 
     return nullptr;
 }
 
+HRESULT Game::Refresh_ReflectionRegistry() const
+{
+    return m_Registry ? m_Registry->Refresh() : E_FAIL;
+}
+
+HRESULT Game::Register_ReflectedPrototypes(uint32 levIndex) const
+{
+    if (!m_Registry || !m_PrototypeManager)
+        return E_FAIL;
+
+    const rttr::type gameObjectType = rttr::type::get<GameObject>();
+    const rttr::type componentType = rttr::type::get<Component>();
+    for (const Registry::Entry& entry : m_Registry->Get_ObjectTypes()) {
+        const Bool isGameObject = entry.reflectedType.is_derived_from(gameObjectType);
+        const Bool isComponent = entry.reflectedType.is_derived_from(componentType);
+        if (!isGameObject && !isComponent)
+            continue;
+
+        const rttr::method createMethod = entry.reflectedType.get_method("Create");
+        if (!createMethod.is_valid())
+            continue;
+
+        const rttr::variant levelMetadata = createMethod.get_metadata("Level");
+        if (!levelMetadata.is_valid())
+            continue;
+
+        rttr::variant convertedLevel = levelMetadata;
+        if (!convertedLevel.convert(rttr::type::get<uint32>())) {
+            LOG_ERROR(L"Invalid Level metadata on reflected type {}",
+                      Helper::To_wString(entry.registeredName));
+            return E_FAIL;
+        }
+        if (convertedLevel.get_value<uint32>() != levIndex)
+            continue;
+
+        const rttr::variant result = createMethod.invoke(
+            {}, m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context());
+        if (!result.is_valid()) {
+            LOG_ERROR(L"Failed to invoke reflected Create for {}",
+                      Helper::To_wString(entry.registeredName));
+            return E_FAIL;
+        }
+
+        Shared<Object> prototype;
+        if (isGameObject && result.is_type<Shared<GameObject>>())
+            prototype = result.get_value<Shared<GameObject>>();
+        else if (isComponent && result.is_type<Shared<Component>>())
+            prototype = result.get_value<Shared<Component>>();
+
+        const HRESULT addResult = prototype
+            ? Add_Prototype_Internal(levIndex, prototype, Helper::To_wString(entry.registeredName))
+            : E_FAIL;
+        if (FAILED(addResult)) {
+            LOG_ERROR(L"Failed to auto-register reflected prototype {}",
+                      Helper::To_wString(entry.registeredName));
+            return E_FAIL;
+        }
+    }
+
+    return S_OK;
+}
+
+string Game::Find_RegisteredName(RuntimeTypeId runtimeTypeId) const
+{
+    return m_Registry ? m_Registry->Find_RegisteredName(runtimeTypeId) : string{};
+}
+
+RuntimeTypeId Game::Find_RuntimeTypeId(std::string_view registeredName) const
+{
+    return m_Registry ? m_Registry->Find_RuntimeTypeId(registeredName) : RuntimeTypeId{};
+}
+
 HRESULT Game::Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag) const 
 {
     return m_PrototypeManager->Add_Prototype(levIndex, object, prototypeTag);
@@ -530,6 +643,36 @@ HRESULT Game::SerializeLevel(uint32 levIndex, const wstring &path) const
 HRESULT Game::DeSerializeLevel(const wstring &path) const
 {
     return m_LevelSerializer->DeSerializeLevel(path);
+}
+
+HRESULT Game::Register_Prefab(PrefabGuid prefabGuid, const wstring& path) const
+{
+	return m_PrefabManager->Register_Prefab(prefabGuid, path);
+}
+
+HRESULT Game::Unregister_Prefab(PrefabGuid prefabGuid) const
+{
+	return m_PrefabManager->Unregister_Prefab(prefabGuid);
+}
+
+wstring Game::Find_PrefabPath(PrefabGuid prefabGuid) const
+{
+	return m_PrefabManager->Find_PrefabPath(prefabGuid);
+}
+
+HRESULT Game::SerializePrefabDocument(PrefabGuid prefabGuid, uint32 levIndex) const
+{
+	return m_PrefabManager->SerializePrefabDocument(prefabGuid, levIndex);
+}
+
+HRESULT Game::DeSerializePrefabDocument(PrefabGuid prefabGuid) const
+{
+	return m_PrefabManager->DeSerializePrefabDocument(prefabGuid);
+}
+
+ObjectGuid Game::Consume_RestoredObjectGuid() const
+{
+	return m_PrefabManager->Consume_RestoredObjectGuid();
 }
 
 HRESULT Game::Add_Font(const wstring& fontTag, const tChar* fontFilePath)
@@ -653,7 +796,8 @@ HRESULT Game::Bind_RenderTarget_ShaderResource(const Shared<Shader>& shader, con
 }
 
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex, void* arg) const
+Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex,
+                                          void* arg, ObjectGuid objectGuid) const
 {
     Shared<Object> protoObject = nullptr;
 	uint32 targetLevel = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
@@ -675,13 +819,40 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, 
     Shared<Object> cloned = nullptr;
     if (protoType == PROTOTYPE::GAMEOBJECT) {
         auto GameObjectPrototype = std::static_pointer_cast<GameObject>(protoObject);
-        cloned = GameObjectPrototype->Clone(arg);
+		if (objectGuid.Is_Valid()) {
+			if (m_ObjectManager->Find_ByObjectGuid(objectGuid) ||
+				FAILED(m_PrefabManager->Prepare_RestoredObjectGuid(objectGuid))) {
+				return nullptr;
+			}
+		}
+
+		cloned = GameObjectPrototype->Clone(arg);
+		if (objectGuid.Is_Valid()) {
+			const ObjectGuid unconsumedObjectGuid = m_PrefabManager->Consume_RestoredObjectGuid();
+			if (unconsumedObjectGuid.Is_Valid()) {
+				LOG_ERROR(L"GameObject Clone did not call GameObject::Initialize before returning");
+				if (cloned) {
+					const Shared<GameObject> gameObject = std::static_pointer_cast<GameObject>(cloned);
+					gameObject->On_Destroy();
+					Object::Destroy(gameObject);
+				}
+				return nullptr;
+			}
+		}
         if (cloned)
         {
-            m_ObjectManager->Add_GameObject(targetLevel, std::static_pointer_cast<GameObject>(cloned));
+            const Shared<GameObject> gameObject = std::static_pointer_cast<GameObject>(cloned);
+            if (FAILED(m_ObjectManager->Add_GameObject(targetLevel, gameObject))) {
+                gameObject->On_Destroy();
+                Object::Destroy(gameObject);
+                return nullptr;
+            }
 
-            if (GameObjectPrototype->Get_GameObjectType() == GAMEOBJECTTYPE::CAMERA)
-                Add_Camera(levIndex, static_pointer_cast<Camera>(cloned));
+            if (GameObjectPrototype->Get_GameObjectType() == GAMEOBJECTTYPE::CAMERA &&
+                FAILED(Add_Camera(targetLevel, static_pointer_cast<Camera>(cloned)))) {
+                m_ObjectManager->Remove_GameObject(targetLevel, gameObject);
+                return nullptr;
+            }
         }
     }
     else {
@@ -715,6 +886,49 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& pr
     }
 
     return Instantiate_Internal(protoType, objectID, levIndex, arg);
+}
+
+Shared<Object> Game::Instantiate_ByRuntimeTypeId(PROTOTYPE protoType, RuntimeTypeId runtimeTypeId,
+                                                 uint32 levIndex, void* arg,
+                                                 ObjectGuid objectGuid) const
+{
+    const uint32 targetLevel = levIndex == UINT_MAX
+        ? m_LevelManager->Get_CurrentLevelIndex()
+        : levIndex;
+
+    Shared<Object> prototype = m_PrototypeManager->Find_DefaultPrototype(protoType, targetLevel, runtimeTypeId);
+    if (!prototype && targetLevel != 0)
+        prototype = m_PrototypeManager->Find_DefaultPrototype(protoType, 0, runtimeTypeId);
+
+    return prototype
+        ? Instantiate_Internal(protoType, prototype->Get_ObjectID(), targetLevel, arg, objectGuid)
+        : nullptr;
+}
+
+Shared<GameObject> Game::Instantiate_GameObject(std::string_view registeredName,
+                                                uint32 levIndex,
+                                                void* arg,
+                                                ObjectGuid objectGuid) const
+{
+    const RuntimeTypeId runtimeTypeId = Find_RuntimeTypeId(registeredName);
+    if (runtimeTypeId == 0) {
+        LOG_ERROR(L"Unknown GameObject RTTR RegisteredName {}", Helper::To_wString(registeredName));
+        return nullptr;
+    }
+
+    return static_pointer_cast<GameObject>(
+        Instantiate_ByRuntimeTypeId(PROTOTYPE::GAMEOBJECT, runtimeTypeId, levIndex, arg, objectGuid));
+}
+
+Bool Game::Can_Instantiate(PROTOTYPE prototypeType, std::string_view registeredName,
+	uint32 levIndex) const
+{
+	const RuntimeTypeId runtimeTypeId = Find_RuntimeTypeId(registeredName);
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? m_LevelManager->Get_CurrentLevelIndex()
+		: levIndex;
+	return runtimeTypeId != 0 &&
+		m_PrototypeManager->Find_DefaultPrototype(prototypeType, targetLevel, runtimeTypeId) != nullptr;
 }
 
 #ifdef _DEBUG

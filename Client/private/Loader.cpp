@@ -104,11 +104,13 @@ HRESULT Loader::Loading_For_TitleLevel() {
             return E_FAIL;
         }
     }
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::TITLE))) {
-            LOG_ERROR(L"Failed to Load TITLE Model");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromExcel())) {
+        LOG_ERROR(L"Failed to synchronize TITLE Model settings from Excel");
+        return E_FAIL;
+    }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::TITLE))) {
+        LOG_ERROR(L"Failed to Load TITLE Model");
+        return E_FAIL;
     }
 
     if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::TITLE))) {
@@ -133,11 +135,13 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
             return E_FAIL;
         }
     }
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::GAMEPLAY))) {
-            LOG_ERROR(L"Failed to Load GAMEPLAY Model");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromExcel())) {
+        LOG_ERROR(L"Failed to synchronize GAMEPLAY Model settings from Excel");
+        return E_FAIL;
+    }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::GAMEPLAY))) {
+        LOG_ERROR(L"Failed to Load GAMEPLAY Model");
+        return E_FAIL;
     }
 
     if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY))) {
@@ -173,11 +177,13 @@ HRESULT Loader::Loading_Global_Prototype()
             return E_FAIL;
         }
     }
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::STATIC))) {
-            LOG_ERROR(L"Failed to Load Model");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromExcel())) {
+        LOG_ERROR(L"Failed to synchronize STATIC Model settings from Excel");
+        return E_FAIL;
+    }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::STATIC))) {
+        LOG_ERROR(L"Failed to Load Model");
+        return E_FAIL;
     }
 
     if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_SoundJson_FromCSV())) {

@@ -1,7 +1,26 @@
 #pragma once
 
+#include <array>
+#include <string_view>
+
 namespace Engine
 {
+	namespace ShaderCB
+	{
+		inline constexpr std::string_view Material = "MaterialBuffer";
+		inline constexpr std::string_view Camera = "CameraBuffer";
+		inline constexpr std::string_view Object = "ObjectBuffer";
+		inline constexpr std::string_view Light = "LightBuffer";
+
+		inline constexpr std::array<std::string_view, ETOI(ConstantBuffer::END)> Names =
+		{
+			Material,
+			Camera,
+			Object,
+			Light,
+		};
+	}
+
 	constexpr const Char* WorldMatrix = "g_WorldMatrix";
 	constexpr const Char* ViewMatrix = "g_ViewMatrix";
 	constexpr const Char* ProjMatrix = "g_ProjMatrix";

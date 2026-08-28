@@ -14,6 +14,7 @@ enum class EVENT_TYPE { ONCE, PERMANENT };
 enum class COLLIDER_TYPE { SPHERE, AABB, OBB, END };
 enum class NOTIFY_TYPE { POINT, RANGE };
 enum class DEFERRED { DEBUG, DIRECTIONAL, POINT, COMBINED, END};
+enum class ConstantBuffer { Material, Camera, Object, Light, END };
 //enum class COLLISION_STATE { ENTER, STAY, EXIT, END };
 
 enum class SOUNDCHANNEL
@@ -39,7 +40,7 @@ enum class UI_ANCHOR {
 	BOTTOM_RIGHT   // (1.0, 1.0) 
 	};
 
-enum class GAMEOBJECTTYPE { GAMEOBJECT, CAMERA, UI, CONTAINER, PART, WORLDUI, END,  };
+enum class GAMEOBJECTTYPE { GAMEOBJECT, CAMERA, UI, PART, WORLDUI, END,  };
 enum class COMPONENT_TYPE {
 	SCRIPT,
 	TRANSFORM,

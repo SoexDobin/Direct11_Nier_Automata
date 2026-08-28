@@ -28,6 +28,7 @@ public:
 
 public:
 	HRESULT Add_GameObject(uint32 levIndex, const Shared<GameObject>& object);
+	HRESULT Remove_GameObject(uint32 levIndex, const Shared<GameObject>& object);
 	HRESULT Clear_GameObjects(uint32 levIndex);
 	HRESULT Clear_AllGameObjects();
 
@@ -36,6 +37,10 @@ public:
 	Shared<GameObject> Find_ObjectByObjectID(uint32 levIndex, uint32 objectID);
 	const vector<Shared<GameObject>>& Find_ObjectsByObjectID(uint32 levIndex, uint32 objectID);
 	Shared<GameObject> Find_ByInstanceID(uint32 levIndex, uint32 instanceID);
+	Shared<GameObject> Find_ByObjectGuid(ObjectGuid objectGuid) const;
+	Shared<GameObject> Find_ByRuntimeObjectId(RuntimeObjectId runtimeObjectId) const;
+	vector<Shared<GameObject>> Find_AllByRuntimeTypeId(RuntimeTypeId runtimeTypeId) const;
+	HRESULT Destroy(ObjectGuid objectGuid);
 	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects(uint32 levIndex);
 	Shared<GameObject> Find_ObjectByObjectTag(uint32 levIndex, const wstring& tagName);
 
@@ -45,6 +50,8 @@ private:
 	vector<unordered_map<uint32, vector<Shared<GameObject>>>> m_ObjectByType;
 	vector<unordered_map<uint32, vector<Shared<GameObject>>>> m_ObjectByObject;
 	vector<unordered_map<uint32, Shared<GameObject>>> m_ObjectByInstance;
+	unordered_map<ObjectGuid, Weak<GameObject>, GuidHash> m_ObjectByGuid;
+	unordered_map<RuntimeObjectId, Weak<GameObject>> m_ObjectByRuntimeId;
 	uint32 m_LayerMask = {ETOI(LAYER::ALL_LAYER)};
 
 public:

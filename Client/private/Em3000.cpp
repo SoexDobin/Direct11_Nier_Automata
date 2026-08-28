@@ -148,39 +148,33 @@ void Em3000::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<C
 
 HRESULT Em3000::Ready_PartObjects()
 {
-	auto em3000 = static_pointer_cast<Em3000>(shared_from_this());
-
 	PartObject::PARTOBJECT_DESC bodyDesc{};
-	bodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	bodyDesc.Owner = em3000;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3000Body", L"Em3000Body", &bodyDesc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Em3000Body", L"Em3000Body", &bodyDesc)))
 		return E_FAIL;
-	m_MainBody = static_pointer_cast<Em3000Body>(Find_PartObject(L"Em3000Body"));
+	m_MainBody = static_pointer_cast<Em3000Body>(Find_Child(L"Em3000Body"));
 
 	auto animMesh = Shader::SHADER_DESC{ VTXANIMMESH::Tag,  VTXANIMMESH::Elements, VTXANIMMESH::numElements };
 	auto staticMesh = Shader::SHADER_DESC{ VTXMESH::Tag,  VTXMESH::Elements, VTXMESH::numElements };
 
 	Em3000Parts::EM3000PART_DESC partsDesc{};
-	partsDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	partsDesc.Owner = em3000;
 	partsDesc.bodyModel = m_MainBody->Get_ModelComponent();
 
 	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3001";
 	partsDesc.targetBoneName = "bone0";
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3001", L"Em3001", &partsDesc))) 
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Em3001", L"Em3001", &partsDesc)))
 		return E_FAIL;
 	
 	partsDesc.shaderDesc = staticMesh;
 	partsDesc.modelResourceTag = L"em3002";
 	partsDesc.targetBoneName = "bone0";
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3002", L"Em3002", &partsDesc))) 
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Em3002", L"Em3002", &partsDesc)))
 		return E_FAIL;
 
 	partsDesc.shaderDesc = animMesh;
 	partsDesc.modelResourceTag = L"em3003";
 	partsDesc.targetBoneName = "bone0";
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3003", L"Em3003", &partsDesc))) 
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Em3003", L"Em3003", &partsDesc)))
 		return E_FAIL;
 
 	return S_OK;

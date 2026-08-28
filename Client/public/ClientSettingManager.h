@@ -23,7 +23,7 @@ public: /* Texture */
 
 public: /* Model */
 	HRESULT Load_Model_FromJson(LEVEL level) const;
-	HRESULT Sync_ModelJson_FromCSV() const;
+	HRESULT Sync_ModelJson_FromExcel() const;
 
 public: /* Shader */
 	HRESULT Load_Shader() const;

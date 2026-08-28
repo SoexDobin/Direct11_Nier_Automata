@@ -42,6 +42,7 @@ public:
 public:
 	void Update_ModelAnimation(Float timeDelta);
 	void Set_Animation(uint32 index, Float blendDuration = 0.5f);
+	HRESULT Load_Animations(const vector<wstring>& animationFilePaths);
 
 public:
 	Bool Is_Blending() const { return m_IsBlending; }
@@ -54,6 +55,8 @@ public:
 	Bool Is_AnimLoop() const { return m_IsAnimLoop; }
 	Bool Is_AnimationFinished() const { return m_IsAnimEnd; }
 	Float Get_AnimationProgress() const {
+		if (m_Animations.empty())
+			return 0.f;
 		if (m_IsBlending)
 			return m_Animations[m_NextAnimIndex]->Get_Progress();
 		return m_Animations[m_CurrentAnimIndex]->Get_Progress();
@@ -91,6 +94,8 @@ private:
 	HRESULT Ready_Meshes(ifstream& in, Bool isAnim);
 	HRESULT Ready_Materials(ifstream& in, const std::string& directoryPath);
 	HRESULT Ready_Animation(ifstream& in);
+	HRESULT Read_AnimationData(ifstream& in, MODEL_ANIMATION& animationData,
+		Bool hasStoredChannelCount, uint32 channelCount = 0) const;
 
 private:
 	TRANSFORM_FRAME m_TransformFrame{};

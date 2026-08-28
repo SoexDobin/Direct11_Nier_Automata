@@ -32,10 +32,9 @@ HRESULT Em3000Movement::Begin()
 {
 	if (!m_Owner.expired())
 	{
-		m_OwnerContainer = static_pointer_cast<Em3000>(m_Owner.lock());
-		if (m_OwnerContainer.expired())
+		if (!dynamic_pointer_cast<Em3000>(m_Owner.lock()))
 		{
-			LOG_ERROR(L"Failed To Find Em0010 Container");
+			LOG_ERROR(L"Failed To Find Em3000 Owner");
 			return E_FAIL;
 		}
 
@@ -76,7 +75,8 @@ void Em3000Movement::Update_Movement(Float timeDelta)
 
 	Vector3 physicalDelta = m_Velocity * timeDelta; // y이동
 
-	TRANSFORM_FRAME transformFrame = m_OwnerContainer.lock()->Get_BodyModelTransform();
+	const auto owner = static_pointer_cast<Em3000>(m_Owner.lock());
+	TRANSFORM_FRAME transformFrame = owner->Get_BodyModelTransform();
 	Vector3 rootPositionVelocity = transformFrame.position;
 
 	if (m_IsGrounded)

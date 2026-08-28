@@ -97,7 +97,7 @@ void WP3000Body::Update(Float timeDelta)
 
 void WP3000Body::Late_Update(Float timeDelta)
 {
-	if (m_Pl0000.expired()) return;
+	if (!Get_Parent()) return;
 	if (m_Pl0000Body.expired()) return;
 
 	Float hoverOffset = 0.f;
@@ -222,7 +222,7 @@ void WP3000Body::Pod_Fire(Float timeDelta)
 			m_FireRateTimer = 0.f;
 			// 총알 매개변수 세팅
 			Entity::DAMAGE_INFO dmgInfo{};
-			dmgInfo.attacker = m_Owner.lock();
+			dmgInfo.attacker = Get_Owner();
 			dmgInfo.attackType = ATK_TYPE::POD;
 			dmgInfo.damage = static_cast<Float>(Helper::Random_Double(10.f, 20.f));
 			dmgInfo.groggyWeight = 0;

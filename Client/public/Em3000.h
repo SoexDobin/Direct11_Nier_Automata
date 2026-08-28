@@ -15,7 +15,7 @@ class CLIENT_DLL Em3000 final : public Monster
 {
 	RTTR_ENABLE(Monster)
 public:
-	typedef struct tagEm3000Desc : public MONSTER_CONTAINER_DESC
+	typedef struct tagEm3000Desc : public MONSTER_DESC
 	{
 		
 	} EM3000_DESC;

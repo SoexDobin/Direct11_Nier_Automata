@@ -13,9 +13,9 @@ class CLIENT_DLL Em3100 final : public Monster
 {
 	RTTR_ENABLE(Monster)
 public:
-	typedef struct tagEm3100Desc : public MONSTER_CONTAINER_DESC
+	typedef struct tagEm3100Desc : public MONSTER_DESC
 	{
-	} EM3100_CONTAINER_DESC;
+	} EM3100_DESC;
 public:
 	explicit Em3100();
 	explicit Em3100(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

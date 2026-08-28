@@ -4,7 +4,9 @@
 namespace Engine // For Converting
 {
 	constexpr char MODEL_MAGIC[4] = { 'N','M','D','L' };
-	constexpr uint32 MODEL_VERSION = 1;
+	constexpr uint32 MODEL_VERSION = 2;
+	constexpr char ANIMATION_MAGIC[4] = { 'N','A','N','M' };
+	constexpr uint32 ANIMATION_VERSION = 1;
 	constexpr uint32 MODEL_BONE_MAX = 512;
 
 	typedef struct MatTexEntry
@@ -23,6 +25,13 @@ namespace Engine // For Converting
 		uint32 numMaterials;
 		uint32 numAnimations;
 	} MODEL_HEADER;
+
+	typedef struct AnimationFileHeader
+	{
+		Char magic[4];       // "NANM"
+		uint32 version;
+		uint32 numChannels;
+	} ANIMATION_HEADER;
 
 	typedef struct BoneData
 	{

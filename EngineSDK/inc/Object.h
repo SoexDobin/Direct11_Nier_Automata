@@ -15,6 +15,8 @@ public:
 	uint32 Get_TypeID() const { return m_DescID.m_typeID; }
 	uint32 Get_ObjectID() const { return m_DescID.m_objectID; }
 	uint32 Get_InstanceID() const { return m_DescID.m_instanceID; }
+	RuntimeTypeId Get_RuntimeTypeId() const { return m_RuntimeTypeId; }
+	RuntimeObjectId Get_RuntimeObjectId() const { return m_RuntimeObjectId; }
 	void Set_ObjectID(uint32 objectID) { m_DescID.m_objectID = objectID; }
 	const wstring &Get_Name() const { return m_ObjectName; }
 	void Set_Name(const wstring& name) { m_ObjectName = name; }
@@ -45,6 +47,8 @@ protected:
 	Bool m_IsDestroy = {false};
 	Bool m_IsActive = {true};
 	ID_DESC m_DescID = {};
+	RuntimeTypeId m_RuntimeTypeId{};
+	RuntimeObjectId m_RuntimeObjectId{};
 	wstring m_ObjectName = {};
 };
 

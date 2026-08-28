@@ -168,23 +168,17 @@ void Em0010::OnAttackHit(const Shared<GameObject>& target)
 
 HRESULT Em0010::Ready_PartObjects()
 {
-	auto thisObject = static_pointer_cast<ContainerObject>(shared_from_this());
-
 	Em0010Body::EM0010BODY_DESC em0010BodyDesc{};
-	em0010BodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	em0010BodyDesc.Owner = thisObject;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em0010Body", L"Em0010Body", &em0010BodyDesc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Em0010Body", L"Em0010Body", &em0010BodyDesc)))
 		return E_FAIL;
 
 	MonsterSight::MONSTER_SIGHT_DESC em0010SightDesc{};
-	em0010SightDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	em0010SightDesc.Owner = thisObject;
 	em0010SightDesc.radius = 8.f;
 	em0010SightDesc.offset = Vector3::Zero;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterSight", L"Em0010Sight", &em0010SightDesc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"MonsterSight", L"Em0010Sight", &em0010SightDesc)))
 		return E_FAIL;
 
-	m_MainBody = static_pointer_cast<Em0010Body>(Find_PartObject(L"Em0010Body"));
+	m_MainBody = static_pointer_cast<Em0010Body>(Find_Child(L"Em0010Body"));
 	if (nullptr == m_MainBody)
 		return E_FAIL;
 
@@ -196,36 +190,30 @@ HRESULT Em0010::Ready_PartObjects()
 	em0010DamageInfo.knockbackForce = 1.f;
 
 	MonsterAOE::MONSTER_AOE_DESC leftArmDesc{};
-	leftArmDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	leftArmDesc.Owner = thisObject;
 	leftArmDesc.model = m_MainBody->Get_ModelComponent();
 	leftArmDesc.offset = Vector3::Zero;
 	leftArmDesc.radius = 0.75f;
 	leftArmDesc.targetBoneName = "bone304";
 	leftArmDesc.dmgInfo = em0010DamageInfo;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010LeftArm", &leftArmDesc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010LeftArm", &leftArmDesc)))
 		return E_FAIL;
 	
 	MonsterAOE::MONSTER_AOE_DESC rightArmDesc{};
-	rightArmDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	rightArmDesc.Owner = thisObject;
 	rightArmDesc.model = m_MainBody->Get_ModelComponent();
 	rightArmDesc.offset = Vector3::Zero;
 	rightArmDesc.radius = 0.75f;
 	rightArmDesc.targetBoneName = "bone560";
 	rightArmDesc.dmgInfo = em0010DamageInfo;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010RightArm", &rightArmDesc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010RightArm", &rightArmDesc)))
 		return E_FAIL;
 	
 	MonsterAOE::MONSTER_AOE_DESC footDesc{};
-	footDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	footDesc.Owner = thisObject;
 	footDesc.model = m_MainBody->Get_ModelComponent();
 	footDesc.offset = Vector3::Zero;
 	footDesc.radius = 2.5f;
 	footDesc.targetBoneName = "bone4094";
 	footDesc.dmgInfo = em0010DamageInfo;
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010Foot", &footDesc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"MonsterAOE", L"Em0010Foot", &footDesc)))
 		return E_FAIL;
 
 	if (FAILED(m_MainBody->Begin()))

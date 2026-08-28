@@ -12,7 +12,6 @@ class Component;
 class ScriptComponent;
 class Transform;
 class Collider;
-
 class ENGINE_DLL GameObject abstract : public Object, public enable_shared_from_this<GameObject> {
 	RTTR_ENABLE(Object)
 public:
@@ -25,7 +24,8 @@ public:
     virtual ~GameObject() override = default;
 
     operator Shared<Transform>() const { return m_Transform; }
-    Shared<Transform> Get_Transform() const { return m_Transform; }
+	Shared<Transform> Get_Transform() const { return m_Transform; }
+	ObjectGuid Get_ObjectGuid() const { return m_ObjectGuid; }
 
 public:
     LAYER_MASK &Get_LayerMask() { return m_LayerMask; }
@@ -48,7 +48,7 @@ public:
     virtual void Fixed_Update(Float fixedDelta);
     virtual HRESULT Render();
     virtual void Submit_RenderGroup();
-    virtual void Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap) final;
+    void Post_Load();
 
 public: // 충돌 함수
     virtual void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) {};
@@ -61,28 +61,38 @@ protected:
     Shared<Transform> m_Transform = {nullptr};
     LayerMask m_LayerMask{};
     TagMask m_TagMask{};
+    ObjectGuid m_ObjectGuid{};
 
 protected: /* Parent Child */
     Weak<GameObject> m_Parent = {};
     vector<Shared<GameObject>> m_Children;
+    wstring m_StableChildKey;
 
 public:
     Bool Has_Parent() const { return !m_Parent.expired(); }
     HRESULT Set_Parent(const Shared<GameObject> &parent);
+    HRESULT Set_Parent(const Shared<GameObject>& parent, const wstring& stableChildKey, size_t insertIndex = numeric_limits<size_t>::max());
     HRESULT Remove_Parent();
     HRESULT Add_Child(const Shared<GameObject> &child);
+    HRESULT Add_Child(const Shared<GameObject>& child, const wstring& stableChildKey, size_t insertIndex = numeric_limits<size_t>::max());
+    HRESULT Add_Child(uint32 prototypeLevIndex, const wstring& registeredName,
+        const wstring& stableChildKey, void* arg = nullptr);
     HRESULT Remove_Child(const Shared<GameObject> &child);
     Shared<GameObject> Get_Parent() const;
     const vector<Shared<GameObject>> &Get_Children() const;
+    Shared<GameObject> Find_Child(ObjectGuid objectGuid) const;
+    Shared<GameObject> Find_Child(const wstring& stableChildKey) const;
+    const wstring& Get_StableChildKey() const { return m_StableChildKey; }
+    void Destroy_Subtree();
 
 protected: /* Component */
     map<uint32, Shared<Component>> m_Components;
     map<uint32, Shared<ScriptComponent>> m_Scripts;
 
 public:
-    inline Shared<Component> Get_Component(uint32 objectID);
     vector<Shared<Component>> Get_Components();
     vector<Shared<ScriptComponent>> Get_Scripts();
+    Bool Has_Component(RuntimeTypeId runtimeTypeId) const;
     HRESULT Add_Component(const Shared<Component> &component);
     Shared<Component> Add_Component(uint32 levIndex, uint32 objectID, void* arg = nullptr);
     Shared<Component> Add_Component(uint32 levIndex, const wstring& prototypeTag, void* arg = nullptr);
@@ -102,15 +112,15 @@ public:
 public:
      template <typename T> requires is_base_of_v<Component, T>
       	Shared<T> Get_Component() {
-        uint32 typeID = static_cast<uint32>(rttr::type::get<T>().get_id());
+        const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id());
 
         for (auto &[objectID, component] : m_Components) {
-            if (component->Get_TypeID() == typeID) {
+            if (component->Get_RuntimeTypeId() == runtimeTypeId) {
               return std::static_pointer_cast<T>(component);
             }
         }
         for (auto &[objectID, script] : m_Scripts) {
-            if (script->Get_TypeID() == typeID) {
+            if (script->Get_RuntimeTypeId() == runtimeTypeId) {
 				auto base = std::static_pointer_cast<Component>(script);
 				return std::static_pointer_cast<T>(base);
             }

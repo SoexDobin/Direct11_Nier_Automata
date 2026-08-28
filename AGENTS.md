@@ -33,17 +33,22 @@ If the Vault root or project hub is missing, unreadable, or ambiguous, stop befo
 - `Launcher/`: launcher application
 - `ModelConverter/`: model conversion tool
 - `EngineSDK/`: exported engine headers and libraries
-- `ProjectSetting/`: project and scene data
+- `ProjectSetting/`: project-wide settings and Editor-authored project assets
+  - `ProjectSetting/Scene/`: Scene/Level hierarchy documents
+  - `ProjectSetting/Prefab/`: Prefab documents
+  - future Editor-authored asset types use their own `ProjectSetting/<AssetType>/` folder when a real writer/reader exists
+  - Editor-only project UI/layout settings use `ProjectSetting/Editor/`; do not mix them with runtime Scene/Prefab documents
 
 Do not treat generated files, copied SDK outputs, project data, or external resources as ordinary source code without first checking their ownership and generation flow.
 
 ## Build and Verification
 
 - The solution entry point is `NieRAutomata.sln`.
-- Verified on 2026-08-24 with Visual Studio 2022, Debug|x64:
+- Verified on 2026-08-28 with Visual Studio 2022, Debug|x64:
   - Engine: `MSBuild.exe NieRAutomata.sln /t:Engine /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
-  - Client (after Engine): `MSBuild.exe Client\default\Client.vcxproj /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
-- Building `Engine\default\Engine.vcxproj` directly is unsupported because its pre-build event requires the solution-level `$(SolutionDir)` value.
+  - Client: `MSBuild.exe NieRAutomata.sln /t:Client /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
+  - Editor: `MSBuild.exe NieRAutomata.sln /t:Editor /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
+- Building `Engine\default\Engine.vcxproj` or `Client\default\Client.vcxproj` directly is unsupported because their build steps require the solution-level `$(SolutionDir)` value.
 - Do not claim build success until the exact Visual Studio/MSBuild command, configuration, and platform have run successfully.
 - When a build command is verified, record it in both this file and the Vault project hub.
 
@@ -62,6 +67,16 @@ Do not treat generated files, copied SDK outputs, project data, or external reso
 - Use notebook ID `direct11-nier-automata`, registered from `https://notebook.google.com/notebook/88617913-333a-42b4-82bb-6eeb6bac60ea`.
 - Treat NotebookLM answers as reference context, not as a replacement for checking repository source, extracted files, tool output, and build or runtime evidence.
 - If a needed NotebookLM lookup is unavailable or unauthenticated, report that limitation and continue with locally verifiable evidence unless the missing reference context is required for a safe decision.
+
+## Architecture Change Discipline
+
+- This project is primarily an architecture refactoring project. Prefer correcting or extending existing types and functions so their current owners enforce the required behavior.
+- Adding a variable or function is allowed when a concrete invariant or caller requires it; this is not a blanket prohibition. Reuse or extend the existing API first, and keep any addition local to the owner whose responsibility it completes.
+- Optimize the existing `Game` Singleton, manager lifecycle, `GameObject`, `ObjectManager`, `PrototypeManager`, Serializer, and template API boundaries before adding architecture.
+- Do not interpret “expand when needed” as standing permission to add classes, services, contexts, registries, keys, transactions, or adapters. Future extensibility alone is not sufficient evidence.
+- When a plan does not prescribe the implementation, inspect the current code and choose the smallest change that satisfies the requirement and preserves ownership.
+- Before adding a new architectural unit, identify the current bug or caller, why the existing owner cannot safely handle it, the new owner and lifetime, the path it replaces, and the verification method. Do not add it when net complexity is not justified.
+- The durable project rule is `AI-Sessions/wiki/projects/Direct11_Nier_Automata/rules/기존_구조_우선_설계_규칙.md` in the Project Vault.
 
 ## Durable Project Memory
 

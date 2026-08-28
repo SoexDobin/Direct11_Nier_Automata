@@ -181,6 +181,23 @@ HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, con
     return S_OK;
 }
 
+HRESULT ResourceManager::Load_ModelAnimations(uint32 levIndex, const wstring& modelTag,
+	const vector<wstring>& animationFilePaths)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_ResourceMutex);
+	if (levIndex >= m_Models.size())
+		return E_INVALIDARG;
+
+	const auto modelIt = m_Models[levIndex].find(modelTag);
+	if (modelIt == m_Models[levIndex].end() || !modelIt->second)
+	{
+		LOG_ERROR(L"Failed to find model prototype {} in level {}", modelTag, levIndex);
+		return E_FAIL;
+	}
+
+	return modelIt->second->Load_Animations(animationFilePaths);
+}
+
 Shared<Model> ResourceManager::Get_Model(uint32 levIndex, const tChar* modelTag)
 {
     if (m_Models[levIndex].contains(modelTag) == false)

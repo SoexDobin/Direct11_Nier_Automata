@@ -30,7 +30,6 @@ public:
 public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
-	void Set_Pl0000Container(const Shared<Em3000>& em3000) { m_Em3000 = em3000; }
 
 public:
 	Shared<Model> Get_ModelComponent() { return m_Model; }
@@ -56,7 +55,6 @@ private:
 protected:
 	Shared<Shader>	m_Shader{ nullptr };
 	Shared<Model>	m_Model{ nullptr };
-	Weak<Em3000>	m_Em3000{};
 
 protected:
 	Weak<Model>		m_BodyModel{};

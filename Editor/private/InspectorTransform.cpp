@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "InspectorTransform.h"
 
-#include <ContainerObject.h>
 #include <PartObject.h>
 
 #include "EditorManager.h"
@@ -56,15 +55,17 @@ void InspectorTransform::RenderComponent(const Shared<Transform>& transform)
 void InspectorTransform::CheckPart(const Shared<GameObject>& isPart)
 {
     auto owner = isPart;
-    if (owner->Get_GameObjectType() == GAMEOBJECTTYPE::CONTAINER)
+	if (!owner)
+		return;
+
+	for (const auto& child : owner->Get_Children())
     {
-        auto container = static_pointer_cast<ContainerObject>(owner);
-        for (auto part : container->Get_PartObjects())
-        {
-            part->Get_Transform()->Update_WorldMatrix();
-            part->Update(0.f);
-            part->Late_Update(0.f);
-        }
+		const auto part = dynamic_pointer_cast<PartObject>(child);
+		if (!part)
+			continue;
+		part->Get_Transform()->Update_WorldMatrix();
+		part->Update(0.f);
+		part->Late_Update(0.f);
     }
 }
 

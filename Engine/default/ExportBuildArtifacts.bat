@@ -26,7 +26,7 @@ echo.
 echo ===== [3/4] Copying Engine.dll to Client\bin ===== 
 xcopy /Y /I "..\bin\Engine.dll"						"..\..\Client\bin\"
 xcopy /Y /I "..\bin\Engine.dll"						"..\..\Editor\bin\"
-xcopy /Y /I	"..\bin\shaders\*.hlsli*"				"..\..\Client\shaders\bin\"
+xcopy /Y /I	"..\bin\shaders\*.hlsli*"				"..\..\Client\bin\shaders\"
 xcopy /Y /I	"..\bin\shaders\*.hlsl*"				"..\..\Client\shaders\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Client\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Editor\bin\"

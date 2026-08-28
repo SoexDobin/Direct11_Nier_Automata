@@ -17,6 +17,8 @@ GameObject::GameObject(const GameObject& prototype)
     m_ObjectName = prototype.m_ObjectName;
     m_DescID.m_typeID = prototype.m_DescID.m_typeID;
     m_DescID.m_objectID = prototype.m_DescID.m_objectID;
+    m_RuntimeTypeId = prototype.m_RuntimeTypeId;
+    m_IsActive = prototype.m_IsActive;
 
     // TODO : Clone 시점에 부모 자식 관계는 어떻게 할 것인지 고민 필요
     // TODO : Prototype의 자식들은 어떻게 할 것인지 고민 필요
@@ -31,6 +33,14 @@ HRESULT GameObject::Initialize_Prototype()
 }
 
 HRESULT GameObject::Initialize(void *arg) {
+    m_ObjectGuid = GAME_INSTANCE->Consume_RestoredObjectGuid();
+    if (!m_ObjectGuid.Is_Valid())
+        m_ObjectGuid = Create_ObjectGuid();
+    if (!m_ObjectGuid.Is_Valid()) {
+        LOG_ERROR(L"GameObject {} Initialize Failed By ObjectGuid", m_ObjectName);
+        return E_FAIL;
+    }
+
     Helper::CreateID(Helper::OBJECT_ID_INSTANCE, m_DescID);
     if (m_DescID.m_instanceID == 0) {
         LOG_ERROR(L"Component {} Initialize Failed By InstanceID", m_ObjectName);
@@ -45,10 +55,8 @@ HRESULT GameObject::Initialize(void *arg) {
     if (FAILED(m_Transform->Initialize(nullptr)))
 		return E_FAIL;
 
-    m_Transform->Set_Owner(shared_from_this());
-
-    if (Get_Component<Transform>() == nullptr)
-		m_Components.emplace(ETOI(COMPONENT_TYPE::TRANSFORM), m_Transform);
+    if (FAILED(Add_Component(m_Transform)))
+        return E_FAIL;
 
     return __super::Initialize(arg);
 }
@@ -70,14 +78,16 @@ void GameObject::On_Destroy() {
     }
     m_Scripts.clear();
 
-    if (m_Transform)
-    {
-        m_Transform->On_Destroy();
-        Destroy(m_Transform);
-    }
+    m_Transform.reset();
 
-    for (auto &child : m_Children)
-		Destroy(child);
+    const vector<Shared<GameObject>> children = m_Children;
+    for (const auto& child : children) {
+        if (!child)
+            continue;
+        child->m_Parent.reset();
+        child->m_StableChildKey.clear();
+        child->Destroy_Subtree();
+    }
     m_Children.clear();
 
     if (auto parent = m_Parent.lock())
@@ -97,11 +107,6 @@ void GameObject::On_Enable() {
   for (auto &component : m_Scripts)
     component.second->Set_Active(true);
 
-  m_Transform->Set_Active(true);
-
-  for (auto &child : m_Children)
-    child->Set_Active(true);
-
   Object::On_Enable();
 }
 
@@ -115,17 +120,12 @@ void GameObject::On_Disable() {
     for (auto &component : m_Scripts)
 		component.second->Set_Active(false);
 
-    m_Transform->Set_Active(false);
-
-    for (auto &child : m_Children)
-		child->Set_Active(false);
-
     Object::On_Disable();
 }
 
 void GameObject::Set_Active(Bool isActive)
 {
-	__super::Set_Active(isActive);
+	Object::Set_Active(isActive);
 }
 
 void GameObject::Priority_Update(Float timeDelta) {}
@@ -140,108 +140,103 @@ HRESULT GameObject::Render() { return S_OK; }
 
 void GameObject::Submit_RenderGroup() {}
 
-HRESULT GameObject::Set_Parent(const Shared<GameObject> &parent) {
+HRESULT GameObject::Set_Parent(const Shared<GameObject>& parent) {
+    return Set_Parent(parent, L"");
+}
 
-  if (!m_Parent.expired()) {
-    auto oldParent = m_Parent.lock();
-    if (oldParent == parent) {
-      LOG_WARN(L"Already Regist Parent {}", oldParent->Get_Name());
-      return S_OK;
+HRESULT GameObject::Set_Parent(const Shared<GameObject>& parent,
+                               const wstring& stableChildKey,
+                               size_t insertIndex) {
+    if (!parent)
+        return Remove_Parent();
+
+    const Shared<GameObject> self = shared_from_this();
+    if (parent == self)
+        return E_INVALIDARG;
+
+    for (Shared<GameObject> ancestor = parent; ancestor; ancestor = ancestor->Get_Parent()) {
+        if (ancestor == self) {
+            LOG_ERROR(L"Rejected cyclic GameObject parent relation");
+            return E_FAIL;
+        }
     }
 
-    oldParent->Remove_Child(shared_from_this());
-    oldParent.reset();
-  }
+    const Shared<GameObject> oldParent = m_Parent.lock();
+    if (oldParent == parent)
+        return E_FAIL;
+    if (parent->Find_Child(m_ObjectGuid) ||
+        (!stableChildKey.empty() && parent->Find_Child(stableChildKey)))
+        return E_FAIL;
 
-  m_Parent = parent;
-  if (parent) {
-    if (FAILED(parent->Add_Child(shared_from_this())))
-      return E_FAIL;
-  }
+    if (oldParent && FAILED(oldParent->Remove_Child(self)))
+        return E_FAIL;
 
-  m_Transform->Set_Dirty();
+    m_Parent = parent;
+    m_StableChildKey = stableChildKey;
+    const size_t targetIndex = min(insertIndex, parent->m_Children.size());
+    parent->m_Children.insert(parent->m_Children.begin() + targetIndex, self);
 
-  return S_OK;
+    const auto markDirty = [](auto&& selfMark, const Shared<GameObject>& object) -> void {
+        if (object->m_Transform)
+            object->m_Transform->Set_Dirty();
+        for (const auto& child : object->m_Children)
+            if (child) selfMark(selfMark, child);
+    };
+    markDirty(markDirty, self);
+    return S_OK;
 }
 
 HRESULT GameObject::Remove_Parent() {
-  m_Transform->Set_Dirty();
-  return Set_Parent(nullptr);
+    const Shared<GameObject> parent = m_Parent.lock();
+    return parent ? parent->Remove_Child(shared_from_this()) : S_FALSE;
 }
 
 HRESULT GameObject::Add_Child(const Shared<GameObject> &child) {
-  if (!child)
-    return E_FAIL;
-
-  for (auto &registeredChild : m_Children)
-    if (registeredChild == child)
-      return S_OK;
-
-  m_Children.push_back(child);
-  m_Transform->Set_Dirty();
-
-  if (child->Get_Parent() != shared_from_this()) {
-    child->Set_Parent(shared_from_this());
-  }
-  return S_OK;
+    return Add_Child(child, L"");
 }
 
-void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& instanceMap)
-{
-    rttr::type type = rttr::type::get(*this);
-    for (auto& prop : type.get_properties())
-    {
-        auto saveDataMeta = prop.get_metadata(Meta_Key_Type::SaveData);
-        if (saveDataMeta == Asset_Type_Key::GameObject || saveDataMeta == Save_Data_Key::TargetObjectID)
-        {
-            uint32 targetID = prop.get_value(*this).convert<uint32>();
-            if (targetID != 0)
-            {
-                Shared<GameObject> pTarget = nullptr;
-                auto it = instanceMap.find(targetID);
-                if (it != instanceMap.end()) pTarget = it->second;
-                else pTarget = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), targetID);
+HRESULT GameObject::Add_Child(const Shared<GameObject>& child,
+                              const wstring& stableChildKey,
+                              size_t insertIndex) {
+    return child ? child->Set_Parent(shared_from_this(), stableChildKey, insertIndex) : E_INVALIDARG;
+}
 
-                if (pTarget)
-                {
-                    if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) {
-                        prop.set_value(*this, pTarget);
-                    }
-                    else {
-                        prop.set_value(*this, targetID);
-                    }
-                }
-            }
-        }
+HRESULT GameObject::Add_Child(uint32 prototypeLevIndex, const wstring& registeredName,
+                              const wstring& stableChildKey, void* arg) {
+    if (registeredName.empty() || stableChildKey.empty() || !m_ObjectGuid.Is_Valid())
+        return E_INVALIDARG;
+
+    const string registeredNameUtf8 = Helper::To_String(registeredName);
+    const ObjectGuid childObjectGuid = Derive_ChildObjectGuid(
+        m_ObjectGuid, stableChildKey, registeredNameUtf8);
+    if (!childObjectGuid.Is_Valid()) {
+        LOG_ERROR(L"Failed to derive ObjectGuid for child {}", registeredName);
+        return E_FAIL;
     }
+
+    Shared<GameObject> child = GAME_INSTANCE->Instantiate_GameObject(
+        registeredNameUtf8, prototypeLevIndex, arg, childObjectGuid);
+    if (!child) {
+        LOG_ERROR(L"Failed to create child {}", registeredName);
+        return E_FAIL;
+    }
+
+    if (FAILED(Add_Child(child, stableChildKey))) {
+        LOG_ERROR(L"Failed to attach child {} with StableChildKey {}", registeredName, stableChildKey);
+        Object::Destroy(child);
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+void GameObject::Post_Load()
+{
 
     // 2. 소속 컴포넌트들의 참조 필드 해결
     for (auto& [id, comp] : m_Components)
     {
         if (!comp) continue;
-        rttr::type compType = rttr::type::get(*comp);
-        for (auto& prop : compType.get_properties())
-        {
-            if (prop.get_metadata(Meta_Key_Type::SaveData) == Save_Data_Key::TargetObjectID)
-            {
-                uint32 targetID = prop.get_value(*comp).convert<uint32>();
-                if (targetID != 0)
-                {
-                    Shared<GameObject> target = nullptr;
-                    auto it = instanceMap.find(targetID);
-                    if (it != instanceMap.end()) target = it->second;
-                    else target = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), targetID);
-
-                    if (target)
-                    {
-                        if (prop.get_type() == rttr::type::get<Shared<GameObject>>()) prop.set_value(*comp, target);
-                        else prop.set_value(*comp, targetID);
-                    }
-                }
-            }
-        }
-        comp->Post_Load(instanceMap);
-
         // 네비게이션 위치 후처리
         if (comp->Get_ComponentType() == COMPONENT_TYPE::NAVIGATION)
         {
@@ -251,14 +246,24 @@ void GameObject::Post_Load(const unordered_map<uint32, Shared<GameObject>>& inst
 }
 
 HRESULT GameObject::Remove_Child(const Shared<GameObject> &child) {
-    if (m_IsDestroy)
-      return S_OK;
+    if (!child)
+        return E_INVALIDARG;
 
-    auto it = std::find(m_Children.begin(), m_Children.end(), child);
-    if (it == m_Children.end())
-      return E_FAIL;
+    const auto it = find(m_Children.begin(), m_Children.end(), child);
+    if (it == m_Children.end() || child->m_Parent.lock().get() != this)
+        return E_FAIL;
 
     m_Children.erase(it);
+    child->m_Parent.reset();
+    child->m_StableChildKey.clear();
+
+    const auto markDirty = [](auto&& selfMark, const Shared<GameObject>& object) -> void {
+        if (object->m_Transform)
+            object->m_Transform->Set_Dirty();
+        for (const auto& nestedChild : object->m_Children)
+            if (nestedChild) selfMark(selfMark, nestedChild);
+    };
+    markDirty(markDirty, child);
     return S_OK;
 }
 
@@ -272,17 +277,33 @@ const vector<Shared<GameObject>> &GameObject::Get_Children() const {
   return m_Children;
 }
 
-Shared<Component> GameObject::Get_Component(uint32 objectID) {
-  if (m_Scripts.contains(objectID)) {
-    return m_Scripts[objectID];
-  }
+Shared<GameObject> GameObject::Find_Child(ObjectGuid objectGuid) const {
+    if (!objectGuid.Is_Valid())
+        return nullptr;
 
-  for (const auto &component : m_Components) {
-    if (component.second->Get_ObjectID() == objectID)
-      return component.second;
-  }
+    const auto it = find_if(m_Children.begin(), m_Children.end(), [objectGuid](const Shared<GameObject>& child) {
+        return child && child->Get_ObjectGuid() == objectGuid;
+    });
+    return it == m_Children.end() ? nullptr : *it;
+}
 
-  return nullptr;
+Shared<GameObject> GameObject::Find_Child(const wstring& stableChildKey) const {
+    if (stableChildKey.empty())
+        return nullptr;
+
+    const auto it = find_if(m_Children.begin(), m_Children.end(), [&stableChildKey](const Shared<GameObject>& child) {
+        return child && child->Get_StableChildKey() == stableChildKey;
+    });
+    return it == m_Children.end() ? nullptr : *it;
+}
+
+void GameObject::Destroy_Subtree() {
+    const vector<Shared<GameObject>> children = m_Children;
+    for (const auto& child : children) {
+        if (child)
+            child->Destroy_Subtree();
+    }
+    Object::Destroy(shared_from_this());
 }
 
 vector<Shared<Component>> GameObject::Get_Components()
@@ -301,7 +322,7 @@ vector<Shared<Component>> GameObject::Get_Components()
 
 vector<Shared<ScriptComponent>> GameObject::Get_Scripts()
 {
-    if (m_Components.empty())
+    if (m_Scripts.empty())
         return EMPTY_VECTOR<Shared<ScriptComponent>>;
 
     vector<Shared<ScriptComponent>> scripts;
@@ -313,50 +334,53 @@ vector<Shared<ScriptComponent>> GameObject::Get_Scripts()
     return scripts;
 }
 
+Bool GameObject::Has_Component(RuntimeTypeId runtimeTypeId) const
+{
+    if (runtimeTypeId == 0)
+        return false;
+
+    for (const auto& [instanceID, component] : m_Components) {
+        if (component && component->Get_RuntimeTypeId() == runtimeTypeId)
+            return true;
+    }
+
+    for (const auto& [instanceID, script] : m_Scripts) {
+        if (script && script->Get_RuntimeTypeId() == runtimeTypeId)
+            return true;
+    }
+
+    return false;
+}
+
 HRESULT GameObject::Add_Component(const Shared<Component>& component) {
-    if (!component) return E_FAIL;
+    if (!component || component->Get_RuntimeTypeId() == 0)
+        return E_INVALIDARG;
+
+    if (Has_Component(component->Get_RuntimeTypeId())) {
+        LOG_WARN(L"Already Added Component RuntimeTypeId {}", component->Get_Name());
+        return E_FAIL;
+    }
+
+    if (const Shared<GameObject> owner = component->Get_Owner(); owner && owner.get() != this) {
+        LOG_ERROR(L"Component {} already belongs to another GameObject", component->Get_Name());
+        return E_FAIL;
+    }
 
     uint32 instID = component->Get_InstanceID();
-    uint32 objectID = component->Get_ObjectID();
-    uint32 typeID = component->Get_TypeID();
+    if (instID == 0 || m_Components.contains(instID) || m_Scripts.contains(instID)) {
+        LOG_ERROR(L"{} has an invalid or duplicate runtime instance id: {}", component->Get_Name(), instID);
+        return E_FAIL;
+    }
 
     if (component->Get_ComponentType() == COMPONENT_TYPE::SCRIPT) {
-        for (auto& [instanceID, script] : m_Scripts) {
-            if (objectID == script->Get_ObjectID())
-            {
-                LOG_WARN(L"Already Added Script {}", component->Get_Name());
-                return E_FAIL;
-            }
-            if (typeID == script->Get_TypeID())
-            {
-                LOG_WARN(L"Already Added Script By TypeID {}", component->Get_Name());
-                return E_FAIL;
-            }
-        }
-
-        if (!m_Scripts.contains(instID)) {
-            m_Scripts.emplace(instID, static_pointer_cast<ScriptComponent>(component));
-        }
-        else LOG_ERROR(L"{} is same id value : {} ", component->Get_Name(), instID);
+        const auto [it, inserted] = m_Scripts.emplace(instID, static_pointer_cast<ScriptComponent>(component));
+        if (!inserted)
+            return E_FAIL;
     }
     else {
-        for (auto& [instanceID, comp] : m_Components) {
-            if (objectID == comp->Get_ObjectID())
-            {
-                LOG_WARN(L"Already Added Component By ObjectID {}", component->Get_Name());
-                return E_FAIL;
-            }
-            if (typeID == comp->Get_TypeID())
-            {
-                LOG_WARN(L"Already Added Component By TypeID {}", component->Get_Name());
-                return E_FAIL;
-            }
-        }
-
-        if (!m_Components.contains(instID)) {
-            m_Components.emplace(instID, component);
-        }
-        else LOG_ERROR(L"{} is same id value : {} ", component->Get_Name(), instID);
+        const auto [it, inserted] = m_Components.emplace(instID, component);
+        if (!inserted)
+            return E_FAIL;
     }
 
     component->Set_Owner(shared_from_this());
@@ -368,10 +392,12 @@ HRESULT GameObject::Add_Component(const Shared<Component>& component) {
 Shared<Component> GameObject::Add_Component(uint32 levIndex, uint32 objectID, void* arg)
 {
     Shared<Component> newComponent = GAME_INSTANCE->Instantiate<Component>(objectID, levIndex, arg);
-    if (newComponent) 
-        Add_Component(newComponent);
+    if (newComponent && FAILED(Add_Component(newComponent))) {
+        Object::Destroy(newComponent);
+        return nullptr;
+    }
     else
-        LOG_ERROR(L"Failed to Add Component {}", objectID);
+        if (!newComponent) LOG_ERROR(L"Failed to Add Component {}", objectID);
     
     return newComponent;
 }
@@ -379,10 +405,12 @@ Shared<Component> GameObject::Add_Component(uint32 levIndex, uint32 objectID, vo
 Shared<Component> GameObject::Add_Component(uint32 levIndex, const wstring& prototypeTag, void* arg)
 {
     Shared<Component> newComponent = static_pointer_cast<Component>(GAME_INSTANCE->Instantiate(prototypeTag, levIndex, arg));
-    if (newComponent)
-        Add_Component(newComponent);
+    if (newComponent && FAILED(Add_Component(newComponent))) {
+        Object::Destroy(newComponent);
+        return nullptr;
+    }
     else
-        LOG_ERROR(L"Failed to Add Component {}", prototypeTag);
+        if (!newComponent) LOG_ERROR(L"Failed to Add Component {}", prototypeTag);
 
     return newComponent;
 }

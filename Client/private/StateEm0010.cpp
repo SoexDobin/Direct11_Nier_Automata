@@ -24,7 +24,7 @@ HRESULT StateEm0010::Initialize()
 {
 	if (m_Owner.expired()) return E_FAIL;
 
-	m_Body = static_pointer_cast<Em0010Body>(m_Owner.lock()->Find_PartObject(L"Em0010Body"));
+	m_Body = static_pointer_cast<Em0010Body>(m_Owner.lock()->Find_Child(L"Em0010Body"));
 
 	m_Movement = m_Owner.lock()->Get_Component<Em0010Movement>();
 	m_States = m_Owner.lock()->Get_Component<MonsterStateMachine>();

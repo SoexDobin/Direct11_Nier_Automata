@@ -8,7 +8,7 @@ Shader::Shader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCont
 
 Shader::Shader(const Shader& rhs)
     : Component(rhs), m_Effect{rhs.m_Effect}, m_NumPasses{rhs.m_NumPasses},
-      m_InputLayouts{rhs.m_InputLayouts} {}
+      m_InputLayouts{rhs.m_InputLayouts}, m_ConstantBuffers{rhs.m_ConstantBuffers} {}
 
 HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements) 
 {
@@ -54,6 +54,15 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
             m_ObjectDesc = &desc;
             m_InputLayouts.push_back(inputLayout);
         }
+
+        for (uint32 i = 0; i < ETOI(ConstantBuffer::END); ++i)
+        {
+            ID3DX11EffectConstantBuffer* constantBuffer =
+                m_Effect->GetConstantBufferByName(ShaderCB::Names[i].data());
+
+            if (nullptr != constantBuffer && constantBuffer->IsValid())
+                m_ConstantBuffers[i] = constantBuffer;
+        }
     } else
     return E_FAIL;
 
@@ -72,6 +81,15 @@ HRESULT Shader::Initialize(void* arg)
 
 void Shader::On_Destroy() {
   m_InputLayouts.clear();
+
+  for (uint32 i = 0; i < ETOI(ConstantBuffer::END); ++i)
+  {
+      m_AllocatedConstantBuffers[i].Reset();
+      m_ConstantBuffers[i].Reset();
+      m_AllocatedConstantBufferSizes[i] = 0;
+  }
+
+  m_Effect.Reset();
 
   Component::On_Destroy();
 }
@@ -108,6 +126,16 @@ HRESULT Shader::Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderReso
 HRESULT Shader::Bind_Matrix(const Char *constantName, const Float4x4 *matrix) 
 {
     if (!m_Effect) return S_OK;
+
+    if (nullptr == constantName || nullptr == matrix)
+        return E_INVALIDARG;
+
+    if (0 == strcmp(constantName, WorldMatrix) && Supports_CBuffer(ConstantBuffer::Object))
+    {
+        ObjectCB objectBuffer{};
+        objectBuffer.worldMatrix = *matrix;
+        return Bind_CBufferData(objectBuffer);
+    }
 
 	ID3DX11EffectVariable* variable = m_Effect->GetVariableByName(constantName);
     if (nullptr == variable) {
@@ -156,6 +184,59 @@ HRESULT Shader::Bind_RawValue(const Char* constantName, const void* data, uint32
     }
 
 	return variable->SetRawValue(data, 0, length);
+}
+
+Bool Shader::Supports_CBuffer(ConstantBuffer type) const
+{
+    const uint32 index = ETOI(type);
+    return index < ETOI(ConstantBuffer::END) &&
+        nullptr != m_ConstantBuffers[index] && m_ConstantBuffers[index]->IsValid();
+}
+
+HRESULT Shader::Update_CBuffer(ConstantBuffer type, const void* data, size_t size)
+{
+    if (nullptr == data || 0 == size || 0 != size % 16)
+        return E_INVALIDARG;
+
+    if (size > D3D11_REQ_CONSTANT_BUFFER_ELEMENT_COUNT * 16ull)
+        return E_INVALIDARG;
+
+    const uint32 index = ETOI(type);
+    if (index >= ETOI(ConstantBuffer::END))
+        return E_INVALIDARG;
+
+    if (!Supports_CBuffer(type))
+        return S_OK;
+
+    if (nullptr == m_AllocatedConstantBuffers[index] ||
+        m_AllocatedConstantBufferSizes[index] != size)
+    {
+        m_AllocatedConstantBuffers[index].Reset();
+        m_AllocatedConstantBufferSizes[index] = 0;
+
+        D3D11_BUFFER_DESC bufferDesc{};
+        bufferDesc.ByteWidth = static_cast<UINT>(size);
+        bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+        if (FAILED(m_Device->CreateBuffer(
+            &bufferDesc, nullptr, m_AllocatedConstantBuffers[index].GetAddressOf())))
+            return E_FAIL;
+
+        m_AllocatedConstantBufferSizes[index] = static_cast<uint32>(size);
+    }
+
+    D3D11_MAPPED_SUBRESOURCE mapped{};
+    if (FAILED(m_Context->Map(
+        m_AllocatedConstantBuffers[index].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+        return E_FAIL;
+
+    memcpy(mapped.pData, data, size);
+    m_Context->Unmap(m_AllocatedConstantBuffers[index].Get(), 0);
+
+    return m_ConstantBuffers[index]->SetConstantBuffer(
+        m_AllocatedConstantBuffers[index].Get());
 }
 
 Shared<Shader> Shader::CreatePrototype()

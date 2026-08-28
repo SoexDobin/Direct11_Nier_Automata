@@ -7,11 +7,12 @@
 #include "Engine_Define.h"
 
 HRESULT PrototypeManager::Initialize(void* arg) {
-    m_LevelCount = arg == nullptr ? 0 : *static_cast<uintptr_t*>(arg);
+    m_LevelCount = arg == nullptr ? 0 : *static_cast<uint32*>(arg);
 
     m_ObjectsID.resize(m_LevelCount);
     m_GameObjects.resize(m_LevelCount);
     m_Components.resize(m_LevelCount);
+    m_DefaultPrototypeIDs.resize(m_LevelCount);
 
     if (FAILED(Register_EngineComponents()))
     {
@@ -26,11 +27,13 @@ void PrototypeManager::On_Destroy() {
         m_GameObjects[i].clear();
         m_Components[i].clear();
         m_ObjectsID[i].clear();
+        m_DefaultPrototypeIDs[i].clear();
     }
 
     m_ObjectsID.clear();
     m_GameObjects.clear();
     m_Components.clear();
+    m_DefaultPrototypeIDs.clear();
 }
 
 uint32 PrototypeManager::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const
@@ -78,6 +81,24 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
 		return E_FAIL;
 	}
 
+    if (!object)
+        return E_INVALIDARG;
+
+    const rttr::type reflectedType = rttr::type::get(*object);
+    const string registeredName = reflectedType.get_name().to_string();
+    const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(reflectedType.get_id());
+    if (registeredName.empty() || runtimeTypeId == 0 ||
+        GAME_INSTANCE->Find_RuntimeTypeId(registeredName) != runtimeTypeId) {
+        LOG_ERROR(L"Registry rejected unfinalized or conflicting reflected type {}",
+                  Helper::To_wString(registeredName));
+        return E_FAIL;
+    }
+
+    const Bool isDefaultPrototype = prototypeTag.empty() ||
+        prototypeTag == Helper::To_wString(registeredName);
+    if (isDefaultPrototype && m_DefaultPrototypeIDs[levIndex].contains(runtimeTypeId))
+        return S_FALSE;
+
     if (FAILED(object->Initialize_Prototype(prototypeTag)))
         return E_FAIL;
 
@@ -95,6 +116,10 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
     }
     m_ObjectsID[levIndex].emplace(prototypeTag, object->Get_ObjectID());
 
+    auto& defaultPrototypeIDs = m_DefaultPrototypeIDs[levIndex];
+    if (!defaultPrototypeIDs.contains(runtimeTypeId) || isDefaultPrototype)
+        defaultPrototypeIDs[runtimeTypeId] = object->Get_ObjectID();
+
 
     return S_OK;
 }
@@ -107,6 +132,7 @@ HRESULT PrototypeManager::Clear_Prototypes()
         m_GameObjects[i].clear();
         m_Components[i].clear();
         m_ObjectsID[i].clear();
+        m_DefaultPrototypeIDs[i].clear();
     }
 
     return S_OK;
@@ -120,6 +146,7 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
     m_GameObjects[levIndex].clear();
     m_Components[levIndex].clear();
     m_ObjectsID[levIndex].clear();
+    m_DefaultPrototypeIDs[levIndex].clear();
 
     return S_OK;
 }
@@ -188,6 +215,30 @@ Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
 			return m_Components[levIndex].at(objectID);
 		}
 	}
+
+    return nullptr;
+}
+
+Shared<Object> PrototypeManager::Find_DefaultPrototype(PROTOTYPE prototype,
+                                                       uint32 levIndex,
+                                                       RuntimeTypeId runtimeTypeId) const {
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+    if (!Validate_Level(levIndex) || runtimeTypeId == 0)
+        return nullptr;
+
+    auto findDefaultObjectID = [&](uint32 targetLevel) -> uint32 {
+        const auto& defaults = m_DefaultPrototypeIDs[targetLevel];
+        const auto it = defaults.find(runtimeTypeId);
+        return it == defaults.end() ? 0 : it->second;
+    };
+
+    if (const uint32 objectID = findDefaultObjectID(levIndex); objectID != 0)
+        return Find_Prototype(prototype, levIndex, objectID);
+
+    if (levIndex != 0) {
+        if (const uint32 objectID = findDefaultObjectID(0); objectID != 0)
+            return Find_Prototype(prototype, 0, objectID);
+    }
 
     return nullptr;
 }

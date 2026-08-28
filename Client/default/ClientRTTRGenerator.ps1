@@ -26,12 +26,12 @@ $processedClasses = @{}
 $newIncludes = ""
 $newRttrBlocks = ""
 
-# Pre-scan output file for already manually registered classes
+# Existing registrations are immutable schema keys. Preserve all existing blocks
+# and append only newly discovered classes.
 if (Test-Path $OutputFile) {
     try {
         $existingContent = [System.IO.File]::ReadAllText($OutputFile, [System.Text.Encoding]::UTF8)
-        $manualContent = [regex]::Replace($existingContent, '(?s)//\s*<AUTO_GENERATED_RTTR>.*?//\s*</AUTO_GENERATED_RTTR>', '')
-        $matches = [regex]::Matches($manualContent, 'rttr::registration::class_<([A-Za-z0-9_]+)>')
+        $matches = [regex]::Matches($existingContent, 'rttr::registration::class_<([A-Za-z0-9_]+)>')
         foreach ($match in $matches) {
             $manualClass = $match.Groups[1].Value
             $processedClasses[$manualClass] = $true
@@ -124,11 +124,16 @@ catch {
     exit 1
 }
 
-# Regex replacement for includes
-$outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_INCLUDES>\r?\n).*?(\r?\n//\s*</AUTO_GENERATED_INCLUDES>)', "`${1}$newIncludes`${2}")
+if ($outContent -notmatch '//\s*</AUTO_GENERATED_INCLUDES>' -or
+    $outContent -notmatch '//\s*</AUTO_GENERATED_RTTR>') {
+    Write-Host "===== [ERROR] Auto-generated markers are missing"
+    exit 1
+}
 
-# Regex replacement for RTTR blocks
-$outContent = [regex]::Replace($outContent, '(?s)(//\s*<AUTO_GENERATED_RTTR>\r?\n).*?(\r?\n//\s*</AUTO_GENERATED_RTTR>)', "`${1}$newRttrBlocks`${2}")
+$outContent = [regex]::Replace($outContent, '//\s*</AUTO_GENERATED_INCLUDES>',
+    "$newIncludes// </AUTO_GENERATED_INCLUDES>", 1)
+$outContent = [regex]::Replace($outContent, '//\s*</AUTO_GENERATED_RTTR>',
+    "$newRttrBlocks// </AUTO_GENERATED_RTTR>", 1)
 
 try {
     # Replace all LFs with CRLFs to ensure consistency

@@ -8,11 +8,11 @@
 
 #include "SpdLogger.h"
 
-Entity::Entity() : ContainerObject{} {}
+Entity::Entity() : GameObject{} {}
 Entity::Entity(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
-	: ContainerObject{device, context} {}
+	: GameObject{device, context} {}
 Entity::Entity(const Entity& rhs)
-	: ContainerObject{rhs} {}
+	: GameObject{rhs} {}
 
 void Entity::TakeDamage(const DAMAGE_INFO& dmgInfo)
 {

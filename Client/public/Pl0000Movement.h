@@ -62,7 +62,6 @@ private:
 	Vector3 m_LastGroundedRootPositionVelocity{ 0.f, 0.f, 0.f };
 
 private:
-	Weak<Pl0000> m_OwnerContainer{};
 	Weak<Pl0000Input> m_Input{};
 	Weak<Navigation> m_Navigation{};
 

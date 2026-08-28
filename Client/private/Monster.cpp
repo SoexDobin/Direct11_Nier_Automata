@@ -87,7 +87,7 @@ void Monster::OnCollisionStay(const Shared<Collider>& ownCollider, const Shared<
 {
 	auto target = targetCollider->Get_Owner();
 
-	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::CONTAINER) return;
+	if (!dynamic_pointer_cast<Entity>(target)) return;
 
 	auto targetLayerName = target->Get_LayerMask().Get_LayerName();
 	if (targetLayerName == L"PlayerPhysical")

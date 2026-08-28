@@ -1,16 +1,16 @@
 #pragma once
-#include "ContainerObject.h"
+#include "GameObject.h"
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL Entity abstract : public ContainerObject
+class CLIENT_DLL Entity abstract : public GameObject
 {
-	RTTR_ENABLE(ContainerObject)
+	RTTR_ENABLE(GameObject)
 public:
-	typedef struct tagEntityObject : public CONTAINEROBJECT_DESC
+	typedef struct tagEntityObject : public GAMEOBJECT_DESC
 	{
 		
-	} ENTITY_CONTAINER_DESC;
+	} ENTITY_DESC;
 
 public:
 	typedef struct tagDamageInfo

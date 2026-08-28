@@ -52,8 +52,12 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 	/* Header */
 	MODEL_HEADER header{};
 	in.read(reinterpret_cast<Char*>(&header), sizeof(header));
-	if (memcmp(header.magic, "NMDL", 4) != 0)
+	if (!in || memcmp(header.magic, MODEL_MAGIC, sizeof(header.magic)) != 0 ||
+		header.version == 0 || header.version > MODEL_VERSION)
+	{
+		LOG_ERROR(L"Invalid model header or unsupported version : {}", modelFilePath);
 		return E_FAIL;
+	}
 
 	m_IsSkeletal = header.isAnim;
 	m_NumMeshes = header.numMeshes;
@@ -191,7 +195,9 @@ const wstring& Model::Get_AnimationNameByIndex(uint32 index)
 
 void Model::Update_ModelAnimation(Float timeDelta)
 {
-	if (!m_IsActive || !m_IsSkeletal) return;
+	if (!m_IsActive || !m_IsSkeletal || m_Animations.empty()) return;
+	if (m_CurrentAnimIndex >= m_Animations.size() || m_NextAnimIndex >= m_Animations.size())
+		return;
 
 	if (m_IsBlending)
 	{
@@ -221,11 +227,17 @@ void Model::Update_ModelAnimation(Float timeDelta)
 
 	uint32 activeAnimIdx = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
 	
-	m_Tracker->Update(activeAnimIdx, Get_AnimationProgress());
+	if (m_Tracker)
+		m_Tracker->Update(activeAnimIdx, Get_AnimationProgress());
 }
 
 void Model::Set_Animation(uint32 index, Float blendDuration)
 {
+	if (index >= m_Animations.size() || !m_Tracker)
+	{
+		LOG_ERROR(L"Failed to set animation index {} on model {}", index, m_ModelTag);
+		return;
+	}
 	if (m_CurrentAnimIndex == index) return;
 	if (m_IsBlending && m_NextAnimIndex == index) return;
 
@@ -502,35 +514,9 @@ HRESULT Model::Ready_Animation(ifstream& in)
 	for (uint32 i = 0; i < m_NumAnimation; ++i)
 	{
 		MODEL_ANIMATION animationData{};
-		uint32 animNameLength = 0;
-		in.read(reinterpret_cast<Char*>(&animNameLength), sizeof(uint32));
-		animationData.name.resize(animNameLength);
-		in.read(animationData.name.data(), animNameLength);
-		in.read(reinterpret_cast<Char*>(&animationData.duration), sizeof(Float));
-		in.read(reinterpret_cast<Char*>(&animationData.tickPerSecond), sizeof(Float));
-		in.read(reinterpret_cast<Char*>(&animationData.numChannel), sizeof(uint32));
+		if (FAILED(Read_AnimationData(in, animationData, true)))
+			return E_FAIL;
 
-		in.read(reinterpret_cast<Char*>(&animationData.rootTotalTranslation), sizeof(Vector3));
-		in.read(reinterpret_cast<Char*>(&animationData.rootTotalRotation), sizeof(Vector4));
-
-		animationData.channels.reserve(animationData.numChannel);
-		for (uint32 j = 0; j < animationData.numChannel; ++j)
-		{
-			MODEL_CHANNEL channelData{};
-			uint32 channelNameLength = 0;
-			in.read(reinterpret_cast<Char*>(&channelNameLength), sizeof(uint32));
-			channelData.name.resize(channelNameLength);
-			in.read(channelData.name.data(), channelNameLength);
-			in.read(reinterpret_cast<Char*>(&channelData.boneIndex), sizeof(int32));
-			in.read(reinterpret_cast<Char*>(&channelData.numKeyFrames), sizeof(uint32));
-
-			channelData.keyFrames.resize(channelData.numKeyFrames);
-			in.read(reinterpret_cast<Char*>(channelData.keyFrames.data()), channelData.numKeyFrames * sizeof(KEYFRAME));
-
-			animationData.channels.push_back(channelData);
-		}
-
-		
 		auto animation = Animation::Create(m_Device, m_Context, animationData);
 		if (animation == nullptr)
 			return E_FAIL;
@@ -539,6 +525,141 @@ HRESULT Model::Ready_Animation(ifstream& in)
 		m_Animations.push_back(animation);
 	}
 
+	return S_OK;
+}
+
+HRESULT Model::Read_AnimationData(ifstream& in, MODEL_ANIMATION& animationData,
+	Bool hasStoredChannelCount, uint32 channelCount) const
+{
+	constexpr uint32 MaxNameLength = 4096;
+	constexpr uint32 MaxChannelCount = MODEL_BONE_MAX * 4;
+	constexpr uint32 MaxKeyFrameCount = 10'000'000;
+
+	uint32 animNameLength = 0;
+	in.read(reinterpret_cast<Char*>(&animNameLength), sizeof(animNameLength));
+	if (!in || animNameLength == 0 || animNameLength > MaxNameLength)
+		return E_FAIL;
+
+	animationData.name.resize(animNameLength);
+	in.read(animationData.name.data(), animNameLength);
+	in.read(reinterpret_cast<Char*>(&animationData.duration), sizeof(animationData.duration));
+	in.read(reinterpret_cast<Char*>(&animationData.tickPerSecond), sizeof(animationData.tickPerSecond));
+	if (hasStoredChannelCount)
+		in.read(reinterpret_cast<Char*>(&channelCount), sizeof(channelCount));
+	in.read(reinterpret_cast<Char*>(&animationData.rootTotalTranslation), sizeof(animationData.rootTotalTranslation));
+	in.read(reinterpret_cast<Char*>(&animationData.rootTotalRotation), sizeof(animationData.rootTotalRotation));
+	if (!in || channelCount == 0 || channelCount > MaxChannelCount)
+		return E_FAIL;
+
+	animationData.numChannel = channelCount;
+	animationData.channels.clear();
+	animationData.channels.reserve(channelCount);
+	unordered_set<string> channelNames;
+
+	for (uint32 i = 0; i < channelCount; ++i)
+	{
+		MODEL_CHANNEL channelData{};
+		uint32 channelNameLength = 0;
+		in.read(reinterpret_cast<Char*>(&channelNameLength), sizeof(channelNameLength));
+		if (!in || channelNameLength == 0 || channelNameLength > MaxNameLength)
+			return E_FAIL;
+
+		channelData.name.resize(channelNameLength);
+		in.read(channelData.name.data(), channelNameLength);
+		if (!in || !channelNames.emplace(channelData.name).second)
+			return E_FAIL;
+
+		if (hasStoredChannelCount)
+		{
+			in.read(reinterpret_cast<Char*>(&channelData.boneIndex), sizeof(channelData.boneIndex));
+		}
+		else
+		{
+			channelData.boneIndex = Get_BoneIndexByName(channelData.name);
+			if (channelData.boneIndex < 0)
+			{
+				LOG_ERROR(L"Animation channel bone not found : {}", Helper::To_wString(channelData.name));
+				return E_FAIL;
+			}
+		}
+
+		in.read(reinterpret_cast<Char*>(&channelData.numKeyFrames), sizeof(channelData.numKeyFrames));
+		if (!in || channelData.numKeyFrames == 0 || channelData.numKeyFrames > MaxKeyFrameCount)
+			return E_FAIL;
+
+		channelData.keyFrames.resize(channelData.numKeyFrames);
+		in.read(reinterpret_cast<Char*>(channelData.keyFrames.data()),
+			static_cast<std::streamsize>(channelData.numKeyFrames) * sizeof(KEYFRAME));
+		if (!in)
+			return E_FAIL;
+
+		animationData.channels.push_back(std::move(channelData));
+	}
+
+	return S_OK;
+}
+
+HRESULT Model::Load_Animations(const vector<wstring>& animationFilePaths)
+{
+	if (!m_IsSkeletal || m_Bones.empty() || animationFilePaths.empty())
+		return E_INVALIDARG;
+
+	vector<Shared<Animation>> pendingAnimations;
+	vector<wstring> pendingNames;
+	unordered_set<wstring> allNames;
+	for (const auto& [name, index] : m_AnimationNames)
+		allNames.emplace(name);
+
+	for (const wstring& animationFilePath : animationFilePaths)
+	{
+		ifstream in(animationFilePath, std::ios::binary);
+		if (!in.is_open())
+		{
+			LOG_ERROR(L"Failed to open animation binary : {}", animationFilePath);
+			return E_FAIL;
+		}
+
+		ANIMATION_HEADER header{};
+		in.read(reinterpret_cast<Char*>(&header), sizeof(header));
+		if (!in || memcmp(header.magic, ANIMATION_MAGIC, sizeof(header.magic)) != 0 ||
+			header.version != ANIMATION_VERSION)
+		{
+			LOG_ERROR(L"Invalid animation header or unsupported version : {}", animationFilePath);
+			return E_FAIL;
+		}
+
+		MODEL_ANIMATION animationData{};
+		if (FAILED(Read_AnimationData(in, animationData, false, header.numChannels)))
+		{
+			LOG_ERROR(L"Failed to read animation binary : {}", animationFilePath);
+			return E_FAIL;
+		}
+
+		const wstring animationName = Helper::To_wString(animationData.name);
+		if (!allNames.emplace(animationName).second)
+		{
+			LOG_ERROR(L"Duplicate animation name {} from {}", animationName, animationFilePath);
+			return E_FAIL;
+		}
+
+		auto animation = Animation::Create(m_Device, m_Context, animationData);
+		if (!animation)
+			return E_FAIL;
+
+		pendingNames.push_back(animationName);
+		pendingAnimations.push_back(std::move(animation));
+	}
+
+	for (size_t i = 0; i < pendingAnimations.size(); ++i)
+	{
+		const uint32 index = static_cast<uint32>(m_Animations.size());
+		m_AnimationNames.emplace(pendingNames[i], index);
+		m_Animations.push_back(std::move(pendingAnimations[i]));
+	}
+	m_NumAnimation = static_cast<uint32>(m_Animations.size());
+	m_CurrentAnimIndex = 0;
+	m_NextAnimIndex = 0;
+	Update_ModelAnimation(0.f);
 	return S_OK;
 }
 

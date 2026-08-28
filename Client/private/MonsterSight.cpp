@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "MonsterSight.h"
 
-#include <ContainerObject.h>
 
 #include "Monster.h"
 #include "SphereCollider.h"
@@ -83,7 +82,7 @@ void MonsterSight::OnCollisionEnter(const Shared<Collider>& ownCollider, const S
 
 	wstring targetLayerName = target->Get_LayerMask().Get_LayerName();
 	if (L"PlayerPhysical" != targetLayerName) return;
-	auto monster = static_pointer_cast<Monster>(m_Owner.lock());
+	auto monster = static_pointer_cast<Monster>(Get_Owner());
 	monster->Set_Target(target);
 }
 

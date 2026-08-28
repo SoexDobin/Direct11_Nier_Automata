@@ -1,8 +1,6 @@
 #include "EngineShaderDefine.hlsli"
+#include "EngineShaderConstantBuffer.hlsli"
 
-float4x4 g_WorldMatrix;
-float4x4 g_ViewMatrix;
-float4x4 g_ProjMatrix;
 row_major matrix g_BoneMatrices[512];
 texture2D g_DiffuseTexture;
 texture2D g_NormalTexture;
@@ -39,8 +37,9 @@ VS_OUT VS_Main(VS_IN input)
 PS_OUT PS_Main(VS_OUT input)
 {
     PS_OUT output;
-    output.diffuse = g_DiffuseTexture.Sample(LinearWrapSampler, input.texcoord);
-    if (output.diffuse.a < 0.3f) discard;
+    output.diffuse = g_DiffuseTexture.Sample(LinearWrapSampler, input.texcoord) * g_BaseColorTint;
+    output.diffuse.rgb += g_EmissiveColor.rgb * g_EmissiveIntensity;
+    if (output.diffuse.a < g_OpacityMaskClipValue) discard;
     output.normal = float4(normalize(input.normal) * 0.5f + 0.5f, 1.f);
     return output;
 }

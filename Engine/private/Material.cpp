@@ -10,8 +10,28 @@ Material::Material(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11Device
 {
 }
 Material::Material(const Material& rhs)
-	: Component{rhs}
+	: Component{rhs}, m_TextureTypeMax{rhs.m_TextureTypeMax},
+	  m_TextureMask{rhs.m_TextureMask}, m_MaterialTextures{rhs.m_MaterialTextures}
 {
+}
+
+namespace
+{
+	uint32 To_MaterialTextureMask(uint32 textureTypeIndex)
+	{
+		switch (textureTypeIndex)
+		{
+		case 1:  return MATERIAL_TEXTURE_BASE_COLOR; // aiTextureType_DIFFUSE
+		case 4:  return MATERIAL_TEXTURE_EMISSIVE;   // aiTextureType_EMISSIVE
+		case 6:  return MATERIAL_TEXTURE_NORMAL;     // aiTextureType_NORMALS
+		case 8:  return MATERIAL_TEXTURE_OPACITY;    // aiTextureType_OPACITY
+		case 14: return MATERIAL_TEXTURE_EMISSIVE;   // aiTextureType_EMISSION_COLOR
+		case 15: // aiTextureType_METALNESS
+		case 16: // aiTextureType_DIFFUSE_ROUGHNESS
+		case 17: return MATERIAL_TEXTURE_ORM;        // aiTextureType_AMBIENT_OCCLUSION
+		default: return 0;
+		}
+	}
 }
 
 void Material::On_Destroy()
@@ -78,6 +98,7 @@ HRESULT Material::Initialize_Prototype(const MODEL_MATERIAL& materialData)
 		
 
 		m_MaterialTextures[typeIndex].push_back(srv);
+		m_TextureMask |= To_MaterialTextureMask(typeIndex);
 	}
 
 	return Component::Initialize_Prototype();
@@ -104,6 +125,14 @@ HRESULT Material::Bind_Material(const Shared<Shader>& shader, const Char* consta
 	{
 		LOG_ERROR(L"Failed to Bind srv to {}", Helper::To_wString(constantName));
 		return E_FAIL;
+	}
+
+	if (shader->Supports_CBuffer(ConstantBuffer::Material))
+	{
+		MaterialCB materialBuffer{};
+		materialBuffer.textureMask = m_TextureMask;
+		if (FAILED(shader->Bind_CBufferData(materialBuffer)))
+			return E_FAIL;
 	}
 
 	return S_OK;

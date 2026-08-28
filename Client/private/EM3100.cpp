@@ -123,10 +123,8 @@ void Em3100::OnCollisionExit(const Shared<Collider>& ownCollider, const Shared<C
 HRESULT Em3100::Ready_PartObjects()
 {
 	Em3100Body::EM3100BODY_DESC em3100BodyDesc{};
-	em3100BodyDesc.parentMatrix = m_Transform->Get_WorldMatrixPtr();
-	em3100BodyDesc.Owner = static_pointer_cast<ContainerObject>(shared_from_this());
 
-	if (FAILED(Add_PartObject(ETOI(LEVEL::GAMEPLAY), L"Em3100Body", L"Em3100Body", &em3100BodyDesc)))
+	if (FAILED(Add_Child(ETOI(LEVEL::GAMEPLAY), L"Em3100Body", L"Em3100Body", &em3100BodyDesc)))
 		return E_FAIL;
 
 	return S_OK;

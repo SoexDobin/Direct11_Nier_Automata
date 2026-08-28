@@ -40,7 +40,14 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 	std::cout << "  mNumMeshes=" << m_AiScene->mNumMeshes << " mNumMaterials=" << m_AiScene->mNumMaterials << "\n";
 
 	m_IsSkeletal = false;
-	m_IsSkeletal = m_AiScene->mNumAnimations > 0;
+	for (uint32 i = 0; i < m_AiScene->mNumMeshes; ++i)
+	{
+		if (m_AiScene->mMeshes[i]->HasBones())
+		{
+			m_IsSkeletal = true;
+			break;
+		}
+	}
 
 	ReadBoneData(m_AiScene->mRootNode, -1);
 	ReadMeshData();
@@ -58,13 +65,28 @@ Bool Tool::Converter::ExportModel(const wstring& outPath)
 		return false;
 	}
 
-	WriteModelFile(outPath);
+	if (!WriteModelFile(outPath))
+		return false;
+
+	if (!WriteAnimationFiles(outPath))
+		return false;
 
 	// JSON 파일 경로는 확장자만 변경
 	wstring jsonPath = filesystem::path(outPath).replace_extension(L".json").wstring();
 	WriteJsonFile(jsonPath);
 
 	return true;
+}
+
+Bool Tool::Converter::ExportAnimations(const wstring& modelPath)
+{
+	if (m_Animation.empty())
+	{
+		std::cerr << "  [Warning] Animation not found, skipped\n";
+		return false;
+	}
+
+	return WriteAnimationFiles(modelPath);
 }
 
 void Tool::Converter::ReadBoneData(aiNode* node, int32_t parentIndex)
@@ -268,8 +290,6 @@ void Tool::Converter::ReadMaterialData()
 
 void Converter::ReadAnimation()
 {
-	if (false == m_IsSkeletal) return;
-
 	m_Channels.resize(m_AiScene->mNumAnimations);
 	for (uint32 i = 0; i < m_AiScene->mNumAnimations; ++i)
 	{
@@ -280,6 +300,7 @@ void Converter::ReadAnimation()
 		anim->duration = static_cast<Float>(aiAnim->mDuration);
 		anim->tickPerSecond = static_cast<Float>(aiAnim->mTicksPerSecond);
 		anim->numChannel = static_cast<uint32>(aiAnim->mNumChannels);
+		anim->rootTotalRotation = Vector4{ 0.f, 0.f, 0.f, 1.f };
 		
 
 		// --- 루트 모션 추출 로직 수정 ---
@@ -304,16 +325,22 @@ void Converter::ReadAnimation()
 
 		if (rootMotionChannel) {
 			// 2. 선택된 루트 모션 본 채널에서 변위 계산
-			aiVector3D startPos = rootMotionChannel->mPositionKeys[0].mValue;
-			aiVector3D endPos = rootMotionChannel->mPositionKeys[rootMotionChannel->mNumPositionKeys - 1].mValue;
-			anim->rootTotalTranslation = Vector3(endPos.x - startPos.x, endPos.y - startPos.y, endPos.z - startPos.z);
+			if (rootMotionChannel->mNumPositionKeys > 0)
+			{
+				aiVector3D startPos = rootMotionChannel->mPositionKeys[0].mValue;
+				aiVector3D endPos = rootMotionChannel->mPositionKeys[rootMotionChannel->mNumPositionKeys - 1].mValue;
+				anim->rootTotalTranslation = Vector3(endPos.x - startPos.x, endPos.y - startPos.y, endPos.z - startPos.z);
+			}
 
-			aiQuaternion startRot = rootMotionChannel->mRotationKeys[0].mValue;
-			aiQuaternion endRot = rootMotionChannel->mRotationKeys[rootMotionChannel->mNumRotationKeys - 1].mValue;
-			aiQuaternion startInverse = startRot;
-			startInverse.Conjugate();
-			aiQuaternion deltaRot = endRot * startInverse;
-			anim->rootTotalRotation = Vector4(deltaRot.x, deltaRot.y, deltaRot.z, deltaRot.w);
+			if (rootMotionChannel->mNumRotationKeys > 0)
+			{
+				aiQuaternion startRot = rootMotionChannel->mRotationKeys[0].mValue;
+				aiQuaternion endRot = rootMotionChannel->mRotationKeys[rootMotionChannel->mNumRotationKeys - 1].mValue;
+				aiQuaternion startInverse = startRot;
+				startInverse.Conjugate();
+				aiQuaternion deltaRot = endRot * startInverse;
+				anim->rootTotalRotation = Vector4(deltaRot.x, deltaRot.y, deltaRot.z, deltaRot.w);
+			}
 
 			// std::cout << "[RootMotion Found] Bone: " << rootMotionChannel->mNodeName.C_Str() << " (ParentIdx: " << minParentIndex << ")\n";
 		}
@@ -331,8 +358,8 @@ void Converter::ReadAnimation()
 			numKeys = std::max(numKeys, aiChannel->mNumScalingKeys);
 			channel->numKeyFrames = numKeys;
 
-			Float3 scale{};
-			Float4 rotation{};
+			Float3 scale{ 1.f, 1.f, 1.f };
+			Float4 rotation{ 0.f, 0.f, 0.f, 1.f };
 			Float3 translation{};
 			for (uint32 k = 0; k < numKeys; ++k)
 			{
@@ -372,20 +399,25 @@ void Converter::ReadAnimation()
 	}
 }
 
-void Tool::Converter::WriteModelFile(const wstring& path)
+Bool Tool::Converter::WriteModelFile(const wstring& path)
 {
 	filesystem::create_directories(filesystem::path(path).parent_path());
 	ofstream out(path, std::ios::binary);
+	if (!out.is_open())
+	{
+		std::cerr << "  [Error] Failed to create model file\n";
+		return false;
+	}
 
 	/* Header */
 	MODEL_HEADER header{};
 	memcpy(header.magic, "NMDL", 4);
-	header.version = 1;
+	header.version = MODEL_VERSION;
 	header.isAnim = m_IsSkeletal;
 	header.numBones = static_cast<uint32>(m_Bones.size());
 	header.numMeshes = static_cast<uint32>(m_Meshes.size());
 	header.numMaterials = static_cast<uint32>(m_Material.size());
-	header.numAnimations = static_cast<uint32>(m_Animation.size());
+	header.numAnimations = 0;
 	out.write(BIN(&header), sizeof(header));
 
 	/* Bones */
@@ -448,39 +480,97 @@ void Tool::Converter::WriteModelFile(const wstring& path)
 		}
 	}
 
-	/* Animation */
+	out.close();
+	return out.good();
+}
+
+Bool Tool::Converter::WriteAnimationFiles(const wstring& modelPath)
+{
+	if (m_Animation.empty())
+		return true;
+
+	const filesystem::path modelFilePath{ modelPath };
+	const filesystem::path animationDirectory =
+		modelFilePath.parent_path() / (modelFilePath.stem().wstring() + L" Animation");
+
+	std::error_code errorCode;
+	filesystem::create_directories(animationDirectory, errorCode);
+	if (errorCode)
+	{
+		std::cerr << "  [Error] Failed to create animation directory: " << errorCode.message() << "\n";
+		return false;
+	}
+
+	unordered_map<string, uint32> usedNames;
 	for (uint32 i = 0; i < m_Animation.size(); ++i)
 	{
-		auto& anim = m_Animation[i];
-
-		uint32 animNameLength = static_cast<uint32>(anim->name.size());
-		out.write(BIN(&animNameLength), sizeof(uint32));
-		out.write(anim->name.data(), animNameLength);
-		out.write(BIN(&anim->duration), sizeof(Float));
-		out.write(BIN(&anim->tickPerSecond), sizeof(Float));
-		out.write(BIN(&anim->numChannel), sizeof(uint32));
-
-		out.write(BIN(&anim->rootTotalTranslation), sizeof(Vector3));
-		out.write(BIN(&anim->rootTotalRotation), sizeof(Vector4));
-
-		for (uint32 j = 0; j < m_Channels[i].size(); ++j)
+		string fileName = m_Animation[i]->name;
+		for (Char& ch : fileName)
 		{
-			auto& channel = m_Channels[i][j];
-
-			uint32 channelNameLength = static_cast<uint32>(channel->name.size());
-			out.write(BIN(&channelNameLength), sizeof(uint32));
-			out.write(channel->name.data(), channelNameLength);
-			out.write(BIN(&channel->boneIndex), sizeof(int32));
-			out.write(BIN(&channel->numKeyFrames), sizeof(uint32));
-			
-			if (channel->numKeyFrames > 0)
-			{
-				out.write(BIN(channel->keyFrames.data()), channel->numKeyFrames * sizeof(Engine::KEYFRAME));
-			}
+			const unsigned char value = static_cast<unsigned char>(ch);
+			if (value < 0x20 || ch == '<' || ch == '>' || ch == ':' || ch == '"' ||
+				ch == '/' || ch == '\\' || ch == '|' || ch == '?' || ch == '*')
+				ch = '_';
 		}
+		while (!fileName.empty() && (fileName.back() == ' ' || fileName.back() == '.'))
+			fileName.pop_back();
+		if (fileName.empty())
+			fileName = "Animation_" + std::to_string(i);
+
+		uint32& duplicateCount = usedNames[fileName];
+		const string uniqueName = duplicateCount++ == 0
+			? fileName
+			: fileName + "_" + std::to_string(duplicateCount);
+
+		const filesystem::path animationPath = animationDirectory / filesystem::path(uniqueName + ".anim");
+		if (!WriteAnimationFile(animationPath, i))
+			return false;
+	}
+
+	return true;
+}
+
+Bool Tool::Converter::WriteAnimationFile(const filesystem::path& path, uint32 animationIndex)
+{
+	if (animationIndex >= m_Animation.size() || animationIndex >= m_Channels.size())
+		return false;
+
+	ofstream out(path, std::ios::binary);
+	if (!out.is_open())
+	{
+		std::cerr << "  [Error] Failed to create animation file\n";
+		return false;
+	}
+
+	const auto& anim = m_Animation[animationIndex];
+	const auto& channels = m_Channels[animationIndex];
+
+	ANIMATION_HEADER header{};
+	memcpy(header.magic, ANIMATION_MAGIC, sizeof(header.magic));
+	header.version = ANIMATION_VERSION;
+	header.numChannels = static_cast<uint32>(channels.size());
+	out.write(BIN(&header), sizeof(header));
+
+	const uint32 animNameLength = static_cast<uint32>(anim->name.size());
+	out.write(BIN(&animNameLength), sizeof(animNameLength));
+	out.write(anim->name.data(), animNameLength);
+	out.write(BIN(&anim->duration), sizeof(anim->duration));
+	out.write(BIN(&anim->tickPerSecond), sizeof(anim->tickPerSecond));
+	out.write(BIN(&anim->rootTotalTranslation), sizeof(anim->rootTotalTranslation));
+	out.write(BIN(&anim->rootTotalRotation), sizeof(anim->rootTotalRotation));
+
+	for (const auto& channel : channels)
+	{
+		const uint32 channelNameLength = static_cast<uint32>(channel->name.size());
+		out.write(BIN(&channelNameLength), sizeof(channelNameLength));
+		out.write(channel->name.data(), channelNameLength);
+		out.write(BIN(&channel->numKeyFrames), sizeof(channel->numKeyFrames));
+		if (channel->numKeyFrames > 0)
+			out.write(BIN(channel->keyFrames.data()), channel->numKeyFrames * sizeof(Engine::KEYFRAME));
 	}
 
 	out.close();
+	return out.good();
 }
 
 int32 Converter::Get_BoneIndex(const Char* boneName)

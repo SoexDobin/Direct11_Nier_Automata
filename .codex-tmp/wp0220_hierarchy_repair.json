@@ -1,0 +1,16 @@
+{
+  "armature": "wp0220",
+  "bone": "bone0",
+  "mesh": "tuka",
+  "mesh_parent": "wp0220",
+  "armature_modifier": "Armature",
+  "armature_modifier_target": "wp0220",
+  "vertex_group": "bone0",
+  "vertex_count": 7357,
+  "weighted_vertices": 7357,
+  "min_weight": 1.0,
+  "max_weight": 1.0,
+  "world_transform_preserved": true,
+  "before_backup": "C:\\Users\\a9018\\Desktop\\Direct11_Nier_Automata\\.codex-tmp\\wp0220_before_hierarchy_fix_20260830_002139.blend",
+  "fixed_backup": "C:\\Users\\a9018\\Desktop\\Direct11_Nier_Automata\\.codex-tmp\\wp0220_hierarchy_fixed_20260830_002139.blend"
+}

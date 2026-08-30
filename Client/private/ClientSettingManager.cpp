@@ -22,7 +22,7 @@
 namespace
 {
 	constexpr size_t MaxXlsxEntrySize = 64ull * 1024ull * 1024ull;
-	constexpr uint32 MaxModelSettingRows = 100'000;
+	constexpr uint32 MaxSettingRows = 100'000;
 
 	struct XlsxArchiveCloser
 	{
@@ -63,6 +63,30 @@ namespace
 			size_t parsedLength = 0;
 			outValue = std::stof(cleaned, &parsedLength);
 			return parsedLength == cleaned.size() && std::isfinite(outValue);
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+
+	Bool TryParseExcelUint32(const string& value, uint32& outValue)
+	{
+		const string cleaned = CleanExcelCell(value);
+		if (cleaned.empty())
+			return false;
+
+		try
+		{
+			size_t parsedLength = 0;
+			const unsigned long long parsedValue = std::stoull(cleaned, &parsedLength);
+			if (parsedLength != cleaned.size() || parsedValue == 0 ||
+				parsedValue > std::numeric_limits<uint32>::max())
+			{
+				return false;
+			}
+			outValue = static_cast<uint32>(parsedValue);
+			return true;
 		}
 		catch (...)
 		{
@@ -160,7 +184,7 @@ namespace
 		return S_OK;
 	}
 
-	HRESULT FindModelsWorksheetPath(unzFile archive, string& outWorksheetPath)
+	HRESULT FindWorksheetPath(unzFile archive, const string& worksheetName, string& outWorksheetPath)
 	{
 		pugi::xml_document workbookDocument;
 		pugi::xml_document relationshipDocument;
@@ -174,7 +198,7 @@ namespace
 		const pugi::xml_node workbookRoot = workbookDocument.document_element();
 		for (const pugi::xml_node& sheet : workbookRoot.child("sheets").children("sheet"))
 		{
-			if (sheet.attribute("name").as_string() == string{ "Models" })
+			if (sheet.attribute("name").as_string() == worksheetName)
 			{
 				relationshipId = sheet.attribute("r:id").as_string();
 				break;
@@ -277,7 +301,7 @@ namespace
 		vector<string> sharedStrings;
 		string worksheetPath;
 		if (FAILED(LoadSharedStrings(archive.get(), sharedStrings)) ||
-			FAILED(FindModelsWorksheetPath(archive.get(), worksheetPath)))
+			FAILED(FindWorksheetPath(archive.get(), "Models", worksheetPath)))
 		{
 			LOG_ERROR(L"Invalid ModelSettings workbook structure or missing Models worksheet : {}", workbookPath.wstring());
 			return E_FAIL;
@@ -294,9 +318,9 @@ namespace
 		uint32 fallbackRowNumber = 0;
 		for (const pugi::xml_node& row : worksheetDocument.document_element().child("sheetData").children("row"))
 		{
-			if (rows.size() >= MaxModelSettingRows)
+			if (rows.size() >= MaxSettingRows)
 			{
-				LOG_ERROR(L"ModelSettings.xlsx exceeds the maximum row count {}", MaxModelSettingRows);
+				LOG_ERROR(L"ModelSettings.xlsx exceeds the maximum row count {}", MaxSettingRows);
 				return E_FAIL;
 			}
 
@@ -451,6 +475,169 @@ namespace
 				{"rotation", {{"x", rx}, {"y", ry}, {"z", rz}}},
 				{"scale", {{"x", sx}, {"y", sy}, {"z", sz}}},
 				{"animationPresetGuid", animationPresetGuid}
+			});
+		}
+
+		return S_OK;
+	}
+
+	HRESULT ParseTextureSettingsWorkbook(const filesystem::path& workbookPath, nlohmann::json& outJson)
+	{
+		zlib_filefunc64_def fileFunctions{};
+		fill_win32_filefunc64W(&fileFunctions);
+		XlsxArchive archive(unzOpen2_64(workbookPath.c_str(), &fileFunctions));
+		if (!archive)
+		{
+			LOG_ERROR(L"Failed to open TextureSettings workbook : {}", workbookPath.wstring());
+			return E_FAIL;
+		}
+
+		vector<string> sharedStrings;
+		string worksheetPath;
+		if (FAILED(LoadSharedStrings(archive.get(), sharedStrings)) ||
+			FAILED(FindWorksheetPath(archive.get(), "Textures", worksheetPath)))
+		{
+			LOG_ERROR(L"Invalid TextureSettings workbook structure or missing Textures worksheet : {}",
+				workbookPath.wstring());
+			return E_FAIL;
+		}
+
+		pugi::xml_document worksheetDocument;
+		if (FAILED(LoadXlsxXml(archive.get(), worksheetPath.c_str(), worksheetDocument)))
+		{
+			LOG_ERROR(L"Failed to read Textures worksheet : {}", workbookPath.wstring());
+			return E_FAIL;
+		}
+
+		vector<pair<uint32, unordered_map<size_t, string>>> rows;
+		uint32 fallbackRowNumber = 0;
+		for (const pugi::xml_node& row : worksheetDocument.document_element().child("sheetData").children("row"))
+		{
+			if (rows.size() >= MaxSettingRows)
+			{
+				LOG_ERROR(L"TextureSettings.xlsx exceeds the maximum row count {}", MaxSettingRows);
+				return E_FAIL;
+			}
+
+			const uint32 rowNumber = row.attribute("r").as_uint(++fallbackRowNumber);
+			fallbackRowNumber = max(fallbackRowNumber, rowNumber);
+			unordered_map<size_t, string> cells;
+			for (const pugi::xml_node& cell : row.children("c"))
+			{
+				const string cellReference = cell.attribute("r").as_string();
+				size_t columnIndex = 0;
+				string value;
+				if (!TryGetColumnIndex(cellReference, columnIndex) ||
+					!TryReadXlsxCell(cell, sharedStrings, value) ||
+					!cells.emplace(columnIndex, std::move(value)).second)
+				{
+					LOG_ERROR(L"Invalid or duplicate TextureSettings cell {}", Helper::To_wString(cellReference));
+					return E_FAIL;
+				}
+			}
+			rows.emplace_back(rowNumber, std::move(cells));
+		}
+
+		if (rows.empty())
+		{
+			LOG_ERROR(L"Textures worksheet is empty : {}", workbookPath.wstring());
+			return E_FAIL;
+		}
+
+		const array<string, 4> requiredHeaders{ "Level", "Tag", "Path", "Count" };
+		unordered_map<string, size_t> headerColumns;
+		const auto& [headerRowNumber, headerCells] = rows.front();
+		for (const auto& [columnIndex, headerValue] : headerCells)
+		{
+			const string normalizedHeader = ToLowerAscii(CleanExcelCell(headerValue));
+			if (!normalizedHeader.empty() && !headerColumns.emplace(normalizedHeader, columnIndex).second)
+			{
+				LOG_ERROR(L"Duplicate header {} in Textures row {}",
+					Helper::To_wString(headerValue), headerRowNumber);
+				return E_FAIL;
+			}
+		}
+		for (const string& requiredHeader : requiredHeaders)
+		{
+			if (!headerColumns.contains(ToLowerAscii(requiredHeader)))
+			{
+				LOG_ERROR(L"Missing required Textures header {}", Helper::To_wString(requiredHeader));
+				return E_FAIL;
+			}
+		}
+
+		auto getCell = [&headerColumns](const unordered_map<size_t, string>& cells, const Char* header)
+		{
+			const auto columnIt = headerColumns.find(ToLowerAscii(header));
+			if (columnIt == headerColumns.end())
+				return string{};
+			const auto cellIt = cells.find(columnIt->second);
+			return cellIt == cells.end() ? string{} : CleanExcelCell(cellIt->second);
+		};
+
+		outJson = nlohmann::json::object();
+		outJson["TextureSettings"] = nlohmann::json::array();
+		unordered_set<string> prototypeKeys;
+		for (size_t rowIndex = 1; rowIndex < rows.size(); ++rowIndex)
+		{
+			const auto& [rowNumber, cells] = rows[rowIndex];
+			Bool hasValue = false;
+			for (const auto& [columnIndex, value] : cells)
+			{
+				if (!CleanExcelCell(value).empty())
+				{
+					hasValue = true;
+					break;
+				}
+			}
+			if (!hasValue)
+				continue;
+
+			const string level = getCell(cells, "Level");
+			const string tag = getCell(cells, "Tag");
+			const string path = getCell(cells, "Path");
+			const string countText = getCell(cells, "Count");
+			if (level.empty() || tag.empty() || path.empty() || countText.empty())
+			{
+				LOG_ERROR(L"Missing required Level, Tag, Path, or Count in Textures row {}", rowNumber);
+				return E_FAIL;
+			}
+
+			LEVEL parsedLevel{};
+			uint32 count = 0;
+			if (!TryParseModelLevel(level, parsedLevel))
+			{
+				LOG_ERROR(L"Invalid Level in Textures row {} : {}", rowNumber, Helper::To_wString(level));
+				return E_FAIL;
+			}
+			if (!TryParseExcelUint32(countText, count))
+			{
+				LOG_ERROR(L"Invalid Count in Textures row {} : {}", rowNumber, Helper::To_wString(countText));
+				return E_FAIL;
+			}
+
+			const filesystem::path relativeTexturePath =
+				filesystem::path(Helper::To_wString(path)).lexically_normal();
+			if (relativeTexturePath.empty() || relativeTexturePath.is_absolute() ||
+				relativeTexturePath.has_root_name() || *relativeTexturePath.begin() == L"..")
+			{
+				LOG_ERROR(L"Invalid Texture Path in Textures row {} : {}", rowNumber, Helper::To_wString(path));
+				return E_FAIL;
+			}
+
+			const string prototypeKey = std::to_string(ETOI(parsedLevel)) + "\n" + tag;
+			if (!prototypeKeys.insert(prototypeKey).second)
+			{
+				LOG_ERROR(L"Duplicate Texture prototype Tag in Textures row {} : {}",
+					rowNumber, Helper::To_wString(tag));
+				return E_FAIL;
+			}
+
+			outJson["TextureSettings"].push_back({
+				{"level", level},
+				{"tag", tag},
+				{"path", path},
+				{"count", count}
 			});
 		}
 
@@ -636,52 +823,37 @@ HRESULT ClientSettingManager::Load_Textures_FromJson(LEVEL baseLevel) const
 	return S_OK;
 }
 
-HRESULT ClientSettingManager::Sync_TextureJson_FromCSV() const
+HRESULT ClientSettingManager::Sync_TextureJson_FromExcel() const
 {
-	wstring csvPath = m_ResourcePath + L"TextureSettings.csv";
-
-	// CSV가 없을 경우 템플릿 생성
-	if (!filesystem::exists(csvPath))
+	const filesystem::path workbookPath = filesystem::path(m_ProjectSettingPath) / L"TextureSettings.xlsx";
+	const filesystem::path jsonPath = filesystem::path(m_ProjectSettingPath) / L"TextureSettings.json";
+	if (!filesystem::exists(workbookPath))
 	{
-		std::ofstream outFile(csvPath);
-		if (outFile.is_open()) {
-			// 헤더 및 템플릿 행 작성
-			outFile << "Level, Tag, Path, Count" << std::endl;
-			outFile << "STATIC, Prototype_Component_Texture_Default, Default/Default.dds, 1" << std::endl;
-			outFile.close();
+		if (filesystem::exists(jsonPath))
+		{
+			LOG_WARN(L"TextureSettings.xlsx is missing; using the existing TextureSettings.json cache");
+			return S_FALSE;
 		}
-		LOG_INFO(L"Created Template TextureSettings.csv: {}", csvPath);
+		LOG_ERROR(L"TextureSettings.xlsx and TextureSettings.json are both missing : {}", m_ProjectSettingPath);
+		return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
 	}
 
-	if (!filesystem::exists(csvPath)) return S_OK;
-
-	ifstream csvFile(csvPath);
 	nlohmann::json jsonRoot;
-	string line;
-
-	getline(csvFile, line);
-	while (getline(csvFile, line))
+	if (FAILED(ParseTextureSettingsWorkbook(workbookPath, jsonRoot)))
 	{
-		if (line.empty()) continue;
-
-		stringstream stream(line);
-		string level, tag, path, count;
-		getline(stream, level, ',');
-		getline(stream, tag, ',');
-		getline(stream, path, ',');
-		getline(stream, count);
-
-		jsonRoot["TextureSettings"].push_back({
-			{"level", Helper::Trim(level)},
-			{"tag", Helper::Trim(tag)},
-			{"path", Helper::Trim(path)},
-			{"count", stoi(Helper::Trim(count))},
-			});
+		LOG_ERROR(L"Failed to synchronize TextureSettings.xlsx : {}", workbookPath.wstring());
+		return E_FAIL;
 	}
 
-	ofstream jsonFile(m_ProjectSettingPath + L"TextureSettings.json");
-	jsonFile << jsonRoot.dump(4);
+	const HRESULT writeResult = WriteJsonAtomically(jsonPath, jsonRoot);
+	if (FAILED(writeResult))
+	{
+		LOG_ERROR(L"Failed to replace TextureSettings.json from workbook : {}", jsonPath.wstring());
+		return writeResult;
+	}
 
+	LOG_INFO(L"Synchronized {} Texture settings from {}",
+		jsonRoot["TextureSettings"].size(), workbookPath.wstring());
 	return S_OK;
 }
 

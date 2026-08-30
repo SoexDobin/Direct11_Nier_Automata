@@ -98,11 +98,13 @@ HRESULT Loader::Loading() {
 HRESULT Loader::Loading_For_TitleLevel() {
 	m_isFinished = false;
 
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::TITLE))) {
-            LOG_ERROR(L"Failed to Load TITLE Textures");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromExcel())) {
+        LOG_ERROR(L"Failed to synchronize TITLE Texture settings from Excel");
+        return E_FAIL;
+    }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::TITLE))) {
+        LOG_ERROR(L"Failed to Load TITLE Textures");
+        return E_FAIL;
     }
     if (FAILED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromExcel())) {
         LOG_ERROR(L"Failed to synchronize TITLE Model settings from Excel");
@@ -129,11 +131,13 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
 
     if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
         return E_FAIL;
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::GAMEPLAY))) {
-            LOG_ERROR(L"Failed to Load GAMEPLAY Textures");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromExcel())) {
+        LOG_ERROR(L"Failed to synchronize GAMEPLAY Texture settings from Excel");
+        return E_FAIL;
+    }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::GAMEPLAY))) {
+        LOG_ERROR(L"Failed to Load GAMEPLAY Textures");
+        return E_FAIL;
     }
     if (FAILED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromExcel())) {
         LOG_ERROR(L"Failed to synchronize GAMEPLAY Model settings from Excel");
@@ -171,11 +175,13 @@ HRESULT Loader::Loading_Global_Prototype()
 
     if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()))
         return E_FAIL;
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::STATIC))) {
-            LOG_ERROR(L"Failed to Load Textures");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromExcel())) {
+        LOG_ERROR(L"Failed to synchronize STATIC Texture settings from Excel");
+        return E_FAIL;
+    }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::STATIC))) {
+        LOG_ERROR(L"Failed to Load Textures");
+        return E_FAIL;
     }
     if (FAILED(ClientSettingManager::GetInstance()->Sync_ModelJson_FromExcel())) {
         LOG_ERROR(L"Failed to synchronize STATIC Model settings from Excel");

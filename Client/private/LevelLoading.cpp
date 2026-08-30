@@ -30,18 +30,18 @@ HRESULT LevelLoading::Initialize(void *arg) {
     m_NextLevel = desc.nextLevelID;
     m_IsLoadStatic = desc.loadStatic;
 
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::LOADING)))
-        {
-            LOG_ERROR(L"Failed to load Loading Texture");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromExcel())) {
+        LOG_ERROR(L"Failed to synchronize Texture settings from Excel");
+        return E_FAIL;
     }
-    if (SUCCEEDED(ClientSettingManager::GetInstance()->Sync_TextureJson_FromCSV())) {
-        if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::STATIC))) {
-            LOG_ERROR(L"Failed to Load Textures");
-            return E_FAIL;
-        }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::LOADING)))
+    {
+        LOG_ERROR(L"Failed to load Loading Texture");
+        return E_FAIL;
+    }
+    if (FAILED(ClientSettingManager::GetInstance()->Load_Textures_FromJson(LEVEL::STATIC))) {
+        LOG_ERROR(L"Failed to Load Textures");
+        return E_FAIL;
     }
 
     if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::LOADING)))

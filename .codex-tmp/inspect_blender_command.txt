@@ -1,0 +1,1 @@
+exec(compile(open(r"C:\Users\a9018\Desktop\Direct11_Nier_Automata\.codex-tmp\inspect_blender_hierarchy.py", encoding="utf-8").read(), "inspect_blender_hierarchy.py", "exec"))

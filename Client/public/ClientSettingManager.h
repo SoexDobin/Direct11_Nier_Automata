@@ -19,7 +19,7 @@ public: /* Project Path */
 
 public: /* Texture */
 	HRESULT Load_Textures_FromJson(LEVEL level) const;
-	HRESULT Sync_TextureJson_FromCSV() const;
+	HRESULT Sync_TextureJson_FromExcel() const;
 
 public: /* Model */
 	HRESULT Load_Model_FromJson(LEVEL level) const;

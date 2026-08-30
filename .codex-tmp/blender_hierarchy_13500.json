@@ -1,0 +1,242 @@
+{
+  "pid": 13500,
+  "blend_filepath": "C:\\Users\\a9018\\Desktop\\Direct11_Nier_Automata\\.codex-tmp\\wp0220_hierarchy_fixed_20260830_002139.blend",
+  "scene": "Scene",
+  "active_object": "wp0220",
+  "selected_objects": [],
+  "objects": [
+    {
+      "name": "wp0220",
+      "type": "ARMATURE",
+      "parent": null,
+      "parent_type": "OBJECT",
+      "parent_bone": "",
+      "children": [
+        "tuka"
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "matrix_parent_inverse": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "modifiers": [],
+      "vertex_groups": [],
+      "action": null
+    },
+    {
+      "name": "tuka",
+      "type": "MESH",
+      "parent": "wp0220",
+      "parent_type": "OBJECT",
+      "parent_bone": "",
+      "children": [],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "matrix_parent_inverse": [
+        [
+          1.0,
+          -0.0,
+          0.0,
+          -0.0
+        ],
+        [
+          -0.0,
+          1.0,
+          -0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.0,
+          1.0,
+          -0.0
+        ],
+        [
+          -0.0,
+          0.0,
+          -0.0,
+          1.0
+        ]
+      ],
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_euler": [
+        0.0,
+        -0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "modifiers": [
+        {
+          "name": "Armature",
+          "type": "ARMATURE",
+          "object": "wp0220",
+          "use_vertex_groups": true,
+          "use_bone_envelopes": false
+        }
+      ],
+      "vertex_groups": [
+        {
+          "name": "bone0",
+          "vertex_count": 7357,
+          "min_weight": 1.0,
+          "max_weight": 1.0,
+          "mean_weight": 1.0
+        }
+      ],
+      "action": null
+    }
+  ],
+  "armatures": [
+    {
+      "object": "wp0220",
+      "data": "wp0220Amt",
+      "parent": null,
+      "children": [
+        "tuka"
+      ],
+      "display_type": "OCTAHEDRAL",
+      "action": null,
+      "bones": [
+        {
+          "name": "bone0",
+          "parent": null,
+          "children": [],
+          "use_connect": false,
+          "head_local": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "tail_local": [
+            0.0,
+            0.0,
+            0.10000000149011612
+          ],
+          "matrix_local": [
+            [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              -1.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": []
+}

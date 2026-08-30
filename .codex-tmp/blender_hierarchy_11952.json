@@ -1,0 +1,222 @@
+{
+  "pid": 11952,
+  "blend_filepath": "",
+  "scene": "Scene",
+  "active_object": "wp0220",
+  "selected_objects": [],
+  "objects": [
+    {
+      "name": "wp0220",
+      "type": "ARMATURE",
+      "parent": null,
+      "parent_type": "OBJECT",
+      "parent_bone": "",
+      "children": [],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "matrix_parent_inverse": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "modifiers": [],
+      "vertex_groups": [],
+      "action": null
+    },
+    {
+      "name": "tuka",
+      "type": "MESH",
+      "parent": null,
+      "parent_type": "OBJECT",
+      "parent_bone": "",
+      "children": [],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "matrix_parent_inverse": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_mode": "XYZ",
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "modifiers": [],
+      "vertex_groups": [],
+      "action": null
+    }
+  ],
+  "armatures": [
+    {
+      "object": "wp0220",
+      "data": "wp0220Amt",
+      "parent": null,
+      "children": [],
+      "display_type": "OCTAHEDRAL",
+      "action": null,
+      "bones": [
+        {
+          "name": "bone0",
+          "parent": null,
+          "children": [],
+          "use_connect": false,
+          "head_local": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "tail_local": [
+            0.0,
+            0.0,
+            0.10000000149011612
+          ],
+          "matrix_local": [
+            [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              -1.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": []
+}

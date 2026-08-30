@@ -438,3 +438,8 @@ FodyWeavers.xsd
 **/[Bb]in/**/Engine.dll
 **/[Bb]in/**/Editor.exe
 **/[Bb]in/**/Launcher.exe
+
+# Large source model files stay local; commit converted/runtime assets only.
+*.[Ff][Bb][Xx]
+*.[Bb][Ll][Ee][Nn][Dd]
+*.[Bb][Ll][Ee][Nn][Dd][0-9]*

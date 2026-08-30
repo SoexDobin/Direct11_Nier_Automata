@@ -1,0 +1,1 @@
+exec(compile(open(r"C:\Users\a9018\Desktop\Direct11_Nier_Automata\.codex-tmp\repair_wp0220_hierarchy.py", encoding="utf-8").read(), "repair_wp0220_hierarchy.py", "exec"))

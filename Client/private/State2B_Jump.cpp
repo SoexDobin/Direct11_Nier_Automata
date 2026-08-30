@@ -32,7 +32,7 @@ Bool State2B_Jump::StateEnterInvoke()
 	JumpScalar = 15.f;
 	m_Movement.lock()->Add_Force(Vector3(0.f, JumpScalar, 0.f));
 
-	switch (auto prevState = m_States.lock()->Get_CurP10000State())
+	switch (auto prevState = m_States.lock()->Get_CurPl0000State())
 	{
 	case Pl0000::PL0000_STATE::IDLE:
 		pl0000->Set_Animation(ETOI(Pl0000::PL0000_STATE::STAND_TO_JUMP), 0.2f, false);

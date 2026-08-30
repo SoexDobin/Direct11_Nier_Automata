@@ -131,7 +131,7 @@ HRESULT Pl0000Body::Ready_Components()
 	if (nullptr == m_Shader)
 		return E_FAIL;
 
-	Model::MODEL_DESC modelDesc{ L"p10000" };
+	Model::MODEL_DESC modelDesc{ L"pl0000" };
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;

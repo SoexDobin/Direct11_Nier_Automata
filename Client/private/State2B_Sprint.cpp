@@ -32,7 +32,7 @@ Bool State2B_Sprint::StateEnterInvoke()
 {
 	auto pl0000 = m_Body.lock();
 	auto input = m_Input.lock();
-	auto stateIndex = m_States.lock()->Get_CurP10000State();
+	auto stateIndex = m_States.lock()->Get_CurPl0000State();
 
 	m_LockedDirection = Calculate_Direction();
 	if (stateIndex == Pl0000::PL0000_STATE::JUMP)

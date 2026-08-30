@@ -314,7 +314,7 @@
     <ClCompile Include="..\private\Pl0000Input.cpp" />
     <ClCompile Include="..\private\Pl0000MonsterChecker.cpp" />
     <ClCompile Include="..\private\Pl0000Parts.cpp" />
-    <ClCompile Include="..\private\P10000StateMachine.cpp" />
+    <ClCompile Include="..\private\Pl0000StateMachine.cpp" />
     <ClCompile Include="..\private\Pl0000Movement.cpp" />
     <ClCompile Include="..\private\Pl0000Shockwave.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />

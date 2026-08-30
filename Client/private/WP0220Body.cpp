@@ -31,7 +31,7 @@ HRESULT WP0220Body::Initialize(void* arg)
 
 	if (FAILED(Ready_Components()))
 	{
-		LOG_ERROR(L"Failed To Ready_Components : P10000Body");
+		LOG_ERROR(L"Failed To Ready_Components : WP0220Body");
 		return E_FAIL;
 	}
 

@@ -165,7 +165,7 @@ void Pl0000::On_Destroy()
 
 void Pl0000::Priority_Update(Float timeDelta)
 {
-	m_Pl0000Input->Update_P10000_InputState(timeDelta);
+	m_Pl0000Input->Update_Pl0000_InputState(timeDelta);
 }
 
 void Pl0000::Update(Float timeDelta)
@@ -274,7 +274,7 @@ void Pl0000::OnAttackHit(const Shared<GameObject>& target)
 
 Bool Pl0000::TryEvade(const Shared<GameObject>& attacker)
 {
-	if (m_Pl0000States->Get_CurP10000State() != PL0000_STATE::EVADE)
+	if (m_Pl0000States->Get_CurPl0000State() != PL0000_STATE::EVADE)
 		return false;
 
 	auto dashState = static_pointer_cast<State2B_Evade>(

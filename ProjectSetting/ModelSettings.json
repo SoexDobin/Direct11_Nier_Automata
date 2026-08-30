@@ -2,7 +2,7 @@
     "ModelSettings": [
         {
             "level": "3",
-            "path": "Models/p10000/p10000.model",
+            "path": "Models/pl0000/pl0000.model",
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -18,7 +18,7 @@
                 "y": 0.009999999776482582,
                 "z": 0.009999999776482582
             },
-            "tag": "p10000"
+            "tag": "pl0000"
         },
         {
             "level": "3",

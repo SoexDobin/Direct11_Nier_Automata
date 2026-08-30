@@ -43,7 +43,7 @@ void Pl0000Input::On_Enable()
 // ===================================================================
 // 매 프레임 갱신
 // ===================================================================
-void Pl0000Input::Update_P10000_InputState(Float timeDelta)
+void Pl0000Input::Update_Pl0000_InputState(Float timeDelta)
 {
 	if (!Is_Active() || !GAME_INSTANCE->Get_InputEnabled()) return;
 
@@ -51,7 +51,7 @@ void Pl0000Input::Update_P10000_InputState(Float timeDelta)
 	for (uint32 i = 0; i < KEY_MAX; ++i)
 	{
 		Byte rawState = GAME_INSTANCE->Get_DIKeyState(static_cast<uByte>(i));
-		Update_P10000_KeyState(rawState, m_KeyInfos[i], timeDelta);
+		Update_Pl0000_KeyState(rawState, m_KeyInfos[i], timeDelta);
 	}
 
 	// --- 마우스 버튼 + 콤보 큐 ---
@@ -59,7 +59,7 @@ void Pl0000Input::Update_P10000_InputState(Float timeDelta)
 	{
 		DIMB buttonID = static_cast<DIMB>(i);
 		Byte rawState = GAME_INSTANCE->Get_DIMouseState(buttonID);
-		Update_P10000_KeyState(rawState, m_MouseInfos[i], timeDelta);
+		Update_Pl0000_KeyState(rawState, m_MouseInfos[i], timeDelta);
 
 		// DOWN 이 발생한 프레임에만 큐에 적재
 		if (m_MouseInfos[i].state == KEY_STATE::DOWN)
@@ -90,7 +90,7 @@ void Pl0000Input::Update_P10000_InputState(Float timeDelta)
 // ===================================================================
 // 키 상태 전이 (DOWN → PRESSED → UP → NONE)
 // ===================================================================
-void Pl0000Input::Update_P10000_KeyState(Byte rawState, INPUT_INFO &outInfo, Float timeDelta)
+void Pl0000Input::Update_Pl0000_KeyState(Byte rawState, INPUT_INFO &outInfo, Float timeDelta)
 {
 	Bool isPressed = (rawState & 0x80) != 0;
 

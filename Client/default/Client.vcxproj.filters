@@ -86,7 +86,7 @@
       <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Pl0000Body.h">
-      <Filter>02. GameObject\Entity\2B\2BPartObject\P10000</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\Pl0000</Filter>
     </ClInclude>
     <ClInclude Include="..\public\WP0070Body.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
@@ -332,7 +332,7 @@
       <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000Body.cpp">
-      <Filter>02. GameObject\Entity\2B\2BPartObject\P10000</Filter>
+      <Filter>02. GameObject\Entity\2B\2BPartObject\Pl0000</Filter>
     </ClCompile>
     <ClCompile Include="..\private\WP0070Body.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
@@ -358,7 +358,7 @@
     <ClCompile Include="..\private\State2B.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\P10000StateMachine.cpp">
+    <ClCompile Include="..\private\Pl0000StateMachine.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates\StateMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000Parts.cpp">
@@ -556,7 +556,7 @@
     <Filter Include="02. GameObject\Entity\2B\2BPartObject">
       <UniqueIdentifier>{860aeb7a-a17a-405c-af57-46faf234f476}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Entity\2B\2BPartObject\P10000">
+    <Filter Include="02. GameObject\Entity\2B\2BPartObject\Pl0000">
       <UniqueIdentifier>{7099d284-19b5-4ec7-85c0-7a5e1e9b45b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\Entity\2B\2BPartObject\WP0070">

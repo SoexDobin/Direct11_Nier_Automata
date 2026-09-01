@@ -28,6 +28,8 @@ xcopy /Y /I "..\bin\Engine.dll"						"..\..\Client\bin\"
 xcopy /Y /I "..\bin\Engine.dll"						"..\..\Editor\bin\"
 xcopy /Y /I	"..\bin\shaders\*.hlsli*"				"..\..\Client\bin\shaders\"
 xcopy /Y /I	"..\bin\shaders\*.hlsl*"				"..\..\Client\bin\shaders\"
+xcopy /Y /I	"..\bin\shaders\*.hlsli*"				"..\..\Editor\bin\shaders\"
+xcopy /Y /I	"..\bin\shaders\*.hlsl*"				"..\..\Editor\bin\shaders\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Client\bin\"
 xcopy /Y /I /E "..\external\FMOD\*.dll*"			"..\..\Editor\bin\"
 echo =================================================

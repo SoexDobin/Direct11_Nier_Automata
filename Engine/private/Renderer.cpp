@@ -87,7 +87,7 @@ HRESULT Renderer::Initialize(void *arg) {
 		return E_FAIL;
 
 	m_Buffer = VIBuffer_Rect::Create(m_Device, m_Context);
-	m_Shader = Shader::Create(m_Device, m_Context, L"../../Client/bin/shaders/DeferredShader.hlsl", VTXTEX::Elements, VTXTEX::numElements);
+	m_Shader = Shader::Create(m_Device, m_Context, L"shaders/DeferredShader.hlsl", VTXTEX::Elements, VTXTEX::numElements);
 
 	m_WorldMatrix = Matrix::CreateScale(viewportDesc.Width, viewportDesc.Height, 1.f);
 	m_ViewMatrix = Matrix::Identity;

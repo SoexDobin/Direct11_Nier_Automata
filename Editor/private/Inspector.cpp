@@ -141,6 +141,12 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
 
     ImGui::Separator();
 
+	if (!GAME_INSTANCE->Get_ReflectedProperties(*obj).empty()) {
+		if (ImGui::CollapsingHeader("Properties", ImGuiTreeNodeFlags_DefaultOpen))
+			RenderGenericProperties(*obj);
+		ImGui::Separator();
+	}
+
     // Camera 렌더링 (Camera는 Component가 아니라 GameObject를 상속받음)
     if (obj->Get_GameObjectType() == GAMEOBJECTTYPE::CAMERA && m_InspectorCamera) {
         m_InspectorCamera->RenderCamera(obj);
@@ -231,9 +237,34 @@ void Inspector::RenderGenericProperties(Object& object)
 				changed = ImGui::InputInt(property.registeredName.c_str(), typed);
 			break;
 		case REFLECTION_VALUE_TYPE::UINT32:
-			if (uint32* typed = value.Try_Get<uint32>())
-				changed = ImGui::InputScalar(property.registeredName.c_str(),
-					ImGuiDataType_U32, typed);
+			if (uint32* typed = value.Try_Get<uint32>()) {
+				if (property.saveDataKey == Save_Data_Key::UIAnchor) {
+					static constexpr array<const Char*, 9> AnchorNames = {
+						"Top Left", "Top Center", "Top Right",
+						"Center Left", "Center", "Center Right",
+						"Bottom Left", "Bottom Center", "Bottom Right"
+					};
+					const Char* preview = *typed < AnchorNames.size()
+						? AnchorNames[*typed]
+						: "Invalid";
+					if (ImGui::BeginCombo(property.registeredName.c_str(), preview)) {
+						for (uint32 index = 0; index < AnchorNames.size(); ++index) {
+							const Bool selected = *typed == index;
+							if (ImGui::Selectable(AnchorNames[index], selected)) {
+								*typed = index;
+								changed = true;
+							}
+							if (selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+				}
+				else {
+					changed = ImGui::InputScalar(property.registeredName.c_str(),
+						ImGuiDataType_U32, typed);
+				}
+			}
 			break;
 		case REFLECTION_VALUE_TYPE::FLOAT:
 			if (Float* typed = value.Try_Get<Float>())

@@ -269,6 +269,40 @@ HRESULT GameObject::Remove_Child(const Shared<GameObject> &child) {
     return S_OK;
 }
 
+HRESULT GameObject::Reorder_Child(const Shared<GameObject>& child, size_t targetIndex) {
+    if (!child || child->m_Parent.lock().get() != this ||
+        !child->m_StableChildKey.empty() || targetIndex >= m_Children.size())
+        return E_INVALIDARG;
+
+    const auto currentIt = find(m_Children.begin(), m_Children.end(), child);
+    if (currentIt == m_Children.end())
+        return E_FAIL;
+
+    const size_t currentIndex = static_cast<size_t>(distance(m_Children.begin(), currentIt));
+    if (currentIndex == targetIndex)
+        return S_FALSE;
+
+    Shared<GameObject> moving = *currentIt;
+    m_Children.erase(currentIt);
+    m_Children.insert(m_Children.begin() + targetIndex, std::move(moving));
+    return S_OK;
+}
+
+HRESULT GameObject::Get_ChildIndex(ObjectGuid childGuid, size_t& outIndex) const {
+    outIndex = numeric_limits<size_t>::max();
+    if (!childGuid.Is_Valid())
+        return E_INVALIDARG;
+
+    const auto it = find_if(m_Children.begin(), m_Children.end(), [childGuid](const auto& child) {
+        return child && child->Get_ObjectGuid() == childGuid;
+    });
+    if (it == m_Children.end())
+        return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+
+    outIndex = static_cast<size_t>(distance(m_Children.begin(), it));
+    return S_OK;
+}
+
 Shared<GameObject> GameObject::Get_Parent() const {
     if (m_Parent.expired())
 		return nullptr;

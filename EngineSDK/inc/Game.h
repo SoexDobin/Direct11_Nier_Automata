@@ -219,6 +219,12 @@ public: /* For LevelSerialize */
 		const Shared<GameObject>& selectedRoot, uint32 levIndex = UINT_MAX) const;
 	HRESULT DeSerializePrefabDocument(PrefabGuid prefabGuid,
 		Shared<GameObject>& outRoot, uint32 levIndex = UINT_MAX) const;
+	HRESULT SerializeSubtreeSnapshot(PrefabGuid snapshotGuid,
+		const Shared<GameObject>& selectedRoot, string& outSnapshot,
+		uint32 levIndex = UINT_MAX) const;
+	HRESULT DeSerializeSubtreeSnapshot(PrefabGuid snapshotGuid,
+		const string& snapshot, Bool preserveObjectGuids,
+		Shared<GameObject>& outRoot, uint32 levIndex = UINT_MAX) const;
 	ObjectGuid Consume_RestoredObjectGuid() const;
 
 public: /* For FontManager */

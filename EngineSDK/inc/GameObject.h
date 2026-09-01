@@ -78,6 +78,8 @@ public:
     HRESULT Add_Child(uint32 prototypeLevIndex, const wstring& registeredName,
         const wstring& stableChildKey, void* arg = nullptr);
     HRESULT Remove_Child(const Shared<GameObject> &child);
+	HRESULT Reorder_Child(const Shared<GameObject>& child, size_t targetIndex);
+	HRESULT Get_ChildIndex(ObjectGuid childGuid, size_t& outIndex) const;
     Shared<GameObject> Get_Parent() const;
     const vector<Shared<GameObject>> &Get_Children() const;
     Shared<GameObject> Find_Child(ObjectGuid objectGuid) const;

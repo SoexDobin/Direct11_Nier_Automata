@@ -772,6 +772,27 @@ HRESULT Game::DeSerializePrefabDocument(PrefabGuid prefabGuid,
 	return m_PrefabManager->DeSerializePrefabDocument(prefabGuid, targetLevel, outRoot);
 }
 
+HRESULT Game::SerializeSubtreeSnapshot(PrefabGuid snapshotGuid,
+	const Shared<GameObject>& selectedRoot, string& outSnapshot, uint32 levIndex) const
+{
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? Get_CurrentLevelIndex()
+		: levIndex;
+	return m_LevelSerializer->SerializeSubtreeSnapshot(
+		snapshotGuid, targetLevel, selectedRoot, outSnapshot);
+}
+
+HRESULT Game::DeSerializeSubtreeSnapshot(PrefabGuid snapshotGuid,
+	const string& snapshot, Bool preserveObjectGuids,
+	Shared<GameObject>& outRoot, uint32 levIndex) const
+{
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? Get_CurrentLevelIndex()
+		: levIndex;
+	return m_LevelSerializer->DeSerializeSubtreeSnapshot(
+		snapshotGuid, targetLevel, snapshot, preserveObjectGuids, outRoot);
+}
+
 ObjectGuid Game::Consume_RestoredObjectGuid() const
 {
 	return m_PrefabManager->Consume_RestoredObjectGuid();

@@ -18,12 +18,18 @@ public:
 		const Shared<GameObject>& selectedRoot, const wstring& filePath);
 	HRESULT DeSerializePrefab(PrefabGuid prefabGuid, uint32 levIndex,
 		const wstring& filePath, Shared<GameObject>& outRoot);
+	HRESULT SerializeSubtreeSnapshot(PrefabGuid snapshotGuid, uint32 levIndex,
+		const Shared<GameObject>& selectedRoot, string& outSnapshot);
+	HRESULT DeSerializeSubtreeSnapshot(PrefabGuid snapshotGuid, uint32 levIndex,
+		const string& snapshot, Bool preserveObjectGuids, Shared<GameObject>& outRoot);
 
 private:
 	HRESULT SerializeDocument(uint32 levIndex, const wstring& filePath,
-		const Shared<GameObject>& selectedRoot, PrefabGuid prefabGuid);
+		const Shared<GameObject>& selectedRoot, PrefabGuid prefabGuid,
+		string* outSnapshot = nullptr);
 	HRESULT DeSerializeDocument(const wstring& filePath, uint32 targetLevel,
-		PrefabGuid prefabGuid, Shared<GameObject>* outRoot);
+		PrefabGuid prefabGuid, Shared<GameObject>* outRoot,
+		Bool preserveObjectGuids = false, const string* snapshot = nullptr);
 
 	static string ToUtf8(const wstring& ws);
 	static wstring FromUtf8(const string& s);

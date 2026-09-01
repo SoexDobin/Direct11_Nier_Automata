@@ -58,6 +58,7 @@ namespace Engine
 		inline constexpr SaveDataKey TextureTag			= "TextureTag";
 		inline constexpr SaveDataKey ModelTag			= "ModelTag";
 		inline constexpr SaveDataKey AnimationPreset	= "AnimationPreset";
+		inline constexpr SaveDataKey UIAnchor			= "UIAnchor";
 	}
 
 }

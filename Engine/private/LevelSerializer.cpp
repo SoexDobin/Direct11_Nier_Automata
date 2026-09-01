@@ -242,8 +242,27 @@ HRESULT LevelSerializer::SerializePrefab(PrefabGuid prefabGuid, uint32 levIndex,
 	return SerializeDocument(levIndex, filePath, selectedRoot, prefabGuid);
 }
 
+HRESULT LevelSerializer::SerializeSubtreeSnapshot(PrefabGuid snapshotGuid, uint32 levIndex,
+	const Shared<GameObject>& selectedRoot, string& outSnapshot)
+{
+	outSnapshot.clear();
+	if (!snapshotGuid.Is_Valid() || !selectedRoot)
+		return E_INVALIDARG;
+	return SerializeDocument(levIndex, L"", selectedRoot, snapshotGuid, &outSnapshot);
+}
+
+HRESULT LevelSerializer::DeSerializeSubtreeSnapshot(PrefabGuid snapshotGuid, uint32 levIndex,
+	const string& snapshot, Bool preserveObjectGuids, Shared<GameObject>& outRoot)
+{
+	outRoot.reset();
+	if (!snapshotGuid.Is_Valid() || levIndex == UINT_MAX || snapshot.empty())
+		return E_INVALIDARG;
+	return DeSerializeDocument(L"", levIndex, snapshotGuid, &outRoot,
+		preserveObjectGuids, &snapshot);
+}
+
 HRESULT LevelSerializer::SerializeDocument(uint32 levIndex, const wstring& filePath,
-	const Shared<GameObject>& selectedRoot, PrefabGuid prefabGuid)
+	const Shared<GameObject>& selectedRoot, PrefabGuid prefabGuid, string* outSnapshot)
 {
 	nlohmann::json root;
 	root["schemaVersion"] = SceneSchemaVersion;
@@ -418,9 +437,14 @@ HRESULT LevelSerializer::SerializeDocument(uint32 levIndex, const wstring& fileP
 
 	try
 	{
-		const HRESULT writeResult = WriteJsonAtomically(filesystem::path(filePath), root);
-		if (FAILED(writeResult))
-			return writeResult;
+		if (outSnapshot)
+			*outSnapshot = root.dump(2);
+		else
+		{
+			const HRESULT writeResult = WriteJsonAtomically(filesystem::path(filePath), root);
+			if (FAILED(writeResult))
+				return writeResult;
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -450,7 +474,8 @@ HRESULT LevelSerializer::DeSerializePrefab(PrefabGuid prefabGuid, uint32 levInde
 }
 
 HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 targetLevel,
-	PrefabGuid prefabGuid, Shared<GameObject>* outRoot)
+	PrefabGuid prefabGuid, Shared<GameObject>* outRoot,
+	Bool preserveObjectGuids, const string* snapshot)
 {
 	const Bool instantiatePrefab = prefabGuid.Is_Valid();
 	if (outRoot)
@@ -458,10 +483,15 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 	nlohmann::json root;
 	try
 	{
-		std::ifstream file(filePath);
-		if (!file.is_open()) return E_FAIL;
-		file >> root;
-		file.close();
+		if (snapshot)
+			root = nlohmann::json::parse(*snapshot);
+		else
+		{
+			std::ifstream file(filePath);
+			if (!file.is_open()) return E_FAIL;
+			file >> root;
+			file.close();
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -685,7 +715,8 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 	const auto RestoreObject = [&](auto&& self,
 		ObjectGuid savedObjectGuid,
 		const Shared<GameObject>& object) -> Bool {
-		if (!object || (!instantiatePrefab && object->Get_ObjectGuid() != savedObjectGuid))
+		if (!object || ((!instantiatePrefab || preserveObjectGuids) &&
+			object->Get_ObjectGuid() != savedObjectGuid))
 			return false;
 
 		const nlohmann::json& objectJson = root["objects"][objectKeys.at(savedObjectGuid)];
@@ -731,7 +762,7 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 				if (!child || child->Get_Parent() != object ||
 					child->Get_StableChildKey() != stableChildKey ||
 					!derivedChildGuid.Is_Valid() || child->Get_ObjectGuid() != derivedChildGuid ||
-					(!instantiatePrefab && derivedChildGuid != savedChildGuid) ||
+					((!instantiatePrefab || preserveObjectGuids) && derivedChildGuid != savedChildGuid) ||
 					GAME_INSTANCE->Find_RegisteredName(child->Get_RuntimeTypeId()) != childTypeName) {
 					LOG_ERROR(L"[SceneSerializer] Factory child structure mismatch {}", stableChildKey);
 					return false;
@@ -747,7 +778,7 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 
 				child = GAME_INSTANCE->Instantiate_GameObject(
 					childTypeName, levelIndex, nullptr,
-					instantiatePrefab ? ObjectGuid{} : savedChildGuid);
+					(instantiatePrefab && !preserveObjectGuids) ? ObjectGuid{} : savedChildGuid);
 				if (!child || FAILED(object->Add_Child(child, L"", childIndex))) {
 					LOG_ERROR(L"[SceneSerializer] Failed to create Editor child {}", FromUtf8(childTypeName));
 					return false;
@@ -773,7 +804,7 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 		const string rootTypeName = rootJson["typeName"].get<string>();
 		const Shared<GameObject> rootObject = GAME_INSTANCE->Instantiate_GameObject(
 			rootTypeName, levelIndex, nullptr,
-			instantiatePrefab ? ObjectGuid{} : rootGuid);
+			(instantiatePrefab && !preserveObjectGuids) ? ObjectGuid{} : rootGuid);
 		if (rootObject)
 			createdRoots.push_back(rootObject);
 		if (!rootObject || !RestoreObject(RestoreObject, rootGuid, rootObject)) {

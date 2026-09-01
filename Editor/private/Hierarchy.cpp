@@ -72,7 +72,7 @@ void Hierarchy::Render(Bool isResize) {
             Shared<GameObject> draggedObj = GAME_INSTANCE->Find(move.objectGuid);
             if (draggedObj)
             {
-                if (!draggedObj->Get_StableChildKey().empty())
+                if (!EDITOR->Can_EditHierarchy(draggedObj))
                 {
                     LOG_WARN(L"[Hierarchy] Code-defined child cannot be moved to Root: {}", draggedObj->Get_Name());
                 }
@@ -90,15 +90,8 @@ void Hierarchy::Render(Bool isResize) {
 
 void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
     const auto& children = pObj->Get_Children();
-    Bool hasCodeDefinedStructure = !pObj->Get_StableChildKey().empty();
-    for (const auto& child : children)
-    {
-        if (child && !child->Get_StableChildKey().empty())
-        {
-            hasCodeDefinedStructure = true;
-            break;
-        }
-    }
+	const Bool canEditNode = EDITOR->Can_EditHierarchy(pObj);
+	const Bool canEditChildren = EDITOR->Can_EditChildren(pObj);
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -122,8 +115,32 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
         reinterpret_cast<void *>(static_cast<intptr_t>(pObj->Get_InstanceID())), // ObjectID 대신 InstanceID 사용 권장 (중복 클릭 방지)
         flags, "%s", name.c_str());
 
+	if (ImGui::BeginPopupContextItem())
+	{
+		EDITOR->Set_SelectedObject(pObj);
+		if (ImGui::MenuItem("Duplicate", "Ctrl+D", false, canEditNode))
+			EDITOR->Queue_Duplicate(pObj->Get_ObjectGuid(), levelIndex);
+
+		const Shared<GameObject> parent = pObj->Get_Parent();
+		size_t childIndex = numeric_limits<size_t>::max();
+		if (parent)
+			parent->Get_ChildIndex(pObj->Get_ObjectGuid(), childIndex);
+		const Bool canReorder = parent && canEditNode && EDITOR->Can_EditChildren(parent) &&
+			childIndex != numeric_limits<size_t>::max();
+		if (ImGui::MenuItem("Move Up", nullptr, false, canReorder && childIndex > 0))
+			EDITOR->Queue_Reorder(pObj->Get_ObjectGuid(), childIndex - 1, levelIndex);
+		if (ImGui::MenuItem("Move Down", nullptr, false,
+			canReorder && childIndex + 1 < parent->Get_Children().size()))
+			EDITOR->Queue_Reorder(pObj->Get_ObjectGuid(), childIndex + 1, levelIndex);
+
+		ImGui::Separator();
+		if (ImGui::MenuItem("Delete", "Delete", false, canEditNode))
+			EDITOR->Queue_Destroy(pObj->Get_ObjectGuid(), levelIndex);
+		ImGui::EndPopup();
+	}
+
     // ── 노드 단위 드롭 수신 (객체 이동) ───────────────────────────
-    if (pObj->Get_StableChildKey().empty() && ImGui::BeginDragDropSource())
+    if (canEditNode && ImGui::BeginDragDropSource())
     {
         const OBJECT_MOVE_PAYLOAD payload{ pObj->Get_ObjectGuid(), levelIndex };
         ImGui::SetDragDropPayload(ObjectMove_PayLoadKey.c_str(), &payload, sizeof(payload));
@@ -139,7 +156,7 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
             const wchar_t *rawTag = static_cast<const wchar_t *>(payload->Data);
             wstring prototypeTag(rawTag);
 
-            if (hasCodeDefinedStructure)
+            if (!canEditChildren)
             {
                 LOG_WARN(L"[Hierarchy] Cannot add Editor child to code-defined hierarchy: {}", pObj->Get_Name());
             }
@@ -157,11 +174,11 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
             // 순환 참조 방지 로직 (자신이 부모가 되거나, 조상을 자신의 자식으로 넣는 경우 방지)
             if (draggedObj && draggedObj != pObj && move.levelIndex == levelIndex)
             {
-                if (!draggedObj->Get_StableChildKey().empty())
+                if (!EDITOR->Can_EditHierarchy(draggedObj))
                 {
                     LOG_WARN(L"[Hierarchy] Code-defined child cannot be moved: {}", draggedObj->Get_Name());
                 }
-                else if (hasCodeDefinedStructure)
+                else if (!canEditChildren)
                 {
                     LOG_WARN(L"[Hierarchy] Cannot modify code-defined hierarchy: {}", pObj->Get_Name());
                 }
@@ -193,7 +210,7 @@ void Hierarchy::Delete_Selected() {
     if (!selected)
       return;
 
-    if (!selected->Get_StableChildKey().empty())
+    if (!EDITOR->Can_EditHierarchy(selected))
     {
       LOG_WARN(L"[Hierarchy] Code-defined child cannot be deleted: {}", selected->Get_Name());
       return;

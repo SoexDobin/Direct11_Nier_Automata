@@ -26,6 +26,14 @@ void MenuBar::Update(Bool isResize)
 void MenuBar::Render(Bool isResize) {
   EditorObject::Render(isResize);
 	if (ImGui::BeginMainMenuBar()) {
+		if (ImGui::BeginMenu("Edit"))
+		{
+			if (ImGui::MenuItem("Undo", "Ctrl+Z", false, EDITOR->Can_Undo()))
+				EDITOR->Queue_Undo();
+			if (ImGui::MenuItem("Redo", "Ctrl+Y", false, EDITOR->Can_Redo()))
+				EDITOR->Queue_Redo();
+			ImGui::EndMenu();
+		}
 
         Render_Debug(); // Debug Rays
 		Render_Prefab();
@@ -73,7 +81,11 @@ void MenuBar::Render(Bool isResize) {
         if (ImGui::MenuItem(loadLabel.c_str(), nullptr, false, isStop))
         {
           if (SUCCEEDED(m_Game->DeSerializeLevel(PATH.GetLevelDataPath(displayIndex))))
-            LOG_INFO("Level loaded successfully.");
+		  {
+			EDITOR->Clear_History();
+			EDITOR->Clear_SelectedObject();
+			LOG_INFO("Level loaded successfully.");
+		  }
           else
             LOG_ERROR(L"Level load failed.");
         }
@@ -308,6 +320,23 @@ void MenuBar::Render_Prefab()
 
 void MenuBar::Update_HotKey()
 {
+	const ImGuiIO& io = ImGui::GetIO();
+	if (!io.WantTextInput && io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z, false))
+		EDITOR->Queue_Undo();
+	if (!io.WantTextInput && io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Y, false))
+		EDITOR->Queue_Redo();
+	if (!io.WantTextInput && io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_D, false))
+	{
+		const Shared<GameObject> selected = EDITOR->Get_SelectedObject();
+		if (selected && EDITOR->Can_EditHierarchy(selected))
+		{
+			uint32 levelIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+			if (!GAME_INSTANCE->Get_GameObjects(levelIndex).contains(selected->Get_InstanceID()))
+				levelIndex = 0;
+			EDITOR->Queue_Duplicate(selected->Get_ObjectGuid(), levelIndex);
+		}
+	}
+
     Bool currF1 = (GAME_INSTANCE->Get_DIKeyState(DIK_F1) & 0x80) != 0;
     Bool currF2 = (GAME_INSTANCE->Get_DIKeyState(DIK_F2) & 0x80) != 0;
 

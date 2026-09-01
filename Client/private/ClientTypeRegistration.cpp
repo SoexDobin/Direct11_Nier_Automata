@@ -2,6 +2,8 @@
 #include "Client_Function.h"
 
 #include "Game.h"
+#include "PartObject.h"
+#include "UIObject.h"
 
 #include "Bullet.h"
 #include "CityOfRuinBridge.h"
@@ -53,13 +55,18 @@ namespace
 {
 	template <typename T>
 	void Add_Type(ReflectionDescriptorBatch& batch, const char* registeredName,
-		const char* baseRegisteredName, REFLECTED_OBJECT_KIND objectKind, uint32 level)
+		const char* baseRegisteredName, REFLECTED_OBJECT_KIND objectKind, uint32 level,
+		HIERARCHY_AUTHORING_MODE authoringMode = HIERARCHY_AUTHORING_MODE::CODE_DEFINED)
 	{
 		ReflectedTypeDescriptor descriptor;
 		descriptor.info.registeredName = registeredName;
 		descriptor.info.runtimeTypeId = Make_ExternalRuntimeTypeId<T>();
 		descriptor.info.baseRegisteredNames.emplace_back(baseRegisteredName);
 		descriptor.info.objectKind = objectKind;
+		if constexpr (std::is_base_of_v<PartObject, T>)
+			descriptor.info.authoringMode = HIERARCHY_AUTHORING_MODE::LEAF;
+		else
+			descriptor.info.authoringMode = authoringMode;
 		descriptor.info.level = level;
 		descriptor.info.hasLevel = true;
 		descriptor.createPrototype = []() -> Shared<Object> {
@@ -218,19 +225,26 @@ HRESULT Client::Register_Client_Reflection()
 	const uint32 titleLevel = ETOI(LEVEL::TITLE);
 	const uint32 gameplayLevel = ETOI(LEVEL::GAMEPLAY);
 
-	Add_Type<LoadingFadeIn>(batch, "LoadingFadeIn", "GameObject", gameObject, staticLevel);
-	Add_Type<LoadingFadeOut>(batch, "LoadingFadeOut", "GameObject", gameObject, staticLevel);
-	Add_Type<LoadingBackground>(batch, "LoadingBackground", "GameObject", gameObject, loadingLevel);
-	Add_Type<LoadingLogo>(batch, "LoadingLogo", "GameObject", gameObject, loadingLevel);
-	Add_Type<LoadingPixelPanel>(batch, "LoadingPixelPanel", "GameObject", gameObject, loadingLevel);
-	Add_Type<TitleBackground>(batch, "TitleBackground", "GameObject", gameObject, titleLevel);
+	Add_Type<LoadingFadeIn>(batch, "LoadingFadeIn", "UIObject", gameObject, staticLevel,
+		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+	Add_Type<LoadingFadeOut>(batch, "LoadingFadeOut", "UIObject", gameObject, staticLevel,
+		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+	Add_Type<LoadingBackground>(batch, "LoadingBackground", "UIObject", gameObject, loadingLevel,
+		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+	Add_Type<LoadingLogo>(batch, "LoadingLogo", "UIObject", gameObject, loadingLevel,
+		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+	Add_Type<LoadingPixelPanel>(batch, "LoadingPixelPanel", "UIObject", gameObject, loadingLevel,
+		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+	Add_Type<TitleBackground>(batch, "TitleBackground", "UIObject", gameObject, titleLevel,
+		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
 	Add_Type<StaticCamera>(batch, "StaticCamera", "Camera", gameObject, staticLevel);
 	Add_Type<FreeCamera>(batch, "FreeCamera", "Camera", gameObject, staticLevel);
 	Add_Type<SkyBox>(batch, "SkyBox", "GameObject", gameObject, staticLevel);
 	Add_Type<SkySphere>(batch, "SkySphere", "GameObject", gameObject, staticLevel);
 	Add_Type<Terrain>(batch, "Terrain", "GameObject", gameObject, staticLevel);
 
-	Add_Type<Pl0000>(batch, "Pl0000", "GameObject", gameObject, gameplayLevel);
+	Add_Type<Pl0000>(batch, "Pl0000", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
 	Add_Type<Pl0000Body>(batch, "Pl0000Body", "GameObject", gameObject, gameplayLevel);
 	Add_Type<WP0070Body>(batch, "WP0070Body", "GameObject", gameObject, gameplayLevel);
 	Add_Type<WP0220Body>(batch, "WP0220Body", "GameObject", gameObject, gameplayLevel);
@@ -244,25 +258,33 @@ HRESULT Client::Register_Client_Reflection()
 	Add_Type<Pl0000MonsterChecker>(batch, "Pl0000MonsterChecker", "GameObject", gameObject, gameplayLevel);
 	Add_Type<SheathWP0070Body>(batch, "SheathWP0070Body", "GameObject", gameObject, gameplayLevel);
 	Add_Type<SheathWP0220Body>(batch, "SheathWP0220Body", "GameObject", gameObject, gameplayLevel);
-	Add_Type<CityOfRuinEntry>(batch, "CityOfRuinEntry", "GameObject", gameObject, gameplayLevel);
+	Add_Type<CityOfRuinEntry>(batch, "CityOfRuinEntry", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
 	Add_Type<CityOfRuinBridge>(batch, "CityOfRuinBridge", "GameObject", gameObject, gameplayLevel);
-	Add_Type<Em3100>(batch, "Em3100", "GameObject", gameObject, gameplayLevel);
+	Add_Type<Em3100>(batch, "Em3100", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
 	Add_Type<Em3100Body>(batch, "Em3100Body", "GameObject", gameObject, gameplayLevel);
-	Add_Type<Em0010>(batch, "Em0010", "GameObject", gameObject, gameplayLevel);
+	Add_Type<Em0010>(batch, "Em0010", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
 	Add_Type<Em0010Body>(batch, "Em0010Body", "GameObject", gameObject, gameplayLevel);
 	Add_Type<MonsterSight>(batch, "MonsterSight", "GameObject", gameObject, gameplayLevel);
 	Add_Type<MonsterAOE>(batch, "MonsterAOE", "GameObject", gameObject, gameplayLevel);
 	Add_Type<Em0010Movement>(batch, "Em0010Movement", "Component", component, gameplayLevel);
-	Add_Type<Em3000>(batch, "Em3000", "GameObject", gameObject, gameplayLevel);
+	Add_Type<Em3000>(batch, "Em3000", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
 	Add_Type<Em3000Body>(batch, "Em3000Body", "GameObject", gameObject, gameplayLevel);
 	Add_Type<Em3000Movement>(batch, "Em3000Movement", "Component", component, gameplayLevel);
 	Add_Type<Em3001>(batch, "Em3001", "GameObject", gameObject, gameplayLevel);
 	Add_Type<Em3002>(batch, "Em3002", "GameObject", gameObject, gameplayLevel);
 	Add_Type<Em3003>(batch, "Em3003", "GameObject", gameObject, gameplayLevel);
-	Add_Type<Bullet>(batch, "Bullet", "GameObject", gameObject, gameplayLevel);
-	Add_Type<FireFlashEffect>(batch, "FireFlashEffect", "GameObject", gameObject, gameplayLevel);
-	Add_Type<SparkEffect>(batch, "SparkEffect", "GameObject", gameObject, gameplayLevel);
-	Add_Type<HpBarWorldUI>(batch, "HpBarWorldUI", "GameObject", gameObject, gameplayLevel);
+	Add_Type<Bullet>(batch, "Bullet", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::TRANSIENT);
+	Add_Type<FireFlashEffect>(batch, "FireFlashEffect", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::TRANSIENT);
+	Add_Type<SparkEffect>(batch, "SparkEffect", "GameObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::TRANSIENT);
+	Add_Type<HpBarWorldUI>(batch, "HpBarWorldUI", "WorldUIObject", gameObject, gameplayLevel,
+		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
 	Add_Type<MonsterStateMachine>(batch, "MonsterStateMachine", "Component", component, staticLevel);
 
 	const HRESULT result = GAME_INSTANCE->Register_ReflectionDescriptors(batch);

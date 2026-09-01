@@ -9,7 +9,7 @@
 #include "GameObject.h"
 #include "Model.h"
 #include "PathManager.h"
-#include "Pl0000EvadeChecker.h"
+#include "TextUI.h"
 #include "Transform.h"
 
 using namespace Engine;
@@ -23,9 +23,11 @@ namespace Phase5GateVerifier
 		constexpr uint32 PrepareStage = 1;
 		constexpr uint32 VerifyStage = 2;
 		constexpr uint32 FrameStage = 3;
+		constexpr uint32 UIAuthoringStage = 4;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
 		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
-		constexpr const wchar_t* FrameFixtureTag = L"Phase5FrameFixture";
+		constexpr const wchar_t* FrameFixtureTag = L"TextUI";
+		constexpr const wchar_t* UIFixtureTag = L"TextUI";
 		constexpr const Char* PresetName = "Phase5Gate_WP3000";
 		constexpr const Char* AnimationEnum = "WP3000.AnimationState";
 
@@ -524,12 +526,12 @@ namespace Phase5GateVerifier
 			report.Check("play-world-once", RuntimeFrameCount() == beforePlay + 1);
 			EDITOR->Set_State(EDITOR_STATE::STOP);
 
-			Shared<Pl0000EvadeChecker> root =
-				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
-			Shared<Pl0000EvadeChecker> child =
-				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
-			Shared<Pl0000EvadeChecker> unrelated =
-				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			Shared<TextUI> root =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, StaticLevel);
+			Shared<TextUI> child =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, StaticLevel);
+			Shared<TextUI> unrelated =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, StaticLevel);
 			const Bool graphReady = root && child && unrelated &&
 				SUCCEEDED(root->Add_Child(child));
 			report.Check("mutation-test-graph-created", graphReady);
@@ -578,10 +580,10 @@ namespace Phase5GateVerifier
 					!EDITOR->Get_SelectedObject());
 			}
 
-			Shared<Pl0000EvadeChecker> codeRoot =
-				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
-			Shared<Pl0000EvadeChecker> codeChild =
-				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			Shared<TextUI> codeRoot =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, StaticLevel);
+			Shared<TextUI> codeChild =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, StaticLevel);
 			const Bool codeGraphReady = codeRoot && codeChild &&
 				SUCCEEDED(codeRoot->Add_Child(codeChild, L"StableChild"));
 			if (codeGraphReady)
@@ -594,10 +596,10 @@ namespace Phase5GateVerifier
 				GAME_INSTANCE->Find(codeChild->Get_ObjectGuid()) == codeChild &&
 				EDITOR->Get_SelectedObject() == codeChild);
 
-			Shared<Pl0000EvadeChecker> cycleRoot =
-				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
-			Shared<Pl0000EvadeChecker> cycleChild =
-				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			Shared<TextUI> cycleRoot =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, StaticLevel);
+			Shared<TextUI> cycleChild =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, StaticLevel);
 			const Bool cycleGraphReady = cycleRoot && cycleChild &&
 				SUCCEEDED(cycleRoot->Add_Child(cycleChild));
 			if (cycleGraphReady)
@@ -623,6 +625,190 @@ namespace Phase5GateVerifier
 				Work_Directory() / L"phase5a-frame-gates.json");
 			return report.Passed() && reportSaved ? S_OK : E_FAIL;
 		}
+
+		HRESULT Run_UIAuthoring(HRESULT initializationResult)
+		{
+			GateReport report("ui-authoring");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult))
+			{
+				report.Save(Work_Directory() / L"phase5b-ui-authoring-gates.json");
+				return E_FAIL;
+			}
+
+			const auto CreateText = []() {
+				return GAME_INSTANCE->Instantiate<TextUI>(UIFixtureTag, StaticLevel);
+			};
+			Shared<TextUI> root = CreateText();
+			Shared<TextUI> childA = CreateText();
+			Shared<TextUI> childB = CreateText();
+			Shared<TextUI> grandChild = CreateText();
+			Shared<TextUI> greatGrandChild = CreateText();
+			const Bool graphCreated = root && childA && childB && grandChild && greatGrandChild &&
+				SUCCEEDED(root->Add_Child(childA)) &&
+				SUCCEEDED(root->Add_Child(childB)) &&
+				SUCCEEDED(childA->Add_Child(grandChild)) &&
+				SUCCEEDED(grandChild->Add_Child(greatGrandChild));
+			report.Check("ui-root-three-depth-created", graphCreated);
+			if (!graphCreated)
+			{
+				report.Save(Work_Directory() / L"phase5b-ui-authoring-gates.json");
+				return E_FAIL;
+			}
+
+			root->Set_Name(L"Phase5B_UIRoot");
+			childA->Set_Name(L"Phase5B_A");
+			childB->Set_Name(L"Phase5B_B");
+			grandChild->Set_Name(L"Phase5B_GrandChild");
+			greatGrandChild->Set_Name(L"Phase5B_GreatGrandChild");
+			root->Set_AnchorState(UI_ANCHOR::TOP_LEFT);
+			childA->Set_AnchorState(UI_ANCHOR::TOP_RIGHT);
+			childB->Set_AnchorState(UI_ANCHOR::BOTTOM_LEFT);
+			grandChild->Set_AnchorState(UI_ANCHOR::BOTTOM_RIGHT);
+			greatGrandChild->Set_AnchorState(UI_ANCHOR::CENTER);
+
+			report.Check("registry-authoring-policy",
+				EDITOR->Can_EditHierarchy(root) && EDITOR->Can_EditChildren(root) &&
+				EDITOR->Can_EditHierarchy(grandChild));
+			ReflectedTypeInfo codeDefinedInfo;
+			ReflectedTypeInfo editorDefinedInfo;
+			ReflectedTypeInfo leafInfo;
+			ReflectedTypeInfo transientInfo;
+			ReflectedTypeInfo defaultCodeDefinedInfo;
+			const Bool authoringModesRegistered =
+				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("Pl0000", codeDefinedInfo)) &&
+				codeDefinedInfo.authoringMode == HIERARCHY_AUTHORING_MODE::CODE_DEFINED &&
+				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("TextUI", editorDefinedInfo)) &&
+				editorDefinedInfo.authoringMode == HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED &&
+				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("Pl0000EvadeChecker", leafInfo)) &&
+				leafInfo.authoringMode == HIERARCHY_AUTHORING_MODE::LEAF &&
+				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("Bullet", transientInfo)) &&
+				transientInfo.authoringMode == HIERARCHY_AUTHORING_MODE::TRANSIENT &&
+				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("StaticCamera", defaultCodeDefinedInfo)) &&
+				defaultCodeDefinedInfo.authoringMode == HIERARCHY_AUTHORING_MODE::CODE_DEFINED;
+			report.Check("four-authoring-modes-registered", authoringModesRegistered);
+
+			ReflectionValue anchorValue;
+			const Bool anchorReflected = SUCCEEDED(GAME_INSTANCE->Read_ReflectedProperty(
+				*grandChild, "Anchor", anchorValue)) &&
+				anchorValue.Try_Get<uint32>() &&
+				*anchorValue.Try_Get<uint32>() == ETOI(UI_ANCHOR::BOTTOM_RIGHT);
+			report.Check("ui-anchor-reflected", anchorReflected);
+
+			const PrefabGuid snapshotGuid = Create_PrefabGuid();
+			string snapshot;
+			nlohmann::json snapshotJson;
+			Bool snapshotSaved = snapshotGuid.Is_Valid() &&
+				SUCCEEDED(GAME_INSTANCE->SerializeSubtreeSnapshot(
+					snapshotGuid, root, snapshot, StaticLevel));
+			try
+			{
+				if (snapshotSaved)
+					snapshotJson = nlohmann::json::parse(snapshot);
+			}
+			catch (...)
+			{
+				snapshotSaved = false;
+			}
+			const string grandGuid = To_String(grandChild->Get_ObjectGuid());
+			const Bool anchorSerialized = snapshotSaved &&
+				snapshotJson["objects"].contains(grandGuid) &&
+				snapshotJson["objects"][grandGuid]["properties"].value(
+					"Anchor", UINT_MAX) == ETOI(UI_ANCHOR::BOTTOM_RIGHT);
+			report.Check("ui-anchor-memory-snapshot", anchorSerialized);
+
+			EDITOR->Queue_Reorder(childB->Get_ObjectGuid(), 0, StaticLevel);
+			EDITOR->Update(false);
+			const Bool reordered = root->Get_Children().size() == 2 &&
+				root->Get_Children()[0] == childB && root->Get_Children()[1] == childA;
+			report.Check("same-parent-reorder", reordered);
+			EDITOR->Queue_Undo();
+			EDITOR->Update(false);
+			const Bool reorderUndone = root->Get_Children()[0] == childA &&
+				root->Get_Children()[1] == childB;
+			EDITOR->Queue_Redo();
+			EDITOR->Update(false);
+			const Bool reorderRedone = root->Get_Children()[0] == childB &&
+				root->Get_Children()[1] == childA;
+			report.Check("reorder-undo-redo", reorderUndone && reorderRedone);
+			const Bool invalidReorderRejected =
+				root->Reorder_Child(childB, 0) == S_FALSE &&
+				FAILED(root->Reorder_Child(childB, root->Get_Children().size())) &&
+				root->Get_Children()[0] == childB && root->Get_Children()[1] == childA;
+			report.Check("reorder-noop-out-of-range-preserves-order", invalidReorderRejected);
+
+			EDITOR->Queue_Reparent(grandChild->Get_ObjectGuid(),
+				childB->Get_ObjectGuid(), StaticLevel, 0);
+			EDITOR->Update(false);
+			const Bool reparented = grandChild->Get_Parent() == childB;
+			EDITOR->Queue_Undo();
+			EDITOR->Update(false);
+			const Bool reparentUndone = grandChild->Get_Parent() == childA;
+			EDITOR->Queue_Redo();
+			EDITOR->Update(false);
+			const Bool reparentRedone = grandChild->Get_Parent() == childB;
+			report.Check("reparent-undo-redo", reparented && reparentUndone && reparentRedone);
+
+			EDITOR->Queue_Spawn(UIFixtureTag, StaticLevel, root->Get_ObjectGuid());
+			EDITOR->Update(false);
+			const Shared<GameObject> spawned = EDITOR->Get_SelectedObject();
+			const ObjectGuid spawnedGuid = spawned ? spawned->Get_ObjectGuid() : ObjectGuid{};
+			const Bool added = spawned && spawned->Get_Parent() == root;
+			EDITOR->Queue_Undo();
+			EDITOR->Update(false);
+			const Bool addUndone = spawnedGuid.Is_Valid() && !GAME_INSTANCE->Find(spawnedGuid);
+			EDITOR->Queue_Redo();
+			EDITOR->Update(false);
+			const Shared<GameObject> restoredSpawn = GAME_INSTANCE->Find(spawnedGuid);
+			const Bool addRedone = restoredSpawn && restoredSpawn->Get_Parent() == root;
+			report.Check("add-undo-redo", added && addUndone && addRedone);
+
+			EDITOR->Queue_Destroy(spawnedGuid, StaticLevel);
+			EDITOR->Update(false);
+			const Bool removed = !GAME_INSTANCE->Find(spawnedGuid);
+			EDITOR->Queue_Undo();
+			EDITOR->Update(false);
+			const Bool removeUndone = GAME_INSTANCE->Find(spawnedGuid) != nullptr;
+			report.Check("remove-undo", removed && removeUndone);
+
+			EDITOR->Queue_Duplicate(root->Get_ObjectGuid(), StaticLevel);
+			EDITOR->Update(false);
+			const Shared<GameObject> duplicate = EDITOR->Get_SelectedObject();
+			const ObjectGuid duplicateGuid = duplicate ? duplicate->Get_ObjectGuid() : ObjectGuid{};
+			unordered_set<ObjectGuid, GuidHash> originalGraph;
+			unordered_set<ObjectGuid, GuidHash> duplicateGraph;
+			const Shared<UIObject> duplicateUI = dynamic_pointer_cast<UIObject>(duplicate);
+			const Bool duplicated = duplicate && duplicate != root &&
+				Collect_Graph(root, originalGraph) && Collect_Graph(duplicate, duplicateGraph) &&
+				originalGraph.size() == duplicateGraph.size() &&
+				std::ranges::none_of(originalGraph, [&duplicateGraph](ObjectGuid guid) {
+					return duplicateGraph.contains(guid);
+				}) && duplicateUI && duplicateUI->Get_AnchorState() == UI_ANCHOR::TOP_LEFT &&
+				duplicate->Get_Children().size() == root->Get_Children().size();
+			report.Check("duplicate-three-depth-distinct-guids-anchor-order", duplicated);
+			EDITOR->Queue_Undo();
+			EDITOR->Update(false);
+			const Bool duplicateUndone = duplicateGuid.Is_Valid() && !GAME_INSTANCE->Find(duplicateGuid);
+			EDITOR->Queue_Redo();
+			EDITOR->Update(false);
+			const Shared<GameObject> duplicateRestored = GAME_INSTANCE->Find(duplicateGuid);
+			const Shared<UIObject> duplicateRestoredUI =
+				dynamic_pointer_cast<UIObject>(duplicateRestored);
+			const Bool duplicateRedone = duplicateRestored && duplicateRestoredUI &&
+				duplicateRestoredUI->Get_AnchorState() == UI_ANCHOR::TOP_LEFT;
+			report.Check("duplicate-undo-redo-preserves-guid-anchor", duplicateUndone && duplicateRedone);
+
+			if (root)
+				GAME_INSTANCE->Destroy(root->Get_ObjectGuid());
+			if (duplicateRestored)
+				GAME_INSTANCE->Destroy(duplicateRestored->Get_ObjectGuid());
+			GAME_INSTANCE->Flush_DestroyedGameObjects();
+			EDITOR->Clear_SelectedObject();
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase5b-ui-authoring-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
 	}
 
 	uint32 Get_RequestedStage()
@@ -637,13 +823,16 @@ namespace Phase5GateVerifier
 			return VerifyStage;
 		if (wstring_view(value) == L"frame")
 			return FrameStage;
+		if (wstring_view(value) == L"ui-authoring")
+			return UIAuthoringStage;
 #endif
 		return 0;
 	}
 
 	HRESULT Initialize_Runtime(uint32 stage)
 	{
-		if (stage != PrepareStage && stage != VerifyStage && stage != FrameStage)
+		if (stage != PrepareStage && stage != VerifyStage &&
+			stage != FrameStage && stage != UIAuthoringStage)
 			return E_INVALIDARG;
 		if (FAILED(Client::Register_Client_Reflection()) ||
 			FAILED(GAME_INSTANCE->Refresh_ReflectionRegistry()) ||
@@ -655,10 +844,15 @@ namespace Phase5GateVerifier
 		if (stage == FrameStage)
 		{
 			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
-			const Shared<Pl0000EvadeChecker> fixturePrototype =
-				Pl0000EvadeChecker::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
 			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_Prototype(
 				StaticLevel, fixturePrototype, FrameFixtureTag)) ? S_OK : E_FAIL;
+		}
+		if (stage == UIAuthoringStage)
+		{
+			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
+			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_Prototype(
+				StaticLevel, fixturePrototype, UIFixtureTag)) ? S_OK : E_FAIL;
 		}
 		if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()) ||
 			FAILED(Load_GateModels()) ||
@@ -675,6 +869,8 @@ namespace Phase5GateVerifier
 			return Run_Verify(initializationResult);
 		if (stage == FrameStage)
 			return Run_Frame(initializationResult);
+		if (stage == UIAuthoringStage)
+			return Run_UIAuthoring(initializationResult);
 		return E_INVALIDARG;
 	}
 }

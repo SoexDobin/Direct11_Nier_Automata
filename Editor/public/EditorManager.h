@@ -46,8 +46,19 @@ public:
 public: /* Frame-safe structural mutations */
   void Queue_Destroy(ObjectGuid targetGuid, uint32 levelIndex);
   void Queue_MoveToRoot(ObjectGuid targetGuid, uint32 levelIndex);
-  void Queue_Reparent(ObjectGuid targetGuid, ObjectGuid parentGuid, uint32 levelIndex);
-  void Queue_Spawn(const wstring& prototypeTag, uint32 levelIndex, ObjectGuid parentGuid = {});
+  void Queue_Reparent(ObjectGuid targetGuid, ObjectGuid parentGuid, uint32 levelIndex,
+	  size_t targetIndex = numeric_limits<size_t>::max());
+  void Queue_Reorder(ObjectGuid targetGuid, size_t targetIndex, uint32 levelIndex);
+  void Queue_Spawn(const wstring& prototypeTag, uint32 levelIndex, ObjectGuid parentGuid = {},
+	  size_t targetIndex = numeric_limits<size_t>::max());
+	void Queue_Duplicate(ObjectGuid targetGuid, uint32 levelIndex);
+	void Queue_Undo();
+	void Queue_Redo();
+	void Clear_History();
+	Bool Can_Undo() const { return !m_UndoHistory.empty(); }
+	Bool Can_Redo() const { return !m_RedoHistory.empty(); }
+	Bool Can_EditHierarchy(const Shared<Engine::GameObject>& object) const;
+	Bool Can_EditChildren(const Shared<Engine::GameObject>& object) const;
 
 public:
     Shared<EditorCamera> Get_EditorCamera() const { return m_EditorCamera; }
@@ -89,6 +100,9 @@ public: /* Selected Object (Hierarchy <-> Inspector 공유) */
   
 public: /* Reset Request */
     void Request_Reset(uint32 startLevel) {
+		Clear_History();
+		m_PendingMutations.clear();
+		Clear_SelectedObject();
         m_IsResetRequested = true;
         m_EngineDesc.startLevel = startLevel;
     }
@@ -113,7 +127,11 @@ private:
         DESTROY,
         MOVE_TO_ROOT,
         REPARENT,
+		REORDER,
         SPAWN,
+		DUPLICATE,
+		UNDO,
+		REDO,
     };
 
     struct MUTATION_COMMAND
@@ -123,10 +141,46 @@ private:
         ObjectGuid parentGuid{};
         uint32 levelIndex{};
         wstring prototypeTag;
+		size_t targetIndex{ numeric_limits<size_t>::max() };
     };
+
+	enum class HISTORY_TYPE
+	{
+		ADD_SUBTREE,
+		REMOVE_SUBTREE,
+		MOVE,
+	};
+
+	struct HIERARCHY_PLACEMENT
+	{
+		ObjectGuid parentGuid{};
+		size_t childIndex{ numeric_limits<size_t>::max() };
+	};
+
+	struct HISTORY_ENTRY
+	{
+		HISTORY_TYPE type{};
+		ObjectGuid targetGuid{};
+		uint32 levelIndex{};
+		HIERARCHY_PLACEMENT before{};
+		HIERARCHY_PLACEMENT after{};
+		PrefabGuid snapshotGuid{};
+		string snapshot;
+	};
 
     void Flush_PendingMutations();
     Bool Apply_Mutation(const MUTATION_COMMAND& command);
+	Bool Apply_Undo();
+	Bool Apply_Redo();
+	Bool Apply_History(const HISTORY_ENTRY& entry, Bool undo);
+	Bool Capture_Subtree(const Shared<Engine::GameObject>& root,
+		uint32 levelIndex, HISTORY_ENTRY& entry) const;
+	Bool Restore_Subtree(const HISTORY_ENTRY& entry,
+		Shared<Engine::GameObject>& outRoot) const;
+	Bool Place_Object(const Shared<Engine::GameObject>& object,
+		const HIERARCHY_PLACEMENT& placement) const;
+	HIERARCHY_PLACEMENT Get_Placement(const Shared<Engine::GameObject>& object) const;
+	void Record_History(HISTORY_ENTRY entry);
 
 private:
     Bool m_IsResizeView{ false };
@@ -136,6 +190,8 @@ private:
     EDITOR_STATE m_State = EDITOR_STATE::STOP;
     Bool m_SingleStepRequested{ false };
     vector<MUTATION_COMMAND> m_PendingMutations;
+	vector<HISTORY_ENTRY> m_UndoHistory;
+	vector<HISTORY_ENTRY> m_RedoHistory;
     Shared<EditorCamera> m_EditorCamera{nullptr};
     Shared<Engine::Camera> m_InGameCamera{nullptr};
     Weak<Engine::GameObject> m_SelectedObject = {};

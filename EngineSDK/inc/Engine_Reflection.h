@@ -44,6 +44,14 @@ namespace Engine
 		COMPONENT,
 	};
 
+	enum class HIERARCHY_AUTHORING_MODE : uint8
+	{
+		CODE_DEFINED,
+		EDITOR_DEFINED,
+		LEAF,
+		TRANSIENT,
+	};
+
 	enum class REFLECTION_VALUE_TYPE : uint8
 	{
 		NONE,
@@ -116,6 +124,7 @@ namespace Engine
 		RuntimeTypeId runtimeTypeId{};
 		std::vector<std::string> baseRegisteredNames;
 		REFLECTED_OBJECT_KIND objectKind{ REFLECTED_OBJECT_KIND::VALUE };
+		HIERARCHY_AUTHORING_MODE authoringMode{ HIERARCHY_AUTHORING_MODE::CODE_DEFINED };
 		uint32 level{};
 		Bool hasLevel{};
 	};

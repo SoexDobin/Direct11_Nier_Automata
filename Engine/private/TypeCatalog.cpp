@@ -4,8 +4,10 @@
 #include "Component.h"
 #include "GameObject.h"
 #include "Object.h"
+#include "PartObject.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
+#include "UIObject.h"
 
 namespace
 {
@@ -70,6 +72,35 @@ namespace
 					property.set_value(target, typedValue);
 			}
 		}, value.data);
+	}
+
+	Engine::ReflectedPropertyDescriptor Make_UIAnchor_Property()
+	{
+		using namespace Engine;
+		ReflectedPropertyDescriptor property;
+		property.info.registeredName = "Anchor";
+		property.info.valueType = REFLECTION_VALUE_TYPE::UINT32;
+		property.info.dataTag = "UIAnchor";
+		property.info.assetType = Asset_Type_Key::NoneAsset;
+		property.info.saveDataKey = Save_Data_Key::UIAnchor;
+		property.info.isWritable = true;
+		property.info.isSerializable = true;
+		property.read = [](Object& target, ReflectionValue& outValue) -> HRESULT {
+			auto* uiObject = dynamic_cast<UIObject*>(&target);
+			if (!uiObject)
+				return E_NOINTERFACE;
+			outValue.data = static_cast<uint32>(uiObject->Get_AnchorState());
+			return S_OK;
+		};
+		property.write = [](Object& target, const ReflectionValue& value) -> HRESULT {
+			auto* uiObject = dynamic_cast<UIObject*>(&target);
+			const uint32* anchor = value.Try_Get<uint32>();
+			if (!uiObject || !anchor || *anchor > static_cast<uint32>(UI_ANCHOR::BOTTOM_RIGHT))
+				return E_INVALIDARG;
+			uiObject->Set_AnchorState(static_cast<UI_ANCHOR>(*anchor));
+			return S_OK;
+		};
+		return property;
 	}
 }
 
@@ -152,6 +183,8 @@ HRESULT Engine::Registry::Refresh() {
 	const rttr::type objectType = rttr::type::get<Object>();
 	const rttr::type gameObjectType = rttr::type::get<GameObject>();
 	const rttr::type componentType = rttr::type::get<Component>();
+	const rttr::type partObjectType = rttr::type::get<PartObject>();
+	const rttr::type uiObjectType = rttr::type::get<UIObject>();
 
     for (const rttr::type reflectedType : rttr::type::get_types()) {
         const std::string registeredName = reflectedType.get_name().to_string();
@@ -170,8 +203,13 @@ HRESULT Engine::Registry::Refresh() {
 				entry.typeInfo.baseRegisteredNames.push_back(baseName);
 		}
 		std::ranges::sort(entry.typeInfo.baseRegisteredNames);
-		if (reflectedType == gameObjectType || reflectedType.is_derived_from(gameObjectType))
+		if (reflectedType == gameObjectType || reflectedType.is_derived_from(gameObjectType)) {
 			entry.typeInfo.objectKind = REFLECTED_OBJECT_KIND::GAMEOBJECT;
+			if (reflectedType == uiObjectType || reflectedType.is_derived_from(uiObjectType))
+				entry.typeInfo.authoringMode = HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED;
+			else if (reflectedType == partObjectType || reflectedType.is_derived_from(partObjectType))
+				entry.typeInfo.authoringMode = HIERARCHY_AUTHORING_MODE::LEAF;
+		}
 		else if (reflectedType == componentType || reflectedType.is_derived_from(componentType))
 			entry.typeInfo.objectKind = REFLECTED_OBJECT_KIND::COMPONENT;
 		else if (reflectedType == objectType || reflectedType.is_derived_from(objectType))
@@ -248,6 +286,17 @@ HRESULT Engine::Registry::Refresh() {
 			entry.reflectedProperties.emplace(propertyName, property);
         }
 		std::ranges::sort(entry.properties, {}, &ReflectedPropertyInfo::registeredName);
+		if (entry.typeInfo.objectKind == REFLECTED_OBJECT_KIND::GAMEOBJECT &&
+			(reflectedType == uiObjectType || reflectedType.is_derived_from(uiObjectType)) &&
+			std::ranges::none_of(entry.properties, [](const ReflectedPropertyInfo& property) {
+				return property.registeredName == "Anchor";
+			})) {
+			ReflectedPropertyDescriptor anchorProperty = Make_UIAnchor_Property();
+			entry.properties.push_back(anchorProperty.info);
+			entry.externalProperties.emplace(anchorProperty.info.registeredName,
+				std::move(anchorProperty));
+			std::ranges::sort(entry.properties, {}, &ReflectedPropertyInfo::registeredName);
+		}
 
 		if (!byRegisteredName.emplace(registeredName, std::move(entry)).second)
 			return E_FAIL;

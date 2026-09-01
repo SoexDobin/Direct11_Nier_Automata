@@ -32,6 +32,9 @@ private:
 	uint32 m_StartLevelIndex{};
 	Bool m_IsReset = { false };
 	Unique<ClientApp> m_ClientApp = {nullptr};
+	uint32 m_Phase5GateStage{};
+	HRESULT m_Phase5GateInitialization{ S_OK };
+	Bool m_Phase5GateExecuted{};
 
 public:
   static Unique<EditorApp> Create();

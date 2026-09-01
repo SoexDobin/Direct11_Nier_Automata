@@ -175,6 +175,7 @@
     <ClInclude Include="..\public\MenuBar.h" />
     <ClInclude Include="..\public\ModelViewer.h" />
 	<ClInclude Include="..\public\AnimationPresetEditor.h" />
+	<ClInclude Include="..\public\Phase5GateVerifier.h" />
     <ClInclude Include="..\public\NavHelper.h" />
     <ClInclude Include="..\public\PathManager.h" />
     <ClInclude Include="Editor.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\private\MenuBar.cpp" />
     <ClCompile Include="..\private\ModelViewer.cpp" />
 	<ClCompile Include="..\private\AnimationPresetEditor.cpp" />
+	<ClCompile Include="..\private\Phase5GateVerifier.cpp" />
     <ClCompile Include="..\private\NavHelper.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">

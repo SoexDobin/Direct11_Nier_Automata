@@ -101,6 +101,86 @@ namespace
 		}
 		return true;
 	}
+
+	Bool Load_AnimationPaths(const filesystem::path& manifestPath,
+		vector<wstring>& outPaths, string& outError)
+	{
+		outPaths.clear();
+		outError.clear();
+		try
+		{
+			ifstream in(manifestPath);
+			nlohmann::json manifest;
+			in >> manifest;
+			if (manifest.value("schemaVersion", 0) != 1 ||
+				!manifest.contains("animations") || !manifest["animations"].is_array())
+				throw runtime_error("Invalid animation manifest schema.");
+
+			vector<wstring> pendingPaths;
+			unordered_set<wstring> uniquePaths;
+			const filesystem::path resourceRoot = PATH.GetResourceDir();
+			for (size_t index = 0; index < manifest["animations"].size(); ++index)
+			{
+				const auto& animation = manifest["animations"][index];
+				if (!animation.is_object() ||
+					animation.value("index", numeric_limits<size_t>::max()) != index)
+					throw runtime_error("Animation manifest index is not dense.");
+				const string fileName = animation.value("file", string{});
+				const filesystem::path fullPath =
+					manifestPath.parent_path() / Helper::To_wString(fileName);
+				std::error_code errorCode;
+				const filesystem::path relativePath =
+					filesystem::relative(fullPath, resourceRoot, errorCode);
+				if (fileName.empty() || errorCode ||
+					!Is_SafeRelativeAnimationPath(relativePath) ||
+					!filesystem::is_regular_file(fullPath) ||
+					!uniquePaths.emplace(relativePath.generic_wstring()).second)
+					throw runtime_error("Animation manifest contains a missing or duplicate clip.");
+				pendingPaths.push_back(relativePath.generic_wstring());
+			}
+			if (pendingPaths.empty())
+				throw runtime_error("Animation manifest has no clips.");
+			outPaths = std::move(pendingPaths);
+			return true;
+		}
+		catch (const exception& exception)
+		{
+			outError = exception.what();
+			return false;
+		}
+	}
+
+	Bool Build_SnapshotFromPaths(const vector<wstring>& animationPaths,
+		const string& enumName, AnimationPresetSnapshot& outPreset, string& outError)
+	{
+		outPreset = {};
+		ReflectedEnumInfo enumInfo;
+		if (!Find_AnimationEnum(enumName, enumInfo))
+		{
+			outError = "Animation enum is not registered: " + enumName;
+			return false;
+		}
+
+		AnimationPresetSnapshot pending;
+		pending.schemaVersion = 2;
+		pending.animationEnum = enumName;
+		pending.animations.reserve(animationPaths.size());
+		for (const wstring& animationPath : animationPaths)
+			pending.animations.push_back({ animationPath, {} });
+		for (const ReflectedEnumValue& value : enumInfo.values)
+		{
+			if (value.value < 0 || static_cast<size_t>(value.value) >= pending.animations.size())
+			{
+				outError = "Animation enum contains an invalid slot.";
+				return false;
+			}
+			pending.animations[static_cast<size_t>(value.value)].states.push_back(value.name);
+		}
+		if (!Validate_Snapshot(pending, outError))
+			return false;
+		outPreset = std::move(pending);
+		return true;
+	}
 }
 
 HRESULT AnimationPresetEditor::Initialize()
@@ -276,42 +356,15 @@ void AnimationPresetEditor::Refresh_Sources()
 
 void AnimationPresetEditor::Load_Manifest(const filesystem::path& manifestPath)
 {
-	try
+	string error;
+	vector<wstring> pendingPaths;
+	if (!Load_AnimationPaths(manifestPath, pendingPaths, error))
 	{
-		ifstream in(manifestPath);
-		nlohmann::json manifest;
-		in >> manifest;
-		if (manifest.value("schemaVersion", 0) != 1 ||
-			!manifest.contains("animations") || !manifest["animations"].is_array())
-			throw runtime_error("Invalid animation manifest schema.");
-
-		vector<wstring> pendingPaths;
-		unordered_set<wstring> uniquePaths;
-		const filesystem::path resourceRoot = PATH.GetResourceDir();
-		for (size_t index = 0; index < manifest["animations"].size(); ++index)
-		{
-			const auto& animation = manifest["animations"][index];
-			if (!animation.is_object() || animation.value("index", numeric_limits<size_t>::max()) != index)
-				throw runtime_error("Animation manifest index is not dense.");
-			const string fileName = animation.value("file", string{});
-			const filesystem::path fullPath = manifestPath.parent_path() / Helper::To_wString(fileName);
-			std::error_code errorCode;
-			const filesystem::path relativePath = filesystem::relative(fullPath, resourceRoot, errorCode);
-			if (fileName.empty() || errorCode || !Is_SafeRelativeAnimationPath(relativePath) ||
-				!filesystem::is_regular_file(fullPath) ||
-				!uniquePaths.emplace(relativePath.generic_wstring()).second)
-				throw runtime_error("Animation manifest contains a missing or duplicate clip.");
-			pendingPaths.push_back(relativePath.generic_wstring());
-		}
-		if (pendingPaths.empty())
-			throw runtime_error("Animation manifest has no clips.");
-		m_AnimationPaths = std::move(pendingPaths);
-		m_Status = "Animation set loaded: " + manifestPath.parent_path().parent_path().filename().string();
+		m_Status = "Failed to load animation set: " + error;
+		return;
 	}
-	catch (const exception& exception)
-	{
-		m_Status = string("Failed to load animation set: ") + exception.what();
-	}
+	m_AnimationPaths = std::move(pendingPaths);
+	m_Status = "Animation set loaded: " + manifestPath.parent_path().parent_path().filename().string();
 }
 
 void AnimationPresetEditor::Select_Enum(const string& enumName)
@@ -341,24 +394,15 @@ void AnimationPresetEditor::Select_Enum(const string& enumName)
 
 Bool AnimationPresetEditor::Build_Snapshot(AnimationPresetSnapshot& outPreset, string& outError) const
 {
-	outPreset = {};
-	AnimationPresetSnapshot pending;
-	pending.schemaVersion = 2;
-	pending.animationEnum = m_AnimationEnum;
-	pending.animations.reserve(m_AnimationPaths.size());
-	for (size_t index = 0; index < m_AnimationPaths.size(); ++index)
-	{
-		AnimationPresetClip clip;
-		clip.relativePath = m_AnimationPaths[index];
-		const auto slotIt = std::ranges::find(m_EnumSlots, static_cast<int32>(index), &ENUM_SLOT::index);
-		if (slotIt != m_EnumSlots.end())
-			clip.states = slotIt->names;
-		pending.animations.push_back(std::move(clip));
-	}
-	if (!Validate_Snapshot(pending, outError))
-		return false;
-	outPreset = std::move(pending);
-	return true;
+	return Build_SnapshotFromPaths(m_AnimationPaths, m_AnimationEnum, outPreset, outError);
+}
+
+Bool AnimationPresetEditor::Build_Snapshot(const filesystem::path& manifestPath,
+	const string& enumName, AnimationPresetSnapshot& outPreset, string& outError)
+{
+	vector<wstring> animationPaths;
+	return Load_AnimationPaths(manifestPath, animationPaths, outError) &&
+		Build_SnapshotFromPaths(animationPaths, enumName, outPreset, outError);
 }
 
 void AnimationPresetEditor::New_Document()
@@ -425,9 +469,31 @@ void AnimationPresetEditor::Save_Document()
 		catch (...) {}
 	}
 
+	if (!Save_Document(target, guid, name, preset, error))
+	{
+		m_Status = error;
+		return;
+	}
+	m_LoadedPath = target;
+	m_Status = "AnimationPreset saved atomically.";
+	Refresh_Sources();
+}
+
+Bool AnimationPresetEditor::Save_Document(const filesystem::path& targetPath,
+	AssetGuid assetGuid, const string& name, const AnimationPresetSnapshot& preset,
+	string& outError)
+{
+	outError.clear();
+	if (targetPath.empty() || !assetGuid.Is_Valid() || !Is_ValidFileName(name) ||
+		!Validate_Snapshot(preset, outError))
+	{
+		if (outError.empty())
+			outError = "A valid target, name, AssetGuid, enum, and animation set are required.";
+		return false;
+	}
 	nlohmann::json document = {
 		{ "schemaVersion", 2 },
-		{ "assetGuid", To_String(guid) },
+		{ "assetGuid", To_String(assetGuid) },
 		{ "name", name },
 		{ "animationEnum", preset.animationEnum },
 		{ "animations", nlohmann::json::array() }
@@ -442,38 +508,36 @@ void AnimationPresetEditor::Save_Document()
 	}
 
 	std::error_code errorCode;
-	filesystem::create_directories(directory, errorCode);
+	filesystem::create_directories(targetPath.parent_path(), errorCode);
 	if (errorCode)
 	{
-		m_Status = "Failed to create AnimationPreset directory.";
-		return;
+		outError = "Failed to create AnimationPreset directory.";
+		return false;
 	}
-	const filesystem::path temporary = target.wstring() + L".tmp";
+	const filesystem::path temporary = targetPath.wstring() + L".tmp";
 	{
 		ofstream out(temporary, ios::binary | ios::trunc);
 		if (!out.is_open())
 		{
-			m_Status = "Failed to open the temporary preset file.";
-			return;
+			outError = "Failed to open the temporary preset file.";
+			return false;
 		}
 		out << document.dump(4);
 		out.flush();
 		if (!out.good())
 		{
-			m_Status = "Failed while writing the temporary preset file.";
-			return;
+			outError = "Failed while writing the temporary preset file.";
+			return false;
 		}
 	}
-	if (!MoveFileExW(temporary.c_str(), target.c_str(),
+	if (!MoveFileExW(temporary.c_str(), targetPath.c_str(),
 		MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
 	{
 		filesystem::remove(temporary, errorCode);
-		m_Status = "Failed to atomically replace the AnimationPreset file.";
-		return;
+		outError = "Failed to atomically replace the AnimationPreset file.";
+		return false;
 	}
-	m_LoadedPath = target;
-	m_Status = "AnimationPreset saved atomically.";
-	Refresh_Sources();
+	return true;
 }
 
 Bool AnimationPresetEditor::Load_Document(const filesystem::path& presetPath,

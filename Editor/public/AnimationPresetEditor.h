@@ -22,6 +22,10 @@ public:
 
 	static Bool Load_Document(const std::filesystem::path& presetPath,
 		Engine::AnimationPresetSnapshot& outPreset, string& outName, string& outError);
+	static Bool Build_Snapshot(const std::filesystem::path& manifestPath,
+		const string& enumName, Engine::AnimationPresetSnapshot& outPreset, string& outError);
+	static Bool Save_Document(const std::filesystem::path& targetPath, AssetGuid assetGuid,
+		const string& name, const Engine::AnimationPresetSnapshot& preset, string& outError);
 	static HRESULT Apply_PresetFile(Engine::Object& model,
 		const std::filesystem::path& presetPath, string& outError);
 

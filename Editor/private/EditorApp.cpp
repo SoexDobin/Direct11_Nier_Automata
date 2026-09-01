@@ -5,6 +5,7 @@
 #include "ClientSettingManager.h"
 
 #include "EditorManager.h"
+#include "Phase5GateVerifier.h"
 
 #include "LayerRegistry.h"
 #include "MenuBar.h"
@@ -51,12 +52,15 @@ HRESULT EditorApp::Initialize() {
     ClientSettingManager::GetInstance()->Set_ShaderPath(
         L"../../Client/bin/shaders/");
 
-    if ((m_ClientApp = ClientApp::Create(desc))) {
-
-    } else {
-      MSG_BOX("Failed To Create : ClientApp");
-      return E_FAIL;
-    }
+	m_Phase5GateStage = Phase5GateVerifier::Get_RequestedStage();
+	if (m_Phase5GateStage != 0)
+		m_Phase5GateInitialization =
+			Phase5GateVerifier::Initialize_Runtime(m_Phase5GateStage);
+	else if (!(m_ClientApp = ClientApp::Create(desc)))
+	{
+		MSG_BOX("Failed To Create : ClientApp");
+		return E_FAIL;
+	}
 
     if (FAILED(Initialize_IMGUI(desc)))
         return E_FAIL;
@@ -97,6 +101,14 @@ void EditorApp::Update() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();
+
+	if (m_Phase5GateStage != 0 && !m_Phase5GateExecuted)
+	{
+		m_Phase5GateExecuted = true;
+		const HRESULT gateResult = Phase5GateVerifier::Run(
+			m_Phase5GateStage, m_Phase5GateInitialization);
+		PostQuitMessage(SUCCEEDED(gateResult) ? 0 : 1);
+	}
     
     EDITOR->Update(m_IsReset);
 }
@@ -169,8 +181,11 @@ HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC &desc) {
 }
 
 HRESULT EditorApp::Destruct_IMGUI() {
-    GAME_INSTANCE->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
-    GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
+	if (m_Phase5GateStage == 0)
+	{
+		GAME_INSTANCE->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
+		GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
+	}
 
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();

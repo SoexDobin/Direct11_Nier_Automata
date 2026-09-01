@@ -111,6 +111,9 @@
 	<ClInclude Include="..\public\AnimationPresetEditor.h">
 	  <Filter>01. EditorObject\ModelViewer</Filter>
 	</ClInclude>
+	<ClInclude Include="..\public\Phase5GateVerifier.h">
+	  <Filter>00. System</Filter>
+	</ClInclude>
     <ClInclude Include="..\public\AssetBrowser.h">
       <Filter>01. EditorObject\AssetBrowser</Filter>
     </ClInclude>
@@ -169,6 +172,9 @@
     </ClCompile>
 	<ClCompile Include="..\private\AnimationPresetEditor.cpp">
 	  <Filter>01. EditorObject\ModelViewer</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\Phase5GateVerifier.cpp">
+	  <Filter>00. System</Filter>
 	</ClCompile>
     <ClCompile Include="..\private\AssetBrowser.cpp">
       <Filter>01. EditorObject\AssetBrowser</Filter>

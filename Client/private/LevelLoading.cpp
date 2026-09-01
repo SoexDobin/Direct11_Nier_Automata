@@ -65,44 +65,17 @@ void LevelLoading::On_Destroy() { Level::On_Destroy(); }
 
 void LevelLoading::Update_Level(Float timeDelta) 
 {
-    m_StaticCamera->Update_CameraTransform(timeDelta);
-    m_Background->Update(timeDelta);
-    m_PixelPanel->Update(timeDelta);
-    m_Logo->Update(timeDelta);
-
-    if (!m_FadeOut->Is_FadeFinished())
-    {
-        m_FadeOut->Update(timeDelta);
-    }
+    UNREFERENCED_PARAMETER(timeDelta);
 
     if (true == m_IsFinished && m_FadeOut->Is_FadeFinished())
-    {
-        Transition_To_NextLevel(timeDelta);
-    }
+        Transition_To_NextLevel();
 }
 
-void LevelLoading::Update_LoadLevel(Float timeDelta)
-{
-    m_Background->Update(timeDelta);
-    m_PixelPanel->Update(timeDelta);
-    m_Logo->Update(timeDelta);
-    
-    if (!m_FadeOut->Is_FadeFinished())
-    {
-        m_FadeOut->Update(timeDelta);
-    }
-    if (true == m_IsFinished && m_FadeOut->Is_FadeFinished())
-    {
-        Transition_To_NextLevel(timeDelta);
-    }
-}
-
-void LevelLoading::Transition_To_NextLevel(Float timeDelta)
+void LevelLoading::Transition_To_NextLevel()
 {
 	if (!m_FadeIn->Is_FadeFinished())
 	{
 		m_FadeIn->Set_Active(true);
-		m_FadeIn->Update(timeDelta); 
 	}
 	else
 	{
@@ -125,12 +98,6 @@ void LevelLoading::Transition_To_NextLevel(Float timeDelta)
 
 HRESULT LevelLoading::Render_Level()
 {
-    m_Background->Render();
-    m_PixelPanel->Render();
-    m_Logo->Render();
-    m_FadeOut->Render();
-    m_FadeIn->Render();
-
     return S_OK;
 }
 

@@ -31,11 +31,10 @@ private:
 
 public:
 	void Update_Level(Float timeDelta) override;
-	void Update_LoadLevel(Float timeDelta) override;
 	HRESULT Render_Level() override;
 
 private:
-	void Transition_To_NextLevel(Float timeDelta);
+	void Transition_To_NextLevel();
 	void Ready_LoadingUI();
 
 private:

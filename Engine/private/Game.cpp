@@ -133,10 +133,21 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     return S_OK;
 }
 
-void Game::Update_Engine() {
-    const Float delta = m_TimeManager->Update_Timers();
-
+Float Game::Begin_Frame(Bool accumulateFixedTime) {
+    const Float delta = m_TimeManager->Update_Timers(accumulateFixedTime);
     m_InputDevice->Update();
+    return delta;
+}
+
+void Game::Update_Engine() {
+    Update_Engine(Begin_Frame(true), false);
+}
+
+void Game::Update_Engine(Float timeDelta, Bool singleFixedStep) {
+    const Float delta = singleFixedStep ? Get_FixedDeltaTime() : timeDelta;
+    ++m_RuntimeFrameCount;
+    m_LastRuntimeFixedStepCount = 0;
+    m_LastRuntimeDelta = delta;
 
     m_ObjectManager->PriorityUpdate(delta);
 
@@ -148,17 +159,20 @@ void Game::Update_Engine() {
     m_Pipeline->Update_Pipeline();
 
 
-    while (m_TimeManager->Is_FixedUpdate()) {
+    if (singleFixedStep) {
+        m_ObjectManager->FixedUpdate(Get_FixedDeltaTime());
+        ++m_LastRuntimeFixedStepCount;
+    }
+    else while (m_TimeManager->Has_FixedUpdate()) {
         Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
         m_ObjectManager->FixedUpdate(fixedDelta);
+        ++m_LastRuntimeFixedStepCount;
         m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
-        m_TimeManager->Has_FixedUpdate();
     }
 
     m_ObjectManager->Submit_RenderGroup();
 
-    m_ObjectManager->Cleanup_GameObjects(0);
-    m_ObjectManager->Cleanup_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
+    Flush_DestroyedGameObjects();
 
     m_CollisionManager->Update_Collision();
 
@@ -307,6 +321,9 @@ Float Game::Compute_TimeDelta() const {
 Float Game::Compute_UnscaledTimeDelta() const {
   return m_TimeManager->Get_MainTimer()->GetUnscaledDeltaTime();
 }
+Float Game::Get_FixedDeltaTime() const {
+  return m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
+}
 Float Game::Compute_TimeDelta(const wstring &timerTag) const {
   return m_TimeManager->Get_Timer(timerTag)->GetDeltaTime();
 }
@@ -397,6 +414,14 @@ Shared<GameObject> Game::Find(RuntimeObjectId runtimeObjectId) const
 HRESULT Game::Destroy(ObjectGuid objectGuid) const
 {
     return m_ObjectManager->Destroy(objectGuid);
+}
+
+void Game::Flush_DestroyedGameObjects() const
+{
+    m_ObjectManager->Cleanup_GameObjects(0);
+    const uint32 currentLevelIndex = Get_CurrentLevelIndex();
+    if (currentLevelIndex != 0)
+        m_ObjectManager->Cleanup_GameObjects(currentLevelIndex);
 }
 
 HRESULT Game::Clear_GameObjects(uint32 levIndex) const

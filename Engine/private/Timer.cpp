@@ -22,7 +22,7 @@ HRESULT Timer::Initialize() {
   return S_OK;
 }
 
-Float Timer::Update_Timer() {
+Float Timer::Update_Timer(Bool accumulateFixedTime) {
     QueryPerformanceCounter(&m_CurrentTime);
     m_UnscaledDeltaTime =
         static_cast<Float>(m_CurrentTime.QuadPart - m_PrevTime.QuadPart) /
@@ -33,7 +33,10 @@ Float Timer::Update_Timer() {
     m_DeltaTime = m_UnscaledDeltaTime * m_TimeScale;
     m_DeltaAcc += m_DeltaTime;
 
-    m_FixedAcc += m_DeltaTime;
+    if (accumulateFixedTime)
+      m_FixedAcc += m_DeltaTime;
+    else
+      m_FixedAcc = 0.f;
 
     ++m_FrameAcc;
     ++m_TempFPS;

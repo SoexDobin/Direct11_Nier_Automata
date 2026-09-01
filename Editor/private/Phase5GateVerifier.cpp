@@ -4,10 +4,12 @@
 #include "AnimationPresetEditor.h"
 #include "ClientSettingManager.h"
 #include "Client_Function.h"
+#include "EditorManager.h"
 #include "Game.h"
 #include "GameObject.h"
 #include "Model.h"
 #include "PathManager.h"
+#include "Pl0000EvadeChecker.h"
 #include "Transform.h"
 
 using namespace Engine;
@@ -20,7 +22,10 @@ namespace Phase5GateVerifier
 	{
 		constexpr uint32 PrepareStage = 1;
 		constexpr uint32 VerifyStage = 2;
+		constexpr uint32 FrameStage = 3;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
+		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
+		constexpr const wchar_t* FrameFixtureTag = L"Phase5FrameFixture";
 		constexpr const Char* PresetName = "Phase5Gate_WP3000";
 		constexpr const Char* AnimationEnum = "WP3000.AnimationState";
 
@@ -470,6 +475,154 @@ namespace Phase5GateVerifier
 			const Bool reportSaved = report.Save(Work_Directory() / L"phase5-entry-gates.json");
 			return report.Passed() && reportSaved ? S_OK : E_FAIL;
 		}
+
+		HRESULT Run_Frame(HRESULT initializationResult)
+		{
+			GateReport report("frame");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult))
+			{
+				report.Save(Work_Directory() / L"phase5a-frame-gates.json");
+				return E_FAIL;
+			}
+
+			const auto RuntimeFrameCount = []() {
+				return GAME_INSTANCE->Get_RuntimeFrameCount();
+			};
+			const auto NearlyEqual = [](Float lhs, Float rhs) {
+				return abs(lhs - rhs) <= 0.00001f;
+			};
+
+			EDITOR->Set_State(EDITOR_STATE::STOP);
+			const uint64_t beforeStop = RuntimeFrameCount();
+			EDITOR->Update(false);
+			report.Check("stop-world-zero", RuntimeFrameCount() == beforeStop);
+
+			EDITOR->Set_State(EDITOR_STATE::PAUSE);
+			const uint64_t beforePause = RuntimeFrameCount();
+			EDITOR->Update(false);
+			report.Check("pause-world-zero", RuntimeFrameCount() == beforePause);
+
+			EDITOR->Request_SingleStep();
+			const uint64_t beforeStep = RuntimeFrameCount();
+			EDITOR->Update(false);
+			const Bool steppedOnce = RuntimeFrameCount() == beforeStep + 1 &&
+				GAME_INSTANCE->Get_LastRuntimeFixedStepCount() == 1 &&
+				NearlyEqual(GAME_INSTANCE->Get_LastRuntimeDelta(),
+					GAME_INSTANCE->Get_FixedDeltaTime());
+			report.Check("single-step-fixed-once", steppedOnce);
+			report.Check("single-step-returns-pause",
+				EDITOR->Get_State() == EDITOR_STATE::PAUSE);
+
+			const uint64_t afterStep = RuntimeFrameCount();
+			EDITOR->Update(false);
+			report.Check("pause-after-step-world-zero", RuntimeFrameCount() == afterStep);
+
+			EDITOR->Set_State(EDITOR_STATE::PLAY);
+			const uint64_t beforePlay = RuntimeFrameCount();
+			EDITOR->Update(false);
+			report.Check("play-world-once", RuntimeFrameCount() == beforePlay + 1);
+			EDITOR->Set_State(EDITOR_STATE::STOP);
+
+			Shared<Pl0000EvadeChecker> root =
+				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			Shared<Pl0000EvadeChecker> child =
+				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			Shared<Pl0000EvadeChecker> unrelated =
+				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			const Bool graphReady = root && child && unrelated &&
+				SUCCEEDED(root->Add_Child(child));
+			report.Check("mutation-test-graph-created", graphReady);
+
+			if (graphReady)
+			{
+				root->Set_Name(L"Phase5A_DeleteRoot");
+				child->Set_Name(L"Phase5A_DeleteChild");
+				unrelated->Set_Name(L"Phase5A_Unrelated");
+
+				const ObjectGuid rootGuid = root->Get_ObjectGuid();
+				const ObjectGuid childGuid = child->Get_ObjectGuid();
+				const ObjectGuid unrelatedGuid = unrelated->Get_ObjectGuid();
+				const RuntimeObjectId rootRuntimeId = root->Get_RuntimeObjectId();
+				const RuntimeObjectId childRuntimeId = child->Get_RuntimeObjectId();
+				const RuntimeObjectId unrelatedRuntimeId = unrelated->Get_RuntimeObjectId();
+				const uint32 rootInstanceId = root->Get_InstanceID();
+				const uint32 childInstanceId = child->Get_InstanceID();
+				const uint32 unrelatedInstanceId = unrelated->Get_InstanceID();
+				const wstring unrelatedName = unrelated->Get_Name();
+
+				EDITOR->Set_SelectedObject(child);
+				EDITOR->Queue_Destroy(rootGuid, StaticLevel);
+				const Bool stillLiveBeforeFlush =
+					GAME_INSTANCE->Find(rootGuid) == root &&
+					GAME_INSTANCE->Find(childGuid) == child &&
+					GAME_INSTANCE->Find(unrelatedGuid) == unrelated &&
+					!root->Is_Destroy() && !child->Is_Destroy();
+				report.Check("mutation-deferred-until-next-update", stillLiveBeforeFlush);
+
+				EDITOR->Update(false);
+				const Bool subtreeIndexesCleared =
+					!GAME_INSTANCE->Find(rootGuid) && !GAME_INSTANCE->Find(childGuid) &&
+					!GAME_INSTANCE->Find(rootRuntimeId) && !GAME_INSTANCE->Find(childRuntimeId) &&
+					!GAME_INSTANCE->Find_ByInstanceID(StaticLevel, rootInstanceId) &&
+					!GAME_INSTANCE->Find_ByInstanceID(StaticLevel, childInstanceId);
+				report.Check("subtree-delete-clears-live-indexes", subtreeIndexesCleared);
+
+				const Bool unrelatedPreserved =
+					GAME_INSTANCE->Find(unrelatedGuid) == unrelated &&
+					GAME_INSTANCE->Find(unrelatedRuntimeId) == unrelated &&
+					GAME_INSTANCE->Find_ByInstanceID(StaticLevel, unrelatedInstanceId) == unrelated &&
+					unrelated->Get_Name() == unrelatedName && !unrelated->Is_Destroy();
+				report.Check("subtree-delete-preserves-unrelated-root", unrelatedPreserved);
+				report.Check("deleted-subtree-selection-only-cleared",
+					!EDITOR->Get_SelectedObject());
+			}
+
+			Shared<Pl0000EvadeChecker> codeRoot =
+				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			Shared<Pl0000EvadeChecker> codeChild =
+				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			const Bool codeGraphReady = codeRoot && codeChild &&
+				SUCCEEDED(codeRoot->Add_Child(codeChild, L"StableChild"));
+			if (codeGraphReady)
+			{
+				EDITOR->Set_SelectedObject(codeChild);
+				EDITOR->Queue_Destroy(codeChild->Get_ObjectGuid(), StaticLevel);
+				EDITOR->Update(false);
+			}
+			report.Check("code-defined-delete-rejected", codeGraphReady &&
+				GAME_INSTANCE->Find(codeChild->Get_ObjectGuid()) == codeChild &&
+				EDITOR->Get_SelectedObject() == codeChild);
+
+			Shared<Pl0000EvadeChecker> cycleRoot =
+				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			Shared<Pl0000EvadeChecker> cycleChild =
+				GAME_INSTANCE->Instantiate<Pl0000EvadeChecker>(FrameFixtureTag, StaticLevel);
+			const Bool cycleGraphReady = cycleRoot && cycleChild &&
+				SUCCEEDED(cycleRoot->Add_Child(cycleChild));
+			if (cycleGraphReady)
+			{
+				EDITOR->Queue_Reparent(cycleRoot->Get_ObjectGuid(),
+					cycleChild->Get_ObjectGuid(), StaticLevel);
+				EDITOR->Update(false);
+			}
+			report.Check("reparent-cycle-rejected", cycleGraphReady &&
+				!cycleRoot->Get_Parent() && cycleChild->Get_Parent() == cycleRoot);
+
+			if (unrelated)
+				GAME_INSTANCE->Destroy(unrelated->Get_ObjectGuid());
+			if (codeRoot)
+				GAME_INSTANCE->Destroy(codeRoot->Get_ObjectGuid());
+			if (cycleRoot)
+				GAME_INSTANCE->Destroy(cycleRoot->Get_ObjectGuid());
+			GAME_INSTANCE->Flush_DestroyedGameObjects();
+			EDITOR->Clear_SelectedObject();
+			EDITOR->Set_State(EDITOR_STATE::STOP);
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase5a-frame-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
 	}
 
 	uint32 Get_RequestedStage()
@@ -482,13 +635,15 @@ namespace Phase5GateVerifier
 			return PrepareStage;
 		if (wstring_view(value) == L"verify")
 			return VerifyStage;
+		if (wstring_view(value) == L"frame")
+			return FrameStage;
 #endif
 		return 0;
 	}
 
 	HRESULT Initialize_Runtime(uint32 stage)
 	{
-		if (stage != PrepareStage && stage != VerifyStage)
+		if (stage != PrepareStage && stage != VerifyStage && stage != FrameStage)
 			return E_INVALIDARG;
 		if (FAILED(Client::Register_Client_Reflection()) ||
 			FAILED(GAME_INSTANCE->Refresh_ReflectionRegistry()) ||
@@ -497,6 +652,14 @@ namespace Phase5GateVerifier
 			return E_FAIL;
 		if (stage == PrepareStage)
 			return S_OK;
+		if (stage == FrameStage)
+		{
+			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
+			const Shared<Pl0000EvadeChecker> fixturePrototype =
+				Pl0000EvadeChecker::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_Prototype(
+				StaticLevel, fixturePrototype, FrameFixtureTag)) ? S_OK : E_FAIL;
+		}
 		if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()) ||
 			FAILED(Load_GateModels()) ||
 			FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY)))
@@ -510,6 +673,8 @@ namespace Phase5GateVerifier
 			return SUCCEEDED(initializationResult) ? Run_Prepare() : initializationResult;
 		if (stage == VerifyStage)
 			return Run_Verify(initializationResult);
+		if (stage == FrameStage)
+			return Run_Frame(initializationResult);
 		return E_INVALIDARG;
 	}
 }

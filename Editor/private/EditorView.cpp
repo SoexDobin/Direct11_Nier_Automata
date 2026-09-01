@@ -171,9 +171,10 @@ void EditorView::RenderView(Bool isResize) {
 	}
 	if (!isPlayDisabled) ImGui::EndDisabled();
 	ImGui::SameLine();
-	Bool canPause = (EDITOR->Get_State() == EDITOR_STATE::PLAY);
+	Bool canPause = (EDITOR->Get_State() == EDITOR_STATE::PLAY ||
+		EDITOR->Get_State() == EDITOR_STATE::PAUSE);
 	if (!canPause) ImGui::BeginDisabled();
-	if (ImGui::Button("Pause")) {
+	if (ImGui::Button(EDITOR->Get_State() == EDITOR_STATE::PAUSE ? "Resume" : "Pause")) {
 		if (EDITOR->Get_State() == EDITOR_STATE::PAUSE)
 			EDITOR->Set_State(EDITOR_STATE::PLAY);
 		else
@@ -187,6 +188,13 @@ void EditorView::RenderView(Bool isResize) {
 		EDITOR->Set_State(EDITOR_STATE::STOP);
 	}
 	if (!canStop) ImGui::EndDisabled();
+
+	ImGui::SameLine();
+	const Bool canStep = EDITOR->Get_State() == EDITOR_STATE::PAUSE;
+	if (!canStep) ImGui::BeginDisabled();
+	if (ImGui::Button("Step"))
+		EDITOR->Request_SingleStep();
+	if (!canStep) ImGui::EndDisabled();
 
 	ImGui::SameLine();
 	ImGui::Text(" | Gizmo: "); // 구분선

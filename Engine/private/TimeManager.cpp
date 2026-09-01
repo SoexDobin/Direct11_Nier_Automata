@@ -16,15 +16,15 @@ HRESULT TimeManager::Initialize()
 	return S_OK;
 }
 
-Float TimeManager::Update_Timers() const
+Float TimeManager::Update_Timers(Bool accumulateFixedTime) const
 {
 	for (const auto& timer : m_Timers)
 	{
 		if (timer.second->IsActive())
-			timer.second->Update_Timer();
+			timer.second->Update_Timer(accumulateFixedTime);
 	}
 
-	return m_MainTimer->Update_Timer();
+	return m_MainTimer->Update_Timer(accumulateFixedTime);
 }
 
 Shared<Timer> TimeManager::Get_MainTimer() const

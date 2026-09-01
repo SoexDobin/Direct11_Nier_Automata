@@ -29,7 +29,7 @@ public:
 
 public:
   HRESULT Initialize();
-  Float Update_Timer();
+  Float Update_Timer(Bool accumulateFixedTime = true);
   Bool IsFixedUpdate() const;
   void ConsumeFixedDeltaTime();
 

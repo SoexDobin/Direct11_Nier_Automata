@@ -3,6 +3,7 @@
 
 #include "EditorCamera.h"
 #include "Game.h"
+#include "GameObject.h"
 #include "PathManager.h"
 
 #include "EditorView.h"
@@ -15,6 +16,59 @@
 #include "AssetBrowser.h"
 #include "NavHelper.h"
 #include "Transform.h"
+
+namespace
+{
+Bool Belongs_To_Level(const Shared<GameObject>& object, uint32 levelIndex)
+{
+    if (!object)
+        return false;
+
+    const auto& objects = GAME_INSTANCE->Get_GameObjects(levelIndex);
+    const auto it = objects.find(object->Get_InstanceID());
+    return it != objects.end() && it->second == object;
+}
+
+Bool Has_CodeDefinedStructure(const Shared<GameObject>& object)
+{
+    if (!object || !object->Get_StableChildKey().empty())
+        return true;
+
+    for (const auto& child : object->Get_Children())
+        if (child && !child->Get_StableChildKey().empty())
+            return true;
+
+    return false;
+}
+
+Bool Is_In_Subtree(const Shared<GameObject>& object, ObjectGuid rootGuid)
+{
+    for (Shared<GameObject> current = object; current; current = current->Get_Parent())
+        if (current->Get_ObjectGuid() == rootGuid)
+            return true;
+
+    return false;
+}
+
+wstring Make_UniqueName(const Shared<GameObject>& object, uint32 levelIndex)
+{
+    const wstring baseName = object ? object->Get_Name() : L"GameObject";
+    const auto& objects = GAME_INSTANCE->Get_GameObjects(levelIndex);
+
+    for (uint32 suffix = 0; ; ++suffix)
+    {
+        const wstring candidate = suffix == 0
+            ? baseName
+            : baseName + L"_" + to_wstring(suffix);
+        const Bool overlaps = ranges::any_of(objects, [&](const auto& entry)
+        {
+            return entry.second && entry.second != object && entry.second->Get_Name() == candidate;
+        });
+        if (!overlaps)
+            return candidate;
+    }
+}
+}
 
 IMPLEMENT_SINGLETON(EditorManager)
 
@@ -68,23 +122,148 @@ HRESULT EditorManager::Initialize()
 	return S_OK;
 }
 
-void EditorManager::Update(Bool IsResetView) {
-    Float timeDelta = GAME_INSTANCE->Compute_UnscaledTimeDelta();
-    EDITOR_STATE state = EDITOR->Get_State();
+void EditorManager::Set_State(EDITOR_STATE state)
+{
+    m_State = state;
+    if (state != EDITOR_STATE::PAUSE)
+        m_SingleStepRequested = false;
+}
 
-    if (state == EDITOR_STATE::PLAY) {
+void EditorManager::Request_SingleStep()
+{
+    if (m_State == EDITOR_STATE::PAUSE)
+        m_SingleStepRequested = true;
+}
 
-        GAME_INSTANCE->Update_Engine();
+void EditorManager::Queue_Destroy(ObjectGuid targetGuid, uint32 levelIndex)
+{
+    if (targetGuid.Is_Valid())
+        m_PendingMutations.push_back({ MUTATION_TYPE::DESTROY, targetGuid, {}, levelIndex, {} });
+}
+
+void EditorManager::Queue_MoveToRoot(ObjectGuid targetGuid, uint32 levelIndex)
+{
+    if (targetGuid.Is_Valid())
+        m_PendingMutations.push_back({ MUTATION_TYPE::MOVE_TO_ROOT, targetGuid, {}, levelIndex, {} });
+}
+
+void EditorManager::Queue_Reparent(ObjectGuid targetGuid, ObjectGuid parentGuid, uint32 levelIndex)
+{
+    if (targetGuid.Is_Valid() && parentGuid.Is_Valid())
+        m_PendingMutations.push_back({ MUTATION_TYPE::REPARENT, targetGuid, parentGuid, levelIndex, {} });
+}
+
+void EditorManager::Queue_Spawn(const wstring& prototypeTag, uint32 levelIndex, ObjectGuid parentGuid)
+{
+    if (!prototypeTag.empty())
+        m_PendingMutations.push_back({ MUTATION_TYPE::SPAWN, {}, parentGuid, levelIndex, prototypeTag });
+}
+
+Bool EditorManager::Apply_Mutation(const MUTATION_COMMAND& command)
+{
+    const uint32 currentLevelIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+    if (command.levelIndex != 0 && command.levelIndex != currentLevelIndex)
+    {
+        LOG_WARN(L"[EditorMutation] Rejected stale level command for level {}", command.levelIndex);
+        return false;
     }
-    else {
-        if (m_EditorCamera) {
-            GAME_INSTANCE->Update_Input();
-            m_EditorCamera->Update(timeDelta);
-            GAME_INSTANCE->Submit_RenderGroup();
+
+    const Shared<GameObject> target = GAME_INSTANCE->Find(command.targetGuid);
+
+    switch (command.type)
+    {
+    case MUTATION_TYPE::DESTROY:
+    {
+        if (!target || target->Is_Destroy() ||
+            !Belongs_To_Level(target, command.levelIndex) ||
+            !target->Get_StableChildKey().empty())
+            return false;
+
+        const Shared<GameObject> selected = Get_SelectedObject();
+        if (selected && Is_In_Subtree(selected, command.targetGuid))
+            Clear_SelectedObject();
+
+        return SUCCEEDED(GAME_INSTANCE->Destroy(command.targetGuid));
+    }
+
+    case MUTATION_TYPE::MOVE_TO_ROOT:
+        if (!target || target->Is_Destroy() ||
+            !Belongs_To_Level(target, command.levelIndex) ||
+            !target->Get_StableChildKey().empty())
+            return false;
+        return SUCCEEDED(target->Remove_Parent());
+
+    case MUTATION_TYPE::REPARENT:
+    {
+        const Shared<GameObject> parent = GAME_INSTANCE->Find(command.parentGuid);
+        if (!target || !parent || target->Is_Destroy() || parent->Is_Destroy() ||
+            target == parent || !Belongs_To_Level(target, command.levelIndex) ||
+            !Belongs_To_Level(parent, command.levelIndex) ||
+            !target->Get_StableChildKey().empty() || Has_CodeDefinedStructure(parent))
+            return false;
+
+        return SUCCEEDED(target->Set_Parent(parent));
+    }
+
+    case MUTATION_TYPE::SPAWN:
+    {
+        Shared<GameObject> parent;
+        if (command.parentGuid.Is_Valid())
+        {
+            parent = GAME_INSTANCE->Find(command.parentGuid);
+            if (!parent || parent->Is_Destroy() ||
+                !Belongs_To_Level(parent, command.levelIndex) || Has_CodeDefinedStructure(parent))
+                return false;
         }
-        if (GAME_INSTANCE->Get_CurrentLevel())
-			GAME_INSTANCE->Get_CurrentLevel()->Update_LoadLevel(0.016777f);
+
+        Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(
+            command.prototypeTag, command.levelIndex);
+        if (!cloned)
+            return false;
+
+        cloned->Set_Name(Make_UniqueName(cloned, command.levelIndex));
+        if (parent && FAILED(cloned->Set_Parent(parent)))
+        {
+            GAME_INSTANCE->Destroy(cloned->Get_ObjectGuid());
+            return false;
+        }
+
+        Set_SelectedObject(cloned);
+        return true;
     }
+    }
+
+    return false;
+}
+
+void EditorManager::Flush_PendingMutations()
+{
+    if (m_PendingMutations.empty())
+        return;
+
+    vector<MUTATION_COMMAND> currentBatch;
+    currentBatch.swap(m_PendingMutations);
+
+    for (const MUTATION_COMMAND& command : currentBatch)
+        if (!Apply_Mutation(command))
+            LOG_WARN(L"[EditorMutation] Command rejected or failed");
+
+    GAME_INSTANCE->Flush_DestroyedGameObjects();
+}
+
+void EditorManager::Update(Bool IsResetView) {
+    const EDITOR_STATE state = Get_State();
+    const Bool isLoading = GAME_INSTANCE->Get_CurrentLevelIndex() == ETOI(LEVEL::LOADING);
+    const Bool singleStep = state == EDITOR_STATE::PAUSE && m_SingleStepRequested;
+    m_SingleStepRequested = false;
+
+    GAME_INSTANCE->Begin_Frame(state == EDITOR_STATE::PLAY || isLoading);
+    const Float editorDelta = GAME_INSTANCE->Compute_UnscaledTimeDelta();
+
+    Flush_PendingMutations();
+
+    if (m_EditorCamera && state != EDITOR_STATE::PLAY)
+        m_EditorCamera->Update(editorDelta);
 
     m_Inspector->Update(IsResetView);
 	m_EditorView->Update(IsResetView);
@@ -95,6 +274,18 @@ void EditorManager::Update(Bool IsResetView) {
 	m_AnimationPresetEditor->Update(IsResetView);
     m_AssetBrowser->Update(IsResetView);
     m_NavHelper->Update(IsResetView);
+
+    if (state == EDITOR_STATE::PLAY || isLoading || singleStep)
+    {
+        const Float runtimeDelta = singleStep
+            ? GAME_INSTANCE->Get_FixedDeltaTime()
+            : GAME_INSTANCE->Compute_TimeDelta();
+        GAME_INSTANCE->Update_Engine(runtimeDelta, singleStep);
+    }
+    else
+    {
+        GAME_INSTANCE->Submit_RenderGroup();
+    }
 }
 
 HRESULT EditorManager::Render(Bool IsResetView) {

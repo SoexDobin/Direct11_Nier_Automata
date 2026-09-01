@@ -19,7 +19,7 @@ public:
   void Render(Bool isResize) override;
 
 private:
-  void Render_Node(const Shared<Engine::GameObject> &pObj);
+  void Render_Node(const Shared<Engine::GameObject> &pObj, uint32 levelIndex);
   void Delete_Selected();
 
 public:

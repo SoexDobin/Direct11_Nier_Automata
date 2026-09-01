@@ -30,14 +30,14 @@ void LevelTitle::On_Destroy()
 
 void LevelTitle::Update_Level(Float timeDelta)
 {
+	UNREFERENCED_PARAMETER(timeDelta);
+
 	if (!m_IsIntroPlayed)
 	{
 		GAME_INSTANCE->PlaySoundFXOnce(L"Title_Intro", SOUNDCHANNEL::CHANNEL_1);
 		m_IsIntroPlayed = true;
 	}
 
-
-	m_FadeOut->Update(timeDelta);
 
 	if (m_FadeOut->Is_FadeFinished())
 	{
@@ -48,7 +48,6 @@ void LevelTitle::Update_Level(Float timeDelta)
 		}
 			
 
-		m_FadeIn->Update(timeDelta);
 		if (m_FadeIn->Is_FadeFinished())
 		{
 			GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelLoading::Create(m_Device, m_Context, LEVEL::GAMEPLAY, true));
@@ -58,9 +57,6 @@ void LevelTitle::Update_Level(Float timeDelta)
 
 HRESULT LevelTitle::Render_Level()
 {
-	m_FadeOut->Render();
-	m_FadeIn->Render();
-
 	return S_OK;
 }
 

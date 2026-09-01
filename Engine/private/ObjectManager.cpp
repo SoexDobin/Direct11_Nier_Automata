@@ -180,39 +180,20 @@ void ObjectManager::Submit_RenderGroup() {
 }
 
 void ObjectManager::Cleanup_GameObjects(uint32 levIndex) {
+    if (levIndex >= m_LevelCount)
+        return;
+
     vector<Shared<GameObject>> garbages;
     for (auto &[layerBit, objects] : m_ObjectByLayer[levIndex]) {
 		for (auto &obj : objects) {
-			if (obj->Is_Destroy()) {
+			if (obj && obj->Is_Destroy()) {
 				garbages.push_back(obj);
 			}
 		}
     }
 
-    for (auto &garbage : garbages) {
-		garbage->On_Destroy();
-    }
-
-    for (auto &[layerBit, objects] : m_ObjectByLayer[levIndex]) {
-		std::erase_if(objects, [&](const Shared<GameObject> &object) {
-			if (object->Is_Destroy()) // 삭제 대상 처리
-			{
-                m_ObjectByInstance[levIndex].erase(object->Get_InstanceID());
-                m_ObjectByGuid.erase(object->Get_ObjectGuid());
-                m_ObjectByRuntimeId.erase(object->Get_RuntimeObjectId());
-                if (m_ObjectByObject[levIndex].contains(object->Get_ObjectID())) {
-                    auto& objectVec = m_ObjectByObject[levIndex][object->Get_ObjectID()];
-                    std::erase(objectVec, object);
-                }
-				if (m_ObjectByType[levIndex].contains(object->Get_TypeID())) {
-					auto& typeVec = m_ObjectByType[levIndex][object->Get_TypeID()];
-					std::erase(typeVec, object);
-				}
-				return true;
-			}
-			return false;
-		});
-    }
+    for (const auto& garbage : garbages)
+        Remove_GameObject(levIndex, garbage);
 }
 
 HRESULT ObjectManager::Add_GameObject(uint32 levIndex, const Shared<GameObject>& object) {
@@ -386,6 +367,8 @@ HRESULT ObjectManager::Destroy(ObjectGuid objectGuid)
     const Shared<GameObject> object = Find_ByObjectGuid(objectGuid);
     if (!object)
         return E_FAIL;
+    if (object->Is_Destroy())
+        return S_FALSE;
 
     object->Destroy_Subtree();
     return S_OK;

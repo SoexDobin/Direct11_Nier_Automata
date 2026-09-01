@@ -40,7 +40,14 @@ public:
 
 public:
   EDITOR_STATE Get_State() const { return m_State; }
-  void Set_State(EDITOR_STATE state) { m_State = state; }
+  void Set_State(EDITOR_STATE state);
+  void Request_SingleStep();
+
+public: /* Frame-safe structural mutations */
+  void Queue_Destroy(ObjectGuid targetGuid, uint32 levelIndex);
+  void Queue_MoveToRoot(ObjectGuid targetGuid, uint32 levelIndex);
+  void Queue_Reparent(ObjectGuid targetGuid, ObjectGuid parentGuid, uint32 levelIndex);
+  void Queue_Spawn(const wstring& prototypeTag, uint32 levelIndex, ObjectGuid parentGuid = {});
 
 public:
     Shared<EditorCamera> Get_EditorCamera() const { return m_EditorCamera; }
@@ -101,11 +108,34 @@ public: /* Auto Load Settings */
     void Request_AutoLoad(Bool isRequested) { m_IsAutoLoadRequested = isRequested; }
 
 private:
+    enum class MUTATION_TYPE
+    {
+        DESTROY,
+        MOVE_TO_ROOT,
+        REPARENT,
+        SPAWN,
+    };
+
+    struct MUTATION_COMMAND
+    {
+        MUTATION_TYPE type{};
+        ObjectGuid targetGuid{};
+        ObjectGuid parentGuid{};
+        uint32 levelIndex{};
+        wstring prototypeTag;
+    };
+
+    void Flush_PendingMutations();
+    Bool Apply_Mutation(const MUTATION_COMMAND& command);
+
+private:
     Bool m_IsResizeView{ false };
     Float m_ResizeWidth{}, m_ResizeHeight{};
 	uint32 m_ScreenIndex{};
 
     EDITOR_STATE m_State = EDITOR_STATE::STOP;
+    Bool m_SingleStepRequested{ false };
+    vector<MUTATION_COMMAND> m_PendingMutations;
     Shared<EditorCamera> m_EditorCamera{nullptr};
     Shared<Engine::Camera> m_InGameCamera{nullptr};
     Weak<Engine::GameObject> m_SelectedObject = {};

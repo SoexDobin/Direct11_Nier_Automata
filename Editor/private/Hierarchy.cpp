@@ -9,6 +9,15 @@
 
 using namespace Engine;
 
+namespace
+{
+struct OBJECT_MOVE_PAYLOAD
+{
+    ObjectGuid objectGuid{};
+    uint32 levelIndex{};
+};
+}
+
 Hierarchy::Hierarchy() : EditorObject{} {}
 Hierarchy::~Hierarchy() {}
 
@@ -29,7 +38,7 @@ void Hierarchy::Render(Bool isResize) {
     auto& staticObjects = GAME_INSTANCE->Get_GameObjects(0);
     for (auto &[id, pObj] : staticObjects) {
         if (!pObj->Has_Parent()) {
-            Render_Node(pObj);
+            Render_Node(pObj, 0);
         }
     }
 
@@ -39,7 +48,7 @@ void Hierarchy::Render(Bool isResize) {
         auto& currentLevelObjects = GAME_INSTANCE->Get_GameObjects(currentLevel);
         for (auto &[id, pObj] : currentLevelObjects) {
             if (!pObj->Has_Parent()) {
-                Render_Node(pObj);
+                Render_Node(pObj, currentLevel);
             }
         }
     }
@@ -54,44 +63,22 @@ void Hierarchy::Render(Bool isResize) {
             const wchar_t *rawTag = static_cast<const wchar_t *>(payload->Data);
             wstring prototypeTag(rawTag);
 
-            Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, GAME_INSTANCE->Get_CurrentLevelIndex());
-            if (cloned)
-            {
-                auto allObjs = GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
-                int suffix = 0;
-                wstring baseName = cloned->Get_Name();
-                wstring uniqueName = baseName;
-                while (true) {
-                    uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
-                    bool overlap = false;
-                    for (auto& [id, obj] : allObjs) {
-                        if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
-                    }
-                    if (!overlap) break;
-                    suffix++;
-                }
-                cloned->Set_Name(uniqueName);
-                cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
-
-				LOG_INFO(L"[Hierarchy] Spawned from prefab: {}", prototypeTag);
-            }
-            else
-				LOG_WARN(L"[Hierarchy] Failed to spawn: {}", prototypeTag);
+            EDITOR->Queue_Spawn(prototypeTag, GAME_INSTANCE->Get_CurrentLevelIndex());
         }
         
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(ObjectMove_PayLoadKey.c_str()))
         {
-            uint32 draggedID = *static_cast<uint32*>(payload->Data);
-            Shared<GameObject> draggedObj = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_CurrentLevelIndex(), draggedID);
+            const OBJECT_MOVE_PAYLOAD move = *static_cast<const OBJECT_MOVE_PAYLOAD*>(payload->Data);
+            Shared<GameObject> draggedObj = GAME_INSTANCE->Find(move.objectGuid);
             if (draggedObj)
             {
                 if (!draggedObj->Get_StableChildKey().empty())
                 {
                     LOG_WARN(L"[Hierarchy] Code-defined child cannot be moved to Root: {}", draggedObj->Get_Name());
                 }
-                else if (SUCCEEDED(draggedObj->Remove_Parent()))
+                else
                 {
-                    LOG_INFO(L"[Hierarchy] Moved {} to Root", draggedObj->Get_Name());
+                    EDITOR->Queue_MoveToRoot(move.objectGuid, move.levelIndex);
                 }
             }
         }
@@ -101,7 +88,7 @@ void Hierarchy::Render(Bool isResize) {
     ImGui::End();
 }
 
-void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
+void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
     const auto& children = pObj->Get_Children();
     Bool hasCodeDefinedStructure = !pObj->Get_StableChildKey().empty();
     for (const auto& child : children)
@@ -120,7 +107,7 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
 
     // 현재 선택된 오브젝트면 하이라이트
     Shared<GameObject> selected = EDITOR->Get_SelectedObject();
-    if (selected && selected->Get_ObjectID() == pObj->Get_ObjectID())
+    if (selected && selected->Get_ObjectGuid() == pObj->Get_ObjectGuid())
       flags |= ImGuiTreeNodeFlags_Selected;
 
     // wstring → UTF-8 string 변환 (ImGui는 UTF-8 기준)
@@ -138,8 +125,8 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
     // ── 노드 단위 드롭 수신 (객체 이동) ───────────────────────────
     if (pObj->Get_StableChildKey().empty() && ImGui::BeginDragDropSource())
     {
-        uint32 instanceID = pObj->Get_InstanceID();
-        ImGui::SetDragDropPayload(ObjectMove_PayLoadKey.c_str(), &instanceID, sizeof(uint32));
+        const OBJECT_MOVE_PAYLOAD payload{ pObj->Get_ObjectGuid(), levelIndex };
+        ImGui::SetDragDropPayload(ObjectMove_PayLoadKey.c_str(), &payload, sizeof(payload));
         ImGui::Text("Moving: %s", name.c_str());
         ImGui::EndDragDropSource();
     }
@@ -158,39 +145,17 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
             }
             else
             {
-                // [핵심] 현재 노드(pObj)를 부모로 하여 생성
-                Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, UINT_MAX);
-                if (cloned)
-                {
-                    auto allObjs = GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
-                    int suffix = 0;
-                    wstring baseName = cloned->Get_Name();
-                    wstring uniqueName = baseName;
-                    while (true) {
-                        uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
-                        bool overlap = false;
-                        for (auto& [id, obj] : allObjs) {
-                            if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
-                        }
-                        if (!overlap) break;
-                        suffix++;
-                    }
-                    cloned->Set_Name(uniqueName);
-                    cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
-
-                    cloned->Set_Parent(pObj);
-                    LOG_INFO(L"[Hierarchy] Spawned {} as child of {}", prototypeTag, pObj->Get_Name());
-                }
+                EDITOR->Queue_Spawn(prototypeTag, levelIndex, pObj->Get_ObjectGuid());
             }
         }
 
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(ObjectMove_PayLoadKey.c_str()))
         {
-            uint32 draggedID = *static_cast<uint32*>(payload->Data);
-            Shared<GameObject> draggedObj = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_CurrentLevelIndex(), draggedID);
+            const OBJECT_MOVE_PAYLOAD move = *static_cast<const OBJECT_MOVE_PAYLOAD*>(payload->Data);
+            Shared<GameObject> draggedObj = GAME_INSTANCE->Find(move.objectGuid);
 
             // 순환 참조 방지 로직 (자신이 부모가 되거나, 조상을 자신의 자식으로 넣는 경우 방지)
-            if (draggedObj && draggedObj != pObj)
+            if (draggedObj && draggedObj != pObj && move.levelIndex == levelIndex)
             {
                 if (!draggedObj->Get_StableChildKey().empty())
                 {
@@ -202,26 +167,7 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
                 }
                 else
                 {
-                    // 단순 체크: pObj가 draggedObj의 자손인지 확인
-                    bool isDescendant = false;
-                    Shared<GameObject> current = pObj;
-                    while (current) {
-                        if (current == draggedObj) {
-                            isDescendant = true;
-                            break;
-                        }
-                        current = current->Get_Parent();
-                    }
-
-                    if (!isDescendant)
-                    {
-                        draggedObj->Set_Parent(pObj);
-                        LOG_INFO(L"[Hierarchy] Moved {} to child of {}", draggedObj->Get_Name(), pObj->Get_Name());
-                    }
-                    else
-                    {
-                        LOG_WARN(L"[Hierarchy] Cannot move ancestor as child of descendant!");
-                    }
+                    EDITOR->Queue_Reparent(move.objectGuid, pObj->Get_ObjectGuid(), levelIndex);
                 }
             }
         }
@@ -236,7 +182,7 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj) {
 
     if (bOpened) {
       for (auto &child : children) {
-        Render_Node(child);
+        Render_Node(child, levelIndex);
       }
       ImGui::TreePop();
     }
@@ -253,10 +199,12 @@ void Hierarchy::Delete_Selected() {
       return;
     }
 
-    Object::Destroy(selected);
-    EDITOR->Clear_SelectedObject();
+    uint32 levelIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+    const auto& currentObjects = GAME_INSTANCE->Get_GameObjects(levelIndex);
+    if (!currentObjects.contains(selected->Get_InstanceID()))
+        levelIndex = 0;
 
-    GAME_INSTANCE->Clearing_ObjectManager(GAME_INSTANCE->Get_CurrentLevelIndex());
+    EDITOR->Queue_Destroy(selected->Get_ObjectGuid(), levelIndex);
 }
 
 Shared<Hierarchy> Hierarchy::Create() {

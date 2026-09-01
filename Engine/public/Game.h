@@ -40,7 +40,12 @@ protected:
 
 public:
     HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
+    Float Begin_Frame(Bool accumulateFixedTime = true);
     void Update_Engine();
+    void Update_Engine(Float timeDelta, Bool singleFixedStep = false);
+    uint64_t Get_RuntimeFrameCount() const { return m_RuntimeFrameCount; }
+    uint32 Get_LastRuntimeFixedStepCount() const { return m_LastRuntimeFixedStepCount; }
+    Float Get_LastRuntimeDelta() const { return m_LastRuntimeDelta; }
     HRESULT Draw() const;
     HRESULT Draw_NoClearing() const;
 
@@ -84,6 +89,7 @@ public: /* For TimeManager */
     Float Get_FPS() const;
     Float Compute_TimeDelta() const;
     Float Compute_UnscaledTimeDelta() const;
+    Float Get_FixedDeltaTime() const;
     Float Compute_TimeDelta(const wstring &timerTag) const;
 
 public: /* For LevelManager */
@@ -129,6 +135,7 @@ public: /* For ObjectManager */
     Shared<GameObject> Find(ObjectGuid objectGuid) const;
     Shared<GameObject> Find(RuntimeObjectId runtimeObjectId) const;
     HRESULT Destroy(ObjectGuid objectGuid) const;
+	void Flush_DestroyedGameObjects() const;
 	HRESULT Clear_GameObjects(uint32 levIndex) const;
     void Clearing_ObjectManager(uint32 levIndex) const;
 
@@ -317,6 +324,10 @@ private:
     Unique<CollisionManager> m_CollisionManager = { nullptr };
     Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
     Unique<NavigationBuilder> m_NavigationBuilder = { nullptr };
+
+    uint64_t m_RuntimeFrameCount{};
+    uint32 m_LastRuntimeFixedStepCount{};
+    Float m_LastRuntimeDelta{};
 
 
 #ifdef _DEBUG /* For Debug Function */

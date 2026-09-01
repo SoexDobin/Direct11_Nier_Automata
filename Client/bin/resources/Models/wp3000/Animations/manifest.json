@@ -1,0 +1,231 @@
+{
+    "schemaVersion":  1,
+    "model":  "wp3000",
+    "animations":  [
+                       {
+                           "index":  0,
+                           "name":  "wp3000|wp3000_0000",
+                           "file":  "wp3000_wp3000_0000.anim"
+                       },
+                       {
+                           "index":  1,
+                           "name":  "wp3000|wp3000_0001",
+                           "file":  "wp3000_wp3000_0001.anim"
+                       },
+                       {
+                           "index":  2,
+                           "name":  "wp3000|wp3000_0002",
+                           "file":  "wp3000_wp3000_0002.anim"
+                       },
+                       {
+                           "index":  3,
+                           "name":  "wp3000|wp3000_0003",
+                           "file":  "wp3000_wp3000_0003.anim"
+                       },
+                       {
+                           "index":  4,
+                           "name":  "wp3000|wp3000_0005",
+                           "file":  "wp3000_wp3000_0005.anim"
+                       },
+                       {
+                           "index":  5,
+                           "name":  "wp3000|wp3000_0006",
+                           "file":  "wp3000_wp3000_0006.anim"
+                       },
+                       {
+                           "index":  6,
+                           "name":  "wp3000|wp3000_0010",
+                           "file":  "wp3000_wp3000_0010.anim"
+                       },
+                       {
+                           "index":  7,
+                           "name":  "wp3000|wp3000_0011",
+                           "file":  "wp3000_wp3000_0011.anim"
+                       },
+                       {
+                           "index":  8,
+                           "name":  "wp3000|wp3000_0012",
+                           "file":  "wp3000_wp3000_0012.anim"
+                       },
+                       {
+                           "index":  9,
+                           "name":  "wp3000|wp3000_001f",
+                           "file":  "wp3000_wp3000_001f.anim"
+                       },
+                       {
+                           "index":  10,
+                           "name":  "wp3000|wp3000_0020",
+                           "file":  "wp3000_wp3000_0020.anim"
+                       },
+                       {
+                           "index":  11,
+                           "name":  "wp3000|wp3000_0021",
+                           "file":  "wp3000_wp3000_0021.anim"
+                       },
+                       {
+                           "index":  12,
+                           "name":  "wp3000|wp3000_0022",
+                           "file":  "wp3000_wp3000_0022.anim"
+                       },
+                       {
+                           "index":  13,
+                           "name":  "wp3000|wp3000_0025",
+                           "file":  "wp3000_wp3000_0025.anim"
+                       },
+                       {
+                           "index":  14,
+                           "name":  "wp3000|wp3000_0026",
+                           "file":  "wp3000_wp3000_0026.anim"
+                       },
+                       {
+                           "index":  15,
+                           "name":  "wp3000|wp3000_0027",
+                           "file":  "wp3000_wp3000_0027.anim"
+                       },
+                       {
+                           "index":  16,
+                           "name":  "wp3000|wp3000_0030",
+                           "file":  "wp3000_wp3000_0030.anim"
+                       },
+                       {
+                           "index":  17,
+                           "name":  "wp3000|wp3000_0031",
+                           "file":  "wp3000_wp3000_0031.anim"
+                       },
+                       {
+                           "index":  18,
+                           "name":  "wp3000|wp3000_0032",
+                           "file":  "wp3000_wp3000_0032.anim"
+                       },
+                       {
+                           "index":  19,
+                           "name":  "wp3000|wp3000_0040",
+                           "file":  "wp3000_wp3000_0040.anim"
+                       },
+                       {
+                           "index":  20,
+                           "name":  "wp3000|wp3000_0041",
+                           "file":  "wp3000_wp3000_0041.anim"
+                       },
+                       {
+                           "index":  21,
+                           "name":  "wp3000|wp3000_0042",
+                           "file":  "wp3000_wp3000_0042.anim"
+                       },
+                       {
+                           "index":  22,
+                           "name":  "wp3000|wp3000_060e",
+                           "file":  "wp3000_wp3000_060e.anim"
+                       },
+                       {
+                           "index":  23,
+                           "name":  "wp3000|wp3000_060f",
+                           "file":  "wp3000_wp3000_060f.anim"
+                       },
+                       {
+                           "index":  24,
+                           "name":  "wp3000|wp3000_0610",
+                           "file":  "wp3000_wp3000_0610.anim"
+                       },
+                       {
+                           "index":  25,
+                           "name":  "wp3000|wp3000_0611",
+                           "file":  "wp3000_wp3000_0611.anim"
+                       },
+                       {
+                           "index":  26,
+                           "name":  "wp3000|wp3000_0612",
+                           "file":  "wp3000_wp3000_0612.anim"
+                       },
+                       {
+                           "index":  27,
+                           "name":  "wp3000|wp3000_062a",
+                           "file":  "wp3000_wp3000_062a.anim"
+                       },
+                       {
+                           "index":  28,
+                           "name":  "wp3000|wp3000_062b",
+                           "file":  "wp3000_wp3000_062b.anim"
+                       },
+                       {
+                           "index":  29,
+                           "name":  "wp3000|wp3000_120d",
+                           "file":  "wp3000_wp3000_120d.anim"
+                       },
+                       {
+                           "index":  30,
+                           "name":  "wp3000|wp3000_120e",
+                           "file":  "wp3000_wp3000_120e.anim"
+                       },
+                       {
+                           "index":  31,
+                           "name":  "wp3000|wp3000_1210",
+                           "file":  "wp3000_wp3000_1210.anim"
+                       },
+                       {
+                           "index":  32,
+                           "name":  "wp3000|wp3000_a000",
+                           "file":  "wp3000_wp3000_a000.anim"
+                       },
+                       {
+                           "index":  33,
+                           "name":  "wp3000|wp3000_e050",
+                           "file":  "wp3000_wp3000_e050.anim"
+                       },
+                       {
+                           "index":  34,
+                           "name":  "wp3000|wp3000_e051",
+                           "file":  "wp3000_wp3000_e051.anim"
+                       },
+                       {
+                           "index":  35,
+                           "name":  "wp3000|wp3000_e052",
+                           "file":  "wp3000_wp3000_e052.anim"
+                       },
+                       {
+                           "index":  36,
+                           "name":  "wp3000|wp3000_e053",
+                           "file":  "wp3000_wp3000_e053.anim"
+                       },
+                       {
+                           "index":  37,
+                           "name":  "wp3000|wp3000_e054",
+                           "file":  "wp3000_wp3000_e054.anim"
+                       },
+                       {
+                           "index":  38,
+                           "name":  "wp3000|wp3000_e063",
+                           "file":  "wp3000_wp3000_e063.anim"
+                       },
+                       {
+                           "index":  39,
+                           "name":  "wp3000|wp3000_e065",
+                           "file":  "wp3000_wp3000_e065.anim"
+                       },
+                       {
+                           "index":  40,
+                           "name":  "wp3000|wp3000_e070",
+                           "file":  "wp3000_wp3000_e070.anim"
+                       },
+                       {
+                           "index":  41,
+                           "name":  "wp3000|wp3000_e072",
+                           "file":  "wp3000_wp3000_e072.anim"
+                       },
+                       {
+                           "index":  42,
+                           "name":  "wp3000|wp3000_e073",
+                           "file":  "wp3000_wp3000_e073.anim"
+                       },
+                       {
+                           "index":  43,
+                           "name":  "wp3000|wp3000_e075",
+                           "file":  "wp3000_wp3000_e075.anim"
+                       },
+                       {
+                           "index":  44,
+                           "name":  "wp3000|wp3000_e076",
+                           "file":  "wp3000_wp3000_e076.anim"
+                       }
+                   ]
+}

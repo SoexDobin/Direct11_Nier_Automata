@@ -1,0 +1,356 @@
+{
+    "schemaVersion":  1,
+    "model":  "wp0070",
+    "animations":  [
+                       {
+                           "index":  0,
+                           "name":  "wp0070|wpf000_0000",
+                           "file":  "wp0070_wpf000_0000.anim"
+                       },
+                       {
+                           "index":  1,
+                           "name":  "wp0070|wpf000_0001",
+                           "file":  "wp0070_wpf000_0001.anim"
+                       },
+                       {
+                           "index":  2,
+                           "name":  "wp0070|wpf000_005a",
+                           "file":  "wp0070_wpf000_005a.anim"
+                       },
+                       {
+                           "index":  3,
+                           "name":  "wp0070|wpf000_005b",
+                           "file":  "wp0070_wpf000_005b.anim"
+                       },
+                       {
+                           "index":  4,
+                           "name":  "wp0070|wpf000_0100",
+                           "file":  "wp0070_wpf000_0100.anim"
+                       },
+                       {
+                           "index":  5,
+                           "name":  "wp0070|wpf000_0101",
+                           "file":  "wp0070_wpf000_0101.anim"
+                       },
+                       {
+                           "index":  6,
+                           "name":  "wp0070|wpf000_0102",
+                           "file":  "wp0070_wpf000_0102.anim"
+                       },
+                       {
+                           "index":  7,
+                           "name":  "wp0070|wpf000_0103",
+                           "file":  "wp0070_wpf000_0103.anim"
+                       },
+                       {
+                           "index":  8,
+                           "name":  "wp0070|wpf000_0104",
+                           "file":  "wp0070_wpf000_0104.anim"
+                       },
+                       {
+                           "index":  9,
+                           "name":  "wp0070|wpf000_0105",
+                           "file":  "wp0070_wpf000_0105.anim"
+                       },
+                       {
+                           "index":  10,
+                           "name":  "wp0070|wpf000_0106",
+                           "file":  "wp0070_wpf000_0106.anim"
+                       },
+                       {
+                           "index":  11,
+                           "name":  "wp0070|wpf000_0107",
+                           "file":  "wp0070_wpf000_0107.anim"
+                       },
+                       {
+                           "index":  12,
+                           "name":  "wp0070|wpf000_0108",
+                           "file":  "wp0070_wpf000_0108.anim"
+                       },
+                       {
+                           "index":  13,
+                           "name":  "wp0070|wpf000_0110",
+                           "file":  "wp0070_wpf000_0110.anim"
+                       },
+                       {
+                           "index":  14,
+                           "name":  "wp0070|wpf000_0111",
+                           "file":  "wp0070_wpf000_0111.anim"
+                       },
+                       {
+                           "index":  15,
+                           "name":  "wp0070|wpf000_0113",
+                           "file":  "wp0070_wpf000_0113.anim"
+                       },
+                       {
+                           "index":  16,
+                           "name":  "wp0070|wpf000_0114",
+                           "file":  "wp0070_wpf000_0114.anim"
+                       },
+                       {
+                           "index":  17,
+                           "name":  "wp0070|wpf000_0116",
+                           "file":  "wp0070_wpf000_0116.anim"
+                       },
+                       {
+                           "index":  18,
+                           "name":  "wp0070|wpf000_0117",
+                           "file":  "wp0070_wpf000_0117.anim"
+                       },
+                       {
+                           "index":  19,
+                           "name":  "wp0070|wpf000_0119",
+                           "file":  "wp0070_wpf000_0119.anim"
+                       },
+                       {
+                           "index":  20,
+                           "name":  "wp0070|wpf000_0130",
+                           "file":  "wp0070_wpf000_0130.anim"
+                       },
+                       {
+                           "index":  21,
+                           "name":  "wp0070|wpf000_0131",
+                           "file":  "wp0070_wpf000_0131.anim"
+                       },
+                       {
+                           "index":  22,
+                           "name":  "wp0070|wpf000_0132",
+                           "file":  "wp0070_wpf000_0132.anim"
+                       },
+                       {
+                           "index":  23,
+                           "name":  "wp0070|wpf000_0133",
+                           "file":  "wp0070_wpf000_0133.anim"
+                       },
+                       {
+                           "index":  24,
+                           "name":  "wp0070|wpf000_0134",
+                           "file":  "wp0070_wpf000_0134.anim"
+                       },
+                       {
+                           "index":  25,
+                           "name":  "wp0070|wpf000_0135",
+                           "file":  "wp0070_wpf000_0135.anim"
+                       },
+                       {
+                           "index":  26,
+                           "name":  "wp0070|wpf000_0136",
+                           "file":  "wp0070_wpf000_0136.anim"
+                       },
+                       {
+                           "index":  27,
+                           "name":  "wp0070|wpf000_0150",
+                           "file":  "wp0070_wpf000_0150.anim"
+                       },
+                       {
+                           "index":  28,
+                           "name":  "wp0070|wpf000_0155",
+                           "file":  "wp0070_wpf000_0155.anim"
+                       },
+                       {
+                           "index":  29,
+                           "name":  "wp0070|wpf000_0156",
+                           "file":  "wp0070_wpf000_0156.anim"
+                       },
+                       {
+                           "index":  30,
+                           "name":  "wp0070|wpf000_0157",
+                           "file":  "wp0070_wpf000_0157.anim"
+                       },
+                       {
+                           "index":  31,
+                           "name":  "wp0070|wpf000_0160",
+                           "file":  "wp0070_wpf000_0160.anim"
+                       },
+                       {
+                           "index":  32,
+                           "name":  "wp0070|wpf000_0180",
+                           "file":  "wp0070_wpf000_0180.anim"
+                       },
+                       {
+                           "index":  33,
+                           "name":  "wp0070|wpf000_0188",
+                           "file":  "wp0070_wpf000_0188.anim"
+                       },
+                       {
+                           "index":  34,
+                           "name":  "wp0070|wpf000_018d",
+                           "file":  "wp0070_wpf000_018d.anim"
+                       },
+                       {
+                           "index":  35,
+                           "name":  "wp0070|wpf000_018e",
+                           "file":  "wp0070_wpf000_018e.anim"
+                       },
+                       {
+                           "index":  36,
+                           "name":  "wp0070|wpf000_018f",
+                           "file":  "wp0070_wpf000_018f.anim"
+                       },
+                       {
+                           "index":  37,
+                           "name":  "wp0070|wpf000_01e0",
+                           "file":  "wp0070_wpf000_01e0.anim"
+                       },
+                       {
+                           "index":  38,
+                           "name":  "wp0070|wpf000_01e8",
+                           "file":  "wp0070_wpf000_01e8.anim"
+                       },
+                       {
+                           "index":  39,
+                           "name":  "wp0070|wpf000_01e9",
+                           "file":  "wp0070_wpf000_01e9.anim"
+                       },
+                       {
+                           "index":  40,
+                           "name":  "wp0070|wpf000_01f0",
+                           "file":  "wp0070_wpf000_01f0.anim"
+                       },
+                       {
+                           "index":  41,
+                           "name":  "wp0070|wpf000_01f5",
+                           "file":  "wp0070_wpf000_01f5.anim"
+                       },
+                       {
+                           "index":  42,
+                           "name":  "wp0070|wpf000_01f6",
+                           "file":  "wp0070_wpf000_01f6.anim"
+                       },
+                       {
+                           "index":  43,
+                           "name":  "wp0070|wpf000_01f7",
+                           "file":  "wp0070_wpf000_01f7.anim"
+                       },
+                       {
+                           "index":  44,
+                           "name":  "wp0070|wpf000_0600",
+                           "file":  "wp0070_wpf000_0600.anim"
+                       },
+                       {
+                           "index":  45,
+                           "name":  "wp0070|wpf000_0640",
+                           "file":  "wp0070_wpf000_0640.anim"
+                       },
+                       {
+                           "index":  46,
+                           "name":  "wp0070|wpf000_0643",
+                           "file":  "wp0070_wpf000_0643.anim"
+                       },
+                       {
+                           "index":  47,
+                           "name":  "wp0070|wpf000_0644",
+                           "file":  "wp0070_wpf000_0644.anim"
+                       },
+                       {
+                           "index":  48,
+                           "name":  "wp0070|wpf000_064c",
+                           "file":  "wp0070_wpf000_064c.anim"
+                       },
+                       {
+                           "index":  49,
+                           "name":  "wp0070|wpf000_0655",
+                           "file":  "wp0070_wpf000_0655.anim"
+                       },
+                       {
+                           "index":  50,
+                           "name":  "wp0070|wpf000_0660",
+                           "file":  "wp0070_wpf000_0660.anim"
+                       },
+                       {
+                           "index":  51,
+                           "name":  "wp0070|wpf000_0900",
+                           "file":  "wp0070_wpf000_0900.anim"
+                       },
+                       {
+                           "index":  52,
+                           "name":  "wp0070|wpf000_0901",
+                           "file":  "wp0070_wpf000_0901.anim"
+                       },
+                       {
+                           "index":  53,
+                           "name":  "wp0070|wpf000_0902",
+                           "file":  "wp0070_wpf000_0902.anim"
+                       },
+                       {
+                           "index":  54,
+                           "name":  "wp0070|wpf000_0903",
+                           "file":  "wp0070_wpf000_0903.anim"
+                       },
+                       {
+                           "index":  55,
+                           "name":  "wp0070|wpf000_0904",
+                           "file":  "wp0070_wpf000_0904.anim"
+                       },
+                       {
+                           "index":  56,
+                           "name":  "wp0070|wpf000_0905",
+                           "file":  "wp0070_wpf000_0905.anim"
+                       },
+                       {
+                           "index":  57,
+                           "name":  "wp0070|wpf000_0906",
+                           "file":  "wp0070_wpf000_0906.anim"
+                       },
+                       {
+                           "index":  58,
+                           "name":  "wp0070|wpf000_0907",
+                           "file":  "wp0070_wpf000_0907.anim"
+                       },
+                       {
+                           "index":  59,
+                           "name":  "wp0070|wpf000_0908",
+                           "file":  "wp0070_wpf000_0908.anim"
+                       },
+                       {
+                           "index":  60,
+                           "name":  "wp0070|wpf000_0909",
+                           "file":  "wp0070_wpf000_0909.anim"
+                       },
+                       {
+                           "index":  61,
+                           "name":  "wp0070|wpf000_090a",
+                           "file":  "wp0070_wpf000_090a.anim"
+                       },
+                       {
+                           "index":  62,
+                           "name":  "wp0070|wpf000_090b",
+                           "file":  "wp0070_wpf000_090b.anim"
+                       },
+                       {
+                           "index":  63,
+                           "name":  "wp0070|wpf000_c001",
+                           "file":  "wp0070_wpf000_c001.anim"
+                       },
+                       {
+                           "index":  64,
+                           "name":  "wp0070|wpf000_c002",
+                           "file":  "wp0070_wpf000_c002.anim"
+                       },
+                       {
+                           "index":  65,
+                           "name":  "wp0070|wpf000_e089",
+                           "file":  "wp0070_wpf000_e089.anim"
+                       },
+                       {
+                           "index":  66,
+                           "name":  "wp0070|wpf000_e0e5",
+                           "file":  "wp0070_wpf000_e0e5.anim"
+                       },
+                       {
+                           "index":  67,
+                           "name":  "wp0070|wpf000_e0e6",
+                           "file":  "wp0070_wpf000_e0e6.anim"
+                       },
+                       {
+                           "index":  68,
+                           "name":  "wp0070|wpf000_e0e7",
+                           "file":  "wp0070_wpf000_e0e7.anim"
+                       },
+                       {
+                           "index":  69,
+                           "name":  "wp0070|wpf000_e0e8",
+                           "file":  "wp0070_wpf000_e0e8.anim"
+                       }
+                   ]
+}

@@ -1,0 +1,231 @@
+{
+    "schemaVersion":  1,
+    "model":  "wp0220",
+    "animations":  [
+                       {
+                           "index":  0,
+                           "name":  "wp0220|wpf200_0000",
+                           "file":  "wp0220_wpf200_0000.anim"
+                       },
+                       {
+                           "index":  1,
+                           "name":  "wp0220|wpf200_005a",
+                           "file":  "wp0220_wpf200_005a.anim"
+                       },
+                       {
+                           "index":  2,
+                           "name":  "wp0220|wpf200_005b",
+                           "file":  "wp0220_wpf200_005b.anim"
+                       },
+                       {
+                           "index":  3,
+                           "name":  "wp0220|wpf200_0200",
+                           "file":  "wp0220_wpf200_0200.anim"
+                       },
+                       {
+                           "index":  4,
+                           "name":  "wp0220|wpf200_0201",
+                           "file":  "wp0220_wpf200_0201.anim"
+                       },
+                       {
+                           "index":  5,
+                           "name":  "wp0220|wpf200_0202",
+                           "file":  "wp0220_wpf200_0202.anim"
+                       },
+                       {
+                           "index":  6,
+                           "name":  "wp0220|wpf200_0203",
+                           "file":  "wp0220_wpf200_0203.anim"
+                       },
+                       {
+                           "index":  7,
+                           "name":  "wp0220|wpf200_0205",
+                           "file":  "wp0220_wpf200_0205.anim"
+                       },
+                       {
+                           "index":  8,
+                           "name":  "wp0220|wpf200_0207",
+                           "file":  "wp0220_wpf200_0207.anim"
+                       },
+                       {
+                           "index":  9,
+                           "name":  "wp0220|wpf200_0209",
+                           "file":  "wp0220_wpf200_0209.anim"
+                       },
+                       {
+                           "index":  10,
+                           "name":  "wp0220|wpf200_020b",
+                           "file":  "wp0220_wpf200_020b.anim"
+                       },
+                       {
+                           "index":  11,
+                           "name":  "wp0220|wpf200_020d",
+                           "file":  "wp0220_wpf200_020d.anim"
+                       },
+                       {
+                           "index":  12,
+                           "name":  "wp0220|wpf200_020f",
+                           "file":  "wp0220_wpf200_020f.anim"
+                       },
+                       {
+                           "index":  13,
+                           "name":  "wp0220|wpf200_0211",
+                           "file":  "wp0220_wpf200_0211.anim"
+                       },
+                       {
+                           "index":  14,
+                           "name":  "wp0220|wpf200_0212",
+                           "file":  "wp0220_wpf200_0212.anim"
+                       },
+                       {
+                           "index":  15,
+                           "name":  "wp0220|wpf200_0213",
+                           "file":  "wp0220_wpf200_0213.anim"
+                       },
+                       {
+                           "index":  16,
+                           "name":  "wp0220|wpf200_0214",
+                           "file":  "wp0220_wpf200_0214.anim"
+                       },
+                       {
+                           "index":  17,
+                           "name":  "wp0220|wpf200_021a",
+                           "file":  "wp0220_wpf200_021a.anim"
+                       },
+                       {
+                           "index":  18,
+                           "name":  "wp0220|wpf200_0220",
+                           "file":  "wp0220_wpf200_0220.anim"
+                       },
+                       {
+                           "index":  19,
+                           "name":  "wp0220|wpf200_0225",
+                           "file":  "wp0220_wpf200_0225.anim"
+                       },
+                       {
+                           "index":  20,
+                           "name":  "wp0220|wpf200_0226",
+                           "file":  "wp0220_wpf200_0226.anim"
+                       },
+                       {
+                           "index":  21,
+                           "name":  "wp0220|wpf200_0227",
+                           "file":  "wp0220_wpf200_0227.anim"
+                       },
+                       {
+                           "index":  22,
+                           "name":  "wp0220|wpf200_022a",
+                           "file":  "wp0220_wpf200_022a.anim"
+                       },
+                       {
+                           "index":  23,
+                           "name":  "wp0220|wpf200_0280",
+                           "file":  "wp0220_wpf200_0280.anim"
+                       },
+                       {
+                           "index":  24,
+                           "name":  "wp0220|wpf200_0288",
+                           "file":  "wp0220_wpf200_0288.anim"
+                       },
+                       {
+                           "index":  25,
+                           "name":  "wp0220|wpf200_028d",
+                           "file":  "wp0220_wpf200_028d.anim"
+                       },
+                       {
+                           "index":  26,
+                           "name":  "wp0220|wpf200_028e",
+                           "file":  "wp0220_wpf200_028e.anim"
+                       },
+                       {
+                           "index":  27,
+                           "name":  "wp0220|wpf200_028f",
+                           "file":  "wp0220_wpf200_028f.anim"
+                       },
+                       {
+                           "index":  28,
+                           "name":  "wp0220|wpf200_02e0",
+                           "file":  "wp0220_wpf200_02e0.anim"
+                       },
+                       {
+                           "index":  29,
+                           "name":  "wp0220|wpf200_02e8",
+                           "file":  "wp0220_wpf200_02e8.anim"
+                       },
+                       {
+                           "index":  30,
+                           "name":  "wp0220|wpf200_02f0",
+                           "file":  "wp0220_wpf200_02f0.anim"
+                       },
+                       {
+                           "index":  31,
+                           "name":  "wp0220|wpf200_02f5",
+                           "file":  "wp0220_wpf200_02f5.anim"
+                       },
+                       {
+                           "index":  32,
+                           "name":  "wp0220|wpf200_02f6",
+                           "file":  "wp0220_wpf200_02f6.anim"
+                       },
+                       {
+                           "index":  33,
+                           "name":  "wp0220|wpf200_02f7",
+                           "file":  "wp0220_wpf200_02f7.anim"
+                       },
+                       {
+                           "index":  34,
+                           "name":  "wp0220|wpf200_0600",
+                           "file":  "wp0220_wpf200_0600.anim"
+                       },
+                       {
+                           "index":  35,
+                           "name":  "wp0220|wpf200_0640",
+                           "file":  "wp0220_wpf200_0640.anim"
+                       },
+                       {
+                           "index":  36,
+                           "name":  "wp0220|wpf200_0646",
+                           "file":  "wp0220_wpf200_0646.anim"
+                       },
+                       {
+                           "index":  37,
+                           "name":  "wp0220|wpf200_0647",
+                           "file":  "wp0220_wpf200_0647.anim"
+                       },
+                       {
+                           "index":  38,
+                           "name":  "wp0220|wpf200_064f",
+                           "file":  "wp0220_wpf200_064f.anim"
+                       },
+                       {
+                           "index":  39,
+                           "name":  "wp0220|wpf200_0658",
+                           "file":  "wp0220_wpf200_0658.anim"
+                       },
+                       {
+                           "index":  40,
+                           "name":  "wp0220|wpf200_0659",
+                           "file":  "wp0220_wpf200_0659.anim"
+                       },
+                       {
+                           "index":  41,
+                           "name":  "wp0220|wpf200_0663",
+                           "file":  "wp0220_wpf200_0663.anim"
+                       },
+                       {
+                           "index":  42,
+                           "name":  "wp0220|wpf200_c201",
+                           "file":  "wp0220_wpf200_c201.anim"
+                       },
+                       {
+                           "index":  43,
+                           "name":  "wp0220|wpf200_c202",
+                           "file":  "wp0220_wpf200_c202.anim"
+                       },
+                       {
+                           "index":  44,
+                           "name":  "wp0220|wpf200_c234",
+                           "file":  "wp0220_wpf200_c234.anim"
+                       }
+                   ]
+}

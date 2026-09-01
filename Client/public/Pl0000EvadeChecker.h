@@ -9,7 +9,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Pl0000EvadeChecker final : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	explicit Pl0000EvadeChecker();
 	explicit Pl0000EvadeChecker(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

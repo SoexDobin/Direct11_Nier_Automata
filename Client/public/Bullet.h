@@ -14,7 +14,6 @@ class Entity;
 
 class CLIENT_DLL Bullet final : public Projectile
 {
-    RTTR_ENABLE(Projectile)
 public:
     typedef struct tagBulletDesc : public PROJECTILE_DESC
     {

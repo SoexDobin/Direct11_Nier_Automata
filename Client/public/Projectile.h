@@ -5,7 +5,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Projectile abstract : public GameObject
 {
-	RTTR_ENABLE(GameObject)
 public:
 	typedef struct tagProjectileDesc : public GAMEOBJECT_DESC
 	{

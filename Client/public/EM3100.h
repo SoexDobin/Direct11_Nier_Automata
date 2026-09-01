@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Em3100 final : public Monster
 {
-	RTTR_ENABLE(Monster)
 public:
 	typedef struct tagEm3100Desc : public MONSTER_DESC
 	{

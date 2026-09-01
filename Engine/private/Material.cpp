@@ -46,9 +46,6 @@ void Material::On_Destroy()
 
 HRESULT Material::Initialize_Prototype(const MODEL_MATERIAL& materialData)
 {
-	Char drivePath[MAX_PATH] = {};
-	Char dirPath[MAX_PATH] = {};
-
 	m_TextureTypeMax = materialData.textureTypeMax;
 	m_MaterialTextures = make_shared<vector<ComPtr<ID3D11ShaderResourceView>>[]>(m_TextureTypeMax);
 
@@ -59,40 +56,39 @@ HRESULT Material::Initialize_Prototype(const MODEL_MATERIAL& materialData)
 		// 유효한 텍스처 타입 인덱스인지 안전 검사
 		if (typeIndex >= m_TextureTypeMax)
 			continue;
-		Char szFileName[MAX_PATH] = {};
-		Char szEXT[MAX_PATH] = {};
+		filesystem::path texturePath = filesystem::path(materialData.directoryPath) / texEntry.path;
+		if (!filesystem::is_regular_file(texturePath))
+		{
+			texturePath = filesystem::path(materialData.directoryPath) /
+				"Textures" / filesystem::path(texEntry.path).filename();
+		}
+		const string extension = texturePath.extension().string();
+		const wstring textureFilePath = texturePath.wstring();
 		// 컨버터가 저장한 텍스처 파일 이름과 확장자 분리
-		_splitpath_s(texEntry.path.c_str(), nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szEXT, MAX_PATH);
-		Char szFullPath[MAX_PATH] = {};
 		// Model에서 주입해준 디렉토리 경로 + 텍스처 파일명 + 확장자로 절대/상대 경로 완성
 
-		strcpy_s(szFullPath, materialData.directoryPath.c_str());
-		strcat_s(szFullPath, szFileName);
-		strcat_s(szFullPath, szEXT);
 		// DirectX 텍스처 로더는 wstring을 요구하므로 변환
 
-		WCHAR szTextureFilePath[MAX_PATH] = {};
-		MultiByteToWideChar(CP_ACP, 0, szFullPath, static_cast<int32>(strlen(szFullPath)), szTextureFilePath, MAX_PATH);
 		HRESULT hr = S_OK;
 		ComPtr<ID3D11ShaderResourceView> srv = nullptr;
 		
-		if (false == _stricmp(szEXT, ".dds"))
+		if (false == _stricmp(extension.c_str(), ".dds"))
 		{
-			hr = CreateDDSTextureFromFile(m_Device.Get(), szTextureFilePath, nullptr, srv.GetAddressOf());
+			hr = CreateDDSTextureFromFile(m_Device.Get(), textureFilePath.c_str(), nullptr, srv.GetAddressOf());
 		}
-		else if (false == _stricmp(szEXT, ".tga"))
+		else if (false == _stricmp(extension.c_str(), ".tga"))
 		{	
 			LOG_ERROR(L"TGA File Service not available");
 			hr = E_FAIL;
 		}
 		else
 		{
-			hr = CreateWICTextureFromFile(m_Device.Get(), szTextureFilePath, nullptr, srv.GetAddressOf());
+			hr = CreateWICTextureFromFile(m_Device.Get(), textureFilePath.c_str(), nullptr, srv.GetAddressOf());
 		}
 		
 		if (FAILED(hr))
 		{
-			LOG_ERROR(L"Failed To Load Texture : {}", szTextureFilePath);
+			LOG_ERROR(L"Failed To Load Texture : {}", textureFilePath);
 			continue; // 혹은 return E_FAIL;
 		}
 		

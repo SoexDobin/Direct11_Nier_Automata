@@ -40,12 +40,15 @@ struct GuidHash final {
 
 ENGINE_DLL ObjectGuid Create_ObjectGuid() noexcept;
 ENGINE_DLL AssetGuid Create_AssetGuid() noexcept;
+ENGINE_DLL PrefabGuid Create_PrefabGuid() noexcept;
 ENGINE_DLL ObjectGuid Derive_ChildObjectGuid(ObjectGuid parentObjectGuid,
     std::wstring_view stableChildKey, std::string_view registeredName) noexcept;
 ENGINE_DLL RuntimeObjectId Create_RuntimeObjectId() noexcept;
 ENGINE_DLL std::string To_String(ObjectGuid guid);
 ENGINE_DLL std::string To_String(AssetGuid guid);
+ENGINE_DLL std::string To_String(PrefabGuid guid);
 ENGINE_DLL bool Try_Parse_ObjectGuid(std::string_view value, ObjectGuid& outGuid) noexcept;
 ENGINE_DLL bool Try_Parse_AssetGuid(std::string_view value, AssetGuid& outGuid) noexcept;
+ENGINE_DLL bool Try_Parse_PrefabGuid(std::string_view value, PrefabGuid& outGuid) noexcept;
 
 NS_END

@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL SkyBox final : public GameObject
 {
-	RTTR_ENABLE(GameObject)
 public:
 	explicit SkyBox();
 	explicit SkyBox(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

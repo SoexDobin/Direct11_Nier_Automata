@@ -20,7 +20,8 @@ ClientApp::~ClientApp() {}
 
 HRESULT ClientApp::Initialize(const ENGINE_DESC& desc) 
 {
-    Client::Register_Client_Reflection();
+	if (FAILED(Client::Register_Client_Reflection()))
+		return E_FAIL;
     if (FAILED(GAME_INSTANCE->Refresh_ReflectionRegistry()))
         return E_FAIL;
 

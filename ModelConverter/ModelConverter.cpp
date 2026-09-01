@@ -178,7 +178,7 @@ int wmain(int argc, wchar_t* argv[])
 		if (animationOnly)
 		{
 			const fs::path animationDirectory =
-				outputPath.parent_path() / (outputPath.stem().wstring() + L" Animation");
+				outputPath.parent_path() / L"Animations";
 			std::cout << "  [OK] -> " << ToUtf8(animationDirectory) << "\n\n";
 		}
 		else

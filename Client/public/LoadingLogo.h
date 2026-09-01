@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL LoadingLogo : public UIObject
 {
-    RTTR_ENABLE(UIObject)
 public:
     LoadingLogo();
     LoadingLogo(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

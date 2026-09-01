@@ -9,7 +9,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Pl0000MonsterChecker final : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	explicit Pl0000MonsterChecker();
 	explicit Pl0000MonsterChecker(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

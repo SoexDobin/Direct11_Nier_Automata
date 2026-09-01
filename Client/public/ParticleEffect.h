@@ -5,7 +5,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL ParticleEffect abstract : public GameObject
 {
-	RTTR_ENABLE(GameObject)
 public:
 	typedef struct tagParticleEffectDesc : public GAMEOBJECT_DESC{} PARTICLE_EFFECT_DESC;
 

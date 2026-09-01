@@ -5,7 +5,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL StaticCamera final : public Camera
 {
-	RTTR_ENABLE(Camera)
 public:
 	typedef struct tagStaticCameraDesc : public CAMERA_DESC
 	{

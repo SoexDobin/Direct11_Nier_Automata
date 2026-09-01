@@ -27,7 +27,6 @@ public:
 	  m_ResourceDir = m_ProjectRoot + L"Client/bin/Resources/";
     m_ClientProjectDir = m_ProjectRoot + L"Client/";
     m_ClientPublicDir = m_ClientProjectDir + L"public/";
-    m_ClientMetadataPath = m_ProjectRoot + L"client_metadata.json";
   }
   const wstring& GetProjectRoot() const { return m_ProjectRoot; }
   const wstring& GetProjectSettingDir() const { return m_ProjectSettingDir; }
@@ -50,7 +49,6 @@ public:
   const wstring& GetNavDataDir() const { return m_NavDataDir; }
   const wstring& GetClientProjectDir() const { return m_ClientProjectDir; }
   const wstring& GetClientPublicDir() const { return m_ClientPublicDir; }
-  const wstring& GetClientMetadataPath() const { return m_ClientMetadataPath; }
   void SetProjectRoot(const wstring &root) { Initialize(root); }
 
 private:
@@ -74,7 +72,6 @@ private:
   wstring m_NavDataDir = L"../../ProjectSetting/NavData/";
   wstring m_ClientProjectDir = L"../../Client/";
   wstring m_ClientPublicDir = L"../../Client/public/";
-  wstring m_ClientMetadataPath = L"../../ProjectSetting/client_metadata.json";
 };
 #define PATH Editor::PathManager::GetInstance()
 

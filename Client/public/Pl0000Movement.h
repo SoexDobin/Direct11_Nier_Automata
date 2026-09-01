@@ -14,7 +14,6 @@ class Pl0000Input;
 
 class CLIENT_DLL Pl0000Movement final : public Movement
 {
-	RTTR_ENABLE(Movement)
 public:
 	typedef struct tagPl0000MovementDesc : public MOVEMENT_DESC
 	{

@@ -13,7 +13,6 @@ class WP0070Body;
 
 class CLIENT_DLL Em3100Body final : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	typedef struct tagEm3100BodyDesc : public PARTOBJECT_DESC
 	{

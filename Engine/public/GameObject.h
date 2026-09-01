@@ -8,6 +8,7 @@
 
 NS_BEGIN(Engine)
 class Game;
+class LevelSerializer;
 class Component;
 class ScriptComponent;
 class Transform;
@@ -48,7 +49,6 @@ public:
     virtual void Fixed_Update(Float fixedDelta);
     virtual HRESULT Render();
     virtual void Submit_RenderGroup();
-    void Post_Load();
 
 public: // 충돌 함수
     virtual void OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<Collider>& targetCollider) {};
@@ -96,11 +96,15 @@ public:
     HRESULT Add_Component(const Shared<Component> &component);
     Shared<Component> Add_Component(uint32 levIndex, uint32 objectID, void* arg = nullptr);
     Shared<Component> Add_Component(uint32 levIndex, const wstring& prototypeTag, void* arg = nullptr);
+	Shared<Component> Add_Component_Reflected(uint32 levIndex, RuntimeTypeId externalRuntimeTypeId,
+		const wstring& fallbackPrototypeTag, void* arg = nullptr);
 
     template <typename T>
     Shared<T> Add_Component(uint32 levIndex = 0, void* arg = nullptr)
     {
-        return static_pointer_cast<T>(Add_Component(levIndex, Helper::To_wString(rttr::type::get<T>().get_name()), arg));
+		return static_pointer_cast<T>(Add_Component_Reflected(levIndex,
+			Make_ExternalRuntimeTypeId<T>(),
+			Helper::To_wString(rttr::type::get<T>().get_name()), arg));
     }
 
     template <typename T>
@@ -111,20 +115,15 @@ public:
 
 public:
      template <typename T> requires is_base_of_v<Component, T>
-      	Shared<T> Get_Component() {
-        const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id());
-
-        for (auto &[objectID, component] : m_Components) {
-            if (component->Get_RuntimeTypeId() == runtimeTypeId) {
-              return std::static_pointer_cast<T>(component);
-            }
-        }
-        for (auto &[objectID, script] : m_Scripts) {
-            if (script->Get_RuntimeTypeId() == runtimeTypeId) {
-				auto base = std::static_pointer_cast<Component>(script);
-				return std::static_pointer_cast<T>(base);
-            }
-        }
+	Shared<T> Get_Component() {
+		for (auto &[objectID, component] : m_Components) {
+			if (Shared<T> typed = std::dynamic_pointer_cast<T>(component))
+				return typed;
+		}
+		for (auto &[objectID, script] : m_Scripts) {
+			if (Shared<T> typed = std::dynamic_pointer_cast<T>(script))
+				return typed;
+		}
 
         return nullptr;
     }
@@ -133,6 +132,9 @@ public:
 	virtual Shared<GameObject> Clone(void *arg) PURE;
 
 private:
+	friend class LevelSerializer;
+	HRESULT Post_Load();
+
 	using Object::m_DescID;
 };
 

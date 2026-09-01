@@ -230,19 +230,21 @@ HRESULT GameObject::Add_Child(uint32 prototypeLevIndex, const wstring& registere
     return S_OK;
 }
 
-void GameObject::Post_Load()
+HRESULT GameObject::Post_Load()
 {
-
-    // 2. 소속 컴포넌트들의 참조 필드 해결
+	// 소속 컴포넌트들의 저장 후처리와 참조 필드 해결
     for (auto& [id, comp] : m_Components)
     {
         if (!comp) continue;
+		if (FAILED(comp->Post_Load()))
+			return E_FAIL;
         // 네비게이션 위치 후처리
         if (comp->Get_ComponentType() == COMPONENT_TYPE::NAVIGATION)
         {
             static_pointer_cast<Navigation>(comp)->Compute_CurrentCellByPosition(m_Transform->Get_Position());
         }
     }
+	return S_OK;
 }
 
 HRESULT GameObject::Remove_Child(const Shared<GameObject> &child) {
@@ -413,4 +415,13 @@ Shared<Component> GameObject::Add_Component(uint32 levIndex, const wstring& prot
         if (!newComponent) LOG_ERROR(L"Failed to Add Component {}", prototypeTag);
 
     return newComponent;
+}
+
+Shared<Component> GameObject::Add_Component_Reflected(uint32 levIndex,
+	RuntimeTypeId externalRuntimeTypeId, const wstring& fallbackPrototypeTag, void* arg)
+{
+	const string registeredName = GAME_INSTANCE->Find_RegisteredName(externalRuntimeTypeId);
+	return Add_Component(levIndex, registeredName.empty()
+		? fallbackPrototypeTag
+		: Helper::To_wString(registeredName), arg);
 }

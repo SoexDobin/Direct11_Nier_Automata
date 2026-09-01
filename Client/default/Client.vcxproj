@@ -136,10 +136,6 @@
       <EntryPointName>main</EntryPointName>
       <AdditionalIncludeDirectories>..\..\EngineSDK\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </FxCompile>
-    <PreBuildEvent>
-      <Command>call "$(ProjectDir)GenerateRTTR_Client.bat"</Command>
-      <Message>Reflection Client Class</Message>
-    </PreBuildEvent>
     <PreLinkEvent>
       <Command>
       </Command>
@@ -273,7 +269,7 @@
     <ClCompile Include="..\private\CityOfRuinBridge.cpp" />
     <ClCompile Include="..\private\CityOfRuinEntry.cpp" />
     <ClCompile Include="..\private\ClientSettingManager.cpp" />
-    <ClCompile Include="..\private\Client_RTTR.cpp" />
+	<ClCompile Include="..\private\ClientTypeRegistration.cpp" />
     <ClCompile Include="..\private\Em0010.cpp" />
     <ClCompile Include="..\private\Em0010Body.cpp" />
     <ClCompile Include="..\private\Em0010Movement.cpp" />
@@ -369,8 +365,6 @@
     <FxCompile Include="..\bin\shaders\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClientRTTRGenerator.py" />
-    <None Include="GenerateRTTR_Client.bat" />
     <None Include="PostBuildCopy.bat" />
   </ItemGroup>
   <ItemGroup>

@@ -10,7 +10,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL WP0070Body final : public Pl0000Parts
 {
-	RTTR_ENABLE(Pl0000Parts)
 public:
 	explicit WP0070Body();
 	explicit WP0070Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

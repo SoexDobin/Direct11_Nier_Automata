@@ -23,5 +23,11 @@ RTTR_REGISTRATION_NAMED(Model_RTTR)
 			metadata(DataType, wString),
 			metadata(TypeTag, Data_Tag::ResourceTag),
 			metadata(SaveData, Save_Data_Key::ModelTag)
+		)
+		.property("AnimationPreset", &Model::Get_AnimationPreset, &Model::Set_AnimationPreset)
+		(
+			metadata(DataType, "AnimationPreset"),
+			metadata(TypeTag, "AnimationPreset"),
+			metadata(SaveData, Save_Data_Key::AnimationPreset)
 		);
 }

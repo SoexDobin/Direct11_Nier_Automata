@@ -18,16 +18,12 @@ public:
 	HRESULT Initialize() override;
 	void Update(Bool isResize) override;
 	void Render(Bool isResize) override;
+	Shared<Engine::Model> Get_SelectedModel() const { return m_pSelectedModel; }
 
 private:
 	void View_ModelList();
 	void View_AnimationList();
-	void View_AnimationPreset();
 	void Handle_KeyInput();
-	void New_AnimationPreset();
-	void Save_AnimationPreset();
-	void Load_AnimationPreset(const filesystem::path& presetPath);
-	void Apply_AnimationPreset();
 
 private:
 	wstring m_SelectedModelTag = L"";
@@ -35,10 +31,6 @@ private:
 	int32 m_CurrentLevelIndex = 0;
 
 	Shared<Engine::Model> m_pSelectedModel = nullptr;
-	Char m_PresetName[128]{};
-	Char m_PresetGuid[33]{};
-	vector<wstring> m_PresetAnimationPaths;
-	string m_PresetStatus;
 
 public:
 	static Shared<ModelViewer> Create();

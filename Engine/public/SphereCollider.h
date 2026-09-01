@@ -33,6 +33,8 @@ public:
 
 	Float Get_Radius() const { return m_Original.Radius; }
 	void Set_Radius(Float radius) { m_Original.Radius = radius; }
+	Vector3 Get_ReflectedOffset() const { return Get_Offset(); }
+	void Set_ReflectedOffset(Vector3 offset) { Set_Offset(offset); }
 	void Set_Offset(const Vector3& offset) override {
 		m_Offset = offset;
 		m_Original.Center = offset;

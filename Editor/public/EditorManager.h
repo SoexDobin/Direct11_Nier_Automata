@@ -15,6 +15,7 @@ class AssetBrowser;
 class LogConsole;
 class Hierarchy;
 class ModelViewer;
+class AnimationPresetEditor;
 class NavHelper;
 
 class EditorCamera;
@@ -49,6 +50,7 @@ public:
     }
 
     Shared<ModelViewer> Get_ModelViewer() const { return m_ModelViewer; }
+	Shared<AnimationPresetEditor> Get_AnimationPresetEditor() const { return m_AnimationPresetEditor; }
     Shared<NavHelper> Get_NavHelper() const { return m_NavHelper; }
     Shared<MenuBar> Get_MenuBar() const { return m_MenuBar; }
 
@@ -122,6 +124,7 @@ private:
     Shared<LogConsole> m_LogConsole = {nullptr};
     Shared<Hierarchy> m_Hierarchy = {nullptr};
     Shared<ModelViewer> m_ModelViewer = {nullptr};
+	Shared<AnimationPresetEditor> m_AnimationPresetEditor = {nullptr};
     Shared<NavHelper> m_NavHelper = {nullptr};
 };
 

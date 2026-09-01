@@ -11,6 +11,44 @@
 #include <filesystem>
 #include "SpdLogger.h"
 
+namespace
+{
+	wstring Find_ResourceRoot(const tChar* modelFilePath)
+	{
+		if (!modelFilePath || !*modelFilePath)
+			return {};
+		std::error_code errorCode;
+		filesystem::path current = filesystem::weakly_canonical(
+			filesystem::absolute(filesystem::path(modelFilePath), errorCode), errorCode).parent_path();
+		if (errorCode)
+			return {};
+		while (!current.empty())
+		{
+			wstring name = current.filename().wstring();
+			std::ranges::transform(name, name.begin(), [](wchar_t ch) {
+				return static_cast<wchar_t>(::towlower(ch));
+			});
+			if (name == L"resources")
+				return current.wstring();
+			const filesystem::path parent = current.parent_path();
+			if (parent == current)
+				break;
+			current = parent;
+		}
+		return {};
+	}
+
+	Bool Is_SafeAnimationPath(const wstring& relativePath)
+	{
+		const filesystem::path path(relativePath);
+		if (relativePath.empty() || path.is_absolute() || path.extension() != L".anim")
+			return false;
+		return std::ranges::none_of(path, [](const filesystem::path& part) {
+			return part == L".." || part == L".";
+		});
+	}
+}
+
 Model::Model() : Component{} {}
 Model::Model(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context)
 	: Component{device, context} {}
@@ -26,6 +64,8 @@ Model::Model(const Model& rhs)
 	m_AnimationNames{ rhs.m_AnimationNames },
 	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation},
 	m_ModelTag { rhs.m_ModelTag },
+	m_ResourceRootPath{ rhs.m_ResourceRootPath },
+	m_AnimationPreset{ rhs.m_AnimationPreset },
 	m_Tracker{ nullptr }
 {
 	for (auto& prototypeAnim : rhs.m_Animations)
@@ -41,6 +81,7 @@ Model::Model(const Model& rhs)
 HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& preLocalTransformMatrix)
 {
 	m_PreLocalTransformMatrix = preLocalTransformMatrix;
+	m_ResourceRootPath = Find_ResourceRoot(modelFilePath);
 
 	ifstream in(modelFilePath, std::ios::binary);
 	if (!in.is_open())
@@ -98,6 +139,11 @@ HRESULT Model::Initialize(void* arg)
 	return Component::Initialize(arg);
 }
 
+HRESULT Model::Post_Load()
+{
+	return m_AnimationPreset.Is_Empty() ? S_OK : Apply_AnimationPreset(m_AnimationPreset);
+}
+
 void Model::Set_ModelTag(const wstring& tag)
 {
 	if (m_ModelTag == tag) return;
@@ -135,6 +181,8 @@ void Model::Set_ModelTag(const wstring& tag)
 	// 3. 데이터 깊은 복사 (프로토타입으로부터)
 	m_ModelTag = tag;
 	m_PreLocalTransformMatrix = prototype->m_PreLocalTransformMatrix;
+	m_ResourceRootPath = prototype->m_ResourceRootPath;
+	m_AnimationPreset = prototype->m_AnimationPreset;
 	m_IsSkeletal = prototype->m_IsSkeletal;
 	m_NumMeshes = prototype->m_NumMeshes;
 	m_Meshes = prototype->m_Meshes; // Mesh는 공유
@@ -599,16 +647,16 @@ HRESULT Model::Read_AnimationData(ifstream& in, MODEL_ANIMATION& animationData,
 	return S_OK;
 }
 
-HRESULT Model::Load_Animations(const vector<wstring>& animationFilePaths)
+HRESULT Model::Build_Animations(const vector<wstring>& animationFilePaths,
+	const unordered_set<wstring>& existingNames,
+	vector<Shared<Animation>>& outAnimations, vector<wstring>& outNames) const
 {
 	if (!m_IsSkeletal || m_Bones.empty() || animationFilePaths.empty())
 		return E_INVALIDARG;
 
-	vector<Shared<Animation>> pendingAnimations;
-	vector<wstring> pendingNames;
-	unordered_set<wstring> allNames;
-	for (const auto& [name, index] : m_AnimationNames)
-		allNames.emplace(name);
+	outAnimations.clear();
+	outNames.clear();
+	unordered_set<wstring> allNames = existingNames;
 
 	for (const wstring& animationFilePath : animationFilePaths)
 	{
@@ -646,9 +694,22 @@ HRESULT Model::Load_Animations(const vector<wstring>& animationFilePaths)
 		if (!animation)
 			return E_FAIL;
 
-		pendingNames.push_back(animationName);
-		pendingAnimations.push_back(std::move(animation));
+		outNames.push_back(animationName);
+		outAnimations.push_back(std::move(animation));
 	}
+	return S_OK;
+}
+
+HRESULT Model::Load_Animations(const vector<wstring>& animationFilePaths)
+{
+	unordered_set<wstring> existingNames;
+	for (const auto& [name, index] : m_AnimationNames)
+		existingNames.emplace(name);
+
+	vector<Shared<Animation>> pendingAnimations;
+	vector<wstring> pendingNames;
+	if (FAILED(Build_Animations(animationFilePaths, existingNames, pendingAnimations, pendingNames)))
+		return E_FAIL;
 
 	for (size_t i = 0; i < pendingAnimations.size(); ++i)
 	{
@@ -659,6 +720,89 @@ HRESULT Model::Load_Animations(const vector<wstring>& animationFilePaths)
 	m_NumAnimation = static_cast<uint32>(m_Animations.size());
 	m_CurrentAnimIndex = 0;
 	m_NextAnimIndex = 0;
+	Update_ModelAnimation(0.f);
+	return S_OK;
+}
+
+Bool Model::Validate_AnimationPreset(const AnimationPresetSnapshot& preset) const
+{
+	if (preset.schemaVersion != 2 || preset.animationEnum.empty() || preset.animations.empty())
+		return false;
+
+	ReflectedEnumInfo enumInfo;
+	if (FAILED(GAME_INSTANCE->Find_ReflectedEnum(preset.animationEnum, enumInfo)) ||
+		enumInfo.category != "AnimationState" || enumInfo.values.empty())
+		return false;
+
+	unordered_map<string, int64_t> enumValues;
+	for (const ReflectedEnumValue& value : enumInfo.values)
+	{
+		if (value.name.empty() || value.value < 0 ||
+			static_cast<size_t>(value.value) >= preset.animations.size() ||
+			!enumValues.emplace(value.name, value.value).second)
+			return false;
+	}
+
+	unordered_set<wstring> animationPaths;
+	unordered_set<string> coveredStates;
+	for (size_t index = 0; index < preset.animations.size(); ++index)
+	{
+		const AnimationPresetClip& clip = preset.animations[index];
+		filesystem::path normalizedPath = filesystem::path(clip.relativePath).lexically_normal();
+		wstring pathKey = normalizedPath.generic_wstring();
+		std::ranges::transform(pathKey, pathKey.begin(), [](wchar_t ch) {
+			return static_cast<wchar_t>(::towlower(ch));
+		});
+		if (!Is_SafeAnimationPath(clip.relativePath) ||
+			!animationPaths.emplace(std::move(pathKey)).second)
+			return false;
+
+		for (const string& state : clip.states)
+		{
+			const auto stateIt = enumValues.find(state);
+			if (stateIt == enumValues.end() || stateIt->second != static_cast<int64_t>(index) ||
+				!coveredStates.emplace(state).second)
+				return false;
+		}
+	}
+	return coveredStates.size() == enumValues.size();
+}
+
+HRESULT Model::Apply_AnimationPreset(const AnimationPresetSnapshot& preset)
+{
+	if (!Validate_AnimationPreset(preset) || m_ResourceRootPath.empty())
+		return E_INVALIDARG;
+
+	vector<wstring> fullPaths;
+	fullPaths.reserve(preset.animations.size());
+	const filesystem::path resourceRoot(m_ResourceRootPath);
+	for (const AnimationPresetClip& clip : preset.animations)
+	{
+		const filesystem::path fullPath = (resourceRoot / clip.relativePath).lexically_normal();
+		if (!filesystem::is_regular_file(fullPath))
+		{
+			LOG_ERROR(L"AnimationPreset clip does not exist: {}", fullPath.wstring());
+			return E_FAIL;
+		}
+		fullPaths.push_back(fullPath.wstring());
+	}
+
+	vector<Shared<Animation>> pendingAnimations;
+	vector<wstring> pendingNames;
+	if (FAILED(Build_Animations(fullPaths, {}, pendingAnimations, pendingNames)))
+		return E_FAIL;
+
+	map<wstring, uint32> pendingAnimationNames;
+	for (size_t index = 0; index < pendingNames.size(); ++index)
+		pendingAnimationNames.emplace(pendingNames[index], static_cast<uint32>(index));
+
+	m_Animations = std::move(pendingAnimations);
+	m_AnimationNames = std::move(pendingAnimationNames);
+	m_NumAnimation = static_cast<uint32>(m_Animations.size());
+	m_CurrentAnimIndex = 0;
+	m_NextAnimIndex = 0;
+	m_IsBlending = false;
+	m_AnimationPreset = preset;
 	Update_ModelAnimation(0.f);
 	return S_OK;
 }

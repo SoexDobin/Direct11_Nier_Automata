@@ -26,7 +26,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Pl0000 final : public Entity
 {
-	RTTR_ENABLE(Entity)
 public:
 	typedef struct tagPl0000Desc : public ENTITY_DESC {
 

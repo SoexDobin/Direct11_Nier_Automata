@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL LoadingFadeIn final : public UIObject
 {
-    RTTR_ENABLE(UIObject)
 public:
     typedef struct tagLoadingFadeIn : public UI_DESC
     {

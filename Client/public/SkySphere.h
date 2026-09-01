@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL SkySphere final : public GameObject
 {
-	RTTR_ENABLE(GameObject)
 public:
 	explicit SkySphere();
 	explicit SkySphere(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

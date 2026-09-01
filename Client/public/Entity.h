@@ -5,7 +5,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Entity abstract : public GameObject
 {
-	RTTR_ENABLE(GameObject)
 public:
 	typedef struct tagEntityObject : public GAMEOBJECT_DESC
 	{

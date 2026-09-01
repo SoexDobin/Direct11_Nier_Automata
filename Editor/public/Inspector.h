@@ -2,6 +2,7 @@
 #include "EditorObject.h"
 
 NS_BEGIN(Engine)
+class Object;
 class GameObject;
 class Component;
 NS_END
@@ -30,6 +31,7 @@ public:
 private:
 	void GameObjectGUI(const Shared<Engine::GameObject>& obj);
 	void Draw_GameObjectHeader(const Shared<Engine::GameObject>& obj);
+	void RenderGenericProperties(Engine::Object& object);
 
 private:
     Shared<InspectorTransform> m_InspectorTransform{ nullptr };

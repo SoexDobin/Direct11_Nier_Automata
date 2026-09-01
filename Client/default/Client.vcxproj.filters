@@ -274,7 +274,7 @@
     <ClCompile Include="..\private\Terrain.cpp">
       <Filter>02. GameObject\World</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Client_RTTR.cpp">
+	<ClCompile Include="..\private\ClientTypeRegistration.cpp">
       <Filter>00. MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\FreeCamera.cpp">
@@ -681,12 +681,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostBuildCopy.bat">
-      <Filter>99. Default</Filter>
-    </None>
-    <None Include="ClientRTTRGenerator.py">
-      <Filter>99. Default</Filter>
-    </None>
-    <None Include="GenerateRTTR_Client.bat">
       <Filter>99. Default</Filter>
     </None>
   </ItemGroup>

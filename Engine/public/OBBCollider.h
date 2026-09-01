@@ -34,6 +34,10 @@ public:
 
 	Vector3 Get_Extents() const { return m_Original.Extents; }
 	void Set_Extents(const Vector3& extents) { m_Original.Extents = extents; }
+	Vector3 Get_ReflectedOffset() const { return Get_Offset(); }
+	void Set_ReflectedOffset(Vector3 offset) { Set_Offset(offset); }
+	Vector3 Get_ReflectedExtents() const { return Get_Extents(); }
+	void Set_ReflectedExtents(Vector3 extents) { Set_Extents(extents); }
 	void Set_Offset(const Vector3& offset) override {
 		m_Offset = offset;
 		m_Original.Center = offset;
@@ -53,4 +57,4 @@ public:
 	static Shared<OBBCollider> Create(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> context);
 };
 
-NS_END 
+NS_END

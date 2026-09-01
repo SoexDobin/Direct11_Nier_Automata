@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class LoadingPixelPanel final : public UIObject
 {
-	RTTR_ENABLE(UIObject)
 public:
 	explicit LoadingPixelPanel();
 	explicit LoadingPixelPanel(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

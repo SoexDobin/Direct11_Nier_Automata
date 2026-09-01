@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class TitleBackground final : public UIObject
 {
-    RTTR_ENABLE(UIObject)
 public:
     explicit TitleBackground();
     explicit TitleBackground(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

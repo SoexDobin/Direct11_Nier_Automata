@@ -9,7 +9,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL MonsterSight final : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	typedef struct tagMonsterSightDesc : public PARTOBJECT_DESC
 	{

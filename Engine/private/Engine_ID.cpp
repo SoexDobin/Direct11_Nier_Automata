@@ -123,6 +123,10 @@ Engine::AssetGuid Engine::Create_AssetGuid() noexcept {
 	return Create_Guid<AssetGuidTag>();
 }
 
+Engine::PrefabGuid Engine::Create_PrefabGuid() noexcept {
+	return Create_Guid<PrefabGuidTag>();
+}
+
 Engine::ObjectGuid Engine::Derive_ChildObjectGuid(
     ObjectGuid parentObjectGuid,
     std::wstring_view stableChildKey,
@@ -143,10 +147,18 @@ std::string Engine::To_String(AssetGuid guid) {
 	return Guid_ToString(guid);
 }
 
+std::string Engine::To_String(PrefabGuid guid) {
+	return Guid_ToString(guid);
+}
+
 bool Engine::Try_Parse_ObjectGuid(std::string_view value, ObjectGuid& outGuid) noexcept {
     return Guid_TryParse(value, outGuid);
 }
 
 bool Engine::Try_Parse_AssetGuid(std::string_view value, AssetGuid& outGuid) noexcept {
+	return Guid_TryParse(value, outGuid);
+}
+
+bool Engine::Try_Parse_PrefabGuid(std::string_view value, PrefabGuid& outGuid) noexcept {
 	return Guid_TryParse(value, outGuid);
 }

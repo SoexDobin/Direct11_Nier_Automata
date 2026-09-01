@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 class Em0010Body;
 class CLIENT_DLL MonsterAOE final : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	typedef struct tagMonsterAoeDesc : public PARTOBJECT_DESC
 	{

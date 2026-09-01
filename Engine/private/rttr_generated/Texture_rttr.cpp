@@ -21,7 +21,7 @@ RTTR_REGISTRATION_NAMED(Texture_RTTR)
 		.property("RGBA", &Texture::Get_RGBAByValue, &Texture::Set_RGBA)
 		(rttr::metadata(DataType, Data_Type_Key::Vector4),
 			rttr::metadata(TypeTag, Data_Tag::Color),
-			rttr::metadata(SaveData, TransformScale))
+			rttr::metadata(SaveData, "RGBA"))
 		.property("ResourceTag", &Texture::Get_TextureTag, &Texture::Set_TextureTag)
 		(
 			metadata(DataType, wString),

@@ -1,5 +1,6 @@
 #pragma once
 #include "EditorObject.h"
+#include <filesystem>
 
 NS_BEGIN(Engine)
 class Component;
@@ -20,6 +21,10 @@ public:
 
 public:
 	static std::shared_ptr<InspectorModel> Create();
+
+private:
+	std::filesystem::path m_SelectedPresetPath;
+	string m_PresetStatus;
 };
 
 NS_END

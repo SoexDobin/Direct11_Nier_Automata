@@ -5,7 +5,6 @@ NS_BEGIN(Editor)
 
 class EditorCamera final : public Camera
 {
-	RTTR_ENABLE(Camera)
 public:
 	typedef struct tagEditorCameraDesc final : public CAMERA_DESC
 	{

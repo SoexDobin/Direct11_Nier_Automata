@@ -14,7 +14,6 @@ class Em0010Movement;
 
 class CLIENT_DLL Em0010 final : public Monster
 {
-	RTTR_ENABLE(Monster)
 public:
 	explicit Em0010();
 	explicit Em0010(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

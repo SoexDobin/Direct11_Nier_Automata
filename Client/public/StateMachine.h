@@ -6,7 +6,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL StateMachine : public ScriptComponent
 {
-	RTTR_ENABLE(ScriptComponent)
 public:
 	typedef struct tagStateMachine : public COMPONENT_DESC
 	{} STATEMACHINE_DESC;

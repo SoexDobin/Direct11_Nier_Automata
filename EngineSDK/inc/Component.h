@@ -21,6 +21,7 @@ public:
 private:
   friend GameObject;
   void Set_Owner(const Shared<GameObject>& owner) { m_Owner = owner; }
+	virtual HRESULT Post_Load() { return S_OK; }
 
 public:
   virtual COMPONENT_TYPE Get_ComponentType() const PURE;

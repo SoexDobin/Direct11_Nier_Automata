@@ -15,10 +15,13 @@ public:
 	~PrefabManager() = default;
 
 	HRESULT Register_Prefab(PrefabGuid prefabGuid, const wstring& filePath);
+	HRESULT Register_PrefabDocument(const wstring& filePath, PrefabGuid& outPrefabGuid);
 	HRESULT Unregister_Prefab(PrefabGuid prefabGuid);
 	wstring Find_PrefabPath(PrefabGuid prefabGuid) const;
-	HRESULT SerializePrefabDocument(PrefabGuid prefabGuid, uint32 levIndex) const;
-	HRESULT DeSerializePrefabDocument(PrefabGuid prefabGuid) const;
+	HRESULT SerializePrefabDocument(PrefabGuid prefabGuid, uint32 levIndex,
+		const Shared<GameObject>& selectedRoot) const;
+	HRESULT DeSerializePrefabDocument(PrefabGuid prefabGuid, uint32 levIndex,
+		Shared<GameObject>& outRoot) const;
 	HRESULT Prepare_RestoredObjectGuid(ObjectGuid objectGuid);
 	ObjectGuid Consume_RestoredObjectGuid() noexcept;
 

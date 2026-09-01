@@ -1,7 +1,5 @@
 #pragma once
 #include "EditorObject.h"
-#include <rttr/property.h>
-#include <rttr/type.h>
 #include <functional>
 
 NS_BEGIN(Engine)

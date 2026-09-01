@@ -7,7 +7,6 @@ class Pl0000Body;
 
 class CLIENT_DLL WP3000Body final : public Pl0000Parts
 {
-	RTTR_ENABLE(Pl0000Parts)
 public:
 	enum class POD_STATE
 	{

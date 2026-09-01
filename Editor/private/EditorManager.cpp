@@ -11,6 +11,7 @@
 #include "MenuBar.h"
 #include "Hierarchy.h"
 #include "ModelViewer.h"
+#include "AnimationPresetEditor.h"
 #include "AssetBrowser.h"
 #include "NavHelper.h"
 #include "Transform.h"
@@ -57,6 +58,8 @@ HRESULT EditorManager::Initialize()
         return E_FAIL;
     if (nullptr == (m_ModelViewer = ModelViewer::Create()))
         return E_FAIL;
+	if (nullptr == (m_AnimationPresetEditor = AnimationPresetEditor::Create()))
+		return E_FAIL;
     if (nullptr == (m_AssetBrowser = AssetBrowser::Create()))
         return E_FAIL;
     if (nullptr == (m_NavHelper = NavHelper::Create()))
@@ -89,6 +92,7 @@ void EditorManager::Update(Bool IsResetView) {
     m_LogConsole->Update(IsResetView);
     m_Hierarchy->Update(IsResetView);
     m_ModelViewer->Update(IsResetView);
+	m_AnimationPresetEditor->Update(IsResetView);
     m_AssetBrowser->Update(IsResetView);
     m_NavHelper->Update(IsResetView);
 }
@@ -206,6 +210,7 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     m_LogConsole->Render(IsResetView);
     m_Hierarchy->Render(IsResetView);
     m_ModelViewer->Render(IsResetView);
+	m_AnimationPresetEditor->Render(IsResetView);
     m_AssetBrowser->Render(IsResetView);
     m_NavHelper->Render(IsResetView);
 

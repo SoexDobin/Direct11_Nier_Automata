@@ -2,7 +2,6 @@
 #include "InspectorCamera.h"
 #include "Editor_Define.h"
 #include "EditorManager.h"
-#include "Camera.h"
 #include "Game.h"
 #include "GameObject.h"
 #include "String_Helper.h"
@@ -11,6 +10,31 @@
 using namespace Editor;
 using namespace Engine;
 
+namespace
+{
+	template <typename T>
+	Bool ReadCameraValue(Object& object, std::string_view propertyName, T& outValue)
+	{
+		ReflectionValue reflectedValue;
+		if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(object, propertyName, reflectedValue)))
+			return false;
+		const T* value = reflectedValue.Try_Get<T>();
+		if (!value)
+			return false;
+		outValue = *value;
+		return true;
+	}
+
+	template <typename T>
+	Bool WriteCameraValue(Object& object, std::string_view propertyName, const T& value)
+	{
+		ReflectionValue reflectedValue;
+		reflectedValue.data = value;
+		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+			object, propertyName, reflectedValue));
+	}
+}
+
 HRESULT InspectorCamera::Initialize()
 {
     return S_OK;
@@ -18,36 +42,40 @@ HRESULT InspectorCamera::Initialize()
 
 void InspectorCamera::RenderCamera(const Shared<GameObject>& pObj)
 {
-	auto pCamera = static_pointer_cast<Camera>(pObj);
-	if (!pCamera) return;
+	if (!pObj) return;
 
     if (ImGui::CollapsingHeader("Camera Component", ImGuiTreeNodeFlags_DefaultOpen))
     {
         // 1. FovY
-        float fovY = pCamera->Get_FovY();
-        if (ImGui::SliderAngle("FovY", &fovY, 1.0f, 179.0f)) {
-            pCamera->Set_FovY(fovY);
+        Float fovY{};
+        if (ReadCameraValue(*pObj, "FovY", fovY) &&
+			ImGui::SliderAngle("FovY", &fovY, 1.0f, 179.0f)) {
+            WriteCameraValue(*pObj, "FovY", fovY);
         }
 
         // 2. Aspect
-        float aspect = pCamera->Get_Aspect();
-        if (ImGui::DragFloat("Aspect", &aspect, 0.01f, 0.1f, 10.0f)) {
-            pCamera->Set_Aspect(aspect);
+        Float aspect{};
+        if (ReadCameraValue(*pObj, "Aspect", aspect) &&
+			ImGui::DragFloat("Aspect", &aspect, 0.01f, 0.1f, 10.0f)) {
+            WriteCameraValue(*pObj, "Aspect", aspect);
         }
 
         // 3. Near / Far
-        float nearPlane = pCamera->Get_NearPlane();
-        if (ImGui::DragFloat("Near", &nearPlane, 0.01f, 0.001f, 1000.0f)) {
-            pCamera->Set_NearPlane(nearPlane);
+        Float nearPlane{};
+        if (ReadCameraValue(*pObj, "Near", nearPlane) &&
+			ImGui::DragFloat("Near", &nearPlane, 0.01f, 0.001f, 1000.0f)) {
+            WriteCameraValue(*pObj, "Near", nearPlane);
         }
 
-        float farPlane = pCamera->Get_FarPlane();
-        if (ImGui::DragFloat("Far", &farPlane, 1.0f, 1.0f, 10000.0f)) {
-            pCamera->Set_FarPlane(farPlane);
+        Float farPlane{};
+        if (ReadCameraValue(*pObj, "Far", farPlane) &&
+			ImGui::DragFloat("Far", &farPlane, 1.0f, 1.0f, 10000.0f)) {
+            WriteCameraValue(*pObj, "Far", farPlane);
         }
         
         // 4. TargetID (GameObject Drag & Drop)
-        uint32 currentTargetID = pCamera->Get_TargetID();
+        uint32 currentTargetID{};
+		ReadCameraValue(*pObj, "TargetID", currentTargetID);
         string targetName = "None";
         bool isLinked = false;
 
@@ -94,7 +122,7 @@ void InspectorCamera::RenderCamera(const Shared<GameObject>& pObj)
                 Shared<GameObject> droppedObj = GAME_INSTANCE->Find_ByInstanceID(GAME_INSTANCE->Get_CurrentLevelIndex(), droppedInstanceID);
                 if (droppedObj)
                 {
-                    pCamera->Set_TargetID(droppedObj->Get_ObjectID());
+					WriteCameraValue(*pObj, "TargetID", droppedObj->Get_ObjectID());
                 }
             }
             ImGui::EndDragDropTarget();
@@ -104,7 +132,7 @@ void InspectorCamera::RenderCamera(const Shared<GameObject>& pObj)
 
         ImGui::SameLine();
         if (ImGui::Button("X##TargetID", ImVec2(30, 25))) {
-            pCamera->Set_TargetID(0u);
+			WriteCameraValue(*pObj, "TargetID", uint32{});
         }
 
         ImGui::Spacing();

@@ -10,7 +10,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Pl0000Shockwave final : public GameObject
 {
-	RTTR_ENABLE(GameObject)
 public:
 	typedef struct tagPlayerShockwaveDesc : public GAMEOBJECT_DESC
 	{

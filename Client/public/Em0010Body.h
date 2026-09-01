@@ -14,7 +14,6 @@ class MonsterAOE;
 
 class CLIENT_DLL Em0010Body final : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	typedef struct tagEm0010BodyDesc : public PARTOBJECT_DESC
 	{

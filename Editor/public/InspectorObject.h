@@ -6,7 +6,6 @@ NS_BEGIN(Editor)
 
 class InspectorObject : public EditorObject
 {
-	RTTR_ENABLE(EditorObject)
 public:
 	InspectorObject();
 	~InspectorObject() override = default;

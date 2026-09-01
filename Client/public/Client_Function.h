@@ -1,5 +1,5 @@
 #pragma once
 
 namespace Client {
-void Register_Client_Reflection();
+HRESULT Register_Client_Reflection();
 }

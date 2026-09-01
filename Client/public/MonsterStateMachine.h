@@ -7,7 +7,6 @@ class StateMonster;
 
 class CLIENT_DLL MonsterStateMachine : public StateMachine
 {
-	RTTR_ENABLE(StateMachine)
 public:
 	typedef struct tagMonsterStateMachine : public STATEMACHINE_DESC
 	{

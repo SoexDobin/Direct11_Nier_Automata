@@ -80,3 +80,10 @@ Bool Object::Is_Active() const
     return m_IsActive;
 }
 
+void Object::Assign_ReflectedIdentity(RuntimeTypeId runtimeTypeId, std::string_view registeredName)
+{
+	m_RuntimeTypeId = runtimeTypeId;
+	m_DescID.m_typeID = static_cast<uint32>(runtimeTypeId);
+	m_ObjectName = Helper::To_wString(std::string{ registeredName });
+}
+

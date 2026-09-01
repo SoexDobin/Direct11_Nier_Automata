@@ -11,7 +11,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL FireFlashEffect final : public ParticleEffect
 {
-	RTTR_ENABLE(ParticleEffect)
 public:
 	typedef struct tagFireFlashEffectDesc : public PARTICLE_EFFECT_DESC
 	{

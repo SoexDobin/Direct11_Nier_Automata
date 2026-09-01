@@ -1,11 +1,37 @@
 #include "pch.h"
 #include "InspectorTexture.h"
 #include "EditorManager.h"
-#include "Texture.h"
+#include "Component.h"
+#include "Game.h"
 #include "String_Helper.h"
 
 using namespace Editor;
 using namespace Engine;
+
+namespace
+{
+	template <typename T>
+	Bool ReadTextureValue(Object& object, std::string_view propertyName, T& outValue)
+	{
+		ReflectionValue reflectedValue;
+		if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(object, propertyName, reflectedValue)))
+			return false;
+		const T* value = reflectedValue.Try_Get<T>();
+		if (!value)
+			return false;
+		outValue = *value;
+		return true;
+	}
+
+	template <typename T>
+	Bool WriteTextureValue(Object& object, std::string_view propertyName, const T& value)
+	{
+		ReflectionValue reflectedValue;
+		reflectedValue.data = value;
+		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+			object, propertyName, reflectedValue));
+	}
+}
 
 HRESULT InspectorTexture::Initialize()
 {
@@ -14,20 +40,21 @@ HRESULT InspectorTexture::Initialize()
 
 void InspectorTexture::RenderComponent(const Shared<Component>& pComp)
 {
-	auto pTexture = static_pointer_cast<Texture>(pComp);
-	if (!pTexture) return;
+	if (!pComp) return;
 
     if (ImGui::CollapsingHeader("Texture Component", ImGuiTreeNodeFlags_DefaultOpen))
     {
         // 1. Color (RGBA)
-        Color rgba = pTexture->Get_RGBAByValue();
+        Color rgba{};
         ImGui::Text("Color Multiplier");
-        if (ImGui::ColorEdit4("##Color", reinterpret_cast<float*>(&rgba))) {
-            pTexture->Set_RGBA(rgba);
+        if (ReadTextureValue(*pComp, "RGBA", rgba) &&
+			ImGui::ColorEdit4("##Color", reinterpret_cast<Float*>(&rgba))) {
+            WriteTextureValue(*pComp, "RGBA", rgba);
         }
         
         // 2. ResourceTag (Texture Drag Drop)
-        wstring currentTag = pTexture->Get_TextureTag();
+		wstring currentTag;
+		ReadTextureValue(*pComp, "ResourceTag", currentTag);
         string sTag = Helper::To_String(currentTag);
         string requiredType = "Texture"; // AssetTypeKey::Texture
 
@@ -74,7 +101,7 @@ void InspectorTexture::RenderComponent(const Shared<Component>& pComp)
 
                     if (requiredType == droppedType)
                     {
-                        pTexture->Set_TextureTag(Helper::To_wString(droppedTag));
+						WriteTextureValue(*pComp, "ResourceTag", Helper::To_wString(droppedTag));
                     }
                 }
             }

@@ -5,7 +5,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Pl0000Input final : public ScriptComponent
 {
-	RTTR_ENABLE(Component)
 public:
 	enum class KEY_STATE { NONE, DOWN, PRESSED, UP, MULTI_CLICKED };
 

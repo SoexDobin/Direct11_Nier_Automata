@@ -5,7 +5,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Movement abstract : public ScriptComponent
 {
-	RTTR_ENABLE(ScriptComponent)
 public:
 	typedef struct tagMovement : public COMPONENT_DESC
 	{

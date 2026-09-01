@@ -399,6 +399,11 @@ HRESULT Game::Destroy(ObjectGuid objectGuid) const
     return m_ObjectManager->Destroy(objectGuid);
 }
 
+HRESULT Game::Clear_GameObjects(uint32 levIndex) const
+{
+	return m_ObjectManager->Clear_GameObjects(levIndex);
+}
+
 vector<Shared<GameObject>> Game::FindAll_Internal(RuntimeTypeId runtimeTypeId) const
 {
     return m_ObjectManager->Find_AllByRuntimeTypeId(runtimeTypeId);
@@ -564,49 +569,49 @@ HRESULT Game::Refresh_ReflectionRegistry() const
     return m_Registry ? m_Registry->Refresh() : E_FAIL;
 }
 
+HRESULT Game::Register_ReflectionDescriptors(const ReflectionDescriptorBatch& descriptors) const
+{
+	return m_Registry ? m_Registry->Register_Descriptors(descriptors) : E_FAIL;
+}
+
 HRESULT Game::Register_ReflectedPrototypes(uint32 levIndex) const
 {
     if (!m_Registry || !m_PrototypeManager)
         return E_FAIL;
 
-    const rttr::type gameObjectType = rttr::type::get<GameObject>();
-    const rttr::type componentType = rttr::type::get<Component>();
     for (const Registry::Entry& entry : m_Registry->Get_ObjectTypes()) {
-        const Bool isGameObject = entry.reflectedType.is_derived_from(gameObjectType);
-        const Bool isComponent = entry.reflectedType.is_derived_from(componentType);
+		const Bool isGameObject = entry.typeInfo.objectKind == REFLECTED_OBJECT_KIND::GAMEOBJECT;
+		const Bool isComponent = entry.typeInfo.objectKind == REFLECTED_OBJECT_KIND::COMPONENT;
         if (!isGameObject && !isComponent)
             continue;
+		if (!entry.typeInfo.hasLevel || entry.typeInfo.level != levIndex)
+			continue;
 
-        const rttr::method createMethod = entry.reflectedType.get_method("Create");
-        if (!createMethod.is_valid())
-            continue;
+		Shared<Object> prototype;
+		const HRESULT externalCreate = m_Registry->Create_Prototype(entry.registeredName, prototype);
+		if (FAILED(externalCreate)) {
+			LOG_ERROR(L"Failed to invoke external Create for {}",
+				Helper::To_wString(entry.registeredName));
+			return E_FAIL;
+		}
+		if (externalCreate == S_FALSE) {
+			const rttr::method createMethod = entry.reflectedType.get_method("Create");
+			if (!createMethod.is_valid())
+				continue;
 
-        const rttr::variant levelMetadata = createMethod.get_metadata("Level");
-        if (!levelMetadata.is_valid())
-            continue;
+			const rttr::variant result = createMethod.invoke(
+				{}, m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context());
+			if (!result.is_valid()) {
+				LOG_ERROR(L"Failed to invoke reflected Create for {}",
+					Helper::To_wString(entry.registeredName));
+				return E_FAIL;
+			}
 
-        rttr::variant convertedLevel = levelMetadata;
-        if (!convertedLevel.convert(rttr::type::get<uint32>())) {
-            LOG_ERROR(L"Invalid Level metadata on reflected type {}",
-                      Helper::To_wString(entry.registeredName));
-            return E_FAIL;
-        }
-        if (convertedLevel.get_value<uint32>() != levIndex)
-            continue;
-
-        const rttr::variant result = createMethod.invoke(
-            {}, m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context());
-        if (!result.is_valid()) {
-            LOG_ERROR(L"Failed to invoke reflected Create for {}",
-                      Helper::To_wString(entry.registeredName));
-            return E_FAIL;
-        }
-
-        Shared<Object> prototype;
-        if (isGameObject && result.is_type<Shared<GameObject>>())
-            prototype = result.get_value<Shared<GameObject>>();
-        else if (isComponent && result.is_type<Shared<Component>>())
-            prototype = result.get_value<Shared<Component>>();
+			if (isGameObject && result.is_type<Shared<GameObject>>())
+				prototype = result.get_value<Shared<GameObject>>();
+			else if (isComponent && result.is_type<Shared<Component>>())
+				prototype = result.get_value<Shared<Component>>();
+		}
 
         const HRESULT addResult = prototype
             ? Add_Prototype_Internal(levIndex, prototype, Helper::To_wString(entry.registeredName))
@@ -631,6 +636,65 @@ RuntimeTypeId Game::Find_RuntimeTypeId(std::string_view registeredName) const
     return m_Registry ? m_Registry->Find_RuntimeTypeId(registeredName) : RuntimeTypeId{};
 }
 
+HRESULT Game::Find_ReflectedType(std::string_view registeredName,
+    ReflectedTypeInfo& outInfo) const
+{
+    return m_Registry ? m_Registry->Find_TypeInfo(registeredName, outInfo) : E_FAIL;
+}
+
+HRESULT Game::Find_ReflectedType(RuntimeTypeId runtimeTypeId,
+    ReflectedTypeInfo& outInfo) const
+{
+    return m_Registry ? m_Registry->Find_TypeInfo(runtimeTypeId, outInfo) : E_FAIL;
+}
+
+vector<ReflectedTypeInfo> Game::Get_ReflectedTypes() const
+{
+    return m_Registry ? m_Registry->Get_Types() : vector<ReflectedTypeInfo>{};
+}
+
+vector<ReflectedPropertyInfo> Game::Get_ReflectedProperties(
+    std::string_view registeredName) const
+{
+    return m_Registry
+        ? m_Registry->Get_Properties(registeredName)
+        : vector<ReflectedPropertyInfo>{};
+}
+
+vector<ReflectedPropertyInfo> Game::Get_ReflectedProperties(const Object& target) const
+{
+    return m_Registry
+        ? m_Registry->Get_Properties(target.Get_RuntimeTypeId())
+        : vector<ReflectedPropertyInfo>{};
+}
+
+HRESULT Game::Find_ReflectedEnum(std::string_view registeredName,
+    ReflectedEnumInfo& outInfo) const
+{
+    return m_Registry ? m_Registry->Find_Enum(registeredName, outInfo) : E_FAIL;
+}
+
+vector<ReflectedEnumInfo> Game::Get_ReflectedEnums(std::string_view category) const
+{
+    return m_Registry ? m_Registry->Get_Enums(category) : vector<ReflectedEnumInfo>{};
+}
+
+HRESULT Game::Read_ReflectedProperty(Object& target, std::string_view propertyName,
+    ReflectionValue& outValue) const
+{
+    return m_Registry
+        ? m_Registry->Read_Property(target, propertyName, outValue)
+        : E_FAIL;
+}
+
+HRESULT Game::Write_ReflectedProperty(Object& target, std::string_view propertyName,
+    const ReflectionValue& value) const
+{
+    return m_Registry
+        ? m_Registry->Write_Property(target, propertyName, value)
+        : E_FAIL;
+}
+
 HRESULT Game::Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag) const 
 {
     return m_PrototypeManager->Add_Prototype(levIndex, object, prototypeTag);
@@ -650,6 +714,11 @@ HRESULT Game::Register_Prefab(PrefabGuid prefabGuid, const wstring& path) const
 	return m_PrefabManager->Register_Prefab(prefabGuid, path);
 }
 
+HRESULT Game::Register_PrefabDocument(const wstring& path, PrefabGuid& outPrefabGuid) const
+{
+	return m_PrefabManager->Register_PrefabDocument(path, outPrefabGuid);
+}
+
 HRESULT Game::Unregister_Prefab(PrefabGuid prefabGuid) const
 {
 	return m_PrefabManager->Unregister_Prefab(prefabGuid);
@@ -660,14 +729,22 @@ wstring Game::Find_PrefabPath(PrefabGuid prefabGuid) const
 	return m_PrefabManager->Find_PrefabPath(prefabGuid);
 }
 
-HRESULT Game::SerializePrefabDocument(PrefabGuid prefabGuid, uint32 levIndex) const
+HRESULT Game::SerializePrefabDocument(PrefabGuid prefabGuid,
+	const Shared<GameObject>& selectedRoot, uint32 levIndex) const
 {
-	return m_PrefabManager->SerializePrefabDocument(prefabGuid, levIndex);
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? Get_CurrentLevelIndex()
+		: levIndex;
+	return m_PrefabManager->SerializePrefabDocument(prefabGuid, targetLevel, selectedRoot);
 }
 
-HRESULT Game::DeSerializePrefabDocument(PrefabGuid prefabGuid) const
+HRESULT Game::DeSerializePrefabDocument(PrefabGuid prefabGuid,
+	Shared<GameObject>& outRoot, uint32 levIndex) const
 {
-	return m_PrefabManager->DeSerializePrefabDocument(prefabGuid);
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? Get_CurrentLevelIndex()
+		: levIndex;
+	return m_PrefabManager->DeSerializePrefabDocument(prefabGuid, targetLevel, outRoot);
 }
 
 ObjectGuid Game::Consume_RestoredObjectGuid() const

@@ -21,6 +21,7 @@
 
 #include "GameObject.h"
 #include "Component.h"
+#include "Engine_Reflection.h"
 #include "NavigationBuilder.h"
 
 NS_BEGIN(Engine)
@@ -32,6 +33,7 @@ class PrefabManager;
 
 class ENGINE_DLL Game {
   DECLARE_SINGLETON(Game)
+	friend class PrefabManager;
 protected:
   explicit Game();
   ~Game();
@@ -98,9 +100,21 @@ public: /* For PrototypeManager */
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
 	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const;
 	HRESULT Refresh_ReflectionRegistry() const;
+	HRESULT Register_ReflectionDescriptors(const ReflectionDescriptorBatch& descriptors) const;
 	HRESULT Register_ReflectedPrototypes(uint32 levIndex) const;
 	string Find_RegisteredName(RuntimeTypeId runtimeTypeId) const;
 	RuntimeTypeId Find_RuntimeTypeId(std::string_view registeredName) const;
+	HRESULT Find_ReflectedType(std::string_view registeredName, ReflectedTypeInfo& outInfo) const;
+	HRESULT Find_ReflectedType(RuntimeTypeId runtimeTypeId, ReflectedTypeInfo& outInfo) const;
+	vector<ReflectedTypeInfo> Get_ReflectedTypes() const;
+	vector<ReflectedPropertyInfo> Get_ReflectedProperties(std::string_view registeredName) const;
+	vector<ReflectedPropertyInfo> Get_ReflectedProperties(const Object& target) const;
+	HRESULT Find_ReflectedEnum(std::string_view registeredName, ReflectedEnumInfo& outInfo) const;
+	vector<ReflectedEnumInfo> Get_ReflectedEnums(std::string_view category = {}) const;
+	HRESULT Read_ReflectedProperty(Object& target, std::string_view propertyName,
+		ReflectionValue& outValue) const;
+	HRESULT Write_ReflectedProperty(Object& target, std::string_view propertyName,
+		const ReflectionValue& value) const;
 
 private: /* For ObjectManager */
 	HRESULT Add_GameObject(const Shared<GameObject>& GameObject, uint32 levIndex) const;
@@ -115,6 +129,7 @@ public: /* For ObjectManager */
     Shared<GameObject> Find(ObjectGuid objectGuid) const;
     Shared<GameObject> Find(RuntimeObjectId runtimeObjectId) const;
     HRESULT Destroy(ObjectGuid objectGuid) const;
+	HRESULT Clear_GameObjects(uint32 levIndex) const;
     void Clearing_ObjectManager(uint32 levIndex) const;
 
     template <typename T> requires is_base_of_v<GameObject, T>
@@ -124,7 +139,10 @@ public: /* For ObjectManager */
 
     template <typename T> requires is_base_of_v<GameObject, T>
     vector<Shared<T>> FindAll() const {
-        const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id());
+		const RuntimeTypeId externalRuntimeTypeId = Make_ExternalRuntimeTypeId<T>();
+		const RuntimeTypeId runtimeTypeId = Find_RegisteredName(externalRuntimeTypeId).empty()
+			? static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id())
+			: externalRuntimeTypeId;
         vector<Shared<T>> typedObjects;
         for (const Shared<GameObject>& object : FindAll_Internal(runtimeTypeId)) {
             if (Shared<T> typedObject = dynamic_pointer_cast<T>(object))
@@ -187,10 +205,13 @@ public: /* For LevelSerialize */
     HRESULT SerializeLevel(uint32 levIndex, const wstring& path) const;
     HRESULT DeSerializeLevel(const wstring& path) const;
 	HRESULT Register_Prefab(PrefabGuid prefabGuid, const wstring& path) const;
+	HRESULT Register_PrefabDocument(const wstring& path, PrefabGuid& outPrefabGuid) const;
 	HRESULT Unregister_Prefab(PrefabGuid prefabGuid) const;
 	wstring Find_PrefabPath(PrefabGuid prefabGuid) const;
-	HRESULT SerializePrefabDocument(PrefabGuid prefabGuid, uint32 levIndex) const;
-	HRESULT DeSerializePrefabDocument(PrefabGuid prefabGuid) const;
+	HRESULT SerializePrefabDocument(PrefabGuid prefabGuid,
+		const Shared<GameObject>& selectedRoot, uint32 levIndex = UINT_MAX) const;
+	HRESULT DeSerializePrefabDocument(PrefabGuid prefabGuid,
+		Shared<GameObject>& outRoot, uint32 levIndex = UINT_MAX) const;
 	ObjectGuid Consume_RestoredObjectGuid() const;
 
 public: /* For FontManager */
@@ -248,7 +269,10 @@ public: /* Prototype & Instantiate Facade */
     template <typename T>
     Shared<T> Instantiate(uint32 levIndex = UINT_MAX, void* arg = nullptr) {
         PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
-        const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id());
+		const RuntimeTypeId externalRuntimeTypeId = Make_ExternalRuntimeTypeId<T>();
+		const RuntimeTypeId runtimeTypeId = Find_RegisteredName(externalRuntimeTypeId).empty()
+			? static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id())
+			: externalRuntimeTypeId;
         Shared<Object> cloned = Instantiate_ByRuntimeTypeId(protoType, runtimeTypeId, levIndex, arg);
         return std::static_pointer_cast<T>(cloned);
     }

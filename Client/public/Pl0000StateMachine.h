@@ -10,7 +10,6 @@ class Pl0000Input;
 
 class CLIENT_DLL Pl0000StateMachine final : public StateMachine
 {
-	RTTR_ENABLE(StateMachine)
 public:
 	typedef struct tagPl0000StateMachine : public STATEMACHINE_DESC
 	{

@@ -1,11 +1,39 @@
 #include "pch.h"
 #include "InspectorModel.h"
 #include "EditorManager.h"
-#include "Model.h"
+#include "AnimationPresetEditor.h"
+#include "Component.h"
+#include "Game.h"
+#include "PathManager.h"
 #include "String_Helper.h"
 
 using namespace Editor;
 using namespace Engine;
+
+namespace
+{
+	template <typename T>
+	Bool ReadModelValue(Object& object, std::string_view propertyName, T& outValue)
+	{
+		ReflectionValue reflectedValue;
+		if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(object, propertyName, reflectedValue)))
+			return false;
+		const T* value = reflectedValue.Try_Get<T>();
+		if (!value)
+			return false;
+		outValue = *value;
+		return true;
+	}
+
+	template <typename T>
+	Bool WriteModelValue(Object& object, std::string_view propertyName, const T& value)
+	{
+		ReflectionValue reflectedValue;
+		reflectedValue.data = value;
+		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+			object, propertyName, reflectedValue));
+	}
+}
 
 HRESULT InspectorModel::Initialize()
 {
@@ -14,12 +42,12 @@ HRESULT InspectorModel::Initialize()
 
 void InspectorModel::RenderComponent(const Shared<Component>& pComp)
 {
-	auto pModel = static_pointer_cast<Model>(pComp);
-	if (!pModel) return;
+	if (!pComp) return;
 
     if (ImGui::CollapsingHeader("Model Component", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        wstring currentTag = pModel->Get_ModelTag();
+		wstring currentTag;
+		ReadModelValue(*pComp, "ModelTag", currentTag);
         string sTag = Helper::To_String(currentTag);
         string requiredType = "Model"; // AssetTypeKey::Model
 
@@ -66,7 +94,7 @@ void InspectorModel::RenderComponent(const Shared<Component>& pComp)
 
                     if (requiredType == droppedType)
                     {
-                        pModel->Set_ModelTag(Helper::To_wString(droppedTag));
+						WriteModelValue(*pComp, "ModelTag", Helper::To_wString(droppedTag));
                     }
                 }
             }
@@ -76,6 +104,44 @@ void InspectorModel::RenderComponent(const Shared<Component>& pComp)
         ImGui::PopStyleColor(3);
 
         ImGui::Spacing();
+		ImGui::SeparatorText("Animation Preset Snapshot");
+		AnimationPresetSnapshot appliedPreset;
+		ReadModelValue(*pComp, "AnimationPreset", appliedPreset);
+		ImGui::Text("Applied: %s", appliedPreset.Is_Empty()
+			? "<None>" : appliedPreset.animationEnum.c_str());
+
+		const string selectedPreset = m_SelectedPresetPath.empty()
+			? "<Select Preset>" : Helper::To_String(m_SelectedPresetPath.stem().wstring());
+		if (ImGui::BeginCombo("Preset", selectedPreset.c_str()))
+		{
+			const filesystem::path presetDirectory = PATH.GetAnimationPresetSettingsDir();
+			std::error_code errorCode;
+			if (filesystem::exists(presetDirectory, errorCode))
+			{
+				for (filesystem::directory_iterator it(presetDirectory,
+					filesystem::directory_options::skip_permission_denied, errorCode), end;
+					it != end; it.increment(errorCode))
+				{
+					if (errorCode) { errorCode.clear(); continue; }
+					if (!it->is_regular_file() || it->path().extension() != L".json")
+						continue;
+					const string label = Helper::To_String(it->path().stem().wstring());
+					if (ImGui::Selectable(label.c_str(), it->path() == m_SelectedPresetPath))
+						m_SelectedPresetPath = it->path();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		if (ImGui::Button("Apply Preset Snapshot"))
+		{
+			string error;
+			m_PresetStatus = SUCCEEDED(AnimationPresetEditor::Apply_PresetFile(
+				*pComp, m_SelectedPresetPath, error))
+				? "Preset snapshot applied; Scene/Prefab save will persist the full mapping."
+				: "Preset apply failed: " + error;
+		}
+		if (!m_PresetStatus.empty())
+			ImGui::TextWrapped("%s", m_PresetStatus.c_str());
     }
 }
 

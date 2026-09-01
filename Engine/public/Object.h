@@ -3,6 +3,8 @@
 
 NS_BEGIN(Engine)
 
+class Registry;
+
 class ENGINE_DLL Object abstract {
 	RTTR_ENABLE()
 public:
@@ -50,6 +52,10 @@ protected:
 	RuntimeTypeId m_RuntimeTypeId{};
 	RuntimeObjectId m_RuntimeObjectId{};
 	wstring m_ObjectName = {};
+
+private:
+	friend class Registry;
+	void Assign_ReflectedIdentity(RuntimeTypeId runtimeTypeId, std::string_view registeredName);
 };
 
 NS_END

@@ -12,7 +12,6 @@ class Em3000;
 
 class CLIENT_DLL Em3000Parts abstract : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	typedef struct tagEm3000PartsDesc : public PARTOBJECT_DESC
 	{

@@ -24,38 +24,105 @@ namespace
 {
 	constexpr uint32 SceneSchemaVersion = 2;
 
-	Bool IsSupportedPropertyType(const rttr::type& propertyType)
+	Bool IsSupportedPropertyType(REFLECTION_VALUE_TYPE propertyType)
 	{
-		return propertyType == rttr::type::get<int32>() ||
-			propertyType == rttr::type::get<uint32>() ||
-			propertyType == rttr::type::get<Float>() ||
-			propertyType == rttr::type::get<Double>() ||
-			propertyType == rttr::type::get<Bool>() ||
-			propertyType == rttr::type::get<string>() ||
-			propertyType == rttr::type::get<wstring>() ||
-			propertyType == rttr::type::get<Vector3>() ||
-			propertyType == rttr::type::get<Float3>() ||
-			propertyType == rttr::type::get<Color>() ||
-			propertyType == rttr::type::get<Float4>();
+		return propertyType != REFLECTION_VALUE_TYPE::NONE;
 	}
 
-	Bool IsCompatiblePropertyValue(const rttr::type& propertyType, const nlohmann::json& value)
+	Bool TryParseAnimationPreset(const nlohmann::json& value,
+		AnimationPresetSnapshot& outPreset)
+	{
+		outPreset = {};
+		if (value.is_null())
+			return true;
+		if (!value.is_object() || value.value("schemaVersion", 0u) != 2u ||
+			!value.contains("animationEnum") || !value["animationEnum"].is_string() ||
+			!value.contains("animations") || !value["animations"].is_array() ||
+			value["animations"].empty())
+			return false;
+
+		AnimationPresetSnapshot pending;
+		pending.schemaVersion = 2;
+		pending.animationEnum = value["animationEnum"].get<string>();
+		if (pending.animationEnum.empty())
+			return false;
+
+		unordered_set<wstring> uniquePaths;
+		for (size_t index = 0; index < value["animations"].size(); ++index)
+		{
+			const auto& animation = value["animations"][index];
+			if (!animation.is_object() || animation.value("index", numeric_limits<size_t>::max()) != index ||
+				!animation.contains("path") || !animation["path"].is_string() ||
+				!animation.contains("states") || !animation["states"].is_array())
+				return false;
+
+			AnimationPresetClip clip;
+			clip.relativePath = Helper::To_wString(animation["path"].get<string>());
+			if (clip.relativePath.empty() || !uniquePaths.emplace(clip.relativePath).second)
+				return false;
+			unordered_set<string> uniqueStates;
+			for (const auto& state : animation["states"])
+			{
+				if (!state.is_string())
+					return false;
+				string stateName = state.get<string>();
+				if (stateName.empty() || !uniqueStates.emplace(stateName).second)
+					return false;
+				clip.states.push_back(std::move(stateName));
+			}
+			pending.animations.push_back(std::move(clip));
+		}
+		outPreset = std::move(pending);
+		return true;
+	}
+
+	nlohmann::json SerializeAnimationPreset(const AnimationPresetSnapshot& preset)
+	{
+		if (preset.Is_Empty())
+			return nullptr;
+		nlohmann::json result = {
+			{ "schemaVersion", preset.schemaVersion },
+			{ "animationEnum", preset.animationEnum },
+			{ "animations", nlohmann::json::array() }
+		};
+		for (size_t index = 0; index < preset.animations.size(); ++index)
+		{
+			const AnimationPresetClip& clip = preset.animations[index];
+			result["animations"].push_back({
+				{ "index", index },
+				{ "path", Helper::To_String(clip.relativePath) },
+				{ "states", clip.states }
+			});
+		}
+		return result;
+	}
+
+	Bool IsCompatiblePropertyValue(REFLECTION_VALUE_TYPE propertyType,
+		const nlohmann::json& value)
 	{
 		if (!IsSupportedPropertyType(propertyType))
 			return false;
-		if (propertyType == rttr::type::get<uint32>())
+		if (propertyType == REFLECTION_VALUE_TYPE::UINT32)
 			return value.is_number_unsigned() && value.get<std::uint64_t>() <= numeric_limits<uint32>::max();
-		if (propertyType == rttr::type::get<int32>())
+		if (propertyType == REFLECTION_VALUE_TYPE::INT32)
 			return value.is_number_integer() && !value.is_number_unsigned() &&
 				value.get<std::int64_t>() >= numeric_limits<int32>::min() &&
 				value.get<std::int64_t>() <= numeric_limits<int32>::max();
-		if (propertyType == rttr::type::get<Float>() || propertyType == rttr::type::get<Double>())
+		if (propertyType == REFLECTION_VALUE_TYPE::FLOAT ||
+			propertyType == REFLECTION_VALUE_TYPE::DOUBLE)
 			return value.is_number();
-		if (propertyType == rttr::type::get<Bool>())
+		if (propertyType == REFLECTION_VALUE_TYPE::BOOL)
 			return value.is_boolean();
-		if (propertyType == rttr::type::get<string>() || propertyType == rttr::type::get<wstring>())
+		if (propertyType == REFLECTION_VALUE_TYPE::STRING ||
+			propertyType == REFLECTION_VALUE_TYPE::WSTRING)
 			return value.is_string();
-		if (propertyType == rttr::type::get<Vector3>() || propertyType == rttr::type::get<Float3>())
+		if (propertyType == REFLECTION_VALUE_TYPE::ANIMATION_PRESET)
+		{
+			AnimationPresetSnapshot preset;
+			return TryParseAnimationPreset(value, preset);
+		}
+		if (propertyType == REFLECTION_VALUE_TYPE::VECTOR3 ||
+			propertyType == REFLECTION_VALUE_TYPE::FLOAT3)
 			return value.is_array() && value.size() == 3 &&
 				all_of(value.begin(), value.end(), [](const auto& element) { return element.is_number(); });
 		return value.is_array() && value.size() == 4 &&
@@ -66,6 +133,71 @@ namespace
 	{
 		return value.is_array() && value.size() == 3 &&
 			all_of(value.begin(), value.end(), [](const auto& element) { return element.is_number(); });
+	}
+
+	const ReflectedPropertyInfo* FindPropertyInfo(
+		const vector<ReflectedPropertyInfo>& properties, std::string_view propertyName)
+	{
+		const auto it = std::ranges::find(properties, propertyName,
+			&ReflectedPropertyInfo::registeredName);
+		return it == properties.end() ? nullptr : &*it;
+	}
+
+	Bool ReadVector3Property(Object& target, std::string_view propertyName, Vector3& outValue)
+	{
+		ReflectionValue reflectedValue;
+		if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(target, propertyName, reflectedValue)))
+			return false;
+		const Vector3* value = reflectedValue.Try_Get<Vector3>();
+		if (!value)
+			return false;
+		outValue = *value;
+		return true;
+	}
+
+	Bool WriteVector3Property(Object& target, std::string_view propertyName,
+		const nlohmann::json& value)
+	{
+		if (!IsVector3Json(value))
+			return false;
+		ReflectionValue reflectedValue;
+		reflectedValue.data = Vector3{
+			value[0].get<Float>(), value[1].get<Float>(), value[2].get<Float>() };
+		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+			target, propertyName, reflectedValue));
+	}
+
+	HRESULT WriteJsonAtomically(const filesystem::path& outputPath,
+		const nlohmann::json& document)
+	{
+		std::error_code errorCode;
+		if (!outputPath.parent_path().empty())
+			filesystem::create_directories(outputPath.parent_path(), errorCode);
+		if (errorCode)
+			return E_FAIL;
+
+		const filesystem::path temporaryPath = outputPath.wstring() + L".tmp";
+		{
+			ofstream output(temporaryPath, ios::binary | ios::trunc);
+			if (!output.is_open())
+				return E_FAIL;
+			output << document.dump(2);
+			output.flush();
+			if (!output.good())
+			{
+				output.close();
+				filesystem::remove(temporaryPath, errorCode);
+				return E_FAIL;
+			}
+		}
+
+		if (!MoveFileExW(temporaryPath.c_str(), outputPath.c_str(),
+			MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+		{
+			filesystem::remove(temporaryPath, errorCode);
+			return HRESULT_FROM_WIN32(GetLastError());
+		}
+		return S_OK;
 	}
 }
 
@@ -99,55 +231,124 @@ LevelSerializer::LevelSerializer() : EngineManager{}
 
 HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath)
 {
+	return SerializeDocument(levIndex, filePath, nullptr, {});
+}
+
+HRESULT LevelSerializer::SerializePrefab(PrefabGuid prefabGuid, uint32 levIndex,
+	const Shared<GameObject>& selectedRoot, const wstring& filePath)
+{
+	if (!prefabGuid.Is_Valid() || !selectedRoot)
+		return E_INVALIDARG;
+	return SerializeDocument(levIndex, filePath, selectedRoot, prefabGuid);
+}
+
+HRESULT LevelSerializer::SerializeDocument(uint32 levIndex, const wstring& filePath,
+	const Shared<GameObject>& selectedRoot, PrefabGuid prefabGuid)
+{
 	nlohmann::json root;
 	root["schemaVersion"] = SceneSchemaVersion;
+	root["documentType"] = selectedRoot ? "Prefab" : "Scene";
 	root["levelIndex"] = levIndex;
 	root["roots"] = nlohmann::json::array();
 	root["objects"] = nlohmann::json::object();
+	if (selectedRoot)
+		root["prefabGuid"] = Engine::To_String(prefabGuid);
 
 	const auto& allObjects = GAME_INSTANCE->Get_GameObjects(levIndex);
 	vector<Shared<GameObject>> objects;
 	unordered_set<ObjectGuid, GuidHash> serializedGuids;
-	for (const auto& [instanceID, object] : allObjects) {
-		if (!object || object->Is_Destroy())
-			continue;
-		if (!object->Get_ObjectGuid().Is_Valid() ||
-			!serializedGuids.emplace(object->Get_ObjectGuid()).second) {
-			LOG_ERROR(L"[SceneSerializer] Invalid or duplicate ObjectGuid on {}", object->Get_Name());
+	unordered_set<const GameObject*> levelObjects;
+	for (const auto& [instanceID, object] : allObjects)
+		if (object && !object->Is_Destroy())
+			levelObjects.emplace(object.get());
+
+	if (selectedRoot)
+	{
+		if (!levelObjects.contains(selectedRoot.get()) ||
+			!selectedRoot->Get_StableChildKey().empty())
+		{
+			LOG_ERROR(L"[PrefabSerializer] Selected root is not a standalone object in level {}", levIndex);
+			return E_INVALIDARG;
+		}
+
+		const auto GatherSubtree = [&](auto&& self, const Shared<GameObject>& object) -> Bool
+		{
+			if (!object || object->Is_Destroy() || !levelObjects.contains(object.get()) ||
+				!object->Get_ObjectGuid().Is_Valid() ||
+				!serializedGuids.emplace(object->Get_ObjectGuid()).second)
+				return false;
+			objects.push_back(object);
+			for (const Shared<GameObject>& child : object->Get_Children())
+				if (child && child->Get_Parent() == object && !self(self, child))
+					return false;
+			return true;
+		};
+		if (!GatherSubtree(GatherSubtree, selectedRoot))
+		{
+			LOG_ERROR(L"[PrefabSerializer] Selected subtree contains an invalid hierarchy");
 			return E_FAIL;
 		}
-		objects.push_back(object);
+	}
+	else
+	{
+		for (const auto& [instanceID, object] : allObjects) {
+			if (!object || object->Is_Destroy())
+				continue;
+			if (!object->Get_ObjectGuid().Is_Valid() ||
+				!serializedGuids.emplace(object->Get_ObjectGuid()).second) {
+				LOG_ERROR(L"[SceneSerializer] Invalid or duplicate ObjectGuid on {}", object->Get_Name());
+				return E_FAIL;
+			}
+			objects.push_back(object);
+		}
 	}
 	std::ranges::sort(objects, {}, [](const Shared<GameObject>& object) {
 		return object->Get_ObjectGuid();
 	});
 
-	auto SerializeProperties = [&](rttr::instance objInstance, nlohmann::json& outProps) -> Bool {
+	auto SerializeProperties = [&](Object& target, nlohmann::json& outProps) -> Bool {
 		outProps = nlohmann::json::object();
-		const rttr::type objectType = objInstance.get_type();
-		for (const rttr::property property : objectType.get_properties()) {
-			const string propertyName = property.get_name().to_string();
-			if (!property.get_metadata(Meta_Key_Type::SaveData).is_valid())
+		const string registeredName = GAME_INSTANCE->Find_RegisteredName(target.Get_RuntimeTypeId());
+		for (const ReflectedPropertyInfo& property :
+			GAME_INSTANCE->Get_ReflectedProperties(target)) {
+			if (!property.isSerializable)
 				continue;
 
-			const rttr::variant value = property.get_value(objInstance);
-			if (!value.is_valid() || !IsSupportedPropertyType(property.get_type())) {
+			ReflectionValue value;
+			if (!IsSupportedPropertyType(property.valueType) ||
+				FAILED(GAME_INSTANCE->Read_ReflectedProperty(
+					target, property.registeredName, value))) {
 				LOG_ERROR(L"[Serializer] Unsupported saved property {} on type {}",
-					FromUtf8(propertyName), Helper::To_wString(objectType.get_name().to_string()));
+					FromUtf8(property.registeredName), Helper::To_wString(registeredName));
 				return false;
 			}
 
-			if (value.is_type<int32>()) outProps[propertyName] = value.get_value<int32>();
-			else if (value.is_type<uint32>()) outProps[propertyName] = value.get_value<uint32>();
-			else if (value.is_type<Float>()) outProps[propertyName] = value.get_value<Float>();
-			else if (value.is_type<Double>()) outProps[propertyName] = value.get_value<Double>();
-			else if (value.is_type<Bool>()) outProps[propertyName] = value.get_value<Bool>();
-			else if (value.is_type<string>()) outProps[propertyName] = value.get_value<string>();
-			else if (value.is_type<wstring>()) outProps[propertyName] = ToUtf8(value.get_value<wstring>());
-			else if (value.is_type<Vector3>()) { const Vector3 v = value.get_value<Vector3>(); outProps[propertyName] = { v.x, v.y, v.z }; }
-			else if (value.is_type<Float3>()) { const Float3 v = value.get_value<Float3>(); outProps[propertyName] = { v.x, v.y, v.z }; }
-			else if (value.is_type<Color>()) { const Color c = value.get_value<Color>(); outProps[propertyName] = { c.R(), c.G(), c.B(), c.A() }; }
-			else if (value.is_type<Float4>()) { const Float4 v = value.get_value<Float4>(); outProps[propertyName] = { v.x, v.y, v.z, v.w }; }
+			auto& output = outProps[property.registeredName];
+			switch (value.Get_Type()) {
+			case REFLECTION_VALUE_TYPE::BOOL: output = *value.Try_Get<Bool>(); break;
+			case REFLECTION_VALUE_TYPE::INT32: output = *value.Try_Get<int32>(); break;
+			case REFLECTION_VALUE_TYPE::UINT32: output = *value.Try_Get<uint32>(); break;
+			case REFLECTION_VALUE_TYPE::FLOAT: output = *value.Try_Get<Float>(); break;
+			case REFLECTION_VALUE_TYPE::DOUBLE: output = *value.Try_Get<Double>(); break;
+			case REFLECTION_VALUE_TYPE::STRING: output = *value.Try_Get<string>(); break;
+			case REFLECTION_VALUE_TYPE::WSTRING: output = ToUtf8(*value.Try_Get<wstring>()); break;
+			case REFLECTION_VALUE_TYPE::VECTOR3: {
+				const Vector3& v = *value.Try_Get<Vector3>(); output = { v.x, v.y, v.z }; break;
+			}
+			case REFLECTION_VALUE_TYPE::FLOAT3: {
+				const Float3& v = *value.Try_Get<Float3>(); output = { v.x, v.y, v.z }; break;
+			}
+			case REFLECTION_VALUE_TYPE::COLOR: {
+				const Color& c = *value.Try_Get<Color>(); output = { c.R(), c.G(), c.B(), c.A() }; break;
+			}
+			case REFLECTION_VALUE_TYPE::FLOAT4: {
+				const Float4& v = *value.Try_Get<Float4>(); output = { v.x, v.y, v.z, v.w }; break;
+			}
+			case REFLECTION_VALUE_TYPE::ANIMATION_PRESET:
+				output = SerializeAnimationPreset(*value.Try_Get<AnimationPresetSnapshot>()); break;
+			default:
+				return false;
+			}
 		}
 		return true;
 	};
@@ -155,8 +356,7 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 	for (const Shared<GameObject>& object : objects)
 	{
 		nlohmann::json objectJson;
-		const rttr::type objectType = rttr::type::get(*object);
-		const string typeName = objectType.get_name().to_string();
+		const string typeName = GAME_INSTANCE->Find_RegisteredName(object->Get_RuntimeTypeId());
 		if (typeName.empty() || GAME_INSTANCE->Find_RuntimeTypeId(typeName) == 0) {
 			LOG_ERROR(L"[SceneSerializer] Unregistered GameObject type {}", FromUtf8(typeName));
 			return E_FAIL;
@@ -176,9 +376,16 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 			root["roots"].push_back(Engine::To_String(object->Get_ObjectGuid()));
 
 		if (const Shared<Transform> transform = object->Get_Transform()) {
-			const Vector3 position = transform->Get_LocalPosition();
-			const Vector3 rotation = transform->Get_LocalEulerAngles();
-			const Vector3 scale = transform->Get_LocalScale();
+			Vector3 position{};
+			Vector3 rotation{};
+			Vector3 scale{};
+			if (!ReadVector3Property(*transform, "Position", position) ||
+				!ReadVector3Property(*transform, "Rotation", rotation) ||
+				!ReadVector3Property(*transform, "Scale", scale)) {
+				LOG_ERROR(L"[SceneSerializer] Transform reflection properties are unavailable on {}",
+					object->Get_Name());
+				return E_FAIL;
+			}
 			objectJson["transform"] = {
 				{ "position", { position.x, position.y, position.z } },
 				{ "rotation", { rotation.x, rotation.y, rotation.z } },
@@ -194,7 +401,8 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 			if (!component)
 				continue;
 			nlohmann::json componentJson;
-			const string componentTypeName = rttr::type::get(*component).get_name().to_string();
+			const string componentTypeName =
+				GAME_INSTANCE->Find_RegisteredName(component->Get_RuntimeTypeId());
 			if (componentTypeName.empty() || GAME_INSTANCE->Find_RuntimeTypeId(componentTypeName) == 0) {
 				LOG_ERROR(L"[SceneSerializer] Unregistered component type {}", FromUtf8(componentTypeName));
 				return E_FAIL;
@@ -210,27 +418,43 @@ HRESULT LevelSerializer::SerializeLevel(uint32 levIndex, const wstring& filePath
 
 	try
 	{
-		std::filesystem::path path(filePath);
-		if (!path.parent_path().empty())
-			std::filesystem::create_directories(path.parent_path());
-
-		std::ofstream file(filePath);
-		if (!file.is_open()) return E_FAIL;
-		file << root.dump(2);
-		file.close();
+		const HRESULT writeResult = WriteJsonAtomically(filesystem::path(filePath), root);
+		if (FAILED(writeResult))
+			return writeResult;
 	}
 	catch (const std::exception& e)
 	{
-		LOG_CRITICAL(L"[SceneSerializer] SerializeLevel exception: {}", Helper::To_wString(e.what()));
+		LOG_CRITICAL(L"[SceneSerializer] Serialize exception: {}", Helper::To_wString(e.what()));
 		return E_FAIL;
 	}
 
-	LOG_INFO(L"[SceneSerializer] Scene saved: {} objects", objects.size());
+	if (selectedRoot)
+		LOG_INFO(L"[PrefabSerializer] Prefab saved: {} objects", objects.size());
+	else
+		LOG_INFO(L"[SceneSerializer] Scene saved: {} objects", objects.size());
 	return S_OK;
 }
 
 HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 {
+	return DeSerializeDocument(filePath, UINT_MAX, {}, nullptr);
+}
+
+HRESULT LevelSerializer::DeSerializePrefab(PrefabGuid prefabGuid, uint32 levIndex,
+	const wstring& filePath, Shared<GameObject>& outRoot)
+{
+	outRoot.reset();
+	if (!prefabGuid.Is_Valid() || levIndex == UINT_MAX)
+		return E_INVALIDARG;
+	return DeSerializeDocument(filePath, levIndex, prefabGuid, &outRoot);
+}
+
+HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 targetLevel,
+	PrefabGuid prefabGuid, Shared<GameObject>* outRoot)
+{
+	const Bool instantiatePrefab = prefabGuid.Is_Valid();
+	if (outRoot)
+		outRoot->reset();
 	nlohmann::json root;
 	try
 	{
@@ -246,17 +470,19 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	}
 
 	// 파일 전체를 먼저 검사한다. 이 검사가 끝나기 전에는 현재 레벨을 변경하지 않는다.
-	auto ValidateProperties = [&](const rttr::type& reflectedType,
+	auto ValidateProperties = [&](std::string_view registeredName,
 		const nlohmann::json& properties) -> Bool {
 		if (!properties.is_object())
 			return false;
+		const vector<ReflectedPropertyInfo> reflectedProperties =
+			GAME_INSTANCE->Get_ReflectedProperties(registeredName);
 		for (auto it = properties.begin(); it != properties.end(); ++it) {
-			const rttr::property property = reflectedType.get_property(it.key());
-			if (!property.is_valid() ||
-				!property.get_metadata(Meta_Key_Type::SaveData).is_valid() ||
-				!IsCompatiblePropertyValue(property.get_type(), it.value())) {
+			const ReflectedPropertyInfo* property =
+				FindPropertyInfo(reflectedProperties, it.key());
+			if (!property || !property->isSerializable || !property->isWritable ||
+				!IsCompatiblePropertyValue(property->valueType, it.value())) {
 				LOG_ERROR(L"[SceneSerializer] Invalid property {} on type {}",
-					FromUtf8(it.key()), Helper::To_wString(reflectedType.get_name().to_string()));
+					FromUtf8(it.key()), Helper::To_wString(registeredName));
 				return false;
 			}
 		}
@@ -273,14 +499,31 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 		return E_FAIL;
 	}
 
-	const uint32 levelIndex = root["levelIndex"].get<uint32>();
+	const string documentType = root.value("documentType", "Scene");
+	if ((!instantiatePrefab && documentType != "Scene") ||
+		(instantiatePrefab && documentType != "Prefab"))
+	{
+		LOG_ERROR(L"[SceneSerializer] Document type does not match the requested operation");
+		return E_FAIL;
+	}
+	if (instantiatePrefab)
+	{
+		PrefabGuid documentPrefabGuid{};
+		if (!root.contains("prefabGuid") || !root["prefabGuid"].is_string() ||
+			!Try_Parse_PrefabGuid(root["prefabGuid"].get<string>(), documentPrefabGuid) ||
+			documentPrefabGuid != prefabGuid)
+		{
+			LOG_ERROR(L"[PrefabSerializer] PrefabGuid does not match the registered document");
+			return E_FAIL;
+		}
+	}
+
+	const uint32 documentLevelIndex = root["levelIndex"].get<uint32>();
+	const uint32 levelIndex = instantiatePrefab ? targetLevel : documentLevelIndex;
 	unordered_set<ObjectGuid, GuidHash> documentObjectGuids;
 	unordered_map<ObjectGuid, string, GuidHash> objectKeys;
 	unordered_map<ObjectGuid, ObjectGuid, GuidHash> parentByChild;
 	unordered_map<ObjectGuid, vector<ObjectGuid>, GuidHash> childrenByParent;
-	const rttr::type gameObjectBaseType = rttr::type::get<GameObject>();
-	const rttr::type componentBaseType = rttr::type::get<Component>();
-
 	for (auto objectIt = root["objects"].begin(); objectIt != root["objects"].end(); ++objectIt)
 	{
 		const string objectGuidText = objectIt.key();
@@ -304,11 +547,11 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 		}
 
 		const string typeName = objectJson["typeName"].get<string>();
-		const rttr::type objectType = rttr::type::get_by_name(typeName);
-		if (GAME_INSTANCE->Find_RuntimeTypeId(typeName) == 0 || !objectType.is_valid() ||
-			(objectType != gameObjectBaseType && !objectType.is_derived_from(gameObjectBaseType)) ||
+		ReflectedTypeInfo objectTypeInfo;
+		if (FAILED(GAME_INSTANCE->Find_ReflectedType(typeName, objectTypeInfo)) ||
+			objectTypeInfo.objectKind != REFLECTED_OBJECT_KIND::GAMEOBJECT ||
 			!GAME_INSTANCE->Can_Instantiate(PROTOTYPE::GAMEOBJECT, typeName, levelIndex) ||
-			!ValidateProperties(objectType, objectJson["properties"])) {
+			!ValidateProperties(typeName, objectJson["properties"])) {
 			LOG_ERROR(L"[SceneSerializer] Invalid GameObject type {}", FromUtf8(typeName));
 			return E_FAIL;
 		}
@@ -331,12 +574,12 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 				return E_FAIL;
 			const string componentTypeName = componentJson["typeName"].get<string>();
 			const RuntimeTypeId componentRuntimeTypeId = GAME_INSTANCE->Find_RuntimeTypeId(componentTypeName);
-			const rttr::type componentType = rttr::type::get_by_name(componentTypeName);
+			ReflectedTypeInfo componentTypeInfo;
 			if (componentRuntimeTypeId == 0 || !componentTypes.emplace(componentRuntimeTypeId).second ||
-				!componentType.is_valid() ||
-				(componentType != componentBaseType && !componentType.is_derived_from(componentBaseType)) ||
+				FAILED(GAME_INSTANCE->Find_ReflectedType(componentTypeName, componentTypeInfo)) ||
+				componentTypeInfo.objectKind != REFLECTED_OBJECT_KIND::COMPONENT ||
 				!GAME_INSTANCE->Can_Instantiate(PROTOTYPE::COMPONENT, componentTypeName, levelIndex) ||
-				!ValidateProperties(componentType, componentJson["properties"])) {
+				!ValidateProperties(componentTypeName, componentJson["properties"])) {
 				LOG_ERROR(L"[SceneSerializer] Invalid or duplicate component type {}", FromUtf8(componentTypeName));
 				return E_FAIL;
 			}
@@ -405,10 +648,17 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 		LOG_ERROR(L"[SceneSerializer] Orphaned object or hierarchy cycle detected");
 		return E_FAIL;
 	}
+	if (instantiatePrefab && rootGuids.size() != 1)
+	{
+		LOG_ERROR(L"[PrefabSerializer] A Prefab document must contain exactly one root");
+		return E_FAIL;
+	}
 
-	GAME_INSTANCE->Clearing_ObjectManager(levelIndex);
+	if (!instantiatePrefab && FAILED(GAME_INSTANCE->Clear_GameObjects(levelIndex)))
+		return E_FAIL;
 
 	unordered_map<ObjectGuid, Shared<GameObject>, GuidHash> objectGuidMap;
+	vector<Shared<GameObject>> createdRoots;
 	Bool deserializeFailed = false;
 	struct ObjectData {
 		Shared<GameObject> pObj;
@@ -416,7 +666,18 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	};
 	vector<ObjectData> loadList;
 	auto RollbackLoad = [&]() {
-		GAME_INSTANCE->Clearing_ObjectManager(levelIndex);
+		if (instantiatePrefab)
+		{
+			for (const Shared<GameObject>& createdRoot : createdRoots)
+				if (createdRoot && !createdRoot->Is_Destroy())
+					createdRoot->Destroy_Subtree();
+			GAME_INSTANCE->Clearing_ObjectManager(levelIndex);
+		}
+		else
+		{
+			GAME_INSTANCE->Clear_GameObjects(levelIndex);
+		}
+		createdRoots.clear();
 		loadList.clear();
 		objectGuidMap.clear();
 	};
@@ -424,12 +685,13 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	const auto RestoreObject = [&](auto&& self,
 		ObjectGuid savedObjectGuid,
 		const Shared<GameObject>& object) -> Bool {
-		if (!object || object->Get_ObjectGuid() != savedObjectGuid)
+		if (!object || (!instantiatePrefab && object->Get_ObjectGuid() != savedObjectGuid))
 			return false;
 
 		const nlohmann::json& objectJson = root["objects"][objectKeys.at(savedObjectGuid)];
 		const string savedTypeName = objectJson["typeName"].get<string>();
-		const string instantiatedTypeName = rttr::type::get(*object).get_name().to_string();
+		const string instantiatedTypeName =
+			GAME_INSTANCE->Find_RegisteredName(object->Get_RuntimeTypeId());
 		if (instantiatedTypeName != savedTypeName) {
 			LOG_ERROR(L"[SceneSerializer] Prototype type mismatch: saved {}, created {}",
 				FromUtf8(savedTypeName), FromUtf8(instantiatedTypeName));
@@ -465,12 +727,12 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 				}
 
 				const ObjectGuid derivedChildGuid = Derive_ChildObjectGuid(
-					savedObjectGuid, stableChildKey, childTypeName);
+					object->Get_ObjectGuid(), stableChildKey, childTypeName);
 				if (!child || child->Get_Parent() != object ||
 					child->Get_StableChildKey() != stableChildKey ||
-					!derivedChildGuid.Is_Valid() || derivedChildGuid != savedChildGuid ||
-					child->Get_ObjectGuid() != savedChildGuid ||
-					rttr::type::get(*child).get_name().to_string() != childTypeName) {
+					!derivedChildGuid.Is_Valid() || child->Get_ObjectGuid() != derivedChildGuid ||
+					(!instantiatePrefab && derivedChildGuid != savedChildGuid) ||
+					GAME_INSTANCE->Find_RegisteredName(child->Get_RuntimeTypeId()) != childTypeName) {
 					LOG_ERROR(L"[SceneSerializer] Factory child structure mismatch {}", stableChildKey);
 					return false;
 				}
@@ -484,7 +746,8 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 				}
 
 				child = GAME_INSTANCE->Instantiate_GameObject(
-					childTypeName, levelIndex, nullptr, savedChildGuid);
+					childTypeName, levelIndex, nullptr,
+					instantiatePrefab ? ObjectGuid{} : savedChildGuid);
 				if (!child || FAILED(object->Add_Child(child, L"", childIndex))) {
 					LOG_ERROR(L"[SceneSerializer] Failed to create Editor child {}", FromUtf8(childTypeName));
 					return false;
@@ -509,7 +772,10 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 		const nlohmann::json& rootJson = root["objects"][objectKeys.at(rootGuid)];
 		const string rootTypeName = rootJson["typeName"].get<string>();
 		const Shared<GameObject> rootObject = GAME_INSTANCE->Instantiate_GameObject(
-			rootTypeName, levelIndex, nullptr, rootGuid);
+			rootTypeName, levelIndex, nullptr,
+			instantiatePrefab ? ObjectGuid{} : rootGuid);
+		if (rootObject)
+			createdRoots.push_back(rootObject);
 		if (!rootObject || !RestoreObject(RestoreObject, rootGuid, rootObject)) {
 			LOG_ERROR(L"[SceneSerializer] Failed to restore root type {}", FromUtf8(rootTypeName));
 			deserializeFailed = true;
@@ -518,7 +784,8 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	}
 
 	if (objectGuidMap.size() != documentObjectGuids.size() ||
-		GAME_INSTANCE->Get_GameObjects(levelIndex).size() != documentObjectGuids.size()) {
+		(!instantiatePrefab &&
+			GAME_INSTANCE->Get_GameObjects(levelIndex).size() != documentObjectGuids.size())) {
 		LOG_ERROR(L"[SceneSerializer] Runtime and document hierarchy counts differ");
 		deserializeFailed = true;
 	}
@@ -528,59 +795,71 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	}
 
 	// 공통 속성 역직렬화 헬퍼 람다
-	auto DeserializeProperties = [&](rttr::instance objInstance, const nlohmann::json& propsJson) -> Bool {
-		rttr::type objType = objInstance.get_type();
+	auto DeserializeProperties = [&](Object& target, const nlohmann::json& propsJson) -> Bool {
+		const string registeredName = GAME_INSTANCE->Find_RegisteredName(target.Get_RuntimeTypeId());
+		const vector<ReflectedPropertyInfo> reflectedProperties =
+			GAME_INSTANCE->Get_ReflectedProperties(target);
 		Bool succeeded = true;
+		// Resource setters replace component-owned state. Apply them first so a
+		// subsequently restored snapshot cannot be overwritten by ModelTag/TextureTag.
+		for (uint32 phase = 0; phase < 2; ++phase)
 		for (auto it = propsJson.begin(); it != propsJson.end(); ++it)
 		{
-			rttr::property prop = objType.get_property(it.key());
-			if (!prop.is_valid()) {
+			const ReflectedPropertyInfo* property = FindPropertyInfo(reflectedProperties, it.key());
+			if (!property || !property->isSerializable || !property->isWritable) {
 				LOG_ERROR(L"[Serializer] Unknown property {} on type {}",
-					FromUtf8(it.key()), Helper::To_wString(objType.get_name().to_string()));
+					FromUtf8(it.key()), Helper::To_wString(registeredName));
 				succeeded = false;
 				continue;
 			}
-			
-			// 실제 오브젝트에 값 꽂아넣기
-			Bool valueApplied = false;
-			if (it.value().is_number()) {
-				if (prop.get_type() == rttr::type::get<uint32>()) valueApplied = prop.set_value(objInstance, static_cast<uint32>(it.value().get<Double>()));
-				else if (prop.get_type() == rttr::type::get<int32>()) valueApplied = prop.set_value(objInstance, static_cast<int32>(it.value().get<Double>()));
-				else if (prop.get_type() == rttr::type::get<Float>()) valueApplied = prop.set_value(objInstance, static_cast<Float>(it.value().get<Double>()));
-				else if (prop.get_type() == rttr::type::get<Double>()) valueApplied = prop.set_value(objInstance, it.value().get<Double>());
+			const Bool isResourceTag = property->saveDataKey == Save_Data_Key::TextureTag ||
+				property->saveDataKey == Save_Data_Key::ModelTag;
+			if ((phase == 0) != isResourceTag)
+				continue;
+
+			ReflectionValue reflectedValue;
+			const auto& value = it.value();
+			switch (property->valueType) {
+			case REFLECTION_VALUE_TYPE::BOOL: reflectedValue.data = value.get<Bool>(); break;
+			case REFLECTION_VALUE_TYPE::INT32: reflectedValue.data = value.get<int32>(); break;
+			case REFLECTION_VALUE_TYPE::UINT32: reflectedValue.data = value.get<uint32>(); break;
+			case REFLECTION_VALUE_TYPE::FLOAT: reflectedValue.data = value.get<Float>(); break;
+			case REFLECTION_VALUE_TYPE::DOUBLE: reflectedValue.data = value.get<Double>(); break;
+			case REFLECTION_VALUE_TYPE::STRING: reflectedValue.data = value.get<string>(); break;
+			case REFLECTION_VALUE_TYPE::WSTRING: reflectedValue.data = FromUtf8(value.get<string>()); break;
+			case REFLECTION_VALUE_TYPE::VECTOR3:
+				reflectedValue.data = Vector3{ value[0].get<Float>(), value[1].get<Float>(), value[2].get<Float>() }; break;
+			case REFLECTION_VALUE_TYPE::FLOAT3:
+				reflectedValue.data = Float3{ value[0].get<Float>(), value[1].get<Float>(), value[2].get<Float>() }; break;
+			case REFLECTION_VALUE_TYPE::COLOR:
+				reflectedValue.data = Color{ value[0].get<Float>(), value[1].get<Float>(), value[2].get<Float>(), value[3].get<Float>() }; break;
+			case REFLECTION_VALUE_TYPE::FLOAT4:
+				reflectedValue.data = Float4{ value[0].get<Float>(), value[1].get<Float>(), value[2].get<Float>(), value[3].get<Float>() }; break;
+			case REFLECTION_VALUE_TYPE::ANIMATION_PRESET: {
+				AnimationPresetSnapshot preset;
+				if (TryParseAnimationPreset(value, preset))
+					reflectedValue.data = std::move(preset);
+				break;
 			}
-			else if (it.value().is_boolean()) { valueApplied = prop.set_value(objInstance, it.value().get<Bool>()); }
-			else if (it.value().is_string()) {
-				if (prop.get_type() == rttr::type::get<wstring>())
-					valueApplied = prop.set_value(objInstance, FromUtf8(it.value().get<string>()));
-				else if (prop.get_type() == rttr::type::get<string>())
-					valueApplied = prop.set_value(objInstance, it.value().get<string>());
+			default:
+				break;
 			}
-			else if (it.value().is_array()) {
-				auto& v = it.value();
-				if (v.size() == 3 && prop.get_type() == rttr::type::get<Vector3>()) valueApplied = prop.set_value(objInstance, Vector3(v[0], v[1], v[2]));
-				else if (v.size() == 3 && prop.get_type() == rttr::type::get<Float3>()) valueApplied = prop.set_value(objInstance, Float3(v[0], v[1], v[2]));
-				else if (v.size() == 4 && prop.get_type() == rttr::type::get<Color>()) valueApplied = prop.set_value(objInstance, Color(v[0], v[1], v[2], v[3]));
-				else if (v.size() == 4 && prop.get_type() == rttr::type::get<Float4>()) valueApplied = prop.set_value(objInstance, Float4(v[0], v[1], v[2], v[3]));
-			}
+
+			const Bool valueApplied = reflectedValue.Is_Valid() &&
+				SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+					target, property->registeredName, reflectedValue));
 
 			if (!valueApplied) {
 				LOG_ERROR(L"[Serializer] Failed to set property {} on type {}",
-					FromUtf8(it.key()), Helper::To_wString(objType.get_name().to_string()));
+					FromUtf8(it.key()), Helper::To_wString(registeredName));
 				succeeded = false;
 			}
 
-			// [로깅용] ResourceTag가 세팅되었는지 검사하여 출력
-			rttr::variant saveMeta = prop.get_metadata(Meta_Key_Type::SaveData);
-			if (saveMeta.is_valid() && saveMeta.is_type<SaveDataKey>())
-			{
-				SaveDataKey saveKey = saveMeta.get_value<SaveDataKey>();
-				if (saveKey == Save_Data_Key::TextureTag || saveKey == Save_Data_Key::ModelTag)
-				{
-					LOG_INFO(L"[Serializer] ResourceTag injected into {} : {}",
-						Helper::To_wString(objType.get_name().to_string()),
-						FromUtf8(it.value().get<string>()));
-				}
+			if (valueApplied && value.is_string() &&
+				(property->saveDataKey == Save_Data_Key::TextureTag ||
+					property->saveDataKey == Save_Data_Key::ModelTag)) {
+				LOG_INFO(L"[Serializer] ResourceTag injected into {} : {}",
+					Helper::To_wString(registeredName), FromUtf8(value.get<string>()));
 			}
 		}
 		return succeeded;
@@ -607,7 +886,8 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			for (const Shared<Component>& component : pObj->Get_Components()) {
 				if (!component)
 					continue;
-				const string typeName = rttr::type::get(*component).get_name().to_string();
+				const string typeName =
+					GAME_INSTANCE->Find_RegisteredName(component->Get_RuntimeTypeId());
 				if (typeName.empty() || !runtimeComponents.emplace(typeName, component).second) {
 					LOG_ERROR(L"[SceneSerializer] Invalid runtime component structure on {}", pObj->Get_Name());
 					deserializeFailed = true;
@@ -652,12 +932,10 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 			auto transform = pObj->Get_Transform();
 			if (transform)
 			{
-				if (t.contains("position")) 
-					transform->Set_LocalPositionByValue({ t["position"][0], t["position"][1], t["position"][2] });
-				if (t.contains("rotation")) 
-					transform->Set_LocalEulerAngleByValue({ t["rotation"][0], t["rotation"][1], t["rotation"][2] });
-				if (t.contains("scale"))    
-					transform->Set_LocalScaleByValue({ t["scale"][0], t["scale"][1], t["scale"][2] });
+				if (!WriteVector3Property(*transform, "Position", t["position"]) ||
+					!WriteVector3Property(*transform, "Rotation", t["rotation"]) ||
+					!WriteVector3Property(*transform, "Scale", t["scale"]))
+					deserializeFailed = true;
 			}
 		}
 	}
@@ -672,13 +950,28 @@ HRESULT LevelSerializer::DeSerializeLevel(const wstring& filePath)
 	{
 		if (data.pObj)
 		{
-			data.pObj->Post_Load();
+			if (FAILED(data.pObj->Post_Load()))
+			{
+				LOG_ERROR(L"[SceneSerializer] Component post-load failed on {}", data.pObj->Get_Name());
+				deserializeFailed = true;
+				continue;
+			}
 			if (data.pObj->Get_Transform()) {
 				data.pObj->Get_Transform()->Update_WorldMatrix();
 			}
 		}
 	}
-	LOG_INFO(L"[SceneSerializer] RTTR Scene loaded: {} objects", loadList.size());
+	if (deserializeFailed)
+	{
+		RollbackLoad();
+		return E_FAIL;
+	}
+	if (instantiatePrefab && outRoot)
+		*outRoot = createdRoots.front();
+	if (instantiatePrefab)
+		LOG_INFO(L"[PrefabSerializer] Prefab instantiated: {} objects", loadList.size());
+	else
+		LOG_INFO(L"[SceneSerializer] Scene loaded: {} objects", loadList.size());
 	return S_OK;
 }
 

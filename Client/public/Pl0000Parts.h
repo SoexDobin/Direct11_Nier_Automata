@@ -13,7 +13,6 @@ class Pl0000;
 
 class CLIENT_DLL Pl0000Parts abstract :public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	typedef struct tagPl0000PartsDesc : public PARTOBJECT_DESC
 	{

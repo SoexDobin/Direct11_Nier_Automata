@@ -8,7 +8,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Em3002 final : public Em3000Parts
 {
-	RTTR_ENABLE(Em3000Parts)
 public:
 	typedef struct tagEm3002Parts : public EM3000PART_DESC
 	{

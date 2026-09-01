@@ -12,7 +12,6 @@ class Em0010;
 
 class CLIENT_DLL Em0010Movement final : public Movement
 {
-	RTTR_ENABLE(Movement)
 public:
 	typedef struct tagEm0010MovementDesc : public MOVEMENT_DESC
 	{

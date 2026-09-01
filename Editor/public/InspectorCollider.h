@@ -2,8 +2,6 @@
 #include "EditorObject.h"
 NS_BEGIN(Engine)
 class Component;
-class OBBCollider;
-class SphereCollider;
 NS_END
 NS_BEGIN(Editor)
 class InspectorCollider final : public EditorObject
@@ -17,8 +15,8 @@ public:
 	void Render(Bool isResize) override {}
 	void RenderComponent(const std::shared_ptr<Engine::Component>& pCollider);
 private:
-	void RenderOBB(const std::shared_ptr<Engine::OBBCollider>& pOBB);
-	void RenderSphere(const std::shared_ptr<Engine::SphereCollider>& pSphere);
+	void RenderOBB(Engine::Component& collider);
+	void RenderSphere(Engine::Component& collider);
 public:
 	static std::shared_ptr<InspectorCollider> Create();
 };

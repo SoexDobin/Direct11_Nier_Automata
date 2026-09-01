@@ -5,7 +5,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL SheathWP0220Body final : public Pl0000Parts
 {
-	RTTR_ENABLE(Pl0000Parts)
 public:
 	explicit SheathWP0220Body() = default;
 	explicit SheathWP0220Body(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

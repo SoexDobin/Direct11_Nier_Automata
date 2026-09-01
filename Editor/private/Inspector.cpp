@@ -4,6 +4,7 @@
 #include "EditorManager.h"
 #include "Component.h"
 #include "GameObject.h"
+#include "Game.h"
 #include "LayerRegistry.h"
 #include "PathManager.h"
 #include "TagRegistry.h"
@@ -35,10 +36,6 @@ HRESULT Inspector::Initialize() {
     m_InspectorCollider = InspectorCollider::Create();
 
     return EditorObject::Initialize();
-}
-
-string Clean_RTTR_Name(const wstring& name) {
-    return Helper::To_String(name); // Optional: keep any custom old logic if needed
 }
 
 void Inspector::Render(Bool isResize) {
@@ -177,10 +174,11 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
                 m_InspectorCollider->RenderComponent(pComp);
             }
             else {
-                // 커스텀 인스펙터가 없는 경우 Fallback
-                string typeName = rttr::type::get(*pComp).get_name().to_string();
+                string typeName = GAME_INSTANCE->Find_RegisteredName(pComp->Get_RuntimeTypeId());
+				if (typeName.empty())
+					typeName = "<Unregistered Component>";
                 if (ImGui::CollapsingHeader(typeName.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-                    ImGui::TextDisabled("No custom inspector available.");
+					RenderGenericProperties(*pComp);
                 }
             }
         }
@@ -194,12 +192,117 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
         ImGui::Text("Scripts (%zu)", scripts.size());
         for (auto& pScript : scripts) {
             if (!pScript) continue;
-            string typeName = rttr::type::get(*pScript).get_name().to_string();
+            string typeName = GAME_INSTANCE->Find_RegisteredName(pScript->Get_RuntimeTypeId());
+			if (typeName.empty())
+				typeName = "<Unregistered Script>";
             if (ImGui::CollapsingHeader(typeName.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-                ImGui::TextDisabled("No custom inspector for Script.");
+				RenderGenericProperties(*pScript);
             }
         }
     }
+}
+
+void Inspector::RenderGenericProperties(Object& object)
+{
+	const vector<ReflectedPropertyInfo> properties =
+		GAME_INSTANCE->Get_ReflectedProperties(object);
+	if (properties.empty()) {
+		ImGui::TextDisabled("No reflected properties.");
+		return;
+	}
+
+	for (const ReflectedPropertyInfo& property : properties) {
+		ReflectionValue value;
+		if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(
+			object, property.registeredName, value))) {
+			ImGui::TextDisabled("%s: unavailable", property.registeredName.c_str());
+			continue;
+		}
+
+		ImGui::PushID(property.registeredName.c_str());
+		Bool changed = false;
+		switch (property.valueType) {
+		case REFLECTION_VALUE_TYPE::BOOL:
+			if (Bool* typed = value.Try_Get<Bool>())
+				changed = ImGui::Checkbox(property.registeredName.c_str(), typed);
+			break;
+		case REFLECTION_VALUE_TYPE::INT32:
+			if (int32* typed = value.Try_Get<int32>())
+				changed = ImGui::InputInt(property.registeredName.c_str(), typed);
+			break;
+		case REFLECTION_VALUE_TYPE::UINT32:
+			if (uint32* typed = value.Try_Get<uint32>())
+				changed = ImGui::InputScalar(property.registeredName.c_str(),
+					ImGuiDataType_U32, typed);
+			break;
+		case REFLECTION_VALUE_TYPE::FLOAT:
+			if (Float* typed = value.Try_Get<Float>())
+				changed = ImGui::DragFloat(property.registeredName.c_str(), typed, 0.01f);
+			break;
+		case REFLECTION_VALUE_TYPE::DOUBLE:
+			if (Double* typed = value.Try_Get<Double>())
+				changed = ImGui::InputDouble(property.registeredName.c_str(), typed);
+			break;
+		case REFLECTION_VALUE_TYPE::STRING:
+			if (string* typed = value.Try_Get<string>()) {
+				Char buffer[256]{};
+				strncpy_s(buffer, typed->c_str(), _TRUNCATE);
+				if (ImGui::InputText(property.registeredName.c_str(), buffer, sizeof(buffer))) {
+					*typed = buffer;
+					changed = true;
+				}
+			}
+			break;
+		case REFLECTION_VALUE_TYPE::WSTRING:
+			if (wstring* typed = value.Try_Get<wstring>()) {
+				Char buffer[256]{};
+				const string utf8 = Helper::To_String(*typed);
+				strncpy_s(buffer, utf8.c_str(), _TRUNCATE);
+				if (ImGui::InputText(property.registeredName.c_str(), buffer, sizeof(buffer))) {
+					*typed = Helper::To_wString(buffer);
+					changed = true;
+				}
+			}
+			break;
+		case REFLECTION_VALUE_TYPE::VECTOR3:
+			if (Vector3* typed = value.Try_Get<Vector3>())
+				changed = ImGui::DragFloat3(property.registeredName.c_str(),
+					reinterpret_cast<Float*>(typed), 0.01f);
+			break;
+		case REFLECTION_VALUE_TYPE::FLOAT3:
+			if (Float3* typed = value.Try_Get<Float3>())
+				changed = ImGui::DragFloat3(property.registeredName.c_str(),
+					reinterpret_cast<Float*>(typed), 0.01f);
+			break;
+		case REFLECTION_VALUE_TYPE::COLOR:
+			if (Color* typed = value.Try_Get<Color>())
+				changed = ImGui::ColorEdit4(property.registeredName.c_str(),
+					reinterpret_cast<Float*>(typed));
+			break;
+		case REFLECTION_VALUE_TYPE::FLOAT4:
+			if (Float4* typed = value.Try_Get<Float4>())
+				changed = ImGui::DragFloat4(property.registeredName.c_str(),
+					reinterpret_cast<Float*>(typed), 0.01f);
+			break;
+		case REFLECTION_VALUE_TYPE::ANIMATION_PRESET:
+			if (const AnimationPresetSnapshot* typed = value.Try_Get<AnimationPresetSnapshot>())
+				ImGui::Text("%s: %s (%zu clips)", property.registeredName.c_str(),
+					typed->animationEnum.empty() ? "<None>" : typed->animationEnum.c_str(),
+					typed->animations.size());
+			break;
+		default:
+			ImGui::TextDisabled("%s: unsupported value type",
+				property.registeredName.c_str());
+			break;
+		}
+
+		if (changed && property.isWritable &&
+			FAILED(GAME_INSTANCE->Write_ReflectedProperty(
+				object, property.registeredName, value))) {
+			ImGui::TextDisabled("Write rejected; value was not changed.");
+		}
+		ImGui::PopID();
+	}
 }
 
 void Inspector::Draw_GameObjectHeader(const Shared<Engine::GameObject>& obj)

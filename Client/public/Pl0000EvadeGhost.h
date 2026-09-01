@@ -10,7 +10,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Pl0000EvadeGhost final : public GameObject
 {
-	RTTR_ENABLE(GameObject)
 public:
 	explicit Pl0000EvadeGhost();
 	explicit Pl0000EvadeGhost(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

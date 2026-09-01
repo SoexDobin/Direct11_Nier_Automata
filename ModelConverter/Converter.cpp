@@ -279,6 +279,7 @@ void Tool::Converter::ReadMaterialData()
 				{
 					entry.path += ".dds";
 				}
+				entry.path = "Textures/" + entry.path;
 
 				mat->textures.push_back(entry);
 			}
@@ -491,7 +492,7 @@ Bool Tool::Converter::WriteAnimationFiles(const wstring& modelPath)
 
 	const filesystem::path modelFilePath{ modelPath };
 	const filesystem::path animationDirectory =
-		modelFilePath.parent_path() / (modelFilePath.stem().wstring() + L" Animation");
+		modelFilePath.parent_path() / L"Animations";
 
 	std::error_code errorCode;
 	filesystem::create_directories(animationDirectory, errorCode);
@@ -502,6 +503,10 @@ Bool Tool::Converter::WriteAnimationFiles(const wstring& modelPath)
 	}
 
 	unordered_map<string, uint32> usedNames;
+	nlohmann::json manifest;
+	manifest["schemaVersion"] = 1;
+	manifest["model"] = modelFilePath.stem().string();
+	manifest["animations"] = nlohmann::json::array();
 	for (uint32 i = 0; i < m_Animation.size(); ++i)
 	{
 		string fileName = m_Animation[i]->name;
@@ -522,9 +527,29 @@ Bool Tool::Converter::WriteAnimationFiles(const wstring& modelPath)
 			? fileName
 			: fileName + "_" + std::to_string(duplicateCount);
 
-		const filesystem::path animationPath = animationDirectory / filesystem::path(uniqueName + ".anim");
+		const string animationFileName = uniqueName + ".anim";
+		const filesystem::path animationPath = animationDirectory / filesystem::path(animationFileName);
 		if (!WriteAnimationFile(animationPath, i))
 			return false;
+
+		manifest["animations"].push_back({
+			{"index", i},
+			{"name", m_Animation[i]->name},
+			{"file", animationFileName}
+		});
+	}
+
+	ofstream manifestFile(animationDirectory / "manifest.json");
+	if (!manifestFile.is_open())
+	{
+		std::cerr << "  [Error] Failed to create animation manifest\n";
+		return false;
+	}
+	manifestFile << manifest.dump(4);
+	if (!manifestFile.good())
+	{
+		std::cerr << "  [Error] Failed to write animation manifest\n";
+		return false;
 	}
 
 	return true;

@@ -3,6 +3,7 @@
 #include "PathManager.h"
 #include "EditorManager.h"
 #include "ModelViewer.h"
+#include "AnimationPresetEditor.h"
 #include "ClientSettingManager.h"
 #include "InputDevice.h"    
 #include "CollisionManager.h"
@@ -27,6 +28,7 @@ void MenuBar::Render(Bool isResize) {
 	if (ImGui::BeginMainMenuBar()) {
 
         Render_Debug(); // Debug Rays
+		Render_Prefab();
 
         if (ImGui::BeginMenu("WindowSetting")) {
           ImGui::Separator();
@@ -34,6 +36,10 @@ void MenuBar::Render(Bool isResize) {
           Bool showModelViewer = EDITOR->Get_ModelViewer()->Is_Enabled();
           if (ImGui::MenuItem("Model Viewer", nullptr, showModelViewer))
               EDITOR->Get_ModelViewer()->Set_Enable(!showModelViewer);
+
+		  Bool showAnimationPreset = EDITOR->Get_AnimationPresetEditor()->Is_Enabled();
+		  if (ImGui::MenuItem("Animation Preset", nullptr, showAnimationPreset))
+			  EDITOR->Get_AnimationPresetEditor()->Set_Enable(!showAnimationPreset);
 
           Bool showNavHelper = EDITOR->Get_NavHelper()->Is_Enabled();
           if (ImGui::MenuItem("NavMesh Builder", nullptr, showNavHelper))
@@ -200,6 +206,104 @@ void MenuBar::Render(Bool isResize) {
         }
         ImGui::End();
     }
+}
+
+void MenuBar::Render_Prefab()
+{
+	const Bool isStop = EDITOR->Get_State() == EDITOR_STATE::STOP;
+	if (!ImGui::BeginMenu("Prefab", isStop))
+		return;
+
+	ImGui::SetNextItemWidth(180.f);
+	ImGui::InputTextWithHint("##PrefabName", "Prefab name", m_PrefabName,
+		static_cast<size_t>(MAX_PATH));
+	const Shared<GameObject> selectedRoot = EDITOR->Get_SelectedObject();
+	const Bool canSave = selectedRoot && selectedRoot->Get_StableChildKey().empty() &&
+		m_PrefabName[0] != '\0';
+	if (ImGui::MenuItem("Save Selected", nullptr, false, canSave))
+	{
+		const filesystem::path inputPath(Helper::To_wString(m_PrefabName));
+		filesystem::path fileName = inputPath.filename();
+		if (fileName.empty() || fileName != inputPath)
+		{
+			LOG_ERROR("Prefab name must not contain a directory path.");
+		}
+		else
+		{
+			fileName.replace_extension(L".json");
+			const filesystem::path filePath =
+				filesystem::path(PATH.GetPrefabSettingsDir()) / fileName;
+			PrefabGuid prefabGuid{};
+			Bool registeredNewGuid = false;
+			if (filesystem::exists(filePath))
+			{
+				if (FAILED(m_Game->Register_PrefabDocument(filePath.wstring(), prefabGuid)))
+					LOG_ERROR(L"Existing Prefab document is invalid: {}", filePath.wstring());
+			}
+			else
+			{
+				prefabGuid = Create_PrefabGuid();
+				registeredNewGuid = prefabGuid.Is_Valid() &&
+					SUCCEEDED(m_Game->Register_Prefab(prefabGuid, filePath.wstring()));
+			}
+
+			if (prefabGuid.Is_Valid() &&
+				SUCCEEDED(m_Game->SerializePrefabDocument(prefabGuid, selectedRoot)))
+				LOG_INFO(L"Prefab saved: {}", filePath.wstring());
+			else
+			{
+				if (registeredNewGuid)
+					m_Game->Unregister_Prefab(prefabGuid);
+				LOG_ERROR(L"Prefab save failed: {}", filePath.wstring());
+			}
+		}
+	}
+	if (!selectedRoot)
+		ImGui::TextDisabled("Select a hierarchy root to save.");
+	else if (!selectedRoot->Get_StableChildKey().empty())
+		ImGui::TextDisabled("Code-defined children cannot be Prefab roots.");
+
+	ImGui::Separator();
+	if (ImGui::BeginMenu("Instantiate"))
+	{
+		std::error_code errorCode;
+		const filesystem::path prefabDirectory(PATH.GetPrefabSettingsDir());
+		vector<filesystem::path> prefabFiles;
+		if (filesystem::exists(prefabDirectory, errorCode))
+		{
+			for (const filesystem::directory_entry& entry :
+				filesystem::directory_iterator(prefabDirectory, errorCode))
+			{
+				if (errorCode)
+					break;
+				if (entry.is_regular_file() && entry.path().extension() == L".json")
+					prefabFiles.push_back(entry.path());
+			}
+		}
+		std::ranges::sort(prefabFiles);
+		if (prefabFiles.empty())
+			ImGui::TextDisabled("No Prefab documents.");
+		for (const filesystem::path& prefabPath : prefabFiles)
+		{
+			const string label = Helper::To_String(prefabPath.stem().wstring());
+			if (!ImGui::MenuItem(label.c_str()))
+				continue;
+
+			PrefabGuid prefabGuid{};
+			Shared<GameObject> instantiatedRoot;
+			if (SUCCEEDED(m_Game->Register_PrefabDocument(prefabPath.wstring(), prefabGuid)) &&
+				SUCCEEDED(m_Game->DeSerializePrefabDocument(prefabGuid, instantiatedRoot)))
+			{
+				EDITOR->Set_SelectedObject(instantiatedRoot);
+				LOG_INFO(L"Prefab instantiated: {}", prefabPath.wstring());
+			}
+			else
+				LOG_ERROR(L"Prefab instantiate failed: {}", prefabPath.wstring());
+		}
+		ImGui::EndMenu();
+	}
+
+	ImGui::EndMenu();
 }
 
 void MenuBar::Update_HotKey()

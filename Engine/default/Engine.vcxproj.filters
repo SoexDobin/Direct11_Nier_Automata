@@ -239,6 +239,9 @@
     <ClInclude Include="..\public\Engine_Typedef.h">
       <Filter>98. Headers</Filter>
     </ClInclude>
+	<ClInclude Include="..\public\Engine_Reflection.h">
+	  <Filter>98. Headers</Filter>
+	</ClInclude>
     <ClInclude Include="..\public\Object.h">
       <Filter>01. Utility\00. Object</Filter>
     </ClInclude>

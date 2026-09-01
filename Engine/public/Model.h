@@ -2,6 +2,7 @@
 #include "Animation.h"
 #include "AnimationTracker.h"
 #include "Component.h"
+#include "Engine_Reflection.h"
 
 NS_BEGIN(Engine)
 class Mesh;
@@ -43,6 +44,7 @@ public:
 	void Update_ModelAnimation(Float timeDelta);
 	void Set_Animation(uint32 index, Float blendDuration = 0.5f);
 	HRESULT Load_Animations(const vector<wstring>& animationFilePaths);
+	HRESULT Apply_AnimationPreset(const AnimationPresetSnapshot& preset);
 
 public:
 	Bool Is_Blending() const { return m_IsBlending; }
@@ -88,18 +90,27 @@ public:
 public:
 	const wstring& Get_ModelTag() const { return m_ModelTag; }
 	void Set_ModelTag(const wstring& tag);
+	const AnimationPresetSnapshot& Get_AnimationPreset() const { return m_AnimationPreset; }
+	void Set_AnimationPreset(const AnimationPresetSnapshot& preset) { m_AnimationPreset = preset; }
 
 private:
+	HRESULT Post_Load() override;
 	HRESULT Ready_Bones(ifstream& in);
 	HRESULT Ready_Meshes(ifstream& in, Bool isAnim);
 	HRESULT Ready_Materials(ifstream& in, const std::string& directoryPath);
 	HRESULT Ready_Animation(ifstream& in);
 	HRESULT Read_AnimationData(ifstream& in, MODEL_ANIMATION& animationData,
 		Bool hasStoredChannelCount, uint32 channelCount = 0) const;
+	HRESULT Build_Animations(const vector<wstring>& animationFilePaths,
+		const unordered_set<wstring>& existingNames,
+		vector<Shared<Animation>>& outAnimations, vector<wstring>& outNames) const;
+	Bool Validate_AnimationPreset(const AnimationPresetSnapshot& preset) const;
 
 private:
 	TRANSFORM_FRAME m_TransformFrame{};
 	wstring	m_ModelTag{};
+	wstring m_ResourceRootPath{};
+	AnimationPresetSnapshot m_AnimationPreset{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
 	int32	m_RootLocalNode{ -1 };

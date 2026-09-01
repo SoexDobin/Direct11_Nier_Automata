@@ -74,12 +74,3 @@ void InspectorObject::Set_UseCustomMask(Bool use)
     if (!m_pTarget) return;
     m_pTarget->Get_LayerMask().Set_UseCustomMask(use);
 }
-
-RTTR_REGISTRATION
-{
-    rttr::registration::class_<Editor::InspectorObject>("InspectorObject")
-        .property("LayerNames", &InspectorObject::Get_LayerNames, &InspectorObject::Set_LayerNames)
-        .property("TagNames", &InspectorObject::Get_TagNames, &InspectorObject::Set_TagNames)
-        .property("UseCustomMask", &InspectorObject::Get_UseCustomMask, &InspectorObject::Set_UseCustomMask)
-        ;
-}

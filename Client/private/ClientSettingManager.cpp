@@ -1,24 +1,6 @@
 #include "pch.h"
 #include "ClientSettingManager.h"
 
-#include <fstream>
-#include <SpdLogger.h>
-#include "Client_Define.h"
-#include "Game.h"
-#include "TagRegistry.h"
-#include "LayerRegistry.h"
-#include "GameObject.h"
-#include "Navigation.h"
-#include "Engine_ID.h"
-// zlib declares a global Byte type; isolate it from Engine::Byte in Client unity builds.
-#define Byte MinizipByte
-#include <minizip/unzip.h>
-#include <minizip/iowin32.h>
-#undef Byte
-#include <pugixml.hpp>
-#include <regex>
-#include <unordered_set>
-
 namespace
 {
 	constexpr size_t MaxXlsxEntrySize = 64ull * 1024ull * 1024ull;
@@ -349,9 +331,9 @@ namespace
 			return E_FAIL;
 		}
 
-		const array<string, 13> requiredHeaders{
+		const array<string, 12> requiredHeaders{
 			"Level", "Tag", "Path", "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ",
-			"ScaleX", "ScaleY", "ScaleZ", "AnimationPresetGuid"
+			"ScaleX", "ScaleY", "ScaleZ"
 		};
 		unordered_map<string, size_t> headerColumns;
 		const auto& [headerRowNumber, headerCells] = rows.front();
@@ -404,7 +386,6 @@ namespace
 			const string level = getCell(cells, "Level");
 			const string tag = getCell(cells, "Tag");
 			const string path = getCell(cells, "Path");
-			const string animationPresetGuid = getCell(cells, "AnimationPresetGuid");
 			if (level.empty() || tag.empty() || path.empty())
 			{
 				LOG_ERROR(L"Missing required Level, Tag, or Path in Models row {}", rowNumber);
@@ -437,14 +418,6 @@ namespace
 				return E_FAIL;
 			}
 
-			AssetGuid parsedPresetGuid{};
-			if (!animationPresetGuid.empty() && !Try_Parse_AssetGuid(animationPresetGuid, parsedPresetGuid))
-			{
-				LOG_ERROR(L"Invalid AnimationPresetGuid in Models row {} : {}",
-					rowNumber, Helper::To_wString(animationPresetGuid));
-				return E_FAIL;
-			}
-
 			Float px{}, py{}, pz{}, rx{}, ry{}, rz{}, sx{}, sy{}, sz{};
 			struct NumericField
 			{
@@ -473,8 +446,7 @@ namespace
 				{"path", path},
 				{"position", {{"x", px}, {"y", py}, {"z", pz}}},
 				{"rotation", {{"x", rx}, {"y", ry}, {"z", rz}}},
-				{"scale", {{"x", sx}, {"y", sy}, {"z", sz}}},
-				{"animationPresetGuid", animationPresetGuid}
+				{"scale", {{"x", sx}, {"y", sy}, {"z", sz}}}
 			});
 		}
 
@@ -672,85 +644,6 @@ namespace
 		return S_OK;
 	}
 
-	HRESULT FindAnimationPresetPaths(const wstring& projectSettingPath, const wstring& resourcePath,
-		const string& assetGuidText, vector<wstring>& outAnimationPaths)
-	{
-		AssetGuid assetGuid{};
-		if (!Try_Parse_AssetGuid(assetGuidText, assetGuid))
-		{
-			LOG_ERROR(L"Invalid AnimationPreset AssetGuid : {}", Helper::To_wString(assetGuidText));
-			return E_INVALIDARG;
-		}
-
-		const filesystem::path presetDirectory = filesystem::path(projectSettingPath) / L"AnimationPreset";
-		if (!filesystem::exists(presetDirectory))
-		{
-			LOG_ERROR(L"AnimationPreset directory not found : {}", presetDirectory.wstring());
-			return E_FAIL;
-		}
-
-		for (const auto& entry : filesystem::directory_iterator(presetDirectory))
-		{
-			if (!entry.is_regular_file() || entry.path().extension() != L".json")
-				continue;
-
-			try
-			{
-				ifstream presetFile(entry.path());
-				nlohmann::json preset;
-				presetFile >> preset;
-				if (preset.value("assetGuid", string{}) != assetGuidText)
-					continue;
-				if (preset.value("schemaVersion", 0) != 1 || !preset.contains("animations") ||
-					!preset["animations"].is_array())
-				{
-					LOG_ERROR(L"Invalid AnimationPreset schema : {}", entry.path().wstring());
-					return E_FAIL;
-				}
-
-				vector<wstring> resolvedPaths;
-				for (const auto& animation : preset["animations"])
-				{
-					const string relativePathText = animation.is_string()
-						? animation.get<string>()
-						: animation.value("path", string{});
-					const filesystem::path relativePath = filesystem::path(Helper::To_wString(relativePathText)).lexically_normal();
-					if (relativePath.empty() || relativePath.is_absolute() ||
-						(!relativePath.empty() && *relativePath.begin() == L"..") ||
-						relativePath.extension() != L".anim")
-					{
-						LOG_ERROR(L"Invalid AnimationPreset clip path : {}", Helper::To_wString(relativePathText));
-						return E_FAIL;
-					}
-
-					const filesystem::path fullPath = filesystem::path(resourcePath) / relativePath;
-					if (!filesystem::exists(fullPath))
-					{
-						LOG_ERROR(L"Animation clip not found : {}", fullPath.wstring());
-						return E_FAIL;
-					}
-					resolvedPaths.push_back(fullPath.wstring());
-				}
-
-				if (resolvedPaths.empty())
-				{
-					LOG_ERROR(L"AnimationPreset has no clips : {}", entry.path().wstring());
-					return E_FAIL;
-				}
-
-				outAnimationPaths = std::move(resolvedPaths);
-				return S_OK;
-			}
-			catch (const std::exception& exception)
-			{
-				LOG_ERROR(L"Failed to parse AnimationPreset {} : {}", entry.path().wstring(), Helper::To_wString(exception.what()));
-				return E_FAIL;
-			}
-		}
-
-		LOG_ERROR(L"AnimationPreset AssetGuid not found : {}", Helper::To_wString(assetGuidText));
-		return E_FAIL;
-	}
 }
 
 IMPLEMENT_SINGLETON(ClientSettingManager)
@@ -943,19 +836,6 @@ HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 			return E_FAIL;
 		}
 
-		const string animationPresetGuid = item.value("animationPresetGuid", string{});
-		if (!animationPresetGuid.empty())
-		{
-			vector<wstring> animationPaths;
-			if (FAILED(FindAnimationPresetPaths(m_ProjectSettingPath, m_ResourcePath,
-				animationPresetGuid, animationPaths)) ||
-				FAILED(GAME_INSTANCE->Load_ModelAnimations(ETOI(level), tag, animationPaths)))
-			{
-				LOG_ERROR(L"Failed to apply AnimationPreset {} to model {}",
-					Helper::To_wString(animationPresetGuid), tag);
-				return E_FAIL;
-			}
-		}
 	}
 
 	return S_OK;
@@ -981,22 +861,6 @@ HRESULT ClientSettingManager::Sync_ModelJson_FromExcel() const
 	{
 		LOG_ERROR(L"Failed to synchronize ModelSettings.xlsx : {}", workbookPath.wstring());
 		return E_FAIL;
-	}
-
-	for (const auto& item : jsonRoot["ModelSettings"])
-	{
-		const string animationPresetGuid = item.value("animationPresetGuid", string{});
-		if (animationPresetGuid.empty())
-			continue;
-
-		vector<wstring> animationPaths;
-		if (FAILED(FindAnimationPresetPaths(m_ProjectSettingPath, m_ResourcePath,
-			animationPresetGuid, animationPaths)))
-		{
-			LOG_ERROR(L"Invalid AnimationPreset reference before ModelSettings.json replacement : {}",
-				Helper::To_wString(animationPresetGuid));
-			return E_FAIL;
-		}
 	}
 
 	const HRESULT writeResult = WriteJsonAtomically(jsonPath, jsonRoot);

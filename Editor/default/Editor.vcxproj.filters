@@ -108,6 +108,9 @@
     <ClInclude Include="..\public\ModelViewer.h">
       <Filter>01. EditorObject\ModelViewer</Filter>
     </ClInclude>
+	<ClInclude Include="..\public\AnimationPresetEditor.h">
+	  <Filter>01. EditorObject\ModelViewer</Filter>
+	</ClInclude>
     <ClInclude Include="..\public\AssetBrowser.h">
       <Filter>01. EditorObject\AssetBrowser</Filter>
     </ClInclude>
@@ -164,6 +167,9 @@
     <ClCompile Include="..\private\ModelViewer.cpp">
       <Filter>01. EditorObject\ModelViewer</Filter>
     </ClCompile>
+	<ClCompile Include="..\private\AnimationPresetEditor.cpp">
+	  <Filter>01. EditorObject\ModelViewer</Filter>
+	</ClCompile>
     <ClCompile Include="..\private\AssetBrowser.cpp">
       <Filter>01. EditorObject\AssetBrowser</Filter>
     </ClCompile>
@@ -200,9 +206,6 @@
     </None>
     <None Include="..\vcpkg.json">
       <Filter>99. SystemFiles\vcpkg</Filter>
-    </None>
-    <None Include="GenerateRTTR.bat">
-      <Filter>99. SystemFiles\Batch</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

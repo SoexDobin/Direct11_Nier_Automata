@@ -8,7 +8,6 @@ class HpBarWorldUI;
 
 class CLIENT_DLL Monster abstract : public Entity
 {
-	RTTR_ENABLE(Entity)
 public:
 	typedef struct tagMonsterObjectDesc : public ENTITY_DESC {} MONSTER_DESC;
 

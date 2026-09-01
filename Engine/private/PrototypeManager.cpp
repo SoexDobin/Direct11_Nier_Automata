@@ -83,14 +83,17 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
 
     if (!object)
         return E_INVALIDARG;
+	if (object->Get_RuntimeTypeId() == 0 && FAILED(object->Initialize_Prototype())) {
+		LOG_ERROR(L"Failed to initialize prototype identity");
+		return E_FAIL;
+	}
 
-    const rttr::type reflectedType = rttr::type::get(*object);
-    const string registeredName = reflectedType.get_name().to_string();
-    const RuntimeTypeId runtimeTypeId = static_cast<RuntimeTypeId>(reflectedType.get_id());
+	const RuntimeTypeId runtimeTypeId = object->Get_RuntimeTypeId();
+	const string registeredName = GAME_INSTANCE->Find_RegisteredName(runtimeTypeId);
     if (registeredName.empty() || runtimeTypeId == 0 ||
-        GAME_INSTANCE->Find_RuntimeTypeId(registeredName) != runtimeTypeId) {
-        LOG_ERROR(L"Registry rejected unfinalized or conflicting reflected type {}",
-                  Helper::To_wString(registeredName));
+		GAME_INSTANCE->Find_RuntimeTypeId(registeredName) != runtimeTypeId) {
+		LOG_ERROR(L"Registry rejected prototype identity: name={}, runtimeTypeId={}, objectName={}",
+			Helper::To_wString(registeredName), runtimeTypeId, object->Get_Name());
         return E_FAIL;
     }
 
@@ -161,7 +164,7 @@ HRESULT PrototypeManager::Register_EngineComponents()
         rttr::method createMethod = searchedType.get_method("CreatePrototype");
         if (createMethod.is_valid())
         {
-            variant result = createMethod.invoke({});
+            rttr::variant result = createMethod.invoke({});
 
             if (result.is_valid())
             {

@@ -13,7 +13,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL LoadingBackground final : public UIObject
 {
-    RTTR_ENABLE(UIObject)
 public:
     typedef struct tagLoadingBackgroundUI final : public UI_DESC
     {

@@ -127,10 +127,6 @@
       <AdditionalDependencies>Engine.lib;Client.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;$(SolutionDir)Editor\bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <PreBuildEvent>
-      <Command>call "$(ProjectDir)GenerateRTTR.bat"</Command>
-      <Message>Parsing Client Headers for Prefab Metadata</Message>
-    </PreBuildEvent>
     <PostBuildEvent>
       <Command>call "$(ProjectDir)ProjectSetting.bat" "$(SolutionDir)" "$(OutDir)"</Command>
     </PostBuildEvent>
@@ -156,10 +152,6 @@
       <AdditionalDependencies>Engine.lib;Client.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\EngineSDK\lib\;$(SolutionDir)Editor\bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <PreBuildEvent>
-      <Command>call "$(ProjectDir)GenerateRTTR.bat"</Command>
-      <Message>Parsing Client Headers for Prefab Metadata</Message>
-    </PreBuildEvent>
     <PostBuildEvent>
       <Command>call "$(ProjectDir)ProjectSetting.bat" "$(SolutionDir)" "$(OutDir)"</Command>
     </PostBuildEvent>
@@ -182,6 +174,7 @@
     <ClInclude Include="..\public\LogConsole.h" />
     <ClInclude Include="..\public\MenuBar.h" />
     <ClInclude Include="..\public\ModelViewer.h" />
+	<ClInclude Include="..\public\AnimationPresetEditor.h" />
     <ClInclude Include="..\public\NavHelper.h" />
     <ClInclude Include="..\public\PathManager.h" />
     <ClInclude Include="Editor.h" />
@@ -189,7 +182,6 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-    <None Include="GenerateRTTR.bat" />
     <None Include="ProjectSetting.bat" />
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +200,7 @@
     <ClCompile Include="..\private\LogConsole.cpp" />
     <ClCompile Include="..\private\MenuBar.cpp" />
     <ClCompile Include="..\private\ModelViewer.cpp" />
+	<ClCompile Include="..\private\AnimationPresetEditor.cpp" />
     <ClCompile Include="..\private\NavHelper.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="pch.cpp">

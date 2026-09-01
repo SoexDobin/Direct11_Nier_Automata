@@ -13,7 +13,6 @@ class Entity;
 
 class CLIENT_DLL HpBarWorldUI final : public WorldUIObject
 {
-	RTTR_ENABLE(WorldUIObject)
 public:
 	typedef struct tagHpBarWorldUIDesc : public WORLD_UI_DESC
 	{

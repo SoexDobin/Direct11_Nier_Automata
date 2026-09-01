@@ -208,6 +208,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Engine_NavStruct.h" />
     <ClInclude Include="..\public\Engine_Rendering_Const.h" />
     <ClInclude Include="..\public\Engine_RTTR_Metadata.h" />
+	<ClInclude Include="..\public\Engine_Reflection.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
     <ClInclude Include="..\public\EventManager.h" />

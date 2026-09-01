@@ -9,7 +9,6 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL Em3000Body final : public PartObject
 {
-	RTTR_ENABLE(PartObject)
 public:
 	typedef struct tagEm3000BodyDesc : public PARTOBJECT_DESC
 	{

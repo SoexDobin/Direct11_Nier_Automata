@@ -213,8 +213,10 @@ public: /* For LevelSerialize */
     HRESULT DeSerializeLevel(const wstring& path) const;
 	HRESULT Register_Prefab(PrefabGuid prefabGuid, const wstring& path) const;
 	HRESULT Register_PrefabDocument(const wstring& path, PrefabGuid& outPrefabGuid) const;
+	HRESULT Load_PrefabRepository(const wstring& directoryPath) const;
 	HRESULT Unregister_Prefab(PrefabGuid prefabGuid) const;
 	wstring Find_PrefabPath(PrefabGuid prefabGuid) const;
+	vector<pair<PrefabGuid, wstring>> Get_PrefabDocuments() const;
 	HRESULT SerializePrefabDocument(PrefabGuid prefabGuid,
 		const Shared<GameObject>& selectedRoot, uint32 levIndex = UINT_MAX) const;
 	HRESULT DeSerializePrefabDocument(PrefabGuid prefabGuid,

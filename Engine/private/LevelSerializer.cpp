@@ -121,6 +121,15 @@ namespace
 			AnimationPresetSnapshot preset;
 			return TryParseAnimationPreset(value, preset);
 		}
+		if (propertyType == REFLECTION_VALUE_TYPE::OBJECT_REF)
+		{
+			if (value.is_null())
+				return true;
+			ObjectGuid objectGuid{};
+			return value.is_string() &&
+				Try_Parse_ObjectGuid(value.get<string>(), objectGuid) &&
+				objectGuid.Is_Valid();
+		}
 		if (propertyType == REFLECTION_VALUE_TYPE::VECTOR3 ||
 			propertyType == REFLECTION_VALUE_TYPE::FLOAT3)
 			return value.is_array() && value.size() == 3 &&
@@ -365,6 +374,13 @@ HRESULT LevelSerializer::SerializeDocument(uint32 levIndex, const wstring& fileP
 			}
 			case REFLECTION_VALUE_TYPE::ANIMATION_PRESET:
 				output = SerializeAnimationPreset(*value.Try_Get<AnimationPresetSnapshot>()); break;
+			case REFLECTION_VALUE_TYPE::OBJECT_REF: {
+				const ObjectGuid objectGuid = *value.Try_Get<ObjectGuid>();
+				output = objectGuid.Is_Valid()
+					? nlohmann::json(Engine::To_String(objectGuid))
+					: nlohmann::json(nullptr);
+				break;
+			}
 			default:
 				return false;
 			}
@@ -870,6 +886,16 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 				AnimationPresetSnapshot preset;
 				if (TryParseAnimationPreset(value, preset))
 					reflectedValue.data = std::move(preset);
+				break;
+			}
+			case REFLECTION_VALUE_TYPE::OBJECT_REF: {
+				ObjectGuid objectGuid{};
+				if (!value.is_null())
+					Try_Parse_ObjectGuid(value.get<string>(), objectGuid);
+				if (const auto objectIt = objectGuidMap.find(objectGuid);
+					objectIt != objectGuidMap.end() && objectIt->second)
+					objectGuid = objectIt->second->Get_ObjectGuid();
+				reflectedValue.data = objectGuid;
 				break;
 			}
 			default:

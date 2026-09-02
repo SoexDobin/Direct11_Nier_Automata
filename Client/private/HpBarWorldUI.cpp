@@ -24,17 +24,14 @@ HRESULT HpBarWorldUI::Initialize(void* arg)
 		return E_FAIL;
 	}
 
-	if (nullptr == arg)
-	{
-		LOG_ERROR(L"Failed to Initialize HPBarWorldUI nullptr arg");
-		return E_FAIL;
-	}
-
 	Set_AnchorState(UI_ANCHOR::TOP_LEFT);
 
-	HP_BAR_WORLD_UI_DESC& desc = *static_cast<HP_BAR_WORLD_UI_DESC*>(arg);
-	m_Target = desc.target;
-	m_WorldOffset = desc.worldOffset;
+	if (arg)
+	{
+		HP_BAR_WORLD_UI_DESC& desc = *static_cast<HP_BAR_WORLD_UI_DESC*>(arg);
+		Set_TargetObjectGuid(desc.target ? desc.target->Get_ObjectGuid() : ObjectGuid{});
+		m_WorldOffset = desc.worldOffset;
+	}
 
 	if (FAILED(Ready_Components()))
 	{
@@ -59,13 +56,11 @@ void HpBarWorldUI::Update(Float timeDelta)
 
 void HpBarWorldUI::Late_Update(Float timeDelta)
 {
-	if (m_Target.expired() || m_Target.lock()->Is_Destroy())
-	{
-		Destroy(shared_from_this());
+	const Shared<Entity> target = Resolve_Target();
+	if (!target)
 		return;
-	}
 
-	Vector3 worldPos = m_Target.lock()->Get_Transform()->Get_Position() + m_WorldOffset;
+	Vector3 worldPos = target->Get_Transform()->Get_Position() + m_WorldOffset;
 	Matrix viewMat = GAME_INSTANCE->Get_Transform(D3DTS::VIEW);
 	Matrix projMat = GAME_INSTANCE->Get_Transform(D3DTS::PROJ);
 
@@ -93,7 +88,7 @@ void HpBarWorldUI::Late_Update(Float timeDelta)
 
 void HpBarWorldUI::Submit_RenderGroup()
 {
-	if (m_Target.expired() || m_Target.lock()->Is_Destroy())
+	if (!Resolve_Target())
 		return;
 
 	if (m_TargetInBack) return;
@@ -103,10 +98,11 @@ void HpBarWorldUI::Submit_RenderGroup()
 
 HRESULT HpBarWorldUI::Render()
 {
-	if (m_Target.expired()) return S_OK;
+	const Shared<Entity> target = Resolve_Target();
+	if (!target) return S_OK;
 	if (false == Is_Active()) return S_OK;
 
-	Float hpRatio = m_Target.lock()->Get_HP() / m_Target.lock()->Get_MaxHP();
+	Float hpRatio = target->Get_HP() / target->Get_MaxHP();
 	if (FAILED(m_Shader->Bind_RawValue(HpRatio, &hpRatio, sizeof(Float))))
 		return E_FAIL;
 
@@ -135,6 +131,40 @@ HRESULT HpBarWorldUI::Render()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+HRESULT HpBarWorldUI::Set_TargetObjectGuid(ObjectGuid targetGuid)
+{
+	if (targetGuid.Is_Valid())
+	{
+		const Shared<GameObject> object = GAME_INSTANCE->Find(targetGuid);
+		if (object && !dynamic_pointer_cast<Entity>(object))
+			return E_NOINTERFACE;
+	}
+	m_TargetGuid = targetGuid;
+	m_Target.reset();
+	Resolve_Target();
+	return S_OK;
+}
+
+Shared<Entity> HpBarWorldUI::Resolve_Target()
+{
+	if (!m_TargetGuid.Is_Valid())
+	{
+		m_Target.reset();
+		return nullptr;
+	}
+	if (const Shared<Entity> target = m_Target.lock();
+		target && !target->Is_Destroy() && target->Get_ObjectGuid() == m_TargetGuid)
+		return target;
+	const Shared<Entity> target = GAME_INSTANCE->Find<Entity>(m_TargetGuid);
+	if (!target || target->Is_Destroy())
+	{
+		m_Target.reset();
+		return nullptr;
+	}
+	m_Target = target;
+	return target;
 }
 
 HRESULT HpBarWorldUI::Ready_Components()

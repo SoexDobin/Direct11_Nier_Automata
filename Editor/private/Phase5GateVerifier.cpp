@@ -5,10 +5,14 @@
 #include "ClientSettingManager.h"
 #include "Client_Function.h"
 #include "EditorManager.h"
+#include "FreeCamera.h"
 #include "Game.h"
 #include "GameObject.h"
+#include "HpBarWorldUI.h"
 #include "Model.h"
 #include "PathManager.h"
+#include "Pl0000.h"
+#include "StaticCamera.h"
 #include "TextUI.h"
 #include "Transform.h"
 
@@ -24,6 +28,10 @@ namespace Phase5GateVerifier
 		constexpr uint32 VerifyStage = 2;
 		constexpr uint32 FrameStage = 3;
 		constexpr uint32 UIAuthoringStage = 4;
+		constexpr uint32 ReferencesStage = 5;
+		constexpr uint32 PrefabRepositoryStage = 6;
+		constexpr uint32 SceneAuthoringStage = 7;
+		constexpr uint32 SceneRestartStage = 8;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
 		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
 		constexpr const wchar_t* FrameFixtureTag = L"TextUI";
@@ -120,6 +128,16 @@ namespace Phase5GateVerifier
 				loadedTags.emplace(tag);
 			}
 			return loadedTags.size() == requiredTags.size() ? S_OK : E_FAIL;
+		}
+
+		HRESULT Load_SceneGateTexture()
+		{
+			const filesystem::path texturePath = filesystem::path(PATH.GetResourceDir()) /
+				L"Models/pl0000/Textures/0454E8A4.dds";
+			if (!filesystem::is_regular_file(texturePath))
+				return E_FAIL;
+			return GAME_INSTANCE->Load_Texture(GateLevel, texturePath.c_str(), 1,
+				L"UI_Hp_Bar");
 		}
 
 		Bool Same_Preset(const AnimationPresetSnapshot& lhs,
@@ -260,6 +278,19 @@ namespace Phase5GateVerifier
 				if (child && child->Get_Parent() == root && !Collect_Graph(child, outGuids))
 					return false;
 			return true;
+		}
+
+		template <typename T>
+		Shared<T> Find_In_Graph(const Shared<GameObject>& root)
+		{
+			if (!root)
+				return nullptr;
+			if (Shared<T> typed = dynamic_pointer_cast<T>(root))
+				return typed;
+			for (const Shared<GameObject>& child : root->Get_Children())
+				if (Shared<T> typed = Find_In_Graph<T>(child))
+					return typed;
+			return nullptr;
 		}
 
 		Bool Verify_DerivedChildren(const Shared<GameObject>& root)
@@ -809,6 +840,480 @@ namespace Phase5GateVerifier
 				Work_Directory() / L"phase5b-ui-authoring-gates.json");
 			return report.Passed() && reportSaved ? S_OK : E_FAIL;
 		}
+
+		HRESULT Run_References(HRESULT initializationResult)
+		{
+			GateReport report("references");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult))
+			{
+				report.Save(Work_Directory() / L"phase6-references-gates.json");
+				return E_FAIL;
+			}
+
+			const vector<ReflectedPropertyInfo> hpBarProperties =
+				GAME_INSTANCE->Get_ReflectedProperties("HpBarWorldUI");
+			const auto hpBarTargetIt = std::ranges::find(
+				hpBarProperties, string{ "Target" }, &ReflectedPropertyInfo::registeredName);
+			const Bool hpBarDescriptorRegistered = hpBarTargetIt != hpBarProperties.end() &&
+				hpBarTargetIt->valueType == REFLECTION_VALUE_TYPE::OBJECT_REF &&
+				hpBarTargetIt->expectedBaseRegisteredName == "Entity" &&
+				hpBarTargetIt->saveDataKey == Save_Data_Key::ObjectReference &&
+				hpBarTargetIt->isWritable && hpBarTargetIt->isSerializable;
+			report.Check("hpbar-objectref-descriptor", hpBarDescriptorRegistered);
+
+			const auto CreateText = []() {
+				return GAME_INSTANCE->Instantiate<TextUI>(UIFixtureTag, GateLevel);
+			};
+			Shared<TextUI> root = CreateText();
+			Shared<TextUI> internalTarget = CreateText();
+			Shared<TextUI> externalTarget = CreateText();
+			Shared<StaticCamera> internalBinding =
+				GAME_INSTANCE->Instantiate<StaticCamera>(GateLevel);
+			Shared<FreeCamera> externalBinding =
+				GAME_INSTANCE->Instantiate<FreeCamera>(GateLevel);
+			const Bool graphCreated = root && internalTarget && externalTarget &&
+				internalBinding && externalBinding &&
+				SUCCEEDED(root->Add_Child(internalTarget)) &&
+				SUCCEEDED(root->Add_Child(internalBinding)) &&
+				SUCCEEDED(root->Add_Child(externalBinding));
+			report.Check("resource-independent-binding-graph", graphCreated);
+			if (!graphCreated)
+			{
+				if (root)
+					GAME_INSTANCE->Destroy(root->Get_ObjectGuid());
+				if (externalTarget)
+					GAME_INSTANCE->Destroy(externalTarget->Get_ObjectGuid());
+				GAME_INSTANCE->Flush_DestroyedGameObjects();
+				report.Save(Work_Directory() / L"phase6-references-gates.json");
+				return E_FAIL;
+			}
+
+			root->Set_Name(L"Phase6_ReferenceRoot");
+			internalTarget->Set_Name(L"Phase6_InternalTarget");
+			externalTarget->Set_Name(L"Phase6_ExternalTarget");
+
+			HpBarWorldUI hpBarFixture;
+			const ObjectGuid unresolvedGuid = Create_ObjectGuid();
+			const Bool unresolvedPreserved = unresolvedGuid.Is_Valid() &&
+				SUCCEEDED(hpBarFixture.Set_TargetObjectGuid(unresolvedGuid));
+			hpBarFixture.Late_Update(0.f);
+			hpBarFixture.Submit_RenderGroup();
+			report.Check("hpbar-unresolved-remains-authorable", unresolvedPreserved &&
+				hpBarFixture.Get_TargetObjectGuid() == unresolvedGuid &&
+				!hpBarFixture.Is_Destroy());
+			const Bool incompatibleRejected =
+				FAILED(hpBarFixture.Set_TargetObjectGuid(externalTarget->Get_ObjectGuid())) &&
+				hpBarFixture.Get_TargetObjectGuid() == unresolvedGuid;
+			report.Check("hpbar-incompatible-live-target-rejected", incompatibleRejected);
+			hpBarFixture.Set_TargetObjectGuid({});
+
+			ReflectionValue internalValue;
+			internalValue.data = internalTarget->Get_ObjectGuid();
+			ReflectionValue externalValue;
+			externalValue.data = externalTarget->Get_ObjectGuid();
+			ReflectionValue readValue;
+			const Bool guidReadWrite =
+				SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+					*internalBinding, "Target", internalValue)) &&
+				SUCCEEDED(GAME_INSTANCE->Read_ReflectedProperty(
+					*internalBinding, "Target", readValue)) &&
+				readValue.Try_Get<ObjectGuid>() &&
+				*readValue.Try_Get<ObjectGuid>() == internalTarget->Get_ObjectGuid() &&
+				SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+					*externalBinding, "Target", externalValue));
+			report.Check("registry-objectguid-read-write", guidReadWrite);
+
+			const PrefabGuid snapshotGuid = Create_PrefabGuid();
+			string snapshot;
+			nlohmann::json snapshotJson;
+			Bool snapshotReady = snapshotGuid.Is_Valid() && guidReadWrite &&
+				SUCCEEDED(GAME_INSTANCE->SerializeSubtreeSnapshot(
+					snapshotGuid, root, snapshot, GateLevel));
+			try
+			{
+				if (snapshotReady)
+					snapshotJson = nlohmann::json::parse(snapshot);
+			}
+			catch (...)
+			{
+				snapshotReady = false;
+			}
+			const string internalBindingGuid = To_String(internalBinding->Get_ObjectGuid());
+			const string externalBindingGuid = To_String(externalBinding->Get_ObjectGuid());
+			const Bool guidOnlyJson = snapshotReady &&
+				snapshotJson["objects"][internalBindingGuid]["properties"]["Target"] ==
+					To_String(internalTarget->Get_ObjectGuid()) &&
+				snapshotJson["objects"][externalBindingGuid]["properties"]["Target"] ==
+					To_String(externalTarget->Get_ObjectGuid());
+			report.Check("objectref-guid-only-json", guidOnlyJson);
+
+			nlohmann::json malformedJson = snapshotJson;
+			if (snapshotReady)
+				malformedJson["objects"][internalBindingGuid]["properties"]["Target"] =
+					"not-an-object-guid";
+			const size_t objectCountBeforeMalformed =
+				GAME_INSTANCE->Get_GameObjects(GateLevel).size();
+			Shared<GameObject> malformedRoot;
+			const Bool malformedRejected = snapshotReady &&
+				FAILED(GAME_INSTANCE->DeSerializeSubtreeSnapshot(snapshotGuid,
+					malformedJson.dump(), false, malformedRoot, GateLevel)) &&
+				!malformedRoot && GAME_INSTANCE->Get_GameObjects(GateLevel).size() ==
+					objectCountBeforeMalformed;
+			report.Check("malformed-objectref-preflight-rollback", malformedRejected);
+
+			GAME_INSTANCE->Destroy(root->Get_ObjectGuid());
+			GAME_INSTANCE->Flush_DestroyedGameObjects();
+			root.reset();
+			internalTarget.reset();
+			internalBinding.reset();
+			externalBinding.reset();
+
+			Shared<GameObject> restoredA;
+			const Bool restoredFirst = snapshotReady &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializeSubtreeSnapshot(
+					snapshotGuid, snapshot, false, restoredA, GateLevel));
+			Shared<StaticCamera> internalA = Find_In_Graph<StaticCamera>(restoredA);
+			Shared<FreeCamera> externalA = Find_In_Graph<FreeCamera>(restoredA);
+			const Shared<GameObject> internalTargetA = restoredA && !restoredA->Get_Children().empty()
+				? restoredA->Get_Children().front()
+				: nullptr;
+			unordered_set<ObjectGuid, GuidHash> graphA;
+			const Bool firstRemapCorrect = restoredFirst && internalA && externalA &&
+				internalTargetA && Collect_Graph(restoredA, graphA) &&
+				internalA->Get_TargetObjectGuid() == internalTargetA->Get_ObjectGuid() &&
+				internalValue.Try_Get<ObjectGuid>() &&
+				internalA->Get_TargetObjectGuid() != *internalValue.Try_Get<ObjectGuid>() &&
+				externalA->Get_TargetObjectGuid() == externalTarget->Get_ObjectGuid() &&
+				externalA->Get_Target() == externalTarget;
+			report.Check("internal-remap-external-reference-preserved", firstRemapCorrect);
+
+			if (restoredA)
+				GAME_INSTANCE->Destroy(restoredA->Get_ObjectGuid());
+			GAME_INSTANCE->Flush_DestroyedGameObjects();
+			restoredA.reset();
+			internalA.reset();
+			externalA.reset();
+
+			Shared<GameObject> restoredB;
+			const Bool restoredSecond = snapshotReady &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializeSubtreeSnapshot(
+					snapshotGuid, snapshot, false, restoredB, GateLevel));
+			const Shared<StaticCamera> internalB = Find_In_Graph<StaticCamera>(restoredB);
+			const Shared<FreeCamera> externalB = Find_In_Graph<FreeCamera>(restoredB);
+			const Shared<GameObject> internalTargetB = restoredB && !restoredB->Get_Children().empty()
+				? restoredB->Get_Children().front()
+				: nullptr;
+			unordered_set<ObjectGuid, GuidHash> graphB;
+			const Bool secondInstanceCorrect = restoredSecond && internalB && externalB &&
+				internalTargetB && Collect_Graph(restoredB, graphB) &&
+				std::ranges::none_of(graphA, [&graphB](ObjectGuid guid) {
+					return graphB.contains(guid);
+				}) && internalB->Get_TargetObjectGuid() == internalTargetB->Get_ObjectGuid() &&
+				externalB->Get_TargetObjectGuid() == externalTarget->Get_ObjectGuid();
+			report.Check("two-instantiates-own-internal-binding", secondInstanceCorrect);
+
+			ReflectionValue nullValue;
+			nullValue.data = ObjectGuid{};
+			const PrefabGuid nullSnapshotGuid = Create_PrefabGuid();
+			string nullSnapshot;
+			nlohmann::json nullSnapshotJson;
+			Bool nullReady = externalB &&
+				SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
+					*externalB, "Target", nullValue)) &&
+				SUCCEEDED(GAME_INSTANCE->SerializeSubtreeSnapshot(
+					nullSnapshotGuid, restoredB, nullSnapshot, GateLevel));
+			try
+			{
+				if (nullReady)
+					nullSnapshotJson = nlohmann::json::parse(nullSnapshot);
+			}
+			catch (...)
+			{
+				nullReady = false;
+			}
+			const Bool nullEncoded = nullReady &&
+				nullSnapshotJson["objects"][To_String(externalB->Get_ObjectGuid())]
+					["properties"]["Target"].is_null();
+			if (restoredB)
+				GAME_INSTANCE->Destroy(restoredB->Get_ObjectGuid());
+			GAME_INSTANCE->Flush_DestroyedGameObjects();
+			restoredB.reset();
+
+			Shared<GameObject> nullRestored;
+			const Bool nullDecoded = nullEncoded &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializeSubtreeSnapshot(
+					nullSnapshotGuid, nullSnapshot, false, nullRestored, GateLevel));
+			const Shared<FreeCamera> nullExternal =
+				Find_In_Graph<FreeCamera>(nullRestored);
+			report.Check("null-objectref-json-roundtrip", nullDecoded && nullExternal &&
+				!nullExternal->Get_TargetObjectGuid().Is_Valid());
+
+			if (nullRestored)
+				GAME_INSTANCE->Destroy(nullRestored->Get_ObjectGuid());
+			if (externalTarget)
+				GAME_INSTANCE->Destroy(externalTarget->Get_ObjectGuid());
+			GAME_INSTANCE->Flush_DestroyedGameObjects();
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase6-references-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
+
+		HRESULT Run_PrefabRepository(HRESULT initializationResult)
+		{
+			GateReport report("prefab-repository");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult))
+			{
+				report.Save(Work_Directory() / L"phase6-prefab-repository-gates.json");
+				return E_FAIL;
+			}
+
+			const filesystem::path fixtureRoot = Work_Directory() /
+				(L"prefab-repository-" + std::to_wstring(GetCurrentProcessId()));
+			const filesystem::path validDirectory = fixtureRoot / L"valid";
+			const filesystem::path duplicateDirectory = fixtureRoot / L"duplicate";
+			const filesystem::path malformedDirectory = fixtureRoot / L"malformed";
+			const filesystem::path invalidGuidDirectory = fixtureRoot / L"invalid-guid";
+			const filesystem::path emptyDirectory = fixtureRoot / L"empty";
+			const PrefabGuid guidA = Create_PrefabGuid();
+			const PrefabGuid guidB = Create_PrefabGuid();
+			const auto MakeHeader = [](PrefabGuid prefabGuid) {
+				return nlohmann::json{
+					{ "schemaVersion", 2 },
+					{ "documentType", "Prefab" },
+					{ "prefabGuid", To_String(prefabGuid) }
+				};
+			};
+			std::error_code errorCode;
+			filesystem::create_directories(emptyDirectory, errorCode);
+			const Bool fixturesWritten = !errorCode && guidA.Is_Valid() && guidB.Is_Valid() &&
+				Write_Json(validDirectory / L"a.json", MakeHeader(guidA)) &&
+				Write_Json(validDirectory / L"z.JSON", MakeHeader(guidB)) &&
+				Write_Json(validDirectory / L"ignored.txt", MakeHeader(guidA)) &&
+				Write_Json(duplicateDirectory / L"a.json", MakeHeader(guidA)) &&
+				Write_Json(duplicateDirectory / L"b.json", MakeHeader(guidA)) &&
+				Write_Json(malformedDirectory / L"a.json", MakeHeader(guidA)) &&
+				Write_Json(malformedDirectory / L"broken.json", nlohmann::json::array()) &&
+				Write_Json(invalidGuidDirectory / L"a.json", MakeHeader(guidA)) &&
+				Write_Json(invalidGuidDirectory / L"invalid.json", {
+					{ "schemaVersion", 2 },
+					{ "documentType", "Prefab" },
+					{ "prefabGuid", "00000000-0000-0000-0000-000000000000" }
+				});
+			report.Check("repository-fixtures-written", fixturesWritten);
+			if (!fixturesWritten)
+			{
+				report.Save(Work_Directory() / L"phase6-prefab-repository-gates.json");
+				return E_FAIL;
+			}
+
+			const Bool missingDirectoryAccepted =
+				SUCCEEDED(GAME_INSTANCE->Load_PrefabRepository(
+					(fixtureRoot / L"missing").wstring())) &&
+				GAME_INSTANCE->Get_PrefabDocuments().empty();
+			report.Check("missing-directory-is-empty-repository", missingDirectoryAccepted);
+
+			const Bool validLoaded = SUCCEEDED(GAME_INSTANCE->Load_PrefabRepository(
+				validDirectory.wstring()));
+			const vector<pair<PrefabGuid, wstring>> validDocuments =
+				GAME_INSTANCE->Get_PrefabDocuments();
+			const Bool deterministicAndFiltered = validLoaded && validDocuments.size() == 2 &&
+				validDocuments[0].first == guidA && validDocuments[1].first == guidB &&
+				filesystem::path(validDocuments[0].second).filename() == L"a.json" &&
+				filesystem::path(validDocuments[1].second).filename() == L"z.JSON";
+			report.Check("json-only-deterministic-repository", deterministicAndFiltered);
+
+			const HRESULT samePathResult = GAME_INSTANCE->Register_Prefab(
+				guidA, (validDirectory / L"." / L"a.json").wstring());
+			PrefabGuid sameDocumentGuid{};
+			const Bool samePathIdempotent = samePathResult == S_FALSE &&
+				SUCCEEDED(GAME_INSTANCE->Register_PrefabDocument(
+					(validDirectory / L"a.json").wstring(), sameDocumentGuid)) &&
+				sameDocumentGuid == guidA &&
+				GAME_INSTANCE->Get_PrefabDocuments() == validDocuments;
+			report.Check("canonical-same-path-idempotent", samePathIdempotent);
+
+			const Bool duplicateRejectedAtomically =
+				FAILED(GAME_INSTANCE->Load_PrefabRepository(duplicateDirectory.wstring())) &&
+				GAME_INSTANCE->Get_PrefabDocuments() == validDocuments;
+			report.Check("duplicate-guid-atomic-rollback", duplicateRejectedAtomically);
+
+			const Bool malformedRejectedAtomically =
+				FAILED(GAME_INSTANCE->Load_PrefabRepository(malformedDirectory.wstring())) &&
+				GAME_INSTANCE->Get_PrefabDocuments() == validDocuments;
+			report.Check("malformed-document-atomic-rollback", malformedRejectedAtomically);
+
+			const Bool invalidGuidRejectedAtomically =
+				FAILED(GAME_INSTANCE->Load_PrefabRepository(invalidGuidDirectory.wstring())) &&
+				GAME_INSTANCE->Get_PrefabDocuments() == validDocuments;
+			report.Check("invalid-guid-atomic-rollback", invalidGuidRejectedAtomically);
+
+			const Bool emptyRepositoryReplacesPrevious =
+				SUCCEEDED(GAME_INSTANCE->Load_PrefabRepository(emptyDirectory.wstring())) &&
+				GAME_INSTANCE->Get_PrefabDocuments().empty();
+			report.Check("empty-directory-replaces-repository", emptyRepositoryReplacesPrevious);
+
+			const Bool repositoryRestored =
+				SUCCEEDED(GAME_INSTANCE->Load_PrefabRepository(validDirectory.wstring())) &&
+				GAME_INSTANCE->Get_PrefabDocuments() == validDocuments;
+			report.Check("folder-reload-restores-same-map", repositoryRestored);
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase6-prefab-repository-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
+
+		HRESULT Run_SceneAuthoring(HRESULT initializationResult)
+		{
+			GateReport report("scene-authoring");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult))
+			{
+				report.Save(Work_Directory() / L"phase6-scene-authoring-gates.json");
+				return E_FAIL;
+			}
+
+			GAME_INSTANCE->Clear_GameObjects(GateLevel);
+			const Shared<Pl0000> player =
+				dynamic_pointer_cast<Pl0000>(GAME_INSTANCE->Instantiate_GameObject("Pl0000", GateLevel));
+			const Shared<TextUI> uiRoot = GAME_INSTANCE->Instantiate<TextUI>(UIFixtureTag, GateLevel);
+			const Shared<TextUI> uiPanel = GAME_INSTANCE->Instantiate<TextUI>(UIFixtureTag, GateLevel);
+			const Shared<HpBarWorldUI> hpBar = dynamic_pointer_cast<HpBarWorldUI>(
+				GAME_INSTANCE->Instantiate_GameObject("HpBarWorldUI", GateLevel));
+			const Bool graphCreated = player && uiRoot && uiPanel && hpBar &&
+				SUCCEEDED(uiRoot->Add_Child(uiPanel)) && SUCCEEDED(uiPanel->Add_Child(hpBar));
+			report.Check("pl0000-and-three-depth-ui-created", graphCreated);
+			if (!graphCreated)
+			{
+				report.Save(Work_Directory() / L"phase6-scene-authoring-gates.json");
+				return E_FAIL;
+			}
+
+			player->Set_Name(L"Phase6_Pl0000");
+			player->Get_Transform()->Set_Position({ 12.f, 0.f, 8.f });
+			uiRoot->Set_Name(L"Phase6_UIRoot");
+			uiRoot->Set_AnchorState(UI_ANCHOR::TOP_LEFT);
+			uiRoot->Get_Transform()->Set_LocalPosition({ 48.f, 32.f, 0.f });
+			uiPanel->Set_Name(L"Phase6_UIPanel");
+			uiPanel->Set_AnchorState(UI_ANCHOR::CENTER);
+			uiPanel->Get_Transform()->Set_LocalPosition({ 120.f, 64.f, 0.f });
+			hpBar->Set_Name(L"Phase6_HpBar");
+			hpBar->Set_AnchorState(UI_ANCHOR::TOP_CENTER);
+			hpBar->Set_WorldOffset({ 0.f, 2.25f, 0.f });
+			const Bool objectRefAssigned =
+				SUCCEEDED(hpBar->Set_TargetObjectGuid(player->Get_ObjectGuid()));
+			report.Check("hpbar-external-objectref-assigned", objectRefAssigned);
+
+			const filesystem::path prefabDirectory(PATH.GetPrefabSettingsDir());
+			const filesystem::path prefabPath = prefabDirectory / L"Phase6_Pl0000.json";
+			PrefabGuid prefabGuid{};
+			Bool registeredNew = false;
+			if (filesystem::exists(prefabPath))
+				GAME_INSTANCE->Register_PrefabDocument(prefabPath.wstring(), prefabGuid);
+			else
+			{
+				prefabGuid = Create_PrefabGuid();
+				registeredNew = prefabGuid.Is_Valid() &&
+					SUCCEEDED(GAME_INSTANCE->Register_Prefab(prefabGuid, prefabPath.wstring()));
+			}
+			const Bool prefabSaved = prefabGuid.Is_Valid() &&
+				SUCCEEDED(GAME_INSTANCE->SerializePrefabDocument(prefabGuid, player, GateLevel));
+			if (!prefabSaved && registeredNew)
+				GAME_INSTANCE->Unregister_Prefab(prefabGuid);
+			report.Check("world-prefab-saved", prefabSaved);
+
+			const filesystem::path scenePath = PATH.GetLevelDataPath(GateLevel);
+			const Bool sceneSaved = prefabSaved &&
+				SUCCEEDED(GAME_INSTANCE->SerializeLevel(GateLevel, scenePath.wstring()));
+			report.Check("project-scene-saved", sceneSaved);
+			const Bool repositoryRestored = sceneSaved &&
+				SUCCEEDED(GAME_INSTANCE->Load_PrefabRepository(prefabDirectory.wstring())) &&
+				GAME_INSTANCE->Find_PrefabPath(prefabGuid) ==
+					filesystem::weakly_canonical(prefabPath).wstring();
+			report.Check("project-prefab-repository-restored", repositoryRestored);
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase6-scene-authoring-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
+
+		HRESULT Run_SceneRestart(HRESULT initializationResult)
+		{
+			GateReport report("scene-restart");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			const filesystem::path prefabDirectory(PATH.GetPrefabSettingsDir());
+			const filesystem::path scenePath = PATH.GetLevelDataPath(GateLevel);
+			const Bool loaded = SUCCEEDED(initializationResult) &&
+				SUCCEEDED(GAME_INSTANCE->Load_PrefabRepository(prefabDirectory.wstring())) &&
+				GAME_INSTANCE->Get_PrefabDocuments().size() == 1 &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializeLevel(scenePath.wstring()));
+			report.Check("restart-repository-and-scene-load", loaded);
+			if (!loaded)
+			{
+				report.Save(Work_Directory() / L"phase6-scene-restart-gates.json");
+				return E_FAIL;
+			}
+
+			Shared<Pl0000> player;
+			Shared<TextUI> uiRoot;
+			for (const auto& [instanceId, object] : GAME_INSTANCE->Get_GameObjects(GateLevel))
+			{
+				if (!object || object->Get_Parent())
+					continue;
+				if (object->Get_Name() == L"Phase6_Pl0000")
+					player = dynamic_pointer_cast<Pl0000>(object);
+				else if (object->Get_Name() == L"Phase6_UIRoot")
+					uiRoot = dynamic_pointer_cast<TextUI>(object);
+			}
+			const Shared<TextUI> uiPanel = uiRoot && uiRoot->Get_Children().size() == 1
+				? dynamic_pointer_cast<TextUI>(uiRoot->Get_Children()[0]) : nullptr;
+			const Shared<HpBarWorldUI> hpBar = uiPanel && uiPanel->Get_Children().size() == 1
+				? dynamic_pointer_cast<HpBarWorldUI>(uiPanel->Get_Children()[0]) : nullptr;
+			const Bool hierarchyRestored = player && uiRoot && uiPanel && hpBar &&
+				uiPanel->Get_Name() == L"Phase6_UIPanel" && hpBar->Get_Name() == L"Phase6_HpBar" &&
+				uiRoot->Get_AnchorState() == UI_ANCHOR::TOP_LEFT &&
+				uiPanel->Get_AnchorState() == UI_ANCHOR::CENTER &&
+				hpBar->Get_AnchorState() == UI_ANCHOR::TOP_CENTER;
+			report.Check("ui-order-anchor-three-depth-restored", hierarchyRestored);
+			report.Check("external-objectref-restored", hierarchyRestored &&
+				hpBar->Get_TargetObjectGuid() == player->Get_ObjectGuid());
+
+			nlohmann::json authoredScene;
+			nlohmann::json resavedScene;
+			const filesystem::path resavePath = Work_Directory() / L"phase6-scene-resaved.json";
+			const Bool semanticEqual = Read_Json(scenePath, authoredScene) &&
+				SUCCEEDED(GAME_INSTANCE->SerializeLevel(GateLevel, resavePath.wstring())) &&
+				Read_Json(resavePath, resavedScene) &&
+				Normalize_Scene(authoredScene) == Normalize_Scene(resavedScene);
+			report.Check("restart-save-semantic-equality", semanticEqual);
+
+			const size_t countBeforeFailure = GAME_INSTANCE->Get_GameObjects(GateLevel).size();
+			const ObjectGuid playerGuid = player ? player->Get_ObjectGuid() : ObjectGuid{};
+			nlohmann::json malformed = authoredScene;
+			if (hpBar)
+				malformed["objects"][To_String(hpBar->Get_ObjectGuid())]["properties"]["Target"] =
+					"invalid-object-guid";
+			const filesystem::path malformedPath = Work_Directory() / L"phase6-scene-malformed.json";
+			const Bool rollbackPreserved = Write_Json(malformedPath, malformed) &&
+				FAILED(GAME_INSTANCE->DeSerializeLevel(malformedPath.wstring())) &&
+				GAME_INSTANCE->Get_GameObjects(GateLevel).size() == countBeforeFailure &&
+				GAME_INSTANCE->Find(playerGuid) == player;
+			report.Check("scene-preflight-failure-preserves-level", rollbackPreserved);
+
+			const auto prefabs = GAME_INSTANCE->Get_PrefabDocuments();
+			Shared<GameObject> prefabInstance;
+			const Bool prefabInstantiated = prefabs.size() == 1 &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializePrefabDocument(
+					prefabs[0].first, prefabInstance, GateLevel)) && prefabInstance &&
+				prefabInstance->Get_ObjectGuid() != playerGuid;
+			report.Check("restart-prefab-instantiates-disjoint-root", prefabInstantiated);
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase6-scene-restart-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
 	}
 
 	uint32 Get_RequestedStage()
@@ -825,6 +1330,14 @@ namespace Phase5GateVerifier
 			return FrameStage;
 		if (wstring_view(value) == L"ui-authoring")
 			return UIAuthoringStage;
+		if (wstring_view(value) == L"references")
+			return ReferencesStage;
+		if (wstring_view(value) == L"prefab-repository")
+			return PrefabRepositoryStage;
+		if (wstring_view(value) == L"scene-authoring")
+			return SceneAuthoringStage;
+		if (wstring_view(value) == L"scene-restart")
+			return SceneRestartStage;
 #endif
 		return 0;
 	}
@@ -832,14 +1345,16 @@ namespace Phase5GateVerifier
 	HRESULT Initialize_Runtime(uint32 stage)
 	{
 		if (stage != PrepareStage && stage != VerifyStage &&
-			stage != FrameStage && stage != UIAuthoringStage)
+			stage != FrameStage && stage != UIAuthoringStage &&
+			stage != ReferencesStage && stage != PrefabRepositoryStage &&
+			stage != SceneAuthoringStage && stage != SceneRestartStage)
 			return E_INVALIDARG;
 		if (FAILED(Client::Register_Client_Reflection()) ||
 			FAILED(GAME_INSTANCE->Refresh_ReflectionRegistry()) ||
 			FAILED(ClientSettingManager::GetInstance()->Apply_LayerAndTagSettings()) ||
 			FAILED(GAME_INSTANCE->Register_ReflectedPrototypes(ETOI(LEVEL::STATIC))))
 			return E_FAIL;
-		if (stage == PrepareStage)
+		if (stage == PrepareStage || stage == PrefabRepositoryStage)
 			return S_OK;
 		if (stage == FrameStage)
 		{
@@ -848,14 +1363,26 @@ namespace Phase5GateVerifier
 			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_Prototype(
 				StaticLevel, fixturePrototype, FrameFixtureTag)) ? S_OK : E_FAIL;
 		}
-		if (stage == UIAuthoringStage)
+		if (stage == UIAuthoringStage || stage == ReferencesStage)
 		{
+			if (stage == ReferencesStage)
+				ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
 			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
 			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_Prototype(
 				StaticLevel, fixturePrototype, UIFixtureTag)) ? S_OK : E_FAIL;
 		}
+		if (stage == SceneAuthoringStage || stage == SceneRestartStage)
+		{
+			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
+			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
+			if (!fixturePrototype || FAILED(GAME_INSTANCE->Add_Prototype(
+				StaticLevel, fixturePrototype, UIFixtureTag)))
+				return E_FAIL;
+		}
 		if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()) ||
 			FAILED(Load_GateModels()) ||
+			((stage == SceneAuthoringStage || stage == SceneRestartStage) &&
+				FAILED(Load_SceneGateTexture())) ||
 			FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY)))
 			return E_FAIL;
 		return S_OK;
@@ -871,6 +1398,14 @@ namespace Phase5GateVerifier
 			return Run_Frame(initializationResult);
 		if (stage == UIAuthoringStage)
 			return Run_UIAuthoring(initializationResult);
+		if (stage == ReferencesStage)
+			return Run_References(initializationResult);
+		if (stage == PrefabRepositoryStage)
+			return Run_PrefabRepository(initializationResult);
+		if (stage == SceneAuthoringStage)
+			return Run_SceneAuthoring(initializationResult);
+		if (stage == SceneRestartStage)
+			return Run_SceneRestart(initializationResult);
 		return E_INVALIDARG;
 	}
 }

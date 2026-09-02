@@ -67,6 +67,7 @@ namespace Engine
 		COLOR,
 		FLOAT4,
 		ANIMATION_PRESET,
+		OBJECT_REF,
 	};
 
 	struct AnimationPresetClip final
@@ -91,7 +92,7 @@ namespace Engine
 	{
 		using Storage = std::variant<std::monostate, Bool, int32, uint32, Float, Double,
 			std::string, std::wstring, Vector3, Float3, Color, Float4,
-			AnimationPresetSnapshot>;
+			AnimationPresetSnapshot, ObjectGuid>;
 
 		Storage data{};
 
@@ -136,6 +137,7 @@ namespace Engine
 		std::string dataTag;
 		std::string assetType;
 		std::string saveDataKey;
+		std::string expectedBaseRegisteredName;
 		Bool isReadable{ true };
 		Bool isWritable{};
 		Bool isSerializable{};

@@ -278,33 +278,19 @@ void MenuBar::Render_Prefab()
 	ImGui::Separator();
 	if (ImGui::BeginMenu("Instantiate"))
 	{
-		std::error_code errorCode;
-		const filesystem::path prefabDirectory(PATH.GetPrefabSettingsDir());
-		vector<filesystem::path> prefabFiles;
-		if (filesystem::exists(prefabDirectory, errorCode))
-		{
-			for (const filesystem::directory_entry& entry :
-				filesystem::directory_iterator(prefabDirectory, errorCode))
-			{
-				if (errorCode)
-					break;
-				if (entry.is_regular_file() && entry.path().extension() == L".json")
-					prefabFiles.push_back(entry.path());
-			}
-		}
-		std::ranges::sort(prefabFiles);
-		if (prefabFiles.empty())
+		const vector<pair<PrefabGuid, wstring>> prefabDocuments =
+			m_Game->Get_PrefabDocuments();
+		if (prefabDocuments.empty())
 			ImGui::TextDisabled("No Prefab documents.");
-		for (const filesystem::path& prefabPath : prefabFiles)
+		for (const auto& [prefabGuid, prefabPathString] : prefabDocuments)
 		{
+			const filesystem::path prefabPath(prefabPathString);
 			const string label = Helper::To_String(prefabPath.stem().wstring());
 			if (!ImGui::MenuItem(label.c_str()))
 				continue;
 
-			PrefabGuid prefabGuid{};
 			Shared<GameObject> instantiatedRoot;
-			if (SUCCEEDED(m_Game->Register_PrefabDocument(prefabPath.wstring(), prefabGuid)) &&
-				SUCCEEDED(m_Game->DeSerializePrefabDocument(prefabGuid, instantiatedRoot)))
+			if (SUCCEEDED(m_Game->DeSerializePrefabDocument(prefabGuid, instantiatedRoot)))
 			{
 				EDITOR->Set_SelectedObject(instantiatedRoot);
 				LOG_INFO(L"Prefab instantiated: {}", prefabPath.wstring());

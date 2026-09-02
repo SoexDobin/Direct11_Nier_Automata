@@ -54,7 +54,7 @@
 namespace
 {
 	template <typename T>
-	void Add_Type(ReflectionDescriptorBatch& batch, const char* registeredName,
+	ReflectedTypeDescriptor& Add_Type(ReflectionDescriptorBatch& batch, const char* registeredName,
 		const char* baseRegisteredName, REFLECTED_OBJECT_KIND objectKind, uint32 level,
 		HIERARCHY_AUTHORING_MODE authoringMode = HIERARCHY_AUTHORING_MODE::CODE_DEFINED)
 	{
@@ -74,6 +74,63 @@ namespace
 				GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()));
 		};
 		batch.types.push_back(std::move(descriptor));
+		return batch.types.back();
+	}
+
+	ReflectedPropertyDescriptor Make_HpBarTarget_Property()
+	{
+		ReflectedPropertyDescriptor property;
+		property.info.registeredName = "Target";
+		property.info.valueType = REFLECTION_VALUE_TYPE::OBJECT_REF;
+		property.info.dataTag = "ObjectRef";
+		property.info.assetType = Asset_Type_Key::GameObject;
+		property.info.saveDataKey = Save_Data_Key::ObjectReference;
+		property.info.expectedBaseRegisteredName = "Entity";
+		property.info.isWritable = true;
+		property.info.isSerializable = true;
+		property.read = [](Object& target, ReflectionValue& outValue) -> HRESULT {
+			auto* hpBar = dynamic_cast<HpBarWorldUI*>(&target);
+			if (!hpBar)
+				return E_NOINTERFACE;
+			outValue.data = hpBar->Get_TargetObjectGuid();
+			return S_OK;
+		};
+		property.write = [](Object& target, const ReflectionValue& value) -> HRESULT {
+			auto* hpBar = dynamic_cast<HpBarWorldUI*>(&target);
+			const ObjectGuid* targetGuid = value.Try_Get<ObjectGuid>();
+			return hpBar && targetGuid
+				? hpBar->Set_TargetObjectGuid(*targetGuid)
+				: E_INVALIDARG;
+		};
+		return property;
+	}
+
+	ReflectedPropertyDescriptor Make_HpBarWorldOffset_Property()
+	{
+		ReflectedPropertyDescriptor property;
+		property.info.registeredName = "WorldOffset";
+		property.info.valueType = REFLECTION_VALUE_TYPE::VECTOR3;
+		property.info.dataTag = Data_Tag::Position;
+		property.info.assetType = Asset_Type_Key::NoneAsset;
+		property.info.saveDataKey = "WorldOffset";
+		property.info.isWritable = true;
+		property.info.isSerializable = true;
+		property.read = [](Object& target, ReflectionValue& outValue) -> HRESULT {
+			auto* hpBar = dynamic_cast<HpBarWorldUI*>(&target);
+			if (!hpBar)
+				return E_NOINTERFACE;
+			outValue.data = hpBar->Get_WorldOffset();
+			return S_OK;
+		};
+		property.write = [](Object& target, const ReflectionValue& value) -> HRESULT {
+			auto* hpBar = dynamic_cast<HpBarWorldUI*>(&target);
+			const Vector3* worldOffset = value.Try_Get<Vector3>();
+			if (!hpBar || !worldOffset)
+				return E_INVALIDARG;
+			hpBar->Set_WorldOffset(*worldOffset);
+			return S_OK;
+		};
+		return property;
 	}
 
 	template <typename Enum>
@@ -283,8 +340,11 @@ HRESULT Client::Register_Client_Reflection()
 		HIERARCHY_AUTHORING_MODE::TRANSIENT);
 	Add_Type<SparkEffect>(batch, "SparkEffect", "GameObject", gameObject, gameplayLevel,
 		HIERARCHY_AUTHORING_MODE::TRANSIENT);
-	Add_Type<HpBarWorldUI>(batch, "HpBarWorldUI", "WorldUIObject", gameObject, gameplayLevel,
+	ReflectedTypeDescriptor& hpBar = Add_Type<HpBarWorldUI>(batch, "HpBarWorldUI",
+		"WorldUIObject", gameObject, gameplayLevel,
 		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+	hpBar.properties.push_back(Make_HpBarTarget_Property());
+	hpBar.properties.push_back(Make_HpBarWorldOffset_Property());
 	Add_Type<MonsterStateMachine>(batch, "MonsterStateMachine", "Component", component, staticLevel);
 
 	const HRESULT result = GAME_INSTANCE->Register_ReflectionDescriptors(batch);

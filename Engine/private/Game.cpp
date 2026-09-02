@@ -744,6 +744,11 @@ HRESULT Game::Register_PrefabDocument(const wstring& path, PrefabGuid& outPrefab
 	return m_PrefabManager->Register_PrefabDocument(path, outPrefabGuid);
 }
 
+HRESULT Game::Load_PrefabRepository(const wstring& directoryPath) const
+{
+	return m_PrefabManager->Load_PrefabRepository(directoryPath);
+}
+
 HRESULT Game::Unregister_Prefab(PrefabGuid prefabGuid) const
 {
 	return m_PrefabManager->Unregister_Prefab(prefabGuid);
@@ -752,6 +757,11 @@ HRESULT Game::Unregister_Prefab(PrefabGuid prefabGuid) const
 wstring Game::Find_PrefabPath(PrefabGuid prefabGuid) const
 {
 	return m_PrefabManager->Find_PrefabPath(prefabGuid);
+}
+
+vector<pair<PrefabGuid, wstring>> Game::Get_PrefabDocuments() const
+{
+	return m_PrefabManager->Get_PrefabDocuments();
 }
 
 HRESULT Game::SerializePrefabDocument(PrefabGuid prefabGuid,

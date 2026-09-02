@@ -61,7 +61,8 @@ void Camera::Bind_Aspect(Float aspect)
 void Camera::Set_Target(const Shared<GameObject>& target)
 {
 	m_Target = target;
-	m_TargetID = m_Target.lock() ? m_Target.lock()->Get_ObjectID() : 0;
+	m_TargetGuid = target ? target->Get_ObjectGuid() : ObjectGuid{};
+	m_TargetID = target ? target->Get_ObjectID() : 0;
 	Update_CameraTransform(0.f);
 }
 
@@ -75,6 +76,18 @@ Shared<GameObject> Camera::Get_Target() const
 	return nullptr;
 }
 
+HRESULT Camera::Set_TargetObjectGuid(ObjectGuid targetGuid)
+{
+	const Shared<GameObject> target = targetGuid.Is_Valid()
+		? GAME_INSTANCE->Find(targetGuid)
+		: nullptr;
+	m_TargetGuid = targetGuid;
+	m_Target = target;
+	m_TargetID = target ? target->Get_ObjectID() : 0;
+	Update_CameraTransform(0.f);
+	return S_OK;
+}
+
 void Camera::Set_TargetID(uint32 targetID)
 {
 	m_TargetID = targetID;
@@ -86,6 +99,7 @@ void Camera::Set_TargetID(uint32 targetID)
 
 		if (const auto& pObj = m_Target.lock())
 		{
+			m_TargetGuid = pObj->Get_ObjectGuid();
 			LOG_INFO(L"[Camera] TargetID {} assigned to object '{}'", m_TargetID, pObj->Get_Name());
 		}
 		else
@@ -96,6 +110,7 @@ void Camera::Set_TargetID(uint32 targetID)
 	else
 	{
 		m_Target.reset();
+		m_TargetGuid = {};
 	}
 	Update_CameraTransform(0.f);
 }

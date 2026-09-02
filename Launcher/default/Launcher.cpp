@@ -40,6 +40,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg{};
 
     Unique<MainApp> App = MainApp::Create();
+
+#ifdef _DEBUG
+    wchar_t launcherClientGate[2]{};
+    if (GetEnvironmentVariableW(L"NIER_PHASE6_LAUNCHER_CLIENT_GATE", launcherClientGate,
+        static_cast<DWORD>(std::size(launcherClientGate))) != 0)
+        return App ? 0 : 1;
+#endif
+
+    if (!App)
+        return 1;
     
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {

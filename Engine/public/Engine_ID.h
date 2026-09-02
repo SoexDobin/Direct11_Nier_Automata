@@ -21,9 +21,9 @@ struct Guid final {
     constexpr auto operator<=>(const Guid&) const noexcept = default;
 };
 
-struct ObjectGuidTag;
-struct AssetGuidTag;
-struct PrefabGuidTag;
+struct ObjectGuidTag final {};
+struct AssetGuidTag final {};
+struct PrefabGuidTag final {};
 
 using ObjectGuid = Guid<ObjectGuidTag>;
 using AssetGuid = Guid<AssetGuidTag>;

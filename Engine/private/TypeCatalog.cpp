@@ -1,6 +1,7 @@
 #include "TypeCatalog.h"
 #include <optional>
 #include "Engine_RTTR_Metadata.h"
+#include "Camera.h"
 #include "Component.h"
 #include "GameObject.h"
 #include "Object.h"
@@ -27,6 +28,8 @@ namespace
 		if (type == rttr::type::get<Float4>()) return REFLECTION_VALUE_TYPE::FLOAT4;
 		if (type == rttr::type::get<AnimationPresetSnapshot>())
 			return REFLECTION_VALUE_TYPE::ANIMATION_PRESET;
+		if (type == rttr::type::get<ObjectGuid>())
+			return REFLECTION_VALUE_TYPE::OBJECT_REF;
 		return REFLECTION_VALUE_TYPE::NONE;
 	}
 
@@ -55,6 +58,7 @@ namespace
 		else if (value.is_type<Float4>()) outValue.data = value.get_value<Float4>();
 		else if (value.is_type<AnimationPresetSnapshot>())
 			outValue.data = value.get_value<AnimationPresetSnapshot>();
+		else if (value.is_type<ObjectGuid>()) outValue.data = value.get_value<ObjectGuid>();
 		else return false;
 		return true;
 	}
@@ -102,6 +106,35 @@ namespace
 		};
 		return property;
 	}
+
+	Engine::ReflectedPropertyDescriptor Make_CameraTarget_Property()
+	{
+		using namespace Engine;
+		ReflectedPropertyDescriptor property;
+		property.info.registeredName = "Target";
+		property.info.valueType = REFLECTION_VALUE_TYPE::OBJECT_REF;
+		property.info.dataTag = "ObjectRef";
+		property.info.assetType = Asset_Type_Key::GameObject;
+		property.info.saveDataKey = Save_Data_Key::ObjectReference;
+		property.info.expectedBaseRegisteredName = "GameObject";
+		property.info.isWritable = true;
+		property.info.isSerializable = true;
+		property.read = [](Object& target, ReflectionValue& outValue) -> HRESULT {
+			auto* camera = dynamic_cast<Camera*>(&target);
+			if (!camera)
+				return E_NOINTERFACE;
+			outValue.data = camera->Get_TargetObjectGuid();
+			return S_OK;
+		};
+		property.write = [](Object& target, const ReflectionValue& value) -> HRESULT {
+			auto* camera = dynamic_cast<Camera*>(&target);
+			const ObjectGuid* targetGuid = value.Try_Get<ObjectGuid>();
+			return camera && targetGuid
+				? camera->Set_TargetObjectGuid(*targetGuid)
+				: E_INVALIDARG;
+		};
+		return property;
+	}
 }
 
 HRESULT Engine::Registry::Initialize(void* arg) {
@@ -130,8 +163,13 @@ HRESULT Engine::Registry::Register_Descriptors(const ReflectionDescriptorBatch& 
 
 		std::unordered_set<std::string> propertyNames;
 		for (const ReflectedPropertyDescriptor& property : descriptor.properties) {
+			const Bool isObjectReference =
+				property.info.valueType == REFLECTION_VALUE_TYPE::OBJECT_REF;
+			const Bool hasExpectedBase =
+				!property.info.expectedBaseRegisteredName.empty();
 			if (property.info.registeredName.empty() ||
 				property.info.valueType == REFLECTION_VALUE_TYPE::NONE ||
+				isObjectReference != hasExpectedBase ||
 				!property.read ||
 				(property.info.isWritable && !property.write) ||
 				!propertyNames.emplace(property.info.registeredName).second) {
@@ -185,6 +223,7 @@ HRESULT Engine::Registry::Refresh() {
 	const rttr::type componentType = rttr::type::get<Component>();
 	const rttr::type partObjectType = rttr::type::get<PartObject>();
 	const rttr::type uiObjectType = rttr::type::get<UIObject>();
+	const rttr::type cameraType = rttr::type::get<Camera>();
 
     for (const rttr::type reflectedType : rttr::type::get_types()) {
         const std::string registeredName = reflectedType.get_name().to_string();
@@ -295,6 +334,17 @@ HRESULT Engine::Registry::Refresh() {
 			entry.properties.push_back(anchorProperty.info);
 			entry.externalProperties.emplace(anchorProperty.info.registeredName,
 				std::move(anchorProperty));
+			std::ranges::sort(entry.properties, {}, &ReflectedPropertyInfo::registeredName);
+		}
+		if (reflectedType == cameraType || reflectedType.is_derived_from(cameraType)) {
+			std::erase_if(entry.properties, [](const ReflectedPropertyInfo& property) {
+				return property.registeredName == "TargetID";
+			});
+			entry.reflectedProperties.erase("TargetID");
+			ReflectedPropertyDescriptor targetProperty = Make_CameraTarget_Property();
+			entry.properties.push_back(targetProperty.info);
+			entry.externalProperties.emplace(targetProperty.info.registeredName,
+				std::move(targetProperty));
 			std::ranges::sort(entry.properties, {}, &ReflectedPropertyInfo::registeredName);
 		}
 

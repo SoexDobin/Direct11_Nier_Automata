@@ -5,12 +5,24 @@
 #include <ClientApp.h>
 #include "ClientSettingManager.h"
 
+namespace
+{
+	Bool Is_LauncherClientGate()
+	{
+		wchar_t value[2]{};
+		return GetEnvironmentVariableW(L"NIER_PHASE6_LAUNCHER_CLIENT_GATE", value,
+			static_cast<DWORD>(std::size(value))) != 0;
+	}
+}
+
 MainApp::MainApp()
 {
 }
 
 MainApp::~MainApp()
 {
+	m_ClientApp.reset();
+	GAME_INSTANCE->DestroyInstance();
 }
 
 HRESULT MainApp::Initialize()
@@ -44,7 +56,8 @@ HRESULT MainApp::Initialize()
 
 	if (FAILED(GAME_INSTANCE->Initialize_Engine(g_EngineDesc)))
 	{
-		MSG_BOX("Failed to initialize Engine");
+		if (!Is_LauncherClientGate())
+			MSG_BOX("Failed to initialize Engine");
 		return E_FAIL;
 	}
 
@@ -54,6 +67,8 @@ HRESULT MainApp::Initialize()
 		L"../../Client/bin/shaders/");
 
 	m_ClientApp = ClientApp::Create(g_EngineDesc);
+	if (!m_ClientApp)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -77,7 +92,8 @@ Unique<MainApp> MainApp::Create()
 
 	if FAILED((mainApp->Initialize()))
 	{
-		MSG_BOX("Failed to Load MainApp");
+		if (!Is_LauncherClientGate())
+			MSG_BOX("Failed to Load MainApp");
 		return nullptr;
 	}
 

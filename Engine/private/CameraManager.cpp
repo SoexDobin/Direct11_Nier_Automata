@@ -22,6 +22,10 @@ HRESULT CameraManager::Initialize(void* arg)
 
 HRESULT CameraManager::Add_Camera(uint32 levIndex, const Shared<Camera>& camera)
 {
+	std::erase_if(m_Cameras[levIndex], [](const Shared<Camera>& current) {
+		return !current || current->Is_Destroy();
+	});
+
 	if (camera->Get_ObjectID() <= 0)
 	{
 		LOG_ERROR(L"Fail to Add Camera By ObjectID");
@@ -44,7 +48,7 @@ HRESULT CameraManager::Add_Camera(uint32 levIndex, const Shared<Camera>& camera)
 
 	m_Cameras[levIndex].push_back(camera);
 
-	if (m_MainCamera.expired())
+	if (m_MainCamera.expired() || m_MainCamera.lock()->Is_Destroy())
 		return Set_MainCamera(camera);
 
 	return S_OK;

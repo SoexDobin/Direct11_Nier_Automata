@@ -9,15 +9,6 @@
 
 using namespace Engine;
 
-namespace
-{
-struct OBJECT_MOVE_PAYLOAD
-{
-    ObjectGuid objectGuid{};
-    uint32 levelIndex{};
-};
-}
-
 Hierarchy::Hierarchy() : EditorObject{} {}
 Hierarchy::~Hierarchy() {}
 

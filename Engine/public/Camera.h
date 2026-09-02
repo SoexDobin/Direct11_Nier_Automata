@@ -38,6 +38,8 @@ public:
 public:
 	void Set_Target(const Shared<GameObject>& target);
 	Shared<GameObject> Get_Target() const;
+	ObjectGuid Get_TargetObjectGuid() const { return m_TargetGuid; }
+	HRESULT Set_TargetObjectGuid(ObjectGuid targetGuid);
 	uint32 Get_TargetID() const { return m_TargetID; }
 	void Set_TargetID(uint32 targetID);
 
@@ -63,6 +65,7 @@ public:
 
 protected:
 	Weak<GameObject> m_Target{};
+	ObjectGuid	m_TargetGuid{};
 	uint32		m_TargetID = 0;
 
 	Float		m_FovY{}, m_Aspect{}, m_Near{}, m_Far{};

@@ -321,6 +321,45 @@ void Inspector::RenderGenericProperties(Object& object)
 					typed->animationEnum.empty() ? "<None>" : typed->animationEnum.c_str(),
 					typed->animations.size());
 			break;
+		case REFLECTION_VALUE_TYPE::OBJECT_REF:
+			if (ObjectGuid* typed = value.Try_Get<ObjectGuid>()) {
+				const Shared<GameObject> target = typed->Is_Valid()
+					? GAME_INSTANCE->Find(*typed)
+					: nullptr;
+				string preview = "None";
+				if (target)
+					preview = Helper::To_String(target->Get_Name());
+				else if (typed->Is_Valid())
+					preview = "Missing (" + To_String(*typed) + ")";
+
+				ImGui::Text("%s", property.registeredName.c_str());
+				if (!property.expectedBaseRegisteredName.empty()) {
+					ImGui::SameLine();
+					ImGui::TextDisabled("(%s)", property.expectedBaseRegisteredName.c_str());
+				}
+				const string fieldId = preview + "##ObjectRef";
+				ImGui::Selectable(fieldId.c_str(), false, ImGuiSelectableFlags_None,
+					ImVec2(ImGui::GetContentRegionAvail().x - 35.f, 25.f));
+				if (ImGui::BeginDragDropTarget()) {
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(
+						ObjectMove_PayLoadKey.c_str())) {
+						if (payload->DataSize == sizeof(OBJECT_MOVE_PAYLOAD)) {
+							const auto& dropped = *static_cast<const OBJECT_MOVE_PAYLOAD*>(payload->Data);
+							if (GAME_INSTANCE->Find(dropped.objectGuid)) {
+								*typed = dropped.objectGuid;
+								changed = true;
+							}
+						}
+					}
+					ImGui::EndDragDropTarget();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("X##ObjectRef", ImVec2(30.f, 25.f))) {
+					*typed = {};
+					changed = true;
+				}
+			}
+			break;
 		default:
 			ImGui::TextDisabled("%s: unsupported value type",
 				property.registeredName.c_str());

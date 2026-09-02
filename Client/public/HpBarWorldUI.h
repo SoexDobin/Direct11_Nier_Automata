@@ -37,13 +37,19 @@ public:
 
 	void Submit_RenderGroup() override;
 	HRESULT Render() override;
+	ObjectGuid Get_TargetObjectGuid() const { return m_TargetGuid; }
+	HRESULT Set_TargetObjectGuid(ObjectGuid targetGuid);
+	Vector3 Get_WorldOffset() const { return m_WorldOffset; }
+	void Set_WorldOffset(const Vector3& worldOffset) { m_WorldOffset = worldOffset; }
 
 private:
 	HRESULT Ready_Components();
+	Shared<Entity> Resolve_Target();
 
 private:
 	Bool m_TargetInBack{};
 	Weak<Entity> m_Target{};
+	ObjectGuid m_TargetGuid{};
 	Vector3 m_WorldOffset = { 0.f, 0.f, 0.f };
 
 	Shared<Shader> m_Shader{ nullptr };

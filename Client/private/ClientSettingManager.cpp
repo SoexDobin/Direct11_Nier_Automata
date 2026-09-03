@@ -1193,7 +1193,8 @@ HRESULT ClientSettingManager::Load_Navigation_FromBinary() const
 			}
 
 			// Add to Engine PrototypeManager (Level STATIC)
-			if (FAILED(GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), pNav, filename)))
+			if (FAILED(GAME_INSTANCE->Add_ResourceComponentPrototype(
+				ETOI(LEVEL::STATIC), pNav, filename)))
 			{
 				LOG_ERROR(L"Failed to register Navigation prototype: {}", filename);
 			}

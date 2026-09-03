@@ -36,7 +36,21 @@ void PrototypeManager::On_Destroy() {
     m_DefaultComponents.clear();
 }
 
-HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag)
+HRESULT PrototypeManager::Add_TypePrototype(uint32 levIndex, const Shared<Object>& object)
+{
+	return Add_Prototype(levIndex, object, L"");
+}
+
+HRESULT PrototypeManager::Add_ResourceComponentPrototype(uint32 levIndex,
+	const Shared<Component>& component, const wstring& resourceTag)
+{
+	if (!component || resourceTag.empty())
+		return E_INVALIDARG;
+	return Add_Prototype(levIndex, component, resourceTag);
+}
+
+HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& object,
+	const wstring& prototypeTag)
 {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
 
@@ -60,26 +74,42 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
         return E_FAIL;
     }
 
-    const wstring registeredTag = Helper::To_wString(registeredName);
-    const wstring resolvedTag = prototypeTag.empty() ? registeredTag : prototypeTag;
-    const Bool isDefaultPrototype = resolvedTag == registeredTag;
+	const wstring registeredTag = Helper::To_wString(registeredName);
+	const Bool isDefaultPrototype = prototypeTag.empty();
+	const wstring resolvedTag = isDefaultPrototype ? registeredTag : prototypeTag;
 
-    if (const Shared<GameObject> gameObject = dynamic_pointer_cast<GameObject>(object)) {
-        auto& prototypes = m_GameObjects[levIndex];
+	if (const Shared<GameObject> gameObject = dynamic_pointer_cast<GameObject>(object)) {
+		if (!isDefaultPrototype) {
+			LOG_ERROR(L"Named GameObject prototypes are not allowed: type={}, tag={}",
+				registeredTag, resolvedTag);
+			return E_INVALIDARG;
+		}
+		auto& prototypes = m_GameObjects[levIndex];
         auto& defaults = m_DefaultGameObjects[levIndex];
-        if (prototypes.contains(resolvedTag) ||
-            (isDefaultPrototype && defaults.contains(runtimeTypeId)))
+		const Bool defaultTypeExists = isDefaultPrototype && std::ranges::any_of(
+			m_DefaultGameObjects, [runtimeTypeId](const auto& levelDefaults) {
+				return levelDefaults.contains(runtimeTypeId);
+			});
+		if (prototypes.contains(resolvedTag) || defaultTypeExists)
             return S_FALSE;
 
         prototypes.emplace(resolvedTag, gameObject);
         if (isDefaultPrototype)
             defaults.emplace(runtimeTypeId, gameObject);
-    }
-    else if (const Shared<Component> component = dynamic_pointer_cast<Component>(object)) {
-        auto& prototypes = m_Components[levIndex];
+	}
+	else if (const Shared<Component> component = dynamic_pointer_cast<Component>(object)) {
+		if (!isDefaultPrototype && resolvedTag == registeredTag) {
+			LOG_ERROR(L"Resource component tag must differ from its registered type name: {}",
+				registeredTag);
+			return E_INVALIDARG;
+		}
+		auto& prototypes = m_Components[levIndex];
         auto& defaults = m_DefaultComponents[levIndex];
-        if (prototypes.contains(resolvedTag) ||
-            (isDefaultPrototype && defaults.contains(runtimeTypeId)))
+		const Bool defaultTypeExists = isDefaultPrototype && std::ranges::any_of(
+			m_DefaultComponents, [runtimeTypeId](const auto& levelDefaults) {
+				return levelDefaults.contains(runtimeTypeId);
+			});
+		if (prototypes.contains(resolvedTag) || defaultTypeExists)
             return S_FALSE;
 
         prototypes.emplace(resolvedTag, component);
@@ -138,7 +168,7 @@ HRESULT PrototypeManager::Register_EngineComponents()
                 auto prototype = result.get_value<Shared<Component>>();
 
                 wstring tag = Helper::To_wString(searchedType.get_name().to_string());
-                if (FAILED(Add_Prototype(0, prototype, tag)))
+				if (FAILED(Add_TypePrototype(0, prototype)))
                     continue;
 
                 LOG_INFO(L"Auto-Registered Prototype: {}", tag);

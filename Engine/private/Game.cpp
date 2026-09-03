@@ -608,9 +608,9 @@ HRESULT Game::Register_ReflectedPrototypes(uint32 levIndex) const
 				prototype = result.get_value<Shared<Component>>();
 		}
 
-        const HRESULT addResult = prototype
-            ? Add_Prototype_Internal(levIndex, prototype, Helper::To_wString(entry.registeredName))
-            : E_FAIL;
+		const HRESULT addResult = prototype
+			? Add_TypePrototype_Internal(levIndex, prototype)
+			: E_FAIL;
         if (FAILED(addResult)) {
             LOG_ERROR(L"Failed to auto-register reflected prototype {}",
                       Helper::To_wString(entry.registeredName));
@@ -690,9 +690,16 @@ HRESULT Game::Write_ReflectedProperty(Object& target, std::string_view propertyN
         : E_FAIL;
 }
 
-HRESULT Game::Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag) const 
+HRESULT Game::Add_TypePrototype_Internal(uint32 levIndex, const Shared<Object>& object) const
 {
-    return m_PrototypeManager->Add_Prototype(levIndex, object, prototypeTag);
+	return m_PrototypeManager->Add_TypePrototype(levIndex, object);
+}
+
+HRESULT Game::Add_ResourceComponentPrototype_Internal(uint32 levIndex,
+	const Shared<Component>& component, const wstring& resourceTag) const
+{
+	return m_PrototypeManager->Add_ResourceComponentPrototype(
+		levIndex, component, resourceTag);
 }
 HRESULT Game::SerializeLevel(uint32 levIndex, const wstring &path) const
 {

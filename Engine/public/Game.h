@@ -263,8 +263,16 @@ public:
 
 public: /* Prototype & Instantiate Facade */
     template <typename T>
-    HRESULT Add_Prototype(uint32 levIndex, const Shared<T>& prototype, const wstring& prototypeTag = L"") {
-        return Add_Prototype_Internal(levIndex, std::static_pointer_cast<Object>(prototype), prototypeTag);
+    HRESULT Add_TypePrototype(uint32 levIndex, const Shared<T>& prototype) {
+        static_assert(std::is_base_of_v<GameObject, T> || std::is_base_of_v<Component, T>);
+        return Add_TypePrototype_Internal(levIndex, std::static_pointer_cast<Object>(prototype));
+    }
+    template <typename T>
+    HRESULT Add_ResourceComponentPrototype(uint32 levIndex, const Shared<T>& prototype,
+        const wstring& resourceTag) {
+        static_assert(std::is_base_of_v<Component, T>);
+        return Add_ResourceComponentPrototype_Internal(levIndex,
+            std::static_pointer_cast<Component>(prototype), resourceTag);
     }
     template <typename T>
     Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) {
@@ -298,7 +306,9 @@ public: /* Prototype & Instantiate Facade */
 		return Instantiate_ComponentByTag(prototypeTag, levIndex, arg);
     }
 private: /* Internal Implementation (Non-Template) */
-    HRESULT Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag = L"") const;
+    HRESULT Add_TypePrototype_Internal(uint32 levIndex, const Shared<Object>& object) const;
+    HRESULT Add_ResourceComponentPrototype_Internal(uint32 levIndex,
+        const Shared<Component>& component, const wstring& resourceTag) const;
 	Shared<GameObject> Instantiate_GameObjectByRuntimeTypeId(RuntimeTypeId runtimeTypeId,
 		uint32 levIndex, void* arg = nullptr, ObjectGuid objectGuid = {}) const;
 	Shared<Component> Instantiate_ComponentByRuntimeTypeId(RuntimeTypeId runtimeTypeId,

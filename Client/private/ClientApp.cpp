@@ -12,7 +12,6 @@
 #include "LoadingFadeOut.h"
 #include "SpdLogger.h"
 #include "StaticCamera.h"
-#include "VISphere.h"
 #include "SkySphere.h"
 #include "GameObject.h"
 #include "HpBarWorldUI.h"
@@ -232,11 +231,9 @@ HRESULT ClientApp::Ready_InitialObject()
         return E_FAIL;
 
 	const Shared<TextUI> textUiPrototype = TextUI::CreatePrototype();
-	if (!textUiPrototype || FAILED(GAME_INSTANCE->Add_Prototype(
-		ETOI(LEVEL::STATIC), textUiPrototype, L"TextUI")))
+	if (!textUiPrototype || FAILED(GAME_INSTANCE->Add_TypePrototype(
+		ETOI(LEVEL::STATIC), textUiPrototype)))
 		return E_FAIL;
-
-    GAME_INSTANCE->Add_Prototype(ETOI(LEVEL::STATIC), VISphere::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()), L"VISphere");
 
     return S_OK;
 }

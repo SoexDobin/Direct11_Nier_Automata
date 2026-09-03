@@ -19,7 +19,9 @@ public:
 	void On_Destroy() override;
 
 public:
-    HRESULT Add_Prototype(uint32 levIndex, const Shared<Object> &object, const wstring &prototypeTag);
+    HRESULT Add_TypePrototype(uint32 levIndex, const Shared<Object>& object);
+    HRESULT Add_ResourceComponentPrototype(uint32 levIndex,
+        const Shared<Component>& component, const wstring& resourceTag);
     Shared<GameObject> Find_DefaultGameObject(uint32 levIndex, RuntimeTypeId runtimeTypeId) const;
     Shared<Component> Find_DefaultComponent(uint32 levIndex, RuntimeTypeId runtimeTypeId) const;
     Shared<GameObject> Find_GameObject(uint32 levIndex, const wstring &prototypeTag) const;
@@ -35,6 +37,8 @@ public: /* Read Only */
 
 private:
     HRESULT Register_EngineComponents();
+    HRESULT Add_Prototype(uint32 levIndex, const Shared<Object>& object,
+        const wstring& prototypeTag);
 
 private:
     uint32 m_LevelCount = {};

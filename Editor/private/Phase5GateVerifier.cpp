@@ -10,6 +10,7 @@
 #include "GameObject.h"
 #include "HpBarWorldUI.h"
 #include "Model.h"
+#include "Navigation.h"
 #include "PathManager.h"
 #include "Pl0000.h"
 #include "StaticCamera.h"
@@ -33,6 +34,7 @@ namespace Phase5GateVerifier
 		constexpr uint32 SceneAuthoringStage = 7;
 		constexpr uint32 SceneRestartStage = 8;
 		constexpr uint32 EditorCutoverStage = 9;
+		constexpr uint32 SingleTypePrototypeStage = 10;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
 		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
 		constexpr const wchar_t* FrameFixtureTag = L"TextUI";
@@ -1327,7 +1329,7 @@ namespace Phase5GateVerifier
 			const size_t prototypeCount = prototypes.size();
 			const Shared<TextUI> duplicatePrototype = TextUI::CreatePrototype();
 			const HRESULT duplicateResult = duplicatePrototype
-				? GAME_INSTANCE->Add_Prototype(StaticLevel, duplicatePrototype, FrameFixtureTag)
+				? GAME_INSTANCE->Add_TypePrototype(StaticLevel, duplicatePrototype)
 				: E_FAIL;
 			report.Check("prototype-tag-storage-is-atomic",
 				originalPrototype && duplicateResult == S_FALSE &&
@@ -1472,6 +1474,159 @@ namespace Phase5GateVerifier
 				Work_Directory() / L"phase7-cutover-gates.json");
 			return report.Passed() && reportSaved ? S_OK : E_FAIL;
 		}
+
+		HRESULT Run_SingleTypePrototype(HRESULT initializationResult)
+		{
+			GateReport report("phase8-single-prototype");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult)) {
+				report.Save(Work_Directory() / L"phase8-single-prototype-gates.json");
+				return E_FAIL;
+			}
+
+			Bool gameObjectTypeInvariant = true;
+			unordered_set<RuntimeTypeId> registeredGameObjectTypes;
+			for (uint32 level = 0; level < ETOI(LEVEL::LEVEL_END); ++level) {
+				for (const auto& [tag, prototype] : GAME_INSTANCE->Get_Prototypes(level)) {
+					if (!prototype || prototype->Get_RuntimeTypeId() == 0 ||
+						tag != Helper::To_wString(GAME_INSTANCE->Find_RegisteredName(
+							prototype->Get_RuntimeTypeId())) ||
+						!registeredGameObjectTypes.emplace(prototype->Get_RuntimeTypeId()).second) {
+						gameObjectTypeInvariant = false;
+						break;
+					}
+				}
+			}
+			report.Check("gameobject-prototype-is-one-per-type", gameObjectTypeInvariant);
+
+			Bool componentDefaultInvariant = true;
+			unordered_set<RuntimeTypeId> registeredComponentDefaults;
+			const auto& componentLevels = GAME_INSTANCE->Get_Prototype_Components();
+			for (const auto& components : componentLevels) {
+				for (const auto& [tag, prototype] : components) {
+					if (!prototype || prototype->Get_RuntimeTypeId() == 0) {
+						componentDefaultInvariant = false;
+						break;
+					}
+					const wstring registeredTag = Helper::To_wString(
+						GAME_INSTANCE->Find_RegisteredName(prototype->Get_RuntimeTypeId()));
+					if (registeredTag.empty() ||
+						(tag == registeredTag &&
+							!registeredComponentDefaults.emplace(
+								prototype->Get_RuntimeTypeId()).second)) {
+						componentDefaultInvariant = false;
+						break;
+					}
+				}
+			}
+			report.Check("component-default-is-one-per-type", componentDefaultInvariant);
+
+			const auto& staticGameObjects = GAME_INSTANCE->Get_Prototypes(StaticLevel);
+			const auto textPrototypeIt = staticGameObjects.find(L"TextUI");
+			const Shared<GameObject> originalTextPrototype = textPrototypeIt == staticGameObjects.end()
+				? nullptr : textPrototypeIt->second;
+			const size_t gameObjectPrototypeCount = staticGameObjects.size();
+			const Shared<TextUI> duplicateTextPrototype = TextUI::CreatePrototype();
+			const HRESULT duplicateResult = duplicateTextPrototype
+				? GAME_INSTANCE->Add_TypePrototype(StaticLevel, duplicateTextPrototype)
+				: E_FAIL;
+			const Bool duplicatePreserved = originalTextPrototype && duplicateResult == S_FALSE &&
+				staticGameObjects.size() == gameObjectPrototypeCount &&
+				staticGameObjects.at(L"TextUI") == originalTextPrototype;
+			report.Check("duplicate-type-registration-preserves-original", duplicatePreserved,
+				"result=" + std::to_string(duplicateResult) +
+				", before=" + std::to_string(gameObjectPrototypeCount) +
+				", after=" + std::to_string(staticGameObjects.size()) +
+				", original=" + std::to_string(originalTextPrototype != nullptr) +
+				", same=" + std::to_string(originalTextPrototype &&
+					staticGameObjects.at(L"TextUI") == originalTextPrototype));
+
+			constexpr const wchar_t* navigationResourceTag = L"Phase8_Navigation_Resource";
+			const auto& staticComponents = componentLevels[StaticLevel];
+			const auto navigationDefaultIt = staticComponents.find(L"Navigation");
+			const Shared<Component> originalNavigationDefault =
+				navigationDefaultIt == staticComponents.end() ? nullptr : navigationDefaultIt->second;
+			const Shared<Navigation> navigationResource = Navigation::CreatePrototype();
+			const HRESULT resourceRegistration = navigationResource
+				? GAME_INSTANCE->Add_ResourceComponentPrototype(
+					StaticLevel, navigationResource, navigationResourceTag)
+				: E_FAIL;
+			Navigation::NAVIGATION_DESC navigationDesc{};
+			const Shared<Navigation> navigationClone = SUCCEEDED(resourceRegistration)
+				? GAME_INSTANCE->Instantiate<Navigation>(
+					navigationResourceTag, StaticLevel, &navigationDesc)
+				: nullptr;
+			report.Check("resource-component-tag-is-not-type-variant",
+				originalNavigationDefault && resourceRegistration == S_OK && navigationClone &&
+				staticComponents.at(L"Navigation") == originalNavigationDefault &&
+				staticComponents.at(navigationResourceTag) == navigationResource);
+
+			GAME_INSTANCE->Clear_GameObjects(GateLevel);
+			Shared<TextUI> sourceA = GAME_INSTANCE->Instantiate<TextUI>(GateLevel);
+			Shared<TextUI> sourceB = GAME_INSTANCE->Instantiate<TextUI>(GateLevel);
+			if (sourceA) {
+				sourceA->Set_Name(L"Phase8_Variant_TopLeft");
+				sourceA->Set_AnchorState(UI_ANCHOR::TOP_LEFT);
+			}
+			if (sourceB) {
+				sourceB->Set_Name(L"Phase8_Variant_BottomRight");
+				sourceB->Set_AnchorState(UI_ANCHOR::BOTTOM_RIGHT);
+			}
+
+			const PrefabGuid variantAGuid = Create_PrefabGuid();
+			const PrefabGuid variantBGuid = Create_PrefabGuid();
+			const filesystem::path variantAPath =
+				Work_Directory() / L"phase8-variant-top-left.prefab.json";
+			const filesystem::path variantBPath =
+				Work_Directory() / L"phase8-variant-bottom-right.prefab.json";
+			const Bool variantsSaved = sourceA && sourceB && variantAGuid.Is_Valid() &&
+				variantBGuid.Is_Valid() && variantAGuid != variantBGuid &&
+				SUCCEEDED(GAME_INSTANCE->Register_Prefab(variantAGuid, variantAPath.wstring())) &&
+				SUCCEEDED(GAME_INSTANCE->Register_Prefab(variantBGuid, variantBPath.wstring())) &&
+				SUCCEEDED(GAME_INSTANCE->SerializePrefabDocument(variantAGuid, sourceA, GateLevel)) &&
+				SUCCEEDED(GAME_INSTANCE->SerializePrefabDocument(variantBGuid, sourceB, GateLevel));
+			report.Check("same-type-variants-save-as-two-prefabs", variantsSaved);
+
+			sourceA.reset();
+			sourceB.reset();
+			GAME_INSTANCE->Clear_GameObjects(GateLevel);
+			Shared<GameObject> variantARoot;
+			Shared<GameObject> variantBRoot;
+			const Bool variantsInstantiated = variantsSaved &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializePrefabDocument(
+					variantAGuid, variantARoot, GateLevel)) &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializePrefabDocument(
+					variantBGuid, variantBRoot, GateLevel));
+			const Shared<TextUI> variantA = dynamic_pointer_cast<TextUI>(variantARoot);
+			const Shared<TextUI> variantB = dynamic_pointer_cast<TextUI>(variantBRoot);
+			const Bool valuesRemainDistinct = variantA && variantB &&
+				variantA->Get_RuntimeTypeId() == variantB->Get_RuntimeTypeId() &&
+				variantA->Get_Name() == L"Phase8_Variant_TopLeft" &&
+				variantB->Get_Name() == L"Phase8_Variant_BottomRight" &&
+				variantA->Get_AnchorState() == UI_ANCHOR::TOP_LEFT &&
+				variantB->Get_AnchorState() == UI_ANCHOR::BOTTOM_RIGHT &&
+				variantA->Get_ObjectGuid() != variantB->Get_ObjectGuid();
+			report.Check("prefab-variants-share-type-not-values-or-guids",
+				variantsInstantiated && valuesRemainDistinct);
+
+			const filesystem::path scenePath = Work_Directory() / L"phase8-variants-scene.json";
+			const filesystem::path resavedScenePath =
+				Work_Directory() / L"phase8-variants-scene-resaved.json";
+			nlohmann::json sceneBefore;
+			nlohmann::json sceneAfter;
+			const Bool sceneRoundTrip = variantsInstantiated &&
+				SUCCEEDED(GAME_INSTANCE->SerializeLevel(GateLevel, scenePath.wstring())) &&
+				Read_Json(scenePath, sceneBefore) &&
+				SUCCEEDED(GAME_INSTANCE->DeSerializeLevel(scenePath.wstring())) &&
+				SUCCEEDED(GAME_INSTANCE->SerializeLevel(GateLevel, resavedScenePath.wstring())) &&
+				Read_Json(resavedScenePath, sceneAfter) &&
+				Normalize_Scene(sceneBefore) == Normalize_Scene(sceneAfter);
+			report.Check("two-prefab-variants-scene-round-trip", sceneRoundTrip);
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase8-single-prototype-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
 	}
 
 	uint32 Get_RequestedStage()
@@ -1499,6 +1654,8 @@ namespace Phase5GateVerifier
 		if (wstring_view(value) == L"phase7-cutover" ||
 			wstring_view(value) == L"editor-cutover")
 			return EditorCutoverStage;
+		if (wstring_view(value) == L"phase8-single-prototype")
+			return SingleTypePrototypeStage;
 #endif
 		return 0;
 	}
@@ -1509,7 +1666,7 @@ namespace Phase5GateVerifier
 			stage != FrameStage && stage != UIAuthoringStage &&
 			stage != ReferencesStage && stage != PrefabRepositoryStage &&
 			stage != SceneAuthoringStage && stage != SceneRestartStage &&
-			stage != EditorCutoverStage)
+			stage != EditorCutoverStage && stage != SingleTypePrototypeStage)
 			return E_INVALIDARG;
 		if (FAILED(Client::Register_Client_Reflection()) ||
 			FAILED(GAME_INSTANCE->Refresh_ReflectionRegistry()) ||
@@ -1518,27 +1675,34 @@ namespace Phase5GateVerifier
 			return E_FAIL;
 		if (stage == PrepareStage || stage == PrefabRepositoryStage)
 			return S_OK;
+		if (stage == SingleTypePrototypeStage)
+		{
+			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
+			const Shared<TextUI> textUiPrototype = TextUI::CreatePrototype();
+			return textUiPrototype && SUCCEEDED(GAME_INSTANCE->Add_TypePrototype(
+				StaticLevel, textUiPrototype)) ? S_OK : E_FAIL;
+		}
 		if (stage == FrameStage || stage == EditorCutoverStage)
 		{
 			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
 			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
-			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_Prototype(
-				StaticLevel, fixturePrototype, FrameFixtureTag)) ? S_OK : E_FAIL;
+			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_TypePrototype(
+				StaticLevel, fixturePrototype)) ? S_OK : E_FAIL;
 		}
 		if (stage == UIAuthoringStage || stage == ReferencesStage)
 		{
 			if (stage == ReferencesStage)
 				ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
 			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
-			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_Prototype(
-				StaticLevel, fixturePrototype, UIFixtureTag)) ? S_OK : E_FAIL;
+			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_TypePrototype(
+				StaticLevel, fixturePrototype)) ? S_OK : E_FAIL;
 		}
 		if (stage == SceneAuthoringStage || stage == SceneRestartStage)
 		{
 			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
 			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
-			if (!fixturePrototype || FAILED(GAME_INSTANCE->Add_Prototype(
-				StaticLevel, fixturePrototype, UIFixtureTag)))
+			if (!fixturePrototype || FAILED(GAME_INSTANCE->Add_TypePrototype(
+				StaticLevel, fixturePrototype)))
 				return E_FAIL;
 		}
 		if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()) ||
@@ -1570,6 +1734,8 @@ namespace Phase5GateVerifier
 			return Run_SceneRestart(initializationResult);
 		if (stage == EditorCutoverStage)
 			return Run_EditorCutover(initializationResult);
+		if (stage == SingleTypePrototypeStage)
+			return Run_SingleTypePrototype(initializationResult);
 		return E_INVALIDARG;
 	}
 }

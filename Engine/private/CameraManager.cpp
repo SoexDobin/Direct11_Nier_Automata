@@ -26,9 +26,9 @@ HRESULT CameraManager::Add_Camera(uint32 levIndex, const Shared<Camera>& camera)
 		return !current || current->Is_Destroy();
 	});
 
-	if (camera->Get_ObjectID() <= 0)
+	if (!camera || !camera->Get_ObjectGuid().Is_Valid() || camera->Get_RuntimeObjectId() == 0)
 	{
-		LOG_ERROR(L"Fail to Add Camera By ObjectID");
+		LOG_ERROR(L"Fail to add camera with invalid runtime identity");
 		return E_FAIL;
 	}
 	if (camera->Get_Name().empty())
@@ -37,9 +37,9 @@ HRESULT CameraManager::Add_Camera(uint32 levIndex, const Shared<Camera>& camera)
 		return E_FAIL;
 	}
 
-	for (auto cameraPtr : m_Cameras[levIndex])
+	for (const auto& cameraPtr : m_Cameras[levIndex])
 	{
-		if (cameraPtr->Get_ObjectID() == camera->Get_ObjectID())
+		if (cameraPtr == camera || cameraPtr->Get_ObjectGuid() == camera->Get_ObjectGuid())
 		{
 			LOG_ERROR(L"Already Added Camera");
 			return E_FAIL;

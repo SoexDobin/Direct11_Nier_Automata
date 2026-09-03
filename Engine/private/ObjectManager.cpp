@@ -8,9 +8,7 @@ HRESULT ObjectManager::Initialize(void *arg) {
     m_LevelCount = *static_cast<uint32*>(arg);
 
 	m_ObjectByLayer.resize(m_LevelCount);
-	m_ObjectByType.resize(m_LevelCount);
-	m_ObjectByObject.resize(m_LevelCount);
-	m_ObjectByInstance.resize(m_LevelCount);
+	m_ObjectsByLevel.resize(m_LevelCount);
 
 	return EngineManager::Initialize(arg);
 }
@@ -212,17 +210,14 @@ HRESULT ObjectManager::Add_GameObject(uint32 levIndex, const Shared<GameObject>&
         return E_FAIL;
     }
 
-    if (object->Get_InstanceID() == 0 ||
-        m_ObjectByInstance[levIndex].contains(object->Get_InstanceID())) {
+    if (m_ObjectsByLevel[levIndex].contains(object->Get_RuntimeObjectId())) {
         return E_FAIL;
     }
 
     m_ObjectByGuid[object->Get_ObjectGuid()] = object;
     m_ObjectByRuntimeId[object->Get_RuntimeObjectId()] = object;
     m_ObjectByLayer[levIndex][object->Get_LayerMask().Get_Layer()].push_back(object);
-    m_ObjectByType[levIndex][object->Get_TypeID()].push_back(object);
-    m_ObjectByObject[levIndex][object->Get_ObjectID()].push_back(object);
-    m_ObjectByInstance[levIndex].emplace(object->Get_InstanceID(), object);
+    m_ObjectsByLevel[levIndex].emplace(object->Get_RuntimeObjectId(), object);
 
     return S_OK;
 }
@@ -234,7 +229,7 @@ HRESULT ObjectManager::Clear_GameObjects(uint32 levIndex) {
 		for (auto &obj : layer.second) {
 			if (!obj->Is_Destroy()) {
 				obj->On_Destroy();
-				Object::Destroy(obj);
+				obj->Mark_Destroyed();
 			}
 			m_ObjectByGuid.erase(obj->Get_ObjectGuid());
 			m_ObjectByRuntimeId.erase(obj->Get_RuntimeObjectId());
@@ -243,9 +238,7 @@ HRESULT ObjectManager::Clear_GameObjects(uint32 levIndex) {
     }
 
 	m_ObjectByLayer[levIndex].clear();
-    m_ObjectByType[levIndex].clear();
-    m_ObjectByObject[levIndex].clear();
-    m_ObjectByInstance[levIndex].clear();
+	m_ObjectsByLevel[levIndex].clear();
 
     m_LayerMask = ETOI(LAYER::ALL_LAYER);
     return S_OK;
@@ -259,7 +252,7 @@ HRESULT ObjectManager::Clear_AllGameObjects()
 			for (auto& obj : layer.second) {
 				if (!obj->Is_Destroy()) {
 					obj->On_Destroy();
-					Object::Destroy(obj);
+					obj->Mark_Destroyed();
 				}
 				m_ObjectByGuid.erase(obj->Get_ObjectGuid());
 				m_ObjectByRuntimeId.erase(obj->Get_RuntimeObjectId());
@@ -267,62 +260,13 @@ HRESULT ObjectManager::Clear_AllGameObjects()
 			layer.second.clear();
 		}
 		m_ObjectByLayer[i].clear();
-		m_ObjectByType[i].clear();
-		m_ObjectByObject[i].clear();
-		m_ObjectByInstance[i].clear();
+		m_ObjectsByLevel[i].clear();
 	}
 
 	m_LayerMask = ETOI(LAYER::ALL_LAYER);
 	m_ObjectByGuid.clear();
 	m_ObjectByRuntimeId.clear();
 	return S_OK;
-}
-
-Shared<GameObject> ObjectManager::Find_ObjectByType(uint32 levIndex, uint32 typeID) {
-    if (!m_ObjectByType[levIndex].contains(typeID) || m_ObjectByType[levIndex][typeID].empty()) {
-		MSG_BOX("Failed To Find GameObject By TypeID");
-		return nullptr;
-    }
-
-    return m_ObjectByType[levIndex][typeID].front();
-}
-
-const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByTypes(uint32 levIndex, uint32 typeID) {
-    if (!m_ObjectByType[levIndex].contains(typeID) || m_ObjectByType[levIndex][typeID].empty()) {
-        MSG_BOX("Failed To Find GameObject By TypeID");
-        return EMPTY_VECTOR<Shared<GameObject>>;
-    }
-
-    return m_ObjectByType[levIndex][typeID];
-}
-
-Shared<GameObject> ObjectManager::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) {
-    if (!m_ObjectByObject[levIndex].contains(objectID)) {
-        // LOG_WARN(L"[ObjectManager] Failed To Find GameObject By ObjectID: {} in Level {}", objectID, levIndex);
-        return nullptr;
-    }
-
-    return m_ObjectByObject[levIndex][objectID].front();
-}
-
-const vector<Shared<GameObject>>& ObjectManager::Find_ObjectsByObjectID(uint32 levIndex, uint32 objectID) {
-    if (!m_ObjectByObject[levIndex].contains(objectID)) {
-        // LOG_WARN(L"[ObjectManager] Failed To Find GameObjects By ObjectID: {} in Level {}", objectID, levIndex);
-        return EMPTY_VECTOR<Shared<GameObject>>;
-    }
-
-    return m_ObjectByObject[levIndex][objectID];
-}
-
-
-Shared<GameObject> ObjectManager::Find_ByInstanceID(uint32 levIndex, uint32 instanceID)
-{
-    if (!m_ObjectByInstance[levIndex].contains(instanceID)) {
-        // LOG_WARN(L"[ObjectManager] Failed To Find GameObject By InstanceID: {} in Level {}", instanceID, levIndex);
-        return nullptr;
-    }
-
-    return m_ObjectByInstance[levIndex][instanceID];
 }
 
 Shared<GameObject> ObjectManager::Find_ByObjectGuid(ObjectGuid objectGuid) const
@@ -341,6 +285,31 @@ Shared<GameObject> ObjectManager::Find_ByRuntimeObjectId(RuntimeObjectId runtime
 
     const auto it = m_ObjectByRuntimeId.find(runtimeObjectId);
     return it == m_ObjectByRuntimeId.end() ? nullptr : it->second.lock();
+}
+
+Bool ObjectManager::Contains(uint32 levIndex, ObjectGuid objectGuid) const
+{
+    if (levIndex >= m_LevelCount || !objectGuid.Is_Valid())
+        return false;
+
+    const Shared<GameObject> object = Find_ByObjectGuid(objectGuid);
+    return object && m_ObjectsByLevel[levIndex].contains(object->Get_RuntimeObjectId());
+}
+
+HRESULT ObjectManager::Find_Level(ObjectGuid objectGuid, uint32& outLevelIndex) const
+{
+	const Shared<GameObject> object = Find_ByObjectGuid(objectGuid);
+	if (!object)
+		return E_FAIL;
+
+	for (uint32 levelIndex = 0; levelIndex < m_LevelCount; ++levelIndex) {
+		if (m_ObjectsByLevel[levelIndex].contains(object->Get_RuntimeObjectId())) {
+			outLevelIndex = levelIndex;
+			return S_OK;
+		}
+	}
+
+	return E_FAIL;
 }
 
 vector<Shared<GameObject>> ObjectManager::Find_AllByRuntimeTypeId(RuntimeTypeId runtimeTypeId) const
@@ -380,7 +349,7 @@ HRESULT ObjectManager::Remove_GameObject(uint32 levIndex, const Shared<GameObjec
 
     m_ObjectByGuid.erase(object->Get_ObjectGuid());
     m_ObjectByRuntimeId.erase(object->Get_RuntimeObjectId());
-    m_ObjectByInstance[levIndex].erase(object->Get_InstanceID());
+    m_ObjectsByLevel[levIndex].erase(object->Get_RuntimeObjectId());
 
     if (auto layerIt = m_ObjectByLayer[levIndex].find(object->Get_LayerMask().Get_Layer());
         layerIt != m_ObjectByLayer[levIndex].end()) {
@@ -389,27 +358,13 @@ HRESULT ObjectManager::Remove_GameObject(uint32 levIndex, const Shared<GameObjec
             m_ObjectByLayer[levIndex].erase(layerIt);
     }
 
-    if (auto typeIt = m_ObjectByType[levIndex].find(object->Get_TypeID());
-        typeIt != m_ObjectByType[levIndex].end()) {
-        std::erase(typeIt->second, object);
-        if (typeIt->second.empty())
-            m_ObjectByType[levIndex].erase(typeIt);
-    }
-
-    if (auto objectIt = m_ObjectByObject[levIndex].find(object->Get_ObjectID());
-        objectIt != m_ObjectByObject[levIndex].end()) {
-        std::erase(objectIt->second, object);
-        if (objectIt->second.empty())
-            m_ObjectByObject[levIndex].erase(objectIt);
-    }
-
     object->On_Destroy();
-    Object::Destroy(object);
+	object->Mark_Destroyed();
     return S_OK;
 }
 
-const unordered_map<uint32, Shared<GameObject>>& ObjectManager::Get_GameObjects(uint32 levIndex) {
-	return m_ObjectByInstance[levIndex];
+const unordered_map<RuntimeObjectId, Shared<GameObject>>& ObjectManager::Get_GameObjects(uint32 levIndex) {
+	return m_ObjectsByLevel[levIndex];
 }
 
 Shared<GameObject> ObjectManager::Find_ObjectByObjectTag(uint32 levIndex, const wstring& tagName)
@@ -417,7 +372,7 @@ Shared<GameObject> ObjectManager::Find_ObjectByObjectTag(uint32 levIndex, const 
 	if (levIndex >= m_LevelCount)
 		return nullptr;
 	
-	for (auto& pair : m_ObjectByInstance[levIndex])
+	for (auto& pair : m_ObjectsByLevel[levIndex])
 	{
 		if (pair.second->Get_Name() == tagName)
 		{

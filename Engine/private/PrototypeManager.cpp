@@ -9,10 +9,10 @@
 HRESULT PrototypeManager::Initialize(void* arg) {
     m_LevelCount = arg == nullptr ? 0 : *static_cast<uint32*>(arg);
 
-    m_ObjectsID.resize(m_LevelCount);
     m_GameObjects.resize(m_LevelCount);
     m_Components.resize(m_LevelCount);
-    m_DefaultPrototypeIDs.resize(m_LevelCount);
+    m_DefaultGameObjects.resize(m_LevelCount);
+    m_DefaultComponents.resize(m_LevelCount);
 
     if (FAILED(Register_EngineComponents()))
     {
@@ -26,51 +26,14 @@ void PrototypeManager::On_Destroy() {
     for (uint32 i = 0; i < m_LevelCount; ++i) {
         m_GameObjects[i].clear();
         m_Components[i].clear();
-        m_ObjectsID[i].clear();
-        m_DefaultPrototypeIDs[i].clear();
+        m_DefaultGameObjects[i].clear();
+        m_DefaultComponents[i].clear();
     }
 
-    m_ObjectsID.clear();
     m_GameObjects.clear();
     m_Components.clear();
-    m_DefaultPrototypeIDs.clear();
-}
-
-uint32 PrototypeManager::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const
-{
-    uint32 targetLevel = levIndex;
-
-    if (false == m_ObjectsID[targetLevel].contains(prototypeTag))
-    {
-        targetLevel = 0;
-        if (false == m_ObjectsID[targetLevel].contains(prototypeTag))
-        {
-            LOG_ERROR(L"{} has no ObjectID", prototypeTag);
-            return 0;
-        }
-    }
-
-    return m_ObjectsID[targetLevel].at(prototypeTag);
-}
-
-wstring PrototypeManager::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
-{
-    uint32 targetLevel = levIndex;
-
-    for (const auto& pair : m_ObjectsID[targetLevel])
-    {
-        if (pair.second == objectID)
-            return pair.first;
-    }
-
-    targetLevel = 0;
-    for (const auto& pair : m_ObjectsID[targetLevel])
-    {
-        if (pair.second == objectID)
-            return pair.first;
-    }
-
-    return L"";
+    m_DefaultGameObjects.clear();
+    m_DefaultComponents.clear();
 }
 
 HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag)
@@ -97,32 +60,36 @@ HRESULT PrototypeManager::Add_Prototype(uint32 levIndex, const Shared<Object>& o
         return E_FAIL;
     }
 
-    const Bool isDefaultPrototype = prototypeTag.empty() ||
-        prototypeTag == Helper::To_wString(registeredName);
-    if (isDefaultPrototype && m_DefaultPrototypeIDs[levIndex].contains(runtimeTypeId))
-        return S_FALSE;
+    const wstring registeredTag = Helper::To_wString(registeredName);
+    const wstring resolvedTag = prototypeTag.empty() ? registeredTag : prototypeTag;
+    const Bool isDefaultPrototype = resolvedTag == registeredTag;
 
-    if (FAILED(object->Initialize_Prototype(prototypeTag)))
+    if (const Shared<GameObject> gameObject = dynamic_pointer_cast<GameObject>(object)) {
+        auto& prototypes = m_GameObjects[levIndex];
+        auto& defaults = m_DefaultGameObjects[levIndex];
+        if (prototypes.contains(resolvedTag) ||
+            (isDefaultPrototype && defaults.contains(runtimeTypeId)))
+            return S_FALSE;
+
+        prototypes.emplace(resolvedTag, gameObject);
+        if (isDefaultPrototype)
+            defaults.emplace(runtimeTypeId, gameObject);
+    }
+    else if (const Shared<Component> component = dynamic_pointer_cast<Component>(object)) {
+        auto& prototypes = m_Components[levIndex];
+        auto& defaults = m_DefaultComponents[levIndex];
+        if (prototypes.contains(resolvedTag) ||
+            (isDefaultPrototype && defaults.contains(runtimeTypeId)))
+            return S_FALSE;
+
+        prototypes.emplace(resolvedTag, component);
+        if (isDefaultPrototype)
+            defaults.emplace(runtimeTypeId, component);
+    }
+    else {
+        LOG_ERROR(L"Unsupported prototype kind for {}", resolvedTag);
         return E_FAIL;
-
-    PROTOTYPE prototype = object->Get_Prototype();
-    if (Find_Prototype(prototype, levIndex, object->Get_ObjectID()) != nullptr) {
-        return S_OK;
     }
-
-  
-
-    if (prototype == PROTOTYPE::GAMEOBJECT) {
-		m_GameObjects[levIndex].emplace(object->Get_ObjectID(), static_pointer_cast<GameObject>(object));
-    } else if (prototype == PROTOTYPE::COMPONENT) {
-		m_Components[levIndex].emplace(object->Get_ObjectID(), static_pointer_cast<Component>(object));
-    }
-    m_ObjectsID[levIndex].emplace(prototypeTag, object->Get_ObjectID());
-
-    auto& defaultPrototypeIDs = m_DefaultPrototypeIDs[levIndex];
-    if (!defaultPrototypeIDs.contains(runtimeTypeId) || isDefaultPrototype)
-        defaultPrototypeIDs[runtimeTypeId] = object->Get_ObjectID();
-
 
     return S_OK;
 }
@@ -134,8 +101,8 @@ HRESULT PrototypeManager::Clear_Prototypes()
     for (uint32 i = 1; i < m_LevelCount; ++i) {
         m_GameObjects[i].clear();
         m_Components[i].clear();
-        m_ObjectsID[i].clear();
-        m_DefaultPrototypeIDs[i].clear();
+        m_DefaultGameObjects[i].clear();
+        m_DefaultComponents[i].clear();
     }
 
     return S_OK;
@@ -148,8 +115,8 @@ HRESULT PrototypeManager::Clear_Prototypes(uint32 levIndex) {
 
     m_GameObjects[levIndex].clear();
     m_Components[levIndex].clear();
-    m_ObjectsID[levIndex].clear();
-    m_DefaultPrototypeIDs[levIndex].clear();
+    m_DefaultGameObjects[levIndex].clear();
+    m_DefaultComponents[levIndex].clear();
 
     return S_OK;
 }
@@ -189,81 +156,51 @@ HRESULT PrototypeManager::Register_EngineComponents()
     return S_OK;
 }
 
-Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype,
-                                                uint32 levIndex,
-                                                uint32 objectID) const {
-    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
-	if (!Validate_Level(levIndex)) {
-		return nullptr;
-	}
-
-    if (prototype == PROTOTYPE::GAMEOBJECT) {
-        if (m_GameObjects[0].contains(objectID)) {
-            return m_GameObjects[0].at(objectID);
-        }
-    }
-    else if (prototype == PROTOTYPE::COMPONENT) {
-        if (m_Components[0].contains(objectID)) {
-            return m_Components[0].at(objectID);
-        }
-    }
-
-	if (prototype == PROTOTYPE::GAMEOBJECT) {
-		if (m_GameObjects[levIndex].contains(objectID)) {
-			return m_GameObjects[levIndex].at(objectID);
-		}
-	} 
-	else if (prototype == PROTOTYPE::COMPONENT) {
-		if (m_Components[levIndex].contains(objectID)) {
-			return m_Components[levIndex].at(objectID);
-		}
-	}
-
-    return nullptr;
-}
-
-Shared<Object> PrototypeManager::Find_DefaultPrototype(PROTOTYPE prototype,
-                                                       uint32 levIndex,
-                                                       RuntimeTypeId runtimeTypeId) const {
+Shared<GameObject> PrototypeManager::Find_DefaultGameObject(
+	uint32 levIndex, RuntimeTypeId runtimeTypeId) const {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
     if (!Validate_Level(levIndex) || runtimeTypeId == 0)
         return nullptr;
 
-    auto findDefaultObjectID = [&](uint32 targetLevel) -> uint32 {
-        const auto& defaults = m_DefaultPrototypeIDs[targetLevel];
-        const auto it = defaults.find(runtimeTypeId);
-        return it == defaults.end() ? 0 : it->second;
-    };
-
-    if (const uint32 objectID = findDefaultObjectID(levIndex); objectID != 0)
-        return Find_Prototype(prototype, levIndex, objectID);
-
-    if (levIndex != 0) {
-        if (const uint32 objectID = findDefaultObjectID(0); objectID != 0)
-            return Find_Prototype(prototype, 0, objectID);
-    }
-
-    return nullptr;
+    const auto& defaults = m_DefaultGameObjects[levIndex];
+    const auto it = defaults.find(runtimeTypeId);
+    return it == defaults.end() ? nullptr : it->second;
 }
 
-Shared<Object> PrototypeManager::Find_Prototype(PROTOTYPE prototype, 
-												uint32 levIndex, 
-												const wstring& prototypeTag) const
+Shared<Component> PrototypeManager::Find_DefaultComponent(
+	uint32 levIndex, RuntimeTypeId runtimeTypeId) const
 {
     std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
-    if (!Validate_Level(levIndex)) {
+    if (!Validate_Level(levIndex) || runtimeTypeId == 0)
         return nullptr;
-    }
-    if (prototypeTag.empty()) return nullptr;
 
-    if (false == m_ObjectsID[levIndex].contains(prototypeTag))
-    {
-		MSG_BOX("Can not found such prototypeTag");
-        LOG_ERROR(L"Can not found such prototypeTag : {}", prototypeTag);
+    const auto& defaults = m_DefaultComponents[levIndex];
+    const auto it = defaults.find(runtimeTypeId);
+    return it == defaults.end() ? nullptr : it->second;
+}
+
+Shared<GameObject> PrototypeManager::Find_GameObject(
+	uint32 levIndex, const wstring& prototypeTag) const
+{
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+    if (!Validate_Level(levIndex) || prototypeTag.empty())
         return nullptr;
-    }
-    
-    return Find_Prototype(prototype, levIndex, m_ObjectsID[levIndex].at(prototypeTag));
+
+    const auto& prototypes = m_GameObjects[levIndex];
+    const auto it = prototypes.find(prototypeTag);
+    return it == prototypes.end() ? nullptr : it->second;
+}
+
+Shared<Component> PrototypeManager::Find_Component(
+	uint32 levIndex, const wstring& prototypeTag) const
+{
+    std::lock_guard<std::recursive_mutex> lock(m_PrototypeMutex);
+    if (!Validate_Level(levIndex) || prototypeTag.empty())
+        return nullptr;
+
+    const auto& prototypes = m_Components[levIndex];
+    const auto it = prototypes.find(prototypeTag);
+    return it == prototypes.end() ? nullptr : it->second;
 }
 
 Unique<PrototypeManager> PrototypeManager::Create(uint32 levCount) {

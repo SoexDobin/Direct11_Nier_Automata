@@ -134,7 +134,7 @@ void WP0220Body::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 	if (target->Get_GameObjectType() != GAMEOBJECTTYPE::PART) return;
 	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
 
-	uint32 targetID = target->Get_InstanceID();
+	const RuntimeObjectId targetID = target->Get_RuntimeObjectId();
 	if (m_HitEntities.contains(targetID) == false)
 	{
 		m_HitEntities.insert(targetID);

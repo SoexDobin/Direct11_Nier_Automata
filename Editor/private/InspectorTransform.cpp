@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "InspectorTransform.h"
 
-#include <PartObject.h>
-
 #include "EditorManager.h"
 #include "Game.h"
 #include "Transform.h"
@@ -24,12 +22,16 @@ namespace
 		return true;
 	}
 
-	Bool WriteVector3(Object& object, std::string_view propertyName, const Vector3& value)
+	void QueueVector3(const Shared<GameObject>& owner, Object& object,
+		std::string_view propertyName, const Vector3& before, const Vector3& after)
 	{
-		ReflectionValue reflectedValue;
-		reflectedValue.data = value;
-		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
-			object, propertyName, reflectedValue));
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
+		beforeValue.data = before;
+		afterValue.data = after;
+		EDITOR->Queue_PropertyWrite(owner, object, propertyName,
+			beforeValue, afterValue,
+			ImGui::IsItemActivated() || !ImGui::IsItemActive());
 	}
 }
 
@@ -44,9 +46,7 @@ void InspectorTransform::RenderComponent(const Shared<Transform>& transform)
 
     if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen))
     {
-		Vector3 pos{};
-		Vector3 rot{};
-		Vector3 scale{};
+		Vector3 pos{}, rot{}, scale{};
 		if (!ReadVector3(*transform, "Position", pos) ||
 			!ReadVector3(*transform, "Rotation", rot) ||
 			!ReadVector3(*transform, "Scale", scale)) {
@@ -56,46 +56,29 @@ void InspectorTransform::RenderComponent(const Shared<Transform>& transform)
 
         ImGui::Text("Position");
         ImGui::PushItemWidth(-1);
+		const Vector3 beforePos = pos;
         if (ImGui::DragFloat3("##Pos", reinterpret_cast<Float*>(&pos), 0.1f)) {
-			if (WriteVector3(*transform, "Position", pos))
-				CheckPart(transform->Get_Owner());
+			QueueVector3(transform->Get_Owner(), *transform, "Position", beforePos, pos);
         }
         ImGui::PopItemWidth();
 
         ImGui::Text("Rotation (Degrees)");
         ImGui::PushItemWidth(-1);
+		const Vector3 beforeRot = rot;
         if (ImGui::DragFloat3("##Rot", reinterpret_cast<Float*>(&rot), 1.0f, 0.0f, 360.0f)) {
-			if (WriteVector3(*transform, "Rotation", rot))
-				CheckPart(transform->Get_Owner());
+			QueueVector3(transform->Get_Owner(), *transform, "Rotation", beforeRot, rot);
         }
         ImGui::PopItemWidth();
 
         ImGui::Text("Scale");
         ImGui::PushItemWidth(-1);
+		const Vector3 beforeScale = scale;
         if (ImGui::DragFloat3("##Scale", reinterpret_cast<Float*>(&scale), 0.05f, 0.001f, 100.0f)) {
-			if (WriteVector3(*transform, "Scale", scale))
-				CheckPart(transform->Get_Owner());
+			QueueVector3(transform->Get_Owner(), *transform, "Scale", beforeScale, scale);
         }
         ImGui::PopItemWidth();
 
         ImGui::Spacing();
-    }
-}
-
-void InspectorTransform::CheckPart(const Shared<GameObject>& isPart)
-{
-    auto owner = isPart;
-	if (!owner)
-		return;
-
-	for (const auto& child : owner->Get_Children())
-    {
-		const auto part = dynamic_pointer_cast<PartObject>(child);
-		if (!part)
-			continue;
-		part->Get_Transform()->Update_WorldMatrix();
-		part->Update(0.f);
-		part->Late_Update(0.f);
     }
 }
 

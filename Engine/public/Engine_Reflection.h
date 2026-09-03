@@ -74,6 +74,7 @@ namespace Engine
 	{
 		std::wstring relativePath;
 		std::vector<std::string> states;
+		Bool operator==(const AnimationPresetClip&) const = default;
 	};
 
 	struct AnimationPresetSnapshot final
@@ -81,6 +82,7 @@ namespace Engine
 		uint32 schemaVersion{ 2 };
 		std::string animationEnum;
 		std::vector<AnimationPresetClip> animations;
+		Bool operator==(const AnimationPresetSnapshot&) const = default;
 
 		Bool Is_Empty() const noexcept
 		{

@@ -32,6 +32,7 @@ namespace Phase5GateVerifier
 		constexpr uint32 PrefabRepositoryStage = 6;
 		constexpr uint32 SceneAuthoringStage = 7;
 		constexpr uint32 SceneRestartStage = 8;
+		constexpr uint32 EditorCutoverStage = 9;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
 		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
 		constexpr const wchar_t* FrameFixtureTag = L"TextUI";
@@ -579,9 +580,6 @@ namespace Phase5GateVerifier
 				const RuntimeObjectId rootRuntimeId = root->Get_RuntimeObjectId();
 				const RuntimeObjectId childRuntimeId = child->Get_RuntimeObjectId();
 				const RuntimeObjectId unrelatedRuntimeId = unrelated->Get_RuntimeObjectId();
-				const uint32 rootInstanceId = root->Get_InstanceID();
-				const uint32 childInstanceId = child->Get_InstanceID();
-				const uint32 unrelatedInstanceId = unrelated->Get_InstanceID();
 				const wstring unrelatedName = unrelated->Get_Name();
 
 				EDITOR->Set_SelectedObject(child);
@@ -596,15 +594,12 @@ namespace Phase5GateVerifier
 				EDITOR->Update(false);
 				const Bool subtreeIndexesCleared =
 					!GAME_INSTANCE->Find(rootGuid) && !GAME_INSTANCE->Find(childGuid) &&
-					!GAME_INSTANCE->Find(rootRuntimeId) && !GAME_INSTANCE->Find(childRuntimeId) &&
-					!GAME_INSTANCE->Find_ByInstanceID(StaticLevel, rootInstanceId) &&
-					!GAME_INSTANCE->Find_ByInstanceID(StaticLevel, childInstanceId);
+					!GAME_INSTANCE->Find(rootRuntimeId) && !GAME_INSTANCE->Find(childRuntimeId);
 				report.Check("subtree-delete-clears-live-indexes", subtreeIndexesCleared);
 
 				const Bool unrelatedPreserved =
 					GAME_INSTANCE->Find(unrelatedGuid) == unrelated &&
 					GAME_INSTANCE->Find(unrelatedRuntimeId) == unrelated &&
-					GAME_INSTANCE->Find_ByInstanceID(StaticLevel, unrelatedInstanceId) == unrelated &&
 					unrelated->Get_Name() == unrelatedName && !unrelated->Is_Destroy();
 				report.Check("subtree-delete-preserves-unrelated-root", unrelatedPreserved);
 				report.Check("deleted-subtree-selection-only-cleared",
@@ -1314,6 +1309,169 @@ namespace Phase5GateVerifier
 				Work_Directory() / L"phase6-scene-restart-gates.json");
 			return report.Passed() && reportSaved ? S_OK : E_FAIL;
 		}
+
+		HRESULT Run_EditorCutover(HRESULT initializationResult)
+		{
+			GateReport report("phase7-cutover");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult)) {
+				report.Save(Work_Directory() / L"phase7-cutover-gates.json");
+				return E_FAIL;
+			}
+
+			const auto& prototypes = GAME_INSTANCE->Get_Prototypes(StaticLevel);
+			const auto prototypeIt = prototypes.find(FrameFixtureTag);
+			const Shared<GameObject> originalPrototype = prototypeIt == prototypes.end()
+				? nullptr
+				: prototypeIt->second;
+			const size_t prototypeCount = prototypes.size();
+			const Shared<TextUI> duplicatePrototype = TextUI::CreatePrototype();
+			const HRESULT duplicateResult = duplicatePrototype
+				? GAME_INSTANCE->Add_Prototype(StaticLevel, duplicatePrototype, FrameFixtureTag)
+				: E_FAIL;
+			report.Check("prototype-tag-storage-is-atomic",
+				originalPrototype && duplicateResult == S_FALSE &&
+				prototypes.size() == prototypeCount &&
+				prototypes.at(FrameFixtureTag) == originalPrototype);
+
+			const uint32 editorLevel = GAME_INSTANCE->Get_CurrentLevelIndex();
+			const Shared<TextUI> fixture =
+				GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, editorLevel);
+			const Shared<TextUI> typedFixture = GAME_INSTANCE->Instantiate<TextUI>(editorLevel);
+			const Shared<Component> wrongKind =
+				GAME_INSTANCE->Instantiate<Component>(FrameFixtureTag, editorLevel);
+			report.Check("prototype-static-fallback-by-tag", fixture != nullptr);
+			report.Check("prototype-static-fallback-by-runtime-type", typedFixture != nullptr);
+			report.Check("prototype-wrong-kind-is-rejected", wrongKind == nullptr);
+			report.Check("runtime-object-ids-are-unique", fixture && typedFixture &&
+				fixture->Get_RuntimeObjectId() != typedFixture->Get_RuntimeObjectId());
+			const Shared<Transform> retainedTransform = fixture ? fixture->Get_Transform() : nullptr;
+			const Shared<Transform> duplicateTransform =
+				GAME_INSTANCE->Instantiate<Transform>(editorLevel);
+			const size_t componentCountBeforeDuplicate = fixture
+				? fixture->Get_Components().size()
+				: 0;
+			report.Check("duplicate-component-type-is-rejected", fixture && duplicateTransform &&
+				FAILED(fixture->Add_Component(duplicateTransform)) &&
+				fixture->Get_Components().size() == componentCountBeforeDuplicate &&
+				fixture->Get_Transform() == retainedTransform);
+
+			Shared<GameObject> spawned;
+			if (fixture && typedFixture) {
+				unordered_set<RuntimeObjectId> runtimeIdsBeforeSpawn;
+				for (const auto& [runtimeObjectId, object] :
+					GAME_INSTANCE->Get_GameObjects(editorLevel))
+					runtimeIdsBeforeSpawn.emplace(runtimeObjectId);
+				const size_t objectCountBeforeSpawn = runtimeIdsBeforeSpawn.size();
+				const Vector3 spawnPosition{ 7.f, 11.f, 13.f };
+				EDITOR->Queue_Spawn(FrameFixtureTag, editorLevel, {},
+					numeric_limits<size_t>::max(), spawnPosition);
+				report.Check("editor-spawn-is-deferred",
+					GAME_INSTANCE->Get_GameObjects(editorLevel).size() == objectCountBeforeSpawn);
+				EDITOR->Update(false);
+				for (const auto& [runtimeObjectId, object] :
+					GAME_INSTANCE->Get_GameObjects(editorLevel)) {
+					if (!runtimeIdsBeforeSpawn.contains(runtimeObjectId) && object &&
+						object->Get_RuntimeTypeId() == fixture->Get_RuntimeTypeId()) {
+						spawned = object;
+						break;
+					}
+				}
+				const Vector3 actualPosition = spawned && spawned->Get_Transform()
+					? spawned->Get_Transform()->Get_LocalPosition()
+					: Vector3{};
+				report.Check("editor-spawn-flushes-with-placement", spawned &&
+					actualPosition.x == spawnPosition.x &&
+					actualPosition.y == spawnPosition.y &&
+					actualPosition.z == spawnPosition.z);
+				if (spawned)
+					GAME_INSTANCE->Destroy(spawned->Get_ObjectGuid());
+				GAME_INSTANCE->Flush_DestroyedGameObjects();
+			}
+
+			if (fixture && fixture->Get_Transform()) {
+				EDITOR->Clear_History();
+				const Shared<TextUI> transformChild =
+					GAME_INSTANCE->Instantiate<TextUI>(FrameFixtureTag, editorLevel);
+				const Bool transformChildReady = transformChild && transformChild->Get_Transform() &&
+					SUCCEEDED(fixture->Add_Child(transformChild));
+				if (transformChildReady) {
+					transformChild->Get_Transform()->Set_LocalPositionByValue({ 1.f, 1.f, 1.f });
+					transformChild->Get_Transform()->Update_WorldMatrix();
+				}
+				report.Check("transform-descendant-fixture-created", transformChildReady);
+				ReflectionValue initial;
+				ReflectionValue first;
+				ReflectionValue second;
+				initial.data = Vector3{ 0.f, 0.f, 0.f };
+				first.data = Vector3{ 2.f, 4.f, 6.f };
+				second.data = Vector3{ 3.f, 6.f, 9.f };
+
+				auto PositionEquals = [&](const ReflectionValue& expected) {
+					ReflectionValue current;
+					if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(
+						*fixture->Get_Transform(), "Position", current)))
+						return false;
+					const Vector3* lhs = current.Try_Get<Vector3>();
+					const Vector3* rhs = expected.Try_Get<Vector3>();
+					return lhs && rhs && lhs->x == rhs->x && lhs->y == rhs->y && lhs->z == rhs->z;
+				};
+
+				EDITOR->Queue_PropertyWrite(fixture, *fixture->Get_Transform(),
+					"Position", initial, first, true);
+				report.Check("property-write-is-deferred", PositionEquals(initial));
+				EDITOR->Update(false);
+				report.Check("property-write-flushed", PositionEquals(first));
+				const Vector3 childWorldPosition = transformChildReady
+					? transformChild->Get_Transform()->Get_Position()
+					: Vector3{};
+				report.Check("property-write-refreshes-descendant-transform",
+					transformChildReady && childWorldPosition.x == 3.f &&
+					childWorldPosition.y == 5.f && childWorldPosition.z == 7.f);
+
+				EDITOR->Queue_PropertyWrite(fixture, *fixture->Get_Transform(),
+					"Position", first, second, false);
+				EDITOR->Update(false);
+				EDITOR->Queue_Undo();
+				EDITOR->Update(false);
+				report.Check("continuous-property-edit-coalesced", PositionEquals(initial));
+				EDITOR->Queue_Redo();
+				EDITOR->Update(false);
+				report.Check("property-redo-restores-value", PositionEquals(second));
+
+				ReflectionValue staleDesired;
+				ReflectionValue externalValue;
+				staleDesired.data = Vector3{ 4.f, 8.f, 12.f };
+				externalValue.data = Vector3{ 5.f, 10.f, 15.f };
+				EDITOR->Queue_PropertyWrite(fixture, *fixture->Get_Transform(),
+					"Position", second, staleDesired, true);
+				GAME_INSTANCE->Write_ReflectedProperty(
+					*fixture->Get_Transform(), "Position", externalValue);
+				EDITOR->Update(false);
+				report.Check("stale-property-write-rejected", PositionEquals(externalValue));
+			}
+
+			const ObjectGuid fixtureGuid = fixture ? fixture->Get_ObjectGuid() : ObjectGuid{};
+			const ObjectGuid typedFixtureGuid = typedFixture ? typedFixture->Get_ObjectGuid() : ObjectGuid{};
+			const RuntimeObjectId fixtureRuntimeId = fixture ? fixture->Get_RuntimeObjectId() : 0;
+			const RuntimeObjectId typedFixtureRuntimeId = typedFixture ? typedFixture->Get_RuntimeObjectId() : 0;
+			if (fixture)
+				GAME_INSTANCE->Destroy(fixture->Get_ObjectGuid());
+			if (typedFixture)
+				GAME_INSTANCE->Destroy(typedFixture->Get_ObjectGuid());
+			GAME_INSTANCE->Flush_DestroyedGameObjects();
+			report.Check("object-manager-destroy-cleans-indices",
+				(!fixtureGuid.Is_Valid() || (!GAME_INSTANCE->Find(fixtureGuid) &&
+					!GAME_INSTANCE->Find(fixtureRuntimeId))) &&
+				(!typedFixtureGuid.Is_Valid() || (!GAME_INSTANCE->Find(typedFixtureGuid) &&
+					!GAME_INSTANCE->Find(typedFixtureRuntimeId))));
+			report.Check("destroyed-owner-releases-components", !retainedTransform ||
+				(retainedTransform->Is_Destroy() && !retainedTransform->Get_Owner()));
+
+			const Bool reportSaved = report.Save(
+				Work_Directory() / L"phase7-cutover-gates.json");
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
 	}
 
 	uint32 Get_RequestedStage()
@@ -1338,6 +1496,9 @@ namespace Phase5GateVerifier
 			return SceneAuthoringStage;
 		if (wstring_view(value) == L"scene-restart")
 			return SceneRestartStage;
+		if (wstring_view(value) == L"phase7-cutover" ||
+			wstring_view(value) == L"editor-cutover")
+			return EditorCutoverStage;
 #endif
 		return 0;
 	}
@@ -1347,7 +1508,8 @@ namespace Phase5GateVerifier
 		if (stage != PrepareStage && stage != VerifyStage &&
 			stage != FrameStage && stage != UIAuthoringStage &&
 			stage != ReferencesStage && stage != PrefabRepositoryStage &&
-			stage != SceneAuthoringStage && stage != SceneRestartStage)
+			stage != SceneAuthoringStage && stage != SceneRestartStage &&
+			stage != EditorCutoverStage)
 			return E_INVALIDARG;
 		if (FAILED(Client::Register_Client_Reflection()) ||
 			FAILED(GAME_INSTANCE->Refresh_ReflectionRegistry()) ||
@@ -1356,7 +1518,7 @@ namespace Phase5GateVerifier
 			return E_FAIL;
 		if (stage == PrepareStage || stage == PrefabRepositoryStage)
 			return S_OK;
-		if (stage == FrameStage)
+		if (stage == FrameStage || stage == EditorCutoverStage)
 		{
 			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
 			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
@@ -1406,6 +1568,8 @@ namespace Phase5GateVerifier
 			return Run_SceneAuthoring(initializationResult);
 		if (stage == SceneRestartStage)
 			return Run_SceneRestart(initializationResult);
+		if (stage == EditorCutoverStage)
+			return Run_EditorCutover(initializationResult);
 		return E_INVALIDARG;
 	}
 }

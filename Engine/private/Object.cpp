@@ -1,5 +1,4 @@
 #include "Object.h"
-#include "ID_Helper.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
 
@@ -16,8 +15,8 @@ HRESULT Object::Initialize_Prototype()
     const rttr::type runtimeType = rttr::type::get(*this);
     m_RuntimeTypeId = runtimeType.get_id();
     if (m_RuntimeTypeId == 0) {
-        LOG_ERROR(L"GameObject Initialize Failed By Set TypeID");
-        MSG_BOX("GameObject Initialize Failed By Set TypeID");
+        LOG_ERROR(L"Object Initialize Failed By RuntimeTypeId");
+        MSG_BOX("Object Initialize Failed By RuntimeTypeId");
         return E_FAIL;
     }
 
@@ -28,39 +27,7 @@ HRESULT Object::Initialize_Prototype()
         MSG_BOX("GameObject Initialize Failed By Set Object Name");
         return E_FAIL;
     }
-    m_DescID.m_typeID = static_cast<uint32>(m_RuntimeTypeId);
-
-    m_DescID.m_objectID = Helper::CreateInstanceID();
-    if (m_DescID.m_objectID == 0) {
-        LOG_ERROR(L"GameObject Initialize Failed By Set ObjectID");
-        MSG_BOX("GameObject Initialize Failed By Set ObjectID");
-        return E_FAIL;
-    }
-
     return S_OK;
-}
-
-HRESULT Object::Initialize_Prototype(const wstring& prototypeTag)
-{
-    m_DescID.m_objectID = Helper::Create_FixedObjectID(prototypeTag, m_ObjectName);
-    if (m_DescID.m_objectID == 0) {
-        LOG_ERROR(L"GameObject Initialize Failed By Set ObjectID");
-        MSG_BOX("GameObject Initialize Failed By Set ObjectID");
-        return E_FAIL;
-    }
-
-    return S_OK;
-}
-
-void Object::Destroy(const Shared<Object>& object)
-{
-	if (nullptr == object)
-	{
-		LOG_WARN(L"Ignored destroy request for a null object");
-		return;
-	}
-
-	object->m_IsDestroy = true;
 }
 
 void Object::Set_Active(Bool isActive)
@@ -83,7 +50,6 @@ Bool Object::Is_Active() const
 void Object::Assign_ReflectedIdentity(RuntimeTypeId runtimeTypeId, std::string_view registeredName)
 {
 	m_RuntimeTypeId = runtimeTypeId;
-	m_DescID.m_typeID = static_cast<uint32>(runtimeTypeId);
 	m_ObjectName = Helper::To_wString(std::string{ registeredName });
 }
 

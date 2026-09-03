@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "StateEm0010_Dead.h"
 
+#include <Game.h>
+
 #include "Em0010.h"
 #include "Random_Helper.h"
 
@@ -59,7 +61,8 @@ void StateEm0010_Dead::Update(Float timeDelta)
 
 	if (m_DeadAnim.contains(animIndex) && isFinished)
 	{
-		Object::Destroy(m_Owner.lock());
+		if (const Shared<Em0010> owner = m_Owner.lock())
+			GAME_INSTANCE->Destroy(owner->Get_ObjectGuid());
 	}
 	else if (animIndex == ETOI(em0010Anim::BACK_DROP_1) && progress >= 0.75f)
 	{

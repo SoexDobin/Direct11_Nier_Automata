@@ -39,14 +39,14 @@ void AssetBrowser::Render_PrototypeList()
 	if (ImGui::CollapsingHeader("Global Prototypes (Level 0)", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		const auto &staticMap = GAME_INSTANCE->Get_Prototypes(0);
-		for (auto &[objectID, staticProto] : staticMap)
+		for (const auto &[prototypeTag, staticProto] : staticMap)
 		{
 			if (!staticProto)
 			{
 				continue;
 			}
 
-			Render_PrototypeItem(staticProto, objectID, 0);
+			Render_PrototypeItem(staticProto, prototypeTag);
 		}
 	}
 
@@ -65,14 +65,14 @@ void AssetBrowser::Render_PrototypeList()
 		else
 		{
 			const auto &protoMap = GAME_INSTANCE->Get_Prototypes(levIndex);
-			for (auto &[objectID, proto] : protoMap)
+			for (const auto &[prototypeTag, proto] : protoMap)
 			{
 				if (!proto)
 				{
 					continue;
 				}
 
-				Render_PrototypeItem(proto, objectID, levIndex);
+				Render_PrototypeItem(proto, prototypeTag);
 			}
 		}
 	}
@@ -137,13 +137,9 @@ void AssetBrowser::Render_ResourceItem(const wstring& tag, const string& assetTy
 	}
 }
 
-void AssetBrowser::Render_PrototypeItem(const Shared<GameObject> &pProto, uint32 objectID, uint32 levIndex)
+void AssetBrowser::Render_PrototypeItem(const Shared<GameObject> &pProto, const wstring& prototypeTag)
 {
-	const wstring &wName = pProto->Get_Name();
-	wstring protoTag = GAME_INSTANCE->Get_PrototypeTagFromObjectID(objectID, levIndex);
-
-	// 태그가 없으면 이름을 대신 사용하되, 앞에 표시하여 구분
-	wstring displayLabel = L"[Proto] " + protoTag + L"_" + std::to_wstring(objectID);
+	const wstring displayLabel = L"[Proto] " + prototypeTag;
 
 	Bool bSelected = false;
 	ImGui::Selectable(To_String(displayLabel).c_str(), &bSelected, ImGuiSelectableFlags_None, ImVec2(0.f, 24.f));
@@ -151,11 +147,11 @@ void AssetBrowser::Render_PrototypeItem(const Shared<GameObject> &pProto, uint32
 	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 	{
 
-		size_t byteSize = (wName.size() + 1) * sizeof(wchar_t);
-		ImGui::SetDragDropPayload(Drag_PayLoadKey.c_str(), protoTag.c_str(), static_cast<int32>(byteSize));
+		const size_t byteSize = (prototypeTag.size() + 1) * sizeof(wchar_t);
+		ImGui::SetDragDropPayload(Drag_PayLoadKey.c_str(), prototypeTag.c_str(), static_cast<int32>(byteSize));
 
-		ImGui::Text("Dragging: %s", protoTag.c_str());
-		if (protoTag.empty())
+		ImGui::Text("Dragging: %s", prototypeTag.c_str());
+		if (prototypeTag.empty())
 		{
 			ImGui::TextColored(ImVec4(1, 0, 0, 1), "(No Prototype Tag!)");
 		}

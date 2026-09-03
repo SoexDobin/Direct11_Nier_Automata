@@ -100,11 +100,8 @@ public: /* For LevelManager */
     HRESULT Change_Level(uint32 levIndex, const Shared<class Level>& newLevel);
 
 public: /* For PrototypeManager */
-    const unordered_map<uint32, Shared<GameObject>>& Get_Prototypes(uint32 levIndex) const;
-    uint32 Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const;
-    wstring Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const;
+    const unordered_map<wstring, Shared<GameObject>>& Get_Prototypes(uint32 levIndex) const;
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
-	Shared<const Object> Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const;
 	HRESULT Refresh_ReflectionRegistry() const;
 	HRESULT Register_ReflectionDescriptors(const ReflectionDescriptorBatch& descriptors) const;
 	HRESULT Register_ReflectedPrototypes(uint32 levIndex) const;
@@ -127,13 +124,13 @@ private: /* For ObjectManager */
 
 public: /* For ObjectManager */
 	void Submit_RenderGroup() const;
-	const unordered_map<uint32, Shared<GameObject>>& Get_GameObjects(uint32 levIndex) const;
+	const unordered_map<RuntimeObjectId, Shared<GameObject>>& Get_GameObjects(uint32 levIndex) const;
 	HRESULT Clear_AllGameObjects() const;
-    Shared<GameObject> Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const;
-    Shared<GameObject> Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const;
     Shared<GameObject> Find_ObjectByObjectTag(uint32 levIndex, const wstring& tag) const;
-    Shared<GameObject> Find(ObjectGuid objectGuid) const;
-    Shared<GameObject> Find(RuntimeObjectId runtimeObjectId) const;
+	Shared<GameObject> Find(ObjectGuid objectGuid) const;
+	Shared<GameObject> Find(RuntimeObjectId runtimeObjectId) const;
+	Bool Contains(uint32 levIndex, ObjectGuid objectGuid) const;
+	HRESULT Find_Level(ObjectGuid objectGuid, uint32& outLevelIndex) const;
     HRESULT Destroy(ObjectGuid objectGuid) const;
 	void Flush_DestroyedGameObjects() const;
 	HRESULT Clear_GameObjects(uint32 levIndex) const;
@@ -270,42 +267,50 @@ public: /* Prototype & Instantiate Facade */
         return Add_Prototype_Internal(levIndex, std::static_pointer_cast<Object>(prototype), prototypeTag);
     }
     template <typename T>
-    Shared<T> Instantiate(uint32 objectID, uint32 levIndex, void* arg = nullptr) {
-        PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
-        Shared<Object> cloned = Instantiate_Internal(protoType, objectID, levIndex, arg);
-        return std::static_pointer_cast<T>(cloned);
-    }
-    template <typename T>
     Shared<T> Instantiate(const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) {
-        PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
-        Shared<Object> cloned = Instantiate_Internal(protoType, prototypeTag, levIndex, arg);
-        return std::static_pointer_cast<T>(cloned);
+		static_assert(std::is_base_of_v<GameObject, T> || std::is_base_of_v<Component, T>);
+		if constexpr (std::is_base_of_v<GameObject, T>)
+			return std::static_pointer_cast<T>(Instantiate_GameObjectByTag(prototypeTag, levIndex, arg));
+		else
+			return std::static_pointer_cast<T>(Instantiate_ComponentByTag(prototypeTag, levIndex, arg));
     }
     template <typename T>
     Shared<T> Instantiate(uint32 levIndex = UINT_MAX, void* arg = nullptr) {
-        PROTOTYPE protoType = std::is_base_of_v<GameObject, T> ? PROTOTYPE::GAMEOBJECT : PROTOTYPE::COMPONENT;
+		static_assert(std::is_base_of_v<GameObject, T> || std::is_base_of_v<Component, T>);
 		const RuntimeTypeId externalRuntimeTypeId = Make_ExternalRuntimeTypeId<T>();
 		const RuntimeTypeId runtimeTypeId = Find_RegisteredName(externalRuntimeTypeId).empty()
 			? static_cast<RuntimeTypeId>(rttr::type::get<T>().get_id())
 			: externalRuntimeTypeId;
-        Shared<Object> cloned = Instantiate_ByRuntimeTypeId(protoType, runtimeTypeId, levIndex, arg);
-        return std::static_pointer_cast<T>(cloned);
+		if constexpr (std::is_base_of_v<GameObject, T>)
+			return std::static_pointer_cast<T>(Instantiate_GameObjectByRuntimeTypeId(
+				runtimeTypeId, levIndex, arg));
+		else
+			return std::static_pointer_cast<T>(Instantiate_ComponentByRuntimeTypeId(
+				runtimeTypeId, levIndex, arg));
     }
     Shared<GameObject> Instantiate_GameObject(std::string_view registeredName,
         uint32 levIndex = UINT_MAX, void* arg = nullptr, ObjectGuid objectGuid = {}) const;
-	Bool Can_Instantiate(PROTOTYPE prototypeType, std::string_view registeredName,
+	Bool Can_InstantiateGameObject(std::string_view registeredName,
+		uint32 levIndex = UINT_MAX) const;
+	Bool Can_InstantiateComponent(std::string_view registeredName,
 		uint32 levIndex = UINT_MAX) const;
     Shared<Object> Instantiate(const wstring& prototypeTag, uint32 levIndex = UINT_MAX, void* arg = nullptr) const {
-        Shared<Object> cloned = Instantiate_Internal(PROTOTYPE::COMPONENT, prototypeTag, levIndex, arg);
-        return cloned;
+		return Instantiate_ComponentByTag(prototypeTag, levIndex, arg);
     }
 private: /* Internal Implementation (Non-Template) */
     HRESULT Add_Prototype_Internal(uint32 levIndex, const Shared<Object>& object, const wstring& prototypeTag = L"") const;
-    Shared<Object> Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex,
-        void* arg = nullptr, ObjectGuid objectGuid = {}) const;
-    Shared<Object> Instantiate_ByRuntimeTypeId(PROTOTYPE protoType, RuntimeTypeId runtimeTypeId,
-        uint32 levIndex, void* arg = nullptr, ObjectGuid objectGuid = {}) const;
-    Shared<Object> Instantiate_Internal(PROTOTYPE protoType, const wstring& prototypeTag, uint32 levIndex, void* arg = nullptr) const;
+	Shared<GameObject> Instantiate_GameObjectByRuntimeTypeId(RuntimeTypeId runtimeTypeId,
+		uint32 levIndex, void* arg = nullptr, ObjectGuid objectGuid = {}) const;
+	Shared<Component> Instantiate_ComponentByRuntimeTypeId(RuntimeTypeId runtimeTypeId,
+		uint32 levIndex, void* arg = nullptr) const;
+	Shared<GameObject> Instantiate_GameObjectByTag(const wstring& prototypeTag,
+		uint32 levIndex, void* arg = nullptr) const;
+	Shared<Component> Instantiate_ComponentByTag(const wstring& prototypeTag,
+		uint32 levIndex, void* arg = nullptr) const;
+	Shared<GameObject> Instantiate_GameObjectPrototype(const Shared<GameObject>& prototype,
+		uint32 levIndex, void* arg = nullptr, ObjectGuid objectGuid = {}) const;
+	Shared<Component> Instantiate_ComponentPrototype(const Shared<Component>& prototype,
+		void* arg = nullptr) const;
     vector<Shared<GameObject>> FindAll_Internal(RuntimeTypeId runtimeTypeId) const;
 
 private:

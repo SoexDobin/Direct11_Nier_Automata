@@ -347,19 +347,9 @@ HRESULT Game::Change_Level(uint32 levIndex, const Shared<Level>& newLevel) {
   return S_OK;
 }
 
-const unordered_map<uint32, Shared<GameObject>>& Game::Get_Prototypes(uint32 levIndex) const
+const unordered_map<wstring, Shared<GameObject>>& Game::Get_Prototypes(uint32 levIndex) const
 {
     return m_PrototypeManager->Get_GameObjects()[levIndex];
-}
-
-uint32 Game::Get_ObjectIDFromPrototypeTag(const wstring& prototypeTag, uint32 levIndex) const
-{
-    return m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, levIndex);
-}
-
-wstring Game::Get_PrototypeTagFromObjectID(uint32 objectID, uint32 levIndex) const
-{
-    return m_PrototypeManager->Get_PrototypeTagFromObjectID(objectID, levIndex);
 }
 
 HRESULT Game::Add_GameObject(const Shared<GameObject> &gameObject, uint32 levIndex) const {
@@ -376,26 +366,6 @@ void Game::Clearing_ObjectManager(uint32 levIndex) const
     m_ObjectManager->Cleanup_GameObjects(levIndex);
 }
 
-Shared<GameObject> Game::Find_ByInstanceID(uint32 levIndex, uint32 instanceID) const
-{
-    Shared<GameObject> pObj = m_ObjectManager->Find_ByInstanceID(levIndex, instanceID);
-    if (!pObj && levIndex != 0)
-    {
-        pObj = m_ObjectManager->Find_ByInstanceID(0, instanceID);
-    }
-    return pObj;
-}
-
-Shared<GameObject> Game::Find_ObjectByObjectID(uint32 levIndex, uint32 objectID) const
-{
-    Shared<GameObject> pObj = m_ObjectManager->Find_ObjectByObjectID(levIndex, objectID);
-    if (!pObj && levIndex != 0)
-    {
-        pObj = m_ObjectManager->Find_ObjectByObjectID(0, objectID);
-    }
-    return pObj;
-}
-
 Shared<GameObject> Game::Find_ObjectByObjectTag(uint32 levIndex, const wstring& tag) const
 {
     return m_ObjectManager->Find_ObjectByObjectTag(levIndex, tag);
@@ -409,6 +379,16 @@ Shared<GameObject> Game::Find(ObjectGuid objectGuid) const
 Shared<GameObject> Game::Find(RuntimeObjectId runtimeObjectId) const
 {
     return m_ObjectManager->Find_ByRuntimeObjectId(runtimeObjectId);
+}
+
+Bool Game::Contains(uint32 levIndex, ObjectGuid objectGuid) const
+{
+    return m_ObjectManager->Contains(levIndex, objectGuid);
+}
+
+HRESULT Game::Find_Level(ObjectGuid objectGuid, uint32& outLevelIndex) const
+{
+	return m_ObjectManager->Find_Level(objectGuid, outLevelIndex);
 }
 
 HRESULT Game::Destroy(ObjectGuid objectGuid) const
@@ -436,7 +416,7 @@ vector<Shared<GameObject>> Game::FindAll_Internal(RuntimeTypeId runtimeTypeId) c
 
 void Game::Submit_RenderGroup() const { m_ObjectManager->Submit_RenderGroup(); }
 
-const unordered_map<uint32, Shared<GameObject>>& Game::Get_GameObjects(uint32 levIndex) const {
+const unordered_map<RuntimeObjectId, Shared<GameObject>>& Game::Get_GameObjects(uint32 levIndex) const {
     return m_ObjectManager->Get_GameObjects(levIndex);
 }
 
@@ -577,16 +557,6 @@ HRESULT Game::Remove_Light(uint32 index) const {
 HRESULT Game::Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const
 {
     return m_LightManager->Render_Lights(shader, buffer);
-}
-
-Shared<const Object> Game::Find_Prototype(PROTOTYPE prototype, uint32 objectID, uint32 levIndex) const {
-    uint32 level = levIndex == MAXINT32 ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
-
-    if (Shared<Object> object = m_PrototypeManager->Find_Prototype(prototype, level, objectID)) {
-		return static_pointer_cast<Object>(object);
-    }
-
-    return nullptr;
 }
 
 HRESULT Game::Refresh_ReflectionRegistry() const
@@ -929,74 +899,59 @@ HRESULT Game::Bind_RenderTarget_ShaderResource(const Shared<Shader>& shader, con
 }
 
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, uint32 objectID, uint32 levIndex,
-                                          void* arg, ObjectGuid objectGuid) const
+Shared<GameObject> Game::Instantiate_GameObjectPrototype(
+	const Shared<GameObject>& prototype, uint32 levIndex, void* arg,
+	ObjectGuid objectGuid) const
 {
-    Shared<Object> protoObject = nullptr;
-	uint32 targetLevel = (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex;
-
-	// 1. Search in target level
-	protoObject = m_PrototypeManager->Find_Prototype(protoType, targetLevel, objectID);
-    
-	// 2. Search in Static level (0)
-	if (!protoObject && targetLevel != 0)
-        protoObject = m_PrototypeManager->Find_Prototype(protoType, 0, objectID);
-
-    // 3. Search in Current level (if targetLevel was something else)
-    if (!protoObject && targetLevel != m_LevelManager->Get_CurrentLevelIndex())
-        protoObject = m_PrototypeManager->Find_Prototype(protoType, m_LevelManager->Get_CurrentLevelIndex(), objectID);
-
-    if (!protoObject) 
+    if (!prototype)
         return nullptr;
 
-    Shared<Object> cloned = nullptr;
-    if (protoType == PROTOTYPE::GAMEOBJECT) {
-        auto GameObjectPrototype = std::static_pointer_cast<GameObject>(protoObject);
-		if (objectGuid.Is_Valid()) {
-			if (m_ObjectManager->Find_ByObjectGuid(objectGuid) ||
-				FAILED(m_PrefabManager->Prepare_RestoredObjectGuid(objectGuid))) {
-				return nullptr;
-			}
-		}
+    const uint32 targetLevel = levIndex == UINT_MAX
+        ? m_LevelManager->Get_CurrentLevelIndex()
+        : levIndex;
 
-		cloned = GameObjectPrototype->Clone(arg);
-		if (objectGuid.Is_Valid()) {
-			const ObjectGuid unconsumedObjectGuid = m_PrefabManager->Consume_RestoredObjectGuid();
-			if (unconsumedObjectGuid.Is_Valid()) {
-				LOG_ERROR(L"GameObject Clone did not call GameObject::Initialize before returning");
-				if (cloned) {
-					const Shared<GameObject> gameObject = std::static_pointer_cast<GameObject>(cloned);
-					gameObject->On_Destroy();
-					Object::Destroy(gameObject);
-				}
-				return nullptr;
-			}
+    if (objectGuid.Is_Valid()) {
+		if (m_ObjectManager->Find_ByObjectGuid(objectGuid) ||
+			FAILED(m_PrefabManager->Prepare_RestoredObjectGuid(objectGuid))) {
+			return nullptr;
 		}
-        if (cloned)
-        {
-            const Shared<GameObject> gameObject = std::static_pointer_cast<GameObject>(cloned);
-            if (FAILED(m_ObjectManager->Add_GameObject(targetLevel, gameObject))) {
-                gameObject->On_Destroy();
-                Object::Destroy(gameObject);
-                return nullptr;
-            }
-
-            if (GameObjectPrototype->Get_GameObjectType() == GAMEOBJECTTYPE::CAMERA &&
-                FAILED(Add_Camera(targetLevel, static_pointer_cast<Camera>(cloned)))) {
-                m_ObjectManager->Remove_GameObject(targetLevel, gameObject);
-                return nullptr;
-            }
-        }
     }
-    else {
-        auto pComponent = std::static_pointer_cast<Component>(protoObject);
-        cloned = pComponent->Clone(arg);
+
+    Shared<GameObject> cloned = prototype->Clone(arg);
+	if (objectGuid.Is_Valid()) {
+		const ObjectGuid unconsumedObjectGuid = m_PrefabManager->Consume_RestoredObjectGuid();
+		if (unconsumedObjectGuid.Is_Valid()) {
+			LOG_ERROR(L"GameObject Clone did not call GameObject::Initialize before returning");
+			if (cloned)
+				cloned->On_Destroy();
+			return nullptr;
+		}
+	}
+    if (cloned)
+    {
+        if (FAILED(m_ObjectManager->Add_GameObject(targetLevel, cloned))) {
+            cloned->On_Destroy();
+            return nullptr;
+        }
+
+        if (prototype->Get_GameObjectType() == GAMEOBJECTTYPE::CAMERA &&
+            FAILED(Add_Camera(targetLevel, static_pointer_cast<Camera>(cloned)))) {
+            m_ObjectManager->Remove_GameObject(targetLevel, cloned);
+            return nullptr;
+        }
     }
 
     return cloned;
 }
 
-Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& prototypeTag, uint32 levIndex, void *arg) const
+Shared<Component> Game::Instantiate_ComponentPrototype(
+	const Shared<Component>& prototype, void* arg) const
+{
+	return prototype ? prototype->Clone(arg) : nullptr;
+}
+
+Shared<GameObject> Game::Instantiate_GameObjectByTag(
+	const wstring& prototypeTag, uint32 levIndex, void* arg) const
 {
 	if (prototypeTag.empty())
 	{
@@ -1004,38 +959,72 @@ Shared<Object> Game::Instantiate_Internal(PROTOTYPE protoType, const wstring& pr
 		return nullptr;
 	}
 
-    uint32 objectID = 0;
-    objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, levIndex);
-    if (objectID == 0)
-    {
-        objectID = m_PrototypeManager->Get_ObjectIDFromPrototypeTag(prototypeTag, 0);
-    }
+    const uint32 targetLevel = levIndex == UINT_MAX
+        ? m_LevelManager->Get_CurrentLevelIndex()
+        : levIndex;
+    Shared<GameObject> prototype = m_PrototypeManager->Find_GameObject(targetLevel, prototypeTag);
+    if (!prototype && targetLevel != 0)
+        prototype = m_PrototypeManager->Find_GameObject(0, prototypeTag);
 
-    if (objectID == 0)
-    {
+    if (!prototype) {
         LOG_WARN(L"[Game] Failed to find prototype by tag: {}. (Searched Level 0 and {})", prototypeTag, 
-            (levIndex == UINT_MAX) ? m_LevelManager->Get_CurrentLevelIndex() : levIndex);
+            targetLevel);
         return nullptr;
     }
 
-    return Instantiate_Internal(protoType, objectID, levIndex, arg);
+    return Instantiate_GameObjectPrototype(prototype, targetLevel, arg);
 }
 
-Shared<Object> Game::Instantiate_ByRuntimeTypeId(PROTOTYPE protoType, RuntimeTypeId runtimeTypeId,
-                                                 uint32 levIndex, void* arg,
-                                                 ObjectGuid objectGuid) const
+Shared<Component> Game::Instantiate_ComponentByTag(
+	const wstring& prototypeTag, uint32 levIndex, void* arg) const
+{
+	if (prototypeTag.empty()) {
+        LOG_ERROR("There is no Tag to prototype");
+		return nullptr;
+	}
+
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? m_LevelManager->Get_CurrentLevelIndex()
+		: levIndex;
+	Shared<Component> prototype = m_PrototypeManager->Find_Component(targetLevel, prototypeTag);
+	if (!prototype && targetLevel != 0)
+		prototype = m_PrototypeManager->Find_Component(0, prototypeTag);
+	if (!prototype) {
+		LOG_WARN(L"[Game] Failed to find component prototype by tag: {}. (Searched Level 0 and {})",
+			prototypeTag, targetLevel);
+		return nullptr;
+	}
+
+	return Instantiate_ComponentPrototype(prototype, arg);
+}
+
+Shared<GameObject> Game::Instantiate_GameObjectByRuntimeTypeId(
+	RuntimeTypeId runtimeTypeId, uint32 levIndex, void* arg,
+	ObjectGuid objectGuid) const
 {
     const uint32 targetLevel = levIndex == UINT_MAX
         ? m_LevelManager->Get_CurrentLevelIndex()
         : levIndex;
 
-    Shared<Object> prototype = m_PrototypeManager->Find_DefaultPrototype(protoType, targetLevel, runtimeTypeId);
+    Shared<GameObject> prototype = m_PrototypeManager->Find_DefaultGameObject(targetLevel, runtimeTypeId);
     if (!prototype && targetLevel != 0)
-        prototype = m_PrototypeManager->Find_DefaultPrototype(protoType, 0, runtimeTypeId);
+        prototype = m_PrototypeManager->Find_DefaultGameObject(0, runtimeTypeId);
 
-    return prototype
-        ? Instantiate_Internal(protoType, prototype->Get_ObjectID(), targetLevel, arg, objectGuid)
-        : nullptr;
+    return Instantiate_GameObjectPrototype(prototype, targetLevel, arg, objectGuid);
+}
+
+Shared<Component> Game::Instantiate_ComponentByRuntimeTypeId(
+	RuntimeTypeId runtimeTypeId, uint32 levIndex, void* arg) const
+{
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? m_LevelManager->Get_CurrentLevelIndex()
+		: levIndex;
+
+	Shared<Component> prototype = m_PrototypeManager->Find_DefaultComponent(targetLevel, runtimeTypeId);
+	if (!prototype && targetLevel != 0)
+		prototype = m_PrototypeManager->Find_DefaultComponent(0, runtimeTypeId);
+
+	return Instantiate_ComponentPrototype(prototype, arg);
 }
 
 Shared<GameObject> Game::Instantiate_GameObject(std::string_view registeredName,
@@ -1049,19 +1038,39 @@ Shared<GameObject> Game::Instantiate_GameObject(std::string_view registeredName,
         return nullptr;
     }
 
-    return static_pointer_cast<GameObject>(
-        Instantiate_ByRuntimeTypeId(PROTOTYPE::GAMEOBJECT, runtimeTypeId, levIndex, arg, objectGuid));
+    return Instantiate_GameObjectByRuntimeTypeId(runtimeTypeId, levIndex, arg, objectGuid);
 }
 
-Bool Game::Can_Instantiate(PROTOTYPE prototypeType, std::string_view registeredName,
-	uint32 levIndex) const
+Bool Game::Can_InstantiateGameObject(std::string_view registeredName, uint32 levIndex) const
 {
 	const RuntimeTypeId runtimeTypeId = Find_RuntimeTypeId(registeredName);
 	const uint32 targetLevel = levIndex == UINT_MAX
 		? m_LevelManager->Get_CurrentLevelIndex()
 		: levIndex;
-	return runtimeTypeId != 0 &&
-		m_PrototypeManager->Find_DefaultPrototype(prototypeType, targetLevel, runtimeTypeId) != nullptr;
+	if (runtimeTypeId == 0)
+		return false;
+
+	if (m_PrototypeManager->Find_DefaultGameObject(targetLevel, runtimeTypeId))
+		return true;
+
+	return targetLevel != 0 &&
+		m_PrototypeManager->Find_DefaultGameObject(0, runtimeTypeId) != nullptr;
+}
+
+Bool Game::Can_InstantiateComponent(std::string_view registeredName, uint32 levIndex) const
+{
+	const RuntimeTypeId runtimeTypeId = Find_RuntimeTypeId(registeredName);
+	const uint32 targetLevel = levIndex == UINT_MAX
+		? m_LevelManager->Get_CurrentLevelIndex()
+		: levIndex;
+	if (runtimeTypeId == 0)
+		return false;
+
+	if (m_PrototypeManager->Find_DefaultComponent(targetLevel, runtimeTypeId))
+		return true;
+
+	return targetLevel != 0 &&
+		m_PrototypeManager->Find_DefaultComponent(0, runtimeTypeId) != nullptr;
 }
 
 #ifdef _DEBUG

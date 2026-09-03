@@ -596,7 +596,7 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 		ReflectedTypeInfo objectTypeInfo;
 		if (FAILED(GAME_INSTANCE->Find_ReflectedType(typeName, objectTypeInfo)) ||
 			objectTypeInfo.objectKind != REFLECTED_OBJECT_KIND::GAMEOBJECT ||
-			!GAME_INSTANCE->Can_Instantiate(PROTOTYPE::GAMEOBJECT, typeName, levelIndex) ||
+			!GAME_INSTANCE->Can_InstantiateGameObject(typeName, levelIndex) ||
 			!ValidateProperties(typeName, objectJson["properties"])) {
 			LOG_ERROR(L"[SceneSerializer] Invalid GameObject type {}", FromUtf8(typeName));
 			return E_FAIL;
@@ -624,7 +624,7 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 			if (componentRuntimeTypeId == 0 || !componentTypes.emplace(componentRuntimeTypeId).second ||
 				FAILED(GAME_INSTANCE->Find_ReflectedType(componentTypeName, componentTypeInfo)) ||
 				componentTypeInfo.objectKind != REFLECTED_OBJECT_KIND::COMPONENT ||
-				!GAME_INSTANCE->Can_Instantiate(PROTOTYPE::COMPONENT, componentTypeName, levelIndex) ||
+				!GAME_INSTANCE->Can_InstantiateComponent(componentTypeName, levelIndex) ||
 				!ValidateProperties(componentTypeName, componentJson["properties"])) {
 				LOG_ERROR(L"[SceneSerializer] Invalid or duplicate component type {}", FromUtf8(componentTypeName));
 				return E_FAIL;

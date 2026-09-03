@@ -90,7 +90,7 @@ void MonsterAOE::OnCollisionStay(const Shared<Collider>& ownCollider, const Shar
 	auto target = targetCollider->Get_Owner();
 	
 	if (target->Get_LayerMask().Get_LayerName() != L"Player") return;
-	uint32 targetID = target->Get_ObjectID();
+	const RuntimeObjectId targetID = target->Get_RuntimeObjectId();
 
 	if (!m_HitEntities.contains(targetID))
 	{

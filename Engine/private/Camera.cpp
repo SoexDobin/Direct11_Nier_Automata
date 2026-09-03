@@ -62,7 +62,6 @@ void Camera::Set_Target(const Shared<GameObject>& target)
 {
 	m_Target = target;
 	m_TargetGuid = target ? target->Get_ObjectGuid() : ObjectGuid{};
-	m_TargetID = target ? target->Get_ObjectID() : 0;
 	Update_CameraTransform(0.f);
 }
 
@@ -83,36 +82,8 @@ HRESULT Camera::Set_TargetObjectGuid(ObjectGuid targetGuid)
 		: nullptr;
 	m_TargetGuid = targetGuid;
 	m_Target = target;
-	m_TargetID = target ? target->Get_ObjectID() : 0;
 	Update_CameraTransform(0.f);
 	return S_OK;
-}
-
-void Camera::Set_TargetID(uint32 targetID)
-{
-	m_TargetID = targetID;
-	if (m_TargetID != 0)
-	{
-		// 1. 현재 레벨에서 검색
-		m_Target = GAME_INSTANCE->Find_ObjectByObjectID(GAME_INSTANCE->Get_CurrentLevelIndex(), m_TargetID);
-
-
-		if (const auto& pObj = m_Target.lock())
-		{
-			m_TargetGuid = pObj->Get_ObjectGuid();
-			LOG_INFO(L"[Camera] TargetID {} assigned to object '{}'", m_TargetID, pObj->Get_Name());
-		}
-		else
-		{
-			LOG_WARN(L"[Camera] Failed to find object for TargetID {}", m_TargetID);
-		}
-	}
-	else
-	{
-		m_Target.reset();
-		m_TargetGuid = {};
-	}
-	Update_CameraTransform(0.f);
 }
 
 void Camera::Priority_Update(Float timeDelta)

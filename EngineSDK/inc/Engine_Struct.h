@@ -24,12 +24,6 @@ namespace Engine
 		uint32_t         renderTargetCount = {};
 	} ENGINE_DESC;
 
-	typedef struct tagGuidDesc {
-		uint32_t m_typeID = {};
-		uint32_t m_objectID = {};
-		uint32_t m_instanceID = {};
-	} ID_DESC, ObjectID;
-
 	typedef struct tagLightDesc
 	{
 		LIGHT type = {};

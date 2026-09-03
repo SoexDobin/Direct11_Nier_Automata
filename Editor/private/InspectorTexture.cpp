@@ -24,12 +24,16 @@ namespace
 	}
 
 	template <typename T>
-	Bool WriteTextureValue(Object& object, std::string_view propertyName, const T& value)
+	void QueueTextureValue(const Shared<GameObject>& owner, Object& object,
+		std::string_view propertyName, const T& before, const T& after,
+		Bool beginGesture)
 	{
-		ReflectionValue reflectedValue;
-		reflectedValue.data = value;
-		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
-			object, propertyName, reflectedValue));
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
+		beforeValue.data = before;
+		afterValue.data = after;
+		EDITOR->Queue_PropertyWrite(owner, object, propertyName,
+			beforeValue, afterValue, beginGesture);
 	}
 }
 
@@ -47,9 +51,11 @@ void InspectorTexture::RenderComponent(const Shared<Component>& pComp)
         // 1. Color (RGBA)
         Color rgba{};
         ImGui::Text("Color Multiplier");
-        if (ReadTextureValue(*pComp, "RGBA", rgba) &&
-			ImGui::ColorEdit4("##Color", reinterpret_cast<Float*>(&rgba))) {
-            WriteTextureValue(*pComp, "RGBA", rgba);
+		if (ReadTextureValue(*pComp, "RGBA", rgba)) {
+			const Color beforeRgba = rgba;
+			if (ImGui::ColorEdit4("##Color", reinterpret_cast<Float*>(&rgba)))
+				QueueTextureValue(pComp->Get_Owner(), *pComp, "RGBA",
+					beforeRgba, rgba, ImGui::IsItemActivated() || !ImGui::IsItemActive());
         }
         
         // 2. ResourceTag (Texture Drag Drop)
@@ -101,7 +107,8 @@ void InspectorTexture::RenderComponent(const Shared<Component>& pComp)
 
                     if (requiredType == droppedType)
                     {
-						WriteTextureValue(*pComp, "ResourceTag", Helper::To_wString(droppedTag));
+						QueueTextureValue(pComp->Get_Owner(), *pComp, "ResourceTag",
+							currentTag, Helper::To_wString(droppedTag), true);
                     }
                 }
             }

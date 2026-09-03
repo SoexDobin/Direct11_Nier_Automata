@@ -18,10 +18,5 @@ RTTR_REGISTRATION_NAMED(Camera_RTTR)
 		.property("Aspect", &Camera::Get_Aspect, &Camera::Set_Aspect)
 		.property("Near", &Camera::Get_NearPlane, &Camera::Set_NearPlane)
 		.property("Far", &Camera::Get_FarPlane, &Camera::Set_FarPlane)
-		.property("TargetID", &Camera::Get_TargetID, &Camera::Set_TargetID)
-		(
-			metadata(DataType, Data_Type_Key::uint32),
-			metadata(TypeTag, Data_Tag::ObjectID),
-			metadata(SaveData, Save_Data_Key::TargetObjectID)
-		);
+		;
 }

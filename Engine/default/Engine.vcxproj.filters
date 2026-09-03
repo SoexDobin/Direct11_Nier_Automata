@@ -245,9 +245,6 @@
     <ClInclude Include="..\public\Object.h">
       <Filter>01. Utility\00. Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\ID_Helper.h">
-      <Filter>97. Helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Game.h">
       <Filter>01. Utility\01. GameInstance</Filter>
     </ClInclude>

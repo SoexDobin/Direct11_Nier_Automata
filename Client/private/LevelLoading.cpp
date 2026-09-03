@@ -22,7 +22,8 @@ LevelLoading::LevelLoading(const ComPtr<ID3D11Device> &device,
 
 LevelLoading::~LevelLoading()
 {
-    Destroy(m_StaticCamera);
+	if (m_StaticCamera)
+		GAME_INSTANCE->Destroy(m_StaticCamera->Get_ObjectGuid());
 }
 
 HRESULT LevelLoading::Initialize(void *arg) {

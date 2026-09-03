@@ -62,16 +62,10 @@ HRESULT LevelTitle::Render_Level()
 
 void LevelTitle::Ready_TitleUI()
 {
-	auto dummyIn = GAME_INSTANCE->Find_ObjectByObjectID(ETOI(LEVEL::STATIC), GAME_INSTANCE->Get_ObjectIDFromPrototypeTag(L"LoadingFadeIn", ETOI(LEVEL::STATIC)));
-	if (dummyIn) Destroy(dummyIn);
-
 	LoadingFadeIn::FADE_IN_DESC fadeIn{};
 	fadeIn.fadeSpeed = 0.35f;
 	m_FadeIn = GAME_INSTANCE->Instantiate<LoadingFadeIn>(L"LoadingFadeIn", ETOI(LEVEL::TITLE), &fadeIn);
 
-
-	auto dummyOut = GAME_INSTANCE->Find_ObjectByObjectID(ETOI(LEVEL::STATIC), GAME_INSTANCE->Get_ObjectIDFromPrototypeTag(L"LoadingFadeOut", ETOI(LEVEL::STATIC)));
-	if (dummyOut) Destroy(dummyOut);
 
 	LoadingFadeOut::FADE_OUT_DESC fadeOut{};
 	fadeOut.fadeSpeed = 0.35f;

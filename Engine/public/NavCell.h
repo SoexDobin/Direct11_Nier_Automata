@@ -22,7 +22,6 @@ public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg) override;
 	HRESULT Begin() override;
-	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
 
 public:
 	Bool IsIn(const Vector3& position, _Out_ int32* outNeighborIndex) const;

@@ -337,10 +337,6 @@ HRESULT Engine::Registry::Refresh() {
 			std::ranges::sort(entry.properties, {}, &ReflectedPropertyInfo::registeredName);
 		}
 		if (reflectedType == cameraType || reflectedType.is_derived_from(cameraType)) {
-			std::erase_if(entry.properties, [](const ReflectedPropertyInfo& property) {
-				return property.registeredName == "TargetID";
-			});
-			entry.reflectedProperties.erase("TargetID");
 			ReflectedPropertyDescriptor targetProperty = Make_CameraTarget_Property();
 			entry.properties.push_back(targetProperty.info);
 			entry.externalProperties.emplace(targetProperty.info.registeredName,

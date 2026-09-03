@@ -2,180 +2,16 @@
   "documentType": "Scene",
   "levelIndex": 3,
   "objects": {
-    "3584edbc69e64eac0d836cf7aff6d39c": {
-      "children": [],
-      "components": [
-        {
-          "properties": {
-            "Offset": [
-              0.0,
-              1.0,
-              0.0
-            ],
-            "Radius": 1.25
-          },
-          "typeName": "SphereCollider"
-        },
-        {
-          "properties": {
-            "Position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "Rotation": [
-              -0.0,
-              0.0,
-              0.0
-            ],
-            "Scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Transform"
-        }
-      ],
-      "name": "Pl0000EvadeChecker",
-      "properties": {},
-      "stableChildKey": "Pl0000EvadeChecker",
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "rotation": [
-          -0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      },
-      "typeName": "Pl0000EvadeChecker"
-    },
-    "3cf297f7eb4749bfb142962eeb495015": {
+    "001835eb6b394abdad769f8f8c5effac": {
       "children": [
-        "6f077153c68f4024979bff815dcda825"
-      ],
-      "components": [
-        {
-          "properties": {
-            "Position": [
-              48.0,
-              32.0,
-              0.0
-            ],
-            "Rotation": [
-              -0.0,
-              0.0,
-              0.0
-            ],
-            "Scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Transform"
-        }
-      ],
-      "name": "Phase6_UIRoot",
-      "properties": {
-        "Anchor": 0
-      },
-      "stableChildKey": "",
-      "transform": {
-        "position": [
-          48.0,
-          32.0,
-          0.0
-        ],
-        "rotation": [
-          -0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      },
-      "typeName": "TextUI"
-    },
-    "4038166562d9518dc27d758c9bfe0691": {
-      "children": [],
-      "components": [
-        {
-          "properties": {},
-          "typeName": "Shader"
-        },
-        {
-          "properties": {
-            "Position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "Rotation": [
-              -0.0,
-              0.0,
-              0.0
-            ],
-            "Scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Transform"
-        },
-        {
-          "properties": {
-            "AnimationPreset": null,
-            "ModelTag": "wp3000"
-          },
-          "typeName": "Model"
-        }
-      ],
-      "name": "WP3000Body",
-      "properties": {},
-      "stableChildKey": "WP3000Body",
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "rotation": [
-          -0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      },
-      "typeName": "WP3000Body"
-    },
-    "453fe13faf0142889dd3896e54776458": {
-      "children": [
-        "4cadb7c0d5da7454a68007f46b7d7f24",
-        "aaafc93c867ddec2ca596f32b0cec41c",
-        "ff3982ebc8b3a37f25938ffae975565e",
-        "a66bc2508e21fa7aa591a792ec7c8a45",
-        "92cb320118108e23a0e604685ef54b27",
-        "4038166562d9518dc27d758c9bfe0691",
-        "3584edbc69e64eac0d836cf7aff6d39c",
-        "529130bb9ac35fd261221dc8d871a037"
+        "8ca3483cb05176e8b36f2fe6dcb0bfef",
+        "661203dac8226ef442a6a462643c3365",
+        "768476763b618cfa05c91463df97352f",
+        "05dc6fb366412b86650b94b79ea5ed38",
+        "cac66cc054ebb01b859a4404bc12e7de",
+        "c5a49b8cc8a85b2f8b27978a759551be",
+        "f45eb0f8dfba64d1a9e9c2e3ade646d3",
+        "aec50678ac035885b2f781cb40ade1b8"
       ],
       "components": [
         {
@@ -232,7 +68,7 @@
       },
       "typeName": "Pl0000"
     },
-    "4cadb7c0d5da7454a68007f46b7d7f24": {
+    "05dc6fb366412b86650b94b79ea5ed38": {
       "children": [],
       "components": [
         {
@@ -256,8 +92,11 @@
           "typeName": "Transform"
         },
         {
-          "properties": {},
-          "typeName": "AABBCollider"
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "wp0220"
+          },
+          "typeName": "Model"
         },
         {
           "properties": {},
@@ -265,10 +104,332 @@
         },
         {
           "properties": {
+            "Extents": [
+              0.25,
+              0.05000000074505806,
+              0.800000011920929
+            ],
+            "Offset": [
+              -0.05000000074505806,
+              0.0,
+              -1.0
+            ]
+          },
+          "typeName": "OBBCollider"
+        }
+      ],
+      "name": "WP0220Body",
+      "properties": {},
+      "stableChildKey": "WP0220Body",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WP0220Body"
+    },
+    "24983af7257c4985b10c0884e01e939a": {
+      "children": [
+        "4cfceea898e640d5b9c8944377bc77d5"
+      ],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              120.0,
+              64.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        }
+      ],
+      "name": "Phase6_UIPanel",
+      "properties": {
+        "Anchor": 4
+      },
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          120.0,
+          64.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "TextUI"
+    },
+    "4cfceea898e640d5b9c8944377bc77d5": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {
+            "RGBA": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "ResourceTag": "UI_Hp_Bar"
+          },
+          "typeName": "Texture"
+        },
+        {
+          "properties": {},
+          "typeName": "VIBuffer_Rect"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "Phase6_HpBar",
+      "properties": {
+        "Anchor": 1,
+        "Target": "001835eb6b394abdad769f8f8c5effac",
+        "WorldOffset": [
+          0.0,
+          2.25,
+          0.0
+        ]
+      },
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "HpBarWorldUI"
+    },
+    "661203dac8226ef442a6a462643c3365": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "wp0070"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
+          "properties": {
+            "Extents": [
+              0.07500000298023224,
+              0.10000000149011612,
+              1.0
+            ],
+            "Offset": [
+              0.0,
+              0.0,
+              -0.550000011920929
+            ]
+          },
+          "typeName": "OBBCollider"
+        }
+      ],
+      "name": "WP0070Body",
+      "properties": {},
+      "stableChildKey": "WP0070Body",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WP0070Body"
+    },
+    "768476763b618cfa05c91463df97352f": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "wp0070"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "SheathWP0070Body",
+      "properties": {},
+      "stableChildKey": "SheathWP0070Body",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "SheathWP0070Body"
+    },
+    "8ca3483cb05176e8b36f2fe6dcb0bfef": {
+      "children": [],
+      "components": [
+        {
+          "properties": {},
+          "typeName": "AABBCollider"
+        },
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {
             "AnimationPreset": null,
             "ModelTag": "pl0000"
           },
           "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
         }
       ],
       "name": "Pl0000Body",
@@ -293,7 +454,7 @@
       },
       "typeName": "Pl0000Body"
     },
-    "529130bb9ac35fd261221dc8d871a037": {
+    "aec50678ac035885b2f781cb40ade1b8": {
       "children": [],
       "components": [
         {
@@ -350,16 +511,14 @@
       },
       "typeName": "Pl0000MonsterChecker"
     },
-    "6f077153c68f4024979bff815dcda825": {
-      "children": [
-        "9ccc2c1514ed49ffb5f12aaf03f37343"
-      ],
+    "c5a49b8cc8a85b2f8b27978a759551be": {
+      "children": [],
       "components": [
         {
           "properties": {
             "Position": [
-              120.0,
-              64.0,
+              0.0,
+              0.0,
               0.0
             ],
             "Rotation": [
@@ -374,17 +533,26 @@
             ]
           },
           "typeName": "Transform"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "wp3000"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
         }
       ],
-      "name": "Phase6_UIPanel",
-      "properties": {
-        "Anchor": 4
-      },
-      "stableChildKey": "",
+      "name": "WP3000Body",
+      "properties": {},
+      "stableChildKey": "WP3000Body",
       "transform": {
         "position": [
-          120.0,
-          64.0,
+          0.0,
+          0.0,
           0.0
         ],
         "rotation": [
@@ -398,9 +566,9 @@
           1.0
         ]
       },
-      "typeName": "TextUI"
+      "typeName": "WP3000Body"
     },
-    "92cb320118108e23a0e604685ef54b27": {
+    "cac66cc054ebb01b859a4404bc12e7de": {
       "children": [],
       "components": [
         {
@@ -457,18 +625,16 @@
       },
       "typeName": "SheathWP0220Body"
     },
-    "9ccc2c1514ed49ffb5f12aaf03f37343": {
-      "children": [],
+    "d725c851aa5f44348f5e83e687ea6550": {
+      "children": [
+        "24983af7257c4985b10c0884e01e939a"
+      ],
       "components": [
-        {
-          "properties": {},
-          "typeName": "VIBuffer_Rect"
-        },
         {
           "properties": {
             "Position": [
-              0.0,
-              0.0,
+              48.0,
+              32.0,
               0.0
             ],
             "Rotation": [
@@ -483,39 +649,17 @@
             ]
           },
           "typeName": "Transform"
-        },
-        {
-          "properties": {},
-          "typeName": "Shader"
-        },
-        {
-          "properties": {
-            "RGBA": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "ResourceTag": "UI_Hp_Bar"
-          },
-          "typeName": "Texture"
         }
       ],
-      "name": "Phase6_HpBar",
+      "name": "Phase6_UIRoot",
       "properties": {
-        "Anchor": 1,
-        "Target": "453fe13faf0142889dd3896e54776458",
-        "WorldOffset": [
-          0.0,
-          2.25,
-          0.0
-        ]
+        "Anchor": 0
       },
       "stableChildKey": "",
       "transform": {
         "position": [
-          0.0,
-          0.0,
+          48.0,
+          32.0,
           0.0
         ],
         "rotation": [
@@ -529,9 +673,9 @@
           1.0
         ]
       },
-      "typeName": "HpBarWorldUI"
+      "typeName": "TextUI"
     },
-    "a66bc2508e21fa7aa591a792ec7c8a45": {
+    "f45eb0f8dfba64d1a9e9c2e3ade646d3": {
       "children": [],
       "components": [
         {
@@ -555,107 +699,20 @@
           "typeName": "Transform"
         },
         {
-          "properties": {},
-          "typeName": "Shader"
-        },
-        {
           "properties": {
-            "AnimationPreset": null,
-            "ModelTag": "wp0220"
-          },
-          "typeName": "Model"
-        },
-        {
-          "properties": {
-            "Extents": [
-              0.25,
-              0.05000000074505806,
-              0.800000011920929
-            ],
-            "Offset": [
-              -0.05000000074505806,
-              0.0,
-              -1.0
-            ]
-          },
-          "typeName": "OBBCollider"
-        }
-      ],
-      "name": "WP0220Body",
-      "properties": {},
-      "stableChildKey": "WP0220Body",
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "rotation": [
-          -0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      },
-      "typeName": "WP0220Body"
-    },
-    "aaafc93c867ddec2ca596f32b0cec41c": {
-      "children": [],
-      "components": [
-        {
-          "properties": {},
-          "typeName": "Shader"
-        },
-        {
-          "properties": {
-            "Extents": [
-              0.07500000298023224,
-              0.10000000149011612,
-              1.0
-            ],
             "Offset": [
               0.0,
-              0.0,
-              -0.550000011920929
-            ]
-          },
-          "typeName": "OBBCollider"
-        },
-        {
-          "properties": {
-            "Position": [
-              0.0,
-              0.0,
+              1.0,
               0.0
             ],
-            "Rotation": [
-              -0.0,
-              0.0,
-              0.0
-            ],
-            "Scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
+            "Radius": 1.25
           },
-          "typeName": "Transform"
-        },
-        {
-          "properties": {
-            "AnimationPreset": null,
-            "ModelTag": "wp0070"
-          },
-          "typeName": "Model"
+          "typeName": "SphereCollider"
         }
       ],
-      "name": "WP0070Body",
+      "name": "Pl0000EvadeChecker",
       "properties": {},
-      "stableChildKey": "WP0070Body",
+      "stableChildKey": "Pl0000EvadeChecker",
       "transform": {
         "position": [
           0.0,
@@ -673,69 +730,12 @@
           1.0
         ]
       },
-      "typeName": "WP0070Body"
-    },
-    "ff3982ebc8b3a37f25938ffae975565e": {
-      "children": [],
-      "components": [
-        {
-          "properties": {},
-          "typeName": "Shader"
-        },
-        {
-          "properties": {
-            "AnimationPreset": null,
-            "ModelTag": "wp0070"
-          },
-          "typeName": "Model"
-        },
-        {
-          "properties": {
-            "Position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "Rotation": [
-              -0.0,
-              0.0,
-              0.0
-            ],
-            "Scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Transform"
-        }
-      ],
-      "name": "SheathWP0070Body",
-      "properties": {},
-      "stableChildKey": "SheathWP0070Body",
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "rotation": [
-          -0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      },
-      "typeName": "SheathWP0070Body"
+      "typeName": "Pl0000EvadeChecker"
     }
   },
   "roots": [
-    "3cf297f7eb4749bfb142962eeb495015",
-    "453fe13faf0142889dd3896e54776458"
+    "001835eb6b394abdad769f8f8c5effac",
+    "d725c851aa5f44348f5e83e687ea6550"
   ],
   "schemaVersion": 2
 }

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "InspectorCollider.h"
+#include "EditorManager.h"
 #include "Component.h"
 #include "Game.h"
 
@@ -22,12 +23,16 @@ namespace
 	}
 
 	template <typename T>
-	Bool WriteColliderValue(Object& object, std::string_view propertyName, const T& value)
+	void QueueColliderValue(Component& component, std::string_view propertyName,
+		const T& before, const T& after)
 	{
-		ReflectionValue reflectedValue;
-		reflectedValue.data = value;
-		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
-			object, propertyName, reflectedValue));
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
+		beforeValue.data = before;
+		afterValue.data = after;
+		EDITOR->Queue_PropertyWrite(component.Get_Owner(), component, propertyName,
+			beforeValue, afterValue,
+			ImGui::IsItemActivated() || !ImGui::IsItemActive());
 	}
 }
 
@@ -68,16 +73,18 @@ void InspectorCollider::RenderOBB(Component& collider)
 	ImGui::Separator();
 
 	Vector3 offset{};
-	if (ReadColliderValue(collider, "Offset", offset) &&
-		ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
-		WriteColliderValue(collider, "Offset", offset);
+	if (ReadColliderValue(collider, "Offset", offset)) {
+		const Vector3 beforeOffset = offset;
+		if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f))
+			QueueColliderValue(collider, "Offset", beforeOffset, offset);
 	}
 
 	Vector3 extents{};
-	if (ReadColliderValue(collider, "Extents", extents) &&
-		ImGui::DragFloat3("Extents(Half-Size)", reinterpret_cast<Float*>(&extents),
-			0.05f, 0.01f, 1000.f)) {
-		WriteColliderValue(collider, "Extents", extents);
+	if (ReadColliderValue(collider, "Extents", extents)) {
+		const Vector3 beforeExtents = extents;
+		if (ImGui::DragFloat3("Extents(Half-Size)", reinterpret_cast<Float*>(&extents),
+			0.05f, 0.01f, 1000.f))
+			QueueColliderValue(collider, "Extents", beforeExtents, extents);
 	}
 }
 
@@ -87,15 +94,17 @@ void InspectorCollider::RenderSphere(Component& collider)
 	ImGui::Separator();
 
 	Vector3 offset{};
-	if (ReadColliderValue(collider, "Offset", offset) &&
-		ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f)) {
-		WriteColliderValue(collider, "Offset", offset);
+	if (ReadColliderValue(collider, "Offset", offset)) {
+		const Vector3 beforeOffset = offset;
+		if (ImGui::DragFloat3("Offset", reinterpret_cast<Float*>(&offset), 0.05f))
+			QueueColliderValue(collider, "Offset", beforeOffset, offset);
 	}
 
 	Float radius{};
-	if (ReadColliderValue(collider, "Radius", radius) &&
-		ImGui::DragFloat("Radius", &radius, 0.05f, 0.01f, 1000.f)) {
-		WriteColliderValue(collider, "Radius", radius);
+	if (ReadColliderValue(collider, "Radius", radius)) {
+		const Float beforeRadius = radius;
+		if (ImGui::DragFloat("Radius", &radius, 0.05f, 0.01f, 1000.f))
+			QueueColliderValue(collider, "Radius", beforeRadius, radius);
 	}
 }
 

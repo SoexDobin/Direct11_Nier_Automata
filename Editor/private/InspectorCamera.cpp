@@ -26,12 +26,16 @@ namespace
 	}
 
 	template <typename T>
-	Bool WriteCameraValue(Object& object, std::string_view propertyName, const T& value)
+	void QueueCameraValue(const Shared<GameObject>& owner, Object& object,
+		std::string_view propertyName, const T& before, const T& after)
 	{
-		ReflectionValue reflectedValue;
-		reflectedValue.data = value;
-		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
-			object, propertyName, reflectedValue));
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
+		beforeValue.data = before;
+		afterValue.data = after;
+		EDITOR->Queue_PropertyWrite(owner, object, propertyName,
+			beforeValue, afterValue,
+			ImGui::IsItemActivated() || !ImGui::IsItemActive());
 	}
 }
 
@@ -48,29 +52,33 @@ void InspectorCamera::RenderCamera(const Shared<GameObject>& pObj)
     {
         // 1. FovY
         Float fovY{};
-        if (ReadCameraValue(*pObj, "FovY", fovY) &&
-			ImGui::SliderAngle("FovY", &fovY, 1.0f, 179.0f)) {
-            WriteCameraValue(*pObj, "FovY", fovY);
+		if (ReadCameraValue(*pObj, "FovY", fovY)) {
+			const Float beforeFovY = fovY;
+			if (ImGui::SliderAngle("FovY", &fovY, 1.0f, 179.0f))
+				QueueCameraValue(pObj, *pObj, "FovY", beforeFovY, fovY);
         }
 
         // 2. Aspect
         Float aspect{};
-        if (ReadCameraValue(*pObj, "Aspect", aspect) &&
-			ImGui::DragFloat("Aspect", &aspect, 0.01f, 0.1f, 10.0f)) {
-            WriteCameraValue(*pObj, "Aspect", aspect);
+		if (ReadCameraValue(*pObj, "Aspect", aspect)) {
+			const Float beforeAspect = aspect;
+			if (ImGui::DragFloat("Aspect", &aspect, 0.01f, 0.1f, 10.0f))
+				QueueCameraValue(pObj, *pObj, "Aspect", beforeAspect, aspect);
         }
 
         // 3. Near / Far
         Float nearPlane{};
-        if (ReadCameraValue(*pObj, "Near", nearPlane) &&
-			ImGui::DragFloat("Near", &nearPlane, 0.01f, 0.001f, 1000.0f)) {
-            WriteCameraValue(*pObj, "Near", nearPlane);
+		if (ReadCameraValue(*pObj, "Near", nearPlane)) {
+			const Float beforeNear = nearPlane;
+			if (ImGui::DragFloat("Near", &nearPlane, 0.01f, 0.001f, 1000.0f))
+				QueueCameraValue(pObj, *pObj, "Near", beforeNear, nearPlane);
         }
 
         Float farPlane{};
-        if (ReadCameraValue(*pObj, "Far", farPlane) &&
-			ImGui::DragFloat("Far", &farPlane, 1.0f, 1.0f, 10000.0f)) {
-            WriteCameraValue(*pObj, "Far", farPlane);
+		if (ReadCameraValue(*pObj, "Far", farPlane)) {
+			const Float beforeFar = farPlane;
+			if (ImGui::DragFloat("Far", &farPlane, 1.0f, 1.0f, 10000.0f))
+				QueueCameraValue(pObj, *pObj, "Far", beforeFar, farPlane);
         }
         
 	}

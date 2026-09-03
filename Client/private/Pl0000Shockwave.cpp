@@ -52,7 +52,6 @@ void Pl0000Shockwave::Priority_Update(Float timeDelta)
 {
 	//if (false == isFirstFrame)
 	//{
-	//	Destroy(shared_from_this());
 	//	Set_Active(false);
 	//}
 	//
@@ -88,7 +87,7 @@ void Pl0000Shockwave::OnCollisionStay(const Shared<Collider>& ownCollider, const
 	auto target = targetCollider->Get_Owner();
 	
 	if (target->Get_LayerMask().Get_LayerName() != L"Monster") return;
-	uint32 targetID = target->Get_InstanceID();
+	const RuntimeObjectId targetID = target->Get_RuntimeObjectId();
 	if (!m_HitEntities.contains(targetID))
 	{
 		m_HitEntities.insert(targetID);

@@ -14,18 +14,13 @@ public:
 	virtual ~Object();
 
 public:
-	uint32 Get_TypeID() const { return m_DescID.m_typeID; }
-	uint32 Get_ObjectID() const { return m_DescID.m_objectID; }
-	uint32 Get_InstanceID() const { return m_DescID.m_instanceID; }
 	RuntimeTypeId Get_RuntimeTypeId() const { return m_RuntimeTypeId; }
 	RuntimeObjectId Get_RuntimeObjectId() const { return m_RuntimeObjectId; }
-	void Set_ObjectID(uint32 objectID) { m_DescID.m_objectID = objectID; }
 	const wstring &Get_Name() const { return m_ObjectName; }
 	void Set_Name(const wstring& name) { m_ObjectName = name; }
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	HRESULT Initialize_Prototype(const wstring& prototypeTag);
 	virtual HRESULT Initialize(void *arg) { return S_OK; }
 	virtual HRESULT Begin() { return S_OK; }
 
@@ -40,21 +35,19 @@ public:
 
 	OBJECT_DESC* Get_ObjectDesc() const { return m_ObjectDesc; }
 
-public:
-	virtual PROTOTYPE Get_Prototype() const PURE;
-	static void Destroy(const Shared<Object> &object);
-
 protected:
+	void Mark_Destroyed() { m_IsDestroy = true; }
 	OBJECT_DESC* m_ObjectDesc{};
 	Bool m_IsDestroy = {false};
 	Bool m_IsActive = {true};
-	ID_DESC m_DescID = {};
 	RuntimeTypeId m_RuntimeTypeId{};
 	RuntimeObjectId m_RuntimeObjectId{};
 	wstring m_ObjectName = {};
 
 private:
 	friend class Registry;
+	friend class ObjectManager;
+	friend class GameObject;
 	void Assign_ReflectedIdentity(RuntimeTypeId runtimeTypeId, std::string_view registeredName);
 };
 

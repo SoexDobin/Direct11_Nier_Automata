@@ -60,7 +60,7 @@ private:
 	int32 m_WeaponBoneIndex{};
 	Bool m_IsSheathing{ true };
 	Shared<OBBCollider> m_AttackCollider{ nullptr };
-	unordered_set<uint32> m_HitEntities;
+	unordered_set<RuntimeObjectId> m_HitEntities;
 
 	Bool m_DetachTransform{ false };
 	Bool m_IsHitTheGround{ false };

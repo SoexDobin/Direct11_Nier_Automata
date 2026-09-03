@@ -4,7 +4,6 @@
 #include <Transform.h>
 #include "UIObject.h"
 #include "Game.h"
-#include "ID_Helper.h"
 #include "EditorManager.h"
 #include "PathManager.h"
 
@@ -108,30 +107,9 @@ void EditorView::RenderView(Bool isResize) {
 						spawnPos = rayOrigin + rayDir * 5.f;
 					}
 
-					// 객체 생성 및 배치
-					Shared<GameObject> cloned = GAME_INSTANCE->Instantiate<GameObject>(prototypeTag, GAME_INSTANCE->Get_CurrentLevelIndex());
-					if (cloned)
-					{
-						auto allObjs = GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex());
-						int suffix = 0;
-						wstring baseName = cloned->Get_Name();
-						wstring uniqueName = baseName;
-						while (true) {
-							uniqueName = (suffix == 0) ? baseName : baseName + L"_" + std::to_wstring(suffix);
-							bool overlap = false;
-							for (auto& [id, obj] : allObjs) {
-								if (obj != cloned && obj->Get_Name() == uniqueName) { overlap = true; break; }
-							}
-							if (!overlap) break;
-							suffix++;
-						}
-						cloned->Set_Name(uniqueName);
-						cloned->Set_ObjectID(Helper::Create_FixedObjectID(prototypeTag, uniqueName));
-
-						cloned->Get_Transform()->Set_LocalPositionByValue(spawnPos);
-						LOG_INFO(L"[SceneView] Dropped {} at ({}, {}, {})", prototypeTag, spawnPos.x, spawnPos.y, spawnPos.z);
-						EDITOR->Set_SelectedObject(cloned);
-					}
+					EDITOR->Queue_Spawn(prototypeTag,
+						GAME_INSTANCE->Get_CurrentLevelIndex(), {},
+						numeric_limits<size_t>::max(), spawnPos);
 				}
 				ImGui::EndDragDropTarget();
 			}
@@ -336,11 +314,27 @@ void EditorView::MousePicking(ImVec2 viewport, ImVec2 imageStartPos)
 
 void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 {
-	if (EDITOR->Get_State() == EDITOR_STATE::PLAY) return;
+	if (EDITOR->Get_State() == EDITOR_STATE::PLAY) {
+		m_WasUsingGizmo = false;
+		return;
+	}
 
 	auto selectedObj = EDITOR->Get_SelectedObject();
-	if (!selectedObj) return;
+	if (!selectedObj) {
+		m_WasUsingGizmo = false;
+		return;
+	}
 	auto transform = selectedObj->Get_Transform();
+	const Bool beginGesture = !m_WasUsingGizmo;
+	const auto QueueTransformValue = [&](std::string_view propertyName,
+		const Vector3& before, const Vector3& after) {
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
+		beforeValue.data = before;
+		afterValue.data = after;
+		EDITOR->Queue_PropertyWrite(selectedObj, *transform, propertyName,
+			beforeValue, afterValue, beginGesture);
+	};
 
 	// 1. 기즈모 드로잉 설정
 	ImGuizmo::SetDrawlist(); // 기본값 사용 (현재 윈도우)
@@ -374,10 +368,17 @@ void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 			Vector3 scale, pos;
 			Quaternion rot;
 			if (uiScreenWorld.Decompose(scale, rot, pos)) {
-				transform->Set_LocalPositionByValue(Vector3(pos.x - anchorPos.x, pos.y - anchorPos.y, 0.f));
-				transform->Set_LocalRotation(rot);
-				transform->Set_LocalScaleByValue(scale);
-				uiObj->Update_UITransform(viewport.x, viewport.y);
+				if (m_CurrentGizmoMode == ImGuizmo::TRANSLATE)
+					QueueTransformValue("Position", transform->Get_LocalPosition(),
+						Vector3(pos.x - anchorPos.x, pos.y - anchorPos.y, 0.f));
+				else if (m_CurrentGizmoMode == ImGuizmo::ROTATE) {
+					const Vector3 radians = rot.ToEuler();
+					QueueTransformValue("Rotation", transform->Get_LocalEulerAngles(),
+						Vector3{ XMConvertToDegrees(radians.x), XMConvertToDegrees(radians.y),
+							XMConvertToDegrees(radians.z) });
+				}
+				else if (m_CurrentGizmoMode == ImGuizmo::SCALE)
+					QueueTransformValue("Scale", transform->Get_LocalScale(), scale);
 			}
 		}
 	}
@@ -397,13 +398,21 @@ void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 			Vector3 scale, pos;
 			Quaternion rot;
 			if (world.Decompose(scale, rot, pos)) {
-				transform->Set_LocalPositionByValue(pos);
-				transform->Set_LocalRotation(rot);
-				transform->Set_LocalScaleByValue(scale);
-				transform->Update_WorldMatrix();
+				if (m_CurrentGizmoMode == ImGuizmo::TRANSLATE)
+					QueueTransformValue("Position", transform->Get_LocalPosition(), pos);
+				else if (m_CurrentGizmoMode == ImGuizmo::ROTATE) {
+					const Vector3 radians = rot.ToEuler();
+					QueueTransformValue("Rotation", transform->Get_LocalEulerAngles(),
+						Vector3{ XMConvertToDegrees(radians.x), XMConvertToDegrees(radians.y),
+							XMConvertToDegrees(radians.z) });
+				}
+				else if (m_CurrentGizmoMode == ImGuizmo::SCALE)
+					QueueTransformValue("Scale", transform->Get_LocalScale(), scale);
 			}
 		}
 	}
+
+	m_WasUsingGizmo = ImGuizmo::IsUsing();
 }
 
 Shared<EditorView> EditorView::Create()

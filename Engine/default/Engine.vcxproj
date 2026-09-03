@@ -217,7 +217,6 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Game.h" />
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GraphicDevice.h" />
-    <ClInclude Include="..\public\ID_Helper.h" />
     <ClInclude Include="..\public\InputDevice.h" />
     <ClInclude Include="..\public\LayerRegistry.h" />
     <ClInclude Include="..\public\Level.h" />

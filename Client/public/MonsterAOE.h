@@ -51,7 +51,7 @@ private:
 	string						m_BoneName{};
 	Entity::DAMAGE_INFO			m_DamageInfo{};
 	Shared<SphereCollider>		m_AttackCollider{ nullptr };
-	unordered_set<uint32>		m_HitEntities; 
+	unordered_set<RuntimeObjectId>	m_HitEntities;
 
 	
 public:

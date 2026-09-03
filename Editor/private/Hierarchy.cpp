@@ -3,7 +3,6 @@
 #include "EditorManager.h"
 #include "Game.h"
 #include "GameObject.h"
-#include "ID_Helper.h"
 
 
 
@@ -102,9 +101,8 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
     WideCharToMultiByte(CP_UTF8, 0, wName.c_str(), -1, name.data(), utf8Len,
                         nullptr, nullptr);
 
-    bool bOpened = ImGui::TreeNodeEx(
-        reinterpret_cast<void *>(static_cast<intptr_t>(pObj->Get_InstanceID())), // ObjectID 대신 InstanceID 사용 권장 (중복 클릭 방지)
-        flags, "%s", name.c_str());
+    const string nodeId = To_String(pObj->Get_ObjectGuid());
+    bool bOpened = ImGui::TreeNodeEx(nodeId.c_str(), flags, "%s", name.c_str());
 
 	if (ImGui::BeginPopupContextItem())
 	{
@@ -208,8 +206,7 @@ void Hierarchy::Delete_Selected() {
     }
 
     uint32 levelIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
-    const auto& currentObjects = GAME_INSTANCE->Get_GameObjects(levelIndex);
-    if (!currentObjects.contains(selected->Get_InstanceID()))
+    if (!GAME_INSTANCE->Contains(levelIndex, selected->Get_ObjectGuid()))
         levelIndex = 0;
 
     EDITOR->Queue_Destroy(selected->Get_ObjectGuid(), levelIndex);

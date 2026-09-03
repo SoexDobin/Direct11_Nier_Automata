@@ -1,6 +1,5 @@
 #include "GameObject.h"
 #include "Game.h"
-#include "ID_Helper.h"
 #include "Navigation.h"
 #include "ScriptComponent.h"
 #include "SpdLogger.h"
@@ -15,8 +14,6 @@ GameObject::GameObject(const GameObject& prototype)
       m_LayerMask(prototype.m_LayerMask), m_TagMask(prototype.m_TagMask) 
 {
     m_ObjectName = prototype.m_ObjectName;
-    m_DescID.m_typeID = prototype.m_DescID.m_typeID;
-    m_DescID.m_objectID = prototype.m_DescID.m_objectID;
     m_RuntimeTypeId = prototype.m_RuntimeTypeId;
     m_IsActive = prototype.m_IsActive;
 
@@ -41,13 +38,6 @@ HRESULT GameObject::Initialize(void *arg) {
         return E_FAIL;
     }
 
-    Helper::CreateID(Helper::OBJECT_ID_INSTANCE, m_DescID);
-    if (m_DescID.m_instanceID == 0) {
-        LOG_ERROR(L"Component {} Initialize Failed By InstanceID", m_ObjectName);
-        MSG_BOX("Component Initialize Failed By InstanceID");
-        return E_FAIL;
-    }
-
     m_Transform = Transform::Create(m_Device, m_Context);
     if (nullptr == m_Transform)
 		return E_FAIL;
@@ -67,14 +57,16 @@ void GameObject::On_Destroy() {
     for (auto &component : m_Components)
     {
         component.second->On_Destroy();
-        Destroy(component.second);
+		component.second->Mark_Destroyed();
+		component.second->Set_Owner(nullptr);
     }
     m_Components.clear();
 
     for (auto &component : m_Scripts)
     {
         component.second->On_Destroy();
-        Destroy(component.second);
+		component.second->Mark_Destroyed();
+		component.second->Set_Owner(nullptr);
     }
     m_Scripts.clear();
 
@@ -223,7 +215,7 @@ HRESULT GameObject::Add_Child(uint32 prototypeLevIndex, const wstring& registere
 
     if (FAILED(Add_Child(child, stableChildKey))) {
         LOG_ERROR(L"Failed to attach child {} with StableChildKey {}", registeredName, stableChildKey);
-        Object::Destroy(child);
+		GAME_INSTANCE->Destroy(child->Get_ObjectGuid());
         return E_FAIL;
     }
 
@@ -339,7 +331,7 @@ void GameObject::Destroy_Subtree() {
         if (child)
             child->Destroy_Subtree();
     }
-    Object::Destroy(shared_from_this());
+	Mark_Destroyed();
 }
 
 vector<Shared<Component>> GameObject::Get_Components()
@@ -375,17 +367,7 @@ Bool GameObject::Has_Component(RuntimeTypeId runtimeTypeId) const
     if (runtimeTypeId == 0)
         return false;
 
-    for (const auto& [instanceID, component] : m_Components) {
-        if (component && component->Get_RuntimeTypeId() == runtimeTypeId)
-            return true;
-    }
-
-    for (const auto& [instanceID, script] : m_Scripts) {
-        if (script && script->Get_RuntimeTypeId() == runtimeTypeId)
-            return true;
-    }
-
-    return false;
+	return m_Components.contains(runtimeTypeId) || m_Scripts.contains(runtimeTypeId);
 }
 
 HRESULT GameObject::Add_Component(const Shared<Component>& component) {
@@ -402,19 +384,16 @@ HRESULT GameObject::Add_Component(const Shared<Component>& component) {
         return E_FAIL;
     }
 
-    uint32 instID = component->Get_InstanceID();
-    if (instID == 0 || m_Components.contains(instID) || m_Scripts.contains(instID)) {
-        LOG_ERROR(L"{} has an invalid or duplicate runtime instance id: {}", component->Get_Name(), instID);
-        return E_FAIL;
-    }
+    const RuntimeTypeId runtimeTypeId = component->Get_RuntimeTypeId();
 
     if (component->Get_ComponentType() == COMPONENT_TYPE::SCRIPT) {
-        const auto [it, inserted] = m_Scripts.emplace(instID, static_pointer_cast<ScriptComponent>(component));
+		const auto [it, inserted] = m_Scripts.emplace(
+			runtimeTypeId, static_pointer_cast<ScriptComponent>(component));
         if (!inserted)
             return E_FAIL;
     }
     else {
-        const auto [it, inserted] = m_Components.emplace(instID, component);
+		const auto [it, inserted] = m_Components.emplace(runtimeTypeId, component);
         if (!inserted)
             return E_FAIL;
     }
@@ -425,24 +404,11 @@ HRESULT GameObject::Add_Component(const Shared<Component>& component) {
 }
 
 
-Shared<Component> GameObject::Add_Component(uint32 levIndex, uint32 objectID, void* arg)
-{
-    Shared<Component> newComponent = GAME_INSTANCE->Instantiate<Component>(objectID, levIndex, arg);
-    if (newComponent && FAILED(Add_Component(newComponent))) {
-        Object::Destroy(newComponent);
-        return nullptr;
-    }
-    else
-        if (!newComponent) LOG_ERROR(L"Failed to Add Component {}", objectID);
-    
-    return newComponent;
-}
-
 Shared<Component> GameObject::Add_Component(uint32 levIndex, const wstring& prototypeTag, void* arg)
 {
     Shared<Component> newComponent = static_pointer_cast<Component>(GAME_INSTANCE->Instantiate(prototypeTag, levIndex, arg));
     if (newComponent && FAILED(Add_Component(newComponent))) {
-        Object::Destroy(newComponent);
+		newComponent->On_Destroy();
         return nullptr;
     }
     else

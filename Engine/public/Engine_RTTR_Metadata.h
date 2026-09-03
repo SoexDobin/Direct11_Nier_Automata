@@ -14,7 +14,7 @@ namespace Engine
 		inline constexpr MetadataKeyType DataType		= "DataType";	// 자료형
 		inline constexpr MetadataKeyType TypeTag		= "TypeTag";	// 데이터 이름 
 		inline constexpr MetadataKeyType AssetType		= "AssetType";	// Texture, Model, Object(특별한 타입 없으면 디폴트)
-		inline constexpr MetadataKeyType SaveData		= "SaveData";	// ObjectID(uin32), Tag(ResourceTag) 등의 표현과 직렬화 대상인지
+		inline constexpr MetadataKeyType SaveData		= "SaveData";	// Tag(ResourceTag) 등의 표현과 직렬화 대상인지
 	}
 
 	namespace Data_Type_Key /* For DataType */
@@ -37,8 +37,6 @@ namespace Engine
 		inline constexpr DataTag Rotation		= "Rotation";		// Vector3
 		inline constexpr DataTag Scale			= "Scale";			// Vector3
 		inline constexpr DataTag Color			= "Color";			// Vector4
-		inline constexpr DataTag TypeID			= "TypeID";			// uint32
-		inline constexpr DataTag ObjectID		= "ObjectID";		// uint32
 		inline constexpr DataTag ResourceTag	= "ResourceTag";	// Load 시 리소스 테그
 	}
 	namespace Asset_Type_Key  /* For AssetType */
@@ -50,11 +48,9 @@ namespace Engine
 	}
 	namespace Save_Data_Key /* For SaveData, Serialize */
 	{
-		inline constexpr SaveDataKey MyObjectID			= "MyObjectID";
 		inline constexpr SaveDataKey TransformPos		= "TransformPosition";
 		inline constexpr SaveDataKey TransformRot		= "TransformRotation";
 		inline constexpr SaveDataKey TransformScale		= "TransformScale";
-		inline constexpr SaveDataKey TargetObjectID		= "TargetObjectID";
 		inline constexpr SaveDataKey TextureTag			= "TextureTag";
 		inline constexpr SaveDataKey ModelTag			= "ModelTag";
 		inline constexpr SaveDataKey AnimationPreset	= "AnimationPreset";

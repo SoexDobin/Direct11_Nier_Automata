@@ -34,7 +34,6 @@ public:
 
 public:
     virtual GAMEOBJECTTYPE Get_GameObjectType() { return GAMEOBJECTTYPE::GAMEOBJECT; }
-    PROTOTYPE Get_Prototype() const final { return PROTOTYPE::GAMEOBJECT; }
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void *arg) override;
     void On_Destroy() override;
@@ -88,15 +87,14 @@ public:
     void Destroy_Subtree();
 
 protected: /* Component */
-    map<uint32, Shared<Component>> m_Components;
-    map<uint32, Shared<ScriptComponent>> m_Scripts;
+	map<RuntimeTypeId, Shared<Component>> m_Components;
+	map<RuntimeTypeId, Shared<ScriptComponent>> m_Scripts;
 
 public:
     vector<Shared<Component>> Get_Components();
     vector<Shared<ScriptComponent>> Get_Scripts();
     Bool Has_Component(RuntimeTypeId runtimeTypeId) const;
     HRESULT Add_Component(const Shared<Component> &component);
-    Shared<Component> Add_Component(uint32 levIndex, uint32 objectID, void* arg = nullptr);
     Shared<Component> Add_Component(uint32 levIndex, const wstring& prototypeTag, void* arg = nullptr);
 	Shared<Component> Add_Component_Reflected(uint32 levIndex, RuntimeTypeId externalRuntimeTypeId,
 		const wstring& fallbackPrototypeTag, void* arg = nullptr);
@@ -137,7 +135,6 @@ private:
 	friend class LevelSerializer;
 	HRESULT Post_Load();
 
-	using Object::m_DescID;
 };
 
 NS_END

@@ -4,6 +4,7 @@
 #include "EditorCamera.h"
 #include "Game.h"
 #include "GameObject.h"
+#include "ScriptComponent.h"
 #include "PathManager.h"
 
 #include "EditorView.h"
@@ -23,12 +24,7 @@ constexpr size_t MaxHistoryEntries = 64;
 
 Bool Belongs_To_Level(const Shared<GameObject>& object, uint32 levelIndex)
 {
-    if (!object)
-        return false;
-
-    const auto& objects = GAME_INSTANCE->Get_GameObjects(levelIndex);
-    const auto it = objects.find(object->Get_InstanceID());
-    return it != objects.end() && it->second == object;
+    return object && GAME_INSTANCE->Contains(levelIndex, object->Get_ObjectGuid());
 }
 
 Bool Is_In_Subtree(const Shared<GameObject>& object, ObjectGuid rootGuid)
@@ -38,6 +34,75 @@ Bool Is_In_Subtree(const Shared<GameObject>& object, ObjectGuid rootGuid)
             return true;
 
     return false;
+}
+
+void Refresh_DescendantTransforms(const Shared<GameObject>& owner)
+{
+	if (!owner)
+		return;
+	for (const Shared<GameObject>& child : owner->Get_Children()) {
+		if (!child || child->Is_Destroy())
+			continue;
+		if (const Shared<Transform> transform = child->Get_Transform())
+			transform->Update_WorldMatrix();
+		Refresh_DescendantTransforms(child);
+	}
+}
+
+Bool ReflectionValuesEqual(const ReflectionValue& left, const ReflectionValue& right)
+{
+	if (left.Get_Type() != right.Get_Type())
+		return false;
+
+	switch (left.Get_Type()) {
+	case REFLECTION_VALUE_TYPE::NONE:
+		return true;
+	case REFLECTION_VALUE_TYPE::BOOL:
+		return *left.Try_Get<Bool>() == *right.Try_Get<Bool>();
+	case REFLECTION_VALUE_TYPE::INT32:
+		return *left.Try_Get<int32>() == *right.Try_Get<int32>();
+	case REFLECTION_VALUE_TYPE::UINT32:
+		return *left.Try_Get<uint32>() == *right.Try_Get<uint32>();
+	case REFLECTION_VALUE_TYPE::FLOAT:
+		return *left.Try_Get<Float>() == *right.Try_Get<Float>();
+	case REFLECTION_VALUE_TYPE::DOUBLE:
+		return *left.Try_Get<Double>() == *right.Try_Get<Double>();
+	case REFLECTION_VALUE_TYPE::STRING:
+		return *left.Try_Get<string>() == *right.Try_Get<string>();
+	case REFLECTION_VALUE_TYPE::WSTRING:
+		return *left.Try_Get<wstring>() == *right.Try_Get<wstring>();
+	case REFLECTION_VALUE_TYPE::VECTOR3:
+	{
+		const Vector3& a = *left.Try_Get<Vector3>();
+		const Vector3& b = *right.Try_Get<Vector3>();
+		return a.x == b.x && a.y == b.y && a.z == b.z;
+	}
+	case REFLECTION_VALUE_TYPE::FLOAT3:
+	{
+		const Float3& a = *left.Try_Get<Float3>();
+		const Float3& b = *right.Try_Get<Float3>();
+		return a.x == b.x && a.y == b.y && a.z == b.z;
+	}
+	case REFLECTION_VALUE_TYPE::COLOR:
+	{
+		const Color& a = *left.Try_Get<Color>();
+		const Color& b = *right.Try_Get<Color>();
+		return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+	}
+	case REFLECTION_VALUE_TYPE::FLOAT4:
+	{
+		const Float4& a = *left.Try_Get<Float4>();
+		const Float4& b = *right.Try_Get<Float4>();
+		return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+	}
+	case REFLECTION_VALUE_TYPE::ANIMATION_PRESET:
+		return *left.Try_Get<AnimationPresetSnapshot>() ==
+			*right.Try_Get<AnimationPresetSnapshot>();
+	case REFLECTION_VALUE_TYPE::OBJECT_REF:
+		return *left.Try_Get<ObjectGuid>() == *right.Try_Get<ObjectGuid>();
+	}
+
+	return false;
 }
 
 wstring Make_UniqueName(const Shared<GameObject>& object, uint32 levelIndex)
@@ -153,17 +218,44 @@ void EditorManager::Queue_Reorder(ObjectGuid targetGuid, size_t targetIndex, uin
 }
 
 void EditorManager::Queue_Spawn(const wstring& prototypeTag, uint32 levelIndex,
-	ObjectGuid parentGuid, size_t targetIndex)
+	ObjectGuid parentGuid, size_t targetIndex, optional<Vector3> spawnPosition)
 {
     if (!prototypeTag.empty())
 		m_PendingMutations.push_back({ MUTATION_TYPE::SPAWN, {}, parentGuid,
-			levelIndex, prototypeTag, targetIndex });
+			levelIndex, prototypeTag, targetIndex, spawnPosition });
 }
 
 void EditorManager::Queue_Duplicate(ObjectGuid targetGuid, uint32 levelIndex)
 {
 	if (targetGuid.Is_Valid())
 		m_PendingMutations.push_back({ MUTATION_TYPE::DUPLICATE, targetGuid, {}, levelIndex, {} });
+}
+
+void EditorManager::Queue_PropertyWrite(const Shared<GameObject>& owner, Object& target,
+	std::string_view propertyName, const ReflectionValue& before,
+	const ReflectionValue& after, Bool beginGesture)
+{
+	if (!owner || owner->Is_Destroy() || propertyName.empty() ||
+		!before.Is_Valid() || !after.Is_Valid() ||
+		ReflectionValuesEqual(before, after))
+		return;
+
+	MUTATION_COMMAND command;
+	command.type = MUTATION_TYPE::PROPERTY_WRITE;
+	command.targetGuid = owner->Get_ObjectGuid();
+	if (FAILED(GAME_INSTANCE->Find_Level(command.targetGuid, command.levelIndex)))
+		return;
+	if (&target != owner.get()) {
+		command.targetRegisteredName =
+			GAME_INSTANCE->Find_RegisteredName(target.Get_RuntimeTypeId());
+		if (command.targetRegisteredName.empty())
+			return;
+	}
+	command.propertyName = propertyName;
+	command.beforeValue = before;
+	command.afterValue = after;
+	command.beginGesture = beginGesture;
+	m_PendingMutations.push_back(std::move(command));
 }
 
 void EditorManager::Queue_Undo()
@@ -242,6 +334,33 @@ Bool EditorManager::Place_Object(const Shared<GameObject>& object,
 	}
 
 	return SUCCEEDED(object->Set_Parent(parent, L"", placement.childIndex));
+}
+
+Shared<Object> EditorManager::Resolve_PropertyTarget(ObjectGuid ownerGuid,
+	std::string_view targetRegisteredName) const
+{
+	const Shared<GameObject> owner = GAME_INSTANCE->Find(ownerGuid);
+	if (!owner || owner->Is_Destroy())
+		return nullptr;
+	if (targetRegisteredName.empty())
+		return static_pointer_cast<Object>(owner);
+	if (const Shared<Transform> transform = owner->Get_Transform();
+		transform && GAME_INSTANCE->Find_RegisteredName(
+			transform->Get_RuntimeTypeId()) == targetRegisteredName)
+		return static_pointer_cast<Object>(transform);
+
+	const auto matchesType = [targetRegisteredName](const Shared<Component>& component) {
+		return component && GAME_INSTANCE->Find_RegisteredName(
+			component->Get_RuntimeTypeId()) == targetRegisteredName;
+	};
+	for (const Shared<Component>& component : owner->Get_Components())
+		if (matchesType(component))
+			return static_pointer_cast<Object>(component);
+	for (const Shared<ScriptComponent>& script : owner->Get_Scripts())
+		if (matchesType(script))
+			return static_pointer_cast<Object>(script);
+
+	return nullptr;
 }
 
 Bool EditorManager::Capture_Subtree(const Shared<GameObject>& root,
@@ -344,6 +463,28 @@ Bool EditorManager::Apply_History(const HISTORY_ENTRY& entry, Bool undo)
 	{
 		const Shared<GameObject> object = GAME_INSTANCE->Find(entry.targetGuid);
 		return object && Place_Object(object, undo ? entry.before : entry.after);
+	}
+
+	case HISTORY_TYPE::PROPERTY:
+	{
+		const Shared<GameObject> owner = GAME_INSTANCE->Find(entry.targetGuid);
+		const Shared<Object> target = Resolve_PropertyTarget(
+			entry.targetGuid, entry.targetRegisteredName);
+		if (!owner || !target)
+			return false;
+
+		ReflectionValue current;
+		const ReflectionValue& expected = undo ? entry.afterValue : entry.beforeValue;
+		const ReflectionValue& desired = undo ? entry.beforeValue : entry.afterValue;
+		if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(
+			*target, entry.propertyName, current)) ||
+			!ReflectionValuesEqual(current, expected) ||
+			FAILED(GAME_INSTANCE->Write_ReflectedProperty(
+				*target, entry.propertyName, desired)))
+			return false;
+		if (dynamic_pointer_cast<Transform>(target))
+			Refresh_DescendantTransforms(owner);
+		return true;
 	}
 	}
 
@@ -501,6 +642,8 @@ Bool EditorManager::Apply_Mutation(const MUTATION_COMMAND& command)
 		}
 
         cloned->Set_Name(Make_UniqueName(cloned, command.levelIndex));
+		if (command.spawnPosition && cloned->Get_Transform())
+			cloned->Get_Transform()->Set_LocalPositionByValue(*command.spawnPosition);
 		if (parent && FAILED(cloned->Set_Parent(parent, L"", command.targetIndex)))
         {
             GAME_INSTANCE->Destroy(cloned->Get_ObjectGuid());
@@ -568,6 +711,49 @@ Bool EditorManager::Apply_Mutation(const MUTATION_COMMAND& command)
 		}
 		Record_History(std::move(history));
 		Set_SelectedObject(duplicate);
+		return true;
+	}
+
+	case MUTATION_TYPE::PROPERTY_WRITE:
+	{
+		if (!target || target->Is_Destroy() ||
+			!Belongs_To_Level(target, command.levelIndex))
+			return false;
+
+		const Shared<Object> propertyTarget = Resolve_PropertyTarget(
+			command.targetGuid, command.targetRegisteredName);
+		ReflectionValue current;
+		if (!propertyTarget || FAILED(GAME_INSTANCE->Read_ReflectedProperty(
+			*propertyTarget, command.propertyName, current)) ||
+			!ReflectionValuesEqual(current, command.beforeValue) ||
+			FAILED(GAME_INSTANCE->Write_ReflectedProperty(
+				*propertyTarget, command.propertyName, command.afterValue)))
+			return false;
+		if (dynamic_pointer_cast<Transform>(propertyTarget))
+			Refresh_DescendantTransforms(target);
+
+		HISTORY_ENTRY history;
+		history.type = HISTORY_TYPE::PROPERTY;
+		history.targetGuid = command.targetGuid;
+		history.levelIndex = command.levelIndex;
+		history.targetRegisteredName = command.targetRegisteredName;
+		history.propertyName = command.propertyName;
+		history.beforeValue = command.beforeValue;
+		history.afterValue = command.afterValue;
+
+		if (!command.beginGesture && !m_UndoHistory.empty()) {
+			HISTORY_ENTRY& previous = m_UndoHistory.back();
+			if (previous.type == HISTORY_TYPE::PROPERTY &&
+				previous.targetGuid == history.targetGuid &&
+				previous.targetRegisteredName == history.targetRegisteredName &&
+				previous.propertyName == history.propertyName) {
+				previous.afterValue = history.afterValue;
+				m_RedoHistory.clear();
+				return true;
+			}
+		}
+
+		Record_History(std::move(history));
 		return true;
 	}
 
@@ -642,7 +828,7 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     Shared<Camera> pCurrentMain = GAME_INSTANCE->Get_MainCamera();
     
     // 만약 엔진의 메인 카메라가 있고, 그게 에디터 카메라가 아니라면 우선적으로 채택
-    if (pCurrentMain && pCurrentMain->Get_InstanceID() != m_EditorCamera->Get_InstanceID())
+    if (pCurrentMain && pCurrentMain != m_EditorCamera)
     {
         m_InGameCamera = pCurrentMain;
     }
@@ -652,7 +838,7 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         m_InGameCamera = nullptr;
         for (auto& pCam : GAME_INSTANCE->Get_Cameras(GAME_INSTANCE->Get_CurrentLevelIndex()))
         {
-            if (pCam && pCam->Get_InstanceID() != m_EditorCamera->Get_InstanceID())
+            if (pCam && pCam != m_EditorCamera)
             {
                 m_InGameCamera = pCam;
                 break;

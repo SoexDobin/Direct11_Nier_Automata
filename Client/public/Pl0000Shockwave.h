@@ -47,7 +47,7 @@ private:
 	Bool isFirstFrame{ true };
 	Shared<SphereCollider> m_ShockwaveCollider{ nullptr };
 	Entity::DAMAGE_INFO m_DamageInfo{};
-	unordered_set<uint32> m_HitEntities;
+	unordered_set<RuntimeObjectId> m_HitEntities;
 
 public:
 	static Shared<Pl0000Shockwave> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

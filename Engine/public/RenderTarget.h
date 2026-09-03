@@ -15,7 +15,6 @@ public:
 public:
 	HRESULT Initialize(uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& clearColor);
 	HRESULT Begin() override;
-	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; };
 
 	ComPtr<ID3D11RenderTargetView> Get_RenderTargetView() const { return m_RenderTargetView; }
 	ComPtr<ID3D11ShaderResourceView> Get_ShaderResourceView() const { return m_ShaderResourceView; }

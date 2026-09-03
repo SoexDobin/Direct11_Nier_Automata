@@ -25,7 +25,6 @@ private:
 
 public:
   virtual COMPONENT_TYPE Get_ComponentType() const PURE;
-  PROTOTYPE Get_Prototype() const final { return PROTOTYPE::COMPONENT; }
 
 public:
   virtual HRESULT Initialize_Prototype() override;
@@ -39,8 +38,6 @@ protected:
 public:
   constexpr virtual Shared<Component> Clone(void *arg = nullptr) PURE;
 
-private:
-  using Object::m_DescID;
 };
 
 NS_END

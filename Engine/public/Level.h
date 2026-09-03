@@ -26,7 +26,6 @@ public:
   void On_Disable() override { Object::On_Disable(); }
   void On_Enable() override { Object::On_Enable(); }
   void Set_Active(Bool isActive) override { Object::Set_Active(isActive); }
-  PROTOTYPE Get_Prototype() const final { return PROTOTYPE::LEVEL; }
 
 public:
 	virtual void Update_Level(Float timeDelta);

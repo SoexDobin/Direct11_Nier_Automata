@@ -1,9 +1,11 @@
 #pragma once
 #include "EditorCamera.h"
+#include "Engine_Reflection.h"
 
 NS_BEGIN(Engine)
 class Camera;
 class GameObject;
+class Object;
 NS_END
 
 NS_BEGIN(Editor)
@@ -50,8 +52,12 @@ public: /* Frame-safe structural mutations */
 	  size_t targetIndex = numeric_limits<size_t>::max());
   void Queue_Reorder(ObjectGuid targetGuid, size_t targetIndex, uint32 levelIndex);
   void Queue_Spawn(const wstring& prototypeTag, uint32 levelIndex, ObjectGuid parentGuid = {},
-	  size_t targetIndex = numeric_limits<size_t>::max());
+	  size_t targetIndex = numeric_limits<size_t>::max(),
+	  optional<Vector3> spawnPosition = nullopt);
 	void Queue_Duplicate(ObjectGuid targetGuid, uint32 levelIndex);
+	void Queue_PropertyWrite(const Shared<Engine::GameObject>& owner, Engine::Object& target,
+		std::string_view propertyName, const ReflectionValue& before,
+		const ReflectionValue& after, Bool beginGesture);
 	void Queue_Undo();
 	void Queue_Redo();
 	void Clear_History();
@@ -130,6 +136,7 @@ private:
 		REORDER,
         SPAWN,
 		DUPLICATE,
+		PROPERTY_WRITE,
 		UNDO,
 		REDO,
     };
@@ -142,6 +149,12 @@ private:
         uint32 levelIndex{};
         wstring prototypeTag;
 		size_t targetIndex{ numeric_limits<size_t>::max() };
+		optional<Vector3> spawnPosition;
+		string targetRegisteredName;
+		string propertyName;
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
+		Bool beginGesture{ true };
     };
 
 	enum class HISTORY_TYPE
@@ -149,6 +162,7 @@ private:
 		ADD_SUBTREE,
 		REMOVE_SUBTREE,
 		MOVE,
+		PROPERTY,
 	};
 
 	struct HIERARCHY_PLACEMENT
@@ -166,6 +180,10 @@ private:
 		HIERARCHY_PLACEMENT after{};
 		PrefabGuid snapshotGuid{};
 		string snapshot;
+		string targetRegisteredName;
+		string propertyName;
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
 	};
 
     void Flush_PendingMutations();
@@ -179,6 +197,8 @@ private:
 		Shared<Engine::GameObject>& outRoot) const;
 	Bool Place_Object(const Shared<Engine::GameObject>& object,
 		const HIERARCHY_PLACEMENT& placement) const;
+	Shared<Engine::Object> Resolve_PropertyTarget(ObjectGuid ownerGuid,
+		std::string_view targetRegisteredName) const;
 	HIERARCHY_PLACEMENT Get_Placement(const Shared<Engine::GameObject>& object) const;
 	void Record_History(HISTORY_ENTRY entry);
 

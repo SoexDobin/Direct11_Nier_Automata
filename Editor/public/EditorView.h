@@ -21,6 +21,7 @@ private:
 
 private:
 	Bool m_PlayMode = { false };
+	Bool m_WasUsingGizmo = { false };
 
 public:
 	static Shared<EditorView> Create();

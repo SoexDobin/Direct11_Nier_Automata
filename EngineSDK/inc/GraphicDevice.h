@@ -26,7 +26,6 @@ public:
     void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref);
 
 public:
-    PROTOTYPE Get_Prototype() const override { return PROTOTYPE::OBJECT; }
     HRESULT Initialize(const ENGINE_DESC &engineDesc);
     void On_Destroy() override;
     HRESULT Clear_BackBufferView(const Shared<Float4> &clearColor) const;

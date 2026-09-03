@@ -31,7 +31,8 @@ public:
 private:
 	void GameObjectGUI(const Shared<Engine::GameObject>& obj);
 	void Draw_GameObjectHeader(const Shared<Engine::GameObject>& obj);
-	void RenderGenericProperties(Engine::Object& object);
+	void RenderGenericProperties(const Shared<Engine::GameObject>& owner,
+		Engine::Object& object);
 
 private:
     Shared<InspectorTransform> m_InspectorTransform{ nullptr };
@@ -39,7 +40,7 @@ private:
     Shared<InspectorTexture> m_InspectorTexture{ nullptr };
     Shared<InspectorCamera> m_InspectorCamera{ nullptr };
 	Shared<InspectorCollider> m_InspectorCollider{ nullptr };
-    uint32 m_iPrevSelectedID{ 0 };
+	ObjectGuid m_PreviousSelectedGuid{};
 
 private:
 	char m_LayerNames[32][64] = { 0 };

@@ -14,7 +14,6 @@ public:
 public:
 	HRESULT Initialize_Prototype(const tChar* fontFilePath);
 	HRESULT Initialize(void* arg) override;
-	PROTOTYPE Get_Prototype() const override { return PROTOTYPE::FONT; }
 
 public:
 	void Draw(const tChar* text, const Vector2& position, const Color& color);

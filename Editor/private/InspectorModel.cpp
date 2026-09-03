@@ -26,12 +26,16 @@ namespace
 	}
 
 	template <typename T>
-	Bool WriteModelValue(Object& object, std::string_view propertyName, const T& value)
+	void QueueModelValue(const Shared<GameObject>& owner, Object& object,
+		std::string_view propertyName, const T& before, const T& after,
+		Bool beginGesture = true)
 	{
-		ReflectionValue reflectedValue;
-		reflectedValue.data = value;
-		return SUCCEEDED(GAME_INSTANCE->Write_ReflectedProperty(
-			object, propertyName, reflectedValue));
+		ReflectionValue beforeValue;
+		ReflectionValue afterValue;
+		beforeValue.data = before;
+		afterValue.data = after;
+		EDITOR->Queue_PropertyWrite(owner, object, propertyName,
+			beforeValue, afterValue, beginGesture);
 	}
 }
 
@@ -94,7 +98,8 @@ void InspectorModel::RenderComponent(const Shared<Component>& pComp)
 
                     if (requiredType == droppedType)
                     {
-						WriteModelValue(*pComp, "ModelTag", Helper::To_wString(droppedTag));
+						QueueModelValue(pComp->Get_Owner(), *pComp, "ModelTag",
+							currentTag, Helper::To_wString(droppedTag));
                     }
                 }
             }
@@ -134,11 +139,18 @@ void InspectorModel::RenderComponent(const Shared<Component>& pComp)
 		}
 		if (ImGui::Button("Apply Preset Snapshot"))
 		{
+			AnimationPresetSnapshot preset;
+			string presetName;
 			string error;
-			m_PresetStatus = SUCCEEDED(AnimationPresetEditor::Apply_PresetFile(
-				*pComp, m_SelectedPresetPath, error))
-				? "Preset snapshot applied; Scene/Prefab save will persist the full mapping."
-				: "Preset apply failed: " + error;
+			if (AnimationPresetEditor::Load_Document(
+				m_SelectedPresetPath, preset, presetName, error)) {
+				QueueModelValue(pComp->Get_Owner(), *pComp, "AnimationPreset",
+					appliedPreset, preset);
+				m_PresetStatus = "Preset snapshot queued; Scene/Prefab save will persist the full mapping.";
+			}
+			else {
+				m_PresetStatus = "Preset apply failed: " + error;
+			}
 		}
 		if (!m_PresetStatus.empty())
 			ImGui::TextWrapped("%s", m_PresetStatus.c_str());

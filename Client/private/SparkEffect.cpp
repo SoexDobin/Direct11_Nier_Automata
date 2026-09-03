@@ -58,7 +58,7 @@ void SparkEffect::Update(Float timeDelta)
 	
 	if (m_Acc >= 0.25f)
 	{
-		Object::Destroy(shared_from_this());
+		GAME_INSTANCE->Destroy(Get_ObjectGuid());
 		return; 
 	}
 

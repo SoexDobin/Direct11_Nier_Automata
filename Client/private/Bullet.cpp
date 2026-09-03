@@ -55,7 +55,7 @@ void Bullet::Update(Float timeDelta)
 
 	if (m_TravelDistance >= m_Desc.maxDistance)
 	{
-		Object::Destroy(shared_from_this());
+		GAME_INSTANCE->Destroy(Get_ObjectGuid());
 		return;
 	}
 	// 직진 이동
@@ -105,7 +105,7 @@ void Bullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 
 		if (otherBullet->Is_Permanent() || m_Desc.isPermanent) return;
 		if (m_Desc.targetLayer == otherBullet->Get_TargetLayerName()) return;
-		Destroy(shared_from_this());
+		GAME_INSTANCE->Destroy(Get_ObjectGuid());
 		return;
 	}
 
@@ -121,7 +121,7 @@ void Bullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 
 		auto monster = static_pointer_cast<Monster>(entity);
 		monster->TakeDamage(m_DamageInfo);
-		Destroy(shared_from_this());
+		GAME_INSTANCE->Destroy(Get_ObjectGuid());
 		return;
 	}
 	
@@ -131,7 +131,7 @@ void Bullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 			&& false == m_Desc.isPermanent)
 		{
 			if (m_Desc.isPermanent) return;
-			Destroy(shared_from_this());
+			GAME_INSTANCE->Destroy(Get_ObjectGuid());
 			return;
 		}
 		if (layerTag == L"Player")
@@ -139,7 +139,7 @@ void Bullet::OnCollisionEnter(const Shared<Collider>& ownCollider, const Shared<
 			m_DamageInfo.hitPosition = targetCollider->ClosestPoint(ownCollider->Get_Pivot());
 			auto player = static_pointer_cast<Pl0000>(entity);
 			player->TakeDamage(m_DamageInfo);
-			Destroy(shared_from_this());
+			GAME_INSTANCE->Destroy(Get_ObjectGuid());
 		}
 		return;
 	}

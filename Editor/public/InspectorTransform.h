@@ -18,9 +18,6 @@ public:
 	void Render(Bool isResize) override {} // Not used directly in polling anymore
 	void RenderComponent(const std::shared_ptr<Engine::Transform>& transform);
 
-private:
-	void CheckPart(const Shared<GameObject>& isPart);
-
 public:
 	static std::shared_ptr<InspectorTransform> Create();
 };

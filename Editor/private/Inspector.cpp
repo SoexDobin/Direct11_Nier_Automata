@@ -45,14 +45,14 @@ void Inspector::Render(Bool isResize) {
 
     Shared<GameObject> selected = EDITOR->Get_SelectedObject();
     if (!selected) {
-		m_iPrevSelectedID = 0;
+		m_PreviousSelectedGuid = {};
 		ImGui::TextDisabled("No object selected.");
 		ImGui::End();
 		return;
     }
 
-    if (m_iPrevSelectedID != selected->Get_ObjectID()) {
-        m_iPrevSelectedID = selected->Get_ObjectID();
+    if (m_PreviousSelectedGuid != selected->Get_ObjectGuid()) {
+        m_PreviousSelectedGuid = selected->Get_ObjectGuid();
     }
 
     GameObjectGUI(selected);
@@ -143,7 +143,7 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
 
 	if (!GAME_INSTANCE->Get_ReflectedProperties(*obj).empty()) {
 		if (ImGui::CollapsingHeader("Properties", ImGuiTreeNodeFlags_DefaultOpen))
-			RenderGenericProperties(*obj);
+			RenderGenericProperties(obj, *obj);
 		ImGui::Separator();
 	}
 
@@ -184,7 +184,7 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
 				if (typeName.empty())
 					typeName = "<Unregistered Component>";
                 if (ImGui::CollapsingHeader(typeName.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-					RenderGenericProperties(*pComp);
+					RenderGenericProperties(obj, *pComp);
                 }
             }
         }
@@ -202,13 +202,13 @@ void Inspector::GameObjectGUI(const Shared<GameObject>& obj) {
 			if (typeName.empty())
 				typeName = "<Unregistered Script>";
             if (ImGui::CollapsingHeader(typeName.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-				RenderGenericProperties(*pScript);
+				RenderGenericProperties(obj, *pScript);
             }
         }
     }
 }
 
-void Inspector::RenderGenericProperties(Object& object)
+void Inspector::RenderGenericProperties(const Shared<GameObject>& owner, Object& object)
 {
 	const vector<ReflectedPropertyInfo> properties =
 		GAME_INSTANCE->Get_ReflectedProperties(object);
@@ -224,6 +224,7 @@ void Inspector::RenderGenericProperties(Object& object)
 			ImGui::TextDisabled("%s: unavailable", property.registeredName.c_str());
 			continue;
 		}
+		const ReflectionValue beforeValue = value;
 
 		ImGui::PushID(property.registeredName.c_str());
 		Bool changed = false;
@@ -366,11 +367,10 @@ void Inspector::RenderGenericProperties(Object& object)
 			break;
 		}
 
-		if (changed && property.isWritable &&
-			FAILED(GAME_INSTANCE->Write_ReflectedProperty(
-				object, property.registeredName, value))) {
-			ImGui::TextDisabled("Write rejected; value was not changed.");
-		}
+		if (changed && property.isWritable)
+			EDITOR->Queue_PropertyWrite(owner, object, property.registeredName,
+				beforeValue, value,
+				ImGui::IsItemActivated() || !ImGui::IsItemActive());
 		ImGui::PopID();
 	}
 }
@@ -380,7 +380,7 @@ void Inspector::Draw_GameObjectHeader(const Shared<Engine::GameObject>& obj)
     // 이름
     string name = Helper::To_String(obj->Get_Name());
     ImGui::Text("Name : %s", name.c_str());
-    ImGui::Text("ID   : %u", obj->Get_InstanceID());
+    ImGui::Text("GUID : %s", To_String(obj->Get_ObjectGuid()).c_str());
     
     ImGui::Separator();
 

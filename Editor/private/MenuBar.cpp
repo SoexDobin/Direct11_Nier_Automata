@@ -317,7 +317,7 @@ void MenuBar::Update_HotKey()
 		if (selected && EDITOR->Can_EditHierarchy(selected))
 		{
 			uint32 levelIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
-			if (!GAME_INSTANCE->Get_GameObjects(levelIndex).contains(selected->Get_InstanceID()))
+			if (!GAME_INSTANCE->Contains(levelIndex, selected->Get_ObjectGuid()))
 				levelIndex = 0;
 			EDITOR->Queue_Duplicate(selected->Get_ObjectGuid(), levelIndex);
 		}

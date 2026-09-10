@@ -15,6 +15,7 @@ EngineSDK/
 *.userosscache
 *.sln.docstates
 *.env
+*codex-tmp/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

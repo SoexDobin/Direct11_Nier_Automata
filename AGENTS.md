@@ -13,17 +13,7 @@ This repository uses the Project Vault as its durable project memory. This file 
 
 ## Mandatory Entry Flow
 
-Before any project-specific analysis, recommendation, implementation plan, code edit, build, verification, or review:
-
-1. Run `git status --short` and preserve unrelated user changes.
-2. Read this file.
-3. Read the Vault root `AGENTS.md`, `index.md`, and `log.md`.
-4. Read the Vault project hub `AI-Sessions/wiki/projects/Direct11_Nier_Automata.md`.
-5. Search the hub, recent relevant log entries, and `AI-Sessions/wiki/projects/Direct11_Nier_Automata/` for request keywords, aliases, affected systems, and Wiki links.
-6. Read relevant decisions, errors, design notes, dev-task summaries, handoffs, and project rules before acting.
-7. Report the preflight files and searches for non-trivial work or code changes.
-
-If the Vault root or project hub is missing, unreadable, or ambiguous, stop before substantive project work and ask the user.
+Follow the Vault root AGENTS.md Context Entry and Reuse policy: first project entry restores this file, Git state, the hub and relevant evidence; same-task follow-ups reuse applicable context and recheck affected changes only. Check descendant AGENTS for selected source paths. Missing project registration still requires clarification.
 
 ## Repository Scope
 
@@ -43,14 +33,14 @@ Do not treat generated files, copied SDK outputs, project data, or external reso
 
 ## Build and Verification
 
-- The solution entry point is `NieRAutomata.sln`.
-- Verified on 2026-08-28 with Visual Studio 2022, Debug|x64:
-  - Engine: `MSBuild.exe NieRAutomata.sln /t:Engine /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
-  - Client: `MSBuild.exe NieRAutomata.sln /t:Client /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
-  - Editor: `MSBuild.exe NieRAutomata.sln /t:Editor /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
-- Building `Engine\default\Engine.vcxproj` or `Client\default\Client.vcxproj` directly is unsupported because their build steps require the solution-level `$(SolutionDir)` value.
-- Do not claim build success until the exact Visual Studio/MSBuild command, configuration, and platform have run successfully.
-- When a build command is verified, record it in both this file and the Vault project hub.
+- Solution entry: `NieRAutomata.sln`. VS2022 Debug x64 command:
+  `MSBuild.exe NieRAutomata.sln /t:Engine,Client,Editor,Launcher /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
+- Direct Engine/default/Engine.vcxproj or Client/default/Client.vcxproj builds are unsupported because their steps require `$(SolutionDir)`.
+- Do not claim current build success until the exact command/configuration/platform succeeds. Keep validation evidence in the active Vault task; update this file only when the supported build procedure changes.
+- The latest recorded AnimationPreset build/runtime checks passed on 2026-09-10, but actual game-view motion/input and MRT/offscreen resize remain pending; no playable-slice completion claim.
+- Authoring gates can rewrite product Scene/Prefab data. Read the active task's failure/validation section before selecting regression commands. Preserve GUIDs and non-target authored properties.
+- Do not use plXXXX.fbx for routine ModelConverter regression: conversion may exceed 20 minutes. Use small weapon fixtures; full resources require the requested full-resource scope.
+- Historical validation and pre-refactor instructions are preserved in the project's `handoffs/컨텍스트_개편_이전_진입문서_2026-09-10.md` in the Vault.
 
 ## Safety and Existing State
 

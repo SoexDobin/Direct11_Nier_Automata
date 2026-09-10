@@ -61,6 +61,7 @@ HRESULT Pl0000Movement::Begin()
 void Pl0000Movement::Update_Movement(Float timeDelta)
 {
 	if (m_Owner.expired() || m_Input.expired() || m_Navigation.expired()) return;
+	if (m_Navigation.lock()->Get_NumCells() == 0) return;
 
 	Shared<Transform> ownerTransform = m_Owner.lock()->Get_Transform();
 

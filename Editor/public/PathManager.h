@@ -15,6 +15,7 @@ public:
     m_SceneSettingsDir = m_ProjectSettingDir + L"Scene/";
     m_PrefabSettingsDir = m_ProjectSettingDir + L"Prefab/";
 	  m_AnimationPresetSettingsDir = m_ProjectSettingDir + L"AnimationPreset/";
+	  m_MaterialSettingsDir = m_ProjectSettingDir + L"Material/";
     m_LayerSettingsPath = m_ProjectSettingDir + L"LayerSettings.json";
     m_TagSettingsPath = m_ProjectSettingDir + L"TagSettings.json";
     m_EngineDescSettingsPath = m_ProjectSettingDir + L"EngineDesc.json";
@@ -43,6 +44,7 @@ public:
   const wstring& GetModelsDir() const { return m_ModelsDir; }
   const wstring& GetPrefabSettingsDir() const { return m_PrefabSettingsDir; }
 	const wstring& GetAnimationPresetSettingsDir() const { return m_AnimationPresetSettingsDir; }
+	const wstring& GetMaterialSettingsDir() const { return m_MaterialSettingsDir; }
 	const wstring& GetResourceDir() const { return m_ResourceDir; }
   const wstring& GetNavDataDir() const { return m_NavDataDir; }
   const wstring& GetClientProjectDir() const { return m_ClientProjectDir; }
@@ -65,6 +67,7 @@ private:
   wstring m_ModelsDir = L"../../Assets/Models/";
   wstring m_PrefabSettingsDir = L"../../ProjectSetting/Prefab/";
 	wstring m_AnimationPresetSettingsDir = L"../../ProjectSetting/AnimationPreset/";
+	wstring m_MaterialSettingsDir = L"../../ProjectSetting/Material/";
 	wstring m_ResourceDir = L"../../Client/bin/Resources/";
   wstring m_NavDataDir = L"../../ProjectSetting/NavData/";
   wstring m_ClientProjectDir = L"../../Client/";

@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "Animation.h"
 #include "AnimationTracker.h"
+#include <nlohmann/json.hpp>
 
 #include <fstream>
 #include <istream>
@@ -13,6 +14,183 @@
 
 namespace
 {
+	using json = nlohmann::json;
+
+	string To_Utf8Path(const filesystem::path& path)
+	{
+		const std::u8string value = path.generic_u8string();
+		return string{ value.begin(), value.end() };
+	}
+
+	Bool Is_SafeResourcePath(const string& value)
+	{
+		if (value.empty() || value.find('\\') != string::npos)
+			return false;
+
+		const filesystem::path path = filesystem::path(Helper::To_wString(value));
+		if (path.is_absolute() || path.has_root_name() || path.has_root_directory())
+			return false;
+		if (To_Utf8Path(path.lexically_normal()) != value)
+			return false;
+
+		Bool firstPart = true;
+		for (const filesystem::path& part : path)
+		{
+			if (part == L"." || part == L"..")
+				return false;
+			if (firstPart)
+			{
+				wstring name = part.wstring();
+				std::ranges::transform(name, name.begin(), [](wchar_t ch) {
+					return static_cast<wchar_t>(::towlower(ch));
+				});
+				if (name == L"resources")
+					return false;
+				firstPart = false;
+			}
+		}
+		return true;
+	}
+
+	Bool Parse_MaterialSettingsDocument(const filesystem::path& settingsPath,
+		const wstring& expectedModelTag, const string& expectedModelPath,
+		const vector<string>& materialNames, MODEL_MATERIAL_SETTINGS& outSettings,
+		string& outError)
+	{
+		outError.clear();
+		try
+		{
+			ifstream in(settingsPath, ios::binary);
+			if (!in.is_open())
+			{
+				outError = "unable to open material settings";
+				return false;
+			}
+
+			json document;
+			in >> document;
+			if (!document.is_object() || document.value("schemaVersion", 0u) != 1u)
+			{
+				outError = "unsupported material settings schema";
+				return false;
+			}
+
+			const string expectedTag = Helper::To_String(expectedModelTag);
+			if (!document.contains("modelTag") || !document["modelTag"].is_string() ||
+				document["modelTag"].get<string>() != expectedTag)
+			{
+				outError = "material settings modelTag mismatch";
+				return false;
+			}
+
+			if (!document.contains("modelPath") || !document["modelPath"].is_string())
+			{
+				outError = "material settings modelPath is missing";
+				return false;
+			}
+			const string modelPath = document["modelPath"].get<string>();
+			if (!Is_SafeResourcePath(modelPath) || modelPath != expectedModelPath)
+			{
+				outError = "material settings modelPath is unsafe or does not match the model";
+				return false;
+			}
+
+			if (!document.contains("materials") || !document["materials"].is_array() ||
+				document["materials"].size() != materialNames.size())
+			{
+				outError = "material settings must contain exactly one entry per model material";
+				return false;
+			}
+
+			MODEL_MATERIAL_SETTINGS candidate;
+			candidate.modelTag = expectedTag;
+			candidate.modelPath = modelPath;
+			candidate.materials.reserve(materialNames.size());
+			unordered_set<uint32> usedIndices;
+			for (const json& item : document["materials"])
+			{
+				if (!item.is_object() || !item.contains("materialIndex") ||
+					!item["materialIndex"].is_number_unsigned())
+				{
+					outError = "materialIndex must be an unsigned integer";
+					return false;
+				}
+
+				MODEL_MATERIAL_SETTING setting;
+				setting.materialIndex = item["materialIndex"].get<uint32>();
+				if (setting.materialIndex >= materialNames.size() ||
+					!usedIndices.insert(setting.materialIndex).second)
+				{
+					outError = "duplicate or out-of-range materialIndex";
+					return false;
+				}
+
+				if (!item.contains("sourceMaterialName") || !item["sourceMaterialName"].is_string())
+				{
+					outError = "sourceMaterialName is missing";
+					return false;
+				}
+				setting.sourceMaterialName = item["sourceMaterialName"].get<string>();
+				if (setting.sourceMaterialName != materialNames[setting.materialIndex])
+				{
+					outError = "sourceMaterialName does not match the model material index";
+					return false;
+				}
+
+				setting.sourceShaderName = item.value("sourceShaderName", string{});
+				setting.sourceTechniqueName = item.value("sourceTechniqueName", string{});
+				setting.passName = item.value("passName", string{});
+				if (setting.passName.empty() || setting.passName == "Unresolved")
+				{
+					outError = "passName must be resolved before saving";
+					return false;
+				}
+
+				const string renderGroup = item.value("renderGroup", string{});
+				if (renderGroup == "NONBLEND")
+					setting.isBlend = false;
+				else if (renderGroup == "BLEND")
+					setting.isBlend = true;
+				else
+				{
+					outError = "renderGroup must be NONBLEND or BLEND";
+					return false;
+				}
+
+				if (!item.contains("textures") || !item["textures"].is_object())
+				{
+					outError = "textures must be an object";
+					return false;
+				}
+				for (auto textureIt = item["textures"].begin(); textureIt != item["textures"].end(); ++textureIt)
+				{
+					if (textureIt.key().empty() || !textureIt.value().is_string())
+					{
+						outError = "texture slot and path must be strings";
+						return false;
+					}
+					const string resourcePath = textureIt.value().get<string>();
+					if (!Is_SafeResourcePath(resourcePath))
+					{
+						outError = "unsafe texture resource path";
+						return false;
+					}
+					setting.textures.push_back({ textureIt.key(), resourcePath });
+				}
+				candidate.materials.push_back(std::move(setting));
+			}
+
+			std::ranges::sort(candidate.materials, {}, &MODEL_MATERIAL_SETTING::materialIndex);
+			outSettings = std::move(candidate);
+			return true;
+		}
+		catch (const std::exception& exception)
+		{
+			outError = exception.what();
+			return false;
+		}
+	}
+
 	wstring Find_ResourceRoot(const tChar* modelFilePath)
 	{
 		if (!modelFilePath || !*modelFilePath)
@@ -65,6 +243,9 @@ Model::Model(const Model& rhs)
 	m_NumBones {rhs.m_NumBones}, m_NumAnimation{rhs.m_NumAnimation},
 	m_ModelTag { rhs.m_ModelTag },
 	m_ResourceRootPath{ rhs.m_ResourceRootPath },
+	m_ModelFilePath{ rhs.m_ModelFilePath },
+	m_ModelResourcePath{ rhs.m_ModelResourcePath },
+	m_MaterialSettings{ rhs.m_MaterialSettings },
 	m_AnimationPreset{ rhs.m_AnimationPreset },
 	m_Tracker{ nullptr }
 {
@@ -82,6 +263,18 @@ HRESULT Model::Initialize_Prototype(const tChar* modelFilePath, const Matrix& pr
 {
 	m_PreLocalTransformMatrix = preLocalTransformMatrix;
 	m_ResourceRootPath = Find_ResourceRoot(modelFilePath);
+	std::error_code modelPathError;
+	m_ModelFilePath = filesystem::weakly_canonical(
+		filesystem::absolute(filesystem::path(modelFilePath), modelPathError), modelPathError).wstring();
+	if (modelPathError)
+		m_ModelFilePath = modelFilePath;
+	if (!m_ResourceRootPath.empty())
+	{
+		const filesystem::path relativePath = filesystem::relative(
+			filesystem::path(m_ModelFilePath), filesystem::path(m_ResourceRootPath), modelPathError);
+		if (!modelPathError)
+			m_ModelResourcePath = To_Utf8Path(relativePath);
+	}
 
 	ifstream in(modelFilePath, std::ios::binary);
 	if (!in.is_open())
@@ -141,6 +334,9 @@ HRESULT Model::Initialize(void* arg)
 
 HRESULT Model::Post_Load()
 {
+	if (m_AnimationPreset.Is_Empty() &&
+		(m_PendingAnimIndex != UINT32_MAX || !m_AnimationNotifyDefinitions.empty()))
+		LOG_WARN(L"[AnimationPreset] Model {} has no snapshot; animation requests remain pending", m_ModelTag);
 	return m_AnimationPreset.Is_Empty() ? S_OK : Apply_AnimationPreset(m_AnimationPreset);
 }
 
@@ -182,6 +378,9 @@ void Model::Set_ModelTag(const wstring& tag)
 	m_ModelTag = tag;
 	m_PreLocalTransformMatrix = prototype->m_PreLocalTransformMatrix;
 	m_ResourceRootPath = prototype->m_ResourceRootPath;
+	m_ModelFilePath = prototype->m_ModelFilePath;
+	m_ModelResourcePath = prototype->m_ModelResourcePath;
+	m_MaterialSettings = prototype->m_MaterialSettings;
 	m_AnimationPreset = prototype->m_AnimationPreset;
 	m_IsSkeletal = prototype->m_IsSkeletal;
 	m_NumMeshes = prototype->m_NumMeshes;
@@ -208,11 +407,191 @@ void Model::Set_ModelTag(const wstring& tag)
 	Update_ModelAnimation(0.f);
 }
 
+HRESULT Model::Get_MeshMaterialInfo(uint32 meshIndex, string& meshName, uint32& materialIndex) const
+{
+	if (meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex]) return E_INVALIDARG;
+	meshName = m_Meshes[meshIndex]->Get_MeshName();
+	materialIndex = m_Meshes[meshIndex]->Get_MaterialIndex();
+	return S_OK;
+}
+
+vector<string> Model::Get_MaterialNames() const
+{
+	vector<string> names;
+	names.reserve(m_Materials.size());
+	for (const Shared<Material>& material : m_Materials)
+		names.push_back(material ? material->Get_MaterialName() : string{});
+	return names;
+}
+
+wstring Model::Make_MaterialSettingsFileName(const wstring& modelTag)
+{
+	wstring fileName = modelTag;
+	for (wchar_t& ch : fileName)
+	{
+		if (ch < 0x20 || ch == L'<' || ch == L'>' || ch == L':' || ch == L'"' ||
+			ch == L'/' || ch == L'\\' || ch == L'|' || ch == L'?' || ch == L'*')
+			ch = L'_';
+	}
+	for (size_t index = fileName.size(); index > 0 &&
+		(fileName[index - 1] == L' ' || fileName[index - 1] == L'.'); --index)
+		fileName[index - 1] = L'_';
+	if (fileName.empty() || fileName == L"." || fileName == L"..")
+		fileName = L"_";
+	return fileName + L".json";
+}
+
+HRESULT Model::Validate_MaterialSettings(const filesystem::path& settingsPath,
+	const wstring& expectedModelTag) const
+{
+	if (!filesystem::is_regular_file(settingsPath))
+		return S_FALSE;
+
+	MODEL_MATERIAL_SETTINGS candidate;
+	string error;
+	if (!Parse_MaterialSettingsDocument(settingsPath, expectedModelTag,
+		m_ModelResourcePath, Get_MaterialNames(), candidate, error))
+	{
+		LOG_ERROR(L"Invalid material settings {} : {}", settingsPath.wstring(), Helper::To_wString(error));
+		return E_FAIL;
+	}
+	return S_OK;
+}
+
+HRESULT Model::Prepare_MaterialSettings(const filesystem::path& settingsPath,
+	const wstring& expectedModelTag, Shared<const MODEL_MATERIAL_SETTINGS>& prepared,
+	const Shared<Shader>& shader) const
+{
+	if (!filesystem::is_regular_file(settingsPath))
+		return S_FALSE;
+
+	MODEL_MATERIAL_SETTINGS candidate;
+	string error;
+	if (!Parse_MaterialSettingsDocument(settingsPath, expectedModelTag,
+		m_ModelResourcePath, Get_MaterialNames(), candidate, error))
+	{
+		LOG_ERROR(L"Invalid material settings {} : {}", settingsPath.wstring(), Helper::To_wString(error));
+		return E_FAIL;
+	}
+
+	try
+	{
+		for (const auto& setting : candidate.materials)
+		{
+			vector<pair<string, filesystem::path>> paths;
+			for (const auto& texture : setting.textures)
+			{
+				const filesystem::path path = filesystem::weakly_canonical(
+					filesystem::path(m_ResourceRootPath) /
+					filesystem::path(std::u8string(texture.resourcePath.begin(), texture.resourcePath.end())));
+				const string relative = To_Utf8Path(filesystem::relative(path, m_ResourceRootPath));
+				if (!Is_SafeResourcePath(relative) || !filesystem::is_regular_file(path))
+				{
+					LOG_ERROR(L"Missing or unsafe material texture {}", path.wstring());
+					return E_FAIL;
+				}
+				paths.emplace_back(texture.slotName, path);
+				if (std::ranges::find(candidate.textureSlots, texture.slotName) == candidate.textureSlots.end())
+					candidate.textureSlots.push_back(texture.slotName);
+			}
+			auto material = make_shared<Material>(m_Device, m_Context);
+			if (FAILED(material->Prepare_NamedTextures(paths))) return E_FAIL;
+			candidate.preparedMaterials.push_back(std::move(material));
+		}
+	}
+	catch (const std::exception& exception)
+	{
+		LOG_ERROR(L"Material preparation failed: {}", Helper::To_wString(exception.what()));
+		return E_FAIL;
+	}
+	std::ranges::sort(candidate.textureSlots);
+	Shared<const MODEL_MATERIAL_SETTINGS> snapshot = make_shared<MODEL_MATERIAL_SETTINGS>(std::move(candidate));
+	if (shader && FAILED(Validate_MaterialBindings(shader, snapshot))) return E_FAIL;
+	prepared = std::move(snapshot);
+	return S_OK;
+}
+
+HRESULT Model::Load_MaterialSettings(const filesystem::path& settingsPath,
+	const wstring& expectedModelTag, const Shared<Shader>& shader)
+{
+	Shared<const MODEL_MATERIAL_SETTINGS> prepared;
+	const HRESULT hr = Prepare_MaterialSettings(settingsPath, expectedModelTag, prepared, shader);
+	if (hr != S_OK) return hr;
+	return Apply_MaterialSettings(prepared);
+}
+
+HRESULT Model::Apply_MaterialSettings(const Shared<const MODEL_MATERIAL_SETTINGS>& prepared)
+{
+	if (!prepared || (!m_ModelTag.empty() && prepared->modelTag != Helper::To_String(m_ModelTag)) ||
+		prepared->modelPath != m_ModelResourcePath || prepared->preparedMaterials.size() != m_Materials.size() ||
+		prepared->materials.size() != m_Materials.size()) return E_INVALIDARG;
+	for (size_t i = 0; i < m_Materials.size(); ++i)
+		if (!prepared->preparedMaterials[i] || prepared->materials[i].materialIndex != i ||
+			prepared->materials[i].sourceMaterialName != m_Materials[i]->Get_MaterialName()) return E_INVALIDARG;
+	if (m_ModelTag.empty()) m_ModelTag = Helper::To_wString(prepared->modelTag);
+	m_MaterialSettings = prepared;
+	return S_OK;
+}
+
+HRESULT Model::Validate_MaterialBindings(const Shared<Shader>& shader,
+	const Shared<const MODEL_MATERIAL_SETTINGS>& settings) const
+{
+	if (!shader) return E_INVALIDARG;
+	if (!settings)
+		return shader->Has_Pass("Default_Pass") && shader->Has_SRV("g_AlbedoMap") ? S_OK : E_FAIL;
+	if (settings->preparedMaterials.size() != m_Materials.size()) return E_FAIL;
+	for (const auto& setting : settings->materials)
+	{
+		if (!shader->Has_Pass(setting.passName))
+		{
+			LOG_ERROR(L"Model {} material {} has unknown pass {}", m_ModelTag,
+				setting.materialIndex, Helper::To_wString(setting.passName));
+			return E_FAIL;
+		}
+		for (const auto& texture : setting.textures)
+			if (!shader->Has_SRV(texture.slotName))
+			{
+				LOG_ERROR(L"Model {} material {} has unknown slot {}", m_ModelTag,
+					setting.materialIndex, Helper::To_wString(texture.slotName));
+				return E_FAIL;
+			}
+	}
+	return S_OK;
+}
+
+HRESULT Model::Validate_MaterialBindings(const Shared<Shader>& shader) const
+{
+	return Validate_MaterialBindings(shader, m_MaterialSettings);
+}
+
+HRESULT Model::BindAndBeginMaterial(const Shared<Shader>& shader, uint32 meshIndex) const
+{
+	if (!shader || meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex]) return E_INVALIDARG;
+	const uint32 materialIndex = m_Meshes[meshIndex]->Get_MaterialIndex();
+	if (materialIndex >= m_Materials.size() || !m_Materials[materialIndex]) return E_INVALIDARG;
+	if (!m_MaterialSettings)
+	{
+		static const vector<string> defaultSlots{ "g_AlbedoMap" };
+		if (!shader->Has_Pass("Default_Pass") || FAILED(shader->Clear_MaterialSlots(defaultSlots)) ||
+			FAILED(m_Materials[materialIndex]->Bind_DefaultTexture(shader))) return E_FAIL;
+		return shader->Begin(string{ "Default_Pass" });
+	}
+	if (materialIndex >= m_MaterialSettings->preparedMaterials.size() ||
+		materialIndex >= m_MaterialSettings->materials.size()) return E_FAIL;
+	const auto& setting = m_MaterialSettings->materials[materialIndex];
+	const auto& material = m_MaterialSettings->preparedMaterials[materialIndex];
+	if (!material || !shader->Has_Pass(setting.passName) ||
+		FAILED(shader->Clear_MaterialSlots(m_MaterialSettings->textureSlots)) ||
+		FAILED(material->Bind_NamedTextures(shader))) return E_FAIL;
+	return shader->Begin(setting.passName);
+}
+
 void Model::On_Destroy()
 {
 	m_Meshes.clear();
 	m_Materials.clear();
 	m_Bones.clear();
+	m_MaterialSettings.reset();
 	m_Animations.clear();
 	m_AnimationNames.clear();
 	Component::On_Destroy();
@@ -238,7 +617,7 @@ const wstring& Model::Get_AnimationNameByIndex(uint32 index)
 		return emptyString;
 	}
 
-	return m_Animations[index]->Get_Name();
+	return m_Animations[index]->Get_AnimationName();
 }
 
 void Model::Update_ModelAnimation(Float timeDelta)
@@ -281,6 +660,13 @@ void Model::Update_ModelAnimation(Float timeDelta)
 
 void Model::Set_Animation(uint32 index, Float blendDuration)
 {
+	if (m_IsSkeletal && m_Animations.empty() && m_Tracker)
+	{
+		if (m_PendingAnimIndex == UINT32_MAX)
+			LOG_WARN(L"[AnimationPreset] Deferring initial animation {} for model {} until clips are applied", index, m_ModelTag);
+		m_PendingAnimIndex = index;
+		return;
+	}
 	if (index >= m_Animations.size() || !m_Tracker)
 	{
 		LOG_ERROR(L"Failed to set animation index {} on model {}", index, m_ModelTag);
@@ -317,14 +703,22 @@ void Model::Set_Animation(uint32 index, Float blendDuration)
 	m_Animations[m_NextAnimIndex]->Set_Progress(0.f);
 }
 
-void Model::Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const
+void Model::Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify)
 {
-	if (animIndex >= m_Animations.size() || m_Tracker == nullptr)
+	if (m_Tracker == nullptr || !m_IsSkeletal ||
+		(!m_Animations.empty() && animIndex >= m_Animations.size()))
 	{
 		LOG_ERROR(L"Failed to Add Animation Notify {} : {}", notify.notifyTag, animIndex);
 		return;
 	}
+	if (m_Animations.empty() && m_AnimationNotifyDefinitions.empty())
+		LOG_WARN(L"[AnimationPreset] Deferring notify registration for model {} until clips are applied", m_ModelTag);
+	m_AnimationNotifyDefinitions.emplace_back(animIndex, notify);
+	if (!m_Animations.empty()) Bind_AnimNotify(animIndex, notify);
+}
 
+void Model::Bind_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const
+{
 	Float duration = m_Animations[animIndex]->Get_Duration();
 
 	if (duration <= 0.f)
@@ -344,15 +738,45 @@ void Model::Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_N
 	m_Tracker->Add_Notify(animIndex, trackerNotify);
 }
 
-void Model::Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies) const
+void Model::Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies)
 {
 	for (auto notify : notifies)
 		Add_AnimNotify(animIndex, notify);
 }
 
-void Model::Clear_AnimNotifies() const
+void Model::Clear_AnimNotifies()
 {
-	m_Tracker->Clear();
+	if (m_Tracker) m_Tracker->Clear();
+	m_AnimationNotifyDefinitions.clear();
+}
+
+Bool Model::Validate_AnimationRequests(size_t clipCount) const
+{
+	if (m_PendingAnimIndex != UINT32_MAX && m_PendingAnimIndex >= clipCount)
+	{
+		LOG_ERROR(L"[AnimationPreset] Pending animation {} is outside {} clips on {}", m_PendingAnimIndex, clipCount, m_ModelTag);
+		return false;
+	}
+	for (const auto& [index, notify] : m_AnimationNotifyDefinitions)
+		if (index >= clipCount)
+		{
+			LOG_ERROR(L"[AnimationPreset] Notify {} index {} is outside {} clips on {}", notify.notifyTag, index, clipCount, m_ModelTag);
+			return false;
+		}
+	return true;
+}
+
+void Model::Restore_AnimationRequests()
+{
+	if (m_Tracker) m_Tracker->Clear();
+	for (const auto& [index, notify] : m_AnimationNotifyDefinitions)
+		Bind_AnimNotify(index, notify);
+	if (m_PendingAnimIndex != UINT32_MAX)
+		m_CurrentAnimIndex = m_NextAnimIndex = m_PendingAnimIndex;
+	m_PendingAnimIndex = UINT32_MAX;
+	m_IsAnimEnd = false;
+	if (m_RootLocalNode >= 0)
+		Set_LocalRootNode(static_cast<uint32>(m_RootLocalNode));
 }
 
 Bool Model::Is_NotifyActive(uint32 animIndex, const wstring& notifyTag) const
@@ -455,10 +879,9 @@ void Model::Set_LocalRootNode(uint32 nodeIndex)
 
 HRESULT Model::Render(uint32 meshIndex)
 {
-	m_Meshes[meshIndex]->Bind_Resources();
-	m_Meshes[meshIndex]->Render();
-
-	return S_OK;
+	if (meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex]) return E_INVALIDARG;
+	if (FAILED(m_Meshes[meshIndex]->Bind_Resources())) return E_FAIL;
+	return m_Meshes[meshIndex]->Render();
 }
 
 HRESULT Model::Ready_Meshes(ifstream& in, Bool isAnim)
@@ -598,6 +1021,9 @@ HRESULT Model::Read_AnimationData(ifstream& in, MODEL_ANIMATION& animationData,
 	in.read(reinterpret_cast<Char*>(&animationData.rootTotalRotation), sizeof(animationData.rootTotalRotation));
 	if (!in || channelCount == 0 || channelCount > MaxChannelCount)
 		return E_FAIL;
+	if (!std::isfinite(animationData.duration) || animationData.duration < 0.f ||
+		!std::isfinite(animationData.tickPerSecond) || animationData.tickPerSecond <= 0.f)
+		return E_FAIL;
 
 	animationData.numChannel = channelCount;
 	animationData.channels.clear();
@@ -710,6 +1136,8 @@ HRESULT Model::Load_Animations(const vector<wstring>& animationFilePaths)
 	vector<wstring> pendingNames;
 	if (FAILED(Build_Animations(animationFilePaths, existingNames, pendingAnimations, pendingNames)))
 		return E_FAIL;
+	if (!Validate_AnimationRequests(m_Animations.size() + pendingAnimations.size()))
+		return E_INVALIDARG;
 
 	for (size_t i = 0; i < pendingAnimations.size(); ++i)
 	{
@@ -720,6 +1148,8 @@ HRESULT Model::Load_Animations(const vector<wstring>& animationFilePaths)
 	m_NumAnimation = static_cast<uint32>(m_Animations.size());
 	m_CurrentAnimIndex = 0;
 	m_NextAnimIndex = 0;
+	m_IsBlending = false;
+	Restore_AnimationRequests();
 	Update_ModelAnimation(0.f);
 	return S_OK;
 }
@@ -770,7 +1200,23 @@ Bool Model::Validate_AnimationPreset(const AnimationPresetSnapshot& preset) cons
 
 HRESULT Model::Apply_AnimationPreset(const AnimationPresetSnapshot& preset)
 {
-	if (!Validate_AnimationPreset(preset) || m_ResourceRootPath.empty())
+	if (preset.schemaVersion == 2 && preset.Is_Empty())
+	{
+		if (!m_Animations.empty())
+			m_PendingAnimIndex = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
+		if (m_Tracker) m_Tracker->Clear();
+		m_Animations.clear();
+		m_AnimationNames.clear();
+		m_NumAnimation = 0;
+		m_CurrentAnimIndex = m_NextAnimIndex = 0;
+		m_IsBlending = false;
+		m_IsAnimEnd = false;
+		m_AnimationPreset = preset;
+		LOG_WARN(L"[AnimationPreset] Cleared snapshot on model {}; requests retained for reapply", m_ModelTag);
+		return S_OK;
+	}
+	if (!Validate_AnimationPreset(preset) || m_ResourceRootPath.empty() ||
+		!Validate_AnimationRequests(preset.animations.size()))
 		return E_INVALIDARG;
 
 	vector<wstring> fullPaths;
@@ -803,7 +1249,9 @@ HRESULT Model::Apply_AnimationPreset(const AnimationPresetSnapshot& preset)
 	m_NextAnimIndex = 0;
 	m_IsBlending = false;
 	m_AnimationPreset = preset;
+	Restore_AnimationRequests();
 	Update_ModelAnimation(0.f);
+	LOG_INFO(L"[AnimationPreset] Applied {} clips and {} notifies to model {}", m_NumAnimation, m_AnimationNotifyDefinitions.size(), m_ModelTag);
 	return S_OK;
 }
 
@@ -836,6 +1284,8 @@ HRESULT Model::Bind_Material(const Shared<Shader>& shader, const Char* constantN
 
 HRESULT Model::Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex)
 {
+	if (!shader || !constantName || meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex])
+		return E_INVALIDARG;
 	return m_Meshes[meshIndex]->Bind_BoneMatrices(shader, constantName, m_Bones);
 }
 

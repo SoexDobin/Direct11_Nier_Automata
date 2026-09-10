@@ -13,10 +13,12 @@ Animation::Animation(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11Devi
 
 Animation::Animation(const Animation& rhs)
 	: Component{ rhs }, 
+	m_Name{ rhs.m_Name },
 	m_Duration{ rhs.m_Duration }, 
 	m_TickPerSecond{ rhs.m_TickPerSecond },
 	m_NumChannels{rhs.m_NumChannels}, 
-	m_CurrentKeyFrameIndices{rhs.m_CurrentKeyFrameIndices}
+	m_CurrentKeyFrameIndices{rhs.m_CurrentKeyFrameIndices},
+	m_IsLocalTransformationPresent{rhs.m_IsLocalTransformationPresent}
 {
 	for (uint32 i = 0; i < m_NumChannels; ++i)
 	{
@@ -89,6 +91,16 @@ const TRANSFORM_FRAME& Animation::Get_TransformVelocity(int32 boneIndex) const
 
 Bool Animation::Update_TransformationMatrix(Float timeDelta, const vector<Shared<Bone>>& bones, Bool isLoop, int32 rootNodeIndex)
 {
+	// Zero-duration clips are authored static poses (e.g. sheathed weapons).
+	// Sample their keys without fmod(0, 0) or skipping the pose on non-loop playback.
+	if (m_Duration <= 0.f)
+	{
+		m_CurrentTrackPosition = 0.f;
+		for (uint32 i = 0; i < m_NumChannels; ++i)
+			m_Channels[i]->Update_TransformationMatrix(m_CurrentKeyFrameIndices[i], 0.f,
+				0.f, bones, m_IsLocalTransformationPresent ? rootNodeIndex : -1, false);
+		return !isLoop;
+	}
 	m_CurrentTrackPosition += m_TickPerSecond * timeDelta; // 트랙의 시간 비율 * timedelta 을 누적하여 현재 트랙 지점을 업데이트
 
 	if (m_CurrentTrackPosition >= m_Duration) //  현재 트랙이 애니메이션 길이를 넘으면 
@@ -119,7 +131,7 @@ void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animati
 	m_CurrentTrackPosition += m_TickPerSecond * timeDelta;
 	if (m_CurrentTrackPosition >= m_Duration)
 	{
-		if (isCurLoop)
+		if (isCurLoop && m_Duration > 0.f)
 			m_CurrentTrackPosition = fmod(m_CurrentTrackPosition, m_Duration);
 		else
 			m_CurrentTrackPosition = m_Duration;
@@ -129,36 +141,54 @@ void Animation::Blend_TransformationMatrix(Float timeDelta, const Shared<Animati
 	nextAnim->m_CurrentTrackPosition += nextAnim->m_TickPerSecond * timeDelta;
 	if (nextAnim->m_CurrentTrackPosition >= nextAnim->m_Duration)
 	{
-		if (isNextLoop)
+		if (isNextLoop && nextAnim->m_Duration > 0.f)
 			nextAnim->m_CurrentTrackPosition = fmod(nextAnim->m_CurrentTrackPosition, nextAnim->m_Duration);
 		else
 			nextAnim->m_CurrentTrackPosition = nextAnim->m_Duration;
 	}
 		
 
-	// 2. 블렌딩 수행
-	for (uint32 i = 0; i < m_NumChannels; ++i)
+	// Sparse clips do not share channel counts or array order. Match by the
+	// remapped model bone index; a missing channel holds the existing local pose.
+	for (uint32 boneIndex = 0; boneIndex < bones.size(); ++boneIndex)
 	{
-		TRANSFORM_FRAME curTrans{}, nextTrans{};
-
-		// 각 채널로부터 보간된 Transform 획득
-		m_Channels[i]->Get_ChannelTransform(m_CurrentTrackPosition, m_CurrentKeyFrameIndices[i], m_Duration, true, curTrans);
-		m_Channels[i]->Update_Velocity(curTrans, m_CurrentTrackPosition);
-
-		nextAnim->m_Channels[i]->Get_ChannelTransform(nextAnim->m_CurrentTrackPosition, nextAnim->m_CurrentKeyFrameIndices[i], nextAnim->m_Duration, isNextLoop, nextTrans);
-		nextAnim->m_Channels[i]->Update_Velocity(nextTrans, nextAnim->m_CurrentTrackPosition);
+		const auto current = std::ranges::find_if(m_Channels, [boneIndex](const auto& channel) {
+			return channel->Get_BoneIndex() == boneIndex;
+		});
+		const auto next = std::ranges::find_if(nextAnim->m_Channels, [boneIndex](const auto& channel) {
+			return channel->Get_BoneIndex() == boneIndex;
+		});
+		if (current == m_Channels.end() && next == nextAnim->m_Channels.end()) continue;
+		TRANSFORM_FRAME held{ Vector3::One, Quaternion::Identity, Vector3::Zero };
+		Quaternion rotation;
+		Matrix localPose = bones[boneIndex]->Get_TransformationMatrix();
+		localPose.Decompose(held.scale, rotation, held.position);
+		held.rotation = rotation;
+		TRANSFORM_FRAME curTrans = held, nextTrans = held;
+		if (current != m_Channels.end())
+		{
+			const auto index = static_cast<size_t>(current - m_Channels.begin());
+			(*current)->Get_ChannelTransform(m_CurrentTrackPosition, m_CurrentKeyFrameIndices[index], m_Duration, isCurLoop, curTrans);
+			(*current)->Update_Velocity(curTrans, m_CurrentTrackPosition);
+		}
+		if (next != nextAnim->m_Channels.end())
+		{
+			const auto index = static_cast<size_t>(next - nextAnim->m_Channels.begin());
+			(*next)->Get_ChannelTransform(nextAnim->m_CurrentTrackPosition, nextAnim->m_CurrentKeyFrameIndices[index], nextAnim->m_Duration, isNextLoop, nextTrans);
+			(*next)->Update_Velocity(nextTrans, nextAnim->m_CurrentTrackPosition);
+		}
 
 		Vector3 targetScale = Vector3::Lerp(curTrans.scale, nextTrans.scale, blendRatio);
 		Vector4 targetRot = Quaternion::Slerp(curTrans.rotation, nextTrans.rotation, blendRatio);
 		Vector3 targetPos = Vector3::Lerp(curTrans.position, nextTrans.position, blendRatio);
 
 		Matrix targetMatrix{};
-		if (m_Channels[i]->Get_BoneIndex() == rootNodeIndex)
+		if (boneIndex == rootNodeIndex)
 			targetMatrix = XMMatrixAffineTransformation(targetScale, Quaternion::Identity, targetRot, Vector3::Zero);
 		else
 			targetMatrix = XMMatrixAffineTransformation(targetScale, Quaternion::Identity, targetRot, targetPos);
 
-		bones[m_Channels[i]->Get_BoneIndex()]->Update_TransformationMatrix(targetMatrix);
+		bones[boneIndex]->Update_TransformationMatrix(targetMatrix);
 	}
 }
 

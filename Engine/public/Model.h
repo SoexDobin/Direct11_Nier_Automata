@@ -12,6 +12,36 @@ class Animation;
 class Shader;
 class AnimationTracker;
 
+struct MATERIAL_TEXTURE_SETTING
+{
+	string slotName{};
+	string resourcePath{};
+};
+
+struct MODEL_MATERIAL_SETTING
+{
+	uint32 materialIndex{};
+	string sourceMaterialName{};
+	string sourceShaderName{};
+	string sourceTechniqueName{};
+	string passName{ "Default_Pass" };
+	Bool isBlend{ false };
+	vector<MATERIAL_TEXTURE_SETTING> textures{};
+};
+
+struct MODEL_MATERIAL_SETTINGS
+{
+	uint32 schemaVersion{ 1 };
+	string modelTag{};
+	string modelPath{};
+	vector<MODEL_MATERIAL_SETTING> materials{};
+private:
+	friend class Model;
+	// Runtime-only preparation; never serialized into the authored document.
+	vector<Shared<const Material>> preparedMaterials{};
+	vector<string> textureSlots{};
+};
+
 class ENGINE_DLL Model final : public Component
 {
 	RTTR_ENABLE(Component)
@@ -65,13 +95,14 @@ public:
 	}
 
 public: /* Animation Tracker */
-	void Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const;
-	void Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies) const;
-	void Clear_AnimNotifies() const;
+	void Add_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify);
+	void Add_AnimNotify(uint32 animIndex, std::initializer_list<AnimationTracker::ANIMATION_NOTIFY> notifies);
+	void Clear_AnimNotifies();
 	Bool Is_NotifyActive(uint32 animIndex, const wstring & notifyTag) const;
 	Bool Is_NotifyActive(const wstring & notifyName) const;
 
 public: /* Mesh Info */
+	HRESULT Get_MeshMaterialInfo(uint32 meshIndex, string& meshName, uint32& materialIndex) const;
 	void Extract_RawMeshData(_Out_ vector<Float>& outPositions, _Out_ vector<int32>& outIndices) const;
 
 public: /* snap shot */
@@ -86,12 +117,25 @@ public:
 	HRESULT Render(uint32 meshIndex);
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex, uint32 materialType, uint32 textureIndex = 0);
 	HRESULT Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex);
+	HRESULT Validate_MaterialBindings(const Shared<Shader>& shader) const;
+	HRESULT BindAndBeginMaterial(const Shared<Shader>& shader, uint32 meshIndex) const;
 
 public:
 	const wstring& Get_ModelTag() const { return m_ModelTag; }
+	const string& Get_ModelResourcePath() const { return m_ModelResourcePath; }
+	const wstring& Get_ModelFilePath() const { return m_ModelFilePath; }
+	Shared<const MODEL_MATERIAL_SETTINGS> Get_MaterialSettings() const { return m_MaterialSettings; }
+	vector<string> Get_MaterialNames() const;
 	void Set_ModelTag(const wstring& tag);
 	const AnimationPresetSnapshot& Get_AnimationPreset() const { return m_AnimationPreset; }
 	void Set_AnimationPreset(const AnimationPresetSnapshot& preset) { m_AnimationPreset = preset; }
+	HRESULT Validate_MaterialSettings(const filesystem::path& settingsPath, const wstring& expectedModelTag) const;
+	HRESULT Load_MaterialSettings(const filesystem::path& settingsPath, const wstring& expectedModelTag,
+		const Shared<Shader>& shader = nullptr);
+	HRESULT Prepare_MaterialSettings(const filesystem::path& settingsPath, const wstring& expectedModelTag,
+		Shared<const MODEL_MATERIAL_SETTINGS>& prepared, const Shared<Shader>& shader = nullptr) const;
+	HRESULT Apply_MaterialSettings(const Shared<const MODEL_MATERIAL_SETTINGS>& prepared);
+	static wstring Make_MaterialSettingsFileName(const wstring& modelTag);
 
 private:
 	HRESULT Post_Load() override;
@@ -105,11 +149,19 @@ private:
 		const unordered_set<wstring>& existingNames,
 		vector<Shared<Animation>>& outAnimations, vector<wstring>& outNames) const;
 	Bool Validate_AnimationPreset(const AnimationPresetSnapshot& preset) const;
+	Bool Validate_AnimationRequests(size_t clipCount) const;
+	void Bind_AnimNotify(uint32 animIndex, const AnimationTracker::ANIMATION_NOTIFY& notify) const;
+	void Restore_AnimationRequests();
+	HRESULT Validate_MaterialBindings(const Shared<Shader>& shader,
+		const Shared<const MODEL_MATERIAL_SETTINGS>& settings) const;
 
 private:
 	TRANSFORM_FRAME m_TransformFrame{};
 	wstring	m_ModelTag{};
 	wstring m_ResourceRootPath{};
+	wstring m_ModelFilePath{};
+	string m_ModelResourcePath{};
+	Shared<const MODEL_MATERIAL_SETTINGS> m_MaterialSettings{};
 	AnimationPresetSnapshot m_AnimationPreset{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
@@ -138,6 +190,9 @@ private:
 	vector<Shared<Animation>> m_Animations;
 	map<wstring, uint32> m_AnimationNames;
 	Shared<AnimationTracker> m_Tracker{ nullptr };
+	// Instance callbacks are deliberately not copied from resource prototypes.
+	vector<pair<uint32, AnimationTracker::ANIMATION_NOTIFY>> m_AnimationNotifyDefinitions;
+	uint32 m_PendingAnimIndex{ UINT32_MAX };
 
 public:
 	static Shared<Model> CreatePrototype();

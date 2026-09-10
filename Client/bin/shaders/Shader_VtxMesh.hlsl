@@ -3,8 +3,8 @@
 float4x4 g_WorldMatrix;
 float4x4 g_ViewMatrix;
 float4x4 g_ProjMatrix;
-texture2D g_DiffuseTexture;
-texture2D g_NormalTexture;
+texture2D g_AlbedoMap;
+texture2D g_NormalMap;
 
 struct VS_IN { float3 position : POSITION; float3 normal : NORMAL; float3 tangent : TANGENT; float2 texcoord : TEXCOORD0; };
 struct VS_OUT { float4 position : SV_POSITION; float3 normal : NORMAL; float2 texcoord : TEXCOORD0; };
@@ -22,7 +22,7 @@ VS_OUT VS_Main(VS_IN input)
 PS_OUT PS_Main(VS_OUT input)
 {
     PS_OUT output;
-    output.diffuse = g_DiffuseTexture.Sample(LinearWrapSampler, input.texcoord);
+    output.diffuse = g_AlbedoMap.Sample(LinearWrapSampler, input.texcoord);
     if (output.diffuse.a < 0.3f) discard;
     output.normal = float4(normalize(input.normal) * 0.5f + 0.5f, 1.f);
     return output;
@@ -30,7 +30,7 @@ PS_OUT PS_Main(VS_OUT input)
 
 technique11 DefaultTechnique
 {
-    pass Default
+    pass Default_Pass
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);

@@ -14,6 +14,11 @@ SoundManager::SoundManager() : EngineManager{}
 SoundManager::~SoundManager()
 {
 	Clear_SoundSources();
+	if (m_System) {
+		FMOD_System_Close(m_System);
+		FMOD_System_Release(m_System);
+		m_System = nullptr;
+	}
 }
 
 HRESULT SoundManager::Initialize_Prototype()
@@ -304,12 +309,6 @@ HRESULT SoundManager::Clear_SoundSources()
 		}
 	}
 	m_SoundSource.clear();
-
-	if (m_System)
-	{
-		FMOD_System_Release(m_System);
-		FMOD_System_Close(m_System);
-	}
 
 	return S_OK;
 }

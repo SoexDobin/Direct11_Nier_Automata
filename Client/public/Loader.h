@@ -49,7 +49,7 @@ private:
 	CRITICAL_SECTION	m_CriticalSection = {};
 	tChar				m_LoadingText[MAX_PATH] = {};
 
-	Bool				m_isFinished = { false };
+	std::atomic_bool m_isFinished{ false };
 
 public:
 	static Shared<Loader> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context, LEVEL nextLevelID, const Shared<Level>& ownerLevel, Bool IsLoadStatic = false);

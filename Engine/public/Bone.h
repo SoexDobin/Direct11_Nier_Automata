@@ -27,6 +27,7 @@ public:
 public:
 	Bool Is_SameBone(const Char* boneName) const { return !strcmp(boneName, m_BoneName); }
 	const Matrix* Get_CombinedTransformationMatrixPtr() const { return &m_CombinedTransformationMatrix; }
+	const Matrix& Get_TransformationMatrix() const { return m_TransformationMatrix; }
 	void Update_TransformationMatrix(const Matrix& transformationMatrix);
 	void Update_CombinedTransformationMatrix(const vector<Shared<Bone>>& modelBones, const Matrix& preTransformMatrix);
 

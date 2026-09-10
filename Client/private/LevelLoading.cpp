@@ -20,11 +20,7 @@ LevelLoading::LevelLoading(const ComPtr<ID3D11Device> &device,
     : Level{device, context}, m_Loader{nullptr}, m_NextLevel{LEVEL::LEVEL_END} {
 }
 
-LevelLoading::~LevelLoading()
-{
-	if (m_StaticCamera)
-		GAME_INSTANCE->Destroy(m_StaticCamera->Get_ObjectGuid());
-}
+LevelLoading::~LevelLoading() = default;
 
 HRESULT LevelLoading::Initialize(void *arg) {
     LEVEL_LOADING_DESC desc = *static_cast<LEVEL_LOADING_DESC*>(arg);
@@ -45,12 +41,6 @@ HRESULT LevelLoading::Initialize(void *arg) {
         return E_FAIL;
     }
 
-    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::LOADING)))
-    {
-        LOG_ERROR(L"Failed to load Loading Prototypes");
-        return E_FAIL;
-    }
-
     Ready_LoadingUI();
 
     m_Loader = Loader::Create(m_Device, m_Context, m_NextLevel, shared_from_this(), m_IsLoadStatic);
@@ -62,7 +52,17 @@ HRESULT LevelLoading::Initialize(void *arg) {
     return Level::Initialize(arg);
 }
 
-void LevelLoading::On_Destroy() { Level::On_Destroy(); }
+void LevelLoading::On_Destroy() {
+    if (m_Loader) {
+        m_Loader->On_Destroy();
+        m_Loader.reset();
+    }
+    if (m_StaticCamera) {
+        GAME_INSTANCE->Destroy(m_StaticCamera->Get_ObjectGuid());
+        m_StaticCamera.reset();
+    }
+    Level::On_Destroy();
+}
 
 void LevelLoading::Update_Level(Float timeDelta) 
 {
@@ -82,6 +82,8 @@ void LevelLoading::Transition_To_NextLevel()
 	{
 		if (ClientSettingManager::GetInstance()->AutoTransitionLevel(LEVEL::LOADING, m_NextLevel))
 		{
+			// A failed Scene must not be recreated every frame after resource loading finishes.
+			m_IsFinished = false;
 			switch (ETOI(m_NextLevel))
 			{
 			case ETOI(LEVEL::TITLE):
@@ -126,7 +128,7 @@ Shared<LevelLoading> LevelLoading::Create(const ComPtr<ID3D11Device> &device, co
     desc.loadStatic = loadStatic;
 
     if (FAILED(loadingLevel->Initialize(&desc))) {
-		LOG_ERROR(L"Failed To Create LoadingBackground");
+		LOG_ERROR(L"Failed to initialize Loading level for target {}", ETOI(nextLevelID));
 		return nullptr;
     }
 

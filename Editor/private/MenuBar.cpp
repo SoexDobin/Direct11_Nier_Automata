@@ -15,7 +15,6 @@ MenuBar::MenuBar() {}
 
 HRESULT MenuBar::Initialize() {
     m_Enable = false;
-    m_Game = GAME_INSTANCE;
     return EditorObject::Initialize();
 }
 void MenuBar::Update(Bool isResize)
@@ -64,14 +63,14 @@ void MenuBar::Render(Bool isResize) {
     {
 		Bool isStop = (EDITOR->Get_State() == EDITOR_STATE::STOP);
 
-        uint32 displayIndex = m_Game->Get_CurrentLevelIndex();
+        uint32 displayIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
         if (displayIndex == 1) // 로딩 중이면 대상 레벨 표시
             displayIndex = EDITOR->Get_EngineDesc().startLevel;
 
         string saveLabel = "Save (" + Helper::To_String(std::filesystem::path(PATH.GetLevelDataPath(displayIndex)).filename().wstring()) + ")";
         if (ImGui::MenuItem(saveLabel.c_str(), nullptr, false, isStop))
         {
-          if (SUCCEEDED(m_Game->SerializeLevel(GAME_INSTANCE->Get_CurrentLevelIndex(), PATH.GetLevelDataPath(displayIndex))))
+          if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(GAME_INSTANCE->Get_CurrentLevelIndex(), PATH.GetLevelDataPath(displayIndex))))
             LOG_INFO("Level saved successfully.");
           else
             LOG_ERROR(L"Level save failed.");
@@ -80,7 +79,7 @@ void MenuBar::Render(Bool isResize) {
         string loadLabel = "Load (" + Helper::To_String(std::filesystem::path(PATH.GetLevelDataPath(displayIndex)).filename().wstring()) + ")";
         if (ImGui::MenuItem(loadLabel.c_str(), nullptr, false, isStop))
         {
-          if (SUCCEEDED(m_Game->DeSerializeLevel(PATH.GetLevelDataPath(displayIndex))))
+          if (SUCCEEDED(GAME_INSTANCE->DeSerializeLevel(PATH.GetLevelDataPath(displayIndex))))
 		  {
 			EDITOR->Clear_History();
 			EDITOR->Clear_SelectedObject();
@@ -131,8 +130,8 @@ void MenuBar::Render(Bool isResize) {
     // X 버튼 클릭 시 프로세스 종료 메시지 호출
     if (ImGui::MenuItem("X")) {
         
-        if (m_Game && m_Game->Get_Device() && m_Game->Get_SwapChain()) {
-            m_Game->Get_SwapChain()->SetFullscreenState(FALSE, nullptr);
+        if (GAME_INSTANCE && GAME_INSTANCE->Get_Device() && GAME_INSTANCE->Get_SwapChain()) {
+            GAME_INSTANCE->Get_SwapChain()->SetFullscreenState(FALSE, nullptr);
         }
 
         PostQuitMessage(0); // Win32 응용 프로그램 안전 종료
@@ -249,23 +248,23 @@ void MenuBar::Render_Prefab()
 			Bool registeredNewGuid = false;
 			if (filesystem::exists(filePath))
 			{
-				if (FAILED(m_Game->Register_PrefabDocument(filePath.wstring(), prefabGuid)))
+				if (FAILED(GAME_INSTANCE->Register_PrefabDocument(filePath.wstring(), prefabGuid)))
 					LOG_ERROR(L"Existing Prefab document is invalid: {}", filePath.wstring());
 			}
 			else
 			{
 				prefabGuid = Create_PrefabGuid();
 				registeredNewGuid = prefabGuid.Is_Valid() &&
-					SUCCEEDED(m_Game->Register_Prefab(prefabGuid, filePath.wstring()));
+					SUCCEEDED(GAME_INSTANCE->Register_Prefab(prefabGuid, filePath.wstring()));
 			}
 
 			if (prefabGuid.Is_Valid() &&
-				SUCCEEDED(m_Game->SerializePrefabDocument(prefabGuid, selectedRoot)))
+				SUCCEEDED(GAME_INSTANCE->SerializePrefabDocument(prefabGuid, selectedRoot)))
 				LOG_INFO(L"Prefab saved: {}", filePath.wstring());
 			else
 			{
 				if (registeredNewGuid)
-					m_Game->Unregister_Prefab(prefabGuid);
+					GAME_INSTANCE->Unregister_Prefab(prefabGuid);
 				LOG_ERROR(L"Prefab save failed: {}", filePath.wstring());
 			}
 		}
@@ -279,7 +278,7 @@ void MenuBar::Render_Prefab()
 	if (ImGui::BeginMenu("Instantiate"))
 	{
 		const vector<pair<PrefabGuid, wstring>> prefabDocuments =
-			m_Game->Get_PrefabDocuments();
+			GAME_INSTANCE->Get_PrefabDocuments();
 		if (prefabDocuments.empty())
 			ImGui::TextDisabled("No Prefab documents.");
 		for (const auto& [prefabGuid, prefabPathString] : prefabDocuments)
@@ -290,7 +289,7 @@ void MenuBar::Render_Prefab()
 				continue;
 
 			Shared<GameObject> instantiatedRoot;
-			if (SUCCEEDED(m_Game->DeSerializePrefabDocument(prefabGuid, instantiatedRoot)))
+			if (SUCCEEDED(GAME_INSTANCE->DeSerializePrefabDocument(prefabGuid, instantiatedRoot)))
 			{
 				EDITOR->Set_SelectedObject(instantiatedRoot);
 				LOG_INFO(L"Prefab instantiated: {}", prefabPath.wstring());

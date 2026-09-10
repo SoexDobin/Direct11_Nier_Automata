@@ -91,13 +91,12 @@ HRESULT Pl0000Body::Render()
 	size_t numMeshes = m_Model->Get_NumMeshes();
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
-		m_Model->Bind_Material(m_Shader, DiffuseMap, i, 1, 0);
-		m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i);
+		if (FAILED(m_Model->Bind_BoneMatrices(m_Shader, BoneMatrices, i))) return E_FAIL;
 
-		if (FAILED(m_Shader->Begin(0)))
+		if (FAILED(m_Model->BindAndBeginMaterial(m_Shader, i)))
 			return E_FAIL;
 
-		m_Model->Render(i);
+		if (FAILED(m_Model->Render(i))) return E_FAIL;
 	}
 
 	return S_OK;
@@ -135,6 +134,7 @@ HRESULT Pl0000Body::Ready_Components()
 	m_Model = Add_Component<Model>(ETOI(LEVEL::STATIC), &modelDesc);
 	if (nullptr == m_Model)
 		return E_FAIL;
+	if (FAILED(m_Model->Validate_MaterialBindings(m_Shader))) return E_FAIL;
 
 	AABBCollider::AABB_COLLIDER_DESC colDesc{};
 	colDesc.extents = Vector3{ 0.5f, 1.f, 0.5f };

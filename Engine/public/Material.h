@@ -17,6 +17,7 @@ public:
 
 public:
 	COMPONENT_TYPE Get_ComponentType() const override { return COMPONENT_TYPE::MATERIAL; }
+	const string& Get_MaterialName() const { return m_MaterialName; }
 	void On_Destroy() override;
 	void On_Disable() override { Component::On_Disable(); }
 	void On_Enable() override { Component::On_Enable(); }
@@ -29,11 +30,16 @@ public:
 
 public:
 	HRESULT Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 textureTypeIndex, uint32 textureIndex);
+	HRESULT Prepare_NamedTextures(const vector<pair<string, filesystem::path>>& textures);
+	HRESULT Bind_NamedTextures(const Shared<Shader>& shader) const;
+	HRESULT Bind_DefaultTexture(const Shared<Shader>& shader) const;
 
 private:
+	string m_MaterialName{};
 	uint32 m_TextureTypeMax{};
 	uint32 m_TextureMask{};
 	Shared<vector<ComPtr<ID3D11ShaderResourceView>>[]> m_MaterialTextures;
+	vector<pair<string, ComPtr<ID3D11ShaderResourceView>>> m_NamedTextures;
 
 
 public:

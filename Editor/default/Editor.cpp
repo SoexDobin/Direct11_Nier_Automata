@@ -50,7 +50,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
   Unique<EditorApp> pEditorApp = EditorApp::Create();
   if (nullptr == pEditorApp)
-    return FALSE;
+    return EXIT_FAILURE;
 
 	while (true) {
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {

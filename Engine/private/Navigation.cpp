@@ -39,7 +39,7 @@ HRESULT Navigation::Initialize(void* arg)
 #endif
 
 	auto* desc = static_cast<NAVIGATION_DESC*>(arg);
-	m_CurrentCellIndex = desc->startCellIndex;
+	m_CurrentCellIndex = desc ? desc->startCellIndex : 0;
 	if (m_CurrentCellIndex >= 0 && m_CurrentCellIndex < static_cast<int32>(m_Cells.size()))
 	{
 		

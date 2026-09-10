@@ -22,7 +22,7 @@ public:
 	void Set_Active(Bool isActive) override {};
 
 public:
-	HRESULT Load_Texture(uint32 levIndex, const tChar* texturePath, uint32 numSRVs, const wstring& descriptionTag);
+	HRESULT Load_Texture(uint32 levIndex, const tChar* texturePath, uint32 numSRVs, const wstring& descriptionTag, Bool allowMissing = false);
 	const Texture::TEXTURE_DESC* Get_TextureDescByTag(uint32 levIndex, const wstring& descriptionTag);
 	vector<wstring> Get_TextureTags(uint32 levIndex);
 	const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar* texturePath);
@@ -32,7 +32,8 @@ public:
 	Shared<Shader> Get_Shader(uint32 levIndex, const tChar* vertexTag);
 
 public:
-	HRESULT Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag, const Matrix& preTransformMatrix);
+	HRESULT Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag,
+		const Matrix& preTransformMatrix, const tChar* materialSettingsPath = nullptr);
 	HRESULT Load_ModelAnimations(uint32 levIndex, const wstring& modelTag, const vector<wstring>& animationFilePaths);
 	Shared<Model> Get_Model(uint32 levIndex, const tChar* modelTag);
 	int32 Get_ContainLevelByModelTag(const wstring& tag);

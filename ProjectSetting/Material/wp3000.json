@@ -1,0 +1,29 @@
+{
+    "schemaVersion": 1,
+    "modelTag": "wp3000",
+    "modelPath": "Models/wp3000/wp3000.model",
+    "materials": [
+        {
+            "materialIndex": 0,
+            "sourceMaterialName": "WP3000_Body",
+            "sourceShaderName": "PBS00_XXXXX",
+            "sourceTechniqueName": "Default",
+            "passName": "Default_Pass",
+            "renderGroup": "NONBLEND",
+            "textures": {
+                "g_AlbedoMap": "Models/wp3000/Textures/08F62E04.dds"
+            }
+        },
+        {
+            "materialIndex": 1,
+            "sourceMaterialName": "WP3000_weapon",
+            "sourceShaderName": "PBS00_XXXXX",
+            "sourceTechniqueName": "Default",
+            "passName": "Default_Pass",
+            "renderGroup": "NONBLEND",
+            "textures": {
+                "g_AlbedoMap": "Models/wp3000/Textures/5EFC5ECA.dds"
+            }
+        }
+    ]
+}

@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <set>
 
 using namespace Tool;
 
@@ -65,6 +66,17 @@ Bool Tool::Converter::ExportModel(const wstring& outPath)
 		return false;
 	}
 
+	for (const auto& mesh : m_Meshes)
+	{
+		if (!mesh || mesh->materialIndex < 0 ||
+			static_cast<size_t>(mesh->materialIndex) >= m_Material.size())
+		{
+			std::cerr << "  [Audit] Invalid mesh material index: "
+				<< (mesh ? mesh->name : "<null>") << "\n";
+			return false;
+		}
+	}
+
 	if (!WriteModelFile(outPath))
 		return false;
 
@@ -73,9 +85,7 @@ Bool Tool::Converter::ExportModel(const wstring& outPath)
 
 	// JSON 파일 경로는 확장자만 변경
 	wstring jsonPath = filesystem::path(outPath).replace_extension(L".json").wstring();
-	WriteJsonFile(jsonPath);
-
-	return true;
+	return WriteJsonFile(jsonPath);
 }
 
 Bool Tool::Converter::ExportAnimations(const wstring& modelPath)
@@ -611,16 +621,28 @@ int32 Converter::Get_BoneIndex(const Char* boneName)
 		return -1;
 	return boneIndex;
 }
-void Tool::Converter::WriteJsonFile(const wstring& path)
+Bool Tool::Converter::WriteJsonFile(const wstring& path)
 {
 	using json = nlohmann::json;
-	json root;
+	json root{
+		{ "inspectionSchemaVersion", 1 },
+		{ "materials", json::array() },
+		{ "animations", json::array() },
+		{ "bones", json::array() },
+		{ "meshes", json::array() }
+	};
 
 	// 1. Materials
-	for (auto& mat : m_Material)
+	std::set<string> converterMaterialNames;
+	std::set<string> duplicateConverterMaterialNames;
+	for (size_t materialIndex = 0; materialIndex < m_Material.size(); ++materialIndex)
 	{
+		const auto& mat = m_Material[materialIndex];
 		json matJson;
+		matJson["materialIndex"] = materialIndex;
 		matJson["name"] = mat->name;
+		if (!converterMaterialNames.insert(mat->name).second)
+			duplicateConverterMaterialNames.insert(mat->name);
 		
 		json textures = json::array();
 		for (auto& tex : mat->textures)
@@ -677,18 +699,159 @@ void Tool::Converter::WriteJsonFile(const wstring& path)
 		json meshJson;
 		meshJson["name"] = mesh->name;
 		meshJson["materialIndex"] = mesh->materialIndex;
+		const Bool validMaterialIndex = mesh->materialIndex >= 0 &&
+			static_cast<size_t>(mesh->materialIndex) < m_Material.size();
+		meshJson["materialName"] = validMaterialIndex
+			? json(m_Material[mesh->materialIndex]->name)
+			: json(nullptr);
 		meshJson["numVertices"] = m_IsSkeletal ? mesh->animVertices.size() : mesh->vertices.size();
 		meshJson["numIndices"] = mesh->indices.size();
 		root["meshes"].push_back(meshJson);
 	}
 
-	ofstream out(path);
-	if (out.is_open())
+	// 5. Converter/reference material inspection. This is authoring evidence only;
+	// runtime .model loading never reads this JSON or the optional materials.json.
+	json inspection;
+	inspection["converterMaterialCount"] = m_Material.size();
+	inspection["meshCount"] = m_Meshes.size();
+	inspection["duplicateConverterMaterialNames"] = duplicateConverterMaterialNames;
+
+	json invalidMeshes = json::array();
+	size_t validMeshMaterialIndexCount = 0;
+	for (const auto& mesh : m_Meshes)
 	{
-		out << root.dump(4);
-		out.close();
-		const std::u8string utf8Path = filesystem::path(path).u8string();
-		std::cout << "  [JSON] Export Success: "
-			<< string{ utf8Path.begin(), utf8Path.end() } << "\n";
+		const Bool valid = mesh && mesh->materialIndex >= 0 &&
+			static_cast<size_t>(mesh->materialIndex) < m_Material.size();
+		if (valid)
+		{
+			++validMeshMaterialIndexCount;
+			continue;
+		}
+
+		invalidMeshes.push_back({
+			{ "meshName", mesh ? mesh->name : "" },
+			{ "materialIndex", mesh ? mesh->materialIndex : -1 }
+		});
 	}
+	inspection["validMeshMaterialIndexCount"] = validMeshMaterialIndexCount;
+	inspection["invalidMeshMaterialIndices"] = invalidMeshes;
+
+	const filesystem::path referencePath = filesystem::path(path).parent_path() / L"materials.json";
+	json referenceAudit{
+		{ "path", "materials.json" },
+		{ "present", filesystem::is_regular_file(referencePath) },
+		{ "status", "not-found" },
+		{ "materialCount", 0 },
+		{ "exactMatchCount", 0 },
+		{ "exactMatches", json::array() },
+		{ "converterOnlyMaterials", json::array() },
+		{ "sourceOnlyMaterials", json::array() },
+		{ "duplicateSourceMaterialNames", json::array() }
+	};
+
+	if (referenceAudit["present"].get<Bool>())
+	{
+		json referenceMaterials;
+		std::set<string> sourceMaterialNames;
+		std::set<string> duplicateSourceMaterialNames;
+		try
+		{
+			ifstream referenceFile(referencePath);
+			if (!referenceFile.is_open())
+				throw runtime_error("unable to open materials.json");
+
+			referenceMaterials = json::parse(referenceFile,
+				[&](int depth, json::parse_event_t event, json& parsed)
+				{
+					if (event == json::parse_event_t::key && depth == 1 && parsed.is_string())
+					{
+						const string name = parsed.get<string>();
+						if (!sourceMaterialNames.insert(name).second)
+							duplicateSourceMaterialNames.insert(name);
+					}
+					return true;
+				});
+
+			if (!referenceMaterials.is_object())
+				throw runtime_error("materials.json root must be an object");
+
+			referenceAudit["status"] = duplicateSourceMaterialNames.empty()
+				? "ok" : "duplicate-names";
+			referenceAudit["materialCount"] = sourceMaterialNames.size();
+			referenceAudit["duplicateSourceMaterialNames"] = duplicateSourceMaterialNames;
+
+			for (size_t materialIndex = 0; materialIndex < m_Material.size(); ++materialIndex)
+			{
+				const string& materialName = m_Material[materialIndex]->name;
+				const auto sourceIt = referenceMaterials.find(materialName);
+				if (sourceIt == referenceMaterials.end())
+				{
+					referenceAudit["converterOnlyMaterials"].push_back(materialName);
+					continue;
+				}
+
+				json match{
+					{ "materialIndex", materialIndex },
+					{ "materialName", materialName }
+				};
+				if (sourceIt->is_object())
+				{
+					const auto shaderIt = sourceIt->find("Shader_Name");
+					if (shaderIt != sourceIt->end() && shaderIt->is_string())
+						match["sourceShaderName"] = shaderIt->get<string>();
+					const auto techniqueIt = sourceIt->find("Technique_Name");
+					if (techniqueIt != sourceIt->end() && techniqueIt->is_string())
+						match["sourceTechniqueName"] = techniqueIt->get<string>();
+				}
+				referenceAudit["exactMatches"].push_back(std::move(match));
+			}
+
+			for (const string& sourceName : sourceMaterialNames)
+			{
+				if (!converterMaterialNames.contains(sourceName))
+					referenceAudit["sourceOnlyMaterials"].push_back(sourceName);
+			}
+			referenceAudit["exactMatchCount"] = referenceAudit["exactMatches"].size();
+		}
+		catch (const std::exception& exception)
+		{
+			referenceAudit["status"] = "invalid";
+			referenceAudit["error"] = exception.what();
+		}
+	}
+	inspection["referenceMaterials"] = std::move(referenceAudit);
+	root["inspection"] = std::move(inspection);
+
+	ofstream out(path);
+	if (!out.is_open())
+	{
+		std::cerr << "  [JSON] Failed to open inspection output\n";
+		return false;
+	}
+
+	out << root.dump(4);
+	if (!out.good())
+	{
+		std::cerr << "  [JSON] Failed to write inspection output\n";
+		return false;
+	}
+	out.close();
+
+	const json& writtenInspection = root["inspection"];
+	const json& writtenReference = writtenInspection["referenceMaterials"];
+	std::cout << "  [Audit] Mesh material indices: "
+		<< writtenInspection["validMeshMaterialIndexCount"] << "/"
+		<< writtenInspection["meshCount"] << " valid\n";
+	if (writtenReference["present"].get<Bool>())
+	{
+		std::cout << "  [Audit] Reference material exact matches: "
+			<< writtenReference["exactMatchCount"] << "/"
+			<< writtenInspection["converterMaterialCount"]
+			<< " (status=" << writtenReference["status"].get<string>() << ")\n";
+	}
+
+	const std::u8string utf8Path = filesystem::path(path).u8string();
+	std::cout << "  [JSON] Export Success: "
+		<< string{ utf8Path.begin(), utf8Path.end() } << "\n";
+	return true;
 }

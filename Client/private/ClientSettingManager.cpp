@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ClientSettingManager.h"
+#include "Model.h"
 
 namespace
 {
@@ -268,8 +269,7 @@ namespace
 		}
 	}
 
-	HRESULT ParseModelSettingsWorkbook(const filesystem::path& workbookPath,
-		const filesystem::path& resourceRoot, nlohmann::json& outJson)
+	HRESULT ParseModelSettingsWorkbook(const filesystem::path& workbookPath, nlohmann::json& outJson)
 	{
 		zlib_filefunc64_def fileFunctions{};
 		fill_win32_filefunc64W(&fileFunctions);
@@ -410,10 +410,9 @@ namespace
 				filesystem::path(Helper::To_wString(path)).lexically_normal();
 			if (relativeModelPath.empty() || relativeModelPath.is_absolute() || relativeModelPath.has_root_name() ||
 				*relativeModelPath.begin() == L".." ||
-				ToLowerAscii(relativeModelPath.extension().string()) != ".model" ||
-				!filesystem::is_regular_file(resourceRoot / relativeModelPath))
+				ToLowerAscii(relativeModelPath.extension().string()) != ".model")
 			{
-				LOG_ERROR(L"Invalid or missing Model Path in Models row {} : {}",
+				LOG_ERROR(L"Invalid Model Path in Models row {} : {}",
 					rowNumber, Helper::To_wString(path));
 				return E_FAIL;
 			}
@@ -693,8 +692,7 @@ HRESULT ClientSettingManager::Load_Textures_FromJson(LEVEL baseLevel) const
 		}
 		
         if (level != baseLevel)
-			if (level != LEVEL::LOADING)
-				continue;
+			continue;
 		
 		wstring tag = Helper::To_wString(item["tag"].get<string>());
 		wstring relativePath = Helper::To_wString(item["path"].get<string>());
@@ -706,9 +704,10 @@ HRESULT ClientSettingManager::Load_Textures_FromJson(LEVEL baseLevel) const
 
 		wstring fullTexturePath = m_ResourcePath + relativePath;
 		
-		if (FAILED(GAME_INSTANCE->Load_Texture(ETOI(level), fullTexturePath.c_str(), count, tag)))
+		if (FAILED(GAME_INSTANCE->Load_Texture(ETOI(level), fullTexturePath.c_str(), count, tag, true)))
 		{
-			LOG_ERROR(L"Failed to Load Texture Prototype: {}", tag);
+			LOG_ERROR(L"Failed to load Texture '{}' at level {} from '{}' (count {})",
+				tag, ETOI(level), filesystem::absolute(fullTexturePath).lexically_normal().wstring(), count);
 			return E_FAIL;
 		}
 	}
@@ -752,6 +751,7 @@ HRESULT ClientSettingManager::Sync_TextureJson_FromExcel() const
 
 HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 {
+	Bool skippedMissing = false;
 	wstring fullPath = m_ProjectSettingPath + L"ModelSettings.json";
 
 	if (!filesystem::exists(fullPath))
@@ -798,6 +798,20 @@ HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 		wstring tag = Helper::To_wString(item["tag"].get<string>());
 		wstring relativePath = Helper::To_wString(item["path"].get<string>());
 		wstring fullTexturePath = m_ResourcePath + relativePath;
+		std::error_code pathError;
+		const Bool modelExists = filesystem::exists(fullTexturePath, pathError);
+		if (pathError)
+		{
+			LOG_ERROR(L"Failed to inspect ModelSettings path '{}' (error {})", fullTexturePath, pathError.value());
+			return E_FAIL;
+		}
+		if (!modelExists)
+		{
+			LOG_WARN(L"[ModelSettings fallback] '{}' level {}: missing '{}'; skipping registration. Add the file and reload the level/application.",
+				tag, ETOI(level), filesystem::absolute(fullTexturePath).lexically_normal().wstring());
+			skippedMissing = true;
+			continue;
+		}
 
 		// JSON에서 트랜스포메이션 데이터 추출 및 기본값 처리
 		Vector3 vPos = Vector3::Zero;
@@ -830,15 +844,19 @@ HRESULT ClientSettingManager::Load_Model_FromJson(LEVEL baseLevel) const
 						  Matrix::CreateFromYawPitchRoll(XMConvertToRadians(vRot.y), XMConvertToRadians(vRot.x), XMConvertToRadians(vRot.z)) * 
 						  Matrix::CreateTranslation(vPos);
 
-		if (FAILED(GAME_INSTANCE->Load_Model(ETOI(level), fullTexturePath.c_str(), tag, matWorld)))
+		const filesystem::path materialSettingsPath = filesystem::path(m_ProjectSettingPath) /
+			L"Material" / Engine::Model::Make_MaterialSettingsFileName(tag);
+		if (FAILED(GAME_INSTANCE->Load_Model(ETOI(level), fullTexturePath.c_str(), tag, matWorld,
+			materialSettingsPath.c_str())))
 		{
-			LOG_ERROR(L"Failed to Load Model Prototype: {}", tag);
+			LOG_ERROR(L"Failed to load Model '{}' at level {} from '{}'",
+				tag, ETOI(level), filesystem::absolute(fullTexturePath).lexically_normal().wstring());
 			return E_FAIL;
 		}
 
 	}
 
-	return S_OK;
+	return skippedMissing ? S_FALSE : S_OK;
 }
 
 HRESULT ClientSettingManager::Sync_ModelJson_FromExcel() const
@@ -857,7 +875,7 @@ HRESULT ClientSettingManager::Sync_ModelJson_FromExcel() const
 	}
 
 	nlohmann::json jsonRoot;
-	if (FAILED(ParseModelSettingsWorkbook(workbookPath, filesystem::path(m_ResourcePath), jsonRoot)))
+	if (FAILED(ParseModelSettingsWorkbook(workbookPath, jsonRoot)))
 	{
 		LOG_ERROR(L"Failed to synchronize ModelSettings.xlsx : {}", workbookPath.wstring());
 		return E_FAIL;
@@ -918,11 +936,6 @@ HRESULT ClientSettingManager::Apply_LayerAndTagSettings() const
 	}
 
 	return S_OK;
-}
-
-HRESULT ClientSettingManager::Ready_Client_Prototypes(LEVEL baseLevel) const
-{
-    return GAME_INSTANCE->Register_ReflectedPrototypes(ETOI(baseLevel));
 }
 
 HRESULT ClientSettingManager::Load_Shader() const
@@ -1057,6 +1070,7 @@ HRESULT ClientSettingManager::Load_LevelData(LEVEL level) const
 
 HRESULT ClientSettingManager::Load_Sound_FromJson() const
 {
+	Bool skippedMissing = false;
 	wstring fullPath = m_ProjectSettingPath + L"SoundSettings.json";
 
 	if (!filesystem::exists(fullPath))
@@ -1100,6 +1114,20 @@ HRESULT ClientSettingManager::Load_Sound_FromJson() const
 		wstring tag = Helper::To_wString(CleanString(item["tag"].get<string>()));
 		wstring relativePath = Helper::To_wString(CleanString(item["path"].get<string>()));
 		wstring fullSoundPath = m_ResourcePath + relativePath;
+		std::error_code pathError;
+		const Bool soundExists = filesystem::exists(fullSoundPath, pathError);
+		if (pathError)
+		{
+			LOG_ERROR(L"Failed to inspect SoundSettings path '{}' (error {})", fullSoundPath, pathError.value());
+			return E_FAIL;
+		}
+		if (!soundExists)
+		{
+			LOG_WARN(L"[SoundSettings fallback] '{}': missing '{}'; skipping registration (silent playback). Add the file and reload the application.",
+				tag, filesystem::absolute(fullSoundPath).lexically_normal().wstring());
+			skippedMissing = true;
+			continue;
+		}
 
 		if (FAILED(GAME_INSTANCE->Load_Sound(tag, fullSoundPath)))
 		{
@@ -1108,7 +1136,7 @@ HRESULT ClientSettingManager::Load_Sound_FromJson() const
 		}
 	}
 
-	return S_OK;
+	return skippedMissing ? S_FALSE : S_OK;
 }
 
 HRESULT ClientSettingManager::Sync_SoundJson_FromCSV() const
@@ -1117,17 +1145,10 @@ HRESULT ClientSettingManager::Sync_SoundJson_FromCSV() const
 
 	if (!filesystem::exists(csvPath))
 	{
-		std::ofstream outFile(csvPath);
-		if (outFile.is_open())
-		{
-			outFile << "Tag, Path" << std::endl;
-			outFile << "Title_BGM, Sound/Title_BGM.wem" << std::endl;
-			outFile.close();
-		}
-		LOG_INFO(L"Created Template SoundSettings.csv: {}", csvPath);
+		LOG_WARN(L"SoundSettings.csv is missing; preserving the existing SoundSettings.json cache");
+		return filesystem::is_regular_file(m_ProjectSettingPath + L"SoundSettings.json")
+			? S_FALSE : HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
 	}
-
-	if (!filesystem::exists(csvPath)) return S_OK;
 
 	ifstream csvFile(csvPath);
 	nlohmann::json jsonRoot;

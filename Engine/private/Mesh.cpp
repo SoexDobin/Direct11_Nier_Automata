@@ -20,6 +20,7 @@ void Mesh::Fill_BoneMatrices(const vector<Shared<Bone>>& bones)
 
 HRESULT Mesh::Initialize_Prototype(Bool isAnim, const MODEL_MESH& modelMesh, const Matrix& preTransformMatrix)
 {
+	m_MeshName = modelMesh.name;
 	m_MaterialIndex = modelMesh.materialIndex;
 	m_BoneIndices = modelMesh.boneIndices;
 	m_OffsetMatrices = modelMesh.offsetMatrices;
@@ -172,9 +173,14 @@ HRESULT Mesh::Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData)
 	vertexBufferDesc.MiscFlags = 0;
 
 	VTXANIMMESH* vertices = new VTXANIMMESH[m_NumVertices];
+	m_RawPosition.clear();
+	m_RawPosition.reserve(m_NumVertices * 3);
 	for (size_t i = 0; i < m_NumVertices; i++)
 	{
 		vertices[i] = meshData.animVertices[i];
+		m_RawPosition.push_back(vertices[i].position.x);
+		m_RawPosition.push_back(vertices[i].position.y);
+		m_RawPosition.push_back(vertices[i].position.z);
 	}
 
 	m_NumBones = meshData.boneIndices.size();

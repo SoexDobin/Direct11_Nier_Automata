@@ -1,0 +1,241 @@
+{
+    "animationEnum": "WP3000.AnimationState",
+    "animations": [
+        {
+            "index": 0,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0000.anim",
+            "states": [
+                "IDLE"
+            ]
+        },
+        {
+            "index": 1,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0001.anim",
+            "states": []
+        },
+        {
+            "index": 2,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0002.anim",
+            "states": []
+        },
+        {
+            "index": 3,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0003.anim",
+            "states": []
+        },
+        {
+            "index": 4,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0005.anim",
+            "states": []
+        },
+        {
+            "index": 5,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0006.anim",
+            "states": []
+        },
+        {
+            "index": 6,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0010.anim",
+            "states": []
+        },
+        {
+            "index": 7,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0011.anim",
+            "states": []
+        },
+        {
+            "index": 8,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0012.anim",
+            "states": []
+        },
+        {
+            "index": 9,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_001f.anim",
+            "states": []
+        },
+        {
+            "index": 10,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0020.anim",
+            "states": []
+        },
+        {
+            "index": 11,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0021.anim",
+            "states": [
+                "SHOOT_START"
+            ]
+        },
+        {
+            "index": 12,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0022.anim",
+            "states": [
+                "SHOOT_LOOP"
+            ]
+        },
+        {
+            "index": 13,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0025.anim",
+            "states": [
+                "SHOOT_END"
+            ]
+        },
+        {
+            "index": 14,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0026.anim",
+            "states": []
+        },
+        {
+            "index": 15,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0027.anim",
+            "states": []
+        },
+        {
+            "index": 16,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0030.anim",
+            "states": []
+        },
+        {
+            "index": 17,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0031.anim",
+            "states": []
+        },
+        {
+            "index": 18,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0032.anim",
+            "states": []
+        },
+        {
+            "index": 19,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0040.anim",
+            "states": []
+        },
+        {
+            "index": 20,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0041.anim",
+            "states": []
+        },
+        {
+            "index": 21,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0042.anim",
+            "states": []
+        },
+        {
+            "index": 22,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_060e.anim",
+            "states": []
+        },
+        {
+            "index": 23,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_060f.anim",
+            "states": []
+        },
+        {
+            "index": 24,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0610.anim",
+            "states": []
+        },
+        {
+            "index": 25,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0611.anim",
+            "states": []
+        },
+        {
+            "index": 26,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_0612.anim",
+            "states": []
+        },
+        {
+            "index": 27,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_062a.anim",
+            "states": []
+        },
+        {
+            "index": 28,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_062b.anim",
+            "states": []
+        },
+        {
+            "index": 29,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_120d.anim",
+            "states": []
+        },
+        {
+            "index": 30,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_120e.anim",
+            "states": []
+        },
+        {
+            "index": 31,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_1210.anim",
+            "states": []
+        },
+        {
+            "index": 32,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_a000.anim",
+            "states": []
+        },
+        {
+            "index": 33,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e050.anim",
+            "states": []
+        },
+        {
+            "index": 34,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e051.anim",
+            "states": []
+        },
+        {
+            "index": 35,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e052.anim",
+            "states": []
+        },
+        {
+            "index": 36,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e053.anim",
+            "states": []
+        },
+        {
+            "index": 37,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e054.anim",
+            "states": []
+        },
+        {
+            "index": 38,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e063.anim",
+            "states": []
+        },
+        {
+            "index": 39,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e065.anim",
+            "states": []
+        },
+        {
+            "index": 40,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e070.anim",
+            "states": []
+        },
+        {
+            "index": 41,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e072.anim",
+            "states": []
+        },
+        {
+            "index": 42,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e073.anim",
+            "states": []
+        },
+        {
+            "index": 43,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e075.anim",
+            "states": []
+        },
+        {
+            "index": 44,
+            "path": "Models/wp3000/Animations/wp3000_wp3000_e076.anim",
+            "states": []
+        }
+    ],
+    "assetGuid": "cf56ac8c566c419ba44452f8dfac5689",
+    "name": "wp3000_Gameplay",
+    "schemaVersion": 2
+}

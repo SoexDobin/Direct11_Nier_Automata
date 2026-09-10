@@ -58,7 +58,7 @@ HRESULT EditorApp::Initialize() {
 			Phase5GateVerifier::Initialize_Runtime(m_Phase5GateStage);
 	else if (!(m_ClientApp = ClientApp::Create(desc)))
 	{
-		MSG_BOX("Failed To Create : ClientApp");
+		LOG_ERROR(L"Editor startup could not initialize ClientApp");
 		return E_FAIL;
 	}
 
@@ -135,7 +135,7 @@ Unique<EditorApp> EditorApp::Create() {
     Unique<EditorApp> editorApp = make_unique<EditorApp>();
 
     if (FAILED(editorApp->Initialize())) {
-      MSG_BOX("Failed to Create : EditorApp");
+      MSG_BOX("Editor could not start.\nCheck Editor/bin/logs/engine.log for the failing resource or initialization step.");
       return nullptr;
     }
 
@@ -181,15 +181,20 @@ HRESULT EditorApp::Initialize_IMGUI(const ENGINE_DESC &desc) {
 }
 
 HRESULT EditorApp::Destruct_IMGUI() {
-	if (m_Phase5GateStage == 0)
+	if (m_Phase5GateStage == 0 && ImGui::GetCurrentContext())
 	{
 		GAME_INSTANCE->Get_LayerRegister()->SaveToFile(PATH.GetLayerSettingsPath());
 		GAME_INSTANCE->Get_TagRegister()->SaveToFile(PATH.GetTagSettingsPath());
 	}
 
-    ImGui_ImplDX11_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
+    // Client/resource startup can fail before the ImGui context/backends exist.
+    if (ImGui::GetCurrentContext()) {
+        if (ImGui::GetIO().BackendRendererUserData)
+            ImGui_ImplDX11_Shutdown();
+        if (ImGui::GetIO().BackendPlatformUserData)
+            ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+    }
     
     m_ClientApp.reset();
     GAME_INSTANCE->DestroyInstance();

@@ -22,6 +22,19 @@ namespace
 {
 constexpr size_t MaxHistoryEntries = 64;
 
+HRESULT Write_EditorProperty(Object& target, std::string_view propertyName,
+	const ReflectionValue& value)
+{
+	// Serialization stages the snapshot until Post_Load. Live editing must apply it
+	// now, including Undo/Redo, and return the actual validation/load result.
+	if (auto* model = dynamic_cast<Model*>(&target); model && propertyName == "AnimationPreset")
+	{
+		const auto* preset = value.Try_Get<AnimationPresetSnapshot>();
+		return preset ? model->Apply_AnimationPreset(*preset) : E_INVALIDARG;
+	}
+	return GAME_INSTANCE->Write_ReflectedProperty(target, propertyName, value);
+}
+
 Bool Belongs_To_Level(const Shared<GameObject>& object, uint32 levelIndex)
 {
     return object && GAME_INSTANCE->Contains(levelIndex, object->Get_ObjectGuid());
@@ -479,7 +492,7 @@ Bool EditorManager::Apply_History(const HISTORY_ENTRY& entry, Bool undo)
 		if (FAILED(GAME_INSTANCE->Read_ReflectedProperty(
 			*target, entry.propertyName, current)) ||
 			!ReflectionValuesEqual(current, expected) ||
-			FAILED(GAME_INSTANCE->Write_ReflectedProperty(
+			FAILED(Write_EditorProperty(
 				*target, entry.propertyName, desired)))
 			return false;
 		if (dynamic_pointer_cast<Transform>(target))
@@ -726,7 +739,7 @@ Bool EditorManager::Apply_Mutation(const MUTATION_COMMAND& command)
 		if (!propertyTarget || FAILED(GAME_INSTANCE->Read_ReflectedProperty(
 			*propertyTarget, command.propertyName, current)) ||
 			!ReflectionValuesEqual(current, command.beforeValue) ||
-			FAILED(GAME_INSTANCE->Write_ReflectedProperty(
+			FAILED(Write_EditorProperty(
 				*propertyTarget, command.propertyName, command.afterValue)))
 			return false;
 		if (dynamic_pointer_cast<Transform>(propertyTarget))

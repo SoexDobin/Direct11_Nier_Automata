@@ -2,8 +2,8 @@
 #include "EngineShaderConstantBuffer.hlsli"
 
 row_major matrix g_BoneMatrices[512];
-texture2D g_DiffuseTexture;
-texture2D g_NormalTexture;
+texture2D g_AlbedoMap;
+texture2D g_NormalMap;
 
 struct VS_IN
 {
@@ -37,7 +37,7 @@ VS_OUT VS_Main(VS_IN input)
 PS_OUT PS_Main(VS_OUT input)
 {
     PS_OUT output;
-    output.diffuse = g_DiffuseTexture.Sample(LinearWrapSampler, input.texcoord) * g_BaseColorTint;
+    output.diffuse = g_AlbedoMap.Sample(LinearWrapSampler, input.texcoord) * g_BaseColorTint;
     output.diffuse.rgb += g_EmissiveColor.rgb * g_EmissiveIntensity;
     if (output.diffuse.a < g_OpacityMaskClipValue) discard;
     output.normal = float4(normalize(input.normal) * 0.5f + 0.5f, 1.f);
@@ -46,7 +46,7 @@ PS_OUT PS_Main(VS_OUT input)
 
 technique11 DefaultTechnique
 {
-    pass Default
+    pass Default_Pass
     {
         SetRasterizerState(RS_Default); SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);

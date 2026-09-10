@@ -27,7 +27,7 @@ public:
 public:
 	const TRANSFORM_FRAME& Get_TransformVelocity(int32 boneIndex) const;
 	const wstring& Get_AnimationName() { return m_Name; }
-	Float Get_Progress() const { return m_CurrentTrackPosition / m_Duration; }
+	Float Get_Progress() const { return m_Duration > 0.f ? m_CurrentTrackPosition / m_Duration : 1.f; }
 	void Set_Progress(Float progress);
 	Float Get_Duration() const { return m_Duration; }
 	Float Get_TickPerSecond() const { return m_TickPerSecond; }

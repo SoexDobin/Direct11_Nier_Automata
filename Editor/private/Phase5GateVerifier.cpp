@@ -10,6 +10,10 @@
 #include "GameObject.h"
 #include "HpBarWorldUI.h"
 #include "Model.h"
+#include "Shader.h"
+#include "ModelViewer.h"
+#include "LevelGamePlay.h"
+#include <wincodec.h>
 #include "Navigation.h"
 #include "PathManager.h"
 #include "Pl0000.h"
@@ -35,6 +39,11 @@ namespace Phase5GateVerifier
 		constexpr uint32 SceneRestartStage = 8;
 		constexpr uint32 EditorCutoverStage = 9;
 		constexpr uint32 SingleTypePrototypeStage = 10;
+		constexpr uint32 MaterialSettingsStage = 11;
+		constexpr uint32 MaterialBindingStage = 12;
+		constexpr uint32 MaterialAuthoringStage = 13;
+		constexpr uint32 AnimationAuthoringStage = 14;
+		constexpr uint32 AnimationRestartStage = 15;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
 		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
 		constexpr const wchar_t* FrameFixtureTag = L"TextUI";
@@ -157,6 +166,57 @@ namespace Phase5GateVerifier
 					return false;
 			}
 			return true;
+		}
+
+		Bool Same_MaterialSettings(const MODEL_MATERIAL_SETTINGS& lhs,
+			const MODEL_MATERIAL_SETTINGS& rhs)
+		{
+			if (lhs.schemaVersion != rhs.schemaVersion || lhs.modelTag != rhs.modelTag ||
+				lhs.modelPath != rhs.modelPath || lhs.materials.size() != rhs.materials.size())
+				return false;
+			for (size_t index = 0; index < lhs.materials.size(); ++index)
+			{
+				const MODEL_MATERIAL_SETTING& left = lhs.materials[index];
+				const MODEL_MATERIAL_SETTING& right = rhs.materials[index];
+				if (left.materialIndex != right.materialIndex ||
+					left.sourceMaterialName != right.sourceMaterialName ||
+					left.sourceShaderName != right.sourceShaderName ||
+					left.sourceTechniqueName != right.sourceTechniqueName ||
+					left.passName != right.passName || left.isBlend != right.isBlend ||
+					left.textures.size() != right.textures.size())
+					return false;
+				for (size_t textureIndex = 0; textureIndex < left.textures.size(); ++textureIndex)
+				{
+					if (left.textures[textureIndex].slotName != right.textures[textureIndex].slotName ||
+						left.textures[textureIndex].resourcePath != right.textures[textureIndex].resourcePath)
+						return false;
+				}
+			}
+			return true;
+		}
+
+		nlohmann::json Make_MaterialSettingsDocument(const Shared<Model>& model)
+		{
+			nlohmann::json document{
+				{ "schemaVersion", 1 },
+				{ "modelTag", Helper::To_String(model->Get_ModelTag()) },
+				{ "modelPath", model->Get_ModelResourcePath() },
+				{ "materials", nlohmann::json::array() }
+			};
+			const vector<string> materialNames = model->Get_MaterialNames();
+			for (size_t index = 0; index < materialNames.size(); ++index)
+			{
+				document["materials"].push_back({
+					{ "materialIndex", index },
+					{ "sourceMaterialName", materialNames[index] },
+					{ "sourceShaderName", "PBS00_XXXXX" },
+					{ "sourceTechniqueName", "Default" },
+					{ "passName", "Default_Pass" },
+					{ "renderGroup", index == 1 ? "BLEND" : "NONBLEND" },
+					{ "textures", nlohmann::json::object() }
+				});
+			}
+			return document;
 		}
 
 		class GateReport final
@@ -325,6 +385,245 @@ namespace Phase5GateVerifier
 			return guid.Is_Valid() && SUCCEEDED(GAME_INSTANCE->Register_Prefab(guid, path.wstring())) &&
 				SUCCEEDED(GAME_INSTANCE->SerializePrefabDocument(guid, root, GateLevel)) &&
 				Read_Json(path, outDocument);
+		}
+
+		HRESULT Run_AnimationProduction(HRESULT initializationResult, Bool author)
+		{
+			GateReport report(author ? "animation-authoring" : "animation-restart");
+			const auto reportPath = Work_Directory() / (author ?
+				L"phase9-animation-authoring.json" : L"phase9-animation-restart.json");
+			const auto finish = [&]() {
+				const Bool saved = report.Save(reportPath);
+				return saved && report.Passed() ? S_OK : E_FAIL;
+			};
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult)) return finish();
+			if (!author)
+			{
+				nlohmann::json previous;
+				report.Check("separate-editor-process", Read_Json(Work_Directory() /
+					L"phase9-animation-authoring.json", previous) && previous.value("passed", false) &&
+					previous.value("processId", GetCurrentProcessId()) != GetCurrentProcessId());
+			}
+
+			const vector<pair<wstring, string>> sources{
+				{L"pl0000", "Pl0000.AnimationState"}, {L"wp0070", "WP0070.AnimationState"},
+				{L"wp0220", "WP0220.AnimationState"}, {L"wp3000", "WP3000.AnimationState"}
+			};
+			map<wstring, AnimationPresetSnapshot> presets;
+			string error;
+			for (const auto& [tag, enumName] : sources)
+			{
+				AnimationPresetSnapshot expected, loaded;
+				string loadedName;
+				const string name = Helper::To_String(tag) + "_Gameplay";
+				const auto target = filesystem::path(PATH.GetAnimationPresetSettingsDir()) /
+					Helper::To_wString(name + ".json");
+				Bool valid = AnimationPresetEditor::Build_Snapshot(filesystem::path(PATH.GetResourceDir()) /
+					L"Models" / tag / L"Animations/manifest.json", enumName, expected, error);
+				if (valid && author && !filesystem::exists(target))
+					valid = AnimationPresetEditor::Save_Document(target, Create_AssetGuid(), name, expected, error);
+				valid = valid && AnimationPresetEditor::Load_Document(target, loaded, loadedName, error) &&
+					Same_Preset(expected, loaded);
+				report.Check("writer-reload-mapping-" + Helper::To_String(tag), valid, error);
+				if (!valid) return finish();
+				presets.emplace(tag, std::move(loaded));
+			}
+
+			const filesystem::path scenePath = PATH.GetLevelDataPath(GateLevel);
+			const auto prefabPath = filesystem::path(PATH.GetPrefabSettingsDir()) / L"Phase6_Pl0000.json";
+			nlohmann::json originalScene, originalPrefab;
+			PrefabGuid prefabGuid;
+			const Bool loaded = Read_Json(scenePath, originalScene) && Read_Json(prefabPath, originalPrefab) &&
+				SUCCEEDED(GAME_INSTANCE->Register_PrefabDocument(prefabPath.wstring(), prefabGuid)) &&
+				SUCCEEDED(GAME_INSTANCE->Change_Level(GateLevel,
+					Client::LevelGamePlay::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context())));
+			report.Check("existing-scene-load", loaded);
+			if (!loaded) return finish();
+			Shared<GameObject> player;
+			for (const auto& [id, object] : GAME_INSTANCE->Get_GameObjects(GateLevel))
+				if (object && !object->Get_Parent() && object->Get_Name() == L"Phase6_Pl0000") player = object;
+			report.Check("existing-player", player != nullptr);
+			if (!player) return finish();
+			size_t modelCount = 0;
+			for (const auto& child : player->Get_Children())
+			{
+				const auto model = child->Get_Component<Model>();
+				if (!model) continue;
+				++modelCount;
+				const auto it = presets.find(model->Get_ModelTag());
+				Bool applied = it != presets.end();
+				if (applied && author)
+				{
+					ReflectionValue beforeValue, afterValue;
+					beforeValue.data = model->Get_AnimationPreset();
+					afterValue.data = it->second;
+					EDITOR->Queue_PropertyWrite(child, *model, "AnimationPreset", beforeValue, afterValue, true);
+					EDITOR->Update(false);
+				}
+				applied = applied && Same_Preset(model->Get_AnimationPreset(), it->second) &&
+					model->Get_NumAnimations() == it->second.animations.size();
+				report.Check("component-snapshot-" + Helper::To_String(child->Get_StableChildKey()), applied);
+			}
+			report.Check("six-model-components", modelCount == 6);
+			if (!report.Passed()) return finish();
+
+			// Only the AnimationPreset property may differ from the authored documents.
+			const auto withoutPresets = [](nlohmann::json document) {
+				for (auto& [id, object] : document["objects"].items())
+				{
+					for (auto& component : object["components"])
+						if (component.value("typeName", string{}) == "Model")
+							component["properties"].erase("AnimationPreset");
+					Sort_Components(object);
+				}
+				return document;
+			};
+			const auto stageScene = Work_Directory() / L"phase9-animation-scene.json";
+			nlohmann::json candidateScene, candidatePrefab;
+			string prefabSnapshot;
+			const Bool serialized = SUCCEEDED(GAME_INSTANCE->SerializeLevel(GateLevel, stageScene.wstring())) &&
+				Read_Json(stageScene, candidateScene) && SUCCEEDED(GAME_INSTANCE->SerializeSubtreeSnapshot(
+					prefabGuid, player, prefabSnapshot, GateLevel));
+			if (serialized) candidatePrefab = nlohmann::json::parse(prefabSnapshot);
+			report.Check("scene-guid-placement-ui-preserved", serialized &&
+				withoutPresets(originalScene) == withoutPresets(candidateScene));
+			report.Check("prefab-guid-properties-preserved", serialized &&
+				withoutPresets(originalPrefab) == withoutPresets(candidatePrefab));
+			if (!report.Passed()) return finish();
+			if (author)
+			{
+				report.Check("existing-writers-save", SUCCEEDED(GAME_INSTANCE->SerializePrefabDocument(
+					prefabGuid, player, GateLevel)) && SUCCEEDED(GAME_INSTANCE->SerializeLevel(GateLevel, scenePath.wstring())));
+				return finish();
+			}
+
+			Shared<GameObject> instance;
+			report.Check("prefab-restart-instantiate", SUCCEEDED(GAME_INSTANCE->DeSerializePrefabDocument(
+				prefabGuid, instance, GateLevel)) && instance && instance->Get_ObjectGuid() != player->Get_ObjectGuid());
+			if (instance)
+				for (const auto& child : instance->Get_Children())
+					if (const auto model = child->Get_Component<Model>())
+						report.Check("prefab-snapshot-" + Helper::To_String(child->Get_StableChildKey()),
+							Same_Preset(model->Get_AnimationPreset(), presets.at(model->Get_ModelTag())));
+
+			// Use isolated instances to exercise playback without mutating the authored scene.
+			for (const auto& [tag, enumName] : sources)
+			{
+				const auto prototype = GAME_INSTANCE->Get_Model(GateLevel, tag.c_str());
+				const auto model = prototype ? make_shared<Model>(*prototype) : nullptr;
+				Bool played = model && SUCCEEDED(model->Apply_AnimationPreset(presets.at(tag)));
+				ReflectedEnumInfo info;
+				played = played && SUCCEEDED(GAME_INSTANCE->Find_ReflectedEnum(enumName, info));
+				if (played)
+				{
+					for (const auto& state : info.values)
+					{
+						model->Set_Animation(static_cast<uint32>(state.value), 0.f);
+						model->Set_AnimLoop(true);
+						model->Update_ModelAnimation(1.f / 60.f);
+						played = played && model->Get_AnimationIndex() == state.value &&
+							std::isfinite(model->Get_AnimationProgress()) && model->Get_AnimationProgress() > 0.f;
+					}
+					for (const auto& state : info.values)
+					{
+						model->Set_Animation(static_cast<uint32>(state.value), 0.1f);
+						model->Update_ModelAnimation(0.05f);
+						model->Update_ModelAnimation(0.1f);
+						played = played && std::isfinite(model->Get_AnimationProgress());
+						for (uint32 bone = 0; bone < model->Get_Num_Bones(); ++bone)
+						{
+							const Matrix pose = model->Get_BoneMatrix(bone);
+							for (uint32 row = 0; row < 4; ++row)
+								for (uint32 column = 0; column < 4; ++column)
+									played = played && std::isfinite(pose.m[row][column]);
+						}
+					}
+				}
+				report.Check("all-enum-slots-play-" + Helper::To_String(tag), played);
+				if (played && tag == L"pl0000")
+				{
+					model->Set_Animation(2, 0.f);
+					model->Update_ModelAnimation(1.f / 60.f);
+					vector<Matrix> before;
+					for (uint32 bone = 0; bone < model->Get_Num_Bones(); ++bone) before.push_back(model->Get_BoneMatrix(bone));
+					model->Update_ModelAnimation(0.1f);
+					Bool changed = false;
+					for (uint32 bone = 0; bone < before.size(); ++bone)
+						changed = changed || before[bone] != model->Get_BoneMatrix(bone);
+					report.Check("player-run-bone-pose-changes", changed);
+					ModelViewer viewer;
+					ComPtr<ID3D11ShaderResourceView> image;
+					Bool captured = SUCCEEDED(viewer.Preview_Model(model, image)) && image;
+					if (captured)
+					{
+						ComPtr<ID3D11Resource> resource;
+						image->GetResource(resource.GetAddressOf());
+						captured = SUCCEEDED(SaveWICTextureToFile(GAME_INSTANCE->Get_Context().Get(),
+							resource.Get(), GUID_ContainerFormatPng, (Work_Directory() / L"phase9-animation-player.png").c_str()));
+					}
+					report.Check("editor-player-preview-capture", captured);
+				}
+				if (played)
+				{
+					const auto clone = make_shared<Model>(*model);
+					const wstring name = model->Get_AnimationNameByIndex(0);
+					report.Check("editor-clip-name-and-clone-" + Helper::To_String(tag), !name.empty() &&
+						clone->Get_AnimationNameByIndex(0) == name && clone->Get_AnimationIndexByName(name) == 0);
+				}
+			}
+
+			const auto prototype = GAME_INSTANCE->Get_Model(GateLevel, L"wp3000");
+			if (instance)
+			{
+				const auto child = instance->Find_Child(L"WP3000Body");
+				const auto target = child->Get_Component<Model>();
+				ReflectionValue full, empty, invalidValue;
+				full.data = target->Get_AnimationPreset();
+				empty.data = AnimationPresetSnapshot{};
+				EDITOR->Clear_History();
+				EDITOR->Queue_PropertyWrite(child, *target, "AnimationPreset", full, empty, true);
+				EDITOR->Update(false);
+				report.Check("editor-clear-live-animation", target->Get_NumAnimations() == 0 && EDITOR->Can_Undo());
+				EDITOR->Queue_Undo(); EDITOR->Update(false);
+				report.Check("editor-undo-reloads-clips", target->Get_NumAnimations() == 45 &&
+					Same_Preset(target->Get_AnimationPreset(), presets.at(L"wp3000")));
+				EDITOR->Queue_Redo(); EDITOR->Update(false);
+				report.Check("editor-redo-clears-clips", target->Get_NumAnimations() == 0);
+				EDITOR->Queue_Undo(); EDITOR->Update(false);
+				auto bad = presets.at(L"wp3000"); bad.animations[0].relativePath = L"../missing.anim";
+				invalidValue.data = bad;
+				EDITOR->Clear_History();
+				EDITOR->Queue_PropertyWrite(child, *target, "AnimationPreset", full, invalidValue, true);
+				EDITOR->Update(false);
+				report.Check("editor-invalid-apply-no-history", !EDITOR->Can_Undo() &&
+					Same_Preset(target->Get_AnimationPreset(), presets.at(L"wp3000")));
+			}
+			const auto model = make_shared<Model>(*prototype);
+			const auto invokes = make_shared<uint32>(0);
+			model->Set_Animation(11, 0.f);
+			model->Add_AnimNotify(11, {L"GateNotify", 0.f, [invokes]() { ++*invokes; }});
+			Bool applied = SUCCEEDED(model->Apply_AnimationPreset(presets.at(L"wp3000")));
+			report.Check("deferred-selection-and-notify", applied && model->Get_AnimationIndex() == 11 && *invokes == 1);
+			const auto before = model->Get_AnimationPreset();
+			auto invalid = before;
+			invalid.animations[0].relativePath = L"../missing.anim";
+			report.Check("invalid-preset-preserves-selection-notify", FAILED(model->Apply_AnimationPreset(invalid)) &&
+				Same_Preset(before, model->Get_AnimationPreset()) && model->Get_AnimationIndex() == 11 && *invokes == 1);
+			applied = SUCCEEDED(model->Apply_AnimationPreset(before));
+			model->Set_Animation(11, 0.f);
+			model->Update_ModelAnimation(0.f);
+			report.Check("reapply-rebinds-notify-once", applied && *invokes == 2);
+			model->Clear_AnimNotifies();
+			model->Apply_AnimationPreset(before);
+			model->Set_Animation(11, 0.f);
+			model->Update_ModelAnimation(0.f);
+			report.Check("clear-removes-deferred-definitions", *invokes == 2);
+			const auto invalidRequest = make_shared<Model>(*prototype);
+			invalidRequest->Set_Animation(9999, 0.f);
+			report.Check("invalid-pending-index-rejects-apply", FAILED(invalidRequest->Apply_AnimationPreset(before)) &&
+				invalidRequest->Get_NumAnimations() == 0 && invalidRequest->Get_AnimationPreset().Is_Empty());
+			return finish();
 		}
 
 		HRESULT Run_Prepare()
@@ -1276,6 +1575,15 @@ namespace Phase5GateVerifier
 			report.Check("ui-order-anchor-three-depth-restored", hierarchyRestored);
 			report.Check("external-objectref-restored", hierarchyRestored &&
 				hpBar->Get_TargetObjectGuid() == player->Get_ObjectGuid());
+			const auto navigation = player ? player->Get_Component<Navigation>() : nullptr;
+			report.Check("player-navigation-structure-and-data-restored", navigation &&
+				navigation->Get_NumCells() > 0 && player->Get_Components().size() == 3);
+			Navigation::NAVIGATION_DESC emptyNavigationDesc{};
+			const auto emptyNavigation = GAME_INSTANCE->Instantiate<Navigation>(
+				L"Navigation", StaticLevel, &emptyNavigationDesc);
+			report.Check("empty-navigation-safe-without-resource", emptyNavigation &&
+				emptyNavigation->Get_NumCells() == 0 &&
+				!emptyNavigation->Has_NeighborCell(Vector3::Zero));
 
 			nlohmann::json authoredScene;
 			nlohmann::json resavedScene;
@@ -1521,7 +1829,36 @@ namespace Phase5GateVerifier
 			}
 			report.Check("component-default-is-one-per-type", componentDefaultInvariant);
 
+			Bool defaultsLiveOnlyInStatic = true;
+			for (uint32 level = StaticLevel + 1; level < ETOI(LEVEL::LEVEL_END); ++level) {
+				if (!GAME_INSTANCE->Get_Prototypes(level).empty()) {
+					defaultsLiveOnlyInStatic = false;
+					break;
+				}
+				for (const auto& [tag, prototype] : componentLevels[level]) {
+					const wstring registeredTag = prototype
+						? Helper::To_wString(GAME_INSTANCE->Find_RegisteredName(
+							prototype->Get_RuntimeTypeId()))
+						: wstring{};
+					if (!registeredTag.empty() && tag == registeredTag) {
+						defaultsLiveOnlyInStatic = false;
+						break;
+					}
+				}
+				if (!defaultsLiveOnlyInStatic)
+					break;
+			}
+			report.Check("default-type-prototypes-live-only-in-static",
+				defaultsLiveOnlyInStatic);
+
 			const auto& staticGameObjects = GAME_INSTANCE->Get_Prototypes(StaticLevel);
+			report.Check("level3-resolves-static-client-types",
+				staticGameObjects.contains(L"LoadingBackground") &&
+				staticGameObjects.contains(L"TitleBackground") &&
+				staticGameObjects.contains(L"Pl0000") &&
+				GAME_INSTANCE->Can_InstantiateGameObject("Pl0000", ETOI(LEVEL::GAMEPLAY)) &&
+				GAME_INSTANCE->Can_InstantiateComponent(
+					"Pl0000Input", ETOI(LEVEL::GAMEPLAY)));
 			const auto textPrototypeIt = staticGameObjects.find(L"TextUI");
 			const Shared<GameObject> originalTextPrototype = textPrototypeIt == staticGameObjects.end()
 				? nullptr : textPrototypeIt->second;
@@ -1627,6 +1964,348 @@ namespace Phase5GateVerifier
 				Work_Directory() / L"phase8-single-prototype-gates.json");
 			return report.Passed() && reportSaved ? S_OK : E_FAIL;
 		}
+
+		HRESULT Run_MaterialBinding(HRESULT initializationResult)
+		{
+			GateReport report("phase9-material-binding");
+			const auto reportPath = Work_Directory() / L"phase9-material-binding-gates.json";
+			const auto path = Work_Directory() / L"phase9-material-binding.json";
+			auto model = GAME_INSTANCE->Get_Model(GateLevel, L"wp3000");
+			auto shader = GAME_INSTANCE->Get_Shader(StaticLevel, VTXANIMMESH::Tag.c_str());
+			auto staticShader = GAME_INSTANCE->Get_Shader(StaticLevel, VTXMESH::Tag.c_str());
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult) && model && shader && staticShader);
+			if (FAILED(initializationResult) || !model || !shader || !staticShader)
+			{
+				report.Save(reportPath);
+				return E_FAIL;
+			}
+			auto context = GAME_INSTANCE->Get_Context();
+			auto boundAlbedo = [&]() {
+				ComPtr<ID3D11ShaderResourceView> srv;
+				context->PSGetShaderResources(0, 1, srv.GetAddressOf());
+				return srv;
+			};
+			auto blendState = [&]() {
+				ComPtr<ID3D11BlendState> blend;
+				context->OMGetBlendState(blend.GetAddressOf(), nullptr, nullptr);
+				return blend;
+			};
+			Bool passOrder = true;
+			const array<string, 3> names{ "Default_Pass", "AlphaBlend", "ShadowCompatible" };
+			for (auto current : { shader, staticShader })
+				for (uint32 index = 0; index < names.size(); ++index)
+				{
+					passOrder = passOrder && current->Has_Pass(names[index]) && SUCCEEDED(current->Begin(index));
+					auto numericBlend = blendState();
+					passOrder = passOrder && SUCCEEDED(current->Begin(names[index])) && numericBlend == blendState();
+				}
+			report.Check("static-animated-named-pass-order", passOrder);
+			report.Check("unknown-pass-and-index-rejected", !shader->Has_Pass("missing") &&
+				FAILED(shader->Begin(string{ "missing" })) && FAILED(shader->Begin(999u)));
+			report.Check("canonical-and-invalid-slots", shader->Has_SRV("g_AlbedoMap") &&
+				staticShader->Has_SRV("g_AlbedoMap") && !shader->Has_SRV("missing") &&
+				FAILED(shader->Bind_SRV("missing", nullptr)));
+			Model::MODEL_DESC cloneDesc{ L"wp3000" };
+			auto compatibility = dynamic_pointer_cast<Model>(model->Clone(&cloneDesc));
+			report.Check("settings-absent-compatibility", compatibility && !compatibility->Get_MaterialSettings() &&
+				SUCCEEDED(compatibility->Validate_MaterialBindings(shader)) &&
+				SUCCEEDED(compatibility->BindAndBeginMaterial(shader, 0)));
+			auto document = Make_MaterialSettingsDocument(model);
+			document["materials"][0]["textures"]["g_AlbedoMap"] = "Models/wp3000/Textures/08F62E04.dds";
+			document["materials"][1]["textures"]["g_AlbedoMap"] = "Models/wp3000/Textures/138F9B7F.dds";
+			document["materials"][1]["passName"] = "AlphaBlend";
+			const Bool loaded = Write_Json(path, document) && model->Load_MaterialSettings(path, L"wp3000", shader) == S_OK;
+			report.Check("two-material-textures-prepared", loaded);
+			if (!loaded) { report.Save(reportPath); return E_FAIL; }
+			auto snapshot = model->Get_MaterialSettings();
+			auto clone = dynamic_pointer_cast<Model>(model->Clone(&cloneDesc));
+			report.Check("clone-shares-immutable-preparation", clone && clone->Get_MaterialSettings() == snapshot);
+			const Bool boundA = SUCCEEDED(model->BindAndBeginMaterial(shader, 0));
+			auto srvA = boundAlbedo();
+			auto blendA = blendState();
+			const Bool boundB = SUCCEEDED(model->BindAndBeginMaterial(shader, 2));
+			auto srvB = boundAlbedo();
+			auto blendB = blendState();
+			report.Check("mesh-index-selects-distinct-srv-and-pass", boundA && boundB && srvA && srvB &&
+				srvA != srvB && blendA && blendB && blendA != blendB);
+			// Inspection fixture: mesh 0/1 use material 0, mesh 2 uses material 1.
+			report.Check("second-mesh-shares-material-zero", SUCCEEDED(model->BindAndBeginMaterial(shader, 1)) && boundAlbedo() == srvA);
+			report.Check("a-b-a-b-binding-order", SUCCEEDED(model->BindAndBeginMaterial(shader, 2)) && boundAlbedo() == srvB &&
+				SUCCEEDED(model->BindAndBeginMaterial(shader, 0)) && boundAlbedo() == srvA);
+			auto shaderClone = make_shared<Shader>(*shader);
+			report.Check("shader-clone-shares-effect-binding", clone &&
+				SUCCEEDED(clone->BindAndBeginMaterial(shaderClone, 2)) && boundAlbedo() == srvB);
+			for (const string kind : { "pass", "slot", "texture" })
+			{
+				auto bad = document;
+				if (kind == "pass") bad["materials"][1]["passName"] = "missing";
+				if (kind == "slot") bad["materials"][1]["textures"]["missing"] = "Models/wp3000/Textures/08F62E04.dds";
+				if (kind == "texture") bad["materials"][1]["textures"]["g_AlbedoMap"] = "Models/wp3000/Textures/missing.dds";
+				report.Check("invalid-" + kind + "-preserves-snapshot-and-srv", Write_Json(path, bad) &&
+					FAILED(model->Load_MaterialSettings(path, L"wp3000", shader)) &&
+					model->Get_MaterialSettings() == snapshot &&
+					SUCCEEDED(model->BindAndBeginMaterial(shader, 2)) && boundAlbedo() == srvB);
+			}
+			auto empty = document;
+			empty["materials"][1]["textures"] = nlohmann::json::object();
+			report.Check("populated-to-empty-slot-cleared", Write_Json(path, empty) &&
+				model->Load_MaterialSettings(path, L"wp3000", shader) == S_OK &&
+				SUCCEEDED(model->BindAndBeginMaterial(shader, 0)) && boundAlbedo() &&
+				SUCCEEDED(model->BindAndBeginMaterial(shader, 2)) && !boundAlbedo());
+			empty["materials"][0]["textures"] = nlohmann::json::object();
+			report.Check("cross-model-and-removed-slot-cleared", Write_Json(path, empty) &&
+				model->Load_MaterialSettings(path, L"wp3000", shader) == S_OK &&
+				SUCCEEDED(clone->BindAndBeginMaterial(shaderClone, 0)) && boundAlbedo() == srvA &&
+				SUCCEEDED(model->BindAndBeginMaterial(shader, 0)) && !boundAlbedo());
+			report.Check("invalid-mesh-rejected", FAILED(model->BindAndBeginMaterial(shader, model->Get_NumMeshes())));
+			report.Check("compatibility-after-authored-model", SUCCEEDED(clone->BindAndBeginMaterial(shaderClone, 2)) &&
+				SUCCEEDED(compatibility->BindAndBeginMaterial(shader, 0)) && boundAlbedo() != srvB);
+			model->Apply_MaterialSettings(snapshot);
+			ObjectCB object{}; CameraCB camera{};
+			object.worldMatrix = Matrix::Identity;
+			camera.viewMatrix = Matrix::Identity; camera.projMatrix = Matrix::Identity;
+			const Bool draw = SUCCEEDED(shader->Bind_CBufferData(object)) && SUCCEEDED(shader->Bind_CBufferData(camera)) &&
+				SUCCEEDED(model->Bind_BoneMatrices(shader, BoneMatrices, 0)) &&
+				SUCCEEDED(model->BindAndBeginMaterial(shader, 0)) && SUCCEEDED(model->Render(0));
+			report.Check("skeletal-mesh-draw", draw);
+			ModelViewer viewer;
+			ComPtr<ID3D11ShaderResourceView> preview;
+			model->Update_ModelAnimation(0.f);
+			const Bool previewRendered = SUCCEEDED(viewer.Preview_Model(model, preview)) && preview;
+			report.Check("editor-material-preview-draw", previewRendered);
+			Bool previewCaptured = false;
+			Bool visiblePixels = false;
+			if (previewRendered)
+			{
+				ComPtr<ID3D11Resource> resource;
+				preview->GetResource(resource.GetAddressOf());
+				previewCaptured = SUCCEEDED(SaveWICTextureToFile(context.Get(), resource.Get(), GUID_ContainerFormatPng,
+					(Work_Directory() / L"phase9-material-preview.png").c_str()));
+				ComPtr<ID3D11Texture2D> texture, staging;
+				resource.As(&texture);
+				D3D11_TEXTURE2D_DESC desc{}; texture->GetDesc(&desc);
+				desc.Usage = D3D11_USAGE_STAGING; desc.BindFlags = 0; desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+				if (SUCCEEDED(GAME_INSTANCE->Get_Device()->CreateTexture2D(&desc, nullptr, staging.GetAddressOf())))
+				{
+					context->CopyResource(staging.Get(), texture.Get());
+					D3D11_MAPPED_SUBRESOURCE mapped{};
+					if (SUCCEEDED(context->Map(staging.Get(), 0, D3D11_MAP_READ, 0, &mapped)))
+					{
+						const auto* pixels = static_cast<const uint8_t*>(mapped.pData);
+						for (UINT y = 0; y < desc.Height && !visiblePixels; ++y)
+							for (UINT x = 0; x < desc.Width; ++x)
+								if (memcmp(pixels, pixels + y * mapped.RowPitch + x * 4, 3) != 0) { visiblePixels = true; break; }
+						context->Unmap(staging.Get(), 0);
+					}
+				}
+			}
+			report.Check("editor-preview-visible-pixels", visiblePixels);
+			report.Check("editor-preview-capture", previewCaptured);
+			const Bool saved = report.Save(reportPath);
+			return report.Passed() && saved ? S_OK : E_FAIL;
+		}
+
+		HRESULT Run_MaterialAuthoring(HRESULT initializationResult)
+		{
+			GateReport report("phase9-material-authoring");
+			const auto reportPath = Work_Directory() / L"phase9-material-authoring-gates.json";
+			const auto authoredPath = filesystem::path(PATH.GetMaterialSettingsDir()) / L"wp3000.json";
+			const auto savedPath = Work_Directory() / L"phase9-material-authored.json";
+			auto model = GAME_INSTANCE->Get_Model(GateLevel, L"wp3000");
+			auto shader = GAME_INSTANCE->Get_Shader(StaticLevel, VTXANIMMESH::Tag.c_str());
+			const Bool loaded = SUCCEEDED(initializationResult) && model && shader &&
+				model->Load_MaterialSettings(authoredPath, L"wp3000", shader) == S_OK;
+			report.Check("authored-project-material-load", loaded);
+			if (!loaded) { report.Save(reportPath); return E_FAIL; }
+			nlohmann::json authored, source, inspection;
+			const auto modelDirectory = filesystem::path(model->Get_ModelFilePath()).parent_path();
+			const Bool evidence = Read_Json(authoredPath, authored) &&
+				Read_Json(modelDirectory / L"materials.json", source) &&
+				Read_Json(modelDirectory / L"wp3000.json", inspection);
+			Bool exactAlbedos = evidence && authored["materials"].size() == 2;
+			if (exactAlbedos)
+				for (const auto& setting : authored["materials"])
+				{
+					const string name = setting["sourceMaterialName"].get<string>();
+					string stem = filesystem::path(setting["textures"]["g_AlbedoMap"].get<string>()).stem().string();
+					std::ranges::transform(stem, stem.begin(), [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+					exactAlbedos = exactAlbedos && source.contains(name) &&
+						source[name]["Textures"]["g_AlbedoMap"] == stem && setting["passName"] == "Default_Pass";
+				}
+			report.Check("two-source-albedos-exact-match", exactAlbedos);
+			if (filesystem::is_regular_file(savedPath))
+			{
+				nlohmann::json previous;
+				report.Check("writer-output-reloaded-in-new-process", Read_Json(reportPath, previous) &&
+					previous.value("processId", GetCurrentProcessId()) != GetCurrentProcessId() &&
+					model->Load_MaterialSettings(savedPath, L"wp3000", shader) == S_OK);
+			}
+			else report.Check("writer-output-reloaded-in-new-process", true, "prepare run; repeat in another Editor process");
+			const auto draft = *model->Get_MaterialSettings();
+			string status;
+			report.Check("editor-writer-save-and-apply", ModelViewer::Save_MaterialSettings(model, draft, savedPath, status) == S_OK, status);
+			nlohmann::json saved;
+			report.Check("editor-writer-round-trip", Read_Json(savedPath, saved) && saved == authored &&
+				model->Load_MaterialSettings(savedPath, L"wp3000", shader) == S_OK);
+			const auto snapshot = model->Get_MaterialSettings();
+			for (const string kind : { "pass", "slot", "texture", "identity" })
+			{
+				auto invalid = draft;
+				if (kind == "pass") invalid.materials[1].passName = "Cloth_Pass";
+				if (kind == "slot") invalid.materials[1].textures[0].slotName = "missing";
+				if (kind == "texture") invalid.materials[1].textures[0].resourcePath = "Models/wp3000/Textures/missing.dds";
+				if (kind == "identity") invalid.materials[1].sourceMaterialName = "wrong-material";
+				nlohmann::json unchanged;
+				report.Check("editor-writer-rejects-" + kind + "-without-publishing",
+					FAILED(ModelViewer::Save_MaterialSettings(model, invalid, savedPath, status)) &&
+					model->Get_MaterialSettings() == snapshot && Read_Json(savedPath, unchanged) && unchanged == saved);
+			}
+			array<ComPtr<ID3D11ShaderResourceView>, 2> albedos;
+			auto context = GAME_INSTANCE->Get_Context();
+			Bool mapping = evidence && inspection["meshes"].size() == model->Get_NumMeshes();
+			Bool bindings = true;
+			for (uint32 index = 0; index < model->Get_NumMeshes(); ++index)
+			{
+				string name;
+				uint32 materialIndex = UINT32_MAX;
+				const Bool info = model->Get_MeshMaterialInfo(index, name, materialIndex) == S_OK && materialIndex < albedos.size();
+				mapping = mapping && info && inspection["meshes"][index]["name"] == name &&
+					inspection["meshes"][index]["materialIndex"] == materialIndex;
+				const Bool bound = info && SUCCEEDED(model->BindAndBeginMaterial(shader, index));
+				ComPtr<ID3D11ShaderResourceView> srv;
+				context->PSGetShaderResources(0, 1, srv.GetAddressOf());
+				bindings = bindings && bound && srv;
+				if (bound)
+				{
+					if (!albedos[materialIndex]) albedos[materialIndex] = srv;
+					else bindings = bindings && albedos[materialIndex] == srv;
+				}
+			}
+			report.Check("all-mesh-names-and-indices-match-binary-inspection", mapping);
+			report.Check("all-meshes-bind-their-authored-material", bindings && albedos[0] && albedos[1] && albedos[0] != albedos[1]);
+			string name = "unchanged";
+			uint32 materialIndex = UINT32_MAX;
+			report.Check("invalid-mesh-info-preserves-outputs", FAILED(model->Get_MeshMaterialInfo(model->Get_NumMeshes(), name, materialIndex)) &&
+				name == "unchanged" && materialIndex == UINT32_MAX);
+			ModelViewer viewer;
+			model->Update_ModelAnimation(0.f);
+			ComPtr<ID3D11ShaderResourceView> image;
+			report.Check("invalid-preview-selection-rejected", FAILED(viewer.Preview_Model(model, image, -2)) && !image &&
+				FAILED(viewer.Preview_Model(model, image, static_cast<int32>(model->Get_NumMeshes()))) && !image);
+			for (int32 index : { -1, 0, 2 })
+			{
+				const Bool rendered = SUCCEEDED(viewer.Preview_Model(model, image, index)) && image;
+				Bool captured = false;
+				if (rendered)
+				{
+					ComPtr<ID3D11Resource> resource;
+					image->GetResource(resource.GetAddressOf());
+					captured = SUCCEEDED(SaveWICTextureToFile(context.Get(), resource.Get(), GUID_ContainerFormatPng,
+						(Work_Directory() / (L"phase9-authored-mesh-" + std::to_wstring(index) + L".png")).c_str()));
+				}
+				report.Check("authored-preview-and-capture-" + std::to_string(index), rendered && captured);
+			}
+			const Bool reportSaved = report.Save(reportPath);
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
+
+		HRESULT Run_MaterialSettings(HRESULT initializationResult)
+		{
+			const filesystem::path reportPath =
+				Work_Directory() / L"phase9-material-settings-gates.json";
+			const filesystem::path validPath =
+				Work_Directory() / L"phase9-material-settings-valid.json";
+			nlohmann::json previousReport;
+			const Bool validExistedAtStart = filesystem::exists(validPath);
+			const Bool restarted = !validExistedAtStart ||
+				(Read_Json(reportPath, previousReport) &&
+				previousReport.value("passed", false) &&
+				previousReport.value("processId", GetCurrentProcessId()) != GetCurrentProcessId());
+
+			GateReport report("phase9-material-settings");
+			report.Check("runtime-initialization", SUCCEEDED(initializationResult));
+			report.Check("editor-process-restart", restarted,
+				validExistedAtStart ? "loaded a fixture created by a different Editor PID" : "prepare run");
+			if (FAILED(initializationResult))
+			{
+				report.Save(reportPath);
+				return E_FAIL;
+			}
+
+			const Shared<Model> model = GAME_INSTANCE->Get_Model(GateLevel, L"wp3000");
+			const Bool modelReady = model && model->Get_MaterialNames().size() == 2 &&
+				model->Get_ModelResourcePath() == "Models/wp3000/wp3000.model";
+			report.Check("wp3000-material-fixture-ready", modelReady);
+			if (!modelReady)
+			{
+				report.Save(reportPath);
+				return E_FAIL;
+			}
+
+			const nlohmann::json validDocument = Make_MaterialSettingsDocument(model);
+			nlohmann::json existingDocument;
+			const Bool validSaved = validExistedAtStart
+				? Read_Json(validPath, existingDocument) && existingDocument == validDocument
+				: Write_Json(validPath, validDocument);
+			report.Check("valid-settings-fixture-created-or-preserved", validSaved,
+				validExistedAtStart ? "existing document matched expected semantics" : "created by prepare run");
+			const Bool validLoaded = validSaved && SUCCEEDED(model->Load_MaterialSettings(validPath, L"wp3000"));
+			report.Check("valid-settings-load", validLoaded);
+			const Shared<const MODEL_MATERIAL_SETTINGS> initialSnapshot = model->Get_MaterialSettings();
+			const Bool semanticValues = initialSnapshot && initialSnapshot->modelTag == "wp3000" &&
+				initialSnapshot->modelPath == "Models/wp3000/wp3000.model" &&
+				initialSnapshot->materials.size() == 2 &&
+				initialSnapshot->materials[0].sourceMaterialName == model->Get_MaterialNames()[0] &&
+				!initialSnapshot->materials[0].isBlend && initialSnapshot->materials[1].isBlend;
+			report.Check("saved-settings-semantic-values", semanticValues);
+
+			Model::MODEL_DESC cloneDesc{ L"wp3000" };
+			const Shared<Model> clone = validLoaded
+				? dynamic_pointer_cast<Model>(model->Clone(&cloneDesc)) : nullptr;
+			report.Check("same-modeltag-clone-shares-settings",
+				clone && clone->Get_MaterialSettings() == initialSnapshot);
+
+			const Bool reloaded = validLoaded && SUCCEEDED(model->Load_MaterialSettings(validPath, L"wp3000"));
+			const Shared<const MODEL_MATERIAL_SETTINGS> reloadedSnapshot = model->Get_MaterialSettings();
+			report.Check("disk-reload-semantic-equality", reloaded && initialSnapshot &&
+				reloadedSnapshot && Same_MaterialSettings(*initialSnapshot, *reloadedSnapshot));
+
+			auto rollbackPreserved = [&](const filesystem::path& path, const wstring& expectedTag) {
+				const Shared<const MODEL_MATERIAL_SETTINGS> before = model->Get_MaterialSettings();
+				return FAILED(model->Load_MaterialSettings(path, expectedTag)) &&
+					model->Get_MaterialSettings() == before;
+			};
+
+			const filesystem::path malformedPath = Work_Directory() / L"phase9-material-settings-malformed.json";
+			{
+				ofstream malformed(malformedPath, ios::binary | ios::trunc);
+				malformed << "{ invalid";
+			}
+			report.Check("malformed-settings-rollback", rollbackPreserved(malformedPath, L"wp3000"));
+
+			nlohmann::json duplicateDocument = validDocument;
+			duplicateDocument["materials"][1]["materialIndex"] = 0;
+			const filesystem::path duplicatePath = Work_Directory() / L"phase9-material-settings-duplicate.json";
+		report.Check("duplicate-index-rollback", Write_Json(duplicatePath, duplicateDocument) &&
+				rollbackPreserved(duplicatePath, L"wp3000"));
+
+			nlohmann::json tagMismatchDocument = validDocument;
+			tagMismatchDocument["modelTag"] = "other-model";
+			const filesystem::path tagMismatchPath = Work_Directory() / L"phase9-material-settings-tag-mismatch.json";
+			report.Check("modeltag-mismatch-rollback", Write_Json(tagMismatchPath, tagMismatchDocument) &&
+				rollbackPreserved(tagMismatchPath, L"wp3000"));
+
+			nlohmann::json unsafePathDocument = validDocument;
+			unsafePathDocument["materials"][0]["textures"]["g_AlbedoMap"] = "../escape.dds";
+			const filesystem::path unsafePath = Work_Directory() / L"phase9-material-settings-unsafe-path.json";
+			report.Check("unsafe-texture-path-rollback", Write_Json(unsafePath, unsafePathDocument) &&
+				rollbackPreserved(unsafePath, L"wp3000"));
+
+			report.Check("deterministic-settings-filename",
+				Model::Make_MaterialSettingsFileName(L"bad:/tag. ") == L"bad__tag__.json");
+			const Bool reportSaved = report.Save(reportPath);
+			return report.Passed() && reportSaved ? S_OK : E_FAIL;
+		}
 	}
 
 	uint32 Get_RequestedStage()
@@ -1656,6 +2335,14 @@ namespace Phase5GateVerifier
 			return EditorCutoverStage;
 		if (wstring_view(value) == L"phase8-single-prototype")
 			return SingleTypePrototypeStage;
+		if (wstring_view(value) == L"phase9-material-settings")
+			return MaterialSettingsStage;
+		if (wstring_view(value) == L"phase9-material-binding")
+			return MaterialBindingStage;
+		if (wstring_view(value) == L"phase9-material-authoring")
+			return MaterialAuthoringStage;
+		if (wstring_view(value) == L"animation-authoring") return AnimationAuthoringStage;
+		if (wstring_view(value) == L"animation-restart") return AnimationRestartStage;
 #endif
 		return 0;
 	}
@@ -1666,12 +2353,14 @@ namespace Phase5GateVerifier
 			stage != FrameStage && stage != UIAuthoringStage &&
 			stage != ReferencesStage && stage != PrefabRepositoryStage &&
 			stage != SceneAuthoringStage && stage != SceneRestartStage &&
-			stage != EditorCutoverStage && stage != SingleTypePrototypeStage)
+			stage != EditorCutoverStage && stage != SingleTypePrototypeStage &&
+			stage != MaterialSettingsStage && stage != MaterialBindingStage && stage != MaterialAuthoringStage &&
+			stage != AnimationAuthoringStage && stage != AnimationRestartStage)
 			return E_INVALIDARG;
 		if (FAILED(Client::Register_Client_Reflection()) ||
 			FAILED(GAME_INSTANCE->Refresh_ReflectionRegistry()) ||
 			FAILED(ClientSettingManager::GetInstance()->Apply_LayerAndTagSettings()) ||
-			FAILED(GAME_INSTANCE->Register_ReflectedPrototypes(ETOI(LEVEL::STATIC))))
+			FAILED(GAME_INSTANCE->Register_ReflectedPrototypes()))
 			return E_FAIL;
 		if (stage == PrepareStage || stage == PrefabRepositoryStage)
 			return S_OK;
@@ -1697,8 +2386,11 @@ namespace Phase5GateVerifier
 			return fixturePrototype && SUCCEEDED(GAME_INSTANCE->Add_TypePrototype(
 				StaticLevel, fixturePrototype)) ? S_OK : E_FAIL;
 		}
-		if (stage == SceneAuthoringStage || stage == SceneRestartStage)
+		if (stage == SceneAuthoringStage || stage == SceneRestartStage ||
+			stage == AnimationAuthoringStage || stage == AnimationRestartStage)
 		{
+			if (FAILED(ClientSettingManager::GetInstance()->Load_Navigation_FromBinary()))
+				return E_FAIL;
 			ClientSettingManager::g_EngineDesc = EDITOR->Get_EngineDesc();
 			const Shared<TextUI> fixturePrototype = TextUI::CreatePrototype();
 			if (!fixturePrototype || FAILED(GAME_INSTANCE->Add_TypePrototype(
@@ -1707,9 +2399,9 @@ namespace Phase5GateVerifier
 		}
 		if (FAILED(ClientSettingManager::GetInstance()->Load_Shader()) ||
 			FAILED(Load_GateModels()) ||
-			((stage == SceneAuthoringStage || stage == SceneRestartStage) &&
-				FAILED(Load_SceneGateTexture())) ||
-			FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY)))
+			((stage == SceneAuthoringStage || stage == SceneRestartStage ||
+			stage == AnimationAuthoringStage || stage == AnimationRestartStage) &&
+			FAILED(Load_SceneGateTexture())))
 			return E_FAIL;
 		return S_OK;
 	}
@@ -1736,6 +2428,14 @@ namespace Phase5GateVerifier
 			return Run_EditorCutover(initializationResult);
 		if (stage == SingleTypePrototypeStage)
 			return Run_SingleTypePrototype(initializationResult);
+		if (stage == MaterialSettingsStage)
+			return Run_MaterialSettings(initializationResult);
+		if (stage == MaterialBindingStage)
+			return Run_MaterialBinding(initializationResult);
+		if (stage == MaterialAuthoringStage)
+			return Run_MaterialAuthoring(initializationResult);
+		if (stage == AnimationAuthoringStage || stage == AnimationRestartStage)
+			return Run_AnimationProduction(initializationResult, stage == AnimationAuthoringStage);
 		return E_INVALIDARG;
 	}
 }

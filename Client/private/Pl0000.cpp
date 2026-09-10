@@ -352,6 +352,11 @@ HRESULT Pl0000::Ready_Components()
 	Navigation::NAVIGATION_DESC navDesc;
 	navDesc.startCellIndex = 0;
 	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
+	if (!m_Navigation) {
+		LOG_WARN(L"[Navigation fallback] CityOfRuinEntry unavailable; retaining empty Navigation component and disabling movement");
+		m_Navigation = Add_Component<Navigation>(ETOI(LEVEL::STATIC), &navDesc);
+	}
+	if (!m_Navigation) return E_FAIL;
 
 	// StateMachine은 마지막에 처리
 	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(ETOI(LEVEL::GAMEPLAY))))

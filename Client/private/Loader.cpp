@@ -48,6 +48,7 @@ HRESULT Loader::Initialize(void *arg)
     
     if (m_Thread == nullptr) {
         delete sharedPtrToPass; // 실패 시 메모리 해제
+        DeleteCriticalSection(&m_CriticalSection);
         return E_FAIL;
     }
   
@@ -55,9 +56,12 @@ HRESULT Loader::Initialize(void *arg)
 }
 
 void Loader::On_Destroy() {
-    WaitForSingleObject(m_Thread, INFINITE);
-    CloseHandle(m_Thread);
-    DeleteCriticalSection(&m_CriticalSection);
+    if (m_Thread) {
+        WaitForSingleObject(m_Thread, INFINITE);
+        CloseHandle(m_Thread);
+        m_Thread = nullptr;
+        DeleteCriticalSection(&m_CriticalSection);
+    }
 
     Level::On_Destroy();
 }
@@ -68,28 +72,34 @@ void Loader::Update_Level(Float timeDelta)
 }
 
 HRESULT Loader::Loading() {
-    HRESULT hr = {};
+    HRESULT hr = E_FAIL;
 
     EnterCriticalSection(&m_CriticalSection);
 
-    if (SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)))
+    const HRESULT comResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    if (SUCCEEDED(comResult))
     {
+        hr = S_OK;
         if (m_LoadStatic)
             hr = Loading_Global_Prototype();
 
-        switch (m_NextLevelID) {
-        case LEVEL::TITLE:
-            hr = Loading_For_TitleLevel();
-            break;
-        case LEVEL::GAMEPLAY:
-            hr = Loading_For_GamePlayLevel();
-            break;
-        default:
-            hr = E_FAIL;
+        // Missing settings resources return S_FALSE; actual failures must not be overwritten.
+        if (SUCCEEDED(hr))
+        {
+            switch (m_NextLevelID) {
+            case LEVEL::TITLE:
+                hr = Loading_For_TitleLevel();
+                break;
+            case LEVEL::GAMEPLAY:
+                hr = Loading_For_GamePlayLevel();
+                break;
+            default:
+                hr = E_FAIL;
+            }
         }
+        CoUninitialize();
     }
 
-    CoUninitialize();
     LeaveCriticalSection(&m_CriticalSection);
 
     return hr;
@@ -112,11 +122,6 @@ HRESULT Loader::Loading_For_TitleLevel() {
     }
     if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::TITLE))) {
         LOG_ERROR(L"Failed to Load TITLE Model");
-        return E_FAIL;
-    }
-
-    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::TITLE))) {
-        LOG_ERROR(L"Failed to Ready Client TITLE Prototypes");
         return E_FAIL;
     }
 
@@ -145,11 +150,6 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
     }
     if (FAILED(ClientSettingManager::GetInstance()->Load_Model_FromJson(LEVEL::GAMEPLAY))) {
         LOG_ERROR(L"Failed to Load GAMEPLAY Model");
-        return E_FAIL;
-    }
-
-    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY))) {
-        LOG_ERROR(L"Failed to Ready Client GAMEPLAY Prototypes");
         return E_FAIL;
     }
 
@@ -199,11 +199,6 @@ HRESULT Loader::Loading_Global_Prototype()
         }
     }
 
-    if (FAILED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::STATIC))) {
-        LOG_ERROR(L"Failed to Ready Client Prototypes");
-        return E_FAIL;
-    }
-
     if (FAILED(ClientSettingManager::GetInstance()->Load_Navigation_FromBinary())) {
         LOG_ERROR(L"Failed to Ready Load_Navigation_FromBinary");
         return E_FAIL;
@@ -228,6 +223,7 @@ Shared<Loader> Loader::Create(const ComPtr<ID3D11Device> &device, const ComPtr<I
 
     if (FAILED(loader->Initialize(&desc))) {
 		MSG_BOX("Failed to Created : Loader");
+        return nullptr;
     }
 
     return loader;

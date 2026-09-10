@@ -8,7 +8,8 @@ Shader::Shader(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCont
 
 Shader::Shader(const Shader& rhs)
     : Component(rhs), m_Effect{rhs.m_Effect}, m_NumPasses{rhs.m_NumPasses},
-      m_InputLayouts{rhs.m_InputLayouts}, m_ConstantBuffers{rhs.m_ConstantBuffers} {}
+      m_InputLayouts{rhs.m_InputLayouts}, m_PassIndices{rhs.m_PassIndices},
+      m_MaterialSlots{rhs.m_MaterialSlots}, m_ConstantBuffers{rhs.m_ConstantBuffers} {}
 
 HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements) 
 {
@@ -24,24 +25,29 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
         0, m_Device.Get(), m_Effect.GetAddressOf(), nullptr)))
 		return E_FAIL;
 
-    if (ID3DX11EffectTechnique* technique = m_Effect->GetTechniqueByIndex(0)) 
+    if (ID3DX11EffectTechnique* technique = m_Effect->GetTechniqueByIndex(0);
+        technique && technique->IsValid())
     {
         Shader::SHADER_DESC desc;
     	D3DX11_TECHNIQUE_DESC techniqueDesc = {};
     	
-    	technique->GetDesc(&techniqueDesc);
+        if (FAILED(technique->GetDesc(&techniqueDesc)) || techniqueDesc.Passes == 0)
+            return E_FAIL;
         m_NumPasses = techniqueDesc.Passes;
+        auto passIndices = make_shared<unordered_map<string, uint32>>();
         m_InputLayouts.reserve(m_NumPasses);
 
         for (uint32 i = 0; i < m_NumPasses; ++i) 
         {
             ComPtr<ID3D11InputLayout> inputLayout = {nullptr};
             ID3DX11EffectPass* pass = technique->GetPassByIndex(i);
-            if (nullptr == pass)
+            if (nullptr == pass || !pass->IsValid())
 				return E_FAIL;
 
             D3DX11_PASS_DESC passDesc = {};
-            pass->GetDesc(&passDesc);
+            if (FAILED(pass->GetDesc(&passDesc)) || !passDesc.Name || !*passDesc.Name ||
+                !passIndices->emplace(passDesc.Name, i).second)
+                return E_FAIL;
 
             if (FAILED(m_Device->CreateInputLayout(
             elements, numElements, passDesc.pIAInputSignature,
@@ -55,6 +61,7 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
             m_InputLayouts.push_back(inputLayout);
         }
 
+        m_PassIndices = std::move(passIndices);
         for (uint32 i = 0; i < ETOI(ConstantBuffer::END); ++i)
         {
             ID3DX11EffectConstantBuffer* constantBuffer =
@@ -95,18 +102,53 @@ void Shader::On_Destroy() {
 }
 
 HRESULT Shader::Begin(uint32 passIndex) {
-    if (passIndex >= m_NumPasses || nullptr == m_InputLayouts[passIndex])
-      return S_OK;
+    if (!m_Effect || passIndex >= m_NumPasses || passIndex >= m_InputLayouts.size() ||
+        nullptr == m_InputLayouts[passIndex])
+      return E_INVALIDARG;
 
-    m_Effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex)->Apply(0, m_Context.Get());
+    if (FAILED(m_Effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex)->Apply(0, m_Context.Get())))
+        return E_FAIL;
     m_Context->IASetInputLayout(m_InputLayouts[passIndex].Get());
 
     return S_OK;
 }
 
+Bool Shader::Has_Pass(const string& passName) const
+{
+    return m_Effect && m_PassIndices && m_PassIndices->contains(passName);
+}
+
+HRESULT Shader::Begin(const string& passName)
+{
+    if (!Has_Pass(passName)) return E_INVALIDARG;
+    return Begin(m_PassIndices->at(passName));
+}
+
+Bool Shader::Has_SRV(const string& slotName) const
+{
+    if (!m_Effect || slotName.empty()) return false;
+    auto* variable = m_Effect->GetVariableByName(slotName.c_str());
+    return variable && variable->IsValid() && variable->AsShaderResource()->IsValid();
+}
+
+HRESULT Shader::Clear_MaterialSlots(const vector<string>& slots)
+{
+    for (const string& slot : slots)
+        if (!Has_SRV(slot)) return E_INVALIDARG;
+    vector<string> clearSlots = *m_MaterialSlots;
+    for (const string& slot : slots)
+        if (std::ranges::find(clearSlots, slot) == clearSlots.end()) clearSlots.push_back(slot);
+    // Keep the union on failure so a retry clears partially changed Effect state.
+    *m_MaterialSlots = clearSlots;
+    for (const string& slot : clearSlots)
+        if (FAILED(Bind_SRV(slot.c_str(), nullptr))) return E_FAIL;
+    *m_MaterialSlots = slots;
+    return S_OK;
+}
+
 HRESULT Shader::Bind_SRV(const Char *constantName, const ComPtr<ID3D11ShaderResourceView> &srv) 
 {
-    if (!m_Effect) return S_OK;
+    if (!constantName || !Has_SRV(constantName)) return E_INVALIDARG;
 
 	ID3DX11EffectVariable* variable = m_Effect->GetVariableByName(constantName);
 	if (nullptr == variable) {
@@ -258,9 +300,8 @@ Shared<Shader> Shader::Create(const ComPtr<ID3D11Device> &device,
                               uint32 numElements) 
 {
     auto shader = make_shared<Shader>(device, context);
-    if (FAILED(shader->Initialize_Prototype(shaderFilePath, elements, numElements))) {
-      MSG_BOX("Failed To Create : Shader");
-    }
+    if (FAILED(shader->Initialize_Prototype(shaderFilePath, elements, numElements)))
+        return nullptr;
 
     return shader;
 }
@@ -275,6 +316,7 @@ Shared<Component> Shader::Clone(void* arg) {
 
     SHADER_DESC& desc = *static_cast<SHADER_DESC*>(arg);
     auto resShader = GAME_INSTANCE->Get_Shader(0, desc.m_VertexTag.c_str());
+    if (!resShader) return nullptr;
 
 	auto shader = make_shared<Shader>(*resShader.get());
 

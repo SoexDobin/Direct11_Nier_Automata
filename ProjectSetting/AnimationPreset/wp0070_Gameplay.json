@@ -1,0 +1,394 @@
+{
+    "animationEnum": "WP0070.AnimationState",
+    "animations": [
+        {
+            "index": 0,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0000.anim",
+            "states": [
+                "SHEATHE_LIGHT"
+            ]
+        },
+        {
+            "index": 1,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0001.anim",
+            "states": [
+                "SHEATHE_HEAVY"
+            ]
+        },
+        {
+            "index": 2,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_005a.anim",
+            "states": []
+        },
+        {
+            "index": 3,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_005b.anim",
+            "states": []
+        },
+        {
+            "index": 4,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0100.anim",
+            "states": [
+                "LIGHT_GROUND1"
+            ]
+        },
+        {
+            "index": 5,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0101.anim",
+            "states": [
+                "LIGHT_GROUND2"
+            ]
+        },
+        {
+            "index": 6,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0102.anim",
+            "states": [
+                "LIGHT_GROUND3"
+            ]
+        },
+        {
+            "index": 7,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0103.anim",
+            "states": [
+                "LIGHT_GROUND4"
+            ]
+        },
+        {
+            "index": 8,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0104.anim",
+            "states": [
+                "LIGHT_GROUND5"
+            ]
+        },
+        {
+            "index": 9,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0105.anim",
+            "states": [
+                "LIGHT_GROUND6"
+            ]
+        },
+        {
+            "index": 10,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0106.anim",
+            "states": [
+                "LIGHT_GROUND7"
+            ]
+        },
+        {
+            "index": 11,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0107.anim",
+            "states": []
+        },
+        {
+            "index": 12,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0108.anim",
+            "states": []
+        },
+        {
+            "index": 13,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0110.anim",
+            "states": []
+        },
+        {
+            "index": 14,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0111.anim",
+            "states": []
+        },
+        {
+            "index": 15,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0113.anim",
+            "states": []
+        },
+        {
+            "index": 16,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0114.anim",
+            "states": []
+        },
+        {
+            "index": 17,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0116.anim",
+            "states": []
+        },
+        {
+            "index": 18,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0117.anim",
+            "states": []
+        },
+        {
+            "index": 19,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0119.anim",
+            "states": []
+        },
+        {
+            "index": 20,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0130.anim",
+            "states": [
+                "LIGHT_AIR1"
+            ]
+        },
+        {
+            "index": 21,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0131.anim",
+            "states": [
+                "LIGHT_AIR2"
+            ]
+        },
+        {
+            "index": 22,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0132.anim",
+            "states": [
+                "LIGHT_AIR3"
+            ]
+        },
+        {
+            "index": 23,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0133.anim",
+            "states": []
+        },
+        {
+            "index": 24,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0134.anim",
+            "states": []
+        },
+        {
+            "index": 25,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0135.anim",
+            "states": []
+        },
+        {
+            "index": 26,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0136.anim",
+            "states": []
+        },
+        {
+            "index": 27,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0150.anim",
+            "states": []
+        },
+        {
+            "index": 28,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0155.anim",
+            "states": []
+        },
+        {
+            "index": 29,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0156.anim",
+            "states": []
+        },
+        {
+            "index": 30,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0157.anim",
+            "states": []
+        },
+        {
+            "index": 31,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0160.anim",
+            "states": []
+        },
+        {
+            "index": 32,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0180.anim",
+            "states": [
+                "LIGHT_GROUND_RUN"
+            ]
+        },
+        {
+            "index": 33,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0188.anim",
+            "states": []
+        },
+        {
+            "index": 34,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_018d.anim",
+            "states": [
+                "LIGHT_AIR_DOWN_ENTER"
+            ]
+        },
+        {
+            "index": 35,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_018e.anim",
+            "states": [
+                "LIGHT_AIR_DOWN_HOLD"
+            ]
+        },
+        {
+            "index": 36,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_018f.anim",
+            "states": [
+                "LIGHT_AIR_DOWN_END"
+            ]
+        },
+        {
+            "index": 37,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_01e0.anim",
+            "states": []
+        },
+        {
+            "index": 38,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_01e8.anim",
+            "states": []
+        },
+        {
+            "index": 39,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_01e9.anim",
+            "states": []
+        },
+        {
+            "index": 40,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_01f0.anim",
+            "states": []
+        },
+        {
+            "index": 41,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_01f5.anim",
+            "states": []
+        },
+        {
+            "index": 42,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_01f6.anim",
+            "states": []
+        },
+        {
+            "index": 43,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_01f7.anim",
+            "states": []
+        },
+        {
+            "index": 44,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0600.anim",
+            "states": []
+        },
+        {
+            "index": 45,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0640.anim",
+            "states": [
+                "LIGHT_COMBO"
+            ]
+        },
+        {
+            "index": 46,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0643.anim",
+            "states": []
+        },
+        {
+            "index": 47,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0644.anim",
+            "states": []
+        },
+        {
+            "index": 48,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_064c.anim",
+            "states": []
+        },
+        {
+            "index": 49,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0655.anim",
+            "states": []
+        },
+        {
+            "index": 50,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0660.anim",
+            "states": [
+                "LIGHT_GROUND_HOLD"
+            ]
+        },
+        {
+            "index": 51,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0900.anim",
+            "states": []
+        },
+        {
+            "index": 52,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0901.anim",
+            "states": []
+        },
+        {
+            "index": 53,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0902.anim",
+            "states": []
+        },
+        {
+            "index": 54,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0903.anim",
+            "states": []
+        },
+        {
+            "index": 55,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0904.anim",
+            "states": []
+        },
+        {
+            "index": 56,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0905.anim",
+            "states": []
+        },
+        {
+            "index": 57,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0906.anim",
+            "states": []
+        },
+        {
+            "index": 58,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0907.anim",
+            "states": []
+        },
+        {
+            "index": 59,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0908.anim",
+            "states": []
+        },
+        {
+            "index": 60,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_0909.anim",
+            "states": []
+        },
+        {
+            "index": 61,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_090a.anim",
+            "states": []
+        },
+        {
+            "index": 62,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_090b.anim",
+            "states": []
+        },
+        {
+            "index": 63,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_c001.anim",
+            "states": []
+        },
+        {
+            "index": 64,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_c002.anim",
+            "states": []
+        },
+        {
+            "index": 65,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_e089.anim",
+            "states": []
+        },
+        {
+            "index": 66,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_e0e5.anim",
+            "states": []
+        },
+        {
+            "index": 67,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_e0e6.anim",
+            "states": []
+        },
+        {
+            "index": 68,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_e0e7.anim",
+            "states": []
+        },
+        {
+            "index": 69,
+            "path": "Models/wp0070/Animations/wp0070_wpf000_e0e8.anim",
+            "states": []
+        }
+    ],
+    "assetGuid": "848f0b6308ed4ddf9d77dc9b2ee99825",
+    "name": "wp0070_Gameplay",
+    "schemaVersion": 2
+}

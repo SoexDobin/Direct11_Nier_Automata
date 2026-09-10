@@ -33,6 +33,7 @@ public:
 
 public:
 	uint32 Get_MaterialIndex() const { return m_MaterialIndex; }
+	const string& Get_MeshName() const { return m_MeshName; }
 	HRESULT Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, const vector<Shared<Bone>>& Bones);
 
 private:
@@ -40,6 +41,7 @@ private:
 	HRESULT Ready_VertexBuffer_For_Anim(const MODEL_MESH& meshData);
 
 private:
+	string m_MeshName{};
 	uint32				m_MaterialIndex{};
 	uint32				m_NumBones{};
 	vector<uint32>		m_BoneIndices;

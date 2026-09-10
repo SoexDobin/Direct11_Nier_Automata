@@ -41,7 +41,7 @@ private:
 	Bool WriteModelFile(const wstring& path);
 	Bool WriteAnimationFiles(const wstring& modelPath);
 	Bool WriteAnimationFile(const std::filesystem::path& path, uint32 animationIndex);
-	void WriteJsonFile(const wstring& path);
+	Bool WriteJsonFile(const wstring& path);
 
 private:
 	int32 Get_BoneIndex(const Char* boneName);

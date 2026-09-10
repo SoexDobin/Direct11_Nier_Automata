@@ -1,0 +1,261 @@
+{
+    "animationEnum": "WP0220.AnimationState",
+    "animations": [
+        {
+            "index": 0,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0000.anim",
+            "states": [
+                "SHEATHE_LIGHT"
+            ]
+        },
+        {
+            "index": 1,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_005a.anim",
+            "states": [
+                "SHEATHE_HEAVY"
+            ]
+        },
+        {
+            "index": 2,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_005b.anim",
+            "states": []
+        },
+        {
+            "index": 3,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0200.anim",
+            "states": []
+        },
+        {
+            "index": 4,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0201.anim",
+            "states": []
+        },
+        {
+            "index": 5,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0202.anim",
+            "states": []
+        },
+        {
+            "index": 6,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0203.anim",
+            "states": []
+        },
+        {
+            "index": 7,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0205.anim",
+            "states": [
+                "HEAVY_GROUND1"
+            ]
+        },
+        {
+            "index": 8,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0207.anim",
+            "states": []
+        },
+        {
+            "index": 9,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0209.anim",
+            "states": [
+                "HEAVY_GROUND2"
+            ]
+        },
+        {
+            "index": 10,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_020b.anim",
+            "states": []
+        },
+        {
+            "index": 11,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_020d.anim",
+            "states": [
+                "HEAVY_GROUND3"
+            ]
+        },
+        {
+            "index": 12,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_020f.anim",
+            "states": []
+        },
+        {
+            "index": 13,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0211.anim",
+            "states": [
+                "HEAVY_GROUND_HOLD_UNFULL"
+            ]
+        },
+        {
+            "index": 14,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0212.anim",
+            "states": [
+                "HEAVY_GROUND_HOLD_CYCLE"
+            ]
+        },
+        {
+            "index": 15,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0213.anim",
+            "states": [
+                "HEAVY_GROUND_HOLD_NO_CONTACT"
+            ]
+        },
+        {
+            "index": 16,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0214.anim",
+            "states": [
+                "HEAVY_GROUND_HOLD_FULL"
+            ]
+        },
+        {
+            "index": 17,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_021a.anim",
+            "states": [
+                "HEAVY_GROUND_SPRINT"
+            ]
+        },
+        {
+            "index": 18,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0220.anim",
+            "states": []
+        },
+        {
+            "index": 19,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0225.anim",
+            "states": [
+                "HEAVY_AIR_DOWN_ENTER"
+            ]
+        },
+        {
+            "index": 20,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0226.anim",
+            "states": [
+                "HEAVY_AIR_DOWN_HOLD"
+            ]
+        },
+        {
+            "index": 21,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0227.anim",
+            "states": [
+                "HEAVY_AIR_DOWN_END"
+            ]
+        },
+        {
+            "index": 22,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_022a.anim",
+            "states": []
+        },
+        {
+            "index": 23,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0280.anim",
+            "states": []
+        },
+        {
+            "index": 24,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0288.anim",
+            "states": []
+        },
+        {
+            "index": 25,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_028d.anim",
+            "states": []
+        },
+        {
+            "index": 26,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_028e.anim",
+            "states": []
+        },
+        {
+            "index": 27,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_028f.anim",
+            "states": []
+        },
+        {
+            "index": 28,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_02e0.anim",
+            "states": []
+        },
+        {
+            "index": 29,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_02e8.anim",
+            "states": []
+        },
+        {
+            "index": 30,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_02f0.anim",
+            "states": []
+        },
+        {
+            "index": 31,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_02f5.anim",
+            "states": []
+        },
+        {
+            "index": 32,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_02f6.anim",
+            "states": []
+        },
+        {
+            "index": 33,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_02f7.anim",
+            "states": []
+        },
+        {
+            "index": 34,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0600.anim",
+            "states": []
+        },
+        {
+            "index": 35,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0640.anim",
+            "states": [
+                "HEAVY_COMBO"
+            ]
+        },
+        {
+            "index": 36,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0646.anim",
+            "states": []
+        },
+        {
+            "index": 37,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0647.anim",
+            "states": []
+        },
+        {
+            "index": 38,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_064f.anim",
+            "states": []
+        },
+        {
+            "index": 39,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0658.anim",
+            "states": []
+        },
+        {
+            "index": 40,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0659.anim",
+            "states": []
+        },
+        {
+            "index": 41,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_0663.anim",
+            "states": []
+        },
+        {
+            "index": 42,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_c201.anim",
+            "states": []
+        },
+        {
+            "index": 43,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_c202.anim",
+            "states": []
+        },
+        {
+            "index": 44,
+            "path": "Models/wp0220/Animations/wp0220_wpf200_c234.anim",
+            "states": []
+        }
+    ],
+    "assetGuid": "714a254bd723492d9b7159db24b402de",
+    "name": "wp0220_Gameplay",
+    "schemaVersion": 2
+}

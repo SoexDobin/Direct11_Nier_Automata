@@ -20,7 +20,6 @@ private:
 	void Render_Prefab();
 
 private:
-	Shared<Game> m_Game = { nullptr };
 	char m_Title[MAX_PATH] = "client";
 
 	Bool m_ShowProjectSettings = false;

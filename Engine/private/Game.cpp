@@ -18,48 +18,76 @@
 #include "Timer.h"
 #include "TypeCatalog.h"
 
-IMPLEMENT_SINGLETON(Game);
+std::shared_ptr<Game> Game::m_pInstance = nullptr;
+std::once_flag Game::m_onceFlag;
+
+std::shared_ptr<Game> Game::GetInstance() {
+    std::call_once(m_onceFlag, []() {
+        struct MakeSharedEnabler : public Game {};
+        m_pInstance = std::make_shared<MakeSharedEnabler>();
+    });
+    return m_pInstance;
+}
+
+void Game::DestroyInstance() {
+    const auto instance = m_pInstance;
+    if (!instance) return;
+    instance->Shutdown(); // Callbacks may still resolve GAME_INSTANCE here.
+    m_pInstance.reset();
+}
 
 Game::Game() = default;
 
-Game::~Game() {
+Game::~Game() = default;
+
+void Game::Shutdown() {
+    if (m_ShuttingDown) return;
+    m_ShuttingDown = true;
+    // Join level loaders before touching any resource or manager they use.
+    if (m_LevelManager) m_LevelManager->On_Destroy();
+    if (m_ObjectManager) m_ObjectManager->On_Destroy();
+
 	m_PrefabManager.reset();
 	m_LevelSerializer.reset();
 
     m_TimeManager.reset();
     m_InputDevice.reset();
 
-    m_CollisionManager->On_Destroy();
+    if (m_CollisionManager) m_CollisionManager->On_Destroy();
     m_CollisionManager.reset();
 
-    m_ResourceManager->On_Destroy();
+    if (m_ResourceManager) m_ResourceManager->On_Destroy();
     m_ResourceManager.reset();
 
-    m_LevelManager->On_Destroy();
     m_LevelManager.reset();
 
-    m_ObjectManager->On_Destroy();
     m_ObjectManager.reset();
 
-    m_Renderer->On_Destroy();
+    if (m_Renderer) m_Renderer->On_Destroy();
     m_Renderer.reset();
 
-    m_PrototypeManager->On_Destroy();
+    if (m_PrototypeManager) m_PrototypeManager->On_Destroy();
     m_PrototypeManager.reset();
 
 	if (m_Registry)
 		m_Registry->On_Destroy();
 	m_Registry.reset();
 
-    m_CameraManager->On_Destroy();
+    if (m_CameraManager) m_CameraManager->On_Destroy();
     m_CameraManager.reset();
 
     m_LayerRegistry.reset();
     m_TagRegistry.reset();
 
-    m_LightManager->On_Destroy();
+    if (m_LightManager) m_LightManager->On_Destroy();
     m_LightManager.reset();
 
+    m_FontManager.reset();
+    m_SoundManager.reset();
+    m_EventManager.reset();
+    m_RenderTargetManager.reset();
+    m_NavigationBuilder.reset();
+    m_Pipeline.reset();
     m_GraphicDevice.reset();
 
     LOG_SHUTDOWN(); /* Debug Helper SpdLogger */
@@ -196,6 +224,7 @@ void Game::Update_CameraPipeline()
 }
 
 void Game::Clear_AllResource() const {
+    m_LevelManager->On_Destroy();
     m_PrototypeManager->Clear_Prototypes();
     m_ObjectManager->Clear_AllGameObjects();
     m_Renderer->Clear_RenderGroup();
@@ -339,12 +368,13 @@ void Game::Update_Level() const
 }
 
 HRESULT Game::Change_Level(uint32 levIndex, const Shared<Level>& newLevel) {
-  if (FAILED(m_LevelManager->Change_Level(levIndex, newLevel))) {
-    MSG_BOX("Change To New Level Got a Trouble");
-    return E_FAIL;
-  }
-
-  return S_OK;
+  const HRESULT result = m_LevelManager->Change_Level(levIndex, newLevel);
+  if (FAILED(result))
+    LOG_ERROR(L"Failed to change to level {} (HRESULT {}); current level preserved",
+        levIndex, static_cast<unsigned long>(result));
+  else
+    LOG_INFO(L"[Level] Entered {}", levIndex);
+  return result;
 }
 
 const unordered_map<wstring, Shared<GameObject>>& Game::Get_Prototypes(uint32 levIndex) const
@@ -460,9 +490,9 @@ Shared<Shader> Game::Get_Shader(uint32 levIndex, const tChar* shaderFilePath) co
     return m_ResourceManager->Get_Shader(levIndex, shaderFilePath);
 }
 
-HRESULT Game::Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const
+HRESULT Game::Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag, Bool allowMissing) const
 {
-    return m_ResourceManager->Load_Texture(levIndex, textureFilePath, numSRVs, descriptionTag);
+    return m_ResourceManager->Load_Texture(levIndex, textureFilePath, numSRVs, descriptionTag, allowMissing);
 }
 
 const Texture::TEXTURE_DESC* Game::Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const
@@ -480,9 +510,11 @@ const ComPtr<ID3D11ShaderResourceView>& Game::Get_Texture(uint32 levIndex, const
     return m_ResourceManager->Get_Texture(levIndex, textureFilePath);
 }
 
-HRESULT Game::Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const
+HRESULT Game::Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag,
+	const Matrix& preTransformMatrix, const tChar* materialSettingsPath) const
 {
-    return m_ResourceManager->Load_Model(levIndex, modelFilePath, descriptionTag, preTransformMatrix);
+    return m_ResourceManager->Load_Model(levIndex, modelFilePath, descriptionTag,
+		preTransformMatrix, materialSettingsPath);
 }
 
 HRESULT Game::Load_ModelAnimations(uint32 levIndex, const wstring& modelTag,
@@ -569,18 +601,17 @@ HRESULT Game::Register_ReflectionDescriptors(const ReflectionDescriptorBatch& de
 	return m_Registry ? m_Registry->Register_Descriptors(descriptors) : E_FAIL;
 }
 
-HRESULT Game::Register_ReflectedPrototypes(uint32 levIndex) const
+HRESULT Game::Register_ReflectedPrototypes() const
 {
     if (!m_Registry || !m_PrototypeManager)
         return E_FAIL;
+	constexpr uint32 staticPrototypeLevel = 0;
 
     for (const Registry::Entry& entry : m_Registry->Get_ObjectTypes()) {
 		const Bool isGameObject = entry.typeInfo.objectKind == REFLECTED_OBJECT_KIND::GAMEOBJECT;
 		const Bool isComponent = entry.typeInfo.objectKind == REFLECTED_OBJECT_KIND::COMPONENT;
         if (!isGameObject && !isComponent)
             continue;
-		if (!entry.typeInfo.hasLevel || entry.typeInfo.level != levIndex)
-			continue;
 
 		Shared<Object> prototype;
 		const HRESULT externalCreate = m_Registry->Create_Prototype(entry.registeredName, prototype);
@@ -589,27 +620,11 @@ HRESULT Game::Register_ReflectedPrototypes(uint32 levIndex) const
 				Helper::To_wString(entry.registeredName));
 			return E_FAIL;
 		}
-		if (externalCreate == S_FALSE) {
-			const rttr::method createMethod = entry.reflectedType.get_method("Create");
-			if (!createMethod.is_valid())
-				continue;
-
-			const rttr::variant result = createMethod.invoke(
-				{}, m_GraphicDevice->Get_Device(), m_GraphicDevice->Get_Context());
-			if (!result.is_valid()) {
-				LOG_ERROR(L"Failed to invoke reflected Create for {}",
-					Helper::To_wString(entry.registeredName));
-				return E_FAIL;
-			}
-
-			if (isGameObject && result.is_type<Shared<GameObject>>())
-				prototype = result.get_value<Shared<GameObject>>();
-			else if (isComponent && result.is_type<Shared<Component>>())
-				prototype = result.get_value<Shared<Component>>();
-		}
+		if (externalCreate == S_FALSE)
+			continue;
 
 		const HRESULT addResult = prototype
-			? Add_TypePrototype_Internal(levIndex, prototype)
+			? Add_TypePrototype_Internal(staticPrototypeLevel, prototype)
 			: E_FAIL;
         if (FAILED(addResult)) {
             LOG_ERROR(L"Failed to auto-register reflected prototype {}",

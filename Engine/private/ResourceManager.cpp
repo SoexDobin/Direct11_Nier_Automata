@@ -44,22 +44,64 @@ void ResourceManager::On_Destroy()
 	EngineManager::On_Destroy();
 }
 
-HRESULT ResourceManager::Load_Texture(uint32 levIndex, const tChar* texturePath, uint32 numSRVs, const wstring& descriptionTag)
+HRESULT ResourceManager::Load_Texture(uint32 levIndex, const tChar* texturePath, uint32 numSRVs, const wstring& descriptionTag, Bool allowMissing)
 {
+    std::lock_guard<std::recursive_mutex> lock(m_ResourceMutex);
+    if (levIndex >= m_LevelCount || !texturePath || !*texturePath || !numSRVs)
+        return E_INVALIDARG;
+
     Texture::TEXTURE_DESC desc{};
     desc.m_levIndex = levIndex;
     desc.m_FilePath = texturePath;
     desc.m_NumSRVs = numSRVs;
     desc.m_TextureTag = descriptionTag;
 
-    m_TextureDescTags[levIndex].emplace(descriptionTag, desc);
+    vector<pair<wstring, ComPtr<ID3D11ShaderResourceView>>> prepared;
+    ComPtr<ID3D11ShaderResourceView> fallback;
+    uint32 fallbackCount = 0;
 
     for (uint32 i = 0; i < numSRVs; ++i) {
     	tChar szFullPath[MAX_PATH] = TEXT("");
-        wsprintf(szFullPath, texturePath, i);
+        if (_stprintf_s(szFullPath, texturePath, i) < 0)
+            return E_INVALIDARG;
+
+        std::error_code pathError;
+        const Bool exists = filesystem::is_regular_file(szFullPath, pathError);
+        if (pathError && pathError != std::errc::no_such_file_or_directory)
+            return HRESULT_FROM_WIN32(pathError.value());
+        if (!exists && !allowMissing)
+            return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
 
         if (m_SRVs[levIndex].contains(szFullPath))
             continue;
+
+        if (!exists)
+        {
+            if (!fallback)
+            {
+                const uint32 transparentPixel = 0;
+                D3D11_TEXTURE2D_DESC fallbackDesc{};
+                fallbackDesc.Width = fallbackDesc.Height = 1;
+                fallbackDesc.MipLevels = fallbackDesc.ArraySize = 1;
+                fallbackDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                fallbackDesc.SampleDesc.Count = 1;
+                fallbackDesc.Usage = D3D11_USAGE_IMMUTABLE;
+                fallbackDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+                D3D11_SUBRESOURCE_DATA initialData{};
+                initialData.pSysMem = &transparentPixel;
+                initialData.SysMemPitch = sizeof(transparentPixel);
+                ComPtr<ID3D11Texture2D> fallbackTexture;
+                HRESULT hr = m_Device->CreateTexture2D(&fallbackDesc, &initialData,
+                    fallbackTexture.GetAddressOf());
+                if (FAILED(hr)) return hr;
+                hr = m_Device->CreateShaderResourceView(fallbackTexture.Get(), nullptr,
+                    fallback.GetAddressOf());
+                if (FAILED(hr)) return hr;
+            }
+            prepared.emplace_back(szFullPath, fallback);
+            ++fallbackCount;
+            continue;
+        }
 
         tChar szDrive[MAX_PATH] = TEXT("");
         tChar szDir[MAX_PATH] = TEXT("");
@@ -88,13 +130,19 @@ HRESULT ResourceManager::Load_Texture(uint32 levIndex, const tChar* texturePath,
                 srv.GetAddressOf());
         }
 
-        if (FAILED(hr)) { return E_FAIL; }
+        if (FAILED(hr)) { return hr; }
 
-        //m_SRVs[levIndex].emplace(texturePath, srv);
-        m_SRVs[levIndex].emplace(szFullPath, srv);
+        prepared.emplace_back(szFullPath, srv);
     }
 
-    return S_OK;
+    for (auto& [path, srv] : prepared)
+        m_SRVs[levIndex].emplace(path, std::move(srv));
+    m_TextureDescTags[levIndex].insert_or_assign(descriptionTag, desc);
+    if (fallbackCount)
+        LOG_WARN(L"[TextureSettings fallback] '{}' level {}: {}/{} missing images at '{}'; using transparent UI/Sprite texture. Add the files and reload the level/application.",
+            descriptionTag, levIndex, fallbackCount, numSRVs,
+            filesystem::absolute(texturePath).lexically_normal().wstring());
+    return fallbackCount ? S_FALSE : S_OK;
 }
 
 const Texture::TEXTURE_DESC* ResourceManager::Get_TextureDescByTag(uint32 levIndex, const wstring& descriptionTag)
@@ -139,6 +187,7 @@ HRESULT ResourceManager::Load_Shader(uint32 levIndex, const tChar* shaderPath, c
     if (nullptr == shader)
     {
         LOG_ERROR(L"Failed to Create Shader Resource. Path : {}", shaderPath);
+        return E_FAIL;
     }
 
     m_Shaders[levIndex].emplace(descriptionTag, shader);
@@ -161,7 +210,8 @@ Shared<Shader> ResourceManager::Get_Shader(uint32 levIndex, const tChar* vertexT
     return m_Shaders[levIndex][vertexTag];
 }
 
-HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag, const Matrix& preTransformMatrix)
+HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, const wstring& descriptionTag,
+	const Matrix& preTransformMatrix, const tChar* materialSettingsPath)
 {
     auto model = Model::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), modelPath, preTransformMatrix);
     if (nullptr == model)
@@ -169,6 +219,12 @@ HRESULT ResourceManager::Load_Model(uint32 levIndex, const tChar* modelPath, con
         LOG_ERROR(L"Failed to Create Shader Resource. Path : {}", modelPath);
         return E_FAIL;
     }
+	if (materialSettingsPath && *materialSettingsPath &&
+		FAILED(model->Load_MaterialSettings(filesystem::path(materialSettingsPath), descriptionTag)))
+	{
+		LOG_ERROR(L"Failed to load material settings for {} : {}", descriptionTag, materialSettingsPath);
+		return E_FAIL;
+	}
 
     if (levIndex == 0)
         m_StaticModelContainLev.emplace(descriptionTag, levIndex);

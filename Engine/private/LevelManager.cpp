@@ -7,12 +7,20 @@ HRESULT LevelManager::Initialize(void *arg) {
   return EngineManager::Initialize(arg);
 }
 
-void LevelManager::On_Destroy() { m_CurrentLevel.reset(); }
+void LevelManager::On_Destroy() {
+    if (m_CurrentLevel) m_CurrentLevel->On_Destroy();
+    m_CurrentLevel.reset();
+}
 
 HRESULT LevelManager::Change_Level(uint32 levIndex,const Shared<Level>& level) {
 
+    // A failed level factory must not clear the current world or publish an empty level.
+    if (!level)
+        return E_INVALIDARG;
+
     if (nullptr != m_CurrentLevel)
     {
+        m_CurrentLevel->On_Destroy();
         Game::GetInstance()->Clear_Resource(m_CurrentLevelIndex);
     }
 

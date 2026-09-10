@@ -254,21 +254,6 @@ HRESULT Engine::Registry::Refresh() {
 		else if (reflectedType == objectType || reflectedType.is_derived_from(objectType))
 			entry.typeInfo.objectKind = REFLECTED_OBJECT_KIND::OBJECT;
 
-		const rttr::method createMethod = reflectedType.get_method("Create");
-		const rttr::variant levelMetadata = createMethod.is_valid()
-			? createMethod.get_metadata("Level")
-			: rttr::variant{};
-		if (levelMetadata.is_valid()) {
-			rttr::variant convertedLevel = levelMetadata;
-			if (!convertedLevel.convert(rttr::type::get<uint32>())) {
-				LOG_ERROR(L"Registry rejected invalid Level metadata on {}",
-					Helper::To_wString(registeredName));
-				return E_FAIL;
-			}
-			entry.typeInfo.level = convertedLevel.get_value<uint32>();
-			entry.typeInfo.hasLevel = true;
-		}
-
 		if (reflectedType.is_enumeration()) {
 			const rttr::enumeration reflectedEnum = reflectedType.get_enumeration();
 			ReflectedEnumInfo enumInfo;

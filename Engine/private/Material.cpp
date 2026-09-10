@@ -10,8 +10,9 @@ Material::Material(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11Device
 {
 }
 Material::Material(const Material& rhs)
-	: Component{rhs}, m_TextureTypeMax{rhs.m_TextureTypeMax},
-	  m_TextureMask{rhs.m_TextureMask}, m_MaterialTextures{rhs.m_MaterialTextures}
+	: Component{rhs}, m_MaterialName{rhs.m_MaterialName}, m_TextureTypeMax{rhs.m_TextureTypeMax},
+	  m_TextureMask{rhs.m_TextureMask}, m_MaterialTextures{rhs.m_MaterialTextures},
+	  m_NamedTextures{rhs.m_NamedTextures}
 {
 }
 
@@ -46,6 +47,7 @@ void Material::On_Destroy()
 
 HRESULT Material::Initialize_Prototype(const MODEL_MATERIAL& materialData)
 {
+	m_MaterialName = materialData.name;
 	m_TextureTypeMax = materialData.textureTypeMax;
 	m_MaterialTextures = make_shared<vector<ComPtr<ID3D11ShaderResourceView>>[]>(m_TextureTypeMax);
 
@@ -113,7 +115,8 @@ HRESULT Material::Initialize(void* arg)
 
 HRESULT Material::Bind_Material(const Shared<Shader>& shader, const Char* constantName, uint32 textureTypeIndex, uint32 textureIndex)
 {
-	if (textureIndex >= m_MaterialTextures[textureTypeIndex].size() || 
+	if (!shader || textureTypeIndex >= m_TextureTypeMax || !m_MaterialTextures ||
+		textureIndex >= m_MaterialTextures[textureTypeIndex].size() ||
 		nullptr == m_MaterialTextures[textureTypeIndex][textureIndex])
 		return E_FAIL;
 
@@ -132,6 +135,54 @@ HRESULT Material::Bind_Material(const Shared<Shader>& shader, const Char* consta
 	}
 
 	return S_OK;
+}
+
+HRESULT Material::Prepare_NamedTextures(const vector<pair<string, filesystem::path>>& textures)
+{
+	vector<pair<string, ComPtr<ID3D11ShaderResourceView>>> candidate;
+	uint32 mask = 0;
+	for (const auto& [slot, path] : textures)
+	{
+		ComPtr<ID3D11ShaderResourceView> srv;
+		const HRESULT hr = _wcsicmp(path.extension().c_str(), L".dds") == 0
+			? CreateDDSTextureFromFile(m_Device.Get(), path.c_str(), nullptr, srv.GetAddressOf())
+			: CreateWICTextureFromFile(m_Device.Get(), path.c_str(), nullptr, srv.GetAddressOf());
+		if (FAILED(hr))
+		{
+			LOG_ERROR(L"Failed to prepare material texture {} : {}", Helper::To_wString(slot), path.wstring());
+			return hr;
+		}
+		candidate.emplace_back(slot, std::move(srv));
+		if (slot == "g_AlbedoMap") mask |= MATERIAL_TEXTURE_BASE_COLOR;
+		else if (slot == "g_NormalMap") mask |= MATERIAL_TEXTURE_NORMAL;
+		else if (slot == "g_EmissiveMap") mask |= MATERIAL_TEXTURE_EMISSIVE;
+		else if (slot == "g_OpacityMap") mask |= MATERIAL_TEXTURE_OPACITY;
+	}
+	m_NamedTextures = std::move(candidate);
+	m_TextureMask = mask;
+	return S_OK;
+}
+
+HRESULT Material::Bind_NamedTextures(const Shared<Shader>& shader) const
+{
+	if (!shader) return E_INVALIDARG;
+	for (const auto& [slot, srv] : m_NamedTextures)
+		if (FAILED(shader->Bind_SRV(slot.c_str(), srv))) return E_FAIL;
+	MaterialCB data{};
+	data.textureMask = m_TextureMask;
+	return shader->Bind_CBufferData(data);
+}
+
+HRESULT Material::Bind_DefaultTexture(const Shared<Shader>& shader) const
+{
+	if (!shader) return E_INVALIDARG;
+	ComPtr<ID3D11ShaderResourceView> srv;
+	if (m_MaterialTextures && m_TextureTypeMax > 1 && !m_MaterialTextures[1].empty())
+		srv = m_MaterialTextures[1][0];
+	if (FAILED(shader->Bind_SRV("g_AlbedoMap", srv))) return E_FAIL;
+	MaterialCB data{};
+	data.textureMask = srv ? MATERIAL_TEXTURE_BASE_COLOR : 0;
+	return shader->Bind_CBufferData(data);
 }
 
 Shared<Material> Material::CreatePrototype()

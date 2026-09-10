@@ -36,7 +36,6 @@ public: /* Navigation */
 	HRESULT Load_Navigation_FromBinary() const;
 
 public:
-	HRESULT Ready_Client_Prototypes(LEVEL level) const;
 	HRESULT Load_EngineDesc(ENGINE_DESC& outDesc) const;
 	HRESULT Apply_LayerAndTagSettings() const;
 	HRESULT Load_LevelData(LEVEL level) const;

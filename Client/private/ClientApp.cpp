@@ -130,10 +130,74 @@ namespace
 
 		Check("project-prefab-repository-loaded",
 			GAME_INSTANCE->Get_PrefabDocuments().size() == 1);
+		const auto initialLevel = GAME_INSTANCE->Get_CurrentLevel();
+		const uint32 initialLevelIndex = GAME_INSTANCE->Get_CurrentLevelIndex();
+		Check("failed-initial-level-is-not-published",
+			GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), nullptr) == E_INVALIDARG &&
+			GAME_INSTANCE->Get_CurrentLevel() == initialLevel &&
+			GAME_INSTANCE->Get_CurrentLevelIndex() == initialLevelIndex);
+		const auto& staticGameObjects = GAME_INSTANCE->Get_Prototypes(ETOI(LEVEL::STATIC));
+		Check("static-type-prototypes-ready",
+			staticGameObjects.contains(L"TextUI") &&
+			staticGameObjects.contains(L"Pl0000") &&
+			GAME_INSTANCE->Can_InstantiateGameObject(
+				"TextUI", LauncherClientGateLevel) &&
+			GAME_INSTANCE->Can_InstantiateGameObject(
+				"Pl0000", LauncherClientGateLevel));
 		const Bool resourcesReady = SUCCEEDED(Load_LauncherClientGateModels()) &&
 			SUCCEEDED(Load_LauncherClientGateTexture()) &&
-			SUCCEEDED(ClientSettingManager::GetInstance()->Ready_Client_Prototypes(LEVEL::GAMEPLAY));
+			SUCCEEDED(ClientSettingManager::GetInstance()->Load_Navigation_FromBinary());
 		Check("gameplay-gate-resources-ready", resourcesReady);
+
+		// UI/Sprite-only opt-in fallback preserves sequence indices and the authored path.
+		const wchar_t* missingTexture = L"../../.codex-tmp/phase5-gates/absent-ui-%d.dds";
+		const wstring fallbackTag = L"Phase9B_MissingUI";
+		const auto tagsBeforeFallback = GAME_INSTANCE->Get_TextureTags(LauncherClientGateLevel);
+		const HRESULT strictResult = GAME_INSTANCE->Load_Texture(
+			LauncherClientGateLevel, missingTexture, 2, fallbackTag);
+		Check("missing-texture-strict-load-preserves-registry", FAILED(strictResult) &&
+			GAME_INSTANCE->Get_TextureTags(LauncherClientGateLevel) == tagsBeforeFallback);
+		const HRESULT fallbackResult = GAME_INSTANCE->Load_Texture(
+			LauncherClientGateLevel, missingTexture, 2, fallbackTag, true);
+		const auto* fallbackDesc = GAME_INSTANCE->Get_TextureDesc(LauncherClientGateLevel, fallbackTag);
+		const auto fallbackSrv = GAME_INSTANCE->Get_Texture(LauncherClientGateLevel,
+			L"../../.codex-tmp/phase5-gates/absent-ui-0.dds");
+		Check("ui-fallback-keeps-path-and-sequence", fallbackResult == S_FALSE &&
+			fallbackDesc && fallbackDesc->m_FilePath == missingTexture && fallbackDesc->m_NumSRVs == 2 &&
+			fallbackSrv && fallbackSrv == GAME_INSTANCE->Get_Texture(LauncherClientGateLevel,
+				L"../../.codex-tmp/phase5-gates/absent-ui-1.dds"));
+		Bool transparentFallback = false;
+		if (fallbackSrv)
+		{
+			ComPtr<ID3D11Resource> resource;
+			fallbackSrv->GetResource(resource.GetAddressOf());
+			ComPtr<ID3D11Texture2D> texture;
+			if (SUCCEEDED(resource.As(&texture)))
+			{
+				D3D11_TEXTURE2D_DESC desc{};
+				texture->GetDesc(&desc);
+				desc.Usage = D3D11_USAGE_STAGING;
+				desc.BindFlags = 0;
+				desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+				ComPtr<ID3D11Texture2D> staging;
+				if (SUCCEEDED(GAME_INSTANCE->Get_Device()->CreateTexture2D(&desc, nullptr, staging.GetAddressOf())))
+				{
+					const auto context = GAME_INSTANCE->Get_Context();
+					context->CopyResource(staging.Get(), texture.Get());
+					D3D11_MAPPED_SUBRESOURCE data{};
+					if (SUCCEEDED(context->Map(staging.Get(), 0, D3D11_MAP_READ, 0, &data)))
+					{
+						transparentFallback = desc.Width == 1 && desc.Height == 1 &&
+							*static_cast<const uint32*>(data.pData) == 0;
+						context->Unmap(staging.Get(), 0);
+					}
+				}
+			}
+		}
+		Check("ui-fallback-pixel-is-transparent", transparentFallback);
+		Check("ui-fallback-reload-is-idempotent", GAME_INSTANCE->Load_Texture(
+			LauncherClientGateLevel, missingTexture, 2, fallbackTag, true) == S_OK &&
+			GAME_INSTANCE->Load_Texture(LauncherClientGateLevel, missingTexture, 2, fallbackTag) == strictResult);
 
 		Shared<LevelGamePlay> gameplayLevel;
 		if (resourcesReady)
@@ -170,6 +234,13 @@ namespace
 		Check("launcher-client-pl0000-and-ui-restored", hierarchyRestored);
 		Check("launcher-client-objectref-restored", hierarchyRestored &&
 			hpBar->Get_TargetObjectGuid() == player->Get_ObjectGuid());
+		const size_t objectCount = GAME_INSTANCE->Get_GameObjects(LauncherClientGateLevel).size();
+		Check("failed-level-transition-preserves-current-world", sceneLoaded && player &&
+			GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), nullptr) == E_INVALIDARG &&
+			GAME_INSTANCE->Get_CurrentLevel() == gameplayLevel &&
+			GAME_INSTANCE->Get_CurrentLevelIndex() == LauncherClientGateLevel &&
+			GAME_INSTANCE->Get_GameObjects(LauncherClientGateLevel).size() == objectCount &&
+			GAME_INSTANCE->Find(player->Get_ObjectGuid()) == player && !player->Is_Destroy());
 
 		return passed && Save() ? S_OK : E_FAIL;
 	}
@@ -214,11 +285,14 @@ HRESULT ClientApp::Initialize(const ENGINE_DESC& desc)
 
 HRESULT ClientApp::Ready_StartLevel(LEVEL startLevel) 
 {
-	if (FAILED(GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), LevelLoading::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(), startLevel, true)))) {
-		return E_FAIL;
+    const auto loadingLevel = LevelLoading::Create(GAME_INSTANCE->Get_Device(),
+        GAME_INSTANCE->Get_Context(), startLevel, true);
+    if (!loadingLevel) {
+        LOG_ERROR(L"Startup blocked before level {}: Loading initialization failed; see the preceding resource error",
+            ETOI(startLevel));
+        return E_FAIL;
     }
-
-    return S_OK;
+    return GAME_INSTANCE->Change_Level(ETOI(LEVEL::LOADING), loadingLevel);
 }
 
 HRESULT ClientApp::Ready_InitialObject()
@@ -227,7 +301,7 @@ HRESULT ClientApp::Ready_InitialObject()
     GAME_INSTANCE->Add_Font(L"Nier_32", L"../../Client/bin/resources/Font/NierFont_32.spritefont");
     GAME_INSTANCE->Add_Font(L"Nier_64", L"../../Client/bin/resources/Font/NierFont_64.spritefont");
 
-    if (FAILED(GAME_INSTANCE->Register_ReflectedPrototypes(ETOI(LEVEL::STATIC))))
+    if (FAILED(GAME_INSTANCE->Register_ReflectedPrototypes()))
         return E_FAIL;
 
 	const Shared<TextUI> textUiPrototype = TextUI::CreatePrototype();
@@ -242,10 +316,7 @@ Unique<ClientApp> ClientApp::Create(const ENGINE_DESC &desc) {
   Unique<ClientApp> mainApp = make_unique<ClientApp>();
 
   if (FAILED(mainApp->Initialize(desc))) {
-#ifdef _DEBUG
-	if (!Is_LauncherClientGate())
-#endif
-    MSG_BOX("Failed to Created : ClientApp");
+    LOG_ERROR(L"ClientApp initialization failed; see the preceding startup error");
     return nullptr;
   }
   return mainApp;

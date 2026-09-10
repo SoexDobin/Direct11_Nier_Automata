@@ -36,6 +36,10 @@ public:
 
 public:
     HRESULT Begin(uint32 passIndex);
+    HRESULT Begin(const string& passName);
+    Bool Has_Pass(const string& passName) const;
+    Bool Has_SRV(const string& slotName) const;
+    HRESULT Clear_MaterialSlots(const vector<string>& slots);
     HRESULT Bind_SRV(const Char* constantName, const ComPtr<ID3D11ShaderResourceView> &srv);
     HRESULT Bind_Matrix(const Char* constantName, const Float4x4 *matrix);
     HRESULT Bind_Matrices(const Char* constantName, const Float4x4* matrices, uint32 numMatrices);
@@ -60,6 +64,9 @@ private:
     ComPtr<ID3DX11Effect> m_Effect = { nullptr };
     uint32 m_NumPasses = {};
     vector<ComPtr<ID3D11InputLayout>> m_InputLayouts;
+    Shared<const unordered_map<string, uint32>> m_PassIndices;
+    // Effect state and the previous material's slots share the same clone lifetime.
+    Shared<vector<string>> m_MaterialSlots{ make_shared<vector<string>>() };
     array<ComPtr<ID3DX11EffectConstantBuffer>, ETOI(ConstantBuffer::END)> m_ConstantBuffers{};
     array<ComPtr<ID3D11Buffer>, ETOI(ConstantBuffer::END)> m_AllocatedConstantBuffers{};
     array<uint32, ETOI(ConstantBuffer::END)> m_AllocatedConstantBufferSizes{};

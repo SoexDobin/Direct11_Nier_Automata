@@ -46,6 +46,18 @@ HRESULT Channel::Initialize(void* arg)
 
 void Channel::Get_ChannelTransform(Float currentTrackPosition, uint32& currentKeyFrameIndex, Float duration, Bool isLoop, _Out_ TRANSFORM_FRAME& outTransform)
 {
+	if (m_KeyFrames.empty())
+	{
+		outTransform = { Vector3::One, Quaternion::Identity, Vector3::Zero };
+		return;
+	}
+	if (m_KeyFrames.size() == 1 || duration <= 0.f)
+	{
+		const auto& key = m_KeyFrames.front();
+		outTransform = { key.scale, key.rotation, key.position };
+		currentKeyFrameIndex = 0;
+		return;
+	}
 	if (currentTrackPosition <= 0.f)
 		currentTrackPosition = 0;
 

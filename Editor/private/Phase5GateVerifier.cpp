@@ -14,6 +14,8 @@
 #include "ModelViewer.h"
 #include "LevelGamePlay.h"
 #include <wincodec.h>
+#include <d3d11sdklayers.h>
+#include "Pl0000Input.h"
 #include "Navigation.h"
 #include "PathManager.h"
 #include "Pl0000.h"
@@ -44,6 +46,7 @@ namespace Phase5GateVerifier
 		constexpr uint32 MaterialAuthoringStage = 13;
 		constexpr uint32 AnimationAuthoringStage = 14;
 		constexpr uint32 AnimationRestartStage = 15;
+		constexpr uint32 ViewResizeStage = 16;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
 		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
 		constexpr const wchar_t* FrameFixtureTag = L"TextUI";
@@ -252,6 +255,153 @@ namespace Phase5GateVerifier
 			nlohmann::json m_Document;
 			Bool m_Passed = true;
 		};
+
+		HRESULT Run_ViewResize(HRESULT initializationResult)
+		{
+			GateReport report("phase9-view-resize");
+			report.Check("initialize", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult)) return initializationResult;
+			auto context = GAME_INSTANCE->Get_Context();
+			ComPtr<ID3D11InfoQueue> debug;
+			GAME_INSTANCE->Get_Device().As(&debug);
+			if (debug) debug->ClearStoredMessages();
+			const auto dimensions = [](ID3D11View* view, uint32 width, uint32 height) {
+				if (!view) return false;
+				ComPtr<ID3D11Resource> resource;
+				ComPtr<ID3D11Texture2D> texture;
+				view->GetResource(resource.GetAddressOf());
+				if (FAILED(resource.As(&texture))) return false;
+				D3D11_TEXTURE2D_DESC desc{};
+				texture->GetDesc(&desc);
+				return desc.Width == width && desc.Height == height;
+			};
+			EDITOR->RequestResize(640.9f, 360.9f, 0);
+			EDITOR->RequestResize(800.2f, 600.2f, 1);
+			EDITOR->RequestResize(0.f, 0.f, 0);
+			EDITOR->RequestResize(-1.f, 500.f, 1);
+			const auto requests = EDITOR->Get_ResizeRequests();
+			report.Check("two-view-requests-and-zero-noop", requests.size() == 2 &&
+				requests.at(0).width == 640 && requests.at(1).height == 600);
+			for (const auto& [index, request] : requests) {
+				report.Check("resize-" + to_string(index), SUCCEEDED(GAME_INSTANCE->OnResize(request.width, request.height, index)));
+				EDITOR->Clear_ResizeRequest(index);
+			}
+			auto original = GAME_INSTANCE->Get_OffScreenSRV(0);
+			report.Check("same-size-reuses-offscreen", SUCCEEDED(GAME_INSTANCE->OnResize(640, 360, 0)) &&
+				GAME_INSTANCE->Get_OffScreenSRV(0) == original);
+			report.Check("invalid-index-rejected", FAILED(GAME_INSTANCE->OnResize(640, 360, 99)));
+			report.Check("zero-size-preserves-offscreen", SUCCEEDED(GAME_INSTANCE->OnResize(0, 0, 0)) &&
+				GAME_INSTANCE->Get_OffScreenSRV(0) == original);
+			// Invalid dimensions fail before touching an existing view.
+			report.Check("failed-resize-preserves-offscreen", FAILED(GAME_INSTANCE->OnResize(UINT_MAX, 360, 0)) &&
+				GAME_INSTANCE->Get_OffScreenSRV(0) == original);
+			if (debug) debug->ClearStoredMessages();
+			ComPtr<ID3D11RenderTargetView> firstDiffuse;
+			for (uint32 pass = 0; pass < 3; ++pass) {
+				const uint32 screen = pass == 1 ? 1 : 0;
+				const uint32 width = screen == 0 ? 640 : 800;
+				const uint32 height = screen == 0 ? 360 : 600;
+				Bool valid = SUCCEEDED(GAME_INSTANCE->Begin_RenderOffScreen(screen)) &&
+					SUCCEEDED(GAME_INSTANCE->Draw_NoClearing());
+				ComPtr<ID3D11RenderTargetView> output;
+				ComPtr<ID3D11DepthStencilView> depth;
+				context->OMGetRenderTargets(1, output.GetAddressOf(), depth.GetAddressOf());
+				valid = valid && dimensions(output.Get(), width, height) && dimensions(depth.Get(), width, height);
+				if (SUCCEEDED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_GameObject))) {
+					ID3D11RenderTargetView* views[2]{};
+					context->OMGetRenderTargets(2, views, nullptr);
+					valid = valid && dimensions(views[0], width, height) && dimensions(views[1], width, height);
+					if (pass == 0) firstDiffuse = views[0];
+					if (pass == 2) report.Check("view-switch-reuses-mrt", firstDiffuse.Get() == views[0]);
+					for (auto* view : views) if (view) view->Release();
+					GAME_INSTANCE->End_MultiRenderTarget();
+				} else valid = false;
+				if (SUCCEEDED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_LIGHT))) {
+					ComPtr<ID3D11RenderTargetView> shade;
+					context->OMGetRenderTargets(1, shade.GetAddressOf(), nullptr);
+					valid = valid && dimensions(shade.Get(), width, height);
+					GAME_INSTANCE->End_MultiRenderTarget();
+				} else valid = false;
+				report.Check("offscreen-depth-mrt-dimensions-" + to_string(pass), valid);
+				GAME_INSTANCE->End_RenderOffScreen();
+			}
+#ifdef _DEBUG
+			// Capture without Draw_NoClearing: a draw could lazily repair a broken MRT batch.
+			struct ResizeSnapshot {
+				ComPtr<ID3D11ShaderResourceView> color;
+				ComPtr<ID3D11DepthStencilView> depth;
+				ComPtr<ID3D11RenderTargetView> diffuse, normal, shade;
+				D3D11_VIEWPORT viewport{};
+			};
+			const auto capture = [&](ResizeSnapshot& state) {
+				state.color = GAME_INSTANCE->Get_OffScreenSRV(0);
+				if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0))) return false;
+				context->OMGetRenderTargets(0, nullptr, state.depth.GetAddressOf());
+				UINT count = 1;
+				context->RSGetViewports(&count, &state.viewport);
+				Bool valid = count == 1;
+				if (SUCCEEDED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_GameObject))) {
+					ID3D11RenderTargetView* views[2]{};
+					context->OMGetRenderTargets(2, views, nullptr);
+					state.diffuse.Attach(views[0]);
+					state.normal.Attach(views[1]);
+					GAME_INSTANCE->End_MultiRenderTarget();
+				} else valid = false;
+				if (SUCCEEDED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_LIGHT))) {
+					context->OMGetRenderTargets(1, state.shade.GetAddressOf(), nullptr);
+					GAME_INSTANCE->End_MultiRenderTarget();
+				} else valid = false;
+				GAME_INSTANCE->End_RenderOffScreen();
+				return valid && state.color && state.depth && state.diffuse && state.normal && state.shade;
+			};
+			for (const Bool offscreenFailure : { true, false }) {
+				ResizeSnapshot before, after;
+				const auto otherView = GAME_INSTANCE->Get_OffScreenSRV(1);
+				Bool valid = capture(before);
+				GAME_INSTANCE->Fail_NextViewResize_Debug(offscreenFailure);
+				const HRESULT failed = GAME_INSTANCE->OnResize(512, 288, 0);
+				valid = capture(after) && valid && FAILED(failed);
+				valid = valid && before.color == after.color && before.depth == after.depth &&
+					before.diffuse == after.diffuse && before.normal == after.normal && before.shade == after.shade &&
+					memcmp(&before.viewport, &after.viewport, sizeof(D3D11_VIEWPORT)) == 0 &&
+					dimensions(after.color.Get(), 640, 360) && dimensions(after.depth.Get(), 640, 360) &&
+					dimensions(after.diffuse.Get(), 640, 360) && dimensions(after.normal.Get(), 640, 360) &&
+					dimensions(after.shade.Get(), 640, 360) && GAME_INSTANCE->Get_OffScreenSRV(1) == otherView;
+				const string prefix = offscreenFailure ? "offscreen-partial-failure" : "mrt-partial-failure";
+				report.Check(prefix + "-preserves-batch", valid);
+				ResizeSnapshot recovered;
+				valid = SUCCEEDED(GAME_INSTANCE->OnResize(512, 288, 0)) && capture(recovered);
+				valid = valid && dimensions(recovered.color.Get(), 512, 288) && dimensions(recovered.depth.Get(), 512, 288) &&
+					dimensions(recovered.diffuse.Get(), 512, 288) && dimensions(recovered.normal.Get(), 512, 288) &&
+					dimensions(recovered.shade.Get(), 512, 288) && recovered.viewport.Width == 512 && recovered.viewport.Height == 288;
+				report.Check(prefix + "-retry", valid);
+				report.Check(prefix + "-restore", SUCCEEDED(GAME_INSTANCE->OnResize(640, 360, 0)));
+			}
+#endif
+			report.Check("resize-roundtrip", SUCCEEDED(GAME_INSTANCE->OnResize(320, 240, 0)) &&
+				SUCCEEDED(GAME_INSTANCE->OnResize(640, 360, 0)) &&
+				dimensions(GAME_INSTANCE->Get_OffScreenSRV(0).Get(), 640, 360));
+			GAME_INSTANCE->Set_MouseLock(true);
+			GAME_INSTANCE->Set_InputEnabled(false);
+			report.Check("input-disable-releases-lock", !GAME_INSTANCE->Get_MouseLock() &&
+				GAME_INSTANCE->Get_DIMouseMove(DIMM::X) == 0);
+			auto input = make_shared<Client::Pl0000Input>();
+			input->Update_Pl0000_InputState(1.f / 60.f);
+			report.Check("disabled-player-input-empty", input->Is_WASD_None() && input->Get_MouseComboCount() == 0);
+			uint32 errors = 0;
+			if (debug) for (UINT64 index = 0; index < debug->GetNumStoredMessages(); ++index) {
+				SIZE_T size = 0;
+				debug->GetMessage(index, nullptr, &size);
+				vector<Byte> bytes(size);
+				auto* message = reinterpret_cast<D3D11_MESSAGE*>(bytes.data());
+				if (SUCCEEDED(debug->GetMessage(index, message, &size)) &&
+					message->Severity <= D3D11_MESSAGE_SEVERITY_ERROR) ++errors;
+			}
+			report.Check("d3d-debug-no-errors", debug && errors == 0, to_string(errors));
+			GAME_INSTANCE->Clear_RenderGroup();
+			const Bool saved = report.Save(Work_Directory() / L"phase9-view-resize.json");
+			return saved && report.Passed() ? S_OK : E_FAIL;
+		}
 
 		void Sort_Components(nlohmann::json& object)
 		{
@@ -2343,12 +2493,14 @@ namespace Phase5GateVerifier
 			return MaterialAuthoringStage;
 		if (wstring_view(value) == L"animation-authoring") return AnimationAuthoringStage;
 		if (wstring_view(value) == L"animation-restart") return AnimationRestartStage;
+		if (wstring_view(value) == L"phase9-view-resize") return ViewResizeStage;
 #endif
 		return 0;
 	}
 
 	HRESULT Initialize_Runtime(uint32 stage)
 	{
+		if (stage == ViewResizeStage) return S_OK;
 		if (stage != PrepareStage && stage != VerifyStage &&
 			stage != FrameStage && stage != UIAuthoringStage &&
 			stage != ReferencesStage && stage != PrefabRepositoryStage &&
@@ -2408,6 +2560,7 @@ namespace Phase5GateVerifier
 
 	HRESULT Run(uint32 stage, HRESULT initializationResult)
 	{
+		if (stage == ViewResizeStage) return Run_ViewResize(initializationResult);
 		if (stage == PrepareStage)
 			return SUCCEEDED(initializationResult) ? Run_Prepare() : initializationResult;
 		if (stage == VerifyStage)

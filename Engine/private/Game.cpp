@@ -209,10 +209,20 @@ void Game::Update_Engine(Float timeDelta, Bool singleFixedStep) {
 }
 
 HRESULT Game::Draw() const {
-    m_Renderer->Draw();
-    return S_OK;
+    const HRESULT result = Draw_NoClearing();
+    m_Renderer->Clear_RenderGroup();
+    return result;
+}
+HRESULT Game::Clear_RenderGroup() const {
+    return m_Renderer->Clear_RenderGroup();
 }
 HRESULT Game::Draw_NoClearing() const {
+    D3D11_VIEWPORT viewport{};
+    UINT count = 1;
+    m_GraphicDevice->Get_Context()->RSGetViewports(&count, &viewport);
+    if (FAILED(m_RenderTargetManager->Prepare_View(m_GraphicDevice->Get_ActiveScreen(),
+        static_cast<uint32>(viewport.Width), static_cast<uint32>(viewport.Height))))
+        return E_FAIL;
     m_Renderer->Draw_NoClearing();
     return S_OK;
 }
@@ -283,23 +293,24 @@ HRESULT Game::OnResize(uint32 width, uint32 height, uint32 offscreenIndex)
 		return S_OK;
 	}
 
-	Float fAspect = 1.6f;
-	if (height > 0)
+	if (offscreenIndex != UINT_MAX && width > 0 && height > 0)
 	{
-		fAspect = static_cast<Float>(width) / height;
+		if (!m_RenderTargetManager) return E_FAIL;
+		GraphicDevice::OffscreenRenderTarget replacement{};
+		const HRESULT prepared = m_GraphicDevice->Prepare_OffscreenResize(width, height, offscreenIndex, replacement);
+		if (FAILED(prepared)) return prepared;
+		// MRT creation is atomic on failure; offscreen commit below cannot fail.
+		const HRESULT resized = m_RenderTargetManager->Resize_View(offscreenIndex, width, height);
+		if (FAILED(resized)) return resized;
+		if (prepared == S_OK)
+			m_GraphicDevice->Commit_OffscreenResize(offscreenIndex, std::move(replacement));
+		return S_OK;
 	}
-
-	if (nullptr != m_CameraManager->Get_MainCamera())
-	{
-		m_CameraManager->Get_MainCamera()->Bind_Aspect(fAspect);
-	}
-
-	for (auto &camera : m_CameraManager->Get_Cameras(GAME_INSTANCE->Get_CurrentLevelIndex()))
-	{
-		camera->Set_Aspect(fAspect);
-	}
-
-	return m_GraphicDevice->OnResize(width, height, offscreenIndex);
+	const HRESULT result = m_GraphicDevice->OnResize(width, height, offscreenIndex);
+	if (SUCCEEDED(result) && offscreenIndex == UINT_MAX && width > 0 && height > 0 &&
+		m_CameraManager && m_CameraManager->Get_MainCamera())
+		m_CameraManager->Get_MainCamera()->Bind_Aspect(static_cast<Float>(width) / height);
+	return result;
 }
 
 HRESULT Game::Begin_RenderOffScreen(uint32 screenIndex) const {
@@ -350,6 +361,13 @@ Float Game::Compute_TimeDelta() const {
 Float Game::Compute_UnscaledTimeDelta() const {
   return m_TimeManager->Get_MainTimer()->GetUnscaledDeltaTime();
 }
+#ifdef _DEBUG
+void Game::Fail_NextViewResize_Debug(Bool offscreen) const
+{
+    m_GraphicDevice->m_FailNextOffscreenCreation = offscreen;
+    m_RenderTargetManager->m_FailNextViewCreation = !offscreen;
+}
+#endif
 Float Game::Get_FixedDeltaTime() const {
   return m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
 }

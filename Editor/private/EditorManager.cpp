@@ -192,9 +192,23 @@ HRESULT EditorManager::Initialize()
 
 void EditorManager::Set_State(EDITOR_STATE state)
 {
+    if (m_State != state)
+    {
+        GAME_INSTANCE->Set_InputEnabled(false);
+        GAME_INSTANCE->Set_MouseLock(false);
+    }
     m_State = state;
     if (state != EDITOR_STATE::PAUSE)
         m_SingleStepRequested = false;
+}
+
+void EditorManager::RequestResize(Float width, Float height, uint32 screenIndex)
+{
+    if (!std::isfinite(width) || !std::isfinite(height) || width < 1.f || height < 1.f ||
+        width > D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION || height > D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION ||
+        screenIndex >= m_EngineDesc.renderTargetCount)
+        return;
+    m_ResizeRequests[screenIndex] = { static_cast<uint32>(width), static_cast<uint32>(height), screenIndex };
 }
 
 void EditorManager::Request_SingleStep()
@@ -819,6 +833,8 @@ void EditorManager::Update(Bool IsResetView) {
 
     if (state == EDITOR_STATE::PLAY || isLoading || singleStep)
     {
+        if (state != EDITOR_STATE::PLAY)
+            GAME_INSTANCE->Set_InputEnabled(false);
         const Float runtimeDelta = singleStep
             ? GAME_INSTANCE->Get_FixedDeltaTime()
             : GAME_INSTANCE->Compute_TimeDelta();
@@ -832,82 +848,56 @@ void EditorManager::Update(Bool IsResetView) {
 
 HRESULT EditorManager::Render(Bool IsResetView) {
 
-	Shared<Float4> vClearColor = make_shared<Float4>(0.f, 0.f, 1.f, 1.f);
-
-    if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0)))
-        return E_FAIL;
-
-
-    Shared<Camera> pCurrentMain = GAME_INSTANCE->Get_MainCamera();
-    
-    // 만약 엔진의 메인 카메라가 있고, 그게 에디터 카메라가 아니라면 우선적으로 채택
-    if (pCurrentMain && pCurrentMain != m_EditorCamera)
-    {
-        m_InGameCamera = pCurrentMain;
-    }
+    Shared<Camera> originalCamera = GAME_INSTANCE->Get_MainCamera();
+    if (originalCamera && originalCamera != m_EditorCamera)
+        m_InGameCamera = originalCamera;
     else
     {
-        // 그렇지 않다면 엔진에 등록된 카메라들 중 에디터 카메라가 아닌 첫 번째 실제 게임 카메라를 찾음
         m_InGameCamera = nullptr;
-        for (auto& pCam : GAME_INSTANCE->Get_Cameras(GAME_INSTANCE->Get_CurrentLevelIndex()))
+        for (const auto& camera : GAME_INSTANCE->Get_Cameras(GAME_INSTANCE->Get_CurrentLevelIndex()))
+            if (camera && camera != m_EditorCamera) { m_InGameCamera = camera; break; }
+    }
+
+    const auto renderViews = [&]() -> HRESULT
+    {
+        if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(0))) return E_FAIL;
+        if (m_InGameCamera)
         {
-            if (pCam && pCam != m_EditorCamera)
-            {
-                m_InGameCamera = pCam;
-                break;
-            }
+            GAME_INSTANCE->Set_MainCamera(m_InGameCamera);
+            D3D11_VIEWPORT viewport{};
+            UINT count = 1;
+            GAME_INSTANCE->Get_Context()->RSGetViewports(&count, &viewport);
+            m_InGameCamera->Bind_Aspect(viewport.Width / viewport.Height);
+            GAME_INSTANCE->Update_Pipeline();
+            if (FAILED(GAME_INSTANCE->Draw_NoClearing())) return E_FAIL;
+#ifdef _DEBUG
+            GAME_INSTANCE->Render_CollisionDebug();
+#endif
         }
-    }
-
-    // 1. In-Game 뷰포트 (OffScreen 0) 바인딩 및 렌더링 준비
-    if (m_InGameCamera)
-    {
-        GAME_INSTANCE->Set_MainCamera(m_InGameCamera);
-        m_InGameCamera->Bind_CameraTransform();
-    }
-    else
-    {
-        // 인게임 카메라가 전혀 없는 경우: 검은 화면 출력을 위해 뷰포트 클리어 및 바인딩 건너뜀
-        Shared<Float4> vBlack = make_shared<Float4>(0.f, 0.f, 0.f, 1.f);
-        GAME_INSTANCE->Clear_BackBufferView(vBlack);
-        // Bind_CameraTransform을 호출하지 않아 렌더링 결과가 나타나지 않음 (검은 화면)
-    }
-
-    GAME_INSTANCE->Update_Pipeline();
-
-    if (FAILED(GAME_INSTANCE->Draw_NoClearing()))
-        return E_FAIL;
-
-    // 1. 인게임(Game Scene) 렌더링 직후 디버그 박스 렌더
+        // Begin_RenderOffScreen already clears a view with no game camera to black.
+        if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(1))) return E_FAIL;
+        if (!m_EditorCamera || FAILED(GAME_INSTANCE->Set_MainCamera(m_EditorCamera))) return E_FAIL;
+        D3D11_VIEWPORT viewport{};
+        UINT count = 1;
+        GAME_INSTANCE->Get_Context()->RSGetViewports(&count, &viewport);
+        m_EditorCamera->Set_Aspect(viewport.Width / viewport.Height);
+        if (FAILED(m_EditorCamera->Bind_EditorMatrix())) return E_FAIL;
+        GAME_INSTANCE->Update_Pipeline();
+        if (FAILED(GAME_INSTANCE->Draw())) return E_FAIL;
 #ifdef _DEBUG
-    GAME_INSTANCE->Render_CollisionDebug();
+        GAME_INSTANCE->Render_CollisionDebug();
 #endif
-
-    if (FAILED(GAME_INSTANCE->Begin_RenderOffScreen(1)))
-        return E_FAIL;
-
-    if (FAILED(GAME_INSTANCE->Set_MainCamera(m_EditorCamera)))
-        return E_FAIL;
-	if (FAILED(m_EditorCamera->Bind_EditorMatrix()))
-        return E_FAIL;
-    GAME_INSTANCE->Update_Pipeline();
-
-    // 2. 에디터 화면(Editor Scene) 구조체 그리기
-    if (FAILED(GAME_INSTANCE->Draw())) 
-        return E_FAIL;
-
-    // 에디터 화면 렌더링 직후 디버그 박스 렌더
-#ifdef _DEBUG
-    GAME_INSTANCE->Render_CollisionDebug();
-#endif
-
-    if (FAILED(GAME_INSTANCE->End_RenderOffScreen()))
-        return E_FAIL;
-
-    if (m_InGameCamera)
-        GAME_INSTANCE->Set_MainCamera(m_InGameCamera);
-    else
-        GAME_INSTANCE->Set_MainCamera(m_EditorCamera);
+        return S_OK;
+    };
+    const HRESULT viewResult = renderViews();
+    GAME_INSTANCE->End_RenderOffScreen();
+    GAME_INSTANCE->Set_MainCamera(originalCamera ? originalCamera : m_EditorCamera);
+    if (FAILED(viewResult))
+    {
+        GAME_INSTANCE->Clear_RenderGroup();
+        GAME_INSTANCE->Update_CameraPipeline();
+        return viewResult;
+    }
 
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -947,5 +937,6 @@ HRESULT EditorManager::Render(Bool IsResetView) {
     m_AssetBrowser->Render(IsResetView);
     m_NavHelper->Render(IsResetView);
 
+    GAME_INSTANCE->Update_CameraPipeline();
     return S_OK;
 }

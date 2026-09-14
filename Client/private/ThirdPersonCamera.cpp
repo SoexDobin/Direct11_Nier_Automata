@@ -78,6 +78,11 @@ void ThirdPersonCamera::Priority_Update(Float timeDelta)
 {
 	if (!m_Target.expired())
 	{
+		if (!GAME_INSTANCE->Get_InputEnabled())
+		{
+			m_OrbitVelocityX = 0.f;
+			m_OrbitVelocityY = 0.f;
+		}
 		auto targetTransform = m_Target.lock()->Get_Transform();
 
 		if (GAME_INSTANCE->Get_DIKeyState(static_cast<uByte>(DIKEYBOARD_ESCAPE)) & 0x80)

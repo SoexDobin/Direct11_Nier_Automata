@@ -15,6 +15,16 @@ void Renderer::Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject>
 }
 
 void Renderer::Draw() {
+	Draw_NoClearing();
+	Clear_RenderGroup();
+}
+
+void Renderer::Draw_NoClearing() {
+	UINT count = 1;
+	D3D11_VIEWPORT viewport{};
+	m_Context->RSGetViewports(&count, &viewport);
+	m_WorldMatrix = Matrix::CreateScale(viewport.Width, viewport.Height, 1.f);
+	m_ProjMatrix = Matrix::CreateOrthographic(viewport.Width, viewport.Height, 0.f, 1.f);
 	Render_Group(ETOI(RENDERGROUP::PRIORITY));
 
 	Render_Group(ETOI(RENDERGROUP::NONLIGHT));
@@ -33,15 +43,6 @@ void Renderer::Draw() {
 	Render_Debug();
 #endif
 
-	for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
-        m_RenderGroup[i].clear();
-	}
-}
-
-void Renderer::Draw_NoClearing() {
-    for (uint32 i = 0; i < ETOI(RENDERGROUP::END); ++i) {
-        Render_Group(i);
-    }
 }
 
 // TODO : draw call check clear group all frame
@@ -50,7 +51,7 @@ HRESULT Renderer::Clear_RenderGroup()
     m_LayerMask = ETOI(LAYER::ALL_LAYER);
 
     for (auto& group : m_RenderGroup)
-        group.shrink_to_fit();
+        group.clear();
 
     return S_OK;
 }
@@ -142,6 +143,7 @@ void Renderer::Render_Lights() const
 	if (FAILED(GAME_INSTANCE->Begin_MultiRenderTarget(MRT_LIGHT)))
 		return;
 
+	const auto drawLights = [&]() {
 	if (FAILED(m_Shader->Bind_Matrix(WorldMatrix, &m_WorldMatrix)))
 		return;
 
@@ -159,6 +161,8 @@ void Renderer::Render_Lights() const
 
 	if (FAILED(GAME_INSTANCE->Render_Lights(m_Shader, m_Buffer)))
 		return;
+	};
+	drawLights();
 
 	if (FAILED(GAME_INSTANCE->End_MultiRenderTarget()))
 		return;
@@ -212,6 +216,9 @@ Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device> &device, const ComP
 #ifdef _DEBUG
 void Renderer::Render_Debug()
 {
+	GAME_INSTANCE->Ready_RenderTarget_Debug(RT_DIFFUSE, 150.f, 150.f, 300.f, 300.f);
+	GAME_INSTANCE->Ready_RenderTarget_Debug(RT_NORMAL, 150.f, 450.f, 300.f, 300.f);
+	GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SHADE, 450.f, 150.f, 300.f, 300.f);
 	if (FAILED(m_Shader->Bind_Matrix(ViewMatrix, &m_ViewMatrix)))
 		return;
 

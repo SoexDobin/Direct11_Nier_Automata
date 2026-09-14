@@ -50,13 +50,13 @@ HRESULT RenderTargetManager::Add_MultiRenderTarget(const wstring& mrtTag, const 
 	
 	if (!mrtList)
 	{
-		list<Shared<RenderTarget>> newList;
-		newList.push_back(renderTarget);
+		list<wstring> newList;
+		newList.push_back(rtTag);
 		m_MultiRenderTargets.emplace(mrtTag, newList);
 	}
 	else
 	{
-		mrtList->push_back(renderTarget);
+		mrtList->push_back(rtTag);
 	}
 
 	return S_OK;
@@ -68,13 +68,18 @@ HRESULT RenderTargetManager::Begin_MultiRenderTarget(const wstring& mrtTag)
 	if (!mrtList)
 		return E_FAIL;
 
-	m_Context->OMGetRenderTargets(1, m_BackBuffer.GetAddressOf(), m_OriginalDepthStencil.GetAddressOf());
+	if (mrtList->size() > D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT || m_BackBuffer)
+		return E_FAIL;
+	ID3D11ShaderResourceView* nullViews[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+	m_Context->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, nullViews);
+	m_Context->OMGetRenderTargets(1, m_BackBuffer.ReleaseAndGetAddressOf(), m_OriginalDepthStencil.ReleaseAndGetAddressOf());
 
 	ID3D11RenderTargetView* renderTargets[8] = { nullptr };
 	uint32 numRenderTargets{ 0 };
 
-	for (auto& renderTarget : *mrtList)
+	for (const auto& tag : *mrtList)
 	{
+		auto renderTarget = Find_RenderTarget(tag);
 		renderTarget->Clear_RenderTarget();
 		renderTargets[numRenderTargets++] = renderTarget->Get_RenderTargetView().Get();
 	}
@@ -94,7 +99,41 @@ HRESULT RenderTargetManager::End_MultiRenderTarget()
 	return S_OK;
 }
 
-list<Shared<RenderTarget>>* RenderTargetManager::Find_MultiRenderTarget(const wstring& mrtTag)
+HRESULT RenderTargetManager::Prepare_View(uint32 screenIndex, uint32 width, uint32 height)
+{
+	const HRESULT result = Resize_View(screenIndex, width, height);
+	if (FAILED(result)) return result;
+	m_ActiveScreen = screenIndex;
+	return S_OK;
+}
+
+HRESULT RenderTargetManager::Resize_View(uint32 screenIndex, uint32 width, uint32 height)
+{
+	if (width == 0 || height == 0 || m_BackBuffer) return E_INVALIDARG;
+	auto found = m_ViewRenderTargets.find(screenIndex);
+	if (found == m_ViewRenderTargets.end() || found->second.size() != m_RenderTargets.size() ||
+		(!found->second.empty() && !found->second.begin()->second->Has_Size(width, height)))
+	{
+		map<const wstring, Shared<RenderTarget>> replacements;
+		for (const auto& [tag, source] : m_RenderTargets)
+		{
+			auto target = source->Create_Resized(width, height);
+			if (!target) return E_FAIL;
+			replacements.emplace(tag, std::move(target));
+#ifdef _DEBUG
+			// Fail with a partially built batch, not at argument validation.
+			if (m_FailNextViewCreation) {
+				m_FailNextViewCreation = false;
+				return E_FAIL;
+			}
+#endif
+		}
+		m_ViewRenderTargets[screenIndex].swap(replacements);
+	}
+	return S_OK;
+}
+
+list<wstring>* RenderTargetManager::Find_MultiRenderTarget(const wstring& mrtTag)
 {
 	if (m_MultiRenderTargets.contains(mrtTag))
 	{
@@ -106,6 +145,12 @@ list<Shared<RenderTarget>>* RenderTargetManager::Find_MultiRenderTarget(const ws
 
 Shared<RenderTarget> RenderTargetManager::Find_RenderTarget(const wstring& rtTag)
 {
+	const auto view = m_ViewRenderTargets.find(m_ActiveScreen);
+	if (view != m_ViewRenderTargets.end())
+	{
+		const auto target = view->second.find(rtTag);
+		return target == view->second.end() ? nullptr : target->second;
+	}
 	if (m_RenderTargets.contains(rtTag))
 		return m_RenderTargets[rtTag];
 
@@ -137,12 +182,13 @@ HRESULT RenderTargetManager::Ready_RenderTarget_Debug(const wstring& rtTag, Floa
 
 HRESULT RenderTargetManager::Render_RenderTarget_Debug(const Shared<VIBuffer_Rect>& buffer, const Shared<Shader>& shader, const wstring& mrtTag)
 {
-	list<Shared<RenderTarget>>* mrtList = Find_MultiRenderTarget(mrtTag);
+	list<wstring>* mrtList = Find_MultiRenderTarget(mrtTag);
 	if (nullptr == mrtList)
 		return E_FAIL;
 
-	for (auto& renderTarget : *mrtList)
+	for (const auto& tag : *mrtList)
 	{
+		auto renderTarget = Find_RenderTarget(tag);
 		if (FAILED(renderTarget->Render_Debug(buffer, shader)))
 		{
 			return E_FAIL;

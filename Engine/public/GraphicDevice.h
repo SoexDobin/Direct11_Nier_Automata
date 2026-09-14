@@ -5,6 +5,7 @@
 
 NS_BEGIN(Engine)
 class GraphicDevice final : public Object {
+    friend class Game;
 private:
     struct OffscreenRenderTarget {
         ComPtr<ID3D11Texture2D> texture;
@@ -23,6 +24,7 @@ public:
 	ComPtr<ID3D11DeviceContext> Get_Context() const { return m_Context; }
 	ComPtr<IDXGISwapChain1> Get_SwapChain() const { return m_SwapChain; }
     const D3D11_VIEWPORT& Get_ViewportDesc() const { return m_ViewPort; }
+    uint32 Get_ActiveScreen() const { return m_ActiveScreen; }
     void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref);
 
 public:
@@ -43,6 +45,12 @@ private:
   HRESULT Ready_BackBufferRenderTargetView();
   HRESULT Ready_DepthStencilView(uint32 winSizeX, uint32 winSizeY);
   HRESULT Create_OffScreenTarget(uint32 width, uint32 height);
+  HRESULT Create_OffScreenTarget(uint32 width, uint32 height, OffscreenRenderTarget& target);
+  HRESULT Prepare_OffscreenResize(uint32 width, uint32 height, uint32 screenIndex, OffscreenRenderTarget& replacement);
+  void Commit_OffscreenResize(uint32 screenIndex, OffscreenRenderTarget&& replacement);
+#ifdef _DEBUG
+  Bool m_FailNextOffscreenCreation = false;
+#endif
 
 private:
   ComPtr<ID3D11Device> m_Device = {nullptr};
@@ -54,6 +62,7 @@ private:
   D3D11_VIEWPORT m_ViewPort = {};
 
   vector<OffscreenRenderTarget> m_Offscreens;
+  uint32 m_ActiveScreen = UINT_MAX;
 
 public:
   static Unique<GraphicDevice> Create(_In_ const ENGINE_DESC &engineDesc);

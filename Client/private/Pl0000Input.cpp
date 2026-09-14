@@ -10,8 +10,6 @@ Pl0000Input::Pl0000Input() : ScriptComponent{}
 Pl0000Input::Pl0000Input(const ComPtr<ID3D11Device> &device, const ComPtr<ID3D11DeviceContext> &context)
 	: ScriptComponent{device, context}
 {
-	ZeroMemory(&m_KeyInfos, sizeof(INPUT_INFO) * KEY_MAX);
-	ZeroMemory(&m_MouseInfos, sizeof(INPUT_INFO) * ETOI(DIMB::END));
 	ZeroMemory(&m_MouseMovement, sizeof(LONG) * ETOI(DIMB::END));
 }
 Pl0000Input::Pl0000Input(const Pl0000Input &rhs)
@@ -45,7 +43,14 @@ void Pl0000Input::On_Enable()
 // ===================================================================
 void Pl0000Input::Update_Pl0000_InputState(Float timeDelta)
 {
-	if (!Is_Active() || !GAME_INSTANCE->Get_InputEnabled()) return;
+	if (!Is_Active() || !GAME_INSTANCE->Get_InputEnabled())
+	{
+		for (auto& info : m_KeyInfos) info = INPUT_INFO{};
+		for (auto& info : m_MouseInfos) info = INPUT_INFO{};
+		ZeroMemory(m_MouseMovement, sizeof(m_MouseMovement));
+		Clear_MouseComboQueue();
+		return;
+	}
 
 	// --- 키보드 ---
 	for (uint32 i = 0; i < KEY_MAX; ++i)

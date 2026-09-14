@@ -25,16 +25,13 @@ void EditorView::Render(Bool isResize) {
 }
 
 void EditorView::RenderView(Bool isResize) {
-	static ImVec2 prevSceneViewportSize{};
-	static ImVec2 prevGameViewportSize{};
 	auto srvScene = GAME_INSTANCE->Get_OffScreenSRV(1);
 	auto srvGame = GAME_INSTANCE->Get_OffScreenSRV(0);
 
 	Bool isSceneViewHovered = false;
 
-	ImGui::Begin("Scene View");
+	if (ImGui::Begin("Scene View"))
 	{
-		isSceneViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
 		auto selected = EDITOR->Get_SelectedObject();
 		if (selected)
 			ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected: %S", selected->Get_Name().c_str());
@@ -44,12 +41,12 @@ void EditorView::RenderView(Bool isResize) {
 		if (srvScene && !isResize)
 		{
 			ImVec2 currentSize = ImGui::GetContentRegionAvail();
-			if (prevSceneViewportSize.x != currentSize.x || prevSceneViewportSize.y != currentSize.y) {
-				prevSceneViewportSize = currentSize;
-				EDITOR->RequestResize(currentSize.x, currentSize.y, 1);
-			}
+			EDITOR->RequestResize(currentSize.x, currentSize.y, 1);
 
-			ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), prevSceneViewportSize);
+			currentSize.x = std::max(1.f, floorf(currentSize.x));
+			currentSize.y = std::max(1.f, floorf(currentSize.y));
+			ImGui::Image(reinterpret_cast<ImTextureID>(srvScene.Get()), currentSize);
+			isSceneViewHovered = ImGui::IsItemHovered();
 			
 			// ── Scene View 드래그 앤 드롭 수신 ──────────────────────────────────
 			if (ImGui::BeginDragDropTarget())
@@ -123,19 +120,8 @@ void EditorView::RenderView(Bool isResize) {
 	}
 	ImGui::End();
 
-	ImGui::Begin("Game View");
-
-	// 마우스가 GameView 컨텐츠 영역 내에 있거나, 카메라 등으로 마우스가 락(Lock)되어 있으면 입력 허용
-	EDITOR_STATE state = EDITOR->Get_State();
-	Bool isGameViewHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-
-	Bool inputEnabled = false;
-	if (state == EDITOR_STATE::PLAY)
-		inputEnabled = isGameViewHovered || GAME_INSTANCE->Get_MouseLock();
-	else
-		inputEnabled = isSceneViewHovered || isGameViewHovered;
-
-	GAME_INSTANCE->Set_InputEnabled(inputEnabled);
+	Bool isGameViewHovered = false;
+	if (ImGui::Begin("Game View")) {
 
 	Bool loadFinished = GAME_INSTANCE->LevelLoad_Finished();
 	Bool canPlay = (EDITOR->Get_State() != EDITOR_STATE::PLAY);
@@ -205,16 +191,20 @@ void EditorView::RenderView(Bool isResize) {
 
 	if (srvGame && !isResize) {
 		ImVec2 currentSize = ImGui::GetContentRegionAvail();
-		if (prevGameViewportSize.x != currentSize.x || prevGameViewportSize.y != currentSize.y) {
-			prevGameViewportSize = currentSize;
-			EDITOR->RequestResize(currentSize.x,currentSize.y,0);
-		}
+		EDITOR->RequestResize(currentSize.x, currentSize.y, 0);
 		
-		ImGui::Image(reinterpret_cast<ImTextureID>(srvGame.Get()), prevGameViewportSize);
-		prevGameViewportSize = currentSize;
+		currentSize.x = std::max(1.f, floorf(currentSize.x));
+		currentSize.y = std::max(1.f, floorf(currentSize.y));
+		ImGui::Image(reinterpret_cast<ImTextureID>(srvGame.Get()), currentSize);
+		isGameViewHovered = ImGui::IsItemHovered();
 	}
 
+	}
 	ImGui::End();
+	const Bool playing = EDITOR->Get_State() == EDITOR_STATE::PLAY;
+	GAME_INSTANCE->Set_InputEnabled(playing
+		? (isGameViewHovered || GAME_INSTANCE->Get_MouseLock())
+		: isSceneViewHovered);
 }
 
 void EditorView::MousePicking(ImVec2 viewport, ImVec2 imageStartPos)

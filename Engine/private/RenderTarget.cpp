@@ -43,6 +43,20 @@ HRESULT RenderTarget::Begin()
 	return Object::Begin();
 }
 
+Shared<RenderTarget> RenderTarget::Create_Resized(uint32 width, uint32 height) const
+{
+	D3D11_TEXTURE2D_DESC desc{};
+	m_Texture2D->GetDesc(&desc);
+	return Create(m_Device, m_Context, width, height, desc.Format, m_ClearColor);
+}
+
+Bool RenderTarget::Has_Size(uint32 width, uint32 height) const
+{
+	D3D11_TEXTURE2D_DESC desc{};
+	m_Texture2D->GetDesc(&desc);
+	return desc.Width == width && desc.Height == height;
+}
+
 HRESULT RenderTarget::Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const
 {
 	return shader->Bind_SRV(constantName, m_ShaderResourceView);

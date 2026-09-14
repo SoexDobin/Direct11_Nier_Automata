@@ -27,8 +27,8 @@ class EditorManager {
 public:
     typedef struct tagResizeInfo
     {
-        Float width{};
-        Float height{};
+        uint32 width{};
+        uint32 height{};
         uint32 screenIndex{};
     } RESIZE_INFO;
 public:
@@ -79,21 +79,9 @@ public:
     Shared<MenuBar> Get_MenuBar() const { return m_MenuBar; }
 
 public:
-    Bool Is_ResizeRequest() const { return m_IsResizeView; }
-    RESIZE_INFO Get_ResizeInfo() const
-    {
-        return RESIZE_INFO{ m_ResizeWidth, m_ResizeHeight, m_ScreenIndex };
-    }
-    void RequestResize(Float width, Float height, uint32 screenIndex)
-    {
-        if (width <= 0.f) width = 10.f;
-        if (height <= 0.f) height = 10.f;
-        m_IsResizeView = true;
-        m_ResizeWidth = width; 
-    	m_ResizeHeight = height; 
-    	m_ScreenIndex = screenIndex;
-    }
-    void Clear_ResizeRequest() { m_IsResizeView = false; }
+    const map<uint32, RESIZE_INFO>& Get_ResizeRequests() const { return m_ResizeRequests; }
+    void RequestResize(Float width, Float height, uint32 screenIndex);
+    void Clear_ResizeRequest(uint32 screenIndex) { m_ResizeRequests.erase(screenIndex); }
 
 public: /* Selected Object (Hierarchy <-> Inspector 공유) */
   Shared<GameObject> Get_SelectedObject() const {
@@ -203,9 +191,7 @@ private:
 	void Record_History(HISTORY_ENTRY entry);
 
 private:
-    Bool m_IsResizeView{ false };
-    Float m_ResizeWidth{}, m_ResizeHeight{};
-	uint32 m_ScreenIndex{};
+    map<uint32, RESIZE_INFO> m_ResizeRequests;
 
     EDITOR_STATE m_State = EDITOR_STATE::STOP;
     Bool m_SingleStepRequested{ false };

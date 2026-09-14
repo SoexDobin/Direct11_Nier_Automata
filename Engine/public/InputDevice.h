@@ -12,7 +12,14 @@ public:
     Bool Get_MouseLock() const { return m_IsMouseLocked; }
     void Set_MouseLock(Bool isLock) { m_IsMouseLocked = isLock; }
     Bool Get_InputEnabled() const { return m_IsInputEnabled; }
-    void Set_InputEnabled(Bool isEnabled) { m_IsInputEnabled = isEnabled; }
+    void Set_InputEnabled(Bool isEnabled) {
+        m_IsInputEnabled = isEnabled;
+        if (!isEnabled) {
+            ZeroMemory(m_ByKeyStates, sizeof(m_ByKeyStates));
+            ZeroMemory(&m_MouseState, sizeof(m_MouseState));
+            m_IsMouseLocked = false;
+        }
+    }
 
     Byte Get_DIKeyState(uByte keyID) const { return m_ByKeyStates[keyID]; }
     Byte Get_DIMouseState(DIMB buttonID) const {

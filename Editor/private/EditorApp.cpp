@@ -91,10 +91,10 @@ void EditorApp::Update() {
         Reset_ClientApp();
     }
     
-    if (EDITOR->Is_ResizeRequest()) {
-        EditorManager::RESIZE_INFO info = EDITOR->Get_ResizeInfo();
-        GAME_INSTANCE->OnResize(static_cast<uint32>(info.width), static_cast<uint32>(info.height), info.screenIndex);
-        EDITOR->Clear_ResizeRequest();
+    const auto resizeRequests = EDITOR->Get_ResizeRequests();
+    for (const auto& [index, info] : resizeRequests) {
+        if (SUCCEEDED(GAME_INSTANCE->OnResize(info.width, info.height, index)))
+            EDITOR->Clear_ResizeRequest(index);
     }
     
     ImGui_ImplDX11_NewFrame();
@@ -114,7 +114,7 @@ void EditorApp::Update() {
 }
 
 HRESULT EditorApp::Render() {
-    EDITOR->Render(m_IsReset);
+    const HRESULT renderResult = EDITOR->Render(m_IsReset);
     
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -128,7 +128,8 @@ HRESULT EditorApp::Render() {
         m_IsReset = false;
     }
 
-    return GAME_INSTANCE->Present();
+    const HRESULT presentResult = GAME_INSTANCE->Present();
+    return FAILED(renderResult) ? renderResult : presentResult;
 }
 
 Unique<EditorApp> EditorApp::Create() {

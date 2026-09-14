@@ -31,15 +31,18 @@ HRESULT InputDevice::Initialize(HWND hWnd, HINSTANCE hInst) {
 
 void InputDevice::Update() {
 	if (FAILED(m_Keyboard->GetDeviceState(256, m_ByKeyStates))) {
+		ZeroMemory(m_ByKeyStates, sizeof(m_ByKeyStates));
 		m_Keyboard->Acquire();
 	}
 	if (FAILED(m_Mouse->GetDeviceState(sizeof(m_MouseState), &m_MouseState))) {
+		ZeroMemory(&m_MouseState, sizeof(m_MouseState));
 		m_Mouse->Acquire();
 	}
 
-    if (!m_IsInputEnabled) {
+    if (!m_IsInputEnabled || GetFocus() != m_hWnd) {
         ZeroMemory(m_ByKeyStates, sizeof(m_ByKeyStates));
         ZeroMemory(&m_MouseState, sizeof(m_MouseState));
+        m_IsMouseLocked = false;
     }
 
     if (nullptr == m_hWnd) return;

@@ -78,6 +78,7 @@ public: /* For GraphicDevice */
     HRESULT Present() const;
     HRESULT OnResize(uint32 width, uint32 height, uint32 offScreenIndex = UINT_MAX);
     HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
+    HRESULT Clear_RenderGroup() const;
     HRESULT End_RenderOffScreen() const;
     ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
     void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref) const;
@@ -360,6 +361,7 @@ private:
 
 #ifdef _DEBUG /* For Debug Function */
 public:
+    void Fail_NextViewResize_Debug(Bool offscreen) const;
     void Render_CollisionDebug() const;
     Bool Toggle_RenderDebug() const;
     HRESULT Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const;

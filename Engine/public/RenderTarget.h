@@ -20,6 +20,8 @@ public:
 	ComPtr<ID3D11ShaderResourceView> Get_ShaderResourceView() const { return m_ShaderResourceView; }
 	HRESULT Bind_ShaderResource(const Shared<Shader>& shader, const Char* constantName) const;
 	void Clear_RenderTarget() const;
+	Shared<RenderTarget> Create_Resized(uint32 width, uint32 height) const;
+	Bool Has_Size(uint32 width, uint32 height) const;
 
 private:
 	Color m_ClearColor{};

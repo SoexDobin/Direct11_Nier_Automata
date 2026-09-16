@@ -902,14 +902,15 @@ vector<NavCellBinary> Game::Bake_Navigation(const Shared<Model>& model, const Ma
     return m_NavigationBuilder->Bake_Navigation(model, worldMatrix, config);
 }
 
-HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config,
+    const NavigationBuilder::NAV_BAKE_ANCHOR_DESC& anchor) const
 {
-    return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config);
+    return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config, anchor);
 }
 
-vector<NavCell> Game::Import_Navigation(const string& filePath) const
+vector<NavCell> Game::Import_Navigation(const string& filePath, Matrix* outBakeWorldMatrix) const
 {
-    return m_NavigationBuilder->Import_Binary(filePath);
+    return m_NavigationBuilder->Import_Binary(filePath, outBakeWorldMatrix);
 }
 
 

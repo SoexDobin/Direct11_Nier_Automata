@@ -35,6 +35,15 @@ public:
 		Bool isSuccess{ false };
 	};
 
+	/// bake 기준이 된 GameObject의 신원. Export_Binary가 헤더에 기록해 두면
+	/// 어떤 오브젝트의 월드 공간에서 구운 navmesh인지 파일만 보고 판별할 수 있다.
+	struct NAV_BAKE_ANCHOR_DESC
+	{
+		ObjectGuid objectGuid{};
+		wstring    objectName{};
+		wstring    sourceModelTag{};
+	};
+
 private:
 	NO_COPY(NavigationBuilder)
 public:
@@ -48,8 +57,10 @@ public:
 
 public:
 	vector<NavCellBinary> Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
-	HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
-	vector<NavCell> Import_Binary(const string& filePath);
+	HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config,
+		const NAV_BAKE_ANCHOR_DESC& anchor = {});
+	/// outBakeWorldMatrix: 헤더에 기록된 bake 공간. v1 파일은 identity로 채우고 경고를 남긴다.
+	vector<NavCell> Import_Binary(const string& filePath, _Out_opt_ Matrix* outBakeWorldMatrix = nullptr);
 private:
 	static vector<NavCellBinary> Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors);
 

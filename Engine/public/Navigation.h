@@ -39,6 +39,8 @@ public: /* build nav */
 	);
 	/// .nnav 바이너리 파일에서 NavCell 로드 (이웃 정보 포함, SetUp_Neighbors 불필요)
 	HRESULT Load_FromBinary(const string& filePath);
+	/// 셀이 놓인 공간. v2 파일은 bake 당시 anchor GameObject의 월드 행렬, v1 파일은 identity다.
+	const Matrix& Get_BakeWorldMatrix() const { return m_BakeWorldMatrix; }
 
 public:
 	Bool Has_NeighborCell(const Vector3& position);
@@ -54,6 +56,7 @@ public:
 private:
 	int32 m_CurrentCellIndex{ -1 };
 	vector<NavCell> m_Cells;
+	Matrix m_BakeWorldMatrix{ Matrix::Identity };
 
 public:
 	static Shared<Navigation> CreatePrototype();

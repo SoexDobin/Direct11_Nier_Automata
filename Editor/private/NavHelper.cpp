@@ -4,6 +4,9 @@
 #include "Game.h"
 #include "PathManager.h"
 #include "Model.h"
+#include "GameObject.h"
+#include "Transform.h"
+#include "EditorManager.h"
 #include "NavigationBuilder.h"
 #include "String_Helper.h"
 #include "SpdLogger.h"
@@ -93,6 +96,8 @@ void NavHelper::Render(Bool isResize)
 		ImGui::SetColumnWidth(0, 360.0f);
 		
 		Render_ModelSelector();
+		ImGui::Separator();
+		Render_AnchorSlot();
 		ImGui::Separator();
 		Render_WorldTransform();
 		ImGui::Separator();
@@ -196,13 +201,55 @@ void NavHelper::Render_ModelSelector()
 }
 
 // ─────────────────────────────────────────────────────────
-// 월드 트랜스폼 (Position/Rotation/Scale)
+// bake anchor (기준 GameObject)
+// ─────────────────────────────────────────────────────────
+void NavHelper::Render_AnchorSlot()
+{
+	ImGui::Text("Bake Anchor (GameObject)");
+
+	const Shared<GameObject> anchor = Resolve_AnchorObject();
+	if (anchor)
+	{
+		const Vector3 anchorPosition = anchor->Get_Transform()->Get_WorldMatrix().Translation();
+		ImGui::TextColored(ImVec4(0.4f, 1.f, 0.4f, 1.f), "%s", Helper::To_String(m_AnchorObjectName).c_str());
+		ImGui::Text("  World: %.2f, %.2f, %.2f", anchorPosition.x, anchorPosition.y, anchorPosition.z);
+	}
+	else if (!m_AnchorObjectName.empty())
+	{
+		ImGui::TextColored(ImVec4(1.f, 0.4f, 0.4f, 1.f), "%s (lost)", Helper::To_String(m_AnchorObjectName).c_str());
+	}
+	else
+	{
+		ImGui::TextDisabled("(none) - navmesh will bake in model-local space");
+	}
+
+	if (ImGui::Button("Bind Selected Object", ImVec2(-1, 24)))
+		Bind_SelectedObjectAsAnchor();
+
+	if (anchor || !m_AnchorObjectName.empty())
+	{
+		if (ImGui::Button("Clear Anchor", ImVec2(-1, 0)))
+			Clear_Anchor();
+	}
+}
+
+// ─────────────────────────────────────────────────────────
+// 월드 트랜스폼 (레거시 수동 오프셋 경로)
 // ─────────────────────────────────────────────────────────
 void NavHelper::Render_WorldTransform()
 {
 	bool changed = false;
 
-	ImGui::Text("World Transform");
+	const Shared<GameObject> anchor = Resolve_AnchorObject();
+
+	if (ImGui::Checkbox("Manual World Transform (legacy)", &m_UseManualTransform))
+		changed = true;
+
+	// anchor가 있으면 수동 오프셋은 쓰지 않는다. 값은 참고용으로만 남겨 둔다.
+	const Bool disabled = (anchor != nullptr) && !m_UseManualTransform;
+	if (disabled)
+		ImGui::BeginDisabled();
+
 	ImGui::DragFloat3("Position##Nav", &m_WorldPosition.x, 0.5f);
 	if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
 
@@ -212,7 +259,52 @@ void NavHelper::Render_WorldTransform()
 	ImGui::DragFloat3("Scale##Nav", &m_WorldScale.x, 0.01f, 0.01f, 100.f);
 	if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
 
+	if (disabled)
+	{
+		ImGui::EndDisabled();
+		ImGui::TextDisabled("Using anchor world matrix; these fields are ignored.");
+	}
+
 	if (changed && m_AutoBake && m_pSelectedModel) BakePreview();
+}
+
+Shared<GameObject> NavHelper::Resolve_AnchorObject() const
+{
+	return m_AnchorObject.lock();
+}
+
+void NavHelper::Bind_SelectedObjectAsAnchor()
+{
+	const Shared<GameObject> selected = EDITOR->Get_SelectedObject();
+	if (!selected)
+	{
+		MSG_BOX("Select a GameObject in the hierarchy first.");
+		return;
+	}
+
+	m_AnchorObject = selected;
+	m_AnchorObjectName = selected->Get_Name();
+	m_AnchorObjectGuid = selected->Get_ObjectGuid();
+
+	// anchor가 Model을 들고 있으면 bake 소스도 같은 오브젝트에서 가져온다.
+	if (const Shared<Model> anchorModel = selected->Get_Component<Model>())
+	{
+		m_pSelectedModel = anchorModel;
+		m_SelectedModelTag = anchorModel->Get_ModelTag();
+		m_HasPreview = false;
+	}
+
+	LOG_INFO(L"[NavHelper] Bake anchor bound: {}", m_AnchorObjectName);
+
+	if (m_AutoBake && m_pSelectedModel) BakePreview();
+}
+
+void NavHelper::Clear_Anchor()
+{
+	m_AnchorObject.reset();
+	m_AnchorObjectName.clear();
+	m_AnchorObjectGuid = ObjectGuid{};
+	m_HasPreview = false;
 }
 
 // ─────────────────────────────────────────────────────────
@@ -464,6 +556,20 @@ Matrix NavHelper::Build_WorldMatrix() const
 }
 
 // ─────────────────────────────────────────────────────────
+// 실제 bake 기준 행렬 — anchor GameObject의 월드 행렬
+// ─────────────────────────────────────────────────────────
+Matrix NavHelper::Resolve_BakeWorldMatrix() const
+{
+	if (m_UseManualTransform)
+		return Build_WorldMatrix();
+
+	if (const Shared<GameObject> anchor = Resolve_AnchorObject())
+		return anchor->Get_Transform()->Get_WorldMatrix();
+
+	return Matrix::Identity;
+}
+
+// ─────────────────────────────────────────────────────────
 // Bake Preview
 // ─────────────────────────────────────────────────────────
 void NavHelper::BakePreview()
@@ -475,7 +581,7 @@ void NavHelper::BakePreview()
 	}
 
 	rcConfig cfg = Build_RcConfig();
-	Matrix worldMat = Build_WorldMatrix();
+	Matrix worldMat = Resolve_BakeWorldMatrix();
 
 	m_PreviewCells = GAME_INSTANCE->Bake_Navigation(m_pSelectedModel, worldMat, cfg);
 	m_HasPreview = !m_PreviewCells.empty();
@@ -506,11 +612,16 @@ void NavHelper::SaveBinary()
 	std::filesystem::create_directories(navDataDir);
 
 	rcConfig cfg = Build_RcConfig();
-	Matrix worldMat = Build_WorldMatrix();
+	Matrix worldMat = Resolve_BakeWorldMatrix();
+
+	NavigationBuilder::NAV_BAKE_ANCHOR_DESC anchorDesc{};
+	anchorDesc.objectGuid = m_AnchorObjectGuid;
+	anchorDesc.objectName = m_AnchorObjectName;
+	anchorDesc.sourceModelTag = m_SelectedModelTag;
 
 	string fileName = Helper::To_String(navDataDir) + string(m_SaveName) + ".nnav";
 
-	if (SUCCEEDED(GAME_INSTANCE->Export_Navigation(fileName, m_pSelectedModel, worldMat, cfg)))
+	if (SUCCEEDED(GAME_INSTANCE->Export_Navigation(fileName, m_pSelectedModel, worldMat, cfg, anchorDesc)))
 	{
 		string msg = "NavMesh exported: " + fileName;
 		LOG_INFO(L"[NavHelper] {}", Helper::To_wString(msg));

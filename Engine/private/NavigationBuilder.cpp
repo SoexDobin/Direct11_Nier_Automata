@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "SpdLogger.h"
+#include "Engine_ID.h"
 #include <recastnavigation/Recast.h>
 #include <recastnavigation/RecastAlloc.h>
 #include "Model.h"
@@ -30,7 +31,8 @@ vector<NavCellBinary> NavigationBuilder::Bake_Navigation(Shared<Model> model, co
 	return Bake_Internal(model, worldMatrix, config, false);
 }
 
-HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
+HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config,
+	const NAV_BAKE_ANCHOR_DESC& anchor)
 {
 	vector<NavCellBinary> bakedData = Bake_Internal(model, worldMatrix, config, true);
 	if (bakedData.empty())
@@ -41,8 +43,22 @@ HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> m
 
 	NavMeshHeader header{};
 	memcpy(header.magic, "NNAV", 4);
-	header.version = 1;
 	header.numCells = static_cast<uint32>(bakedData.size());
+
+	// bake 공간을 파일이 스스로 증명하도록 기록한다.
+	memcpy(header.bakeWorldMatrix, &worldMatrix, sizeof(Float) * 16);
+
+	const auto CopyFixedString = [](Char* dest, size_t capacity, const string& source)
+	{
+		const size_t length = source.size() < capacity - 1 ? source.size() : capacity - 1;
+		memcpy(dest, source.data(), length);
+		dest[length] = '\0';
+	};
+
+	if (anchor.objectGuid.Is_Valid())
+		CopyFixedString(header.anchorObjectGuid, sizeof(header.anchorObjectGuid), Engine::To_String(anchor.objectGuid));
+	CopyFixedString(header.anchorObjectName, sizeof(header.anchorObjectName), Helper::To_String(anchor.objectName));
+	CopyFixedString(header.sourceModelTag, sizeof(header.sourceModelTag), Helper::To_String(anchor.sourceModelTag));
 
 	// AABB 계산
 	Vector3 bmin{ FLT_MAX, FLT_MAX, FLT_MAX };
@@ -223,9 +239,12 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 	return resultData;
 }
 
-vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath)
+vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath, Matrix* outBakeWorldMatrix)
 {
 	vector<NavCell> cells;
+	if (outBakeWorldMatrix)
+		*outBakeWorldMatrix = Matrix::Identity;
+
 	std::ifstream fin(filePath, std::ios::binary);
 	if (!fin.is_open())
 	{
@@ -235,6 +254,11 @@ vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath)
 
 	NavMeshHeader header{};
 	fin.read(reinterpret_cast<char*>(&header), sizeof(NavMeshHeader));
+	if (fin.gcount() != static_cast<std::streamsize>(sizeof(NavMeshHeader)))
+	{
+		LOG_ERROR(L"[NavMeshBuilder] Import_Binary: 헤더가 잘렸습니다 ({})", Helper::To_wString(filePath));
+		return cells;
+	}
 
 	// 매직 넘버 검증
 	if (memcmp(header.magic, "NNAV", 4) != 0)
@@ -242,6 +266,28 @@ vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath)
 		LOG_ERROR(L"[NavMeshBuilder] Import_Binary: 잘못된 매직 넘버");
 		return cells;
 	}
+
+	// version 필드가 없으므로 파일 크기로 페이로드 정합성을 확인한다.
+	fin.seekg(0, std::ios::end);
+	const std::streamoff fileSize = fin.tellg();
+	fin.seekg(sizeof(NavMeshHeader), std::ios::beg);
+
+	const std::streamoff expectedSize =
+		static_cast<std::streamoff>(sizeof(NavMeshHeader)) +
+		static_cast<std::streamoff>(header.numCells) * static_cast<std::streamoff>(sizeof(NavCellBinary));
+	if (fileSize != expectedSize)
+	{
+		LOG_ERROR(L"[NavMeshBuilder] Import_Binary: 크기 불일치 ({} != {}) ({}). anchor 기준으로 재bake하세요.",
+			static_cast<long long>(fileSize), static_cast<long long>(expectedSize), Helper::To_wString(filePath));
+		return cells;
+	}
+
+	if (outBakeWorldMatrix)
+		memcpy(outBakeWorldMatrix, header.bakeWorldMatrix, sizeof(Float) * 16);
+
+	LOG_INFO(L"[NavMeshBuilder] Import_Binary: anchor='{}' model='{}'",
+		Helper::To_wString(string(header.anchorObjectName)),
+		Helper::To_wString(string(header.sourceModelTag)));
 
 	cells.reserve(header.numCells);
 	for (uint32 i = 0; i < header.numCells; ++i)

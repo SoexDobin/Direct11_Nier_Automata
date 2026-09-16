@@ -3,6 +3,7 @@
 
 NS_BEGIN(Engine)
 class Model;
+class GameObject;
 NS_END
 
 NS_BEGIN(Editor)
@@ -38,7 +39,15 @@ private:
 	wstring m_SelectedModelTag{};
 	Shared<Engine::Model> m_pSelectedModel{ nullptr };
 
-	// ── 월드 변환 (Transform 오프셋) ──
+	// ── bake 기준 GameObject (anchor) ──
+	// navmesh는 이 오브젝트의 월드 공간에서 굽는다. 이것이 기본 경로다.
+	Weak<Engine::GameObject> m_AnchorObject{};
+	wstring m_AnchorObjectName{};
+	ObjectGuid m_AnchorObjectGuid{};
+
+	// ── 수동 월드 변환 (레거시 오프셋 경로) ──
+	// anchor 기준 bake로 대체됐다. 코드는 남겨 두지만 m_UseManualTransform을 켜야만 사용된다.
+	Bool m_UseManualTransform{ false };
 	Vector3 m_WorldPosition{ Vector3::Zero };
 	Vector3 m_WorldRotation{ Vector3::Zero };
 	Vector3 m_WorldScale{ Vector3::One };
@@ -75,11 +84,18 @@ private:
 
 	// ── 내부 함수 ──
 	rcConfig Build_RcConfig() const;
+	/// 레거시 수동 오프셋 행렬. m_UseManualTransform일 때만 쓰인다.
 	Matrix Build_WorldMatrix() const;
+	/// 실제 bake에 쓰는 행렬. anchor가 있으면 그 GameObject의 월드 행렬이다.
+	Matrix Resolve_BakeWorldMatrix() const;
+	Shared<Engine::GameObject> Resolve_AnchorObject() const;
+	void Bind_SelectedObjectAsAnchor();
+	void Clear_Anchor();
 	void BakePreview();
 	void SaveBinary();
 
 	void Render_ModelSelector();
+	void Render_AnchorSlot();
 	void Render_WorldTransform();
 	void Render_ConfigPanel();
 	void Render_Viewport();

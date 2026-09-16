@@ -15,7 +15,8 @@ Navigation::Navigation(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11De
 Navigation::Navigation(const Navigation& rhs)
 	: Component{ rhs }
 	, m_CurrentCellIndex{ -1 }      
-	, m_Cells{ rhs.m_Cells } {}
+	, m_Cells{ rhs.m_Cells }
+	, m_BakeWorldMatrix{ rhs.m_BakeWorldMatrix } {}
 
 HRESULT Navigation::Initialize_Prototype()
 {
@@ -78,7 +79,8 @@ HRESULT Navigation::Build_FromMesh(
 
 HRESULT Navigation::Load_FromBinary(const string& filePath)
 {
-	auto cells = GAME_INSTANCE->Import_Navigation(filePath);
+	Matrix bakeWorldMatrix = Matrix::Identity;
+	auto cells = GAME_INSTANCE->Import_Navigation(filePath, &bakeWorldMatrix);
 	if (cells.empty())
 	{
 		LOG_ERROR(L"[Navigation] Load_FromBinary Failed : {}",
@@ -87,8 +89,11 @@ HRESULT Navigation::Load_FromBinary(const string& filePath)
 	}
 	m_Cells = std::move(cells);
 	m_CurrentCellIndex = 0;
+	m_BakeWorldMatrix = bakeWorldMatrix;
 
-	LOG_INFO(L"[Navigation] Loaded {} cells from binary", m_Cells.size());
+	const Vector3 bakeTranslation = m_BakeWorldMatrix.Translation();
+	LOG_INFO(L"[Navigation] Loaded {} cells from binary (bake origin {:.2f}, {:.2f}, {:.2f})",
+		m_Cells.size(), bakeTranslation.x, bakeTranslation.y, bakeTranslation.z);
 	return S_OK;
 }
 

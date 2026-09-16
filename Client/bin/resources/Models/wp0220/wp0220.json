@@ -1,0 +1,1296 @@
+{
+    "animations": [
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0220|wpf200_0000",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 139
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 140.0,
+            "name": "wp0220|wpf200_005a",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 76
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 75.0,
+            "name": "wp0220|wpf200_005b",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 330
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 328
+                }
+            ],
+            "duration": 370.0,
+            "name": "wp0220|wpf200_0200",
+            "rootMove": [
+                5.2982330322265625,
+                0.0,
+                -286.32049560546875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 334
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 322
+                }
+            ],
+            "duration": 333.0,
+            "name": "wp0220|wpf200_0201",
+            "rootMove": [
+                9.300613403320313,
+                0.0,
+                -522.7380981445313
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 480
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 464
+                }
+            ],
+            "duration": 481.0,
+            "name": "wp0220|wpf200_0202",
+            "rootMove": [
+                -8.518218994140625,
+                0.0,
+                -705.2743530273438
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 481
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 406
+                }
+            ],
+            "duration": 490.0,
+            "name": "wp0220|wpf200_0203",
+            "rootMove": [
+                20.709228515625,
+                0.0,
+                -849.288818359375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 134
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 133
+                }
+            ],
+            "duration": 133.0,
+            "name": "wp0220|wpf200_0205",
+            "rootMove": [
+                -25.9552001953125,
+                0.0,
+                -139.36181640625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 53
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 52
+                }
+            ],
+            "duration": 52.0,
+            "name": "wp0220|wpf200_0207",
+            "rootMove": [
+                -40.39192199707031,
+                0.0,
+                48.980712890625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 140
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 140
+                }
+            ],
+            "duration": 139.0,
+            "name": "wp0220|wpf200_0209",
+            "rootMove": [
+                35.72502136230469,
+                0.0,
+                -30.20071029663086
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 53
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 53
+                }
+            ],
+            "duration": 52.0,
+            "name": "wp0220|wpf200_020b",
+            "rootMove": [
+                -29.816627502441406,
+                0.0,
+                23.284912109375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 433
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 465
+                }
+            ],
+            "duration": 506.0,
+            "name": "wp0220|wpf200_020d",
+            "rootMove": [
+                -8.6944580078125,
+                0.0,
+                -487.5787048339844
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 53
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 52
+                }
+            ],
+            "duration": 52.0,
+            "name": "wp0220|wpf200_020f",
+            "rootMove": [
+                -36.721229553222656,
+                0.0,
+                -71.78878784179688
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 197
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 201
+                }
+            ],
+            "duration": 200.0,
+            "name": "wp0220|wpf200_0211",
+            "rootMove": [
+                28.558731079101563,
+                0.0,
+                -61.283111572265625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 204
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 289
+                }
+            ],
+            "duration": 288.0,
+            "name": "wp0220|wpf200_0212",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 484
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 487
+                }
+            ],
+            "duration": 494.0,
+            "name": "wp0220|wpf200_0213",
+            "rootMove": [
+                -0.321197509765625,
+                0.0,
+                -663.3367919921875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 464
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 405
+                }
+            ],
+            "duration": 469.0,
+            "name": "wp0220|wpf200_0214",
+            "rootMove": [
+                -4.9701690673828125,
+                0.0,
+                -1369.1273193359375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 126
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 123
+                }
+            ],
+            "duration": 125.0,
+            "name": "wp0220|wpf200_021a",
+            "rootMove": [
+                19.8760986328125,
+                0.0,
+                -690.7334594726563
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 103
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 103
+                }
+            ],
+            "duration": 102.0,
+            "name": "wp0220|wpf200_0220",
+            "rootMove": [
+                6.974601745605469,
+                299.774169921875,
+                -42.458343505859375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 37
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 37
+                }
+            ],
+            "duration": 36.0,
+            "name": "wp0220|wpf200_0225",
+            "rootMove": [
+                5.65338134765625,
+                0.0,
+                -96.20475769042969
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0220|wpf200_0226",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 402
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 413
+                }
+            ],
+            "duration": 412.0,
+            "name": "wp0220|wpf200_0227",
+            "rootMove": [
+                12.279510498046875,
+                0.0,
+                -12.3779296875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 86
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 86
+                }
+            ],
+            "duration": 85.0,
+            "name": "wp0220|wpf200_022a",
+            "rootMove": [
+                0.1316070556640625,
+                64.9017333984375,
+                -195.3277587890625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 339
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 263
+                }
+            ],
+            "duration": 345.0,
+            "name": "wp0220|wpf200_0280",
+            "rootMove": [
+                -20.5108642578125,
+                0.0,
+                -679.5701293945313
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 114
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 111
+                }
+            ],
+            "duration": 114.0,
+            "name": "wp0220|wpf200_0288",
+            "rootMove": [
+                -11.789703369140625,
+                0.0,
+                -676.9841918945313
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 27
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 27
+                }
+            ],
+            "duration": 26.0,
+            "name": "wp0220|wpf200_028d",
+            "rootMove": [
+                -0.966644287109375,
+                0.0,
+                -514.7067260742188
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0220|wpf200_028e",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 402
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 407
+                }
+            ],
+            "duration": 412.0,
+            "name": "wp0220|wpf200_028f",
+            "rootMove": [
+                12.279510498046875,
+                0.0,
+                -112.44964599609375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 295
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 289
+                }
+            ],
+            "duration": 295.0,
+            "name": "wp0220|wpf200_02e0",
+            "rootMove": [
+                -33.47625732421875,
+                0.0,
+                -409.97027587890625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 610
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 620
+                }
+            ],
+            "duration": 628.0,
+            "name": "wp0220|wpf200_02e8",
+            "rootMove": [
+                -0.52642822265625,
+                0.0,
+                -10.454584121704102
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 132
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 131
+                }
+            ],
+            "duration": 190.0,
+            "name": "wp0220|wpf200_02f0",
+            "rootMove": [
+                32.63568878173828,
+                0.0,
+                -32.11822509765625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 37
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 37
+                }
+            ],
+            "duration": 36.0,
+            "name": "wp0220|wpf200_02f5",
+            "rootMove": [
+                5.65338134765625,
+                0.0,
+                -96.20475769042969
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0220|wpf200_02f6",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 402
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 413
+                }
+            ],
+            "duration": 412.0,
+            "name": "wp0220|wpf200_02f7",
+            "rootMove": [
+                12.279510498046875,
+                0.0,
+                -12.3779296875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 9
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 8.0,
+            "name": "wp0220|wpf200_0600",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 378
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 316
+                }
+            ],
+            "duration": 390.0,
+            "name": "wp0220|wpf200_0640",
+            "rootMove": [
+                -28.363800048828125,
+                0.0,
+                -830.6885986328125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 211
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 199
+                }
+            ],
+            "duration": 210.0,
+            "name": "wp0220|wpf200_0646",
+            "rootMove": [
+                -13.801956176757813,
+                0.0,
+                -539.4817504882813
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 205
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 199
+                }
+            ],
+            "duration": 210.0,
+            "name": "wp0220|wpf200_0647",
+            "rootMove": [
+                -13.801956176757813,
+                0.0,
+                -539.4817504882813
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 277
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 236
+                }
+            ],
+            "duration": 340.0,
+            "name": "wp0220|wpf200_064f",
+            "rootMove": [
+                -55.40313720703125,
+                0.0,
+                -291.6770935058594
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 266
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 253
+                }
+            ],
+            "duration": 325.0,
+            "name": "wp0220|wpf200_0658",
+            "rootMove": [
+                42.35382080078125,
+                0.0,
+                -203.1097412109375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 222
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 193
+                }
+            ],
+            "duration": 244.0,
+            "name": "wp0220|wpf200_0659",
+            "rootMove": [
+                64.11895751953125,
+                0.0,
+                -250.7174072265625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 279
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 267
+                }
+            ],
+            "duration": 301.0,
+            "name": "wp0220|wpf200_0663",
+            "rootMove": [
+                36.263465881347656,
+                0.0,
+                -827.1923828125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1002
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 1071
+                }
+            ],
+            "duration": 1079.0,
+            "name": "wp0220|wpf200_c201",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 381
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 436
+                }
+            ],
+            "duration": 475.0,
+            "name": "wp0220|wpf200_c202",
+            "rootMove": [
+                1.6973495483398438,
+                0.0,
+                -40.422821044921875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 410
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0220",
+                    "numKeyFrames": 337
+                }
+            ],
+            "duration": 413.0,
+            "name": "wp0220|wpf200_c234",
+            "rootMove": [
+                17.35687255859375,
+                0.0,
+                52.420806884765625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        }
+    ],
+    "bones": [
+        {
+            "name": "RootNode",
+            "parentIndex": -1
+        },
+        {
+            "name": "tuka",
+            "parentIndex": 0
+        },
+        {
+            "name": "wp0220",
+            "parentIndex": 0
+        },
+        {
+            "name": "bone0",
+            "parentIndex": 2
+        }
+    ],
+    "materials": [
+        {
+            "name": "WP_0220_Body",
+            "textures": []
+        }
+    ],
+    "meshes": [
+        {
+            "materialIndex": 0,
+            "name": "tuka.001",
+            "numIndices": 11730,
+            "numVertices": 11730
+        }
+    ]
+}

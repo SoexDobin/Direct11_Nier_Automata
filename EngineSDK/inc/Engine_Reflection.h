@@ -128,8 +128,6 @@ namespace Engine
 		std::vector<std::string> baseRegisteredNames;
 		REFLECTED_OBJECT_KIND objectKind{ REFLECTED_OBJECT_KIND::VALUE };
 		HIERARCHY_AUTHORING_MODE authoringMode{ HIERARCHY_AUTHORING_MODE::CODE_DEFINED };
-		uint32 level{};
-		Bool hasLevel{};
 	};
 
 	struct ReflectedPropertyInfo final

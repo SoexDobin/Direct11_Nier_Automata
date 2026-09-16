@@ -1,0 +1,4229 @@
+{
+    "animations": [
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0070|wpf000_0000",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0070|wpf000_0001",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 141
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 140.0,
+            "name": "wp0070|wpf000_005a",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 11
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 10.0,
+            "name": "wp0070|wpf000_005b",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 260
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 247
+                }
+            ],
+            "duration": 274.0,
+            "name": "wp0070|wpf000_0100",
+            "rootMove": [
+                5.995941162109375,
+                0.0,
+                -239.520263671875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 299
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 260
+                }
+            ],
+            "duration": 305.0,
+            "name": "wp0070|wpf000_0101",
+            "rootMove": [
+                8.14666748046875,
+                0.0,
+                -235.7940673828125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 134
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 115
+                }
+            ],
+            "duration": 133.0,
+            "name": "wp0070|wpf000_0102",
+            "rootMove": [
+                -5.8818817138671875,
+                0.0,
+                -320.9285583496094
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 150
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 148
+                }
+            ],
+            "duration": 150.0,
+            "name": "wp0070|wpf000_0103",
+            "rootMove": [
+                -3.61328125,
+                0.0,
+                -283.237060546875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 141
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 143
+                }
+            ],
+            "duration": 142.0,
+            "name": "wp0070|wpf000_0104",
+            "rootMove": [
+                2.436542510986328,
+                0.0,
+                -304.26226806640625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 271
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 246
+                }
+            ],
+            "duration": 272.0,
+            "name": "wp0070|wpf000_0105",
+            "rootMove": [
+                -17.374229431152344,
+                0.0,
+                -588.5991821289063
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 15
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 15
+                }
+            ],
+            "duration": 14.0,
+            "name": "wp0070|wpf000_0106",
+            "rootMove": [
+                1.4747858047485352,
+                0.0,
+                -27.57740020751953
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 3
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 3
+                }
+            ],
+            "duration": 2.0,
+            "name": "wp0070|wpf000_0107",
+            "rootMove": [
+                -1.0305047035217285,
+                -93.77288818359375,
+                -88.52005004882813
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 50
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 50
+                }
+            ],
+            "duration": 49.0,
+            "name": "wp0070|wpf000_0108",
+            "rootMove": [
+                1.3867855072021484,
+                0.07457099854946136,
+                0.06250664591789246
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 174
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 173
+                }
+            ],
+            "duration": 173.0,
+            "name": "wp0070|wpf000_0110",
+            "rootMove": [
+                -32.920074462890625,
+                0.0,
+                -621.5504760742188
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 328
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 251
+                }
+            ],
+            "duration": 328.0,
+            "name": "wp0070|wpf000_0111",
+            "rootMove": [
+                -13.7481689453125,
+                0.0,
+                -659.32373046875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 164
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 133
+                }
+            ],
+            "duration": 165.0,
+            "name": "wp0070|wpf000_0113",
+            "rootMove": [
+                57.131195068359375,
+                0.0,
+                -514.9937744140625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 328
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 211
+                }
+            ],
+            "duration": 328.0,
+            "name": "wp0070|wpf000_0114",
+            "rootMove": [
+                24.710845947265625,
+                0.0,
+                -655.0656127929688
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 321
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 306
+                }
+            ],
+            "duration": 320.0,
+            "name": "wp0070|wpf000_0116",
+            "rootMove": [
+                -21.567535400390625,
+                0.0,
+                -1332.8131103515625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 326
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 252
+                }
+            ],
+            "duration": 328.0,
+            "name": "wp0070|wpf000_0117",
+            "rootMove": [
+                3.783416748046875,
+                0.0,
+                -619.8763427734375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 108
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 108
+                }
+            ],
+            "duration": 107.0,
+            "name": "wp0070|wpf000_0119",
+            "rootMove": [
+                3.68499755859375,
+                0.0,
+                -177.23464965820313
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 53
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 53
+                }
+            ],
+            "duration": 52.0,
+            "name": "wp0070|wpf000_0130",
+            "rootMove": [
+                -6.6890716552734375,
+                0.0,
+                -218.28460693359375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 71
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 70
+                }
+            ],
+            "duration": 70.0,
+            "name": "wp0070|wpf000_0131",
+            "rootMove": [
+                -22.303009033203125,
+                0.0,
+                -228.40118408203125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 91
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 91
+                }
+            ],
+            "duration": 90.0,
+            "name": "wp0070|wpf000_0132",
+            "rootMove": [
+                -2.9650211334228516,
+                0.0,
+                -210.50262451171875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 90
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 93.0,
+            "name": "wp0070|wpf000_0133",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 92
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 7
+                }
+            ],
+            "duration": 92.0,
+            "name": "wp0070|wpf000_0134",
+            "rootMove": [
+                -5.392670631408691,
+                0.0,
+                -5.3501129150390625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 141
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 132
+                }
+            ],
+            "duration": 140.0,
+            "name": "wp0070|wpf000_0135",
+            "rootMove": [
+                18.383026123046875,
+                0.0,
+                -386.6401062011719
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 130
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 138
+                }
+            ],
+            "duration": 137.0,
+            "name": "wp0070|wpf000_0136",
+            "rootMove": [
+                -27.81963348388672,
+                -199.85504150390625,
+                -43.1121826171875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 68
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 68
+                }
+            ],
+            "duration": 67.0,
+            "name": "wp0070|wpf000_0150",
+            "rootMove": [
+                -21.361541748046875,
+                294.9371337890625,
+                -172.56546020507813
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 74
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 74
+                }
+            ],
+            "duration": 73.0,
+            "name": "wp0070|wpf000_0155",
+            "rootMove": [
+                3.7250518798828125,
+                29.803466796875,
+                -29.897689819335938
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0070|wpf000_0156",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 265
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 280
+                }
+            ],
+            "duration": 284.0,
+            "name": "wp0070|wpf000_0157",
+            "rootMove": [
+                -1.3602256774902344,
+                0.0,
+                -22.042083740234375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 101
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 100
+                }
+            ],
+            "duration": 100.0,
+            "name": "wp0070|wpf000_0160",
+            "rootMove": [
+                34.2926025390625,
+                0.0,
+                -1008.5864868164063
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 298
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 264
+                }
+            ],
+            "duration": 300.0,
+            "name": "wp0070|wpf000_0180",
+            "rootMove": [
+                -13.625144958496094,
+                0.0,
+                -595.4300537109375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 174
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 167
+                }
+            ],
+            "duration": 173.0,
+            "name": "wp0070|wpf000_0188",
+            "rootMove": [
+                -31.30359649658203,
+                0.0,
+                -772.3643798828125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 28
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 28
+                }
+            ],
+            "duration": 27.0,
+            "name": "wp0070|wpf000_018d",
+            "rootMove": [
+                -0.9386599063873291,
+                199.9969482421875,
+                3.8429737091064453
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0070|wpf000_018e",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 268
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 279
+                }
+            ],
+            "duration": 284.0,
+            "name": "wp0070|wpf000_018f",
+            "rootMove": [
+                -1.3602256774902344,
+                0.0,
+                -21.973419189453125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 60
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 60
+                }
+            ],
+            "duration": 59.0,
+            "name": "wp0070|wpf000_01e0",
+            "rootMove": [
+                3.76739501953125,
+                429.9971618652344,
+                -289.24267578125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 287
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 264
+                }
+            ],
+            "duration": 298.0,
+            "name": "wp0070|wpf000_01e8",
+            "rootMove": [
+                -13.68255615234375,
+                0.0,
+                8.837127685546875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 193
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 164
+                }
+            ],
+            "duration": 192.0,
+            "name": "wp0070|wpf000_01e9",
+            "rootMove": [
+                32.62310028076172,
+                0.0,
+                -146.49581909179688
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 351
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 300
+                }
+            ],
+            "duration": 360.0,
+            "name": "wp0070|wpf000_01f0",
+            "rootMove": [
+                -7.349395751953125,
+                0.0,
+                11.527061462402344
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 74
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 74
+                }
+            ],
+            "duration": 73.0,
+            "name": "wp0070|wpf000_01f5",
+            "rootMove": [
+                3.7250518798828125,
+                29.803466796875,
+                -29.897689819335938
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0070|wpf000_01f6",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 265
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 280
+                }
+            ],
+            "duration": 284.0,
+            "name": "wp0070|wpf000_01f7",
+            "rootMove": [
+                -1.3602256774902344,
+                0.0,
+                -22.042083740234375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 9
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 8.0,
+            "name": "wp0070|wpf000_0600",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 388
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 316
+                }
+            ],
+            "duration": 390.0,
+            "name": "wp0070|wpf000_0640",
+            "rootMove": [
+                -28.363800048828125,
+                0.0,
+                -830.6885986328125
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 319
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 307
+                }
+            ],
+            "duration": 334.0,
+            "name": "wp0070|wpf000_0643",
+            "rootMove": [
+                -5.9295654296875,
+                0.0,
+                -837.6570434570313
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 332
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 307
+                }
+            ],
+            "duration": 334.0,
+            "name": "wp0070|wpf000_0644",
+            "rootMove": [
+                -5.9295654296875,
+                0.0,
+                -837.6570434570313
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 306
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 257
+                }
+            ],
+            "duration": 305.0,
+            "name": "wp0070|wpf000_064c",
+            "rootMove": [
+                12.040138244628906,
+                0.0,
+                -1004.8180541992188
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 356
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 315
+                }
+            ],
+            "duration": 366.0,
+            "name": "wp0070|wpf000_0655",
+            "rootMove": [
+                13.958930969238281,
+                0.0,
+                281.6868591308594
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 328
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 262
+                }
+            ],
+            "duration": 331.0,
+            "name": "wp0070|wpf000_0660",
+            "rootMove": [
+                -31.964492797851563,
+                0.0,
+                -1062.608154296875
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 109
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 116
+                }
+            ],
+            "duration": 115.0,
+            "name": "wp0070|wpf000_0900",
+            "rootMove": [
+                9.740924835205078,
+                0.0,
+                -586.416015625
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 44
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 43.0,
+            "name": "wp0070|wpf000_0901",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 26
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 25.0,
+            "name": "wp0070|wpf000_0902",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 21
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 20.0,
+            "name": "wp0070|wpf000_0903",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 18
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 17.0,
+            "name": "wp0070|wpf000_0904",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 141
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 140.0,
+            "name": "wp0070|wpf000_0905",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 15
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 14.0,
+            "name": "wp0070|wpf000_0906",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 15
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 14.0,
+            "name": "wp0070|wpf000_0907",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 15
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 14.0,
+            "name": "wp0070|wpf000_0908",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 14
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 13.0,
+            "name": "wp0070|wpf000_0909",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 14
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 13.0,
+            "name": "wp0070|wpf000_090a",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 14
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 2
+                }
+            ],
+            "duration": 13.0,
+            "name": "wp0070|wpf000_090b",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0070|wpf000_c001",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 281
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 310
+                }
+            ],
+            "duration": 310.0,
+            "name": "wp0070|wpf000_c002",
+            "rootMove": [
+                -1.861572265625,
+                0.0,
+                -15.45257568359375
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 1
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 1
+                }
+            ],
+            "duration": 0.0,
+            "name": "wp0070|wpf000_e089",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 358
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 405
+                }
+            ],
+            "duration": 404.0,
+            "name": "wp0070|wpf000_e0e5",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 234
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 249
+                }
+            ],
+            "duration": 249.0,
+            "name": "wp0070|wpf000_e0e6",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 131
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 136
+                }
+            ],
+            "duration": 135.0,
+            "name": "wp0070|wpf000_e0e7",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        },
+        {
+            "channels": [
+                {
+                    "boneIndex": 3,
+                    "name": "bone0",
+                    "numKeyFrames": 125
+                },
+                {
+                    "boneIndex": 4,
+                    "name": "bone3072",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 5,
+                    "name": "bone3073",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 6,
+                    "name": "bone3074",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 7,
+                    "name": "bone3075",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 8,
+                    "name": "bone3076",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 9,
+                    "name": "bone3077",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 10,
+                    "name": "bone3078",
+                    "numKeyFrames": 2
+                },
+                {
+                    "boneIndex": 2,
+                    "name": "wp0070",
+                    "numKeyFrames": 126
+                }
+            ],
+            "duration": 125.0,
+            "name": "wp0070|wpf000_e0e8",
+            "rootMove": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "rootRot": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "tickPerSecond": 60.0
+        }
+    ],
+    "bones": [
+        {
+            "name": "RootNode",
+            "parentIndex": -1
+        },
+        {
+            "name": "haku",
+            "parentIndex": 0
+        },
+        {
+            "name": "wp0070",
+            "parentIndex": 0
+        },
+        {
+            "name": "bone0",
+            "parentIndex": 2
+        },
+        {
+            "name": "bone3072",
+            "parentIndex": 3
+        },
+        {
+            "name": "bone3073",
+            "parentIndex": 4
+        },
+        {
+            "name": "bone3074",
+            "parentIndex": 5
+        },
+        {
+            "name": "bone3075",
+            "parentIndex": 6
+        },
+        {
+            "name": "bone3076",
+            "parentIndex": 7
+        },
+        {
+            "name": "bone3077",
+            "parentIndex": 8
+        },
+        {
+            "name": "bone3078",
+            "parentIndex": 9
+        }
+    ],
+    "materials": [
+        {
+            "name": "WP_0070_Body",
+            "textures": []
+        }
+    ],
+    "meshes": [
+        {
+            "materialIndex": 0,
+            "name": "haku.001",
+            "numIndices": 8016,
+            "numVertices": 8016
+        }
+    ]
+}

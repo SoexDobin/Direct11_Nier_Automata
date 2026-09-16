@@ -38,6 +38,10 @@ protected:
   explicit Game();
   ~Game();
 
+private:
+    void Shutdown();
+    Bool m_ShuttingDown = false;
+
 public:
     HRESULT Initialize_Engine(const ENGINE_DESC &engineDesc);
     Float Begin_Frame(Bool accumulateFixedTime = true);
@@ -74,6 +78,7 @@ public: /* For GraphicDevice */
     HRESULT Present() const;
     HRESULT OnResize(uint32 width, uint32 height, uint32 offScreenIndex = UINT_MAX);
     HRESULT Begin_RenderOffScreen(uint32 screenIndex) const;
+    HRESULT Clear_RenderGroup() const;
     HRESULT End_RenderOffScreen() const;
     ComPtr<ID3D11ShaderResourceView> Get_OffScreenSRV(uint32 screenIndex) const;
     void Set_DepthStencilState(ID3D11DepthStencilState* state, UINT ref) const;
@@ -104,7 +109,7 @@ public: /* For PrototypeManager */
 	const auto &Get_Prototype_Components() const { return m_PrototypeManager->Get_Components(); }
 	HRESULT Refresh_ReflectionRegistry() const;
 	HRESULT Register_ReflectionDescriptors(const ReflectionDescriptorBatch& descriptors) const;
-	HRESULT Register_ReflectedPrototypes(uint32 levIndex) const;
+	HRESULT Register_ReflectedPrototypes() const;
 	string Find_RegisteredName(RuntimeTypeId runtimeTypeId) const;
 	RuntimeTypeId Find_RuntimeTypeId(std::string_view registeredName) const;
 	HRESULT Find_ReflectedType(std::string_view registeredName, ReflectedTypeInfo& outInfo) const;
@@ -171,12 +176,13 @@ public: /* For ResourceManager */
     HRESULT Load_Shader(uint32 levIndex, const tChar* shaderFilePath, const D3D11_INPUT_ELEMENT_DESC* elements, uint32 numElements, const wstring& descriptionTag) const;
     Shared<Shader> Get_Shader(uint32 levIndex, const tChar* shaderFilePath) const;
 
-    HRESULT Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag) const;
+    HRESULT Load_Texture(uint32 levIndex, const tChar* textureFilePath, uint32 numSRVs, const wstring& descriptionTag, Bool allowMissing = false) const;
     const Texture::TEXTURE_DESC* Get_TextureDesc(uint32 levIndex, const wstring& descriptionTag) const;
     vector<wstring> Get_TextureTags(uint32 levIndex) const;
     const ComPtr<ID3D11ShaderResourceView>& Get_Texture(uint32 levIndex, const tChar *textureFilePath) const;
 
-	HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag, const Matrix& preTransformMatrix) const;
+	HRESULT Load_Model(uint32 levIndex, const tChar* modelFilePath, const wstring& descriptionTag,
+		const Matrix& preTransformMatrix, const tChar* materialSettingsPath = nullptr) const;
 	HRESULT Load_ModelAnimations(uint32 levIndex, const wstring& modelTag, const vector<wstring>& animationFilePaths) const;
 	Shared<Model> Get_Model(uint32 levIndex, const tChar *modelFilePath) const;
     int32 Get_ContainLevelByModelTag(const wstring &modelTag) const;
@@ -251,8 +257,9 @@ public: /* CollisionManager */
 public: /* NavigationBuilder */
     NavigationBuilder::NAV_BUILD_RESULT Build_Navigation(const Float* vertices, int32 numVertices, const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params);
     vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
-    HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
-    vector<NavCell> Import_Navigation(const string& filePath) const;
+    HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config,
+        const NavigationBuilder::NAV_BAKE_ANCHOR_DESC& anchor = {}) const;
+    vector<NavCell> Import_Navigation(const string& filePath, _Out_opt_ Matrix* outBakeWorldMatrix = nullptr) const;
 
 public:
     HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;
@@ -355,6 +362,7 @@ private:
 
 #ifdef _DEBUG /* For Debug Function */
 public:
+    void Fail_NextViewResize_Debug(Bool offscreen) const;
     void Render_CollisionDebug() const;
     Bool Toggle_RenderDebug() const;
     HRESULT Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const;

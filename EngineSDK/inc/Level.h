@@ -12,8 +12,8 @@ public:
   virtual ~Level() override = default;
 
 public:
-    Bool Load_Finished() const { return m_IsFinished; }
-    void Set_LoadFinishFlag(Bool isFinish) { m_IsFinished = isFinish; }
+    Bool Load_Finished() const { return m_IsFinished.load(); }
+    void Set_LoadFinishFlag(Bool isFinish) { m_IsFinished.store(isFinish); }
 
 public:
   HRESULT Initialize_Prototype() override {
@@ -34,7 +34,7 @@ public:
 protected:
 	ComPtr<ID3D11Device> m_Device{nullptr};
 	ComPtr<ID3D11DeviceContext> m_Context{nullptr};
-    Bool m_IsFinished = { true };
+    std::atomic_bool m_IsFinished{ true };
 };
 
 NS_END

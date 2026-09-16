@@ -47,6 +47,7 @@ namespace Phase5GateVerifier
 		constexpr uint32 AnimationAuthoringStage = 14;
 		constexpr uint32 AnimationRestartStage = 15;
 		constexpr uint32 ViewResizeStage = 16;
+		constexpr uint32 NavAnchorStage = 17;
 		constexpr uint32 GateLevel = ETOI(LEVEL::GAMEPLAY);
 		constexpr uint32 StaticLevel = ETOI(LEVEL::STATIC);
 		constexpr const wchar_t* FrameFixtureTag = L"TextUI";
@@ -401,6 +402,105 @@ namespace Phase5GateVerifier
 			GAME_INSTANCE->Clear_RenderGroup();
 			const Bool saved = report.Save(Work_Directory() / L"phase9-view-resize.json");
 			return saved && report.Passed() ? S_OK : E_FAIL;
+		}
+
+		// N3 재정렬 검증: bake 공간의 셀을 anchor의 현재 월드 공간으로 옮기는 경로.
+		// 실제 월드 모델 없이도 Navigation의 재정렬 계약만 독립적으로 확인한다.
+		HRESULT Run_NavAnchor(HRESULT initializationResult)
+		{
+			GateReport report("nav-anchor");
+			const auto finish = [&]() {
+				const Bool saved = report.Save(Work_Directory() / L"nav-anchor.json");
+				return saved && report.Passed() ? S_OK : E_FAIL;
+			};
+
+			report.Check("initialize", SUCCEEDED(initializationResult));
+			if (FAILED(initializationResult)) return finish();
+
+			// 원점 주변 1x1 사각형을 삼각형 두 장으로 덮는다.
+			const auto MakeCells = []() {
+				vector<NavCell> cells;
+				cells.emplace_back(Vector3{ 0.f, 0.f, 0.f }, Vector3{ 0.f, 0.f, 1.f }, Vector3{ 1.f, 0.f, 1.f }, 0);
+				cells.emplace_back(Vector3{ 0.f, 0.f, 0.f }, Vector3{ 1.f, 0.f, 1.f }, Vector3{ 1.f, 0.f, 0.f }, 1);
+				return cells;
+			};
+			const auto MakeNavigation = [&]() {
+				auto navigation = Navigation::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context());
+				if (navigation) navigation->Set_NavCells(MakeCells());
+				return navigation;
+			};
+
+			auto navigation = MakeNavigation();
+			report.Check("create-navigation", navigation != nullptr && navigation->Get_NumCells() == 2);
+			if (!navigation) return finish();
+
+			// bake 공간에서의 기준 동작
+			report.Check("bake-space-locates-cell", navigation->Compute_CurrentCellByPosition(Vector3{ 0.5f, 0.f, 0.4f }));
+
+			// 이동: 셀이 정확히 델타만큼 옮겨져야 한다.
+			const Matrix moved = Matrix::CreateTranslation(Vector3{ 50.f, 0.f, 100.f });
+			report.Check("translate-rebase-applied", navigation->Rebase_ToWorld(moved));
+			const Vector3 movedPoint = navigation->Get_NavCells().at(0).Get_Point(NavCell::CELL_POINT::A);
+			report.Check("translate-moves-cells",
+				fabsf(movedPoint.x - 50.f) < 0.001f && fabsf(movedPoint.z - 100.f) < 0.001f,
+				to_string(movedPoint.x) + "," + to_string(movedPoint.z));
+			report.Check("translate-tracks-anchor-matrix",
+				fabsf(navigation->Get_AnchorWorldMatrix().Translation().x - 50.f) < 0.001f);
+
+			// 옮긴 공간에서만 셀이 잡혀야 한다.
+			report.Check("locates-cell-in-new-space",
+				navigation->Compute_CurrentCellByPosition(Vector3{ 50.5f, 0.f, 100.4f }));
+			report.Check("misses-cell-at-old-position",
+				!navigation->Compute_CurrentCellByPosition(Vector3{ 0.5f, 0.f, 0.4f }));
+
+			// 같은 행렬로 다시 부르면 아무 일도 하지 않아야 한다(프레임마다 호출되는 경로).
+			report.Check("same-anchor-is-noop", !navigation->Rebase_ToWorld(moved));
+
+			// 높이 보간이 옮긴 공간에서도 성립하는지
+			auto raised = MakeNavigation();
+			if (raised)
+			{
+				raised->Rebase_ToWorld(Matrix::CreateTranslation(Vector3{ 0.f, 7.f, 0.f }));
+				raised->Compute_CurrentCellByPosition(Vector3{ 0.5f, 7.f, 0.4f });
+				report.Check("height-follows-anchor",
+					fabsf(raised->Get_HeightAtPoint(Vector3{ 0.5f, 0.f, 0.4f }) - 7.f) < 0.001f);
+			}
+			else report.Check("height-follows-anchor", false);
+
+			// Y축 회전은 허용된다.
+			auto yawed = MakeNavigation();
+			report.Check("yaw-rebase-allowed",
+				yawed != nullptr && yawed->Rebase_ToWorld(Matrix::CreateRotationY(XM_PIDIV2)));
+
+			// 기울기와 비균등 스케일은 XZ 투영 판정을 깨므로 거부해야 한다.
+			auto pitched = MakeNavigation();
+			report.Check("pitch-rebase-rejected",
+				pitched != nullptr && !pitched->Rebase_ToWorld(Matrix::CreateRotationX(XM_PIDIV4)));
+			auto squashed = MakeNavigation();
+			report.Check("non-uniform-scale-rejected",
+				squashed != nullptr && !squashed->Rebase_ToWorld(Matrix::CreateScale(2.f, 1.f, 1.f)));
+
+			// 거부된 뒤에도 셀은 bake 공간 그대로여야 한다.
+			if (pitched)
+			{
+				const Vector3 untouched = pitched->Get_NavCells().at(0).Get_Point(NavCell::CELL_POINT::C);
+				report.Check("rejected-rebase-leaves-cells",
+					fabsf(untouched.x - 1.f) < 0.001f && fabsf(untouched.y) < 0.001f && fabsf(untouched.z - 1.f) < 0.001f);
+			}
+			else report.Check("rejected-rebase-leaves-cells", false);
+
+			// anchor가 없는 navmesh는 재정렬 대상이 아니다.
+			auto unanchored = MakeNavigation();
+			if (unanchored)
+			{
+				unanchored->Ensure_Anchored();
+				report.Check("no-anchor-guid-is-noop",
+					!unanchored->Get_AnchorObjectGuid().Is_Valid() &&
+					fabsf(unanchored->Get_NavCells().at(0).Get_Point(NavCell::CELL_POINT::C).x - 1.f) < 0.001f);
+			}
+			else report.Check("no-anchor-guid-is-noop", false);
+
+			return finish();
 		}
 
 		void Sort_Components(nlohmann::json& object)
@@ -2494,13 +2594,14 @@ namespace Phase5GateVerifier
 		if (wstring_view(value) == L"animation-authoring") return AnimationAuthoringStage;
 		if (wstring_view(value) == L"animation-restart") return AnimationRestartStage;
 		if (wstring_view(value) == L"phase9-view-resize") return ViewResizeStage;
+		if (wstring_view(value) == L"nav-anchor") return NavAnchorStage;
 #endif
 		return 0;
 	}
 
 	HRESULT Initialize_Runtime(uint32 stage)
 	{
-		if (stage == ViewResizeStage) return S_OK;
+		if (stage == ViewResizeStage || stage == NavAnchorStage) return S_OK;
 		if (stage != PrepareStage && stage != VerifyStage &&
 			stage != FrameStage && stage != UIAuthoringStage &&
 			stage != ReferencesStage && stage != PrefabRepositoryStage &&
@@ -2561,6 +2662,7 @@ namespace Phase5GateVerifier
 	HRESULT Run(uint32 stage, HRESULT initializationResult)
 	{
 		if (stage == ViewResizeStage) return Run_ViewResize(initializationResult);
+		if (stage == NavAnchorStage) return Run_NavAnchor(initializationResult);
 		if (stage == PrepareStage)
 			return SUCCEEDED(initializationResult) ? Run_Prepare() : initializationResult;
 		if (stage == VerifyStage)

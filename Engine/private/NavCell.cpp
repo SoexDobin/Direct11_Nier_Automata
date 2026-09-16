@@ -14,6 +14,18 @@ NavCell::NavCell(const Vector3& a, const Vector3& b, const Vector3& c, int32 ind
 	m_Neighbors[1] = -1;
 	m_Neighbors[2] = -1;
 
+	Rebuild_Normals();
+}
+void NavCell::Transform_By(const Matrix& matrix)
+{
+	for (int32 i = 0; i < 3; ++i)
+		m_Points[i] = Vector3::Transform(m_Points[i], matrix);
+
+	Rebuild_Normals();
+}
+
+void NavCell::Rebuild_Normals()
+{
 	for (int32 i = 0; i < 3; ++i)
 	{
 		const Vector3& p0 = m_Points[i];
@@ -38,6 +50,7 @@ NavCell::NavCell(const Vector3& a, const Vector3& b, const Vector3& c, int32 ind
 		m_Normal[i] = normal;
 	}
 }
+
 HRESULT NavCell::Initialize(const Shared<Navigation>& owner)
 {
 	if (FAILED(Initialize_Prototype()))

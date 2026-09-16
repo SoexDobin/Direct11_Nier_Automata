@@ -239,11 +239,11 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 	return resultData;
 }
 
-vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath, Matrix* outBakeWorldMatrix)
+vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath, NAV_IMPORT_INFO* outInfo)
 {
 	vector<NavCell> cells;
-	if (outBakeWorldMatrix)
-		*outBakeWorldMatrix = Matrix::Identity;
+	if (outInfo)
+		*outInfo = NAV_IMPORT_INFO{};
 
 	std::ifstream fin(filePath, std::ios::binary);
 	if (!fin.is_open())
@@ -282,8 +282,13 @@ vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath, Matrix*
 		return cells;
 	}
 
-	if (outBakeWorldMatrix)
-		memcpy(outBakeWorldMatrix, header.bakeWorldMatrix, sizeof(Float) * 16);
+	if (outInfo)
+	{
+		memcpy(&outInfo->bakeWorldMatrix, header.bakeWorldMatrix, sizeof(Float) * 16);
+		Try_Parse_ObjectGuid(string(header.anchorObjectGuid), outInfo->anchorObjectGuid);
+		outInfo->anchorObjectName = Helper::To_wString(string(header.anchorObjectName));
+		outInfo->sourceModelTag = Helper::To_wString(string(header.sourceModelTag));
+	}
 
 	LOG_INFO(L"[NavMeshBuilder] Import_Binary: anchor='{}' model='{}'",
 		Helper::To_wString(string(header.anchorObjectName)),

@@ -908,9 +908,9 @@ HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& mod
     return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config, anchor);
 }
 
-vector<NavCell> Game::Import_Navigation(const string& filePath, Matrix* outBakeWorldMatrix) const
+vector<NavCell> Game::Import_Navigation(const string& filePath, NavigationBuilder::NAV_IMPORT_INFO* outInfo) const
 {
-    return m_NavigationBuilder->Import_Binary(filePath, outBakeWorldMatrix);
+    return m_NavigationBuilder->Import_Binary(filePath, outInfo);
 }
 
 

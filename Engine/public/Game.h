@@ -259,7 +259,8 @@ public: /* NavigationBuilder */
     vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
     HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config,
         const NavigationBuilder::NAV_BAKE_ANCHOR_DESC& anchor = {}) const;
-    vector<NavCell> Import_Navigation(const string& filePath, _Out_opt_ Matrix* outBakeWorldMatrix = nullptr) const;
+    vector<NavCell> Import_Navigation(const string& filePath,
+        _Out_opt_ NavigationBuilder::NAV_IMPORT_INFO* outInfo = nullptr) const;
 
 public:
     HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;

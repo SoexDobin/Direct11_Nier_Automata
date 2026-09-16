@@ -25,6 +25,9 @@ public:
 
 public:
 	Bool IsIn(const Vector3& position, _Out_ int32* outNeighborIndex) const;
+	/// 셀을 다른 공간으로 옮긴다. 정점을 변환하고 내/외 판별용 노멀을 다시 만든다.
+	/// 인덱스와 이웃 관계는 강체 변환에 영향받지 않으므로 그대로 둔다.
+	void Transform_By(const Matrix& matrix);
 	Float Compute_Height(Float pointX, Float pointZ) const;
 	Bool Compare_Points(const Vector3& src, const Vector3& dst) const;
 
@@ -42,6 +45,9 @@ public:
 public:
 	HRESULT Render_Debug(const Shared<PrimitiveBatch<VertexPositionColor>>& batch, const Color& color);
 #endif
+
+private:
+	void Rebuild_Normals();
 
 private:
 	Weak<Navigation> m_Owner{};

@@ -64,6 +64,9 @@
     <ClInclude Include="..\public\CityOfRuinEntry.h">
       <Filter>02. GameObject\World</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\DirectionalLight.h">
+      <Filter>02. GameObject\World</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Pl0000.h">
       <Filter>02. GameObject\Entity\2B</Filter>
     </ClInclude>
@@ -308,6 +311,9 @@
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CityOfRuinEntry.cpp">
+      <Filter>02. GameObject\World</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DirectionalLight.cpp">
       <Filter>02. GameObject\World</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pl0000.cpp">

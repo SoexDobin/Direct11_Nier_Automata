@@ -10,6 +10,8 @@ texture2D g_NormalTexture;
 texture2D g_ShadeTexture;
 
 float4 g_LightDirection = float4(0.f, -1.f, 0.f, 0.f);
+float4 g_LightDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+float4 g_LightAmbient = float4(0.2f, 0.2f, 0.2f, 1.f);
 
 struct VS_IN
 {
@@ -42,7 +44,7 @@ float4 PS_Directional(VS_OUT input) : SV_TARGET0
     float3 encodedNormal = g_NormalTexture.Sample(LinearClampSampler, input.texcoord).xyz;
     float3 normal = normalize(encodedNormal * 2.f - 1.f);
     float diffuse = saturate(dot(normal, -normalize(g_LightDirection.xyz)));
-    return float4(0.2f + diffuse, 0.2f + diffuse, 0.2f + diffuse, 1.f);
+    return float4(g_LightAmbient.rgb + g_LightDiffuse.rgb * diffuse, 1.f);
 }
 
 float4 PS_Point(VS_OUT input) : SV_TARGET0
@@ -55,6 +57,10 @@ float4 PS_Combined(VS_OUT input) : SV_TARGET0
 {
     float4 diffuse = g_DiffuseTexture.Sample(LinearClampSampler, input.texcoord);
     float4 shade = g_ShadeTexture.Sample(LinearClampSampler, input.texcoord);
+    // The G-buffer diffuse target clears to zero, so alpha 0 means no geometry was written
+    // here. This pass runs with no depth test and no blending, so without the clip it would
+    // overwrite whatever the PRIORITY group already drew - the sky box - with black.
+    clip(diffuse.a - 0.0001f);
     return float4(diffuse.rgb * shade.rgb, diffuse.a);
 }
 

@@ -20,24 +20,28 @@ HRESULT Light::Initialize(void* arg)
 
 HRESULT Light::Render(const Shared<Shader>& shader, const Shared<VIBuffer_Rect>& buffer)
 {
-	uint32 shaderPass{ 0 };
+	/* DeferredShader pass index, not the light type: pass 0 is the Debug blit. */
+	uint32 shaderPass{ ETOI(DEFERRED::DIRECTIONAL) };
 
 	if (m_LightDesc.type == LIGHT::DIRECTIONAL)
 	{
-		if (FAILED(shader->Bind_RawValue(LightDirection, &m_LightDesc.direction, sizeof(m_LightDesc.direction))))
+		if (FAILED(shader->Bind_RawValue(LightDirection, &m_LightDesc.direction, sizeof(m_LightDesc.direction))) ||
+			FAILED(shader->Bind_RawValue("g_LightDiffuse", &m_LightDesc.diffuse, sizeof(m_LightDesc.diffuse))) ||
+			FAILED(shader->Bind_RawValue("g_LightAmbient", &m_LightDesc.ambient, sizeof(m_LightDesc.ambient))))
 		{
 			return E_FAIL;
 		}
 
-		shaderPass = ETOI(LIGHT::DIRECTIONAL);
+		shaderPass = ETOI(DEFERRED::DIRECTIONAL);
 	}
 	else if (m_LightDesc.type == LIGHT::POINT)
 	{
 		
-		shaderPass = ETOI(LIGHT::POINT);
+		shaderPass = ETOI(DEFERRED::POINT);
 	}
 
-	shader->Begin(shaderPass);
+	if (FAILED(shader->Begin(shaderPass)))
+		return E_FAIL;
 
 	return buffer->Render();
 }

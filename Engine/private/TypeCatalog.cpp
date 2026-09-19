@@ -5,7 +5,6 @@
 #include "Component.h"
 #include "GameObject.h"
 #include "Object.h"
-#include "PartObject.h"
 #include "SpdLogger.h"
 #include "String_Helper.h"
 #include "UIObject.h"
@@ -221,7 +220,6 @@ HRESULT Engine::Registry::Refresh() {
 	const rttr::type objectType = rttr::type::get<Object>();
 	const rttr::type gameObjectType = rttr::type::get<GameObject>();
 	const rttr::type componentType = rttr::type::get<Component>();
-	const rttr::type partObjectType = rttr::type::get<PartObject>();
 	const rttr::type uiObjectType = rttr::type::get<UIObject>();
 	const rttr::type cameraType = rttr::type::get<Camera>();
 
@@ -242,13 +240,8 @@ HRESULT Engine::Registry::Refresh() {
 				entry.typeInfo.baseRegisteredNames.push_back(baseName);
 		}
 		std::ranges::sort(entry.typeInfo.baseRegisteredNames);
-		if (reflectedType == gameObjectType || reflectedType.is_derived_from(gameObjectType)) {
+		if (reflectedType == gameObjectType || reflectedType.is_derived_from(gameObjectType))
 			entry.typeInfo.objectKind = REFLECTED_OBJECT_KIND::GAMEOBJECT;
-			if (reflectedType == uiObjectType || reflectedType.is_derived_from(uiObjectType))
-				entry.typeInfo.authoringMode = HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED;
-			else if (reflectedType == partObjectType || reflectedType.is_derived_from(partObjectType))
-				entry.typeInfo.authoringMode = HIERARCHY_AUTHORING_MODE::LEAF;
-		}
 		else if (reflectedType == componentType || reflectedType.is_derived_from(componentType))
 			entry.typeInfo.objectKind = REFLECTED_OBJECT_KIND::COMPONENT;
 		else if (reflectedType == objectType || reflectedType.is_derived_from(objectType))

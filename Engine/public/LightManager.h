@@ -16,8 +16,9 @@ public:
 
 public:
 	const LIGHT_DESC* Get_LightDesc(uint32 index) const;
-	HRESULT Add_Light(const LIGHT_DESC& desc);
-	HRESULT Remove_Light(uint32 index);
+	/* Lights are owned by the scene object that placed them; it adds and removes its own. */
+	HRESULT Add_Light(const Shared<Light>& light);
+	HRESULT Remove_Light(const Shared<Light>& light);
 	HRESULT Clear_Lights();
 
 public:

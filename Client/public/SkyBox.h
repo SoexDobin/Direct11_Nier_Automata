@@ -31,6 +31,8 @@ public:
 
 private:
 	HRESULT Bind_ShaderResources();
+	/* Keeps the cube centred on the active camera so its edges never enter the view. */
+	void Follow_Camera();
 	HRESULT Ready_Components();
 
 private:

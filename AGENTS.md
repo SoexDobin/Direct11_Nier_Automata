@@ -35,6 +35,7 @@ Do not treat generated files, copied SDK outputs, project data, or external reso
 
 - Solution entry: `NieRAutomata.sln`. VS2022 Debug x64 command:
   `MSBuild.exe NieRAutomata.sln /t:Engine,Client,Editor,Launcher /p:Configuration=Debug /p:Platform=x64 /m /v:minimal`
+- For Codex build validation, request elevated execution for this solution-level command on the first attempt. The sandbox previously denied access to the installed Windows SDK; the same command succeeded after approval. Keep the request limited to this build command and repository working directory, and retain normal approval review. Do not retry the known failing sandbox build first or broaden approval to unrelated commands.
 - Direct Engine/default/Engine.vcxproj or Client/default/Client.vcxproj builds are unsupported because their steps require `$(SolutionDir)`.
 - Do not claim current build success until the exact command/configuration/platform succeeds. Keep validation evidence in the active Vault task; update this file only when the supported build procedure changes.
 - The latest recorded AnimationPreset build/runtime checks passed on 2026-09-10, but actual game-view motion/input and MRT/offscreen resize remain pending; no playable-slice completion claim.

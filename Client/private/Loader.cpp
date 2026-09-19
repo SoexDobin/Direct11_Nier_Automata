@@ -153,16 +153,6 @@ HRESULT Loader::Loading_For_GamePlayLevel() {
         return E_FAIL;
     }
 
-    LIGHT_DESC			LightDesc{};
-    LightDesc.type = LIGHT::DIRECTIONAL;
-    LightDesc.direction = Vector4(1.f, -1.f, 1.f, 0.f);
-    LightDesc.diffuse = Vector4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.ambient = Vector4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.specular = Vector4(1.f, 1.f, 1.f, 1.f);
-
-    if (FAILED(GAME_INSTANCE->Add_Light(LightDesc)))
-        return E_FAIL;
-
     m_isFinished = true;
     if (!m_OwnerLevel.expired())
         m_OwnerLevel.lock()->Set_LoadFinishFlag(m_isFinished);

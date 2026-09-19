@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -511,7 +511,8 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Engine\bin\Engine.dll" "$(OutDir)Engine.dll"
-copy /Y "$(SolutionDir)Engine\external\FMOD\fmod.dll" "$(OutDir)fmod.dll"</Command>
+copy /Y "$(SolutionDir)Engine\external\FMOD\fmod.dll" "$(OutDir)fmod.dll"
+xcopy /Y /I /E "$(SolutionDir)Client\bin\shaders" "$(OutDir)shaders\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

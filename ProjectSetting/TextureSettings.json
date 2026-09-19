@@ -1,70 +1,70 @@
 {
-    "TextureSettings": [
-        {
-            "count": 1,
-            "level": "STATIC",
-            "path": "UI/Loading/Loading_Fade.dds",
-            "tag": "UI_Loading_Fade"
-        },
-        {
-            "count": 1,
-            "level": "LOADING",
-            "path": "UI/Loading/Loading_BackGround.dds",
-            "tag": "UI_Loading_BackGround"
-        },
-        {
-            "count": 1,
-            "level": "LOADING",
-            "path": "UI/Loading/Loading_Pixel.dds",
-            "tag": "UI_Loading_Pixel"
-        },
-        {
-            "count": 1,
-            "level": "LOADING",
-            "path": "UI/Loading/Loading_Logo.dds",
-            "tag": "UI_Loading_Logo"
-        },
-        {
-            "count": 1,
-            "level": "Title",
-            "path": "UI/Title/Title_BackGround.dds",
-            "tag": "UI_Title_BackGround"
-        },
-        {
-            "count": 1,
-            "level": "Title",
-            "path": "UI/Title/Title_HUD.dds",
-            "tag": "UI_Title_HUD"
-        },
-        {
-            "count": 1,
-            "level": "STATIC",
-            "path": "Sky/CubeMap4.dds",
-            "tag": "Skybox_Default"
-        },
-        {
-            "count": 30,
-            "level": "GAMEPLAY",
-            "path": "Texture/Effect/Spark/Spark_%d.dds",
-            "tag": "Effect_Spark"
-        },
-        {
-            "count": 30,
-            "level": "GAMEPLAY",
-            "path": "Texture/Effect/Spark2/Spark2_%d.dds",
-            "tag": "Effect_Spark2"
-        },
-        {
-            "count": 1,
-            "level": "GAMEPLAY",
-            "path": "UI/HUD/UI_Hp_Bar.png",
-            "tag": "UI_Hp_Bar"
-        },
-        {
-            "count": 1,
-            "level": "GAMEPLAY",
-            "path": "Texture/Effect/FireFlash/FireFlash.dds",
-            "tag": "Fire_Flash"
-        }
-    ]
+ "TextureSettings": [
+  {
+   "count": 1,
+   "level": "STATIC",
+   "path": "UI/Loading/Loading_Fade.dds",
+   "tag": "UI_Loading_Fade"
+  },
+  {
+   "count": 1,
+   "level": "LOADING",
+   "path": "UI/Loading/Loading_BackGround.dds",
+   "tag": "UI_Loading_BackGround"
+  },
+  {
+   "count": 1,
+   "level": "LOADING",
+   "path": "UI/Loading/Loading_Pixel.dds",
+   "tag": "UI_Loading_Pixel"
+  },
+  {
+   "count": 1,
+   "level": "LOADING",
+   "path": "UI/Loading/Loading_Logo.dds",
+   "tag": "UI_Loading_Logo"
+  },
+  {
+   "count": 1,
+   "level": "Title",
+   "path": "UI/Title/Title_BackGround.dds",
+   "tag": "UI_Title_BackGround"
+  },
+  {
+   "count": 1,
+   "level": "Title",
+   "path": "UI/Title/Title_HUD.dds",
+   "tag": "UI_Title_HUD"
+  },
+  {
+   "count": 1,
+   "level": "STATIC",
+   "path": "Sky/Default_SkyBox.dds",
+   "tag": "Skybox_Default"
+  },
+  {
+   "count": 30,
+   "level": "GAMEPLAY",
+   "path": "Texture/Effect/Spark/Spark_%d.dds",
+   "tag": "Effect_Spark"
+  },
+  {
+   "count": 30,
+   "level": "GAMEPLAY",
+   "path": "Texture/Effect/Spark2/Spark2_%d.dds",
+   "tag": "Effect_Spark2"
+  },
+  {
+   "count": 1,
+   "level": "GAMEPLAY",
+   "path": "UI/HUD/UI_Hp_Bar.png",
+   "tag": "UI_Hp_Bar"
+  },
+  {
+   "count": 1,
+   "level": "GAMEPLAY",
+   "path": "Texture/Effect/FireFlash/FireFlash.dds",
+   "tag": "Fire_Flash"
+  }
+ ]
 }

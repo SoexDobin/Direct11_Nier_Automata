@@ -20,10 +20,16 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
     else
 		hlslFlag |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
 
-	if (FAILED(D3DX11CompileEffectFromFile(
+    /* A silent failure here used to surface much later as a null dereference inside
+       Bind_Matrix, with nothing in the log. Always name the shader and the HRESULT. */
+    if (const HRESULT compiled = D3DX11CompileEffectFromFile(
         shaderFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, hlslFlag,
-        0, m_Device.Get(), m_Effect.GetAddressOf(), nullptr)))
-		return E_FAIL;
+        0, m_Device.Get(), m_Effect.GetAddressOf(), nullptr); FAILED(compiled))
+    {
+        LOG_ERROR(L"[Shader] Failed to compile effect '{}' (HRESULT 0x{:08X})",
+            shaderFilePath ? shaderFilePath : L"<null>", static_cast<uint32>(compiled));
+        return E_FAIL;
+    }
 
     if (ID3DX11EffectTechnique* technique = m_Effect->GetTechniqueByIndex(0);
         technique && technique->IsValid())
@@ -42,17 +48,29 @@ HRESULT Shader::Initialize_Prototype(const tChar* shaderFilePath, const D3D11_IN
             ComPtr<ID3D11InputLayout> inputLayout = {nullptr};
             ID3DX11EffectPass* pass = technique->GetPassByIndex(i);
             if (nullptr == pass || !pass->IsValid())
-				return E_FAIL;
+            {
+                LOG_ERROR(L"[Shader] '{}' pass {} is invalid",
+                    shaderFilePath ? shaderFilePath : L"<null>", i);
+                return E_FAIL;
+            }
 
             D3DX11_PASS_DESC passDesc = {};
             if (FAILED(pass->GetDesc(&passDesc)) || !passDesc.Name || !*passDesc.Name ||
                 !passIndices->emplace(passDesc.Name, i).second)
+            {
+                LOG_ERROR(L"[Shader] '{}' pass {} has a missing or duplicate name",
+                    shaderFilePath ? shaderFilePath : L"<null>", i);
                 return E_FAIL;
+            }
 
             if (FAILED(m_Device->CreateInputLayout(
             elements, numElements, passDesc.pIAInputSignature,
             passDesc.IAInputSignatureSize, inputLayout.GetAddressOf())))
-              return E_FAIL;
+            {
+                LOG_ERROR(L"[Shader] '{}' pass {} input layout creation failed",
+                    shaderFilePath ? shaderFilePath : L"<null>", i);
+                return E_FAIL;
+            }
 
             
             desc.m_elementsDesc = elements;

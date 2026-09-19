@@ -90,6 +90,20 @@ HRESULT Renderer::Initialize(void *arg) {
 	m_Buffer = VIBuffer_Rect::Create(m_Device, m_Context);
 	m_Shader = Shader::Create(m_Device, m_Context, L"shaders/DeferredShader.hlsl", VTXTEX::Elements, VTXTEX::numElements);
 
+	/* Every frame goes through Render_Lights, which dereferences both of these. Leaving them
+	   null here turns a load failure into an access violation deep in Shader::Bind_Matrix. */
+	if (nullptr == m_Buffer)
+	{
+		LOG_ERROR(L"Failed to Initialize Renderer: screen quad buffer could not be created");
+		return E_FAIL;
+	}
+	if (nullptr == m_Shader)
+	{
+		LOG_ERROR(L"Failed to Initialize Renderer: 'shaders/DeferredShader.hlsl' could not be loaded; "
+			L"check that the shaders folder is deployed next to the executable");
+		return E_FAIL;
+	}
+
 	m_WorldMatrix = Matrix::CreateScale(viewportDesc.Width, viewportDesc.Height, 1.f);
 	m_ViewMatrix = Matrix::Identity;
 	m_ProjMatrix = Matrix::CreateOrthographic(viewportDesc.Width, viewportDesc.Height, 0.f, 1.f);

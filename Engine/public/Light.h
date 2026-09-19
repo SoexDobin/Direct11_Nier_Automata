@@ -6,7 +6,7 @@ NS_BEGIN(Engine)
 class Shader;
 class VIBuffer_Rect;
 
-class Light final : public Object
+class ENGINE_DLL Light final : public Object
 {
 	NO_COPY(Light)
 public:
@@ -15,6 +15,7 @@ public:
 
 public:
 	const LIGHT_DESC& Get_LightDesc() const { return m_LightDesc; }
+	void Set_LightDesc(const LIGHT_DESC& desc) { m_LightDesc = desc; }
 
 public:
 	HRESULT Initialize_Prototype(const LIGHT_DESC& desc);

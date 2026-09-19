@@ -8,6 +8,7 @@
 #include "Bullet.h"
 #include "CityOfRuinBridge.h"
 #include "CityOfRuinEntry.h"
+#include "DirectionalLight.h"
 #include "Em0010.h"
 #include "Em0010Body.h"
 #include "Em0010Movement.h"
@@ -55,18 +56,13 @@ namespace
 {
 	template <typename T>
 	ReflectedTypeDescriptor& Add_Type(ReflectionDescriptorBatch& batch, const char* registeredName,
-		const char* baseRegisteredName, REFLECTED_OBJECT_KIND objectKind,
-		HIERARCHY_AUTHORING_MODE authoringMode = HIERARCHY_AUTHORING_MODE::CODE_DEFINED)
+		const char* baseRegisteredName, REFLECTED_OBJECT_KIND objectKind)
 	{
 		ReflectedTypeDescriptor descriptor;
 		descriptor.info.registeredName = registeredName;
 		descriptor.info.runtimeTypeId = Make_ExternalRuntimeTypeId<T>();
 		descriptor.info.baseRegisteredNames.emplace_back(baseRegisteredName);
 		descriptor.info.objectKind = objectKind;
-		if constexpr (std::is_base_of_v<PartObject, T>)
-			descriptor.info.authoringMode = HIERARCHY_AUTHORING_MODE::LEAF;
-		else
-			descriptor.info.authoringMode = authoringMode;
 		descriptor.createPrototype = []() -> Shared<Object> {
 			return static_pointer_cast<Object>(T::Create(
 				GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context()));
@@ -99,6 +95,35 @@ namespace
 			return hpBar && targetGuid
 				? hpBar->Set_TargetObjectGuid(*targetGuid)
 				: E_INVALIDARG;
+		};
+		return property;
+	}
+
+	ReflectedPropertyDescriptor Make_DirectionalLightColor_Property(const char* name,
+		const Color& (DirectionalLight::*getter)() const, void (DirectionalLight::*setter)(const Color&))
+	{
+		ReflectedPropertyDescriptor property;
+		property.info.registeredName = name;
+		property.info.valueType = REFLECTION_VALUE_TYPE::COLOR;
+		property.info.dataTag = Data_Tag::Color;
+		property.info.assetType = Asset_Type_Key::NoneAsset;
+		property.info.saveDataKey = name;
+		property.info.isWritable = true;
+		property.info.isSerializable = true;
+		property.read = [getter](Object& target, ReflectionValue& outValue) -> HRESULT {
+			auto* light = dynamic_cast<DirectionalLight*>(&target);
+			if (!light)
+				return E_NOINTERFACE;
+			outValue.data = (light->*getter)();
+			return S_OK;
+		};
+		property.write = [setter](Object& target, const ReflectionValue& value) -> HRESULT {
+			auto* light = dynamic_cast<DirectionalLight*>(&target);
+			const Color* color = value.Try_Get<Color>();
+			if (!light || !color)
+				return E_INVALIDARG;
+			(light->*setter)(*color);
+			return S_OK;
 		};
 		return property;
 	}
@@ -276,26 +301,19 @@ HRESULT Client::Register_Client_Reflection()
 	constexpr auto gameObject = REFLECTED_OBJECT_KIND::GAMEOBJECT;
 	constexpr auto component = REFLECTED_OBJECT_KIND::COMPONENT;
 
-	Add_Type<LoadingFadeIn>(batch, "LoadingFadeIn", "UIObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
-	Add_Type<LoadingFadeOut>(batch, "LoadingFadeOut", "UIObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
-	Add_Type<LoadingBackground>(batch, "LoadingBackground", "UIObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
-	Add_Type<LoadingLogo>(batch, "LoadingLogo", "UIObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
-	Add_Type<LoadingPixelPanel>(batch, "LoadingPixelPanel", "UIObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
-	Add_Type<TitleBackground>(batch, "TitleBackground", "UIObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+	Add_Type<LoadingFadeIn>(batch, "LoadingFadeIn", "UIObject", gameObject);
+	Add_Type<LoadingFadeOut>(batch, "LoadingFadeOut", "UIObject", gameObject);
+	Add_Type<LoadingBackground>(batch, "LoadingBackground", "UIObject", gameObject);
+	Add_Type<LoadingLogo>(batch, "LoadingLogo", "UIObject", gameObject);
+	Add_Type<LoadingPixelPanel>(batch, "LoadingPixelPanel", "UIObject", gameObject);
+	Add_Type<TitleBackground>(batch, "TitleBackground", "UIObject", gameObject);
 	Add_Type<StaticCamera>(batch, "StaticCamera", "Camera", gameObject);
 	Add_Type<FreeCamera>(batch, "FreeCamera", "Camera", gameObject);
 	Add_Type<SkyBox>(batch, "SkyBox", "GameObject", gameObject);
 	Add_Type<SkySphere>(batch, "SkySphere", "GameObject", gameObject);
 	Add_Type<Terrain>(batch, "Terrain", "GameObject", gameObject);
 
-	Add_Type<Pl0000>(batch, "Pl0000", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
+	Add_Type<Pl0000>(batch, "Pl0000", "GameObject", gameObject);
 	Add_Type<Pl0000Body>(batch, "Pl0000Body", "GameObject", gameObject);
 	Add_Type<WP0070Body>(batch, "WP0070Body", "GameObject", gameObject);
 	Add_Type<WP0220Body>(batch, "WP0220Body", "GameObject", gameObject);
@@ -309,34 +327,32 @@ HRESULT Client::Register_Client_Reflection()
 	Add_Type<Pl0000MonsterChecker>(batch, "Pl0000MonsterChecker", "GameObject", gameObject);
 	Add_Type<SheathWP0070Body>(batch, "SheathWP0070Body", "GameObject", gameObject);
 	Add_Type<SheathWP0220Body>(batch, "SheathWP0220Body", "GameObject", gameObject);
-	Add_Type<CityOfRuinEntry>(batch, "CityOfRuinEntry", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
+	Add_Type<CityOfRuinEntry>(batch, "CityOfRuinEntry", "GameObject", gameObject);
 	Add_Type<CityOfRuinBridge>(batch, "CityOfRuinBridge", "GameObject", gameObject);
-	Add_Type<Em3100>(batch, "Em3100", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
+	ReflectedTypeDescriptor& directionalLight = Add_Type<DirectionalLight>(batch, "DirectionalLight",
+		"GameObject", gameObject);
+	directionalLight.properties.push_back(Make_DirectionalLightColor_Property("Color",
+		&DirectionalLight::Get_Color, &DirectionalLight::Set_Color));
+	directionalLight.properties.push_back(Make_DirectionalLightColor_Property("Ambient",
+		&DirectionalLight::Get_Ambient, &DirectionalLight::Set_Ambient));
+	Add_Type<Em3100>(batch, "Em3100", "GameObject", gameObject);
 	Add_Type<Em3100Body>(batch, "Em3100Body", "GameObject", gameObject);
-	Add_Type<Em0010>(batch, "Em0010", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
+	Add_Type<Em0010>(batch, "Em0010", "GameObject", gameObject);
 	Add_Type<Em0010Body>(batch, "Em0010Body", "GameObject", gameObject);
 	Add_Type<MonsterSight>(batch, "MonsterSight", "GameObject", gameObject);
 	Add_Type<MonsterAOE>(batch, "MonsterAOE", "GameObject", gameObject);
 	Add_Type<Em0010Movement>(batch, "Em0010Movement", "Component", component);
-	Add_Type<Em3000>(batch, "Em3000", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::CODE_DEFINED);
+	Add_Type<Em3000>(batch, "Em3000", "GameObject", gameObject);
 	Add_Type<Em3000Body>(batch, "Em3000Body", "GameObject", gameObject);
 	Add_Type<Em3000Movement>(batch, "Em3000Movement", "Component", component);
 	Add_Type<Em3001>(batch, "Em3001", "GameObject", gameObject);
 	Add_Type<Em3002>(batch, "Em3002", "GameObject", gameObject);
 	Add_Type<Em3003>(batch, "Em3003", "GameObject", gameObject);
-	Add_Type<Bullet>(batch, "Bullet", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::TRANSIENT);
-	Add_Type<FireFlashEffect>(batch, "FireFlashEffect", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::TRANSIENT);
-	Add_Type<SparkEffect>(batch, "SparkEffect", "GameObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::TRANSIENT);
+	Add_Type<Bullet>(batch, "Bullet", "GameObject", gameObject);
+	Add_Type<FireFlashEffect>(batch, "FireFlashEffect", "GameObject", gameObject);
+	Add_Type<SparkEffect>(batch, "SparkEffect", "GameObject", gameObject);
 	ReflectedTypeDescriptor& hpBar = Add_Type<HpBarWorldUI>(batch, "HpBarWorldUI",
-		"WorldUIObject", gameObject,
-		HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED);
+		"WorldUIObject", gameObject);
 	hpBar.properties.push_back(Make_HpBarTarget_Property());
 	hpBar.properties.push_back(Make_HpBarWorldOffset_Property());
 	Add_Type<MonsterStateMachine>(batch, "MonsterStateMachine", "Component", component);

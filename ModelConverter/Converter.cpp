@@ -18,6 +18,9 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 {
 	m_Bones.clear();
 	m_Meshes.clear();
+	m_MeshRoles.clear();
+	for (auto& bucket : m_RoleBuckets)
+		bucket.clear();
 	m_Material.clear();
 	m_Animation.clear();
 	m_Channels.clear();
@@ -52,10 +55,110 @@ Bool Tool::Converter::ReadAssetFile(const wstring& path)
 
 	ReadBoneData(m_AiScene->mRootNode, -1);
 	ReadMeshData();
+	ClassifyMeshRoles();
 	ReadMaterialData();
+	ApplySourceMaterialTextures(path);
 	ReadAnimation();
 
 	return true;
+}
+
+void Tool::Converter::ApplySourceMaterialTextures(const wstring& assetPath)
+{
+	const filesystem::path assetDirectory = filesystem::path(assetPath).parent_path();
+	const filesystem::path referencePath = assetDirectory / L"materials.json";
+	if (!filesystem::is_regular_file(referencePath))
+		return;
+
+	nlohmann::json referenceMaterials;
+	try
+	{
+		ifstream referenceFile(referencePath);
+		referenceMaterials = nlohmann::json::parse(referenceFile);
+	}
+	catch (const std::exception& exception)
+	{
+		std::cerr << "  [Nier] materials.json unreadable, textures left as exported: " << exception.what() << "\n";
+		return;
+	}
+	if (!referenceMaterials.is_object())
+		return;
+
+	uint32 filledMaterials = 0;
+	uint32 addedTextures = 0;
+	uint32 missingFiles = 0;
+	for (const Shared<MODEL_MATERIAL>& material : m_Material)
+	{
+		const auto sourceIt = referenceMaterials.find(material->name);
+		if (sourceIt == referenceMaterials.end())
+			continue;
+
+		Bool filled = false;
+		for (const MODEL_ENTRY& entry : Nier_Fbx_Rule::Resolve_SourceTextures(*sourceIt))
+		{
+			/* What the FBX did carry stays authoritative. */
+			const Bool hasType = std::ranges::any_of(material->textures,
+				[&](const MODEL_ENTRY& existing) { return existing.typeIndex == entry.typeIndex; });
+			if (hasType)
+				continue;
+
+			if (!filesystem::is_regular_file(assetDirectory / entry.path))
+			{
+				std::cerr << "  [Nier] Missing texture " << entry.path << " for material " << material->name << "\n";
+				++missingFiles;
+				continue;
+			}
+
+			material->textures.push_back(entry);
+			++addedTextures;
+			filled = true;
+		}
+		if (filled)
+			++filledMaterials;
+	}
+
+	std::cout << "  [Nier] materials.json textures: +" << addedTextures << " on "
+		<< filledMaterials << "/" << m_Material.size() << " materials, " << missingFiles << " missing files\n";
+}
+
+void Tool::Converter::ClassifyMeshRoles()
+{
+	m_MeshRoles.clear();
+	m_MeshRoles.reserve(m_Meshes.size());
+	for (auto& bucket : m_RoleBuckets)
+		bucket.clear();
+
+	for (uint32 i = 0; i < static_cast<uint32>(m_Meshes.size()); ++i)
+	{
+		const Nier_Fbx_Rule::Classification classification =
+			Nier_Fbx_Rule::Classify(m_Meshes[i] ? m_Meshes[i]->name : string{});
+
+		m_MeshRoles.push_back(classification);
+		m_RoleBuckets[static_cast<uint32>(classification.role)].push_back(i);
+	}
+
+	std::cout << "  Role split  :";
+	for (uint32 role = 0; role < static_cast<uint32>(NIER_FBX_ROLE::Count); ++role)
+	{
+		std::cout << " " << Nier_Fbx_Rule::Get_RoleName(static_cast<NIER_FBX_ROLE>(role))
+			<< "=" << m_RoleBuckets[role].size();
+	}
+	std::cout << "\n";
+}
+
+wstring Tool::Converter::Build_RolePath(const wstring& basePath, NIER_FBX_ROLE role)
+{
+	const Char* suffix = Nier_Fbx_Rule::Get_RoleSuffix(role);
+	if ('\0' == suffix[0])
+		return basePath;
+
+	filesystem::path path{ basePath };
+	const wstring stem = path.stem().wstring();
+	const string narrowSuffix{ suffix };
+	const wstring wideSuffix{ narrowSuffix.begin(), narrowSuffix.end() };
+
+	path.replace_filename(stem + wideSuffix + path.extension().wstring());
+	return path.wstring();
 }
 
 Bool Tool::Converter::ExportModel(const wstring& outPath)
@@ -77,8 +180,31 @@ Bool Tool::Converter::ExportModel(const wstring& outPath)
 		}
 	}
 
-	if (!WriteModelFile(outPath))
+	/* One .model per occupied role so the engine can apply render, LOD, collision and
+	   placement data independently. A source file that only ever produces one role
+	   (an LOD-only map, a collision-only export) simply writes that one file. */
+	uint32 writtenRoles = 0;
+	for (uint32 role = 0; role < static_cast<uint32>(NIER_FBX_ROLE::Count); ++role)
+	{
+		if (m_RoleBuckets[role].empty())
+			continue;
+
+		const NIER_FBX_ROLE typedRole = static_cast<NIER_FBX_ROLE>(role);
+		const wstring rolePath = Build_RolePath(outPath, typedRole);
+
+		if (!WriteModelFile(rolePath, typedRole))
+			return false;
+
+		std::cout << "  [Write] " << Nier_Fbx_Rule::Get_RoleName(typedRole)
+			<< " meshes=" << m_RoleBuckets[role].size() << "\n";
+		++writtenRoles;
+	}
+
+	if (0 == writtenRoles)
+	{
+		std::cerr << "  [Error] No mesh role produced an output file\n";
 		return false;
+	}
 
 	if (!WriteAnimationFiles(outPath))
 		return false;
@@ -410,8 +536,10 @@ void Converter::ReadAnimation()
 	}
 }
 
-Bool Tool::Converter::WriteModelFile(const wstring& path)
+Bool Tool::Converter::WriteModelFile(const wstring& path, NIER_FBX_ROLE role)
 {
+	const vector<uint32>& bucket = m_RoleBuckets[static_cast<uint32>(role)];
+
 	filesystem::create_directories(filesystem::path(path).parent_path());
 	ofstream out(path, std::ios::binary);
 	if (!out.is_open())
@@ -426,7 +554,7 @@ Bool Tool::Converter::WriteModelFile(const wstring& path)
 	header.version = MODEL_VERSION;
 	header.isAnim = m_IsSkeletal;
 	header.numBones = static_cast<uint32>(m_Bones.size());
-	header.numMeshes = static_cast<uint32>(m_Meshes.size());
+	header.numMeshes = static_cast<uint32>(bucket.size());
 	header.numMaterials = static_cast<uint32>(m_Material.size());
 	header.numAnimations = 0;
 	out.write(BIN(&header), sizeof(header));
@@ -442,8 +570,9 @@ Bool Tool::Converter::WriteModelFile(const wstring& path)
 	}
 
 	/* Meshes */
-	for (auto& mesh : m_Meshes)
+	for (const uint32 meshIndex : bucket)
 	{
+		const auto& mesh = m_Meshes[meshIndex];
 		uint32 nameLength = static_cast<uint32>(mesh->name.size());
 		out.write(BIN(&nameLength), sizeof(uint32));
 		out.write(mesh->name.data(), nameLength);
@@ -694,10 +823,19 @@ Bool Tool::Converter::WriteJsonFile(const wstring& path)
 	}
 
 	// 4. Meshes
-	for (auto& mesh : m_Meshes)
+	for (size_t meshIndex = 0; meshIndex < m_Meshes.size(); ++meshIndex)
 	{
+		const auto& mesh = m_Meshes[meshIndex];
 		json meshJson;
 		meshJson["name"] = mesh->name;
+		if (meshIndex < m_MeshRoles.size())
+		{
+			const auto& classification = m_MeshRoles[meshIndex];
+			meshJson["role"] = Nier_Fbx_Rule::Get_RoleName(classification.role);
+			meshJson["lodLevel"] = classification.lodLevel;
+			meshJson["roleBaseName"] = classification.baseName;
+			meshJson["roleMatchedToken"] = classification.matchedToken;
+		}
 		meshJson["materialIndex"] = mesh->materialIndex;
 		const Bool validMaterialIndex = mesh->materialIndex >= 0 &&
 			static_cast<size_t>(mesh->materialIndex) < m_Material.size();
@@ -714,6 +852,15 @@ Bool Tool::Converter::WriteJsonFile(const wstring& path)
 	json inspection;
 	inspection["converterMaterialCount"] = m_Material.size();
 	inspection["meshCount"] = m_Meshes.size();
+
+	json roleCounts;
+	for (uint32 role = 0; role < static_cast<uint32>(NIER_FBX_ROLE::Count); ++role)
+	{
+		roleCounts[Nier_Fbx_Rule::Get_RoleName(static_cast<NIER_FBX_ROLE>(role))] =
+			m_RoleBuckets[role].size();
+	}
+	inspection["roleMeshCounts"] = roleCounts;
+
 	inspection["duplicateConverterMaterialNames"] = duplicateConverterMaterialNames;
 
 	json invalidMeshes = json::array();

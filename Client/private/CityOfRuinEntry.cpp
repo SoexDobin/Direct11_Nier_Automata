@@ -113,8 +113,6 @@ HRESULT CityOfRuinEntry::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(GAME_INSTANCE->Bind_TransformMatrix(m_Shader, ProjMatrix, D3DTS::PROJ)))
 		return E_FAIL;
-	if (FAILED(GAME_INSTANCE->Bind_CameraPosition(m_Shader, CameraPosition)))
-		return E_FAIL;
 
 	return S_OK;
 }

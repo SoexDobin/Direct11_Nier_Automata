@@ -13,42 +13,38 @@ const LIGHT_DESC* LightManager::Get_LightDesc(uint32 index) const
 	return &m_Lights[index]->Get_LightDesc();
 }
 
-HRESULT LightManager::Add_Light(const LIGHT_DESC& desc)
+HRESULT LightManager::Add_Light(const Shared<Light>& light)
 {
-	Shared<Light> light = Light::Create(desc);
 	if (!light)
-	{
-		MSG_BOX("Failed to create Light");
-		return E_FAIL;
-	}
+		return E_INVALIDARG;
+	if (ranges::find(m_Lights, light) != m_Lights.end())
+		return S_FALSE;
 
 	m_Lights.push_back(light);
-
 	return S_OK;
 }
 
-HRESULT LightManager::Remove_Light(uint32 index)
+HRESULT LightManager::Remove_Light(const Shared<Light>& light)
 {
-	if (index >= m_Lights.size())
-		return E_FAIL;
+	const auto it = ranges::find(m_Lights, light);
+	if (it == m_Lights.end())
+		return S_FALSE;
 
-	swap(m_Lights[index], m_Lights.back());
-	m_Lights.pop_back();
-
+	m_Lights.erase(it);
 	return S_OK;
 }
 
 HRESULT LightManager::Clear_Lights()
 {
-	m_Lights.shrink_to_fit(); 
-	return S_OK; 
+	m_Lights.clear();
+	return S_OK;
 }
 
 HRESULT LightManager::Render_Lights(const Shared<Shader>& shader, const Shared<VIBuffer_Rect>& buffer)
 {
 	for (auto& light : m_Lights)
 	{
-		if (light)
+		if (light && light->Is_Active())
 			light->Render(shader, buffer);
 	}
 

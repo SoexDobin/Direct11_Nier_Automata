@@ -162,6 +162,12 @@ int wmain(int argc, wchar_t* argv[])
 		std::cout << "  Materials    : " << converter.GetMaterialCount() << "\n";
 		std::cout << "  Bones        : " << converter.GetBoneCount() << "\n";
 		std::cout << "  Animations   : " << converter.GetAnimationCount() << "\n";
+		std::cout << "  Mesh / Lod / Shadow / Col / Inst : "
+			<< converter.GetRoleMeshCount(NIER_FBX_ROLE::Mesh) << " / "
+			<< converter.GetRoleMeshCount(NIER_FBX_ROLE::Lod) << " / "
+			<< converter.GetRoleMeshCount(NIER_FBX_ROLE::Shadow) << " / "
+			<< converter.GetRoleMeshCount(NIER_FBX_ROLE::Col) << " / "
+			<< converter.GetRoleMeshCount(NIER_FBX_ROLE::Instance) << "\n";
 
 		const Bool exported = animationOnly
 			? converter.ExportAnimations(outputPath.wstring())

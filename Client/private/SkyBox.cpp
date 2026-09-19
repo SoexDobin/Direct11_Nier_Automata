@@ -33,7 +33,25 @@ HRESULT SkyBox::Initialize(void* arg)
 
 void SkyBox::Priority_Update(Float timeDelta)
 {
-	
+}
+
+void SkyBox::Follow_Camera()
+{
+	/* The cube has a finite size, so it has to stay centred on the viewer or its edges become
+	   visible and the corners of the view fall outside it. Only the position follows; the
+	   orientation must stay fixed or the sky would turn with the camera.
+
+	   This runs from the render path rather than Priority_Update because the Editor does not
+	   step the engine while stopped, yet it still renders every frame. */
+	const auto camera = GAME_INSTANCE->Get_MainCamera();
+	if (nullptr == camera || nullptr == m_Transform)
+		return;
+
+	const auto cameraTransform = camera->Get_Transform();
+	if (nullptr == cameraTransform)
+		return;
+
+	m_Transform->Set_Position(cameraTransform->Get_Position());
 }
 
 void SkyBox::Update(Float timeDelta)
@@ -88,6 +106,8 @@ void SkyBox::Submit_RenderGroup()
 
 HRESULT SkyBox::Bind_ShaderResources()
 {
+	Follow_Camera();
+
 	if (FAILED(m_Transform->Bind_ShaderResource(m_Shader, WorldMatrix)))
 		return E_FAIL;
 

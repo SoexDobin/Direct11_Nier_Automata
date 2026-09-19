@@ -207,8 +207,8 @@ public: /* For Pipeline */
 
 public: /* For.LightManager */
     const LIGHT_DESC *Get_LightDesc(uint32 index) const;
-    HRESULT Add_Light(const LIGHT_DESC &lightDesc) const;
-    HRESULT Remove_Light(uint32 index) const;
+    HRESULT Add_Light(const Shared<class Light>& light) const;
+    HRESULT Remove_Light(const Shared<class Light>& light) const;
     HRESULT Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const;
 
 public: /* For LevelSerialize */
@@ -256,10 +256,9 @@ public: /* CollisionManager */
 
 public: /* NavigationBuilder */
     NavigationBuilder::NAV_BUILD_RESULT Build_Navigation(const Float* vertices, int32 numVertices, const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params);
-    vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const;
-    HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config,
-        const NavigationBuilder::NAV_BAKE_ANCHOR_DESC& anchor = {}) const;
-    vector<NavCell> Import_Navigation(const string& filePath, _Out_opt_ Matrix* outBakeWorldMatrix = nullptr) const;
+    vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const rcConfig& config) const;
+    HRESULT Export_Navigation(const string& fileName, const Shared<Model>& model, const rcConfig& config) const;
+    vector<NavCell> Import_Navigation(const string& filePath) const;
 
 public:
     HRESULT Add_RenderTarget(const wstring& renderTargetTag, uint32 sizeX, uint32 sizeY, DXGI_FORMAT pixelFormat, const Color& color = Vector4::One) const;

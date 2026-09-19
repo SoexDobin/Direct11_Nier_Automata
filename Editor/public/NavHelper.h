@@ -21,8 +21,8 @@ public:
 
 private:
 	// ── rcConfig 파라미터 (UI 바인딩) ──
-	Float	m_CellSize{ 0.3f };
-	Float	m_CellHeight{ 0.2f };
+	Float	m_CellSize{ 0.4f };
+	Float	m_CellHeight{ 0.15f };
 	Float	m_SlopeAngle{ 45.f };
 	Float	m_AgentHeight{ 2.f };
 	Float	m_AgentRadius{ 0.6f };
@@ -38,19 +38,6 @@ private:
 	bool m_AutoBake{ true };
 	wstring m_SelectedModelTag{};
 	Shared<Engine::Model> m_pSelectedModel{ nullptr };
-
-	// ── bake 기준 GameObject (anchor) ──
-	// navmesh는 이 오브젝트의 월드 공간에서 굽는다. 이것이 기본 경로다.
-	Weak<Engine::GameObject> m_AnchorObject{};
-	wstring m_AnchorObjectName{};
-	ObjectGuid m_AnchorObjectGuid{};
-
-	// ── 수동 월드 변환 (레거시 오프셋 경로) ──
-	// anchor 기준 bake로 대체됐다. 코드는 남겨 두지만 m_UseManualTransform을 켜야만 사용된다.
-	Bool m_UseManualTransform{ false };
-	Vector3 m_WorldPosition{ Vector3::Zero };
-	Vector3 m_WorldRotation{ Vector3::Zero };
-	Vector3 m_WorldScale{ Vector3::One };
 
 	// ── 프리뷰 데이터 ──
 	vector<NavCellBinary> m_PreviewCells;
@@ -79,24 +66,13 @@ private:
 	ImVec2 m_ViewportSize{ 800.f, 600.f };
 #endif
 
-	// ── 저장 설정 ──
-	char m_SaveName[MAX_PATH]{ "NavMesh_Default" };
-
 	// ── 내부 함수 ──
 	rcConfig Build_RcConfig() const;
-	/// 레거시 수동 오프셋 행렬. m_UseManualTransform일 때만 쓰인다.
-	Matrix Build_WorldMatrix() const;
-	/// 실제 bake에 쓰는 행렬. anchor가 있으면 그 GameObject의 월드 행렬이다.
-	Matrix Resolve_BakeWorldMatrix() const;
-	Shared<Engine::GameObject> Resolve_AnchorObject() const;
-	void Bind_SelectedObjectAsAnchor();
-	void Clear_Anchor();
 	void BakePreview();
 	void SaveBinary();
 
 	void Render_ModelSelector();
-	void Render_AnchorSlot();
-	void Render_WorldTransform();
+	void Render_SourceSelector();
 	void Render_ConfigPanel();
 	void Render_Viewport();
 	void Render_PreviewStats();

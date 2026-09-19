@@ -97,9 +97,7 @@ void NavHelper::Render(Bool isResize)
 		
 		Render_ModelSelector();
 		ImGui::Separator();
-		Render_AnchorSlot();
-		ImGui::Separator();
-		Render_WorldTransform();
+		Render_SourceSelector();
 		ImGui::Separator();
 		Render_ConfigPanel();
 		ImGui::Separator();
@@ -201,110 +199,25 @@ void NavHelper::Render_ModelSelector()
 }
 
 // ─────────────────────────────────────────────────────────
-// bake anchor (기준 GameObject)
+// 선택한 GameObject의 모델을 bake 소스로
 // ─────────────────────────────────────────────────────────
-void NavHelper::Render_AnchorSlot()
+void NavHelper::Render_SourceSelector()
 {
-	ImGui::Text("Bake Anchor (GameObject)");
+	if (!ImGui::Button("Use Selected Object's Model", ImVec2(-1, 24)))
+		return;
 
-	const Shared<GameObject> anchor = Resolve_AnchorObject();
-	if (anchor)
-	{
-		const Vector3 anchorPosition = anchor->Get_Transform()->Get_WorldMatrix().Translation();
-		ImGui::TextColored(ImVec4(0.4f, 1.f, 0.4f, 1.f), "%s", Helper::To_String(m_AnchorObjectName).c_str());
-		ImGui::Text("  World: %.2f, %.2f, %.2f", anchorPosition.x, anchorPosition.y, anchorPosition.z);
-	}
-	else if (!m_AnchorObjectName.empty())
-	{
-		ImGui::TextColored(ImVec4(1.f, 0.4f, 0.4f, 1.f), "%s (lost)", Helper::To_String(m_AnchorObjectName).c_str());
-	}
-	else
-	{
-		ImGui::TextDisabled("(none) - navmesh will bake in model-local space");
-	}
-
-	if (ImGui::Button("Bind Selected Object", ImVec2(-1, 24)))
-		Bind_SelectedObjectAsAnchor();
-
-	if (anchor || !m_AnchorObjectName.empty())
-	{
-		if (ImGui::Button("Clear Anchor", ImVec2(-1, 0)))
-			Clear_Anchor();
-	}
-}
-
-// ─────────────────────────────────────────────────────────
-// 월드 트랜스폼 (레거시 수동 오프셋 경로)
-// ─────────────────────────────────────────────────────────
-void NavHelper::Render_WorldTransform()
-{
-	bool changed = false;
-
-	const Shared<GameObject> anchor = Resolve_AnchorObject();
-
-	if (ImGui::Checkbox("Manual World Transform (legacy)", &m_UseManualTransform))
-		changed = true;
-
-	// anchor가 있으면 수동 오프셋은 쓰지 않는다. 값은 참고용으로만 남겨 둔다.
-	const Bool disabled = (anchor != nullptr) && !m_UseManualTransform;
-	if (disabled)
-		ImGui::BeginDisabled();
-
-	ImGui::DragFloat3("Position##Nav", &m_WorldPosition.x, 0.5f);
-	if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
-
-	ImGui::DragFloat3("Rotation##Nav", &m_WorldRotation.x, 0.5f, -360.f, 360.f);
-	if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
-
-	ImGui::DragFloat3("Scale##Nav", &m_WorldScale.x, 0.01f, 0.01f, 100.f);
-	if (ImGui::IsItemDeactivatedAfterEdit()) changed = true;
-
-	if (disabled)
-	{
-		ImGui::EndDisabled();
-		ImGui::TextDisabled("Using anchor world matrix; these fields are ignored.");
-	}
-
-	if (changed && m_AutoBake && m_pSelectedModel) BakePreview();
-}
-
-Shared<GameObject> NavHelper::Resolve_AnchorObject() const
-{
-	return m_AnchorObject.lock();
-}
-
-void NavHelper::Bind_SelectedObjectAsAnchor()
-{
 	const Shared<GameObject> selected = EDITOR->Get_SelectedObject();
-	if (!selected)
+	const Shared<Model> model = selected ? selected->Get_Component<Model>() : nullptr;
+	if (!model)
 	{
-		MSG_BOX("Select a GameObject in the hierarchy first.");
+		MSG_BOX("Select a GameObject with a Model in the hierarchy first.");
 		return;
 	}
 
-	m_AnchorObject = selected;
-	m_AnchorObjectName = selected->Get_Name();
-	m_AnchorObjectGuid = selected->Get_ObjectGuid();
-
-	// anchor가 Model을 들고 있으면 bake 소스도 같은 오브젝트에서 가져온다.
-	if (const Shared<Model> anchorModel = selected->Get_Component<Model>())
-	{
-		m_pSelectedModel = anchorModel;
-		m_SelectedModelTag = anchorModel->Get_ModelTag();
-		m_HasPreview = false;
-	}
-
-	LOG_INFO(L"[NavHelper] Bake anchor bound: {}", m_AnchorObjectName);
-
-	if (m_AutoBake && m_pSelectedModel) BakePreview();
-}
-
-void NavHelper::Clear_Anchor()
-{
-	m_AnchorObject.reset();
-	m_AnchorObjectName.clear();
-	m_AnchorObjectGuid = ObjectGuid{};
+	m_pSelectedModel = model;
+	m_SelectedModelTag = model->Get_ModelTag();
 	m_HasPreview = false;
+	if (m_AutoBake) BakePreview();
 }
 
 // ─────────────────────────────────────────────────────────
@@ -507,7 +420,7 @@ void NavHelper::Render_ExportPanel()
 	}
 
 	ImGui::Text("Export");
-	ImGui::InputText("File Name##Nav", m_SaveName, MAX_PATH);
+	ImGui::TextDisabled("ProjectSetting/NavData/%s.nnav", Helper::To_String(m_SelectedModelTag).c_str());
 
 	if (ImGui::Button("Export .nnav", ImVec2(-1, 30)))
 	{
@@ -541,35 +454,6 @@ rcConfig NavHelper::Build_RcConfig() const
 }
 
 // ─────────────────────────────────────────────────────────
-// 월드 행렬 생성
-// ─────────────────────────────────────────────────────────
-Matrix NavHelper::Build_WorldMatrix() const
-{
-	Matrix scaleMat = Matrix::CreateScale(m_WorldScale);
-	Matrix rotMat = Matrix::CreateFromYawPitchRoll(
-		XMConvertToRadians(m_WorldRotation.y),
-		XMConvertToRadians(m_WorldRotation.x),
-		XMConvertToRadians(m_WorldRotation.z)
-	);
-	Matrix transMat = Matrix::CreateTranslation(m_WorldPosition);
-	return scaleMat * rotMat * transMat;
-}
-
-// ─────────────────────────────────────────────────────────
-// 실제 bake 기준 행렬 — anchor GameObject의 월드 행렬
-// ─────────────────────────────────────────────────────────
-Matrix NavHelper::Resolve_BakeWorldMatrix() const
-{
-	if (m_UseManualTransform)
-		return Build_WorldMatrix();
-
-	if (const Shared<GameObject> anchor = Resolve_AnchorObject())
-		return anchor->Get_Transform()->Get_WorldMatrix();
-
-	return Matrix::Identity;
-}
-
-// ─────────────────────────────────────────────────────────
 // Bake Preview
 // ─────────────────────────────────────────────────────────
 void NavHelper::BakePreview()
@@ -581,9 +465,9 @@ void NavHelper::BakePreview()
 	}
 
 	rcConfig cfg = Build_RcConfig();
-	Matrix worldMat = Resolve_BakeWorldMatrix();
 
-	m_PreviewCells = GAME_INSTANCE->Bake_Navigation(m_pSelectedModel, worldMat, cfg);
+	// 모델 로컬 공간에서 굽는다. 배치는 런타임에 그 모델을 그리는 GameObject를 따른다.
+	m_PreviewCells = GAME_INSTANCE->Bake_Navigation(m_pSelectedModel, cfg);
 	m_HasPreview = !m_PreviewCells.empty();
 
 	if (m_HasPreview)
@@ -611,17 +495,10 @@ void NavHelper::SaveBinary()
 	wstring navDataDir = PATH.GetNavDataDir();
 	std::filesystem::create_directories(navDataDir);
 
-	rcConfig cfg = Build_RcConfig();
-	Matrix worldMat = Resolve_BakeWorldMatrix();
+	// 파일 이름은 모델 태그로 고정한다. Client가 같은 이름으로 Navigation prototype을 등록한다.
+	const string fileName = Helper::To_String(navDataDir + m_SelectedModelTag) + ".nnav";
 
-	NavigationBuilder::NAV_BAKE_ANCHOR_DESC anchorDesc{};
-	anchorDesc.objectGuid = m_AnchorObjectGuid;
-	anchorDesc.objectName = m_AnchorObjectName;
-	anchorDesc.sourceModelTag = m_SelectedModelTag;
-
-	string fileName = Helper::To_String(navDataDir) + string(m_SaveName) + ".nnav";
-
-	if (SUCCEEDED(GAME_INSTANCE->Export_Navigation(fileName, m_pSelectedModel, worldMat, cfg, anchorDesc)))
+	if (SUCCEEDED(GAME_INSTANCE->Export_Navigation(fileName, m_pSelectedModel, Build_RcConfig())))
 	{
 		string msg = "NavMesh exported: " + fileName;
 		LOG_INFO(L"[NavHelper] {}", Helper::To_wString(msg));

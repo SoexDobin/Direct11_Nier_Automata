@@ -35,24 +35,6 @@ public:
 		Bool isSuccess{ false };
 	};
 
-	/// Import_Binary가 헤더에서 읽어 오는 bake 정보.
-	struct NAV_IMPORT_INFO
-	{
-		Matrix     bakeWorldMatrix{ Matrix::Identity };
-		ObjectGuid anchorObjectGuid{};
-		wstring    anchorObjectName{};
-		wstring    sourceModelTag{};
-	};
-
-	/// bake 기준이 된 GameObject의 신원. Export_Binary가 헤더에 기록해 두면
-	/// 어떤 오브젝트의 월드 공간에서 구운 navmesh인지 파일만 보고 판별할 수 있다.
-	struct NAV_BAKE_ANCHOR_DESC
-	{
-		ObjectGuid objectGuid{};
-		wstring    objectName{};
-		wstring    sourceModelTag{};
-	};
-
 private:
 	NO_COPY(NavigationBuilder)
 public:
@@ -65,12 +47,12 @@ public:
 	HRESULT Begin() override;
 
 public:
-	vector<NavCellBinary> Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config);
-	HRESULT Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config,
-		const NAV_BAKE_ANCHOR_DESC& anchor = {});
-	vector<NavCell> Import_Binary(const string& filePath, _Out_opt_ NAV_IMPORT_INFO* outInfo = nullptr);
+	/// 모델 로컬 공간에서 굽는다. 배치 위치는 런타임에 소유 GameObject가 정한다.
+	vector<NavCellBinary> Bake_Navigation(Shared<Model> model, const rcConfig& config);
+	HRESULT Export_Binary(const string& fileName, Shared<Model> model, const rcConfig& config);
+	vector<NavCell> Import_Binary(const string& filePath);
 private:
-	static vector<NavCellBinary> Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors);
+	static vector<NavCellBinary> Bake_Internal(Shared<Model> model, rcConfig config);
 
 public:
 	NAV_BUILD_RESULT Build(

@@ -26,15 +26,14 @@ HRESULT NavigationBuilder::Begin()
 	return EngineManager::Begin();
 }
 
-vector<NavCellBinary> NavigationBuilder::Bake_Navigation(Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config)
+vector<NavCellBinary> NavigationBuilder::Bake_Navigation(Shared<Model> model, const rcConfig& config)
 {
-	return Bake_Internal(model, worldMatrix, config, false);
+	return Bake_Internal(model, config);
 }
 
-HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> model, const Matrix& worldMatrix, const rcConfig& config,
-	const NAV_BAKE_ANCHOR_DESC& anchor)
+HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> model, const rcConfig& config)
 {
-	vector<NavCellBinary> bakedData = Bake_Internal(model, worldMatrix, config, true);
+	vector<NavCellBinary> bakedData = Bake_Internal(model, config);
 	if (bakedData.empty())
 	{
 		MSG_BOX("[ NavMesh Builder Export ] There is no vertex or just failed");
@@ -44,21 +43,6 @@ HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> m
 	NavMeshHeader header{};
 	memcpy(header.magic, "NNAV", 4);
 	header.numCells = static_cast<uint32>(bakedData.size());
-
-	// bake 공간을 파일이 스스로 증명하도록 기록한다.
-	memcpy(header.bakeWorldMatrix, &worldMatrix, sizeof(Float) * 16);
-
-	const auto CopyFixedString = [](Char* dest, size_t capacity, const string& source)
-	{
-		const size_t length = source.size() < capacity - 1 ? source.size() : capacity - 1;
-		memcpy(dest, source.data(), length);
-		dest[length] = '\0';
-	};
-
-	if (anchor.objectGuid.Is_Valid())
-		CopyFixedString(header.anchorObjectGuid, sizeof(header.anchorObjectGuid), Engine::To_String(anchor.objectGuid));
-	CopyFixedString(header.anchorObjectName, sizeof(header.anchorObjectName), Helper::To_String(anchor.objectName));
-	CopyFixedString(header.sourceModelTag, sizeof(header.sourceModelTag), Helper::To_String(anchor.sourceModelTag));
 
 	// AABB 계산
 	Vector3 bmin{ FLT_MAX, FLT_MAX, FLT_MAX };
@@ -84,7 +68,7 @@ HRESULT NavigationBuilder::Export_Binary(const string& fileName, Shared<Model> m
 	return S_OK;
 }
 
-vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, const Matrix& worldMatrix, rcConfig config, Bool computeNeighbors)
+vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, rcConfig config)
 {
 	vector<NavCellBinary> resultData;
 	if (model == nullptr) return resultData;
@@ -99,22 +83,12 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 
 	if (numVertices == 0 || numTris == 0) return resultData;
 
-	// 2. 모델 Local 좌표를 World 좌표로 변환
-	vector<Float> worldVertices(rawPos.size());
-	for (int32 i = 0; i < numVertices; ++i)
-	{
-		Vector3 localPos(rawPos[i * 3], rawPos[i * 3 + 1], rawPos[i * 3 + 2]);
-		Vector3 worldPos = Vector3::Transform(localPos, worldMatrix);
-
-		worldVertices[i * 3] = worldPos.x;
-		worldVertices[i * 3 + 1] = worldPos.y;
-		worldVertices[i * 3 + 2] = worldPos.z;
-	}
+	// 2. 모델 로컬 좌표 그대로 굽는다 (raw 위치에는 ModelSettings pre-transform이 이미 적용돼 있다)
 
 	rcContext ctx;
 	config.maxVertsPerPoly = 3; // NavCell 구조체(삼각형)를 위해 3으로 고정
 
-	rcCalcBounds(worldVertices.data(), numVertices, config.bmin, config.bmax);
+	rcCalcBounds(rawPos.data(), numVertices, config.bmin, config.bmax);
 	rcCalcGridSize(config.bmin, config.bmax, config.cs, &config.width, &config.height);
 
 	rcHeightfield* solid = nullptr;
@@ -130,9 +104,9 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 	{
 		triAreas = new unsigned char[numTris];
 		memset(triAreas, 0, numTris);
-		rcMarkWalkableTriangles(&ctx, config.walkableSlopeAngle, worldVertices.data(), numVertices, rawIndices.data(), numTris, triAreas);
+		rcMarkWalkableTriangles(&ctx, config.walkableSlopeAngle, rawPos.data(), numVertices, rawIndices.data(), numTris, triAreas);
 
-		if (!rcRasterizeTriangles(&ctx, worldVertices.data(), numVertices, rawIndices.data(), triAreas, numTris, *solid, config.walkableClimb))
+		if (!rcRasterizeTriangles(&ctx, rawPos.data(), numVertices, rawIndices.data(), triAreas, numTris, *solid, config.walkableClimb))
 		{
 			MSG_BOX("[ Failed NavMesh Builder Bake_Internal ] rcRasterizeTriangles");
 			delete[] triAreas;
@@ -200,7 +174,7 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 			NavCellBinary cell;
 			const uShort* p = &polyMesh->polys[i * nvp * 2];
 
-			// 정점 추출 (quantized → world 좌표 복원)
+			// 정점 추출 (quantized → 모델 로컬 좌표 복원)
 			for (int j = 0; j < 3; ++j)
 			{
 				if (p[j] == RC_MESH_NULL_IDX) continue;
@@ -239,11 +213,9 @@ vector<NavCellBinary> NavigationBuilder::Bake_Internal(Shared<Model> model, cons
 	return resultData;
 }
 
-vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath, NAV_IMPORT_INFO* outInfo)
+vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath)
 {
 	vector<NavCell> cells;
-	if (outInfo)
-		*outInfo = NAV_IMPORT_INFO{};
 
 	std::ifstream fin(filePath, std::ios::binary);
 	if (!fin.is_open())
@@ -277,22 +249,10 @@ vector<NavCell> NavigationBuilder::Import_Binary(const string& filePath, NAV_IMP
 		static_cast<std::streamoff>(header.numCells) * static_cast<std::streamoff>(sizeof(NavCellBinary));
 	if (fileSize != expectedSize)
 	{
-		LOG_ERROR(L"[NavMeshBuilder] Import_Binary: 크기 불일치 ({} != {}) ({}). anchor 기준으로 재bake하세요.",
+		LOG_ERROR(L"[NavMeshBuilder] Import_Binary: 크기 불일치 ({} != {}) ({}). 다시 bake하세요.",
 			static_cast<long long>(fileSize), static_cast<long long>(expectedSize), Helper::To_wString(filePath));
 		return cells;
 	}
-
-	if (outInfo)
-	{
-		memcpy(&outInfo->bakeWorldMatrix, header.bakeWorldMatrix, sizeof(Float) * 16);
-		Try_Parse_ObjectGuid(string(header.anchorObjectGuid), outInfo->anchorObjectGuid);
-		outInfo->anchorObjectName = Helper::To_wString(string(header.anchorObjectName));
-		outInfo->sourceModelTag = Helper::To_wString(string(header.sourceModelTag));
-	}
-
-	LOG_INFO(L"[NavMeshBuilder] Import_Binary: anchor='{}' model='{}'",
-		Helper::To_wString(string(header.anchorObjectName)),
-		Helper::To_wString(string(header.sourceModelTag)));
 
 	cells.reserve(header.numCells);
 	for (uint32 i = 0; i < header.numCells; ++i)

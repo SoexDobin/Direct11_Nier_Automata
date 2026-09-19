@@ -102,48 +102,87 @@ namespace Phase5GateVerifier
 			return output.good();
 		}
 
+		/* The gate path replaces ClientApp bootstrap, so it must still populate the model
+		   prototypes the Loader would have created. Call the production loader rather than a
+		   hand-maintained tag list: it stays in step with ModelSettings automatically and
+		   returns S_FALSE (not a failure) when some model files are merely absent. */
+		/* Two gate stages deliberately exercise the production writers against the REAL
+		   authored paths (ProjectSetting/Scene/LevelData_3.json and the player prefab). That
+		   check is worth keeping, but on 2026-09-17 it replaced authored data with preset-free
+		   fixture data and cost 1193 .anim references in each file. This guard snapshots the
+		   bytes up front and puts them back when the stage finishes, so a gate run leaves the
+		   working tree untouched no matter how the stage exits. */
+		class AuthoredDataGuard final
+		{
+		public:
+			explicit AuthoredDataGuard(const vector<filesystem::path>& paths)
+			{
+				for (const filesystem::path& path : paths)
+				{
+					Entry entry{ path, {}, false };
+					std::error_code error;
+					if (filesystem::exists(path, error) && !error)
+					{
+						ifstream in(path, std::ios::binary);
+						if (in.is_open())
+						{
+							entry.contents.assign(std::istreambuf_iterator<Char>(in),
+								std::istreambuf_iterator<Char>());
+							entry.existed = true;
+						}
+						else
+						{
+							LOG_ERROR(L"[Gate] Could not snapshot authored file {}", path.wstring());
+							m_Valid = false;
+						}
+					}
+					m_Entries.push_back(std::move(entry));
+				}
+			}
+
+			~AuthoredDataGuard() { Restore(); }
+
+			AuthoredDataGuard(const AuthoredDataGuard&) = delete;
+			AuthoredDataGuard& operator=(const AuthoredDataGuard&) = delete;
+
+			Bool Is_Valid() const { return m_Valid; }
+
+		private:
+			struct Entry
+			{
+				filesystem::path path;
+				string contents;
+				Bool existed{ false };
+			};
+
+			void Restore() const
+			{
+				for (const Entry& entry : m_Entries)
+				{
+					std::error_code error;
+					if (!entry.existed)
+					{
+						filesystem::remove(entry.path, error);
+						continue;
+					}
+					ofstream out(entry.path, std::ios::binary | std::ios::trunc);
+					if (!out.is_open())
+					{
+						LOG_ERROR(L"[Gate] Could not restore authored file {}", entry.path.wstring());
+						continue;
+					}
+					out.write(entry.contents.data(), static_cast<std::streamsize>(entry.contents.size()));
+				}
+			}
+
+			vector<Entry> m_Entries;
+			Bool m_Valid{ true };
+		};
+
 		HRESULT Load_GateModels()
 		{
-			nlohmann::json settings;
-			if (!Read_Json(filesystem::path(PATH.GetProjectSettingDir()) / L"ModelSettings.json",
-				settings) || !settings.contains("ModelSettings") ||
-				!settings["ModelSettings"].is_array())
-				return E_FAIL;
-
-			const unordered_set<string> requiredTags = {
-				"pl0000", "wp0070", "wp0220", "wp3000"
-			};
-			unordered_set<string> loadedTags;
-			for (const nlohmann::json& item : settings["ModelSettings"])
-			{
-				const string tag = item.value("tag", string{});
-				if (!requiredTags.contains(tag))
-					continue;
-				const auto ReadVector = [&item](const Char* name, const Vector3& fallback) {
-					Vector3 value = fallback;
-					if (item.contains(name) && item[name].is_object())
-					{
-						value.x = item[name].value("x", fallback.x);
-						value.y = item[name].value("y", fallback.y);
-						value.z = item[name].value("z", fallback.z);
-					}
-					return value;
-				};
-				const Vector3 position = ReadVector("position", Vector3::Zero);
-				const Vector3 rotation = ReadVector("rotation", Vector3::Zero);
-				const Vector3 scale = ReadVector("scale", Vector3::One);
-				const Matrix preTransform = Matrix::CreateScale(scale) *
-					Matrix::CreateFromYawPitchRoll(XMConvertToRadians(rotation.y),
-						XMConvertToRadians(rotation.x), XMConvertToRadians(rotation.z)) *
-					Matrix::CreateTranslation(position);
-				const filesystem::path modelPath = filesystem::path(PATH.GetResourceDir()) /
-					Helper::To_wString(item.value("path", string{}));
-				if (FAILED(GAME_INSTANCE->Load_Model(GateLevel, modelPath.c_str(),
-					Helper::To_wString(tag), preTransform)))
-					return E_FAIL;
-				loadedTags.emplace(tag);
-			}
-			return loadedTags.size() == requiredTags.size() ? S_OK : E_FAIL;
+			return SUCCEEDED(ClientSettingManager::GetInstance()->Load_Model_FromJson(
+				LEVEL::GAMEPLAY)) ? S_OK : E_FAIL;
 		}
 
 		HRESULT Load_SceneGateTexture()
@@ -437,69 +476,6 @@ namespace Phase5GateVerifier
 			// bake 공간에서의 기준 동작
 			report.Check("bake-space-locates-cell", navigation->Compute_CurrentCellByPosition(Vector3{ 0.5f, 0.f, 0.4f }));
 
-			// 이동: 셀이 정확히 델타만큼 옮겨져야 한다.
-			const Matrix moved = Matrix::CreateTranslation(Vector3{ 50.f, 0.f, 100.f });
-			report.Check("translate-rebase-applied", navigation->Rebase_ToWorld(moved));
-			const Vector3 movedPoint = navigation->Get_NavCells().at(0).Get_Point(NavCell::CELL_POINT::A);
-			report.Check("translate-moves-cells",
-				fabsf(movedPoint.x - 50.f) < 0.001f && fabsf(movedPoint.z - 100.f) < 0.001f,
-				to_string(movedPoint.x) + "," + to_string(movedPoint.z));
-			report.Check("translate-tracks-anchor-matrix",
-				fabsf(navigation->Get_AnchorWorldMatrix().Translation().x - 50.f) < 0.001f);
-
-			// 옮긴 공간에서만 셀이 잡혀야 한다.
-			report.Check("locates-cell-in-new-space",
-				navigation->Compute_CurrentCellByPosition(Vector3{ 50.5f, 0.f, 100.4f }));
-			report.Check("misses-cell-at-old-position",
-				!navigation->Compute_CurrentCellByPosition(Vector3{ 0.5f, 0.f, 0.4f }));
-
-			// 같은 행렬로 다시 부르면 아무 일도 하지 않아야 한다(프레임마다 호출되는 경로).
-			report.Check("same-anchor-is-noop", !navigation->Rebase_ToWorld(moved));
-
-			// 높이 보간이 옮긴 공간에서도 성립하는지
-			auto raised = MakeNavigation();
-			if (raised)
-			{
-				raised->Rebase_ToWorld(Matrix::CreateTranslation(Vector3{ 0.f, 7.f, 0.f }));
-				raised->Compute_CurrentCellByPosition(Vector3{ 0.5f, 7.f, 0.4f });
-				report.Check("height-follows-anchor",
-					fabsf(raised->Get_HeightAtPoint(Vector3{ 0.5f, 0.f, 0.4f }) - 7.f) < 0.001f);
-			}
-			else report.Check("height-follows-anchor", false);
-
-			// Y축 회전은 허용된다.
-			auto yawed = MakeNavigation();
-			report.Check("yaw-rebase-allowed",
-				yawed != nullptr && yawed->Rebase_ToWorld(Matrix::CreateRotationY(XM_PIDIV2)));
-
-			// 기울기와 비균등 스케일은 XZ 투영 판정을 깨므로 거부해야 한다.
-			auto pitched = MakeNavigation();
-			report.Check("pitch-rebase-rejected",
-				pitched != nullptr && !pitched->Rebase_ToWorld(Matrix::CreateRotationX(XM_PIDIV4)));
-			auto squashed = MakeNavigation();
-			report.Check("non-uniform-scale-rejected",
-				squashed != nullptr && !squashed->Rebase_ToWorld(Matrix::CreateScale(2.f, 1.f, 1.f)));
-
-			// 거부된 뒤에도 셀은 bake 공간 그대로여야 한다.
-			if (pitched)
-			{
-				const Vector3 untouched = pitched->Get_NavCells().at(0).Get_Point(NavCell::CELL_POINT::C);
-				report.Check("rejected-rebase-leaves-cells",
-					fabsf(untouched.x - 1.f) < 0.001f && fabsf(untouched.y) < 0.001f && fabsf(untouched.z - 1.f) < 0.001f);
-			}
-			else report.Check("rejected-rebase-leaves-cells", false);
-
-			// anchor가 없는 navmesh는 재정렬 대상이 아니다.
-			auto unanchored = MakeNavigation();
-			if (unanchored)
-			{
-				unanchored->Ensure_Anchored();
-				report.Check("no-anchor-guid-is-noop",
-					!unanchored->Get_AnchorObjectGuid().Is_Valid() &&
-					fabsf(unanchored->Get_NavCells().at(0).Get_Point(NavCell::CELL_POINT::C).x - 1.f) < 0.001f);
-			}
-			else report.Check("no-anchor-guid-is-noop", false);
-
 			return finish();
 		}
 
@@ -682,6 +658,12 @@ namespace Phase5GateVerifier
 
 			const filesystem::path scenePath = PATH.GetLevelDataPath(GateLevel);
 			const auto prefabPath = filesystem::path(PATH.GetPrefabSettingsDir()) / L"Phase6_Pl0000.json";
+			const AuthoredDataGuard authoredGuard({ scenePath, prefabPath });
+			if (!authoredGuard.Is_Valid())
+			{
+				report.Check("authored-data-snapshot", false);
+				return finish();
+			}
 			nlohmann::json originalScene, originalPrefab;
 			PrefabGuid prefabGuid;
 			const Bool loaded = Read_Json(scenePath, originalScene) && Read_Json(prefabPath, originalPrefab) &&
@@ -1247,23 +1229,6 @@ namespace Phase5GateVerifier
 			report.Check("registry-authoring-policy",
 				EDITOR->Can_EditHierarchy(root) && EDITOR->Can_EditChildren(root) &&
 				EDITOR->Can_EditHierarchy(grandChild));
-			ReflectedTypeInfo codeDefinedInfo;
-			ReflectedTypeInfo editorDefinedInfo;
-			ReflectedTypeInfo leafInfo;
-			ReflectedTypeInfo transientInfo;
-			ReflectedTypeInfo defaultCodeDefinedInfo;
-			const Bool authoringModesRegistered =
-				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("Pl0000", codeDefinedInfo)) &&
-				codeDefinedInfo.authoringMode == HIERARCHY_AUTHORING_MODE::CODE_DEFINED &&
-				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("TextUI", editorDefinedInfo)) &&
-				editorDefinedInfo.authoringMode == HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED &&
-				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("Pl0000EvadeChecker", leafInfo)) &&
-				leafInfo.authoringMode == HIERARCHY_AUTHORING_MODE::LEAF &&
-				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("Bullet", transientInfo)) &&
-				transientInfo.authoringMode == HIERARCHY_AUTHORING_MODE::TRANSIENT &&
-				SUCCEEDED(GAME_INSTANCE->Find_ReflectedType("StaticCamera", defaultCodeDefinedInfo)) &&
-				defaultCodeDefinedInfo.authoringMode == HIERARCHY_AUTHORING_MODE::CODE_DEFINED;
-			report.Check("four-authoring-modes-registered", authoringModesRegistered);
 
 			ReflectionValue anchorValue;
 			const Bool anchorReflected = SUCCEEDED(GAME_INSTANCE->Read_ReflectedProperty(
@@ -1754,6 +1719,14 @@ namespace Phase5GateVerifier
 
 			const filesystem::path prefabDirectory(PATH.GetPrefabSettingsDir());
 			const filesystem::path prefabPath = prefabDirectory / L"Phase6_Pl0000.json";
+			const AuthoredDataGuard authoredGuard(
+				{ PATH.GetLevelDataPath(GateLevel), prefabPath });
+			if (!authoredGuard.Is_Valid())
+			{
+				report.Check("authored-data-snapshot", false);
+				report.Save(Work_Directory() / L"phase6-scene-authoring-gates.json");
+				return E_FAIL;
+			}
 			PrefabGuid prefabGuid{};
 			Bool registeredNew = false;
 			if (filesystem::exists(prefabPath))

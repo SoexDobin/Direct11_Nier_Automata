@@ -424,6 +424,10 @@
           "typeName": "Model"
         },
         {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
           "properties": {
             "Extents": [
               0.07500000298023224,
@@ -437,10 +441,6 @@
             ]
           },
           "typeName": "OBBCollider"
-        },
-        {
-          "properties": {},
-          "typeName": "Shader"
         }
       ],
       "name": "WP0070Body",
@@ -490,11 +490,11 @@
         },
         {
           "properties": {},
-          "typeName": "VIBuffer_Rect"
+          "typeName": "Shader"
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "VIBuffer_Rect"
         },
         {
           "properties": {
@@ -611,9 +611,9 @@
         {
           "properties": {
             "Position": [
-              12.0,
-              0.0,
-              8.0
+              -40.35504150390625,
+              -18.808929443359375,
+              -77.91022491455078
             ],
             "Rotation": [
               -0.0,
@@ -649,9 +649,9 @@
       "stableChildKey": "",
       "transform": {
         "position": [
-          12.0,
-          0.0,
-          8.0
+          -40.35504150390625,
+          -18.808929443359375,
+          -77.91022491455078
         ],
         "rotation": [
           -0.0,
@@ -777,6 +777,10 @@
       "children": [],
       "components": [
         {
+          "properties": {},
+          "typeName": "AABBCollider"
+        },
+        {
           "properties": {
             "Position": [
               0.0,
@@ -795,10 +799,6 @@
             ]
           },
           "typeName": "Transform"
-        },
-        {
-          "properties": {},
-          "typeName": "AABBCollider"
         },
         {
           "properties": {
@@ -5569,6 +5569,72 @@
       },
       "typeName": "Pl0000Body"
     },
+    "9672e3e2614040ee957a08b07cf00bc2": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              10.0,
+              -10.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              10000.0,
+              10000.0,
+              10000.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
+          "properties": {
+            "RGBA": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "ResourceTag": "Skybox_Default"
+          },
+          "typeName": "Texture"
+        },
+        {
+          "properties": {},
+          "typeName": "VICube"
+        }
+      ],
+      "name": "SkyBox",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          0.0,
+          10.0,
+          -10.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          10000.0,
+          10000.0,
+          10000.0
+        ]
+      },
+      "typeName": "SkyBox"
+    },
     "a57101c8c8104d98b1b34c4e334c28b3": {
       "children": [
         "3d7fad771f534d83954bdf59ee775462"
@@ -5618,6 +5684,67 @@
         ]
       },
       "typeName": "TextUI"
+    },
+    "a59cd898eb804d26bf78420749dc4f65": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinEntry"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "CityOfRuinEntry",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "CityOfRuinEntry"
     },
     "a77d103cffaa1f80f4abd9e307a0c564": {
       "children": [],
@@ -5913,6 +6040,54 @@
         ]
       },
       "typeName": "WP3000Body"
+    },
+    "b2605ffe79e14348a695f351b6de7ae2": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              10.0,
+              -10.0
+            ],
+            "Rotation": [
+              44.99999237060547,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        }
+      ],
+      "name": "ThirdPersonCamera",
+      "properties": {
+        "Target": "594c14c4acc543379a88f5f1c103c6e7"
+      },
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          0.0,
+          10.0,
+          -10.0
+        ],
+        "rotation": [
+          44.99999237060547,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "ThirdPersonCamera"
     },
     "d1790ff8d372862a80eb78cd9f36713a": {
       "children": [],
@@ -6677,6 +6852,65 @@
       },
       "typeName": "SheathWP0070Body"
     },
+    "f19ba3d5f8ec41cda74a49d9c5b459b9": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              49.999996185302734,
+              -30.0,
+              -2.6564719064481324e-06
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        }
+      ],
+      "name": "DirectionalLight",
+      "properties": {
+        "Ambient": [
+          0.20000000298023224,
+          0.20000000298023224,
+          0.20000000298023224,
+          1.0
+        ],
+        "Color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          49.999996185302734,
+          -30.0,
+          -2.6564719064481324e-06
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "DirectionalLight"
+    },
     "f9a7df3b6ff8227d6571733c07587c38": {
       "children": [],
       "components": [
@@ -6966,6 +7200,10 @@
           "typeName": "Model"
         },
         {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
           "properties": {
             "Extents": [
               0.25,
@@ -6979,10 +7217,6 @@
             ]
           },
           "typeName": "OBBCollider"
-        },
-        {
-          "properties": {},
-          "typeName": "Shader"
         }
       ],
       "name": "WP0220Body",
@@ -7010,7 +7244,11 @@
   },
   "roots": [
     "594c14c4acc543379a88f5f1c103c6e7",
-    "841ef725d4324d49b50e3e856bede204"
+    "841ef725d4324d49b50e3e856bede204",
+    "9672e3e2614040ee957a08b07cf00bc2",
+    "a59cd898eb804d26bf78420749dc4f65",
+    "b2605ffe79e14348a695f351b6de7ae2",
+    "f19ba3d5f8ec41cda74a49d9c5b459b9"
   ],
   "schemaVersion": 2
 }

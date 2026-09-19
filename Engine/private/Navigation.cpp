@@ -4,6 +4,8 @@
 #include "GameObject.h"
 #include "SpdLogger.h"
 #include "Transform.h"
+#include "Model.h"
+#include <filesystem>
 #include "String_Helper.h"
 
 #ifdef _DEBUG
@@ -17,9 +19,7 @@ Navigation::Navigation(const Navigation& rhs)
 	: Component{ rhs }
 	, m_CurrentCellIndex{ -1 }      
 	, m_Cells{ rhs.m_Cells }
-	, m_BakeWorldMatrix{ rhs.m_BakeWorldMatrix }
-	, m_AnchorWorldMatrix{ rhs.m_AnchorWorldMatrix }
-	, m_AnchorObjectGuid{ rhs.m_AnchorObjectGuid } {}
+	, m_ModelTag{ rhs.m_ModelTag } {}
 
 HRESULT Navigation::Initialize_Prototype()
 {
@@ -82,8 +82,7 @@ HRESULT Navigation::Build_FromMesh(
 
 HRESULT Navigation::Load_FromBinary(const string& filePath)
 {
-	NavigationBuilder::NAV_IMPORT_INFO importInfo{};
-	auto cells = GAME_INSTANCE->Import_Navigation(filePath, &importInfo);
+	auto cells = GAME_INSTANCE->Import_Navigation(filePath);
 	if (cells.empty())
 	{
 		LOG_ERROR(L"[Navigation] Load_FromBinary Failed : {}",
@@ -92,32 +91,65 @@ HRESULT Navigation::Load_FromBinary(const string& filePath)
 	}
 	m_Cells = std::move(cells);
 	m_CurrentCellIndex = 0;
-	m_BakeWorldMatrix = importInfo.bakeWorldMatrix;
-	// 로드 직후 셀은 bake 공간에 있다. anchor를 찾으면 그때 현재 공간으로 옮긴다.
-	m_AnchorWorldMatrix = m_BakeWorldMatrix;
-	m_AnchorObjectGuid = importInfo.anchorObjectGuid;
-	m_AnchorObject.reset();
-	m_AnchorUnsupported = false;
+	// 파일 이름이 곧 원본 모델 태그다.
+	m_ModelTag = std::filesystem::path(Helper::To_wString(filePath)).stem().wstring();
 
-	const Vector3 bakeTranslation = m_BakeWorldMatrix.Translation();
-	LOG_INFO(L"[Navigation] Loaded {} cells from binary (bake origin {:.2f}, {:.2f}, {:.2f})",
-		m_Cells.size(), bakeTranslation.x, bakeTranslation.y, bakeTranslation.z);
+	LOG_INFO(L"[Navigation] Loaded {} cells for model {}", m_Cells.size(), m_ModelTag);
 	return S_OK;
+}
+
+void Navigation::Refresh_Space()
+{
+	Shared<Transform> transform = m_SpaceTransform.lock();
+	if (!transform && !m_ModelTag.empty())
+	{
+		// 소유자가 그 모델을 그리면 소유자, 아니면(에이전트) 현재 레벨에서 그 모델을 가진 오브젝트.
+		const auto HasSourceModel = [this](const Shared<GameObject>& object) {
+			const Shared<Model> model = object ? object->Get_Component<Model>() : nullptr;
+			return model && model->Get_ModelTag() == m_ModelTag;
+		};
+		if (const Shared<GameObject> owner = Get_Owner(); HasSourceModel(owner))
+			transform = owner->Get_Transform();
+		else
+			for (const auto& [id, object] : GAME_INSTANCE->Get_GameObjects(GAME_INSTANCE->Get_CurrentLevelIndex()))
+				if (object && !object->Is_Destroy() && HasSourceModel(object)) {
+					transform = object->Get_Transform();
+					break;
+				}
+		m_SpaceTransform = transform;
+	}
+
+	const Matrix worldMatrix = transform ? transform->Get_WorldMatrix() : Matrix::Identity;
+	if (worldMatrix != m_WorldMatrix)
+	{
+		m_WorldMatrix = worldMatrix;
+		m_InvWorldMatrix = worldMatrix.Invert();
+	}
+}
+
+Vector3 Navigation::To_Local(const Vector3& worldPosition) const
+{
+	return Vector3::Transform(worldPosition, m_InvWorldMatrix);
+}
+
+Float Navigation::To_WorldHeight(const Vector3& localPosition, Float localHeight) const
+{
+	return Vector3::Transform(Vector3{ localPosition.x, localHeight, localPosition.z }, m_WorldMatrix).y;
 }
 
 Bool Navigation::Has_NeighborCell(const Vector3& position)
 {
-	Ensure_Anchored();
-
-	// 재정렬 직후에는 현재 셀이 무효다. 셀을 옮긴 공간에서 다시 찾는다.
-	if (m_CurrentCellIndex < 0 && !m_Cells.empty())
-		Compute_CurrentCellByPosition(position);
+	Refresh_Space();
+	const Vector3 local = To_Local(position);
 
 	if (m_CurrentCellIndex < 0 || m_CurrentCellIndex >= static_cast<int32>(m_Cells.size()))
-		return false;
+	{
+		if (m_Cells.empty() || !Compute_CurrentCellByPosition(position))
+			return false;
+	}
 
 	int32 neighborIndex{ -1 };
-	if (m_Cells[m_CurrentCellIndex].IsIn(position, &neighborIndex))
+	if (m_Cells[m_CurrentCellIndex].IsIn(local, &neighborIndex))
 		return true;
 
 	constexpr int32 maxChain = 16;
@@ -126,7 +158,7 @@ Bool Navigation::Has_NeighborCell(const Vector3& position)
 	while (neighborIndex != -1 && chain++ < maxChain)
 	{
 		int32 nextNeighbor = -1;
-		if (m_Cells[neighborIndex].IsIn(position, &nextNeighbor))
+		if (m_Cells[neighborIndex].IsIn(local, &nextNeighbor))
 		{
 			m_CurrentCellIndex = neighborIndex;
 			return true;
@@ -135,28 +167,27 @@ Bool Navigation::Has_NeighborCell(const Vector3& position)
 		neighborIndex = nextNeighbor;
 	}
 
-	return false; // 전체 셀을 뒤져도 이웃 없음 (완전 NavMesh 밖)
+	return false; // 이웃을 따라가도 없음 (NavMesh 밖)
 }
 
 void Navigation::Compute_Height(const Shared<Transform>& transform)
 {
-	Ensure_Anchored();
-
-	// 재정렬 직후에는 현재 셀이 무효다. 셀을 옮긴 공간에서 다시 찾는다.
-	if (m_CurrentCellIndex < 0 && !m_Cells.empty())
-		Compute_CurrentCellByPosition(transform->Get_Position());
+	Refresh_Space();
+	const Vector3 position = transform->Get_Position();
 
 	if (m_CurrentCellIndex < 0 || m_CurrentCellIndex >= static_cast<int32>(m_Cells.size()))
-		return;
+	{
+		if (m_Cells.empty() || !Compute_CurrentCellByPosition(position))
+			return;
+	}
 
-	Vector3 pos = transform->Get_Position();
-	Float y = m_Cells[m_CurrentCellIndex].Compute_Height(pos.x, pos.z);
-	transform->Set_Position(pos.x, y, pos.z);
+	transform->Set_Position(position.x, Get_HeightAtPoint(position), position.z);
 }
 
 Bool Navigation::Compute_CurrentCellByPosition(const Vector3& position)
 {
-	Ensure_Anchored();
+	Refresh_Space();
+	const Vector3 local = To_Local(position);
 
 	int32 bestIndex = -1;
 	Float minHeightDiff = FLT_MAX;
@@ -164,10 +195,10 @@ Bool Navigation::Compute_CurrentCellByPosition(const Vector3& position)
 	for (int32 i = 0; i < m_Cells.size(); ++i)
 	{
 		int32 neighborIndex = -1;
-		if (m_Cells[i].IsIn(position, &neighborIndex))
+		if (m_Cells[i].IsIn(local, &neighborIndex))
 		{
-			Float cellHeight = m_Cells[i].Compute_Height(position.x, position.z);
-			Float heightDiff = fabsf(position.y - cellHeight);
+			Float cellHeight = m_Cells[i].Compute_Height(local.x, local.z);
+			Float heightDiff = fabsf(local.y - cellHeight);
 
 			if (heightDiff < minHeightDiff)
 			{
@@ -183,7 +214,8 @@ Bool Navigation::Compute_CurrentCellByPosition(const Vector3& position)
 		return true;
 	}
 
-	LOG_WARN(L"[Navigation] Failed to find Navigation Cell at Initial Position!");
+	LOG_WARN(L"[Navigation] No cell contains ({:.2f}, {:.2f}, {:.2f}) among {} cells of {}",
+		position.x, position.y, position.z, m_Cells.size(), m_ModelTag);
 	m_CurrentCellIndex = m_Cells.empty() ? -1 : 0;
 	return false;
 }
@@ -193,95 +225,8 @@ Float Navigation::Get_HeightAtPoint(const Vector3& position) const
 	if (m_CurrentCellIndex < 0 || m_CurrentCellIndex >= static_cast<int32>(m_Cells.size()))
 		return 0.f;
 
-	return m_Cells[m_CurrentCellIndex].Compute_Height(position.x, position.z);
-}
-
-void Navigation::Ensure_Anchored()
-{
-	// anchor 없이 구운 navmesh는 옮길 기준이 없다. bake 공간 그대로 쓴다.
-	if (!m_AnchorObjectGuid.Is_Valid() || m_AnchorUnsupported)
-		return;
-
-	Shared<GameObject> anchor = m_AnchorObject.lock();
-	if (!anchor)
-	{
-		// anchor가 아직 레벨에 없을 수 있다. 다음 질의에서 다시 찾는다.
-		anchor = GAME_INSTANCE->Find(m_AnchorObjectGuid);
-		if (!anchor)
-			return;
-
-		m_AnchorObject = anchor;
-	}
-
-	const Shared<Transform> transform = anchor->Get_Transform();
-	if (!transform)
-		return;
-
-	Rebase_ToWorld(transform->Get_WorldMatrix());
-}
-
-Bool Navigation::Rebase_ToWorld(const Matrix& anchorWorldMatrix)
-{
-	if (m_Cells.empty())
-		return false;
-
-	// 지금 놓인 공간에서 목표 공간으로 가는 차이만큼만 옮긴다.
-	Matrix delta = m_AnchorWorldMatrix.Invert() * anchorWorldMatrix;
-
-	constexpr Float epsilon = 0.0001f;
-	Bool isIdentity = true;
-	for (int32 row = 0; row < 4 && isIdentity; ++row)
-	{
-		for (int32 col = 0; col < 4; ++col)
-		{
-			const Float expected = (row == col) ? 1.f : 0.f;
-			if (fabsf(delta.m[row][col] - expected) > epsilon)
-			{
-				isIdentity = false;
-				break;
-			}
-		}
-	}
-
-	if (isIdentity)
-		return false;
-
-	// NavCell의 내/외 판별과 높이 보간은 XZ 평면 투영이다. Y축을 기울이거나
-	// 축마다 다른 스케일을 주면 셀 판정이 깨지므로 재bake를 요구한다.
-	Vector3 deltaScale{};
-	Quaternion deltaRotation{};
-	Vector3 deltaTranslation{};
-	if (!delta.Decompose(deltaScale, deltaRotation, deltaTranslation))
-	{
-		LOG_ERROR(L"[Navigation] Rebase_ToWorld: 분해할 수 없는 행렬입니다. 재bake가 필요합니다.");
-		m_AnchorUnsupported = true;
-		return false;
-	}
-
-	const Vector3 rotatedUp = Vector3::Transform(Vector3::Up, deltaRotation);
-	const Bool isUpPreserved = fabsf(rotatedUp.x) < 0.001f && fabsf(rotatedUp.z) < 0.001f && rotatedUp.y > 0.f;
-	const Bool isUniformScale = fabsf(deltaScale.x - deltaScale.y) < 0.001f &&
-								fabsf(deltaScale.y - deltaScale.z) < 0.001f;
-
-	if (!isUpPreserved || !isUniformScale)
-	{
-		LOG_ERROR(L"[Navigation] Rebase_ToWorld: 이동/Y축 회전/균등 스케일만 지원합니다. "
-			L"(up {:.3f}, {:.3f}, {:.3f} / scale {:.3f}, {:.3f}, {:.3f}) 재bake가 필요합니다.",
-			rotatedUp.x, rotatedUp.y, rotatedUp.z, deltaScale.x, deltaScale.y, deltaScale.z);
-		m_AnchorUnsupported = true;
-		return false;
-	}
-
-	for (auto& cell : m_Cells)
-		cell.Transform_By(delta);
-
-	m_AnchorWorldMatrix = anchorWorldMatrix;
-	m_CurrentCellIndex = -1; // 옮긴 뒤의 현재 셀은 다시 찾아야 한다.
-
-	LOG_INFO(L"[Navigation] Rebase_ToWorld: {} cells 재정렬 (이동 {:.2f}, {:.2f}, {:.2f})",
-		m_Cells.size(), deltaTranslation.x, deltaTranslation.y, deltaTranslation.z);
-
-	return true;
+	const Vector3 local = To_Local(position);
+	return To_WorldHeight(local, m_Cells[m_CurrentCellIndex].Compute_Height(local.x, local.z));
 }
 
 Shared<Navigation> Navigation::CreatePrototype()
@@ -341,11 +286,11 @@ HRESULT Navigation::Render_Debug()
 
 	if (!m_Batch || !m_Effect) return E_FAIL;
 
-	Ensure_Anchored();
+	Refresh_Space();
 	m_Effect->SetView(GAME_INSTANCE->Get_Transform(D3DTS::VIEW));
 	m_Effect->SetProjection(GAME_INSTANCE->Get_Transform(D3DTS::PROJ));
 
-	m_Effect->SetWorld(Matrix::Identity);
+	m_Effect->SetWorld(m_WorldMatrix);
 	m_Context->IASetInputLayout(m_InputLayout.Get());
 	m_Effect->Apply(m_Context.Get());
 	m_Batch->Begin();

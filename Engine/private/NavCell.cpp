@@ -16,14 +16,6 @@ NavCell::NavCell(const Vector3& a, const Vector3& b, const Vector3& c, int32 ind
 
 	Rebuild_Normals();
 }
-void NavCell::Transform_By(const Matrix& matrix)
-{
-	for (int32 i = 0; i < 3; ++i)
-		m_Points[i] = Vector3::Transform(m_Points[i], matrix);
-
-	Rebuild_Normals();
-}
-
 void NavCell::Rebuild_Normals()
 {
 	for (int32 i = 0; i < 3; ++i)

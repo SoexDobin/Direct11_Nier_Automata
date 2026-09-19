@@ -265,9 +265,9 @@ void Game::Clear_Resource(uint32 levIndex) const {
 	if (FAILED(m_CameraManager->Clear_Cameras(levIndex)))
       LOG_CRITICAL(L"Failed To Clear Cameras");
 
-	if (FAILED(m_LightManager->Clear_Lights())) 
-		LOG_CRITICAL(L"Failed To Clear Lights");
-	
+	/* Lights are not cleared per level: each belongs to a scene object and leaves with it.
+	   Change_Level clears the previous level only after the next level's scene has loaded,
+	   so a global clear here would drop the new level's lights. */
     if (FAILED(m_EventManager->Clear_Events(levIndex)))
         LOG_CRITICAL(L"Failed To Clear Events");
 
@@ -598,11 +598,11 @@ void Game::Update_Pipeline() const { m_Pipeline->Update_Pipeline(); }
 const LIGHT_DESC *Game::Get_LightDesc(uint32 index) const {
   return m_LightManager->Get_LightDesc(index);
 }
-HRESULT Game::Add_Light(const LIGHT_DESC &lightDesc) const {
-  return m_LightManager->Add_Light(lightDesc);
+HRESULT Game::Add_Light(const Shared<Light>& light) const {
+  return m_LightManager->Add_Light(light);
 }
-HRESULT Game::Remove_Light(uint32 index) const {
-  return m_LightManager->Remove_Light(index);
+HRESULT Game::Remove_Light(const Shared<Light>& light) const {
+  return m_LightManager->Remove_Light(light);
 }
 HRESULT Game::Render_Lights(const Shared<class Shader>& shader, const Shared<class VIBuffer_Rect>& buffer) const
 {
@@ -897,20 +897,19 @@ NavigationBuilder::NAV_BUILD_RESULT Game::Build_Navigation(const Float* vertices
     return m_NavigationBuilder->Build(vertices, numVertices, triangles, numTriangles, params);
 }
 
-vector<NavCellBinary> Game::Bake_Navigation(const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config) const
+vector<NavCellBinary> Game::Bake_Navigation(const Shared<Model>& model, const rcConfig& config) const
 {
-    return m_NavigationBuilder->Bake_Navigation(model, worldMatrix, config);
+    return m_NavigationBuilder->Bake_Navigation(model, config);
 }
 
-HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const Matrix& worldMatrix, const rcConfig& config,
-    const NavigationBuilder::NAV_BAKE_ANCHOR_DESC& anchor) const
+HRESULT Game::Export_Navigation(const string& fileName, const Shared<Model>& model, const rcConfig& config) const
 {
-    return m_NavigationBuilder->Export_Binary(fileName, model, worldMatrix, config, anchor);
+    return m_NavigationBuilder->Export_Binary(fileName, model, config);
 }
 
-vector<NavCell> Game::Import_Navigation(const string& filePath, NavigationBuilder::NAV_IMPORT_INFO* outInfo) const
+vector<NavCell> Game::Import_Navigation(const string& filePath) const
 {
-    return m_NavigationBuilder->Import_Binary(filePath, outInfo);
+    return m_NavigationBuilder->Import_Binary(filePath);
 }
 
 

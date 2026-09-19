@@ -40,18 +40,6 @@ public: /* build nav */
 	);
 	/// .nnav 바이너리 파일에서 NavCell 로드 (이웃 정보 포함, SetUp_Neighbors 불필요)
 	HRESULT Load_FromBinary(const string& filePath);
-	/// 셀이 놓인 공간. bake 당시 anchor GameObject의 월드 행렬이며, identity면 오프셋 없는 로컬이다.
-	const Matrix& Get_BakeWorldMatrix() const { return m_BakeWorldMatrix; }
-	/// 현재 셀이 실제로 놓여 있는 공간. anchor가 움직이면 여기로 따라온다.
-	const Matrix& Get_AnchorWorldMatrix() const { return m_AnchorWorldMatrix; }
-	ObjectGuid Get_AnchorObjectGuid() const { return m_AnchorObjectGuid; }
-
-	/// 셀 전체를 anchor의 현재 월드 공간으로 옮긴다. 이미 그 공간이면 아무것도 하지 않는다.
-	/// NavCell의 내/외 판별이 XZ 평면 투영이므로 이동·Y축 회전·균등 스케일만 허용한다.
-	Bool Rebase_ToWorld(const Matrix& anchorWorldMatrix);
-	/// anchor GameObject를 찾아 현재 월드 행렬로 재정렬한다. 질의 진입점에서 호출된다.
-	void Ensure_Anchored();
-
 public:
 	Bool Has_NeighborCell(const Vector3& position);
 	void Compute_Height(const Shared<Transform>& transform);
@@ -67,12 +55,16 @@ private:
 	int32 m_CurrentCellIndex{ -1 };
 	vector<NavCell> m_Cells;
 
-	// bake 공간과, 셀이 현재 놓여 있는 공간. 둘의 차이가 재정렬해야 할 양이다.
-	Matrix m_BakeWorldMatrix{ Matrix::Identity };
-	Matrix m_AnchorWorldMatrix{ Matrix::Identity };
-	ObjectGuid m_AnchorObjectGuid{};
-	Weak<GameObject> m_AnchorObject{};
-	Bool m_AnchorUnsupported{ false };
+	// 셀은 모델 로컬 공간에 있다. m_ModelTag(= .nnav 파일 이름)로 그 모델을 그리는
+	// GameObject를 찾아, 질의 때 월드 좌표를 그 로컬 공간으로 바꿔 판정한다.
+	wstring m_ModelTag{};
+	Weak<Transform> m_SpaceTransform{};
+	Matrix m_WorldMatrix{ Matrix::Identity };
+	Matrix m_InvWorldMatrix{ Matrix::Identity };
+
+	void Refresh_Space();
+	Vector3 To_Local(const Vector3& worldPosition) const;
+	Float To_WorldHeight(const Vector3& localPosition, Float localHeight) const;
 
 public:
 	static Shared<Navigation> CreatePrototype();

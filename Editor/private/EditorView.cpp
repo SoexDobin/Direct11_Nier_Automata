@@ -67,8 +67,8 @@ void EditorView::RenderView(Bool isResize) {
 					Float ndcY = 1.f - (localY / imageRectSize.y) * 2.f;
 
 					// 레이 생성
-					Matrix invView = GAME_INSTANCE->Get_InvTransform(D3DTS::VIEW);
-					Matrix invProj = GAME_INSTANCE->Get_InvTransform(D3DTS::PROJ);
+					Matrix invView = EDITOR->Get_SceneViewMatrix().Invert();
+					Matrix invProj = EDITOR->Get_SceneProjMatrix().Invert();
 
 					Vector4 vNear = Vector4(ndcX, ndcY, 0.f, 1.f);
 					Vector4 vFar = Vector4(ndcX, ndcY, 1.f, 1.f);
@@ -116,6 +116,10 @@ void EditorView::RenderView(Bool isResize) {
 
 			EditorView::MousePicking(imageRectSize, imageRectMin);
 			Update_ImGuizmo(imageRectSize, imageRectMin);
+
+			// F frames the selection, matching the Hierarchy double-click.
+			if (isSceneViewHovered && ImGui::IsKeyPressed(ImGuiKey_F, false) && selected)
+				EDITOR->Focus_Object(selected);
 		}
 	}
 	ImGui::End();
@@ -228,8 +232,8 @@ void EditorView::MousePicking(ImVec2 viewport, ImVec2 imageStartPos)
 		Float ndcX = (localX / viewport.x) * 2.f - 1.f;
 		Float ndcY = 1.f - (localY / viewport.y) * 2.f;
 
-		Matrix invView = GAME_INSTANCE->Get_InvTransform(D3DTS::VIEW);
-		Matrix invProj = GAME_INSTANCE->Get_InvTransform(D3DTS::PROJ);
+		Matrix invView = EDITOR->Get_SceneViewMatrix().Invert();
+		Matrix invProj = EDITOR->Get_SceneProjMatrix().Invert();
 
 		Vector4 vNear = Vector4(ndcX, ndcY, 0.f, 1.f);
 		Vector4 vFar = Vector4(ndcX, ndcY, 1.f, 1.f);
@@ -332,8 +336,8 @@ void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 	ImGuizmo::Enable(true);
 
 	// 2. 행렬 준비 (SimpleMath::Matrix 사용)
-	Matrix view = GAME_INSTANCE->Get_Transform(D3DTS::VIEW);
-	Matrix proj = GAME_INSTANCE->Get_Transform(D3DTS::PROJ);
+	Matrix view = EDITOR->Get_SceneViewMatrix();
+	Matrix proj = EDITOR->Get_SceneProjMatrix();
 	
 	// 3. 조작 처리
 	auto uiObj = std::dynamic_pointer_cast<UIObject>(selectedObj);
@@ -377,6 +381,7 @@ void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 		ImGuizmo::SetOrthographic(false);
 		transform->Update_WorldMatrix();
 		Matrix world = transform->Get_WorldMatrix();
+		Draw_ForwardAxis(world, view, proj, viewport, imageStartPos);
 
 		if (ImGuizmo::Manipulate(
 			reinterpret_cast<Float*>(&view),
@@ -385,9 +390,14 @@ void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 			ImGuizmo::WORLD,
 			reinterpret_cast<Float*>(&world)))
 		{
+			// The gizmo edits the world matrix, but Position/Rotation/Scale are local values.
+			Matrix local = world;
+			if (const Shared<GameObject> parent = selectedObj->Get_Parent())
+				local = world * parent->Get_Transform()->Get_WorldMatrix().Invert();
+
 			Vector3 scale, pos;
 			Quaternion rot;
-			if (world.Decompose(scale, rot, pos)) {
+			if (local.Decompose(scale, rot, pos)) {
 				if (m_CurrentGizmoMode == ImGuizmo::TRANSLATE)
 					QueueTransformValue("Position", transform->Get_LocalPosition(), pos);
 				else if (m_CurrentGizmoMode == ImGuizmo::ROTATE) {
@@ -403,6 +413,40 @@ void EditorView::Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos)
 	}
 
 	m_WasUsingGizmo = ImGuizmo::IsUsing();
+}
+
+/* Draws the selected object's +Z (look) axis, the direction a DirectionalLight shines along,
+   so rotations can be checked against the scene. Length stays constant on screen. */
+void EditorView::Draw_ForwardAxis(const Matrix& world, const Matrix& view, const Matrix& proj,
+	ImVec2 viewport, ImVec2 imageStartPos)
+{
+	const Vector3 origin = world.Translation();
+	Vector3 look = world.Backward();
+	if (look.LengthSquared() < 1e-8f)
+		return;
+	look.Normalize();
+
+	const Vector3 cameraPosition = view.Invert().Translation();
+	const Float length = std::max(0.01f, Vector3::Distance(cameraPosition, origin) * 0.2f);
+	const Matrix viewProj = view * proj;
+
+	const auto ToScreen = [&](const Vector3& point, ImVec2& outScreen) -> Bool {
+		const Vector4 clip = Vector4::Transform(Vector4(point.x, point.y, point.z, 1.f), viewProj);
+		if (clip.w <= 1e-4f)
+			return false;
+		outScreen.x = imageStartPos.x + (clip.x / clip.w * 0.5f + 0.5f) * viewport.x;
+		outScreen.y = imageStartPos.y + (0.5f - clip.y / clip.w * 0.5f) * viewport.y;
+		return true;
+	};
+
+	ImVec2 start, end;
+	if (!ToScreen(origin, start) || !ToScreen(origin + look * length, end))
+		return;
+
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+	const ImU32 color = IM_COL32(255, 220, 0, 255);
+	drawList->AddLine(start, end, color, 3.f);
+	drawList->AddCircleFilled(end, 5.f, color);
 }
 
 Shared<EditorView> EditorView::Create()

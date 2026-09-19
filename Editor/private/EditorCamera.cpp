@@ -46,6 +46,19 @@ void EditorCamera::Update(Float timeDelta) {
     if (timeDelta <= 0)
         timeDelta = 0.016667f;
 
+    if (m_IsFocusing)
+    {
+        constexpr Float focusDuration = 0.25f;
+        m_FocusElapsed += timeDelta;
+        Float t = std::min(1.f, m_FocusElapsed / focusDuration);
+        t = t * t * (3.f - 2.f * t);
+        m_Transform->Set_Position(Vector3::Lerp(m_FocusStart, m_FocusGoal, t));
+        // Get_Position reads the world matrix, which the WASD step below starts from.
+        m_Transform->Update_WorldMatrix();
+        if (m_FocusElapsed >= focusDuration)
+            m_IsFocusing = false;
+    }
+
     Float speed = m_CameraSpeed * timeDelta;
     // 1. WASD (XZ 평면 이동)
     Vector3 look = m_Transform->Get_WorldMatrix().Backward();
@@ -97,6 +110,26 @@ void EditorCamera::Update(Float timeDelta) {
 void EditorCamera::Late_Update(Float timeDelta) {}
 void EditorCamera::Fixed_Update(Float fixedDelta) {}
 HRESULT EditorCamera::Render() { return S_OK; }
+
+void EditorCamera::Focus(const Vector3& center, Float radius) {
+  radius = std::max(radius, 0.5f);
+  m_Transform->Update_WorldMatrix();
+  Vector3 look = m_Transform->Get_WorldMatrix().Backward();
+  look.Normalize();
+
+  // Distance at which the bounding sphere fits the narrower field of view, with a margin.
+  const Float halfFovY = m_FovY * 0.5f;
+  const Float halfFovX = atanf(tanf(halfFovY) * std::max(m_Aspect, 0.001f));
+  const Float distance = radius / sinf(std::min(halfFovX, halfFovY)) * 1.1f;
+
+  if (m_Far < distance + radius * 2.f)
+    m_Far = distance + radius * 2.f;
+
+  m_FocusStart = m_Transform->Get_Position();
+  m_FocusGoal = center - look * distance;
+  m_FocusElapsed = 0.f;
+  m_IsFocusing = true;
+}
 
 HRESULT EditorCamera::Bind_EditorMatrix() const {
   m_Transform->Update_WorldMatrix();

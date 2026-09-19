@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MenuBar.h"
+#include "AuthoringBackup.h"
 #include "PathManager.h"
 #include "EditorManager.h"
 #include "ModelViewer.h"
@@ -70,7 +71,11 @@ void MenuBar::Render(Bool isResize) {
         string saveLabel = "Save (" + Helper::To_String(std::filesystem::path(PATH.GetLevelDataPath(displayIndex)).filename().wstring()) + ")";
         if (ImGui::MenuItem(saveLabel.c_str(), nullptr, false, isStop))
         {
-          if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(GAME_INSTANCE->Get_CurrentLevelIndex(), PATH.GetLevelDataPath(displayIndex))))
+          const wstring levelDataPath = PATH.GetLevelDataPath(displayIndex);
+          /* Never overwrite authored scene data without a recoverable copy. */
+          if (!AuthoringBackup::Capture(levelDataPath))
+            LOG_ERROR(L"Level save aborted: could not back up the existing scene.");
+          else if (SUCCEEDED(GAME_INSTANCE->SerializeLevel(GAME_INSTANCE->Get_CurrentLevelIndex(), levelDataPath)))
             LOG_INFO("Level saved successfully.");
           else
             LOG_ERROR(L"Level save failed.");
@@ -258,7 +263,13 @@ void MenuBar::Render_Prefab()
 					SUCCEEDED(GAME_INSTANCE->Register_Prefab(prefabGuid, filePath.wstring()));
 			}
 
-			if (prefabGuid.Is_Valid() &&
+			if (!AuthoringBackup::Capture(filePath))
+			{
+				if (registeredNewGuid)
+					GAME_INSTANCE->Unregister_Prefab(prefabGuid);
+				LOG_ERROR(L"Prefab save aborted: could not back up {}", filePath.wstring());
+			}
+			else if (prefabGuid.Is_Valid() &&
 				SUCCEEDED(GAME_INSTANCE->SerializePrefabDocument(prefabGuid, selectedRoot)))
 				LOG_INFO(L"Prefab saved: {}", filePath.wstring());
 			else

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -74,9 +74,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\bin\</OutDir>
+    <!-- The renderer loads "shaders/DeferredShader.hlsl" relative to the working
+         directory. Without this, F5 runs from $(ProjectDir), the shader silently
+         fails to load, and the first frame access-violates in Shader::Bind_Matrix. -->
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\bin\</OutDir>
+    <!-- The renderer loads "shaders/DeferredShader.hlsl" relative to the working
+         directory. Without this, F5 runs from $(ProjectDir), the shader silently
+         fails to load, and the first frame access-violates in Shader::Bind_Matrix. -->
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -172,6 +182,7 @@
     <ClInclude Include="..\public\InspectorTexture.h" />
     <ClInclude Include="..\public\InspectorTransform.h" />
     <ClInclude Include="..\public\LogConsole.h" />
+    <ClInclude Include="..\public\AuthoringBackup.h" />
     <ClInclude Include="..\public\MenuBar.h" />
     <ClInclude Include="..\public\ModelViewer.h" />
 	<ClInclude Include="..\public\AnimationPresetEditor.h" />
@@ -199,6 +210,7 @@
     <ClCompile Include="..\private\InspectorTexture.cpp" />
     <ClCompile Include="..\private\InspectorTransform.cpp" />
     <ClCompile Include="..\private\LogConsole.cpp" />
+    <ClCompile Include="..\private\AuthoringBackup.cpp" />
     <ClCompile Include="..\private\MenuBar.cpp" />
     <ClCompile Include="..\private\ModelViewer.cpp" />
 	<ClCompile Include="..\private\AnimationPresetEditor.cpp" />

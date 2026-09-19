@@ -18,6 +18,8 @@ private:
 	void RenderView(Bool isResize);
 	void MousePicking(ImVec2 viewport, ImVec2 imageStartPos);
 	void Update_ImGuizmo(ImVec2 viewport, ImVec2 imageStartPos);
+	void Draw_ForwardAxis(const Matrix& world, const Matrix& view, const Matrix& proj,
+		ImVec2 viewport, ImVec2 imageStartPos);
 
 private:
 	Bool m_PlayMode = { false };

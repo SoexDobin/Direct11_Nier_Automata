@@ -104,6 +104,9 @@ HRESULT Pl0000Body::Render()
 
 void Pl0000Body::Submit_RenderGroup()
 {
+	// Also runs in edit mode, where Late_Update does not: keep the mesh on the owner's transform.
+	m_Transform->Update_WorldMatrix();
+	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 	if (Is_Active())
 		GAME_INSTANCE->Add_RenderGroup(RENDERGROUP::NONBLEND, shared_from_this());
 }

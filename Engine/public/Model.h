@@ -104,6 +104,8 @@ public: /* Animation Tracker */
 public: /* Mesh Info */
 	HRESULT Get_MeshMaterialInfo(uint32 meshIndex, string& meshName, uint32& materialIndex) const;
 	void Extract_RawMeshData(_Out_ vector<Float>& outPositions, _Out_ vector<int32>& outIndices) const;
+	/* Bind-pose AABB in the owner's local space (pre-transform applied). False when there is no geometry. */
+	Bool Compute_LocalBounds(_Out_ BoundingBox& outBounds) const;
 
 public: /* snap shot */
 	vector<BONE_SNAPSHOT> Get_SnapShot_BoneMatrices();
@@ -165,6 +167,8 @@ private:
 	AnimationPresetSnapshot m_AnimationPreset{};
 	Matrix	m_PreLocalTransformMatrix{};
 	Bool	m_IsSkeletal{ false };
+	/* False until bone matrices were combined once; edit mode never runs the animation update. */
+	Bool	m_HasPose{ false };
 	int32	m_RootLocalNode{ -1 };
 
 private:

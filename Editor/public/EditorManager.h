@@ -68,6 +68,10 @@ public: /* Frame-safe structural mutations */
 
 public:
     Shared<EditorCamera> Get_EditorCamera() const { return m_EditorCamera; }
+    /* View/Proj the Scene View image was rendered with this frame. The shared pipeline is
+       rebound to the in-game camera afterwards, so gizmo and picking must use these. */
+    const Matrix& Get_SceneViewMatrix() const { return m_SceneViewMatrix; }
+    const Matrix& Get_SceneProjMatrix() const { return m_SceneProjMatrix; }
     Shared<Engine::Camera> Get_InGameCamera() const { return m_InGameCamera; }
     void Set_InGameCamera(const Shared<Engine::Camera> &camera) {
 		m_InGameCamera = camera;
@@ -91,6 +95,8 @@ public: /* Selected Object (Hierarchy <-> Inspector 공유) */
     m_SelectedObject = obj;
   }
   void Clear_SelectedObject() { m_SelectedObject.reset(); }
+  /* Moves the editor camera so the object and its children fill the Scene View. */
+  void Focus_Object(const Shared<GameObject>& obj);
   
 public: /* Reset Request */
     void Request_Reset(uint32 startLevel) {
@@ -199,6 +205,8 @@ private:
 	vector<HISTORY_ENTRY> m_UndoHistory;
 	vector<HISTORY_ENTRY> m_RedoHistory;
     Shared<EditorCamera> m_EditorCamera{nullptr};
+    Matrix m_SceneViewMatrix{};
+    Matrix m_SceneProjMatrix{};
     Shared<Engine::Camera> m_InGameCamera{nullptr};
     Weak<Engine::GameObject> m_SelectedObject = {};
 

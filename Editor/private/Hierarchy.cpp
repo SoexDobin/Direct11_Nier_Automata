@@ -185,6 +185,11 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
     if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
       EDITOR->Set_SelectedObject(pObj);
     }
+    // Double-click frames the object in the Scene View, like Unreal's outliner.
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+      EDITOR->Set_SelectedObject(pObj);
+      EDITOR->Focus_Object(pObj);
+    }
 
     if (bOpened) {
       for (auto &child : children) {

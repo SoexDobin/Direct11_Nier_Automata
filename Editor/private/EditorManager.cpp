@@ -4,6 +4,7 @@
 #include "EditorCamera.h"
 #include "Game.h"
 #include "GameObject.h"
+#include "PartObject.h"
 #include "ScriptComponent.h"
 #include "PathManager.h"
 
@@ -190,6 +191,52 @@ HRESULT EditorManager::Initialize()
 	return S_OK;
 }
 
+void EditorManager::Focus_Object(const Shared<GameObject>& obj)
+{
+    if (!obj || obj->Is_Destroy() || !m_EditorCamera)
+        return;
+
+    BoundingBox bounds{};
+    Bool hasBounds = false;
+    const auto collect = [&](auto&& self, const Shared<GameObject>& current) -> void {
+        if (!current || current->Is_Destroy())
+            return;
+        const Shared<Transform> transform = current->Get_Transform();
+        BoundingBox localBounds{};
+        if (const Shared<Model> model = current->Get_Component<Model>();
+            transform && model && model->Compute_LocalBounds(localBounds)) {
+            transform->Update_WorldMatrix();
+            BoundingBox worldBounds{};
+            localBounds.Transform(worldBounds, transform->Get_WorldMatrix());
+            if (hasBounds)
+                BoundingBox::CreateMerged(bounds, bounds, worldBounds);
+            else
+                bounds = worldBounds;
+            hasBounds = true;
+        }
+        for (const Shared<GameObject>& child : current->Get_Children())
+            if (child && child->Get_Parent() == current)
+                self(self, child);
+    };
+    collect(collect, obj);
+
+    Vector3 center{};
+    Float radius = 1.f;
+    if (hasBounds) {
+        center = bounds.Center;
+        radius = Vector3{ bounds.Extents }.Length();
+    }
+    else if (const Shared<Transform> transform = obj->Get_Transform()) {
+        // No geometry (camera, light, empty): frame a unit sphere scaled by the object.
+        transform->Update_WorldMatrix();
+        center = transform->Get_WorldMatrix().Translation();
+        const Vector3 scale = transform->Get_Scale();
+        radius = std::max({ scale.x, scale.y, scale.z, 1.f });
+    }
+
+    m_EditorCamera->Focus(center, radius);
+}
+
 void EditorManager::Set_State(EDITOR_STATE state)
 {
     if (m_State != state)
@@ -270,13 +317,18 @@ void EditorManager::Queue_PropertyWrite(const Shared<GameObject>& owner, Object&
 	MUTATION_COMMAND command;
 	command.type = MUTATION_TYPE::PROPERTY_WRITE;
 	command.targetGuid = owner->Get_ObjectGuid();
-	if (FAILED(GAME_INSTANCE->Find_Level(command.targetGuid, command.levelIndex)))
+	if (FAILED(GAME_INSTANCE->Find_Level(command.targetGuid, command.levelIndex))) {
+		LOG_WARN("[EditorMutation] Dropped {} write: owner is not in any level", string(propertyName));
 		return;
+	}
 	if (&target != owner.get()) {
 		command.targetRegisteredName =
 			GAME_INSTANCE->Find_RegisteredName(target.Get_RuntimeTypeId());
-		if (command.targetRegisteredName.empty())
+		if (command.targetRegisteredName.empty()) {
+			LOG_WARN("[EditorMutation] Dropped {} write: target component type is not registered",
+				string(propertyName));
 			return;
+		}
 	}
 	command.propertyName = propertyName;
 	command.beforeValue = before;
@@ -303,13 +355,14 @@ void EditorManager::Clear_History()
 
 Bool EditorManager::Can_EditHierarchy(const Shared<GameObject>& object) const
 {
-    if (!object || object->Is_Destroy() || !object->Get_StableChildKey().empty())
+    // Children created by their parent's code are locked; parts only exist under their owner.
+    if (!object || object->Is_Destroy() || !object->Get_StableChildKey().empty() ||
+        dynamic_pointer_cast<PartObject>(object))
         return false;
 
     ReflectedTypeInfo typeInfo;
     return SUCCEEDED(GAME_INSTANCE->Find_ReflectedType(object->Get_RuntimeTypeId(), typeInfo)) &&
-        typeInfo.objectKind == REFLECTED_OBJECT_KIND::GAMEOBJECT &&
-        typeInfo.authoringMode == HIERARCHY_AUTHORING_MODE::EDITOR_DEFINED;
+        typeInfo.objectKind == REFLECTED_OBJECT_KIND::GAMEOBJECT;
 }
 
 Bool EditorManager::Can_EditChildren(const Shared<GameObject>& object) const
@@ -751,11 +804,21 @@ Bool EditorManager::Apply_Mutation(const MUTATION_COMMAND& command)
 			command.targetGuid, command.targetRegisteredName);
 		ReflectionValue current;
 		if (!propertyTarget || FAILED(GAME_INSTANCE->Read_ReflectedProperty(
-			*propertyTarget, command.propertyName, current)) ||
-			!ReflectionValuesEqual(current, command.beforeValue) ||
-			FAILED(Write_EditorProperty(
-				*propertyTarget, command.propertyName, command.afterValue)))
+			*propertyTarget, command.propertyName, current))) {
+			LOG_WARN("[EditorMutation] {} write: property target unresolved or unreadable",
+				command.propertyName);
 			return false;
+		}
+		if (!ReflectionValuesEqual(current, command.beforeValue)) {
+			LOG_WARN("[EditorMutation] {} write: live value changed since the edit was queued",
+				command.propertyName);
+			return false;
+		}
+		if (FAILED(Write_EditorProperty(
+			*propertyTarget, command.propertyName, command.afterValue))) {
+			LOG_WARN("[EditorMutation] {} write: reflected setter failed", command.propertyName);
+			return false;
+		}
 		if (dynamic_pointer_cast<Transform>(propertyTarget))
 			Refresh_DescendantTransforms(target);
 
@@ -883,6 +946,8 @@ HRESULT EditorManager::Render(Bool IsResetView) {
         m_EditorCamera->Set_Aspect(viewport.Width / viewport.Height);
         if (FAILED(m_EditorCamera->Bind_EditorMatrix())) return E_FAIL;
         GAME_INSTANCE->Update_Pipeline();
+        m_SceneViewMatrix = GAME_INSTANCE->Get_Transform(D3DTS::VIEW);
+        m_SceneProjMatrix = GAME_INSTANCE->Get_Transform(D3DTS::PROJ);
         if (FAILED(GAME_INSTANCE->Draw())) return E_FAIL;
 #ifdef _DEBUG
         GAME_INSTANCE->Render_CollisionDebug();

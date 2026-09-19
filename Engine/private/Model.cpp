@@ -651,6 +651,7 @@ void Model::Update_ModelAnimation(Float timeDelta)
 	{
 		bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
 	}
+	m_HasPose = true;
 
 	uint32 activeAnimIdx = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
 	
@@ -788,6 +789,32 @@ Bool Model::Is_NotifyActive(const wstring& notifyTag) const
 {
 	uint32 activeIndex = m_IsBlending ? m_NextAnimIndex : m_CurrentAnimIndex;
 	return m_Tracker->Is_ActiveNotify(activeIndex, notifyTag);
+}
+
+Bool Model::Compute_LocalBounds(BoundingBox& outBounds) const
+{
+	Vector3 minPoint{ FLT_MAX, FLT_MAX, FLT_MAX };
+	Vector3 maxPoint{ -FLT_MAX, -FLT_MAX, -FLT_MAX };
+	Bool hasPoint = false;
+	for (const auto& mesh : m_Meshes)
+	{
+		const vector<Float>& positions = mesh->Get_RawPositions();
+		for (size_t i = 0; i + 2 < positions.size(); i += 3)
+		{
+			Vector3 point{ positions[i], positions[i + 1], positions[i + 2] };
+			// Skinned vertices stay in bind space; the pre-transform is applied through the bones.
+			if (m_IsSkeletal)
+				point = Vector3::Transform(point, m_PreLocalTransformMatrix);
+			minPoint = Vector3::Min(minPoint, point);
+			maxPoint = Vector3::Max(maxPoint, point);
+			hasPoint = true;
+		}
+	}
+	if (!hasPoint)
+		return false;
+
+	BoundingBox::CreateFromPoints(outBounds, minPoint, maxPoint);
+	return true;
 }
 
 void Model::Extract_RawMeshData(_Out_ vector<Float>& outPositions, _Out_ vector<int32>& outIndices) const
@@ -1286,6 +1313,13 @@ HRESULT Model::Bind_BoneMatrices(const Shared<Shader>& shader, const Char* const
 {
 	if (!shader || !constantName || meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex])
 		return E_INVALIDARG;
+	// Without an animation update (edit mode) the combined matrices were never built; show the bind pose.
+	if (!m_HasPose)
+	{
+		for (auto& bone : m_Bones)
+			bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
+		m_HasPose = true;
+	}
 	return m_Meshes[meshIndex]->Bind_BoneMatrices(shader, constantName, m_Bones);
 }
 

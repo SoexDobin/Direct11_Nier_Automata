@@ -4,7 +4,6 @@
 #include <Game.h>
 
 #include "Em0010.h"
-#include "Navigation.h"
 #include <SpdLogger.h>
 
 Em0010Movement::Em0010Movement() : Movement{} {}
@@ -41,13 +40,6 @@ HRESULT Em0010Movement::Begin()
 		if (!dynamic_pointer_cast<Em0010>(m_Owner.lock()))
 		{
 			LOG_ERROR(L"Failed To Find Em0010 Owner");
-			return E_FAIL;
-		}
-
-		m_Navigation = m_Owner.lock()->Get_Component<Navigation>();
-		if (m_Navigation.expired())
-		{
-			LOG_ERROR(L"Failed To Find Em0010 Navigation");
 			return E_FAIL;
 		}
 	}
@@ -149,38 +141,7 @@ void Em0010Movement::Update_Movement(Float timeDelta)
 	nextPosition += m_CorrectionDelta;
 	Reset_Correction();
 
-	if (auto nav = m_Navigation.lock())
-	{
-		Float groundHeight = -FLT_MAX;
-		Bool validNav = nav->Has_NeighborCell(nextPosition);
-
-		if (validNav)
-		{
-			groundHeight = nav->Get_HeightAtPoint(nextPosition);
-			nextPosition.y = groundHeight;
-
-			m_IsGrounded = true;
-			ownerTransform->Set_Position(nextPosition);
-		}
-		else
-		{
-			Vector3 rollbackPos = ownerTransform->Get_Position();
-
-			groundHeight = nav->Get_HeightAtPoint(rollbackPos);
-
-			if (rollbackPos.y <= groundHeight) {
-				rollbackPos.y = groundHeight;
-				m_IsGrounded = true;
-				m_Velocity = Vector3::Zero;
-			}
-
-			ownerTransform->Set_Position(rollbackPos);
-		}
-	}
-	else
-	{
-		ownerTransform->Set_Position(nextPosition);
-	}
+	Move_Owner(ownerTransform, nextPosition, timeDelta);
 }
 
 Shared<Em0010Movement> Em0010Movement::Create(const ComPtr<ID3D11Device>& device,

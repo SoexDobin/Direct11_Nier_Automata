@@ -8,7 +8,6 @@ NS_BEGIN(Engine)
 	class Shader;
     class Model;
     class SphereCollider;
-    class Navigation;
 }
 
 NS_BEGIN(Client)
@@ -41,7 +40,6 @@ public: /* pl0000 */
     Shared<Pl0000Body> Get_Body() const { return m_MainBody; }
     Shared<GameObject> Get_ClosestTarget() const { return m_MonsterChecker->Get_ClosestTarget(); }
     TRANSFORM_FRAME Get_BodyModelTransform() const { return m_MainBody->Get_ModelTransform(); }
-    void Set_Navigation(const Shared<Navigation>& linkedNavigation);
 
 public:
     void Draw_LightWeapon();
@@ -96,7 +94,6 @@ private:
     Shared<Pl0000Input> m_Pl0000Input{ nullptr };
     Shared<Pl0000Movement> m_Pl0000Movement{ nullptr };
     Shared<SphereCollider> m_PhysicalZone{ nullptr };
-    Shared<Navigation> m_Navigation{ nullptr };
 
 public:
 	static Shared<Pl0000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

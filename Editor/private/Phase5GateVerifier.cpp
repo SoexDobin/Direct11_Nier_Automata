@@ -1798,9 +1798,6 @@ namespace Phase5GateVerifier
 			report.Check("ui-order-anchor-three-depth-restored", hierarchyRestored);
 			report.Check("external-objectref-restored", hierarchyRestored &&
 				hpBar->Get_TargetObjectGuid() == player->Get_ObjectGuid());
-			const auto navigation = player ? player->Get_Component<Navigation>() : nullptr;
-			report.Check("player-navigation-structure-and-data-restored", navigation &&
-				navigation->Get_NumCells() > 0 && player->Get_Components().size() == 3);
 			Navigation::NAVIGATION_DESC emptyNavigationDesc{};
 			const auto emptyNavigation = GAME_INSTANCE->Instantiate<Navigation>(
 				L"Navigation", StaticLevel, &emptyNavigationDesc);

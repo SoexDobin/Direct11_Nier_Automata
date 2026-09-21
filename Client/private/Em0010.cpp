@@ -2,7 +2,6 @@
 #include "Em0010.h"
 
 #include <Game.h>
-#include <Navigation.h>
 #include <SpdLogger.h>
 #include <SphereCollider.h>
 
@@ -227,10 +226,6 @@ HRESULT Em0010::Ready_PartObjects()
 
 HRESULT Em0010::Ready_Components()
 {
-	Navigation::NAVIGATION_DESC navDesc;
-	navDesc.startCellIndex = 0;
-	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
-
 	Em0010Movement::EM0010_MOVEMENT_DESC movementDesc{};
 	movementDesc.velocity = Vector3{ 0.f, 0.f, 0.f };
 	movementDesc.moveSpeed = 0.f;

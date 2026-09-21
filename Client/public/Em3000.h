@@ -3,7 +3,6 @@
 
 NS_BEGIN(Engine)
 class SphereCollider;
-class Navigation;
 NS_END
 
 NS_BEGIN(Client)
@@ -55,7 +54,6 @@ private:
 	Shared<Em3000Body> m_MainBody{ nullptr };
 	Shared<Em3000Movement> m_Em3000Movement{ nullptr };
 	Shared<SphereCollider> m_PhysicalZone{ nullptr };
-	Shared<Navigation> m_Navigation{ nullptr };
 
 public:
 	static Shared<Em3000> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

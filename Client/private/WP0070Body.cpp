@@ -7,7 +7,6 @@
 #include "Model.h"
 #include "OBBCollider.h"
 #include "Entity.h"
-#include "Navigation.h"
 #include "Monster.h"
 #include "Pl0000.h"
 #include "Pl0000Shockwave.h"

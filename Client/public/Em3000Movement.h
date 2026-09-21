@@ -3,7 +3,6 @@
 
 NS_BEGIN(Engine)
 class Transform;
-class Navigation;
 NS_END
 
 NS_BEGIN(Client)
@@ -70,9 +69,6 @@ private:
 	Vector3 m_RootPosition{};
 	Vector3 m_TargetPosition{};
 	Bool m_HasWalkTarget{ false };
-
-private:
-	Weak<Navigation> m_Navigation{};
 
 public:
 	static Shared<Em3000Movement> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

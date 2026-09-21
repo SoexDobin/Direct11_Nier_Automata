@@ -1,6 +1,10 @@
 #pragma once
 #include "ScriptComponent.h"
 
+NS_BEGIN(Engine)
+class Transform;
+NS_END
+
 NS_BEGIN(Client)
 
 class CLIENT_DLL Movement abstract : public ScriptComponent
@@ -39,9 +43,19 @@ public:
 	HRESULT Initialize_Prototype() override;
 	HRESULT Initialize(void* arg = nullptr) override;
 	HRESULT Begin() override;
+	void On_Destroy() override;
 
 public:
 	virtual void Update_Movement(Float timeDelta) {};
+
+protected:
+	/// 정적 충돌이 있으면 캡슐 컨트롤러로 옮겨 접지와 벽을 처리하고, 없으면 그대로 옮긴다.
+	void Move_Owner(const Shared<Transform>& transform, const Vector3& nextPosition, Float timeDelta);
+
+private:
+	/// 정적 충돌이 있으면 첫 호출에 캡슐 컨트롤러를 만든다. 쓸 수 있으면 true.
+	Bool Ensure_Controller(const Shared<Transform>& transform);
+	void Move_WithController(const Shared<Transform>& transform, Vector3 displacement, Float timeDelta);
 
 protected:
 	Vector3			m_Velocity{ 0.f, 0.f, 0.f };
@@ -52,6 +66,12 @@ protected:
 	Bool			m_IsGrounded{ true };
 	Float			m_RootMotionScale{ 1.0f };
 	Vector3			m_CorrectionDelta{ 0.f };
+
+private:
+	// PhysX 캐릭터 컨트롤러 핸들. 복제본은 자기 컨트롤러를 따로 만든다.
+	uint32			m_ControllerHandle{ 0 };
+	Vector3			m_LastFootPosition{ 0.f, 0.f, 0.f };
+	Bool			m_ControllerUnavailable{ false };
 
 public:
 	Shared<Component> Clone(void* arg = nullptr) PURE;

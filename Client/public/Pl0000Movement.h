@@ -4,7 +4,6 @@
 NS_BEGIN(Engine)
 class Camera;
 class Transform;
-class Navigation;
 NS_END
 
 NS_BEGIN(Client)
@@ -62,7 +61,6 @@ private:
 
 private:
 	Weak<Pl0000Input> m_Input{};
-	Weak<Navigation> m_Navigation{};
 
 public:
 	static Shared<Pl0000Movement> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

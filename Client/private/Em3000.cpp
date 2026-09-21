@@ -8,7 +8,6 @@
 #include "Em3000Movement.h"
 #include "Em3001.h"
 #include "SphereCollider.h"
-#include "Navigation.h"
 #include "HpBarWorldUI.h"
 #include "MonsterStateMachine.h"
 
@@ -182,10 +181,6 @@ HRESULT Em3000::Ready_PartObjects()
 
 HRESULT Em3000::Ready_Components()
 {
-	Navigation::NAVIGATION_DESC navDesc;
-	navDesc.startCellIndex = 0;
-	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
-
 	Em3000Movement::EM3000_MOVEMENT_DESC movementDesc{};
 	movementDesc.velocity = Vector3{ 0.f, 0.f, 0.f };
 	movementDesc.moveSpeed = 0.f;

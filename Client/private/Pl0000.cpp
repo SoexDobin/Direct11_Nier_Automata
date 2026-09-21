@@ -4,7 +4,6 @@
 #include <Game.h>
 #include <SpdLogger.h>
 #include <SphereCollider.h>
-#include <Navigation.h>
 
 #include "Bullet.h"
 #include "Monster.h"
@@ -32,11 +31,6 @@ Pl0000::Pl0000(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceCont
 	: Entity{ device, context } {}
 Pl0000::Pl0000(const Pl0000& rhs)
 	: Entity{ rhs } {}
-
-void Pl0000::Set_Navigation(const Shared<Navigation>& linkedNavigation)
-{
-	m_Navigation = linkedNavigation;
-}
 
 void Pl0000::Draw_LightWeapon()
 {
@@ -348,15 +342,6 @@ HRESULT Pl0000::Ready_Components()
 	m_Pl0000Movement = Add_Component<Pl0000Movement>(ETOI(LEVEL::GAMEPLAY), &movementDesc);
 	if (nullptr == m_Pl0000Movement)
 		return E_FAIL;
-
-	Navigation::NAVIGATION_DESC navDesc;
-	navDesc.startCellIndex = 0;
-	m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
-	if (!m_Navigation) {
-		LOG_WARN(L"[Navigation fallback] CityOfRuinEntry unavailable; retaining empty Navigation component and disabling movement");
-		m_Navigation = Add_Component<Navigation>(ETOI(LEVEL::STATIC), &navDesc);
-	}
-	if (!m_Navigation) return E_FAIL;
 
 	// StateMachine은 마지막에 처리
 	if ((m_Pl0000States = Add_Component<Pl0000StateMachine>(ETOI(LEVEL::GAMEPLAY))))

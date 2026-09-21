@@ -150,7 +150,10 @@ Bool Navigation::Has_NeighborCell(const Vector3& position)
 
 	int32 neighborIndex{ -1 };
 	if (m_Cells[m_CurrentCellIndex].IsIn(local, &neighborIndex))
+	{
+		m_LoggedMiss = false;
 		return true;
+	}
 
 	constexpr int32 maxChain = 16;
 	int32 chain = 0;
@@ -161,6 +164,7 @@ Bool Navigation::Has_NeighborCell(const Vector3& position)
 		if (m_Cells[neighborIndex].IsIn(local, &nextNeighbor))
 		{
 			m_CurrentCellIndex = neighborIndex;
+			m_LoggedMiss = false;
 			return true;
 		}
 
@@ -211,21 +215,36 @@ Bool Navigation::Compute_CurrentCellByPosition(const Vector3& position)
 	if (bestIndex != -1)
 	{
 		m_CurrentCellIndex = bestIndex;
+		m_LoggedMiss = false;
 		return true;
 	}
 
-	LOG_WARN(L"[Navigation] No cell contains ({:.2f}, {:.2f}, {:.2f}) among {} cells of {}",
-		position.x, position.y, position.z, m_Cells.size(), m_ModelTag);
-	m_CurrentCellIndex = m_Cells.empty() ? -1 : 0;
+	// 셀 0으로 되돌리면 호출자가 성공과 구분할 수 없고, 엉뚱한 셀의 평면이 지면으로 쓰인다.
+	m_CurrentCellIndex = -1;
+
+	// 밖으로 나간 동안 프레임마다 같은 줄을 찍지 않도록 상태 전이에서만 남긴다.
+	if (!m_LoggedMiss)
+	{
+		m_LoggedMiss = true;
+		LOG_WARN(L"[Navigation] No cell contains ({:.2f}, {:.2f}, {:.2f}) among {} cells of {}",
+			position.x, position.y, position.z, m_Cells.size(), m_ModelTag);
+	}
 	return false;
 }
 
 Float Navigation::Get_HeightAtPoint(const Vector3& position) const
 {
 	if (m_CurrentCellIndex < 0 || m_CurrentCellIndex >= static_cast<int32>(m_Cells.size()))
-		return 0.f;
+		return -FLT_MAX;
 
 	const Vector3 local = To_Local(position);
+
+	// 셀 평면은 삼각형 밖에서도 값을 내므로, 덮지 않는 지점까지 답하면
+	// 멀리 있는 셀의 외삽값이 지면으로 쓰인다. 덮을 때만 답한다.
+	int32 neighborIndex{ -1 };
+	if (!m_Cells[m_CurrentCellIndex].IsIn(local, &neighborIndex))
+		return -FLT_MAX;
+
 	return To_WorldHeight(local, m_Cells[m_CurrentCellIndex].Compute_Height(local.x, local.z));
 }
 

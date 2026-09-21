@@ -43,7 +43,10 @@ public: /* build nav */
 public:
 	Bool Has_NeighborCell(const Vector3& position);
 	void Compute_Height(const Shared<Transform>& transform);
+	/// 현재 셀이 그 XZ를 실제로 덮을 때만 지면 높이를 준다.
+	/// 덮지 않으면 셀 평면을 외삽하지 않고 -FLT_MAX("지면 없음")를 돌려준다.
 	Float Get_HeightAtPoint(const Vector3& position) const;
+	/// 실패하면 현재 셀 인덱스를 -1로 두어 호출자가 실패를 구분할 수 있게 한다.
 	Bool Compute_CurrentCellByPosition(const Vector3& position);
 
 public:
@@ -54,6 +57,8 @@ public:
 private:
 	int32 m_CurrentCellIndex{ -1 };
 	vector<NavCell> m_Cells;
+	// 밖으로 나간 상태가 이어지는 동안 경고를 한 번만 남기기 위한 표식.
+	Bool m_LoggedMiss{ false };
 
 	// 셀은 모델 로컬 공간에 있다. m_ModelTag(= .nnav 파일 이름)로 그 모델을 그리는
 	// GameObject를 찾아, 질의 때 월드 좌표를 그 로컬 공간으로 바꿔 판정한다.

@@ -41,7 +41,10 @@ HRESULT Texture::Initialize(void* arg)
 
     if (!desc.m_TextureTag.empty())
     {
-        const TEXTURE_DESC& registDesc = *GAME_INSTANCE->Get_TextureDesc(desc.m_levIndex, desc.m_TextureTag);
+        const TEXTURE_DESC* registered = GAME_INSTANCE->Get_TextureDesc(desc.m_levIndex, desc.m_TextureTag);
+        if (registered == nullptr)
+            return E_FAIL;   // Get_TextureDesc가 이미 태그를 로그로 남긴다.
+        const TEXTURE_DESC& registDesc = *registered;
 
         m_NumSRVs = registDesc.m_NumSRVs;
         m_FilePath = registDesc.m_FilePath;

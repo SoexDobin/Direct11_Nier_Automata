@@ -951,9 +951,12 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 				}
 			}
 
-			if (runtimeComponents.size() != objJson["components"].size()) {
-				LOG_ERROR(L"[SceneSerializer] Component count mismatch on {}", pObj->Get_Name());
-				deserializeFailed = true;
+			// 코드가 컴포넌트를 새로 추가한 상황이다. 실패가 아니라 아직 저장되지 않은 상태이므로
+			// 기본값으로 로드되고 다음 저장 때 문서에 기록된다. 반대로 코드에서 빠진 컴포넌트는 아래에서 건너뛴다.
+			if (runtimeComponents.size() > objJson["components"].size()) {
+				LOG_WARN(L"[SceneSerializer] {} has {} runtime components but the document stores {}; "
+					L"the extra ones load with defaults and will be written on the next save",
+					pObj->Get_Name(), runtimeComponents.size(), objJson["components"].size());
 			}
 
 			for (auto& compJson : objJson["components"])
@@ -976,8 +979,10 @@ HRESULT LevelSerializer::DeSerializeDocument(const wstring& filePath, uint32 tar
 						deserializeFailed = true;
 				}
 				else {
-					LOG_ERROR(L"[SceneSerializer] Missing factory component {}", FromUtf8(typeName));
-					deserializeFailed = true;
+					// 코드가 더 이상 붙이지 않는 컴포넌트다. 객체는 그대로 쓸 수 있으니 건너뛰고,
+					// 다음 저장 때 문서에서 빠진다.
+					LOG_WARN(L"[SceneSerializer] {} no longer has component {}; its stored data is skipped "
+						L"and will be dropped on the next save", pObj->Get_Name(), FromUtf8(typeName));
 				}
 			}
 		}

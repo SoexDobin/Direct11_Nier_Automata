@@ -439,6 +439,9 @@ FodyWeavers.xsd
 **/[Bb]in/**/Engine.dll
 **/[Bb]in/**/Editor.exe
 **/[Bb]in/**/Launcher.exe
+# PhysX GPU acceleration is unused and PhysXGpu_64.dll exceeds GitHub's 100MB limit.
+**/[Bb]in/**/PhysXGpu_64.dll
+**/[Bb]in/**/PhysXDevice64.dll
 
 # Large source model files stay local; commit converted/runtime assets only.
 *.[Ff][Bb][Xx]

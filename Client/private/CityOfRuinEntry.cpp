@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "Game.h"
 #include "Navigation.h"
+#include "WorldCollider.h"
 #include <SpdLogger.h>
 
 CityOfRuinEntry::CityOfRuinEntry() : GameObject{} {}
@@ -99,6 +100,16 @@ HRESULT CityOfRuinEntry::Ready_Components()
 		m_Navigation = Add_Component_Tag<Navigation>(ETOI(LEVEL::STATIC), L"CityOfRuinEntry", &navDesc);
 		if (m_Navigation == nullptr) {
 			LOG_ERROR("Failed to hook pre-baked Navigation Mesh!");
+		}
+	}
+
+	{
+		// 원작 COL이 걸을 수 있는 구역과 벽을 모두 정의한다. 시각 메시는 충돌로 쓰지 않는다.
+		WorldCollider::WORLD_COLLIDER_DESC colliderDesc{};
+		colliderDesc.sourceModelTag = L"CityOfRuinEntry_COL";
+		m_WorldCollider = Add_Component<WorldCollider>(ETOI(LEVEL::STATIC), &colliderDesc);
+		if (m_WorldCollider == nullptr) {
+			LOG_ERROR(L"Failed to attach WorldCollider to CityOfRuinEntry");
 		}
 	}
 

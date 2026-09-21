@@ -5,6 +5,7 @@ NS_BEGIN(Engine)
 	class Shader;
 	class Model;
 	class Navigation;
+	class WorldCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -42,6 +43,7 @@ private:
 	Shared<Shader> m_Shader{ nullptr };
 	Shared<Model> m_Model{ nullptr };
 	Shared<Navigation> m_Navigation{ nullptr };
+	Shared<WorldCollider> m_WorldCollider{ nullptr };
 
 public:
 	static Shared<CityOfRuinEntry> Create(const ComPtr<ID3D11Device>& device, const ComPtr<ID3D11DeviceContext>& context);

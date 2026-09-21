@@ -56,6 +56,9 @@ void Game::Shutdown() {
     if (m_CollisionManager) m_CollisionManager->On_Destroy();
     m_CollisionManager.reset();
 
+    if (m_PhysicsManager) m_PhysicsManager->On_Destroy();
+    m_PhysicsManager.reset();
+
     if (m_ResourceManager) m_ResourceManager->On_Destroy();
     m_ResourceManager.reset();
 
@@ -154,6 +157,9 @@ HRESULT Game::Initialize_Engine(const ENGINE_DESC &engineDesc) {
     if (nullptr == (m_CollisionManager = CollisionManager::Create()))
         return E_FAIL;
 
+    if (nullptr == (m_PhysicsManager = PhysicsManager::Create()))
+        return E_FAIL;
+
     if (nullptr == (m_NavigationBuilder = NavigationBuilder::Create()))
         return E_FAIL;
 
@@ -189,11 +195,14 @@ void Game::Update_Engine(Float timeDelta, Bool singleFixedStep) {
 
     if (singleFixedStep) {
         m_ObjectManager->FixedUpdate(Get_FixedDeltaTime());
+        m_PhysicsManager->Step(Get_FixedDeltaTime());
         ++m_LastRuntimeFixedStepCount;
     }
     else while (m_TimeManager->Has_FixedUpdate()) {
         Float fixedDelta = m_TimeManager->Get_MainTimer()->GetFixedDeltaTime();
         m_ObjectManager->FixedUpdate(fixedDelta);
+        // 오브젝트가 이번 스텝의 변위를 정한 뒤에 물리를 돌린다.
+        m_PhysicsManager->Step(fixedDelta);
         ++m_LastRuntimeFixedStepCount;
         m_TimeManager->Get_MainTimer()->ConsumeFixedDeltaTime();
     }
@@ -884,6 +893,60 @@ void Game::Add_Collider(const Shared<class Collider>& collider) const
 void Game::Remove_Collider(const Shared<class Collider>& collider) const
 {
     m_CollisionManager->Remove_Collider(collider);
+}
+
+Bool Game::Is_PhysicsReady() const
+{
+    return m_PhysicsManager && m_PhysicsManager->Is_Ready();
+}
+
+uint32 Game::Add_StaticCollision(const wstring& modelTag, const Matrix& worldMatrix) const
+{
+    return m_PhysicsManager ? m_PhysicsManager->Add_StaticActor(modelTag, worldMatrix) : 0;
+}
+
+void Game::Remove_StaticCollision(uint32 handle) const
+{
+    if (m_PhysicsManager)
+        m_PhysicsManager->Remove_StaticActor(handle);
+}
+
+Bool Game::Raycast_Physics(const Vector3& origin, const Vector3& direction,
+    Float distance, Vector3& outHit) const
+{
+    return m_PhysicsManager && m_PhysicsManager->Raycast(origin, direction, distance, outHit);
+}
+
+Bool Game::Has_StaticCollision() const
+{
+    return m_PhysicsManager && m_PhysicsManager->Has_StaticCollision();
+}
+
+uint32 Game::Create_CharacterController(const CHARACTER_CONTROLLER_DESC& desc, const Vector3& footPosition) const
+{
+    return m_PhysicsManager ? m_PhysicsManager->Create_Controller(desc, footPosition) : 0;
+}
+
+uint32 Game::Move_CharacterController(uint32 handle, const Vector3& displacement, Float timeDelta) const
+{
+    return m_PhysicsManager ? m_PhysicsManager->Move_Controller(handle, displacement, timeDelta) : 0;
+}
+
+void Game::Set_ControllerFootPosition(uint32 handle, const Vector3& footPosition) const
+{
+    if (m_PhysicsManager)
+        m_PhysicsManager->Set_ControllerFootPosition(handle, footPosition);
+}
+
+Vector3 Game::Get_ControllerFootPosition(uint32 handle) const
+{
+    return m_PhysicsManager ? m_PhysicsManager->Get_ControllerFootPosition(handle) : Vector3::Zero;
+}
+
+void Game::Release_CharacterController(uint32 handle) const
+{
+    if (m_PhysicsManager)
+        m_PhysicsManager->Release_Controller(handle);
 }
 
 void Game::Update_Collision() const

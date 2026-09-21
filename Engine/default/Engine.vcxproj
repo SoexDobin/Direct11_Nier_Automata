@@ -197,6 +197,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\Channel.h" />
     <ClInclude Include="..\public\Collider.h" />
     <ClInclude Include="..\public\CollisionManager.h" />
+    <ClInclude Include="..\public\PhysicsManager.h" />
+    <ClInclude Include="..\public\WorldCollider.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\DebugDraw.h" />
     <ClInclude Include="..\public\Engine_Define.h" />
@@ -278,6 +280,8 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\Channel.cpp" />
     <ClCompile Include="..\private\Collider.cpp" />
     <ClCompile Include="..\private\CollisionManager.cpp" />
+    <ClCompile Include="..\private\PhysicsManager.cpp" />
+    <ClCompile Include="..\private\WorldCollider.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\DebugDraw.cpp" />
     <ClCompile Include="..\private\EventManager.cpp" />
@@ -312,6 +316,7 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\RenderTargetManager.cpp" />
     <ClCompile Include="..\private\ResourceManager.cpp" />
     <ClCompile Include="..\private\rttr_generated\AABBCollider_rttr.cpp" />
+    <ClCompile Include="..\private\rttr_generated\WorldCollider_rttr.cpp" />
 	<ClCompile Include="..\private\rttr_generated\Animation_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\AnimationTracker_rttr.cpp" />
 	<ClCompile Include="..\private\rttr_generated\Bone_rttr.cpp" />

@@ -17,6 +17,7 @@
 #include "SoundManager.h"
 #include "EventManager.h"
 #include "CollisionManager.h"
+#include "PhysicsManager.h"
 #include "RenderTargetManager.h"
 
 #include "GameObject.h"
@@ -254,6 +255,23 @@ public: /* CollisionManager */
     void Remove_Collider(const Shared<class Collider>& collider) const;
     void Update_Collision() const;
 
+public: /* PhysicsManager */
+    /// 물리 씬이 준비됐는지.
+    Bool Is_PhysicsReady() const;
+    /// 월드 지오메트리를 정적 충돌로 올린다. 0이면 실패.
+    uint32 Add_StaticCollision(const wstring& modelTag, const Matrix& worldMatrix) const;
+    void   Remove_StaticCollision(uint32 handle) const;
+    Bool   Raycast_Physics(const Vector3& origin, const Vector3& direction, Float distance,
+        _Out_ Vector3& outHit) const;
+    Bool   Has_StaticCollision() const;
+
+    /// 캐릭터 컨트롤러. 핸들로만 다루며 PhysX 타입은 노출하지 않는다.
+    uint32  Create_CharacterController(const CHARACTER_CONTROLLER_DESC& desc, const Vector3& footPosition) const;
+    uint32  Move_CharacterController(uint32 handle, const Vector3& displacement, Float timeDelta) const;
+    void    Set_ControllerFootPosition(uint32 handle, const Vector3& footPosition) const;
+    Vector3 Get_ControllerFootPosition(uint32 handle) const;
+    void    Release_CharacterController(uint32 handle) const;
+
 public: /* NavigationBuilder */
     NavigationBuilder::NAV_BUILD_RESULT Build_Navigation(const Float* vertices, int32 numVertices, const int32* triangles, int32 numTriangles, const NavigationBuilder::NAV_BUILD_PARAMS_DESC& params);
     vector<NavCellBinary> Bake_Navigation(const Shared<Model>& model, const rcConfig& config) const;
@@ -351,6 +369,7 @@ private:
     Unique<SoundManager> m_SoundManager = { nullptr };
     Unique<EventManager> m_EventManager = { nullptr };
     Unique<CollisionManager> m_CollisionManager = { nullptr };
+    Unique<PhysicsManager> m_PhysicsManager = { nullptr };
     Unique<RenderTargetManager> m_RenderTargetManager = { nullptr };
     Unique<NavigationBuilder> m_NavigationBuilder = { nullptr };
 

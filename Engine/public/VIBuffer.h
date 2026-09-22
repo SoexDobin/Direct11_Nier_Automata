@@ -39,6 +39,10 @@ public:
   virtual HRESULT Render();
 
 protected:
+  // Debug 빌드에서 이번 draw를 Renderer 프레임 통계에 더한다.
+  void Count_Draw(uint32 indexCount, uint32 instanceCount = 1) const;
+
+protected:
   ComPtr<ID3D11Buffer> m_VB = {nullptr};
   ComPtr<ID3D11Buffer> m_IB = {nullptr};
 

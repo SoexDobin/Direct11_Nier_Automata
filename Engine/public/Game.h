@@ -386,6 +386,9 @@ public:
     Bool Get_RenderDebug() const;
     Bool Toggle_RenderTargetDebug() const;
     Bool Get_RenderTargetDebug() const;
+    void Add_DrawStats(uint32 triangleCount) const;
+    uint32 Get_FrameDrawCount() const;
+    uint64_t Get_FrameTriangleCount() const;
     HRESULT Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const;
 	HRESULT Render_RenderTarget_Debug(const Shared<class VIBuffer_Rect>& buffer, const Shared<class Shader>& shader, const wstring& multiRenderTargetTag) const;
 

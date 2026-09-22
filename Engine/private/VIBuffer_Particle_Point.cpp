@@ -102,6 +102,7 @@ HRESULT VIBuffer_Particle_Point::Bind_Resources()
 HRESULT VIBuffer_Particle_Point::Render()
 {
 	m_Context->DrawInstanced(1, m_NumInstances, 0, 0);
+	Count_Draw(1, m_NumInstances);
 	return S_OK;
 }
 

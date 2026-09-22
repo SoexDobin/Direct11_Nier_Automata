@@ -40,6 +40,7 @@ HRESULT VIBuffer_Instance::Render()
 		m_Context->DrawIndexedInstanced(m_IndexCountPerInstance, m_NumInstances, 0, 0, 0);
 	else
 		m_Context->DrawInstanced(m_NumVertices, m_NumInstances, 0, 0);
+	Count_Draw(m_IB ? m_IndexCountPerInstance : m_NumVertices, m_NumInstances);
 
 	return S_OK;
 }

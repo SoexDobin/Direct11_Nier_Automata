@@ -1202,6 +1202,21 @@ Bool Game::Get_RenderTargetDebug() const
     return m_Renderer->Get_RenderTargetDebug();
 }
 
+void Game::Add_DrawStats(uint32 triangleCount) const
+{
+    m_Renderer->Add_DrawStats(triangleCount);
+}
+
+uint32 Game::Get_FrameDrawCount() const
+{
+    return m_Renderer->Get_FrameDrawCount();
+}
+
+uint64_t Game::Get_FrameTriangleCount() const
+{
+    return m_Renderer->Get_FrameTriangleCount();
+}
+
 HRESULT Game::Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const
 {
     return m_RenderTargetManager->Ready_RenderTarget_Debug(renderTargetTag, x, y, sizeX, sizeY);

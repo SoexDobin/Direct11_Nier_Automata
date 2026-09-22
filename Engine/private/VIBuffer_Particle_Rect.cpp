@@ -130,6 +130,7 @@ HRESULT VIBuffer_Particle_Rect::Bind_Resources()
 HRESULT VIBuffer_Particle_Rect::Render()
 {
 	m_Context->DrawIndexedInstanced(m_IndexCountPerInstance, m_NumInstances, 0, 0, 0);
+	Count_Draw(m_IndexCountPerInstance, m_NumInstances);
 	return S_OK;
 }
 

@@ -45,9 +45,15 @@ void Renderer::Draw_NoClearing() {
 
 }
 
-// TODO : draw call check clear group all frame
 HRESULT Renderer::Clear_RenderGroup()
 {
+#ifdef _DEBUG
+    // 프레임마다 모든 View를 그린 뒤 한 번 불리므로 여기서 프레임 draw 통계를 넘긴다.
+    m_LastDrawCount = m_DrawCount;
+    m_LastTriangleCount = m_TriangleCount;
+    m_DrawCount = 0;
+    m_TriangleCount = 0;
+#endif
     m_LayerMask = ETOI(LAYER::ALL_LAYER);
 
     for (auto& group : m_RenderGroup)

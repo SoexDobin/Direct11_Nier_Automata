@@ -51,12 +51,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     if (!App)
         return 1;
     
-    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    // 메시지 큐가 비어도 루프를 유지하고, 메시지가 없을 때 프레임을 돈다.
+    while (WM_QUIT != msg.message)
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            continue;
         }
 
         App->Update();

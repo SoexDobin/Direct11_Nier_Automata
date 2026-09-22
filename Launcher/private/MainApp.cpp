@@ -76,6 +76,22 @@ HRESULT MainApp::Initialize()
 void MainApp::Update()
 {
 	GAME_INSTANCE->Update_Engine();
+
+#ifdef _DEBUG
+	m_StatsTime += GAME_INSTANCE->Compute_UnscaledTimeDelta();
+	++m_StatsFrames;
+	if (m_StatsTime < 1.f)
+		return;
+
+	wchar_t title[160]{};
+	swprintf_s(title, L"Launcher  |  %.0f FPS  %.2f ms  |  %u draws  %.2fM tris",
+		m_StatsFrames / m_StatsTime, m_StatsTime * 1000.f / m_StatsFrames,
+		GAME_INSTANCE->Get_FrameDrawCount(),
+		static_cast<double>(GAME_INSTANCE->Get_FrameTriangleCount()) / 1000000.0);
+	SetWindowTextW(g_hWnd, title);
+	m_StatsTime = 0.f;
+	m_StatsFrames = 0;
+#endif
 }
 
 void MainApp::Render()

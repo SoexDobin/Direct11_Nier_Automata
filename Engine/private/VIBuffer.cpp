@@ -1,4 +1,5 @@
 #include "VIBuffer.h"
+#include "Game.h"
 
 VIBuffer::VIBuffer()
 	: Component{}
@@ -39,6 +40,20 @@ HRESULT VIBuffer::Bind_Resources() {
 
 HRESULT VIBuffer::Render() {
     m_Context->DrawIndexed(m_NumIndices, 0, 0);
+    Count_Draw(m_NumIndices);
 
     return S_OK;
+}
+
+void VIBuffer::Count_Draw(uint32 indexCount, uint32 instanceCount) const {
+#ifdef _DEBUG
+    uint32 triangles = 0;
+    if (D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST == m_PrimitiveType)
+        triangles = indexCount / 3;
+    else if (D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP == m_PrimitiveType && indexCount >= 3)
+        triangles = indexCount - 2;
+    GAME_INSTANCE->Add_DrawStats(triangles * instanceCount);
+#else
+    (void)indexCount; (void)instanceCount;
+#endif
 }

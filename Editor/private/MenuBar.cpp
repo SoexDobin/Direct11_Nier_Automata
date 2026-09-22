@@ -131,9 +131,12 @@ void MenuBar::Render(Bool isResize) {
     if (m_ShowFrameStats)
     {
         // 에디터 전체 프레임(모든 View 렌더 + ImGui) 기준. ImGui가 최근 프레임을 평균낸다.
+        // draw·삼각형 수는 직전 프레임에 그린 모든 View(Game + Scene)의 합이다.
         const Float fps = ImGui::GetIO().Framerate;
-        Char frameText[64]{};
-        snprintf(frameText, sizeof(frameText), "%.0f FPS  %.2f ms", fps, fps > 0.f ? 1000.f / fps : 0.f);
+        Char frameText[128]{};
+        snprintf(frameText, sizeof(frameText), "%.0f FPS  %.2f ms  |  %u draws  %.2fM tris (all views)",
+            fps, fps > 0.f ? 1000.f / fps : 0.f, GAME_INSTANCE->Get_FrameDrawCount(),
+            static_cast<double>(GAME_INSTANCE->Get_FrameTriangleCount()) / 1000000.0);
         ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 40.0f - ImGui::CalcTextSize(frameText).x);
         ImGui::TextUnformatted(frameText);
     }

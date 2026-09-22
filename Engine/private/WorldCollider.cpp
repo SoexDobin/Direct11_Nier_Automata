@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "GameObject.h"
+#include "Model.h"
 #include "SpdLogger.h"
 #include "Transform.h"
 
@@ -32,15 +33,20 @@ HRESULT WorldCollider::Initialize(void* arg)
 
 HRESULT WorldCollider::Post_Load()
 {
+	const Shared<GameObject> owner = Get_Owner();
+	if (nullptr == owner)
+		return E_FAIL;
+
+	// 태그를 받지 않았으면 소유자가 그리는 모델의 COL을 쓴다. 저장된 ModelTag는 이 시점에 이미 적용돼 있다.
+	if (m_SourceModelTag.empty())
+		if (const Shared<Model> model = owner->Get_Component<Model>(); model && !model->Get_ModelTag().empty())
+			m_SourceModelTag = model->Get_ModelTag() + L"_COL";
+
 	if (m_SourceModelTag.empty())
 	{
 		LOG_WARN(L"[WorldCollider] No source model tag; nothing registered");
 		return S_OK;
 	}
-
-	const Shared<GameObject> owner = Get_Owner();
-	if (nullptr == owner)
-		return E_FAIL;
 
 	m_ActorHandle = GAME_INSTANCE->Add_StaticCollision(
 		m_SourceModelTag, owner->Get_Transform()->Get_WorldMatrix());

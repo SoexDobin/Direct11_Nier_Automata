@@ -424,6 +424,10 @@
           "typeName": "Model"
         },
         {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
           "properties": {
             "Extents": [
               0.07500000298023224,
@@ -437,10 +441,6 @@
             ]
           },
           "typeName": "OBBCollider"
-        },
-        {
-          "properties": {},
-          "typeName": "Shader"
         }
       ],
       "name": "WP0070Body",
@@ -465,14 +465,144 @@
       },
       "typeName": "WP0070Body"
     },
+    "32438e1ec3a54b99adfa0afa36f591a2": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              300.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinMainField"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "WorldMap_2",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          300.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
+    },
+    "3d127efb65fa4041af0df7c822a78370": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              450.0,
+              0.0,
+              86.60250091552734
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinG11319"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "WorldMap_1_1",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          450.0,
+          0.0,
+          86.60250091552734
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
+    },
     "3d7fad771f534d83954bdf59ee775462": {
       "children": [],
       "components": [
         {
           "properties": {
             "Position": [
-              0.0,
-              0.0,
+              802.4075927734375,
+              289.69146728515625,
               0.0
             ],
             "Rotation": [
@@ -522,8 +652,8 @@
       "stableChildKey": "",
       "transform": {
         "position": [
-          0.0,
-          0.0,
+          802.4075927734375,
+          289.69146728515625,
           0.0
         ],
         "rotation": [
@@ -596,24 +726,15 @@
       },
       "typeName": "Pl0000MonsterChecker"
     },
-    "594c14c4acc543379a88f5f1c103c6e7": {
-      "children": [
-        "946085809fdd885e653cc877735344dd",
-        "16232753029c12952f32061b2d723b6d",
-        "d477c797054e790f1de228c81066e66b",
-        "f9a7df3b6ff8227d6571733c07587c38",
-        "d1790ff8d372862a80eb78cd9f36713a",
-        "a77d103cffaa1f80f4abd9e307a0c564",
-        "61fe0aec862add80e6a3b834527a4aa9",
-        "453d4fce21824106b67903954380db1e"
-      ],
+    "4c2b302f04ba42f989b568c5475ed4f5": {
+      "children": [],
       "components": [
         {
           "properties": {
             "Position": [
-              -40.35504150390625,
-              -18.808929443359375,
-              -77.91022491455078
+              0.0,
+              0.0,
+              0.0
             ],
             "Rotation": [
               -0.0,
@@ -630,7 +751,77 @@
         },
         {
           "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinEntry"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
           "typeName": "Navigation"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "WorldMap",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
+    },
+    "594c14c4acc543379a88f5f1c103c6e7": {
+      "children": [
+        "946085809fdd885e653cc877735344dd",
+        "16232753029c12952f32061b2d723b6d",
+        "d477c797054e790f1de228c81066e66b",
+        "f9a7df3b6ff8227d6571733c07587c38",
+        "d1790ff8d372862a80eb78cd9f36713a",
+        "a77d103cffaa1f80f4abd9e307a0c564",
+        "61fe0aec862add80e6a3b834527a4aa9",
+        "453d4fce21824106b67903954380db1e"
+      ],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              11.37484359741211,
+              -16.905941009521484,
+              -41.60697937011719
+            ],
+            "Rotation": [
+              -0.0,
+              55.54119873046875,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
         },
         {
           "properties": {
@@ -649,9 +840,74 @@
       "stableChildKey": "",
       "transform": {
         "position": [
-          -40.35504150390625,
-          -18.808929443359375,
-          -77.91022491455078
+          11.37484359741211,
+          -16.905941009521484,
+          -41.60697937011719
+        ],
+        "rotation": [
+          -0.0,
+          55.54119873046875,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "Pl0000"
+    },
+    "617ee45639994f93b96ef9d6719695f3": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              600.0,
+              0.0,
+              173.2050018310547
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinManHole"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "WorldMap_3",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          600.0,
+          0.0,
+          173.2050018310547
         ],
         "rotation": [
           -0.0,
@@ -664,7 +920,7 @@
           1.0
         ]
       },
-      "typeName": "Pl0000"
+      "typeName": "WorldMap"
     },
     "61fe0aec862add80e6a3b834527a4aa9": {
       "children": [],
@@ -722,6 +978,71 @@
         ]
       },
       "typeName": "Pl0000EvadeChecker"
+    },
+    "718b32868dbe4d88a7b06b68e7b5b1ac": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              150.0,
+              0.0,
+              86.60250091552734
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinBridge"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "WorldMap_1",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          150.0,
+          0.0,
+          86.60250091552734
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
     },
     "841ef725d4324d49b50e3e856bede204": {
       "children": [
@@ -5685,80 +6006,15 @@
       },
       "typeName": "TextUI"
     },
-    "a59cd898eb804d26bf78420749dc4f65": {
-      "children": [],
-      "components": [
-        {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
-          "properties": {
-            "Position": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "Rotation": [
-              -0.0,
-              0.0,
-              0.0
-            ],
-            "Scale": [
-              1.0,
-              1.0,
-              1.0
-            ]
-          },
-          "typeName": "Transform"
-        },
-        {
-          "properties": {},
-          "typeName": "Navigation"
-        },
-        {
-          "properties": {
-            "AnimationPreset": null,
-            "ModelTag": "CityOfRuinEntry"
-          },
-          "typeName": "Model"
-        },
-        {
-          "properties": {},
-          "typeName": "Shader"
-        }
-      ],
-      "name": "CityOfRuinEntry",
-      "properties": {},
-      "stableChildKey": "",
-      "transform": {
-        "position": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "rotation": [
-          -0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0,
-          1.0
-        ]
-      },
-      "typeName": "CityOfRuinEntry"
-    },
     "a77d103cffaa1f80f4abd9e307a0c564": {
       "children": [],
       "components": [
         {
           "properties": {
             "Position": [
-              0.0,
-              0.0,
-              0.0
+              -40.289730072021484,
+              18.507314682006836,
+              14.822480201721191
             ],
             "Rotation": [
               -0.0,
@@ -6028,9 +6284,9 @@
       "stableChildKey": "WP3000Body",
       "transform": {
         "position": [
-          0.0,
-          0.0,
-          0.0
+          -40.289730072021484,
+          18.507314682006836,
+          14.822480201721191
         ],
         "rotation": [
           -0.0,
@@ -6051,14 +6307,14 @@
         {
           "properties": {
             "Position": [
-              0.0,
-              10.0,
-              -10.0
+              5.580473899841309,
+              -15.930377960205078,
+              -45.573219299316406
             ],
             "Rotation": [
-              44.99999237060547,
-              0.0,
-              0.0
+              -2.4928090572357178,
+              55.54120635986328,
+              1.0682278883678009e-07
             ],
             "Scale": [
               1.0,
@@ -6076,14 +6332,14 @@
       "stableChildKey": "",
       "transform": {
         "position": [
-          0.0,
-          10.0,
-          -10.0
+          5.580473899841309,
+          -15.930377960205078,
+          -45.573219299316406
         ],
         "rotation": [
-          44.99999237060547,
-          0.0,
-          0.0
+          -2.4928090572357178,
+          55.54120635986328,
+          1.0682278883678009e-07
         ],
         "scale": [
           1.0,
@@ -7204,6 +7460,10 @@
           "typeName": "Model"
         },
         {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
           "properties": {
             "Extents": [
               0.25,
@@ -7217,10 +7477,6 @@
             ]
           },
           "typeName": "OBBCollider"
-        },
-        {
-          "properties": {},
-          "typeName": "Shader"
         }
       ],
       "name": "WP0220Body",
@@ -7247,10 +7503,14 @@
     }
   },
   "roots": [
+    "32438e1ec3a54b99adfa0afa36f591a2",
+    "3d127efb65fa4041af0df7c822a78370",
+    "4c2b302f04ba42f989b568c5475ed4f5",
     "594c14c4acc543379a88f5f1c103c6e7",
+    "617ee45639994f93b96ef9d6719695f3",
+    "718b32868dbe4d88a7b06b68e7b5b1ac",
     "841ef725d4324d49b50e3e856bede204",
     "9672e3e2614040ee957a08b07cf00bc2",
-    "a59cd898eb804d26bf78420749dc4f65",
     "b2605ffe79e14348a695f351b6de7ae2",
     "f19ba3d5f8ec41cda74a49d9c5b459b9"
   ],

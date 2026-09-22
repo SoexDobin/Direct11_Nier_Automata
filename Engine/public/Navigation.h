@@ -67,6 +67,8 @@ private:
 	Matrix m_WorldMatrix{ Matrix::Identity };
 	Matrix m_InvWorldMatrix{ Matrix::Identity };
 
+	/// 태그 없이 붙었으면 소유자 ModelTag의 .nnav 프로토타입에서 셀을 가져온다. 없으면 빈 채로 둔다.
+	HRESULT Post_Load() override;
 	void Refresh_Space();
 	Vector3 To_Local(const Vector3& worldPosition) const;
 	Float To_WorldHeight(const Vector3& localPosition, Float localHeight) const;

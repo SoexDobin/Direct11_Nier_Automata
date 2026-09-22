@@ -61,7 +61,7 @@
     <ClInclude Include="..\public\State2B_Walk.h">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\CityOfRuinEntry.h">
+    <ClInclude Include="..\public\WorldMap.h">
       <Filter>02. GameObject\World</Filter>
     </ClInclude>
     <ClInclude Include="..\public\DirectionalLight.h">
@@ -242,9 +242,6 @@
     <ClInclude Include="..\public\NavigationManager.h">
       <Filter>00. MainApp</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\CityOfRuinBridge.h">
-      <Filter>02. GameObject\World</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\SheathWP0070Body.h">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>
     </ClInclude>
@@ -310,7 +307,7 @@
     <ClCompile Include="..\private\State2B_Walk.cpp">
       <Filter>02. GameObject\Entity\2B\2BStates</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\CityOfRuinEntry.cpp">
+    <ClCompile Include="..\private\WorldMap.cpp">
       <Filter>02. GameObject\World</Filter>
     </ClCompile>
     <ClCompile Include="..\private\DirectionalLight.cpp">
@@ -487,9 +484,6 @@
     </ClCompile>
     <ClCompile Include="..\private\NavigationManager.cpp">
       <Filter>00. MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\CityOfRuinBridge.cpp">
-      <Filter>02. GameObject\World</Filter>
     </ClCompile>
     <ClCompile Include="..\private\SheathWP0070Body.cpp">
       <Filter>02. GameObject\Entity\2B\2BPartObject\WP0070</Filter>

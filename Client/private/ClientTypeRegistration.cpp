@@ -6,8 +6,7 @@
 #include "UIObject.h"
 
 #include "Bullet.h"
-#include "CityOfRuinBridge.h"
-#include "CityOfRuinEntry.h"
+#include "WorldMap.h"
 #include "DirectionalLight.h"
 #include "Em0010.h"
 #include "Em0010Body.h"
@@ -327,8 +326,7 @@ HRESULT Client::Register_Client_Reflection()
 	Add_Type<Pl0000MonsterChecker>(batch, "Pl0000MonsterChecker", "GameObject", gameObject);
 	Add_Type<SheathWP0070Body>(batch, "SheathWP0070Body", "GameObject", gameObject);
 	Add_Type<SheathWP0220Body>(batch, "SheathWP0220Body", "GameObject", gameObject);
-	Add_Type<CityOfRuinEntry>(batch, "CityOfRuinEntry", "GameObject", gameObject);
-	Add_Type<CityOfRuinBridge>(batch, "CityOfRuinBridge", "GameObject", gameObject);
+	Add_Type<WorldMap>(batch, "WorldMap", "GameObject", gameObject);
 	ReflectedTypeDescriptor& directionalLight = Add_Type<DirectionalLight>(batch, "DirectionalLight",
 		"GameObject", gameObject);
 	directionalLight.properties.push_back(Make_DirectionalLightColor_Property("Color",

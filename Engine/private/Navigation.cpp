@@ -98,6 +98,34 @@ HRESULT Navigation::Load_FromBinary(const string& filePath)
 	return S_OK;
 }
 
+HRESULT Navigation::Post_Load()
+{
+	if (!m_ModelTag.empty() || !m_Cells.empty())
+		return S_OK;
+
+	const Shared<GameObject> owner = Get_Owner();
+	const Shared<Model> model = owner ? owner->Get_Component<Model>() : nullptr;
+	if (!model || model->Get_ModelTag().empty())
+		return S_OK;
+
+	const wstring& modelTag = model->Get_ModelTag();
+	for (const auto& levelComponents : GAME_INSTANCE->Get_Prototype_Components())
+	{
+		const auto found = levelComponents.find(modelTag);
+		if (found == levelComponents.end())
+			continue;
+		if (const auto source = dynamic_pointer_cast<Navigation>(found->second))
+		{
+			m_Cells = source->m_Cells;
+			m_ModelTag = source->m_ModelTag;
+			return S_OK;
+		}
+	}
+
+	LOG_WARN(L"[Navigation] No baked navigation for model {}; left empty", modelTag);
+	return S_OK;
+}
+
 void Navigation::Refresh_Space()
 {
 	Shared<Transform> transform = m_SpaceTransform.lock();

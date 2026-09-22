@@ -230,6 +230,9 @@ Unique<Renderer> Renderer::Create(const ComPtr<ID3D11Device> &device, const ComP
 #ifdef _DEBUG
 void Renderer::Render_Debug()
 {
+	if (!m_ShowRenderTargets)
+		return;
+
 	GAME_INSTANCE->Ready_RenderTarget_Debug(RT_DIFFUSE, 150.f, 150.f, 300.f, 300.f);
 	GAME_INSTANCE->Ready_RenderTarget_Debug(RT_NORMAL, 150.f, 450.f, 300.f, 300.f);
 	GAME_INSTANCE->Ready_RenderTarget_Debug(RT_SHADE, 450.f, 150.f, 300.f, 300.f);

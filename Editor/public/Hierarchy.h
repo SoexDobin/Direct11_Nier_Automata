@@ -22,6 +22,12 @@ private:
   void Render_Node(const Shared<Engine::GameObject> &pObj, uint32 levelIndex);
   void Delete_Selected();
 
+private:
+  // 이름을 바꾸는 중인 노드. 비어 있으면 편집 중이 아니다.
+  ObjectGuid m_RenamingGuid{};
+  Char m_RenameBuffer[256]{};
+  Bool m_RenameFocusPending{ false };
+
 public:
   static Shared<Hierarchy> Create();
 };

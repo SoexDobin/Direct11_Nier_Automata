@@ -27,6 +27,8 @@ private:
 
 	Bool m_PrevF1 = false;
 	Bool m_PrevF2 = false;
+	Bool m_PrevF3 = false;
+	Bool m_ShowFrameStats = true;
 
 public:
 	static Shared<MenuBar> Create();

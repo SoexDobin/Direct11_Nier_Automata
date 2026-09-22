@@ -128,6 +128,16 @@ void MenuBar::Render(Bool isResize) {
         }
         ImGui::EndMenu();
     }
+    if (m_ShowFrameStats)
+    {
+        // 에디터 전체 프레임(모든 View 렌더 + ImGui) 기준. ImGui가 최근 프레임을 평균낸다.
+        const Float fps = ImGui::GetIO().Framerate;
+        Char frameText[64]{};
+        snprintf(frameText, sizeof(frameText), "%.0f FPS  %.2f ms", fps, fps > 0.f ? 1000.f / fps : 0.f);
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 40.0f - ImGui::CalcTextSize(frameText).x);
+        ImGui::TextUnformatted(frameText);
+    }
+
     Float rightAlignPos = ImGui::GetWindowWidth() - 30.0f;
     ImGui::SetCursorPosX(rightAlignPos);
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
@@ -335,6 +345,7 @@ void MenuBar::Update_HotKey()
 
     Bool currF1 = (GAME_INSTANCE->Get_DIKeyState(DIK_F1) & 0x80) != 0;
     Bool currF2 = (GAME_INSTANCE->Get_DIKeyState(DIK_F2) & 0x80) != 0;
+    Bool currF3 = (GAME_INSTANCE->Get_DIKeyState(DIK_F3) & 0x80) != 0;
 
     if (currF1 && !m_PrevF1)
     {
@@ -346,23 +357,33 @@ void MenuBar::Update_HotKey()
         Navigation::Toggle_DebugRender();
     }
 
+    if (currF3 && !m_PrevF3)
+    {
+        GAME_INSTANCE->Toggle_RenderTargetDebug();
+    }
+
     m_PrevF1 = currF1;
     m_PrevF2 = currF2;
+    m_PrevF3 = currF3;
 }
 
 void MenuBar::Render_Debug()
 {
     if (ImGui::BeginMenu("Debug"))
     {
-        Bool colDebug = GAME_INSTANCE->Toggle_RenderDebug();
+        // 메뉴를 여는 것만으로 상태가 바뀌지 않도록 읽기와 토글을 나눈다.
+        if (ImGui::MenuItem("Toggle DebugRender Collider", "F1", GAME_INSTANCE->Get_RenderDebug()))
+            GAME_INSTANCE->Toggle_RenderDebug();
 
-        if (ImGui::MenuItem("Toggle DebugRender Collider", "F1", &colDebug))
-			;
+        if (ImGui::MenuItem("Toggle DebugRender Navigation", "F2", Navigation::Get_DebugRender()))
+            Navigation::Toggle_DebugRender();
 
-        Bool navDebug = Navigation::Get_DebugRender();
-        if (ImGui::MenuItem("Toggle DebugRender Navigation", "F2", &navDebug))
-            ;
-        
+        if (ImGui::MenuItem("Toggle MRT Preview", "F3", GAME_INSTANCE->Get_RenderTargetDebug()))
+            GAME_INSTANCE->Toggle_RenderTargetDebug();
+
+        ImGui::Separator();
+        ImGui::MenuItem("Show Frame Stats", nullptr, &m_ShowFrameStats);
+
 
         ImGui::EndMenu();
     }

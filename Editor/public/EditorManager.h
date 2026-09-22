@@ -55,6 +55,7 @@ public: /* Frame-safe structural mutations */
 	  size_t targetIndex = numeric_limits<size_t>::max(),
 	  optional<Vector3> spawnPosition = nullopt);
 	void Queue_Duplicate(ObjectGuid targetGuid, uint32 levelIndex);
+	void Queue_Rename(ObjectGuid targetGuid, uint32 levelIndex, const wstring& newName);
 	void Queue_PropertyWrite(const Shared<Engine::GameObject>& owner, Engine::Object& target,
 		std::string_view propertyName, const ReflectionValue& before,
 		const ReflectionValue& after, Bool beginGesture);
@@ -131,6 +132,7 @@ private:
         SPAWN,
 		DUPLICATE,
 		PROPERTY_WRITE,
+		RENAME,
 		UNDO,
 		REDO,
     };
@@ -149,6 +151,7 @@ private:
 		ReflectionValue beforeValue;
 		ReflectionValue afterValue;
 		Bool beginGesture{ true };
+		wstring newName;
     };
 
 	enum class HISTORY_TYPE
@@ -157,6 +160,7 @@ private:
 		REMOVE_SUBTREE,
 		MOVE,
 		PROPERTY,
+		RENAME,
 	};
 
 	struct HIERARCHY_PLACEMENT
@@ -178,6 +182,8 @@ private:
 		string propertyName;
 		ReflectionValue beforeValue;
 		ReflectionValue afterValue;
+		wstring beforeName;
+		wstring afterName;
 	};
 
     void Flush_PendingMutations();

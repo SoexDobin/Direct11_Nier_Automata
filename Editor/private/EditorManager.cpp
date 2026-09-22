@@ -305,6 +305,19 @@ void EditorManager::Queue_Duplicate(ObjectGuid targetGuid, uint32 levelIndex)
 		m_PendingMutations.push_back({ MUTATION_TYPE::DUPLICATE, targetGuid, {}, levelIndex, {} });
 }
 
+void EditorManager::Queue_Rename(ObjectGuid targetGuid, uint32 levelIndex, const wstring& newName)
+{
+	if (!targetGuid.Is_Valid() || newName.empty())
+		return;
+
+	MUTATION_COMMAND command;
+	command.type = MUTATION_TYPE::RENAME;
+	command.targetGuid = targetGuid;
+	command.levelIndex = levelIndex;
+	command.newName = newName;
+	m_PendingMutations.push_back(std::move(command));
+}
+
 void EditorManager::Queue_PropertyWrite(const Shared<GameObject>& owner, Object& target,
 	std::string_view propertyName, const ReflectionValue& before,
 	const ReflectionValue& after, Bool beginGesture)
@@ -543,6 +556,15 @@ Bool EditorManager::Apply_History(const HISTORY_ENTRY& entry, Bool undo)
 	{
 		const Shared<GameObject> object = GAME_INSTANCE->Find(entry.targetGuid);
 		return object && Place_Object(object, undo ? entry.before : entry.after);
+	}
+
+	case HISTORY_TYPE::RENAME:
+	{
+		const Shared<GameObject> object = GAME_INSTANCE->Find(entry.targetGuid);
+		if (!object || object->Get_Name() != (undo ? entry.afterName : entry.beforeName))
+			return false;
+		object->Set_Name(undo ? entry.beforeName : entry.afterName);
+		return true;
 	}
 
 	case HISTORY_TYPE::PROPERTY:
@@ -843,6 +865,24 @@ Bool EditorManager::Apply_Mutation(const MUTATION_COMMAND& command)
 			}
 		}
 
+		Record_History(std::move(history));
+		return true;
+	}
+
+	case MUTATION_TYPE::RENAME:
+	{
+		if (!target || target->Is_Destroy() ||
+			!Belongs_To_Level(target, command.levelIndex) || !Can_EditHierarchy(target) ||
+			target->Get_Name() == command.newName)
+			return false;
+
+		HISTORY_ENTRY history;
+		history.type = HISTORY_TYPE::RENAME;
+		history.targetGuid = command.targetGuid;
+		history.levelIndex = command.levelIndex;
+		history.beforeName = target->Get_Name();
+		history.afterName = command.newName;
+		target->Set_Name(command.newName);
 		Record_History(std::move(history));
 		return true;
 	}

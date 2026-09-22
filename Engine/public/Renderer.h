@@ -51,8 +51,15 @@ public:
 
 
 #ifdef _DEBUG
+public:
+	Bool Toggle_RenderTargetDebug() { m_ShowRenderTargets = !m_ShowRenderTargets; return m_ShowRenderTargets; }
+	Bool Get_RenderTargetDebug() const { return m_ShowRenderTargets; }
+
 private:
 	void Render_Debug();
+
+	// MRT 미리보기는 필요할 때만 켠다.
+	Bool m_ShowRenderTargets{ false };
 #endif
 };
 

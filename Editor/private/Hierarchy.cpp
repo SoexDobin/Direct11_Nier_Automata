@@ -14,7 +14,7 @@ Hierarchy::~Hierarchy() {}
 HRESULT Hierarchy::Initialize() { return EditorObject::Initialize(); }
 
 void Hierarchy::Update(Bool isResize) {
-  if (ImGui::IsKeyPressed(ImGuiKey_Delete)) {
+  if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Delete)) {
     Delete_Selected();
   }
 
@@ -102,11 +102,44 @@ void Hierarchy::Render_Node(const Shared<GameObject> &pObj, uint32 levelIndex) {
                         nullptr, nullptr);
 
     const string nodeId = To_String(pObj->Get_ObjectGuid());
-    bool bOpened = ImGui::TreeNodeEx(nodeId.c_str(), flags, "%s", name.c_str());
+    const Bool isRenaming = m_RenamingGuid.Is_Valid() && m_RenamingGuid == pObj->Get_ObjectGuid();
+    bool bOpened = ImGui::TreeNodeEx(nodeId.c_str(), flags, "%s", isRenaming ? "" : name.c_str());
+
+    if (isRenaming)
+    {
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(-1);
+        const Bool focusRequested = m_RenameFocusPending;
+        if (focusRequested)
+        {
+            ImGui::SetKeyboardFocusHere();
+            m_RenameFocusPending = false;
+        }
+        if (ImGui::InputText(("##Rename" + nodeId).c_str(), m_RenameBuffer, sizeof(m_RenameBuffer),
+            ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+        {
+            const int wideLen = MultiByteToWideChar(CP_UTF8, 0, m_RenameBuffer, -1, nullptr, 0);
+            wstring newName(wideLen > 1 ? wideLen - 1 : 0, wchar_t{});
+            if (wideLen > 1)
+                MultiByteToWideChar(CP_UTF8, 0, m_RenameBuffer, -1, newName.data(), wideLen);
+            EDITOR->Queue_Rename(pObj->Get_ObjectGuid(), levelIndex, newName);
+            m_RenamingGuid = {};
+        }
+        else if (!focusRequested && (ImGui::IsKeyPressed(ImGuiKey_Escape) || !ImGui::IsItemActive()))
+        {
+            m_RenamingGuid = {};
+        }
+    }
 
 	if (ImGui::BeginPopupContextItem())
 	{
 		EDITOR->Set_SelectedObject(pObj);
+		if (ImGui::MenuItem("Rename", nullptr, false, canEditNode))
+		{
+			m_RenamingGuid = pObj->Get_ObjectGuid();
+			strncpy_s(m_RenameBuffer, name.c_str(), _TRUNCATE);
+			m_RenameFocusPending = true;
+		}
 		if (ImGui::MenuItem("Duplicate", "Ctrl+D", false, canEditNode))
 			EDITOR->Queue_Duplicate(pObj->Get_ObjectGuid(), levelIndex);
 

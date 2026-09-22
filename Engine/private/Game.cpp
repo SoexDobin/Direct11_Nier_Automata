@@ -1187,6 +1187,21 @@ Bool Game::Toggle_RenderDebug() const
     return m_CollisionManager->Toggle_DebugMode();
 }
 
+Bool Game::Get_RenderDebug() const
+{
+    return m_CollisionManager->Get_DebugMode();
+}
+
+Bool Game::Toggle_RenderTargetDebug() const
+{
+    return m_Renderer->Toggle_RenderTargetDebug();
+}
+
+Bool Game::Get_RenderTargetDebug() const
+{
+    return m_Renderer->Get_RenderTargetDebug();
+}
+
 HRESULT Game::Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const
 {
     return m_RenderTargetManager->Ready_RenderTarget_Debug(renderTargetTag, x, y, sizeX, sizeY);

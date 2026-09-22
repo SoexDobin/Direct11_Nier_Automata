@@ -383,6 +383,9 @@ public:
     void Fail_NextViewResize_Debug(Bool offscreen) const;
     void Render_CollisionDebug() const;
     Bool Toggle_RenderDebug() const;
+    Bool Get_RenderDebug() const;
+    Bool Toggle_RenderTargetDebug() const;
+    Bool Get_RenderTargetDebug() const;
     HRESULT Ready_RenderTarget_Debug(const wstring& renderTargetTag, Float x, Float y, Float sizeX, Float sizeY) const;
 	HRESULT Render_RenderTarget_Debug(const Shared<class VIBuffer_Rect>& buffer, const Shared<class Shader>& shader, const wstring& multiRenderTargetTag) const;
 

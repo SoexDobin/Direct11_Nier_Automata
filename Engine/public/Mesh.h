@@ -30,6 +30,9 @@ public:
 public:
 	uint32 Get_MaterialIndex() const { return m_MaterialIndex; }
 	const string& Get_MeshName() const { return m_MeshName; }
+	// 정점 기준 로컬 AABB. 정적 메시는 pre-transform이 반영된 값이고, 스켈레탈은 bind space다.
+	const BoundingBox& Get_LocalBounds() const { return m_LocalBounds; }
+	Bool Has_LocalBounds() const { return m_HasLocalBounds; }
 
 protected:
 	// 하위 타입이 자기 정점 형식으로 정점 버퍼를 만들고 m_RawPosition을 채운다.
@@ -37,6 +40,7 @@ protected:
 
 private:
 	HRESULT Ready_IndexBuffer(const MODEL_MESH& meshData);
+	void Compute_LocalBounds();
 
 protected:
 	string				m_MeshName{};
@@ -45,6 +49,8 @@ protected:
 protected:
 	vector<Float> m_RawPosition;
 	vector<int32> m_RawIndices;
+	BoundingBox m_LocalBounds{};
+	Bool m_HasLocalBounds{ false };
 
 public:
 	static Shared<Mesh> CreatePrototype();

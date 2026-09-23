@@ -60,9 +60,44 @@ HRESULT WorldMap::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	size_t numMeshes = m_Model->Get_NumMeshes();
+	const uint32 numMeshes = static_cast<uint32>(m_Model->Get_NumMeshes());
+	const Bool culling = GAME_INSTANCE->Get_FrustumCulling();
+	const Matrix worldMatrix = m_Transform->Get_WorldMatrix();
+
+	// 타일이 통째로 화면 밖이면 메시를 하나도 보지 않는다.
+	if (culling)
+	{
+		BoundingBox tileLocal{};
+		BoundingBox tileWorld{};
+		if (m_Model->Compute_LocalBounds(tileLocal))
+		{
+			tileLocal.Transform(tileWorld, worldMatrix);
+			if (!GAME_INSTANCE->Is_Visible(tileWorld))
+			{
+				for (uint32 i = 0; i < numMeshes; ++i)
+					GAME_INSTANCE->Add_CulledMesh();
+				return S_OK;
+			}
+		}
+	}
+
 	for (uint32 i = 0; i < numMeshes; ++i)
 	{
+		if (culling)
+		{
+			BoundingBox meshLocal{};
+			BoundingBox meshWorld{};
+			if (m_Model->Get_MeshLocalBounds(i, meshLocal))
+			{
+				meshLocal.Transform(meshWorld, worldMatrix);
+				if (!GAME_INSTANCE->Is_Visible(meshWorld))
+				{
+					GAME_INSTANCE->Add_CulledMesh();
+					continue;
+				}
+			}
+		}
+
 		if (FAILED(m_Model->BindAndBeginMaterial(m_Shader, i)))
 			return E_FAIL;
 

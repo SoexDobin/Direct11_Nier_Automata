@@ -38,9 +38,15 @@ public:
 	HRESULT Bind_TransformMatrix_Inverse(const Shared<Shader>& shader, const Char* constantName, D3DTS transformState);
 	void Update_Pipeline();
 
+public:
+	// 현재 View의 월드 공간 프러스텀. Update_Pipeline이 View마다 다시 만든다.
+	const BoundingFrustum& Get_Frustum() const { return m_Frustum; }
+	Bool Is_Visible(const BoundingBox& worldBounds) const;
+
 private:
 	Matrix m_TransformStateMatrices[ETOI(D3DTS::END)] = {};
 	Matrix m_TransformStateInverseMatrices[ETOI(D3DTS::END)] = {};
+	BoundingFrustum m_Frustum{};
 
 public:
 	static Unique<Pipeline> Create();

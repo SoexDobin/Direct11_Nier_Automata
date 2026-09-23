@@ -49,6 +49,16 @@ void Pipeline::Update_Pipeline()
 {
 	for (uint32 i = 0; i < ETOI(D3DTS::END); ++i)
 		m_TransformStateInverseMatrices[i] = m_TransformStateMatrices[i].Invert();
+
+	// View마다 한 번 불리므로 프러스텀도 그 View의 카메라를 따라간다.
+	// PROJ에서 카메라 공간 프러스텀을 만들고 VIEW의 역행렬(= 카메라 월드 행렬)로 월드 공간에 올린다.
+	BoundingFrustum::CreateFromMatrix(m_Frustum, m_TransformStateMatrices[ETOI(D3DTS::PROJ)]);
+	m_Frustum.Transform(m_Frustum, m_TransformStateInverseMatrices[ETOI(D3DTS::VIEW)]);
+}
+
+Bool Pipeline::Is_Visible(const BoundingBox& worldBounds) const
+{
+	return m_Frustum.Contains(worldBounds) != DISJOINT;
 }
 
 Unique<Pipeline> Pipeline::Create()

@@ -386,6 +386,11 @@ public:
     Bool Get_RenderDebug() const;
     Bool Toggle_RenderTargetDebug() const;
     Bool Get_RenderTargetDebug() const;
+    Bool Toggle_FrustumCulling() const;
+    Bool Get_FrustumCulling() const;
+    Bool Is_Visible(const BoundingBox& worldBounds) const;
+    void Add_CulledMesh() const;
+    uint32 Get_FrameCulledCount() const;
     void Add_DrawStats(uint32 triangleCount) const;
     uint32 Get_FrameDrawCount() const;
     uint64_t Get_FrameTriangleCount() const;

@@ -107,6 +107,8 @@ public: /* Mesh Info */
 	void Extract_RawMeshData(_Out_ vector<Float>& outPositions, _Out_ vector<int32>& outIndices) const;
 	/* Bind-pose AABB in the owner's local space (pre-transform applied). False when there is no geometry. */
 	Bool Compute_LocalBounds(_Out_ BoundingBox& outBounds) const;
+	// 메시 하나의 로컬 AABB. 컬링처럼 메시 단위로 판정하는 호출부가 쓴다.
+	Bool Get_MeshLocalBounds(uint32 meshIndex, _Out_ BoundingBox& outBounds) const;
 
 public: /* snap shot */
 	vector<BONE_SNAPSHOT> Get_SnapShot_BoneMatrices();

@@ -1202,6 +1202,31 @@ Bool Game::Get_RenderTargetDebug() const
     return m_Renderer->Get_RenderTargetDebug();
 }
 
+Bool Game::Toggle_FrustumCulling() const
+{
+    return m_Renderer->Toggle_FrustumCulling();
+}
+
+Bool Game::Get_FrustumCulling() const
+{
+    return m_Renderer->Get_FrustumCulling();
+}
+
+Bool Game::Is_Visible(const BoundingBox& worldBounds) const
+{
+    return m_Pipeline->Is_Visible(worldBounds);
+}
+
+void Game::Add_CulledMesh() const
+{
+    m_Renderer->Add_CulledMesh();
+}
+
+uint32 Game::Get_FrameCulledCount() const
+{
+    return m_Renderer->Get_FrameCulledCount();
+}
+
 void Game::Add_DrawStats(uint32 triangleCount) const
 {
     m_Renderer->Add_DrawStats(triangleCount);

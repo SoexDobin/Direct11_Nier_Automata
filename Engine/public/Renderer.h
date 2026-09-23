@@ -17,6 +17,14 @@ public:
   uint32 Get_LayerBits() const { return m_LayerMask; }
 
 public:
+	// 프러스텀 컬링 스위치. 기본은 켜짐이고 Debug에서 전후 비교용으로만 끈다.
+	Bool Toggle_FrustumCulling() { m_FrustumCulling = !m_FrustumCulling; return m_FrustumCulling; }
+	Bool Get_FrustumCulling() const { return m_FrustumCulling; }
+	// 컬링으로 건너뛴 메시 수. draw 통계와 같은 주기로 넘어간다.
+	void Add_CulledMesh() { ++m_CulledCount; }
+	uint32 Get_FrameCulledCount() const { return m_LastCulledCount; }
+
+public:
 	void Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject> &gameObject);
 	void Draw();
 	void Draw_NoClearing();
@@ -40,6 +48,9 @@ private:
 	ComPtr<ID3D11DeviceContext> m_Context = {nullptr};
 	array<vector<Shared<GameObject>>, ETOI(RENDERGROUP::END)> m_RenderGroup;
 	uint32 m_LayerMask = {ETOI(LAYER::ALL_LAYER)};
+	Bool m_FrustumCulling{ true };
+	uint32 m_CulledCount{};
+	uint32 m_LastCulledCount{};
 
 private: /* For DefShader */
 	Matrix m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};

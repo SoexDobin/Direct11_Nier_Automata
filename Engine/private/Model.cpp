@@ -794,27 +794,38 @@ Bool Model::Is_NotifyActive(const wstring& notifyTag) const
 
 Bool Model::Compute_LocalBounds(BoundingBox& outBounds) const
 {
-	Vector3 minPoint{ FLT_MAX, FLT_MAX, FLT_MAX };
-	Vector3 maxPoint{ -FLT_MAX, -FLT_MAX, -FLT_MAX };
-	Bool hasPoint = false;
+	Bool hasBounds = false;
 	for (const auto& mesh : m_Meshes)
 	{
-		const vector<Float>& positions = mesh->Get_RawPositions();
-		for (size_t i = 0; i + 2 < positions.size(); i += 3)
-		{
-			Vector3 point{ positions[i], positions[i + 1], positions[i + 2] };
-			// Skinned vertices stay in bind space; the pre-transform is applied through the bones.
-			if (m_IsSkeletal)
-				point = Vector3::Transform(point, m_PreLocalTransformMatrix);
-			minPoint = Vector3::Min(minPoint, point);
-			maxPoint = Vector3::Max(maxPoint, point);
-			hasPoint = true;
-		}
+		if (!mesh || !mesh->Has_LocalBounds())
+			continue;
+
+		BoundingBox meshBounds = mesh->Get_LocalBounds();
+
+		// Skinned vertices stay in bind space; the pre-transform is applied through the bones.
+		if (m_IsSkeletal)
+			meshBounds.Transform(meshBounds, m_PreLocalTransformMatrix);
+
+		if (hasBounds)
+			BoundingBox::CreateMerged(outBounds, outBounds, meshBounds);
+		else
+			outBounds = meshBounds;
+		hasBounds = true;
 	}
-	if (!hasPoint)
+
+	return hasBounds;
+}
+
+Bool Model::Get_MeshLocalBounds(uint32 meshIndex, BoundingBox& outBounds) const
+{
+	if (meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex] || !m_Meshes[meshIndex]->Has_LocalBounds())
 		return false;
 
-	BoundingBox::CreateFromPoints(outBounds, minPoint, maxPoint);
+	outBounds = m_Meshes[meshIndex]->Get_LocalBounds();
+	// Skinned vertices stay in bind space; the pre-transform is applied through the bones.
+	if (m_IsSkeletal)
+		outBounds.Transform(outBounds, m_PreLocalTransformMatrix);
+
 	return true;
 }
 

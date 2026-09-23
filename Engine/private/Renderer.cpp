@@ -54,6 +54,9 @@ HRESULT Renderer::Clear_RenderGroup()
     m_DrawCount = 0;
     m_TriangleCount = 0;
 #endif
+    m_LastCulledCount = m_CulledCount;
+    m_CulledCount = 0;
+
     m_LayerMask = ETOI(LAYER::ALL_LAYER);
 
     for (auto& group : m_RenderGroup)

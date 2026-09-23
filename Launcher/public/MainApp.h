@@ -31,6 +31,7 @@ private:
 	wchar_t m_StatsText[128]{};
 	Bool m_ShowFrameStats{ false };
 	Bool m_PrevF7{ false };
+	Bool m_PrevF8{ false };
 #endif
 
 public:

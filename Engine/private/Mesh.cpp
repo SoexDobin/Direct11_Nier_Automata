@@ -27,6 +27,8 @@ HRESULT Mesh::Initialize_Prototype(const MODEL_MESH& modelMesh, const Matrix& pr
 		return E_FAIL;
 	}
 
+	Compute_LocalBounds();
+
 	return Ready_IndexBuffer(modelMesh);
 }
 
@@ -68,6 +70,29 @@ HRESULT Mesh::Ready_IndexBuffer(const MODEL_MESH& modelMesh)
 	delete[] indices;
 
 	return S_OK;
+}
+
+void Mesh::Compute_LocalBounds()
+{
+	// 하위 타입이 m_RawPosition을 채운 뒤에 부른다. 정점을 다시 훑지 않도록 여기서 한 번만 만든다.
+	m_HasLocalBounds = false;
+	if (m_RawPosition.size() < 3)
+	{
+		m_LocalBounds = BoundingBox{};
+		return;
+	}
+
+	Vector3 minPoint{ FLT_MAX, FLT_MAX, FLT_MAX };
+	Vector3 maxPoint{ -FLT_MAX, -FLT_MAX, -FLT_MAX };
+	for (size_t i = 0; i + 2 < m_RawPosition.size(); i += 3)
+	{
+		const Vector3 point{ m_RawPosition[i], m_RawPosition[i + 1], m_RawPosition[i + 2] };
+		minPoint = Vector3::Min(minPoint, point);
+		maxPoint = Vector3::Max(maxPoint, point);
+	}
+
+	BoundingBox::CreateFromPoints(m_LocalBounds, minPoint, maxPoint);
+	m_HasLocalBounds = true;
 }
 
 HRESULT Mesh::Ready_VertexBuffer(const MODEL_MESH& /*meshData*/, const Matrix& /*preTransformMatrix*/)

@@ -38,8 +38,10 @@ public:
 protected:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
-	/// 이번 프레임에 그릴 모델을 고른다. 멀면 <ModelTag>_LOD, 가까우면 원본이다.
+	/// 이번 프레임에 그릴 모델을 고른다. 거리에 따라 원본 / LOD1 / LOD2다.
 	const Shared<Model>& Select_Model();
+	/// <ModelTag>_LOD를 잡고 그 안에 섞여 있는 LOD1·LOD2를 밴드별 인덱스로 나눈다. 최초 1회만 돈다.
+	void Ready_LodBands();
 
 private:
 	Shared<Shader> m_Shader{ nullptr };
@@ -47,7 +49,11 @@ private:
 	// <ModelTag>_LOD 프로토타입. 등록돼 있지 않으면 nullptr로 남고 LOD는 그냥 꺼진다.
 	Shared<Model> m_LodModel{ nullptr };
 	Bool m_LodResolved{ false };
-	Bool m_UseLod{ false };
+	/* _LOD.model 하나에 LOD1과 LOD2가 함께 들어 있고 구분은 메시 이름뿐이다. 두 레벨을 같이
+	   그리면 같은 물체가 겹치므로, 해석할 때 밴드별 인덱스를 만들어 한 밴드만 그린다. */
+	vector<uint32> m_LodBand1;   // LOD1 메시
+	vector<uint32> m_LodBand2;   // LOD2 메시 + LOD2가 없는 그룹의 LOD1 메시
+	uint32 m_LodBand{ 0 };       // 0 = 원본, 1 = LOD1, 2 = LOD2
 	Shared<Navigation> m_Navigation{ nullptr };
 	Shared<WorldCollider> m_WorldCollider{ nullptr };
 

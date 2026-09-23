@@ -10,11 +10,60 @@
 
 namespace
 {
-	/* 임시 거리 규칙이다. 원작 DistRate(0.70/0.35/0.10/0.03)를 거리로 바꾸는 공식이 아직
-	   풀리지 않았으므로, 타일마다 크기가 크게 다른 점만 반영해 AABB 반경에 비례한 배수를 쓴다.
-	   들어갈 임계값을 나올 임계값보다 크게 둬서 경계에 서 있어도 매 프레임 뒤집히지 않는다. */
-	constexpr Float LOD_ENTER_RADIUS_SCALE{ 2.2f };
-	constexpr Float LOD_EXIT_RADIUS_SCALE{ 1.8f };
+	/* 원작 ObjectParam의 DistRate를 그대로 쓴다(g11120·g11121·g11220 모두 0.70/0.35/0.10/0.03).
+	   미터로 환산할 공식이 아직 없으므로 겉보기 크기 비율 s = 타일 AABB 반경 / 카메라 거리로
+	   읽는다. 값이 내림차순인 것과 자연스럽게 맞는다. DistRate3(0.03)은 LOD3이 아니라 가시성
+	   한계이고, 우리 타일 반경에서는 far plane 500 밖이라 쓰지 않는다. */
+	constexpr Float LOD_RATE_LEAVE_LOD0{ 0.70f };
+	constexpr Float LOD_RATE_LEAVE_LOD1{ 0.35f };
+	// 잠정 배율. 원작 전환 공식이 밝혀지면 이 상수만 걷어내면 된다.
+	constexpr Float LOD_RATE_SCALE{ 1.0f };
+	// 경계에서 매 프레임 뒤집히지 않게 하는 폭.
+	constexpr Float LOD_HYSTERESIS{ 0.10f };
+
+	/// "LOD1_<이름>-LOD1.003"과 "g11021_build1-LOD1.002" 두 표기를 모두 받는다.
+	uint32 Parse_LodLevel(const string& name)
+	{
+		const size_t suffix = name.rfind("-LOD");
+		if (suffix != string::npos && suffix + 4 < name.size())
+		{
+			const Char digit = name[suffix + 4];
+			if (digit >= '0' && digit <= '9')
+				return static_cast<uint32>(digit - '0');
+		}
+		if (name.size() > 4 && name.compare(0, 3, "LOD") == 0 && name[4] == '_' &&
+			name[3] >= '0' && name[3] <= '9')
+			return static_cast<uint32>(name[3] - '0');
+		return 0;
+	}
+
+	/// 레벨 표기와 Blender 사본 번호를 떼어 같은 물체끼리 묶을 이름을 만든다.
+	string Strip_LodDecoration(const string& name)
+	{
+		string out = name;
+		if (out.size() > 4 && out.compare(0, 3, "LOD") == 0 && out[4] == '_' &&
+			out[3] >= '0' && out[3] <= '9')
+			out.erase(0, 5);
+
+		const size_t dash = out.rfind("-LOD");
+		if (dash != string::npos)
+		{
+			size_t end = dash + 4;
+			while (end < out.size() && out[end] >= '0' && out[end] <= '9')
+				++end;
+			out.erase(dash, end - dash);
+		}
+
+		const size_t dot = out.rfind('.');
+		if (dot != string::npos && dot + 1 < out.size())
+		{
+			Bool allDigits = true;
+			for (size_t i = dot + 1; i < out.size(); ++i)
+				if (out[i] < '0' || out[i] > '9') { allDigits = false; break; }
+			if (allDigits) out.erase(dot);
+		}
+		return out;
+	}
 }
 
 WorldMap::WorldMap() : GameObject{} {}
@@ -71,7 +120,14 @@ HRESULT WorldMap::Render()
 		return E_FAIL;
 
 	const Shared<Model>& model = Select_Model();
-	const uint32 numMeshes = static_cast<uint32>(model->Get_NumMeshes());
+	/* 밴드0은 원본 모델 전체, 밴드1·2는 _LOD.model에서 그 레벨에 속한 메시만 그린다.
+	   참조 대신 포인터를 쓰는 이유는 nullptr로 "전체"를 표현하면서 벡터 복사를 피하기 위해서다. */
+	const vector<uint32>* meshOrder = nullptr;
+	if (m_LodBand == 1) meshOrder = &m_LodBand1;
+	else if (m_LodBand == 2) meshOrder = &m_LodBand2;
+
+	const uint32 numMeshes = meshOrder ?
+		static_cast<uint32>(meshOrder->size()) : static_cast<uint32>(model->Get_NumMeshes());
 	const Bool culling = GAME_INSTANCE->Get_FrustumCulling();
 	const Matrix worldMatrix = m_Transform->Get_WorldMatrix();
 
@@ -92,8 +148,10 @@ HRESULT WorldMap::Render()
 		}
 	}
 
-	for (uint32 i = 0; i < numMeshes; ++i)
+	for (uint32 k = 0; k < numMeshes; ++k)
 	{
+		const uint32 i = meshOrder ? (*meshOrder)[k] : k;
+
 		if (culling)
 		{
 			BoundingBox meshLocal{};
@@ -116,6 +174,53 @@ HRESULT WorldMap::Render()
 	}
 
 	return S_OK;
+}
+
+void WorldMap::Ready_LodBands()
+{
+	m_LodBand1.clear();
+	m_LodBand2.clear();
+	if (nullptr == m_LodModel)
+		return;
+
+	const uint32 numMeshes = m_LodModel->Get_NumMeshes();
+	vector<uint32> levels(numMeshes, 0);
+	vector<string> groups(numMeshes);
+	std::set<string> hasLod2;
+
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+		string meshName{};
+		uint32 materialIndex{};
+		if (FAILED(m_LodModel->Get_MeshMaterialInfo(i, meshName, materialIndex)))
+			continue;
+
+		levels[i] = Parse_LodLevel(meshName);
+		groups[i] = Strip_LodDecoration(meshName);
+		if (levels[i] == 2)
+			hasLod2.insert(groups[i]);
+	}
+
+	for (uint32 i = 0; i < numMeshes; ++i)
+	{
+		if (levels[i] == 2)
+		{
+			m_LodBand2.push_back(i);
+		}
+		else if (levels[i] == 1)
+		{
+			m_LodBand1.push_back(i);
+			// 더 거친 판이 없는 물체는 먼 밴드에서도 LOD1을 그대로 쓴다.
+			if (!hasLod2.contains(groups[i]))
+				m_LodBand2.push_back(i);
+		}
+		else
+		{
+			// 레벨 표기가 없는 메시는 어느 밴드에서도 빠지지 않게 둘 다에 넣는다.
+			m_LodBand1.push_back(i);
+			m_LodBand2.push_back(i);
+		}
+	}
 }
 
 const Shared<Model>& WorldMap::Select_Model()
@@ -144,11 +249,13 @@ const Shared<Model>& WorldMap::Select_Model()
 				}
 			}
 		}
+
+		Ready_LodBands();
 	}
 
-	if (nullptr == m_LodModel || !GAME_INSTANCE->Get_WorldLod())
+	if (nullptr == m_LodModel || m_LodBand1.empty() || !GAME_INSTANCE->Get_WorldLod())
 	{
-		m_UseLod = false;
+		m_LodBand = 0;
 		return m_Model;
 	}
 
@@ -164,12 +271,31 @@ const Shared<Model>& WorldMap::Select_Model()
 		const Float radius = extents.Length();
 		const Float distance = Vector3::Distance(center, camera->Get_Transform()->Get_Position());
 
-		m_UseLod = m_UseLod ?
-			distance > radius * LOD_EXIT_RADIUS_SCALE :
-			distance > radius * LOD_ENTER_RADIUS_SCALE;
+		// 겉보기 크기. 가까울수록 커진다.
+		const Float size = distance > 0.f ? radius / distance : FLT_MAX;
+		const Float leave0 = LOD_RATE_LEAVE_LOD0 * LOD_RATE_SCALE;
+		const Float leave1 = LOD_RATE_LEAVE_LOD1 * LOD_RATE_SCALE;
+
+		switch (m_LodBand)
+		{
+		case 0:
+			if (size < leave0 * (1.f - LOD_HYSTERESIS)) m_LodBand = 1;
+			break;
+		case 1:
+			if (size < leave1 * (1.f - LOD_HYSTERESIS)) m_LodBand = 2;
+			else if (size > leave0 * (1.f + LOD_HYSTERESIS)) m_LodBand = 0;
+			break;
+		default:
+			if (size > leave1 * (1.f + LOD_HYSTERESIS)) m_LodBand = 1;
+			break;
+		}
+
+		// LOD2가 아예 없는 타일은 밴드2로 내려가도 볼 게 없으므로 밴드1에 머문다.
+		if (m_LodBand == 2 && m_LodBand2.empty())
+			m_LodBand = 1;
 	}
 
-	if (m_UseLod)
+	if (m_LodBand != 0)
 	{
 		GAME_INSTANCE->Add_LodTile();
 		return m_LodModel;

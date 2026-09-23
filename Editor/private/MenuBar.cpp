@@ -349,6 +349,7 @@ void MenuBar::Update_HotKey()
     Bool currF1 = (GAME_INSTANCE->Get_DIKeyState(DIK_F1) & 0x80) != 0;
     Bool currF2 = (GAME_INSTANCE->Get_DIKeyState(DIK_F2) & 0x80) != 0;
     Bool currF3 = (GAME_INSTANCE->Get_DIKeyState(DIK_F3) & 0x80) != 0;
+    Bool currF7 = (GAME_INSTANCE->Get_DIKeyState(DIK_F7) & 0x80) != 0;
 
     if (currF1 && !m_PrevF1)
     {
@@ -367,7 +368,13 @@ void MenuBar::Update_HotKey()
 
     m_PrevF1 = currF1;
     m_PrevF2 = currF2;
+    if (currF7 && !m_PrevF7)
+    {
+        m_ShowFrameStats = !m_ShowFrameStats;
+    }
+
     m_PrevF3 = currF3;
+    m_PrevF7 = currF7;
 }
 
 void MenuBar::Render_Debug()
@@ -385,7 +392,7 @@ void MenuBar::Render_Debug()
             GAME_INSTANCE->Toggle_RenderTargetDebug();
 
         ImGui::Separator();
-        ImGui::MenuItem("Show Frame Stats", nullptr, &m_ShowFrameStats);
+        ImGui::MenuItem("Show Frame Stats", "F7", &m_ShowFrameStats);
 
 
         ImGui::EndMenu();

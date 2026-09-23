@@ -78,17 +78,20 @@ void MainApp::Update()
 	GAME_INSTANCE->Update_Engine();
 
 #ifdef _DEBUG
+	const Bool currF7 = (GAME_INSTANCE->Get_DIKeyState(DIK_F7) & 0x80) != 0;
+	if (currF7 && !m_PrevF7)
+		m_ShowFrameStats = !m_ShowFrameStats;
+	m_PrevF7 = currF7;
+
 	m_StatsTime += GAME_INSTANCE->Compute_UnscaledTimeDelta();
 	++m_StatsFrames;
 	if (m_StatsTime < 1.f)
 		return;
 
-	wchar_t title[160]{};
-	swprintf_s(title, L"Launcher  |  %.0f FPS  %.2f ms  |  %u draws  %.2fM tris",
+	swprintf_s(m_StatsText, L"%.0f FPS  %.2f ms  |  %u draws  %.2fM tris",
 		m_StatsFrames / m_StatsTime, m_StatsTime * 1000.f / m_StatsFrames,
 		GAME_INSTANCE->Get_FrameDrawCount(),
 		static_cast<double>(GAME_INSTANCE->Get_FrameTriangleCount()) / 1000000.0);
-	SetWindowTextW(g_hWnd, title);
 	m_StatsTime = 0.f;
 	m_StatsFrames = 0;
 #endif
@@ -96,10 +99,23 @@ void MainApp::Update()
 
 void MainApp::Render()
 {
+	// Launcher는 오프스크린 없이 스왑 체인 백버퍼에 그린다. Present가 렌더 타깃을 풀기 때문에 매 프레임 다시 묶는다.
+	static const Shared<Float4> clearColor = make_shared<Float4>(0.f, 0.f, 0.f, 1.f);
+	GAME_INSTANCE->End_RenderOffScreen();
+	GAME_INSTANCE->Clear_BackBufferView(clearColor);
+
 	if (FAILED(GAME_INSTANCE->Draw()))
 	{
 		MSG_BOX("MainApp Rendering Failed");
 	}
+
+#ifdef _DEBUG
+	if (m_ShowFrameStats)
+		GAME_INSTANCE->Draw_Font(L"Nier_16", m_StatsText,
+			Vector2(static_cast<Float>(g_EngineDesc.viewportWidth) - 520.f, 10.f));
+#endif
+
+	GAME_INSTANCE->Present();
 }
 
 Unique<MainApp> MainApp::Create()

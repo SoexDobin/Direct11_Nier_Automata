@@ -228,6 +228,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClInclude Include="..\public\LightManager.h" />
     <ClInclude Include="..\public\Material.h" />
     <ClInclude Include="..\public\Mesh.h" />
+    <ClInclude Include="..\public\StaticMesh.h" />
+    <ClInclude Include="..\public\SkeletalMesh.h" />
+    <ClInclude Include="..\public\InstanceMesh.h" />
     <ClInclude Include="..\public\Model.h" />
     <ClInclude Include="..\public\NavCell.h" />
     <ClInclude Include="..\public\Navigation.h" />
@@ -300,6 +303,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     <ClCompile Include="..\private\LightManager.cpp" />
     <ClCompile Include="..\private\Material.cpp" />
     <ClCompile Include="..\private\Mesh.cpp" />
+    <ClCompile Include="..\private\StaticMesh.cpp" />
+    <ClCompile Include="..\private\SkeletalMesh.cpp" />
+    <ClCompile Include="..\private\InstanceMesh.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\NavCell.cpp" />
     <ClCompile Include="..\private\Navigation.cpp" />
@@ -331,6 +337,9 @@ call "$(ProjectDir)ExportBuildArtifacts.bat"</Command>
     </ClCompile>
 	<ClCompile Include="..\private\rttr_generated\Material_rttr.cpp" />
 	<ClCompile Include="..\private\rttr_generated\Mesh_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\StaticMesh_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\SkeletalMesh_rttr.cpp" />
+	<ClCompile Include="..\private\rttr_generated\InstanceMesh_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Model_rttr.cpp" />
     <ClCompile Include="..\private\rttr_generated\Navigation_rttr.cpp" />
 	<ClCompile Include="..\private\rttr_generated\NavCell_rttr.cpp" />

@@ -6,6 +6,7 @@
 
 NS_BEGIN(Engine)
 class Mesh;
+class SkeletalMesh;
 class Material;
 class Bone;
 class Animation;
@@ -156,6 +157,8 @@ private:
 	void Restore_AnimationRequests();
 	HRESULT Validate_MaterialBindings(const Shared<Shader>& shader,
 		const Shared<const MODEL_MATERIAL_SETTINGS>& settings) const;
+	// 본을 쓰는 경로 전용. 스켈레탈 모델이 아니거나 인덱스가 범위 밖이면 nullptr.
+	Shared<SkeletalMesh> Get_SkeletalMesh(uint32 meshIndex) const;
 
 private:
 	TRANSFORM_FRAME m_TransformFrame{};

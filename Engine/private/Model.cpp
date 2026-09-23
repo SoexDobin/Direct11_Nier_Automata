@@ -3,6 +3,7 @@
 #include "Bone.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "SkeletalMesh.h"
 #include "Animation.h"
 #include "AnimationTracker.h"
 #include <nlohmann/json.hpp>
@@ -845,13 +846,17 @@ vector<BONE_SNAPSHOT> Model::Get_SnapShot_BoneMatrices()
 
 	for (uint32 i = 0 ; i < m_NumMeshes; ++i)
 	{
-		m_Meshes[i]->Fill_BoneMatrices(m_Bones);
+		const Shared<SkeletalMesh> mesh = Get_SkeletalMesh(i);
+		if (!mesh)
+			continue;
 
-		const uint32 numBones = m_Meshes[i]->Get_NumMeshBones();
+		mesh->Fill_BoneMatrices(m_Bones);
+
+		const uint32 numBones = mesh->Get_NumMeshBones();
 		snapShots[i].numBones = numBones;
 
 		memcpy(snapShots[i].matrices,
-			m_Meshes[i]->Get_BoneMatrices(),
+			mesh->Get_BoneMatrices(),
 			sizeof(Matrix) * numBones);
 	}
 
@@ -1311,8 +1316,13 @@ HRESULT Model::Bind_Material(const Shared<Shader>& shader, const Char* constantN
 
 HRESULT Model::Bind_BoneMatrices(const Shared<Shader>& shader, const Char* constantName, uint32 meshIndex)
 {
-	if (!shader || !constantName || meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex])
+	if (!shader || !constantName)
 		return E_INVALIDARG;
+
+	const Shared<SkeletalMesh> mesh = Get_SkeletalMesh(meshIndex);
+	if (!mesh)
+		return E_INVALIDARG;
+
 	// Without an animation update (edit mode) the combined matrices were never built; show the bind pose.
 	if (!m_HasPose)
 	{
@@ -1320,7 +1330,15 @@ HRESULT Model::Bind_BoneMatrices(const Shared<Shader>& shader, const Char* const
 			bone->Update_CombinedTransformationMatrix(m_Bones, m_PreLocalTransformMatrix);
 		m_HasPose = true;
 	}
-	return m_Meshes[meshIndex]->Bind_BoneMatrices(shader, constantName, m_Bones);
+	return mesh->Bind_BoneMatrices(shader, constantName, m_Bones);
+}
+
+Shared<SkeletalMesh> Model::Get_SkeletalMesh(uint32 meshIndex) const
+{
+	if (!m_IsSkeletal || meshIndex >= m_Meshes.size() || !m_Meshes[meshIndex])
+		return nullptr;
+
+	return static_pointer_cast<SkeletalMesh>(m_Meshes[meshIndex]);
 }
 
 Shared<Model> Model::CreatePrototype()

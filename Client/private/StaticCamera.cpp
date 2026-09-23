@@ -22,7 +22,7 @@ HRESULT StaticCamera::Initialize(void* arg)
 	desc.fovY = XMConvertToRadians(60.0f);
 	desc.aspect = static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportWidth / ClientSettingManager::g_EngineDesc.viewportHeight);
 	desc.nearPlane = 0.1f;
-	desc.farPlane = 500.f;
+	desc.farPlane = 1000.f;
 
 	return Camera::Initialize(&desc);
 }

@@ -161,7 +161,7 @@ HRESULT EditorManager::Initialize()
         desc.fovY = XMConvertToRadians(60.f);
         desc.aspect = static_cast<Float>(g_projectSettings.viewportWidth) / static_cast<Float>(g_projectSettings.viewportHeight);
         desc.nearPlane = 0.1f;
-        desc.farPlane = 500.f;
+        desc.farPlane = 1000.f;
     }
 
     m_EditorCamera = EditorCamera::Create(GAME_INSTANCE->Get_Device(), GAME_INSTANCE->Get_Context(),desc);

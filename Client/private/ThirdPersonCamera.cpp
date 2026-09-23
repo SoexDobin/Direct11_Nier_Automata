@@ -25,7 +25,7 @@ HRESULT ThirdPersonCamera::Initialize(void* arg)
 	localDesc.fovY = XMConvertToRadians(60.f);
 	localDesc.aspect = static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportWidth) / static_cast<Float>(ClientSettingManager::g_EngineDesc.viewportHeight);
 	localDesc.nearPlane = 0.1f;
-	localDesc.farPlane = 500.f;
+	localDesc.farPlane = 1000.f;
 	
 	localDesc.distance = 7.f;
 	localDesc.minDistance = 3.f;

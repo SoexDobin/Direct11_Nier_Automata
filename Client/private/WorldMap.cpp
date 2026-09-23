@@ -11,9 +11,9 @@
 namespace
 {
 	/* 원작 ObjectParam의 DistRate를 그대로 쓴다(g11120·g11121·g11220 모두 0.70/0.35/0.10/0.03).
-	   미터로 환산할 공식이 아직 없으므로 겉보기 크기 비율 s = 타일 AABB 반경 / 카메라 거리로
-	   읽는다. 값이 내림차순인 것과 자연스럽게 맞는다. DistRate3(0.03)은 LOD3이 아니라 가시성
-	   한계이고, 우리 타일 반경에서는 far plane 500 밖이라 쓰지 않는다. */
+	   미터로 환산할 공식이 아직 없으므로 겉보기 크기 비율 s = 타일 AABB 반경 / 가장 가까운
+	   면까지의 거리로 읽는다. 값이 내림차순인 것과 자연스럽게 맞는다. DistRate3(0.03)은
+	   LOD3이 아니라 가시성 한계이고, 우리 타일 반경에서는 far plane 밖이라 쓰지 않는다. */
 	constexpr Float LOD_RATE_LEAVE_LOD0{ 0.70f };
 	constexpr Float LOD_RATE_LEAVE_LOD1{ 0.35f };
 	// 잠정 배율. 원작 전환 공식이 밝혀지면 이 상수만 걷어내면 된다.
@@ -269,7 +269,18 @@ const Shared<Model>& WorldMap::Select_Model()
 		const Vector3 center{ tileWorld.Center };
 		const Vector3 extents{ tileWorld.Extents };
 		const Float radius = extents.Length();
-		const Float distance = Vector3::Distance(center, camera->Get_Transform()->Get_Position());
+
+		/* 중심까지가 아니라 AABB에서 가장 가까운 점까지를 잰다. 타일이 200~600으로 커서
+		   중심 거리로 재면 바로 옆에 서 있어도 멀다고 판정된다. 상자 안에 있으면 0이 되어
+		   항상 LOD0이고, 멀어지면 중심 거리에서 반경을 뺀 값에 수렴한다. */
+		const Vector3 cameraPosition = camera->Get_Transform()->Get_Position();
+		const Vector3 boxMin = center - extents;
+		const Vector3 boxMax = center + extents;
+		const Vector3 nearestPoint{
+			std::clamp(cameraPosition.x, boxMin.x, boxMax.x),
+			std::clamp(cameraPosition.y, boxMin.y, boxMax.y),
+			std::clamp(cameraPosition.z, boxMin.z, boxMax.z) };
+		const Float distance = Vector3::Distance(nearestPoint, cameraPosition);
 
 		// 겉보기 크기. 가까울수록 커진다.
 		const Float size = distance > 0.f ? radius / distance : FLT_MAX;
@@ -293,6 +304,7 @@ const Shared<Model>& WorldMap::Select_Model()
 		// LOD2가 아예 없는 타일은 밴드2로 내려가도 볼 게 없으므로 밴드1에 머문다.
 		if (m_LodBand == 2 && m_LodBand2.empty())
 			m_LodBand = 1;
+
 	}
 
 	if (m_LodBand != 0)

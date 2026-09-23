@@ -24,6 +24,13 @@ public:
 	void Add_CulledMesh() { ++m_CulledCount; }
 	uint32 Get_FrameCulledCount() const { return m_LastCulledCount; }
 
+	// 월드 타일 LOD 스위치. 컬링과 같은 이유로 기본은 켜짐이고 전후 비교용으로만 끈다.
+	Bool Toggle_WorldLod() { m_WorldLod = !m_WorldLod; return m_WorldLod; }
+	Bool Get_WorldLod() const { return m_WorldLod; }
+	// LOD 메시로 그린 타일 수. 컬링 카운터와 같은 주기로 넘어간다.
+	void Add_LodTile() { ++m_LodTileCount; }
+	uint32 Get_FrameLodTileCount() const { return m_LastLodTileCount; }
+
 public:
 	void Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject> &gameObject);
 	void Draw();
@@ -51,6 +58,9 @@ private:
 	Bool m_FrustumCulling{ true };
 	uint32 m_CulledCount{};
 	uint32 m_LastCulledCount{};
+	Bool m_WorldLod{ true };
+	uint32 m_LodTileCount{};
+	uint32 m_LastLodTileCount{};
 
 private: /* For DefShader */
 	Matrix m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};

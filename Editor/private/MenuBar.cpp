@@ -133,11 +133,12 @@ void MenuBar::Render(Bool isResize) {
         // 에디터 전체 프레임(모든 View 렌더 + ImGui) 기준. ImGui가 최근 프레임을 평균낸다.
         // draw·삼각형 수는 직전 프레임에 그린 모든 View(Game + Scene)의 합이다.
         const Float fps = ImGui::GetIO().Framerate;
-        Char frameText[160]{};
-        snprintf(frameText, sizeof(frameText), "%.0f FPS  %.2f ms  |  %u draws  %.2fM tris  |  cull %s %u (all views)",
+        Char frameText[208]{};
+        snprintf(frameText, sizeof(frameText), "%.0f FPS  %.2f ms  |  %u draws  %.2fM tris  |  cull %s %u  |  lod %s %u (all views)",
             fps, fps > 0.f ? 1000.f / fps : 0.f, GAME_INSTANCE->Get_FrameDrawCount(),
             static_cast<double>(GAME_INSTANCE->Get_FrameTriangleCount()) / 1000000.0,
-            GAME_INSTANCE->Get_FrustumCulling() ? "on" : "off", GAME_INSTANCE->Get_FrameCulledCount());
+            GAME_INSTANCE->Get_FrustumCulling() ? "on" : "off", GAME_INSTANCE->Get_FrameCulledCount(),
+            GAME_INSTANCE->Get_WorldLod() ? "on" : "off", GAME_INSTANCE->Get_FrameLodTileCount());
         ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 40.0f - ImGui::CalcTextSize(frameText).x);
         ImGui::TextUnformatted(frameText);
     }
@@ -352,6 +353,7 @@ void MenuBar::Update_HotKey()
     Bool currF3 = (GAME_INSTANCE->Get_DIKeyState(DIK_F3) & 0x80) != 0;
     Bool currF7 = (GAME_INSTANCE->Get_DIKeyState(DIK_F7) & 0x80) != 0;
     Bool currF8 = (GAME_INSTANCE->Get_DIKeyState(DIK_F8) & 0x80) != 0;
+    Bool currF9 = (GAME_INSTANCE->Get_DIKeyState(DIK_F9) & 0x80) != 0;
 
     if (currF1 && !m_PrevF1)
     {
@@ -380,9 +382,15 @@ void MenuBar::Update_HotKey()
         GAME_INSTANCE->Toggle_FrustumCulling();
     }
 
+    if (currF9 && !m_PrevF9)
+    {
+        GAME_INSTANCE->Toggle_WorldLod();
+    }
+
     m_PrevF3 = currF3;
     m_PrevF7 = currF7;
     m_PrevF8 = currF8;
+    m_PrevF9 = currF9;
 }
 
 void MenuBar::Render_Debug()
@@ -401,6 +409,9 @@ void MenuBar::Render_Debug()
 
         if (ImGui::MenuItem("Toggle Frustum Culling", "F8", GAME_INSTANCE->Get_FrustumCulling()))
             GAME_INSTANCE->Toggle_FrustumCulling();
+
+        if (ImGui::MenuItem("Toggle World LOD", "F9", GAME_INSTANCE->Get_WorldLod()))
+            GAME_INSTANCE->Toggle_WorldLod();
 
         ImGui::Separator();
         ImGui::MenuItem("Show Frame Stats", "F7", &m_ShowFrameStats);

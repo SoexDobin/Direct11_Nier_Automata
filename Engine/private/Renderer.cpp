@@ -56,6 +56,8 @@ HRESULT Renderer::Clear_RenderGroup()
 #endif
     m_LastCulledCount = m_CulledCount;
     m_CulledCount = 0;
+    m_LastLodTileCount = m_LodTileCount;
+    m_LodTileCount = 0;
 
     m_LayerMask = ETOI(LAYER::ALL_LAYER);
 

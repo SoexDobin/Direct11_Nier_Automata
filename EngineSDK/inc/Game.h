@@ -391,6 +391,10 @@ public:
     Bool Is_Visible(const BoundingBox& worldBounds) const;
     void Add_CulledMesh() const;
     uint32 Get_FrameCulledCount() const;
+    Bool Toggle_WorldLod() const;
+    Bool Get_WorldLod() const;
+    void Add_LodTile() const;
+    uint32 Get_FrameLodTileCount() const;
     void Add_DrawStats(uint32 triangleCount) const;
     uint32 Get_FrameDrawCount() const;
     uint64_t Get_FrameTriangleCount() const;

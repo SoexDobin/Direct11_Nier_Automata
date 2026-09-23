@@ -1227,6 +1227,26 @@ uint32 Game::Get_FrameCulledCount() const
     return m_Renderer->Get_FrameCulledCount();
 }
 
+Bool Game::Toggle_WorldLod() const
+{
+    return m_Renderer->Toggle_WorldLod();
+}
+
+Bool Game::Get_WorldLod() const
+{
+    return m_Renderer->Get_WorldLod();
+}
+
+void Game::Add_LodTile() const
+{
+    m_Renderer->Add_LodTile();
+}
+
+uint32 Game::Get_FrameLodTileCount() const
+{
+    return m_Renderer->Get_FrameLodTileCount();
+}
+
 void Game::Add_DrawStats(uint32 triangleCount) const
 {
     m_Renderer->Add_DrawStats(triangleCount);

@@ -30,6 +30,7 @@ private:
 	Bool m_PrevF3 = false;
 	Bool m_PrevF7 = false;
 	Bool m_PrevF8 = false;
+	Bool m_PrevF9 = false;
 	Bool m_ShowFrameStats = false;
 
 public:

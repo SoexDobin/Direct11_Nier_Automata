@@ -38,10 +38,16 @@ public:
 protected:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
+	/// 이번 프레임에 그릴 모델을 고른다. 멀면 <ModelTag>_LOD, 가까우면 원본이다.
+	const Shared<Model>& Select_Model();
 
 private:
 	Shared<Shader> m_Shader{ nullptr };
 	Shared<Model> m_Model{ nullptr };
+	// <ModelTag>_LOD 프로토타입. 등록돼 있지 않으면 nullptr로 남고 LOD는 그냥 꺼진다.
+	Shared<Model> m_LodModel{ nullptr };
+	Bool m_LodResolved{ false };
+	Bool m_UseLod{ false };
 	Shared<Navigation> m_Navigation{ nullptr };
 	Shared<WorldCollider> m_WorldCollider{ nullptr };
 

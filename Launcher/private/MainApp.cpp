@@ -88,17 +88,24 @@ void MainApp::Update()
 		GAME_INSTANCE->Toggle_FrustumCulling();
 	m_PrevF8 = currF8;
 
+	const Bool currF9 = (GAME_INSTANCE->Get_DIKeyState(DIK_F9) & 0x80) != 0;
+	if (currF9 && !m_PrevF9)
+		GAME_INSTANCE->Toggle_WorldLod();
+	m_PrevF9 = currF9;
+
 	m_StatsTime += GAME_INSTANCE->Compute_UnscaledTimeDelta();
 	++m_StatsFrames;
 	if (m_StatsTime < 1.f)
 		return;
 
-	swprintf_s(m_StatsText, L"%.0f FPS  %.2f ms  |  %u draws  %.2fM tris  |  cull %s %u",
+	swprintf_s(m_StatsText, L"%.0f FPS  %.2f ms  |  %u draws  %.2fM tris  |  cull %s %u  |  lod %s %u",
 		m_StatsFrames / m_StatsTime, m_StatsTime * 1000.f / m_StatsFrames,
 		GAME_INSTANCE->Get_FrameDrawCount(),
 		static_cast<double>(GAME_INSTANCE->Get_FrameTriangleCount()) / 1000000.0,
 		GAME_INSTANCE->Get_FrustumCulling() ? L"on" : L"off",
-		GAME_INSTANCE->Get_FrameCulledCount());
+		GAME_INSTANCE->Get_FrameCulledCount(),
+		GAME_INSTANCE->Get_WorldLod() ? L"on" : L"off",
+		GAME_INSTANCE->Get_FrameLodTileCount());
 	m_StatsTime = 0.f;
 	m_StatsFrames = 0;
 #endif

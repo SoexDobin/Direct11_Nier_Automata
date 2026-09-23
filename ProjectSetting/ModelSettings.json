@@ -42,6 +42,26 @@
       },
       {
          "level": "3",
+         "path": "Models/World/CityOfRuinEntry/CityOfRuinEntry_LOD.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinEntry_LOD"
+      },
+      {
+         "level": "3",
          "path": "Models/World/CityOfRuinEntry/CityOfRuinEntry_COL.model",
          "position": {
             "x": 0.0,
@@ -79,6 +99,26 @@
             "z": 1.0
          },
          "tag": "CityOfRuinBridge"
+      },
+      {
+         "level": "3",
+         "path": "Models/World/CityOfRuinBridge/CityOfRuinBridge_LOD.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinBridge_LOD"
       },
       {
          "level": "3",
@@ -122,6 +162,26 @@
       },
       {
          "level": "3",
+         "path": "Models/World/CityOfRuinMainField/CityOfRuinMainField_LOD.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinMainField_LOD"
+      },
+      {
+         "level": "3",
          "path": "Models/World/CityOfRuinMainField/CityOfRuinMainField_COL.model",
          "position": {
             "x": 0.0,
@@ -162,6 +222,26 @@
       },
       {
          "level": "3",
+         "path": "Models/World/CityOfRuinG11319/CityOfRuinG11319_LOD.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinG11319_LOD"
+      },
+      {
+         "level": "3",
          "path": "Models/World/CityOfRuinG11319/CityOfRuinG11319_COL.model",
          "position": {
             "x": 0.0,
@@ -199,6 +279,26 @@
             "z": 1.0
          },
          "tag": "CityOfRuinManHole"
+      },
+      {
+         "level": "3",
+         "path": "Models/World/CityOfRuinManHole/CityOfRuinManHole_LOD.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinManHole_LOD"
       },
       {
          "level": "3",

@@ -48,6 +48,16 @@ HRESULT WorldCollider::Post_Load()
 		return S_OK;
 	}
 
+	/* 지역 백드롭에서 가져온 배경 타일에는 원작에 COL 자체가 없다. 등록되지 않은 것은
+	   이 자산에서 오류가 아니므로 경고로 끝낸다. 등록돼 있는데 실패하는 경우는 아래에서
+	   그대로 오류로 남긴다. */
+	if (-1 == GAME_INSTANCE->Get_ContainLevelByModelTag(m_SourceModelTag))
+	{
+		LOG_WARN(L"[WorldCollider] No collision model {} is registered; this object has no collision",
+			m_SourceModelTag);
+		return S_OK;
+	}
+
 	m_ActorHandle = GAME_INSTANCE->Add_StaticCollision(
 		m_SourceModelTag, owner->Get_Transform()->Get_WorldMatrix());
 

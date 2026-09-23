@@ -1,0 +1,513 @@
+{
+    "animations": [],
+    "bones": [
+        {
+            "name": "RootNode",
+            "parentIndex": -1
+        },
+        {
+            "name": "g11219_GROUND_11219_00",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_GROUND_11219road_00",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_GROUND_11219road_01",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_GROUND_11219road_02",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_00",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_01",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_02",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_03",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_04",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_06",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_08",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_09",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_10",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_11",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_12",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_13",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219__build_11219_15",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_bigtree_11219_00",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_bigtree_11219_01",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_bigtree_11219_02",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_bigtree_11219_03",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_far_tree",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_tree",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_tree1",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_tree2",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_tree3",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11219_tree4",
+            "parentIndex": 0
+        }
+    ],
+    "inspection": {
+        "converterMaterialCount": 4,
+        "duplicateConverterMaterialNames": [],
+        "invalidMeshMaterialIndices": [],
+        "meshCount": 27,
+        "referenceMaterials": {
+            "converterOnlyMaterials": [],
+            "duplicateSourceMaterialNames": [],
+            "exactMatchCount": 4,
+            "exactMatches": [
+                {
+                    "materialIndex": 0,
+                    "materialName": "Ground3"
+                },
+                {
+                    "materialIndex": 1,
+                    "materialName": "NonGround3"
+                },
+                {
+                    "materialIndex": 2,
+                    "materialName": "kaj_tree_leaf_aaa1_5"
+                },
+                {
+                    "materialIndex": 3,
+                    "materialName": "Material09"
+                }
+            ],
+            "materialCount": 4,
+            "path": "materials.json",
+            "present": true,
+            "sourceOnlyMaterials": [],
+            "status": "ok"
+        },
+        "roleMeshCounts": {
+            "Col": 0,
+            "Instance": 0,
+            "Lod": 0,
+            "Mesh": 27,
+            "Shadow": 0
+        },
+        "validMeshMaterialIndexCount": 27
+    },
+    "inspectionSchemaVersion": 1,
+    "materials": [
+        {
+            "materialIndex": 0,
+            "name": "Ground3",
+            "textures": [
+                {
+                    "path": "Textures/2088E045.dds",
+                    "type": 1
+                }
+            ]
+        },
+        {
+            "materialIndex": 1,
+            "name": "NonGround3",
+            "textures": [
+                {
+                    "path": "Textures/685AAE13.dds",
+                    "type": 1
+                }
+            ]
+        },
+        {
+            "materialIndex": 2,
+            "name": "kaj_tree_leaf_aaa1_5",
+            "textures": [
+                {
+                    "path": "Textures/665DBB84.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/665DBB84.dds",
+                    "type": 8
+                },
+                {
+                    "path": "Textures/34301313.dds",
+                    "type": 6
+                }
+            ]
+        },
+        {
+            "materialIndex": 3,
+            "name": "Material09",
+            "textures": [
+                {
+                    "path": "Textures/586B99D9.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/586B99D9.dds",
+                    "type": 8
+                }
+            ]
+        }
+    ],
+    "meshes": [
+        {
+            "lodLevel": -1,
+            "materialIndex": 0,
+            "materialName": "Ground3",
+            "name": "g11219_GROUND_11219_00",
+            "numIndices": 10725,
+            "numVertices": 10725,
+            "role": "Mesh",
+            "roleBaseName": "g11219_GROUND_11219_00",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 0,
+            "materialName": "Ground3",
+            "name": "g11219_GROUND_11219road_00",
+            "numIndices": 246,
+            "numVertices": 246,
+            "role": "Mesh",
+            "roleBaseName": "g11219_GROUND_11219road_00",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 0,
+            "materialName": "Ground3",
+            "name": "g11219_GROUND_11219road_01",
+            "numIndices": 318,
+            "numVertices": 318,
+            "role": "Mesh",
+            "roleBaseName": "g11219_GROUND_11219road_01",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 0,
+            "materialName": "Ground3",
+            "name": "g11219_GROUND_11219road_02",
+            "numIndices": 501,
+            "numVertices": 501,
+            "role": "Mesh",
+            "roleBaseName": "g11219_GROUND_11219road_02",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_00",
+            "numIndices": 1938,
+            "numVertices": 1938,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_00",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_01",
+            "numIndices": 5193,
+            "numVertices": 5193,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_01",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_02",
+            "numIndices": 2055,
+            "numVertices": 2055,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_02",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_03",
+            "numIndices": 609,
+            "numVertices": 609,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_03",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_04",
+            "numIndices": 1071,
+            "numVertices": 1071,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_04",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_06",
+            "numIndices": 1068,
+            "numVertices": 1068,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_06",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_08",
+            "numIndices": 1005,
+            "numVertices": 1005,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_08",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_09",
+            "numIndices": 732,
+            "numVertices": 732,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_09",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_10",
+            "numIndices": 1284,
+            "numVertices": 1284,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_10",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_11",
+            "numIndices": 216,
+            "numVertices": 216,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_11",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_12",
+            "numIndices": 1536,
+            "numVertices": 1536,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_12",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_13",
+            "numIndices": 1011,
+            "numVertices": 1011,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_13",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219__build_11219_15",
+            "numIndices": 978,
+            "numVertices": 978,
+            "role": "Mesh",
+            "roleBaseName": "g11219__build_11219_15",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219_bigtree_11219_00",
+            "numIndices": 4506,
+            "numVertices": 4506,
+            "role": "Mesh",
+            "roleBaseName": "g11219_bigtree_11219_00",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219_bigtree_11219_01",
+            "numIndices": 4569,
+            "numVertices": 4569,
+            "role": "Mesh",
+            "roleBaseName": "g11219_bigtree_11219_01",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219_bigtree_11219_02",
+            "numIndices": 1902,
+            "numVertices": 1902,
+            "role": "Mesh",
+            "roleBaseName": "g11219_bigtree_11219_02",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11219_bigtree_11219_03",
+            "numIndices": 1383,
+            "numVertices": 1383,
+            "role": "Mesh",
+            "roleBaseName": "g11219_bigtree_11219_03",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 2,
+            "materialName": "kaj_tree_leaf_aaa1_5",
+            "name": "g11219_far_tree",
+            "numIndices": 19656,
+            "numVertices": 19656,
+            "role": "Mesh",
+            "roleBaseName": "g11219_far_tree",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 3,
+            "materialName": "Material09",
+            "name": "g11219_tree",
+            "numIndices": 360,
+            "numVertices": 360,
+            "role": "Mesh",
+            "roleBaseName": "g11219_tree",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 3,
+            "materialName": "Material09",
+            "name": "g11219_tree1",
+            "numIndices": 384,
+            "numVertices": 384,
+            "role": "Mesh",
+            "roleBaseName": "g11219_tree1",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 3,
+            "materialName": "Material09",
+            "name": "g11219_tree2",
+            "numIndices": 240,
+            "numVertices": 240,
+            "role": "Mesh",
+            "roleBaseName": "g11219_tree2",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 3,
+            "materialName": "Material09",
+            "name": "g11219_tree3",
+            "numIndices": 192,
+            "numVertices": 192,
+            "role": "Mesh",
+            "roleBaseName": "g11219_tree3",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 3,
+            "materialName": "Material09",
+            "name": "g11219_tree4",
+            "numIndices": 456,
+            "numVertices": 456,
+            "role": "Mesh",
+            "roleBaseName": "g11219_tree4",
+            "roleMatchedToken": ""
+        }
+    ]
+}

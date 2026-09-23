@@ -1,0 +1,279 @@
+{
+    "animations": [],
+    "bones": [
+        {
+            "name": "RootNode",
+            "parentIndex": -1
+        },
+        {
+            "name": "g11121_GROUND_11121",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_GROUND_11121road_00",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_GROUND_11121road_01",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_bureakbuild11121_01",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_00",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_01",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_02",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_03",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_04",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_05",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_06",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_07",
+            "parentIndex": 0
+        },
+        {
+            "name": "g11121_g11121_buildings_08",
+            "parentIndex": 0
+        }
+    ],
+    "inspection": {
+        "converterMaterialCount": 3,
+        "duplicateConverterMaterialNames": [],
+        "invalidMeshMaterialIndices": [],
+        "meshCount": 13,
+        "referenceMaterials": {
+            "converterOnlyMaterials": [],
+            "duplicateSourceMaterialNames": [],
+            "exactMatchCount": 3,
+            "exactMatches": [
+                {
+                    "materialIndex": 0,
+                    "materialName": "Ground1"
+                },
+                {
+                    "materialIndex": 1,
+                    "materialName": "NonGround3"
+                },
+                {
+                    "materialIndex": 2,
+                    "materialName": "lowbuildingmodel_aaax_tga2"
+                }
+            ],
+            "materialCount": 4,
+            "path": "materials.json",
+            "present": true,
+            "sourceOnlyMaterials": [
+                "kaj_tree_leaf_aaa1_5"
+            ],
+            "status": "ok"
+        },
+        "roleMeshCounts": {
+            "Col": 0,
+            "Instance": 0,
+            "Lod": 0,
+            "Mesh": 13,
+            "Shadow": 0
+        },
+        "validMeshMaterialIndexCount": 13
+    },
+    "inspectionSchemaVersion": 1,
+    "materials": [
+        {
+            "materialIndex": 0,
+            "name": "Ground1",
+            "textures": [
+                {
+                    "path": "Textures/36157998.dds",
+                    "type": 1
+                }
+            ]
+        },
+        {
+            "materialIndex": 1,
+            "name": "NonGround3",
+            "textures": [
+                {
+                    "path": "Textures/3E25B829.dds",
+                    "type": 1
+                }
+            ]
+        },
+        {
+            "materialIndex": 2,
+            "name": "lowbuildingmodel_aaax_tga2",
+            "textures": [
+                {
+                    "path": "Textures/23254335.dds",
+                    "type": 1
+                }
+            ]
+        }
+    ],
+    "meshes": [
+        {
+            "lodLevel": -1,
+            "materialIndex": 0,
+            "materialName": "Ground1",
+            "name": "g11121_GROUND_11121",
+            "numIndices": 819,
+            "numVertices": 819,
+            "role": "Mesh",
+            "roleBaseName": "g11121_GROUND_11121",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 0,
+            "materialName": "Ground1",
+            "name": "g11121_GROUND_11121road_00",
+            "numIndices": 1329,
+            "numVertices": 1329,
+            "role": "Mesh",
+            "roleBaseName": "g11121_GROUND_11121road_00",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 0,
+            "materialName": "Ground1",
+            "name": "g11121_GROUND_11121road_01",
+            "numIndices": 237,
+            "numVertices": 237,
+            "role": "Mesh",
+            "roleBaseName": "g11121_GROUND_11121road_01",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_bureakbuild11121_01",
+            "numIndices": 2520,
+            "numVertices": 2520,
+            "role": "Mesh",
+            "roleBaseName": "g11121_bureakbuild11121_01",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_00",
+            "numIndices": 102,
+            "numVertices": 102,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_00",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_01",
+            "numIndices": 42,
+            "numVertices": 42,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_01",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_02",
+            "numIndices": 801,
+            "numVertices": 801,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_02",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_03",
+            "numIndices": 54,
+            "numVertices": 54,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_03",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_04",
+            "numIndices": 732,
+            "numVertices": 732,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_04",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_05",
+            "numIndices": 339,
+            "numVertices": 339,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_05",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_06",
+            "numIndices": 867,
+            "numVertices": 867,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_06",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 2,
+            "materialName": "lowbuildingmodel_aaax_tga2",
+            "name": "g11121_g11121_buildings_07",
+            "numIndices": 48,
+            "numVertices": 48,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_07",
+            "roleMatchedToken": ""
+        },
+        {
+            "lodLevel": -1,
+            "materialIndex": 1,
+            "materialName": "NonGround3",
+            "name": "g11121_g11121_buildings_08",
+            "numIndices": 4992,
+            "numVertices": 4992,
+            "role": "Mesh",
+            "roleBaseName": "g11121_g11121_buildings_08",
+            "roleMatchedToken": ""
+        }
+    ]
+}

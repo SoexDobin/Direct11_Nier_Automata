@@ -1,0 +1,44 @@
+{
+ "NonGround3": {
+  "Textures": {
+   "g_AlbedoMap": "685aae13"
+  }
+ },
+ "building11320_1_Material5": {
+  "Textures": {
+   "g_AlbedoMap": "6b1676d8"
+  }
+ },
+ "building11320_2_Material4": {
+  "Textures": {
+   "g_AlbedoMap": "40659660"
+  }
+ },
+ "building11320_3_Material6": {
+  "Textures": {
+   "g_AlbedoMap": "7bf3a369"
+  }
+ },
+ "kaj_tree_leaf_aaa1_5": {
+  "Textures": {
+   "g_AlbedoMap": "665dbb84",
+   "g_NormalMap": "34301313"
+  }
+ },
+ "Ground3": {
+  "Textures": {
+   "g_AlbedoMap": "2088e045"
+  }
+ },
+ "pre_lightmap_2_5": {
+  "Textures": {
+   "g_AlbedoMap": "6b673247",
+   "g_NormalMap": "6b673247"
+  }
+ },
+ "Material09": {
+  "Textures": {
+   "g_AlbedoMap": "586b99d9"
+  }
+ }
+}

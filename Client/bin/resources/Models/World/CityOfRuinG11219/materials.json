@@ -1,0 +1,23 @@
+{
+ "NonGround3": {
+  "Textures": {
+   "g_AlbedoMap": "685aae13"
+  }
+ },
+ "kaj_tree_leaf_aaa1_5": {
+  "Textures": {
+   "g_AlbedoMap": "665dbb84",
+   "g_NormalMap": "34301313"
+  }
+ },
+ "Ground3": {
+  "Textures": {
+   "g_AlbedoMap": "2088e045"
+  }
+ },
+ "Material09": {
+  "Textures": {
+   "g_AlbedoMap": "586b99d9"
+  }
+ }
+}

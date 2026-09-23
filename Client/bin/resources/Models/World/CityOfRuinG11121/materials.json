@@ -1,0 +1,22 @@
+{
+ "NonGround3": {
+  "Textures": {
+   "g_AlbedoMap": "3e25b829"
+  }
+ },
+ "kaj_tree_leaf_aaa1_5": {
+  "Textures": {
+   "g_AlbedoMap": "7175df44"
+  }
+ },
+ "lowbuildingmodel_aaax_tga2": {
+  "Textures": {
+   "g_AlbedoMap": "23254335"
+  }
+ },
+ "Ground1": {
+  "Textures": {
+   "g_AlbedoMap": "36157998"
+  }
+ }
+}

@@ -54,6 +54,10 @@ private:
 	vector<uint32> m_LodBand1;   // LOD1 메시
 	vector<uint32> m_LodBand2;   // LOD2 메시 + LOD2가 없는 그룹의 LOD1 메시
 	uint32 m_LodBand{ 0 };       // 0 = 원본, 1 = LOD1, 2 = LOD2
+	/* 히스테리시스는 같은 카메라로 이어질 때만 뜻이 있다. Editor는 View마다 메인 카메라를
+	   바꿔 끼우므로(EditorManager.cpp:969, :982) 어느 카메라의 밴드인지 같이 들고 있어야
+	   한 View가 다른 View의 밴드를 물려받지 않는다. 식별용이며 역참조하지 않는다. */
+	const class Camera* m_LodBandCamera{ nullptr };
 	Shared<Navigation> m_Navigation{ nullptr };
 	Shared<WorldCollider> m_WorldCollider{ nullptr };
 

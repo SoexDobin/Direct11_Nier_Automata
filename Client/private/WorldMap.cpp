@@ -21,6 +21,14 @@ namespace
 	// 경계에서 매 프레임 뒤집히지 않게 하는 폭.
 	constexpr Float LOD_HYSTERESIS{ 0.10f };
 
+	/// 이력 없이 겉보기 크기만으로 고르는 기본 판정.
+	uint32 Band_From_Size(Float size)
+	{
+		if (size >= LOD_RATE_LEAVE_LOD0 * LOD_RATE_SCALE) return 0;
+		if (size >= LOD_RATE_LEAVE_LOD1 * LOD_RATE_SCALE) return 1;
+		return 2;
+	}
+
 	/// "LOD1_<이름>-LOD1.003"과 "g11021_build1-LOD1.002" 두 표기를 모두 받는다.
 	uint32 Parse_LodLevel(const string& name)
 	{
@@ -226,8 +234,10 @@ void WorldMap::Ready_LodBands()
 const Shared<Model>& WorldMap::Select_Model()
 {
 	/* Editor는 정지 상태에서 Update를 돌리지 않으면서 렌더는 계속하므로 판정이 Update가 아닌
-	   렌더 경로에 있다. SkyBox::Follow_Camera가 같은 이유로 여기에 있다. Render는 View마다
-	   불리지만 입력이 메인 카메라 하나라 두 View가 같은 LOD를 보고 히스테리시스도 흔들리지 않는다. */
+	   렌더 경로에 있다. SkyBox::Follow_Camera가 같은 이유로 여기에 있다.
+	   Render는 View마다 불리고, Editor는 View마다 메인 카메라를 바꿔 끼운다
+	   (EditorManager.cpp:969, :982). 따라서 밴드는 그 View의 카메라로 판정해야 하고,
+	   히스테리시스는 같은 카메라로 이어질 때만 적용한다. */
 	if (!m_LodResolved)
 	{
 		m_LodResolved = true;
@@ -287,23 +297,34 @@ const Shared<Model>& WorldMap::Select_Model()
 		const Float leave0 = LOD_RATE_LEAVE_LOD0 * LOD_RATE_SCALE;
 		const Float leave1 = LOD_RATE_LEAVE_LOD1 * LOD_RATE_SCALE;
 
-		switch (m_LodBand)
+		if (camera.get() != m_LodBandCamera)
 		{
-		case 0:
-			if (size < leave0 * (1.f - LOD_HYSTERESIS)) m_LodBand = 1;
-			break;
-		case 1:
-			if (size < leave1 * (1.f - LOD_HYSTERESIS)) m_LodBand = 2;
-			else if (size > leave0 * (1.f + LOD_HYSTERESIS)) m_LodBand = 0;
-			break;
-		default:
-			if (size > leave1 * (1.f + LOD_HYSTERESIS)) m_LodBand = 1;
-			break;
+			/* 다른 View다. 이전 밴드를 이어받으면 한 번에 한 단계씩만 움직이는 탓에
+			   Game View가 밀어놓은 밴드에서 못 빠져나온다. 이 카메라 기준으로 새로 판정한다. */
+			m_LodBand = Band_From_Size(size);
+			m_LodBandCamera = camera.get();
+		}
+		else
+		{
+			switch (m_LodBand)
+			{
+			case 0:
+				if (size < leave0 * (1.f - LOD_HYSTERESIS)) m_LodBand = 1;
+				break;
+			case 1:
+				if (size < leave1 * (1.f - LOD_HYSTERESIS)) m_LodBand = 2;
+				else if (size > leave0 * (1.f + LOD_HYSTERESIS)) m_LodBand = 0;
+				break;
+			default:
+				if (size > leave1 * (1.f + LOD_HYSTERESIS)) m_LodBand = 1;
+				break;
+			}
 		}
 
 		// LOD2가 아예 없는 타일은 밴드2로 내려가도 볼 게 없으므로 밴드1에 머문다.
 		if (m_LodBand == 2 && m_LodBand2.empty())
 			m_LodBand = 1;
+
 
 	}
 

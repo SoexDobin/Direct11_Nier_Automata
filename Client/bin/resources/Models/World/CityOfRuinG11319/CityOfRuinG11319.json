@@ -4658,57 +4658,156 @@
         {
             "materialIndex": 1,
             "name": "DRY_yo_asphalt_01",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/277C0B89.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/0E4D6DE2.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 2,
             "name": "DRY_yo_road1_texa",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/27AC617B.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/6F939F08.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 3,
             "name": "DRY_yo_road1_texb",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/213813D5.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/6907EDA6.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 4,
             "name": "Material0130",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/5FD465FE.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/76E50395.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 5,
             "name": "WET_kajirock_01",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/710B2837.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/269C7303.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 6,
             "name": "kaj_ground_leerdead_01_aaa7",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/69E9894D.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/47157233.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 7,
             "name": "DRY_yo_road1_damage_a",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/0466BAA6.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/4C5944D5.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 8,
             "name": "Material0129",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/5FD465FE.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/76E50395.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 9,
             "name": "_kajirock_06_diffuse_8k_aaax2",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/46EB7423.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/060E0F48.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 10,
             "name": "DRY_yo_road1_texc",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/6A64C070.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/225B3E03.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 11,
             "name": "DRY_yo_road1_texd",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/786109FC.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/3F5E0EBB.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 12,
@@ -4811,7 +4910,16 @@
         {
             "materialIndex": 19,
             "name": "Material017",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/2EE78788.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/66D879FB.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 20,
@@ -4886,7 +4994,16 @@
         {
             "materialIndex": 25,
             "name": "yam_build01_aaax1",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/20339D81.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/680C63F2.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 26,
@@ -4971,7 +5088,16 @@
         {
             "materialIndex": 32,
             "name": "Material0129_LT1",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/5FD465FE.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/76E50395.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 33,
@@ -4994,42 +5120,114 @@
         {
             "materialIndex": 34,
             "name": "metal_plate1",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/02FBE309.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/4AC41D7A.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 35,
             "name": "yam_build02_aaax_tga2",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/26A7EF2F.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/6E98115C.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 36,
             "name": "Material018",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/2BA29A68.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/639D641B.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 37,
             "name": "Material019",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/2D36E8C6.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/650916B5.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 38,
             "name": "Material020",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/78403D04.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/307FC377.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 39,
             "name": "Material022",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/33E2B730.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/7BDD4943.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 40,
             "name": "kaj_fartree_06_aaa1_dds4",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/7A914490.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/77B669AB.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 41,
             "name": "WET_ground_grass",
-            "textures": []
+            "textures": [
+                {
+                    "path": "Textures/5B9FFB4B.dds",
+                    "type": 1
+                },
+                {
+                    "path": "Textures/72AE9D20.dds",
+                    "type": 6
+                }
+            ]
         },
         {
             "materialIndex": 42,

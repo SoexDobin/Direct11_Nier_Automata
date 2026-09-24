@@ -128,24 +128,30 @@ HRESULT WorldMap::Render()
 		return E_FAIL;
 
 	const Shared<Model>& model = Select_Model();
-	/* 밴드0은 원본 모델 전체, 밴드1·2는 _LOD.model에서 그 레벨에 속한 메시만 그린다.
+	/* 밴드0은 원본 모델 전체다. 밴드1·2는 _LOD.model에서 그 레벨에 속한 메시와, LOD 판이 없어
+	   원본으로 남는 메시(m_LodKeepOriginal)를 함께 그린다.
 	   참조 대신 포인터를 쓰는 이유는 nullptr로 "전체"를 표현하면서 벡터 복사를 피하기 위해서다. */
 	const vector<uint32>* meshOrder = nullptr;
 	if (m_LodBand == 1) meshOrder = &m_LodBand1;
 	else if (m_LodBand == 2) meshOrder = &m_LodBand2;
+	const vector<uint32>* keepOrder = meshOrder ? &m_LodKeepOriginal : nullptr;
 
-	const uint32 numMeshes = meshOrder ?
-		static_cast<uint32>(meshOrder->size()) : static_cast<uint32>(model->Get_NumMeshes());
+	const uint32 numMeshes = (meshOrder ?
+		static_cast<uint32>(meshOrder->size()) : static_cast<uint32>(model->Get_NumMeshes())) +
+		(keepOrder ? static_cast<uint32>(keepOrder->size()) : 0u);
 	const Bool culling = GAME_INSTANCE->Get_FrustumCulling();
 	const Matrix worldMatrix = m_Transform->Get_WorldMatrix();
 
-	// 타일이 통째로 화면 밖이면 메시를 하나도 보지 않는다.
+	// 타일이 통째로 화면 밖이면 메시를 하나도 보지 않는다. 밴드1·2는 원본 메시도 섞이므로 원본 상자로 본다.
 	if (culling)
 	{
 		BoundingBox tileLocal{};
 		BoundingBox tileWorld{};
-		if (model->Compute_LocalBounds(tileLocal))
+		if (m_Model->Compute_LocalBounds(tileLocal))
 		{
+			BoundingBox lodLocal{};
+			if (meshOrder && model->Compute_LocalBounds(lodLocal))
+				BoundingBox::CreateMerged(tileLocal, tileLocal, lodLocal);
 			tileLocal.Transform(tileWorld, worldMatrix);
 			if (!GAME_INSTANCE->Is_Visible(tileWorld))
 			{
@@ -156,38 +162,48 @@ HRESULT WorldMap::Render()
 		}
 	}
 
-	for (uint32 k = 0; k < numMeshes; ++k)
+	const auto renderMeshes = [&](const Shared<Model>& target, const vector<uint32>* order) -> HRESULT
 	{
-		const uint32 i = meshOrder ? (*meshOrder)[k] : k;
-
-		if (culling)
+		const uint32 count = order ?
+			static_cast<uint32>(order->size()) : static_cast<uint32>(target->Get_NumMeshes());
+		for (uint32 k = 0; k < count; ++k)
 		{
-			BoundingBox meshLocal{};
-			BoundingBox meshWorld{};
-			if (model->Get_MeshLocalBounds(i, meshLocal))
+			const uint32 i = order ? (*order)[k] : k;
+
+			if (culling)
 			{
-				meshLocal.Transform(meshWorld, worldMatrix);
-				if (!GAME_INSTANCE->Is_Visible(meshWorld))
+				BoundingBox meshLocal{};
+				BoundingBox meshWorld{};
+				if (target->Get_MeshLocalBounds(i, meshLocal))
 				{
-					GAME_INSTANCE->Add_CulledMesh();
-					continue;
+					meshLocal.Transform(meshWorld, worldMatrix);
+					if (!GAME_INSTANCE->Is_Visible(meshWorld))
+					{
+						GAME_INSTANCE->Add_CulledMesh();
+						continue;
+					}
 				}
 			}
+
+			if (FAILED(target->BindAndBeginMaterial(m_Shader, i)))
+				return E_FAIL;
+
+			if (FAILED(target->Render(i))) return E_FAIL;
 		}
+		return S_OK;
+	};
 
-		if (FAILED(model->BindAndBeginMaterial(m_Shader, i)))
-			return E_FAIL;
+	if (keepOrder && FAILED(renderMeshes(m_Model, keepOrder)))
+		return E_FAIL;
 
-		if (FAILED(model->Render(i))) return E_FAIL;
-	}
-
-	return S_OK;
+	return renderMeshes(model, meshOrder);
 }
 
 void WorldMap::Ready_LodBands()
 {
 	m_LodBand1.clear();
 	m_LodBand2.clear();
+	m_LodKeepOriginal.clear();
 	if (nullptr == m_LodModel)
 		return;
 
@@ -228,6 +244,20 @@ void WorldMap::Ready_LodBands()
 			m_LodBand1.push_back(i);
 			m_LodBand2.push_back(i);
 		}
+	}
+
+	/* LOD 판이 있는 그룹만 교체 대상이다. 지면(g11319_ground, GROUND_11220 등)처럼 _LOD.model에
+	   같은 그룹이 없는 원본 메시까지 빼면 먼 타일에서 땅이 사라지고 건물만 떠 보인다. */
+	const std::set<string> lodGroups(groups.begin(), groups.end());
+	const uint32 numOriginal = m_Model->Get_NumMeshes();
+	for (uint32 i = 0; i < numOriginal; ++i)
+	{
+		string meshName{};
+		uint32 materialIndex{};
+		if (FAILED(m_Model->Get_MeshMaterialInfo(i, meshName, materialIndex)))
+			continue;
+		if (!lodGroups.contains(Strip_LodDecoration(meshName)))
+			m_LodKeepOriginal.push_back(i);
 	}
 }
 

@@ -17,19 +17,11 @@ public:
   uint32 Get_LayerBits() const { return m_LayerMask; }
 
 public:
-	// 프러스텀 컬링 스위치. 기본은 켜짐이고 Debug에서 전후 비교용으로만 끈다.
+	// 프러스텀 컬링·월드 타일 LOD 스위치. 기본은 켜짐이고 전후 FPS 비교용으로 끈다.
 	Bool Toggle_FrustumCulling() { m_FrustumCulling = !m_FrustumCulling; return m_FrustumCulling; }
 	Bool Get_FrustumCulling() const { return m_FrustumCulling; }
-	// 컬링으로 건너뛴 메시 수. draw 통계와 같은 주기로 넘어간다.
-	void Add_CulledMesh() { ++m_CulledCount; }
-	uint32 Get_FrameCulledCount() const { return m_LastCulledCount; }
-
-	// 월드 타일 LOD 스위치. 컬링과 같은 이유로 기본은 켜짐이고 전후 비교용으로만 끈다.
 	Bool Toggle_WorldLod() { m_WorldLod = !m_WorldLod; return m_WorldLod; }
 	Bool Get_WorldLod() const { return m_WorldLod; }
-	// LOD 메시로 그린 타일 수. 컬링 카운터와 같은 주기로 넘어간다.
-	void Add_LodTile() { ++m_LodTileCount; }
-	uint32 Get_FrameLodTileCount() const { return m_LastLodTileCount; }
 
 public:
 	void Add_RenderGroup(RENDERGROUP renderGroup, const Shared<GameObject> &gameObject);
@@ -56,11 +48,7 @@ private:
 	array<vector<Shared<GameObject>>, ETOI(RENDERGROUP::END)> m_RenderGroup;
 	uint32 m_LayerMask = {ETOI(LAYER::ALL_LAYER)};
 	Bool m_FrustumCulling{ true };
-	uint32 m_CulledCount{};
-	uint32 m_LastCulledCount{};
 	Bool m_WorldLod{ true };
-	uint32 m_LodTileCount{};
-	uint32 m_LastLodTileCount{};
 
 private: /* For DefShader */
 	Matrix m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
@@ -80,6 +68,11 @@ public:
 	void Add_DrawStats(uint32 triangleCount) { ++m_DrawCount; m_TriangleCount += triangleCount; }
 	uint32 Get_FrameDrawCount() const { return m_LastDrawCount; }
 	uint64_t Get_FrameTriangleCount() const { return m_LastTriangleCount; }
+	// 컬링으로 건너뛴 메시 수와 LOD 메시로 그린 타일 수. draw 통계와 같은 주기로 넘어간다.
+	void Add_CulledMesh() { ++m_CulledCount; }
+	uint32 Get_FrameCulledCount() const { return m_LastCulledCount; }
+	void Add_LodTile() { ++m_LodTileCount; }
+	uint32 Get_FrameLodTileCount() const { return m_LastLodTileCount; }
 
 private:
 	void Render_Debug();
@@ -89,6 +82,8 @@ private:
 
 	uint32 m_DrawCount{}, m_LastDrawCount{};
 	uint64_t m_TriangleCount{}, m_LastTriangleCount{};
+	uint32 m_CulledCount{}, m_LastCulledCount{};
+	uint32 m_LodTileCount{}, m_LastLodTileCount{};
 #endif
 };
 

@@ -39,8 +39,7 @@ public:
 	void Update_Pipeline();
 
 public:
-	// 현재 View의 월드 공간 프러스텀. Update_Pipeline이 View마다 다시 만든다.
-	const BoundingFrustum& Get_Frustum() const { return m_Frustum; }
+	// 현재 View의 월드 공간 프러스텀과 겹치는지 본다. 프러스텀은 Update_Pipeline이 View마다 다시 만든다.
 	Bool Is_Visible(const BoundingBox& worldBounds) const;
 
 private:

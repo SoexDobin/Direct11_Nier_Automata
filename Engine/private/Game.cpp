@@ -569,6 +569,14 @@ void Game::Add_RenderGroup(RENDERGROUP group, const Shared<GameObject> &gameObje
 	m_Renderer->Add_RenderGroup(group, gameObject);
 }
 
+Bool Game::Toggle_FrustumCulling() const { return m_Renderer->Toggle_FrustumCulling(); }
+
+Bool Game::Get_FrustumCulling() const { return m_Renderer->Get_FrustumCulling(); }
+
+Bool Game::Toggle_WorldLod() const { return m_Renderer->Toggle_WorldLod(); }
+
+Bool Game::Get_WorldLod() const { return m_Renderer->Get_WorldLod(); }
+
 HRESULT Game::Bind_CameraPosition(const Shared<Shader> &shader,
                                   const Char *constantName) const {
 	return m_Pipeline->Bind_CameraPosition(shader, constantName);
@@ -603,6 +611,8 @@ void Game::Set_Transform(D3DTS transformState, Matrix transformStateMatrix) {
 }
 
 void Game::Update_Pipeline() const { m_Pipeline->Update_Pipeline(); }
+
+Bool Game::Is_Visible(const BoundingBox& worldBounds) const { return m_Pipeline->Is_Visible(worldBounds); }
 
 const LIGHT_DESC *Game::Get_LightDesc(uint32 index) const {
   return m_LightManager->Get_LightDesc(index);
@@ -1202,21 +1212,6 @@ Bool Game::Get_RenderTargetDebug() const
     return m_Renderer->Get_RenderTargetDebug();
 }
 
-Bool Game::Toggle_FrustumCulling() const
-{
-    return m_Renderer->Toggle_FrustumCulling();
-}
-
-Bool Game::Get_FrustumCulling() const
-{
-    return m_Renderer->Get_FrustumCulling();
-}
-
-Bool Game::Is_Visible(const BoundingBox& worldBounds) const
-{
-    return m_Pipeline->Is_Visible(worldBounds);
-}
-
 void Game::Add_CulledMesh() const
 {
     m_Renderer->Add_CulledMesh();
@@ -1225,16 +1220,6 @@ void Game::Add_CulledMesh() const
 uint32 Game::Get_FrameCulledCount() const
 {
     return m_Renderer->Get_FrameCulledCount();
-}
-
-Bool Game::Toggle_WorldLod() const
-{
-    return m_Renderer->Toggle_WorldLod();
-}
-
-Bool Game::Get_WorldLod() const
-{
-    return m_Renderer->Get_WorldLod();
 }
 
 void Game::Add_LodTile() const

@@ -77,7 +77,7 @@ void MainApp::Update()
 {
 	GAME_INSTANCE->Update_Engine();
 
-#ifdef _DEBUG
+	// F7 프레임 표시, F8 컬링, F9 LOD. 켜고 끈 FPS 차이를 Release에서도 보일 수 있게 둔다.
 	const Bool currF7 = (GAME_INSTANCE->Get_DIKeyState(DIK_F7) & 0x80) != 0;
 	if (currF7 && !m_PrevF7)
 		m_ShowFrameStats = !m_ShowFrameStats;
@@ -98,6 +98,8 @@ void MainApp::Update()
 	if (m_StatsTime < 1.f)
 		return;
 
+#ifdef _DEBUG
+	// Debug는 draw·삼각형·컬링·LOD 카운터까지 붙인다.
 	swprintf_s(m_StatsText, L"%.0f FPS  %.2f ms  |  %u draws  %.2fM tris  |  cull %s %u  |  lod %s %u",
 		m_StatsFrames / m_StatsTime, m_StatsTime * 1000.f / m_StatsFrames,
 		GAME_INSTANCE->Get_FrameDrawCount(),
@@ -106,9 +108,14 @@ void MainApp::Update()
 		GAME_INSTANCE->Get_FrameCulledCount(),
 		GAME_INSTANCE->Get_WorldLod() ? L"on" : L"off",
 		GAME_INSTANCE->Get_FrameLodTileCount());
+#else
+	swprintf_s(m_StatsText, L"%.0f FPS  %.2f ms  |  cull %s  |  lod %s",
+		m_StatsFrames / m_StatsTime, m_StatsTime * 1000.f / m_StatsFrames,
+		GAME_INSTANCE->Get_FrustumCulling() ? L"on" : L"off",
+		GAME_INSTANCE->Get_WorldLod() ? L"on" : L"off");
+#endif
 	m_StatsTime = 0.f;
 	m_StatsFrames = 0;
-#endif
 }
 
 void MainApp::Render()
@@ -123,11 +130,9 @@ void MainApp::Render()
 		MSG_BOX("MainApp Rendering Failed");
 	}
 
-#ifdef _DEBUG
 	if (m_ShowFrameStats)
 		GAME_INSTANCE->Draw_Font(L"Nier_16", m_StatsText,
 			Vector2(static_cast<Float>(g_EngineDesc.viewportWidth) - 520.f, 10.f));
-#endif
 
 	GAME_INSTANCE->Present();
 }

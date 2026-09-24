@@ -16,16 +16,14 @@ namespace
 	   LOD3이 아니라 가시성 한계이고, 우리 타일 반경에서는 far plane 밖이라 쓰지 않는다. */
 	constexpr Float LOD_RATE_LEAVE_LOD0{ 0.70f };
 	constexpr Float LOD_RATE_LEAVE_LOD1{ 0.35f };
-	// 잠정 배율. 원작 전환 공식이 밝혀지면 이 상수만 걷어내면 된다.
-	constexpr Float LOD_RATE_SCALE{ 1.0f };
 	// 경계에서 매 프레임 뒤집히지 않게 하는 폭.
 	constexpr Float LOD_HYSTERESIS{ 0.10f };
 
 	/// 이력 없이 겉보기 크기만으로 고르는 기본 판정.
 	uint32 Band_From_Size(Float size)
 	{
-		if (size >= LOD_RATE_LEAVE_LOD0 * LOD_RATE_SCALE) return 0;
-		if (size >= LOD_RATE_LEAVE_LOD1 * LOD_RATE_SCALE) return 1;
+		if (size >= LOD_RATE_LEAVE_LOD0) return 0;
+		if (size >= LOD_RATE_LEAVE_LOD1) return 1;
 		return 2;
 	}
 
@@ -140,19 +138,17 @@ HRESULT WorldMap::Render()
 	const Matrix worldMatrix = m_Transform->Get_WorldMatrix();
 
 	// 타일이 통째로 화면 밖이면 메시를 하나도 보지 않는다.
-	if (culling)
+	if (culling && (0 != m_LodBand || m_HasModelBounds))
 	{
-		BoundingBox tileLocal{};
 		BoundingBox tileWorld{};
-		if (model->Compute_LocalBounds(tileLocal))
+		(0 != m_LodBand ? m_LodBounds : m_ModelBounds).Transform(tileWorld, worldMatrix);
+		if (!GAME_INSTANCE->Is_Visible(tileWorld))
 		{
-			tileLocal.Transform(tileWorld, worldMatrix);
-			if (!GAME_INSTANCE->Is_Visible(tileWorld))
-			{
-				for (uint32 i = 0; i < numMeshes; ++i)
-					GAME_INSTANCE->Add_CulledMesh();
-				return S_OK;
-			}
+#ifdef _DEBUG
+			for (uint32 i = 0; i < numMeshes; ++i)
+				GAME_INSTANCE->Add_CulledMesh();
+#endif
+			return S_OK;
 		}
 	}
 
@@ -169,7 +165,9 @@ HRESULT WorldMap::Render()
 				meshLocal.Transform(meshWorld, worldMatrix);
 				if (!GAME_INSTANCE->Is_Visible(meshWorld))
 				{
+#ifdef _DEBUG
 					GAME_INSTANCE->Add_CulledMesh();
+#endif
 					continue;
 				}
 			}
@@ -241,6 +239,8 @@ const Shared<Model>& WorldMap::Select_Model()
 	if (!m_LodResolved)
 	{
 		m_LodResolved = true;
+		// 정적 타일의 상자는 로드 뒤 바뀌지 않으므로 LOD 모델을 잡을 때 한 번만 구한다.
+		m_HasModelBounds = m_Model && m_Model->Compute_LocalBounds(m_ModelBounds);
 
 		if (m_Model && !m_Model->Get_ModelTag().empty())
 		{
@@ -257,6 +257,9 @@ const Shared<Model>& WorldMap::Select_Model()
 					LOG_WARN(L"[WorldMap] LOD model {} failed material validation; LOD disabled", lodTag);
 					m_LodModel = nullptr;
 				}
+				// 지오메트리가 없는 LOD 모델은 거리도 잴 수 없고 그릴 것도 없다.
+				if (m_LodModel && !m_LodModel->Compute_LocalBounds(m_LodBounds))
+					m_LodModel = nullptr;
 			}
 		}
 
@@ -273,11 +276,10 @@ const Shared<Model>& WorldMap::Select_Model()
 	/* 원본 모델 상자는 타일 밖 물체까지 품는다. G11319의 g11420_dummybuild는 214 떨어진
 	   이웃 타일 위에, G11121의 enkei 판은 수천 밖에 있어 카메라가 이웃 타일로 가도 상자 안에
 	   남아 LOD0에 머문다. 바꿔 그릴 대상인 LOD 모델의 상자로 잰다. */
-	BoundingBox tileLocal{};
-	if (camera && camera->Get_Transform() && m_LodModel->Compute_LocalBounds(tileLocal))
+	if (camera && camera->Get_Transform())
 	{
 		BoundingBox tileWorld{};
-		tileLocal.Transform(tileWorld, m_Transform->Get_WorldMatrix());
+		m_LodBounds.Transform(tileWorld, m_Transform->Get_WorldMatrix());
 
 		const Vector3 center{ tileWorld.Center };
 		const Vector3 extents{ tileWorld.Extents };
@@ -297,8 +299,6 @@ const Shared<Model>& WorldMap::Select_Model()
 
 		// 겉보기 크기. 가까울수록 커진다.
 		const Float size = distance > 0.f ? radius / distance : FLT_MAX;
-		const Float leave0 = LOD_RATE_LEAVE_LOD0 * LOD_RATE_SCALE;
-		const Float leave1 = LOD_RATE_LEAVE_LOD1 * LOD_RATE_SCALE;
 
 		if (camera.get() != m_LodBandCamera)
 		{
@@ -312,14 +312,14 @@ const Shared<Model>& WorldMap::Select_Model()
 			switch (m_LodBand)
 			{
 			case 0:
-				if (size < leave0 * (1.f - LOD_HYSTERESIS)) m_LodBand = 1;
+				if (size < LOD_RATE_LEAVE_LOD0 * (1.f - LOD_HYSTERESIS)) m_LodBand = 1;
 				break;
 			case 1:
-				if (size < leave1 * (1.f - LOD_HYSTERESIS)) m_LodBand = 2;
-				else if (size > leave0 * (1.f + LOD_HYSTERESIS)) m_LodBand = 0;
+				if (size < LOD_RATE_LEAVE_LOD1 * (1.f - LOD_HYSTERESIS)) m_LodBand = 2;
+				else if (size > LOD_RATE_LEAVE_LOD0 * (1.f + LOD_HYSTERESIS)) m_LodBand = 0;
 				break;
 			default:
-				if (size > leave1 * (1.f + LOD_HYSTERESIS)) m_LodBand = 1;
+				if (size > LOD_RATE_LEAVE_LOD1 * (1.f + LOD_HYSTERESIS)) m_LodBand = 1;
 				break;
 			}
 		}
@@ -327,13 +327,13 @@ const Shared<Model>& WorldMap::Select_Model()
 		// LOD2가 아예 없는 타일은 밴드2로 내려가도 볼 게 없으므로 밴드1에 머문다.
 		if (m_LodBand == 2 && m_LodBand2.empty())
 			m_LodBand = 1;
-
-
 	}
 
 	if (m_LodBand != 0)
 	{
+#ifdef _DEBUG
 		GAME_INSTANCE->Add_LodTile();
+#endif
 		return m_LodModel;
 	}
 

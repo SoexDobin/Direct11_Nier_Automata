@@ -191,6 +191,11 @@ public: /* For ResourceManager */
 
 public: /* For Renderer */
 	void Add_RenderGroup(RENDERGROUP group, const Shared<class GameObject> &gameObject) const;
+    // 프러스텀 컬링·월드 LOD 스위치. Release에서도 켜고 끌 수 있어야 FPS 차이를 보일 수 있다.
+    Bool Toggle_FrustumCulling() const;
+    Bool Get_FrustumCulling() const;
+    Bool Toggle_WorldLod() const;
+    Bool Get_WorldLod() const;
 
 public: /* For Pipeline */
     HRESULT Bind_CameraPosition(const Shared<class Shader> &shader,
@@ -205,6 +210,7 @@ public: /* For Pipeline */
     Vector4 Get_CamTransform() const;
     void Set_Transform(D3DTS transformState, Matrix transformStateMatrix);
     void Update_Pipeline() const;
+    Bool Is_Visible(const BoundingBox& worldBounds) const;
 
 public: /* For.LightManager */
     const LIGHT_DESC *Get_LightDesc(uint32 index) const;
@@ -386,13 +392,8 @@ public:
     Bool Get_RenderDebug() const;
     Bool Toggle_RenderTargetDebug() const;
     Bool Get_RenderTargetDebug() const;
-    Bool Toggle_FrustumCulling() const;
-    Bool Get_FrustumCulling() const;
-    Bool Is_Visible(const BoundingBox& worldBounds) const;
     void Add_CulledMesh() const;
     uint32 Get_FrameCulledCount() const;
-    Bool Toggle_WorldLod() const;
-    Bool Get_WorldLod() const;
     void Add_LodTile() const;
     uint32 Get_FrameLodTileCount() const;
     void Add_DrawStats(uint32 triangleCount) const;

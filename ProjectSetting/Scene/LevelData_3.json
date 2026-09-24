@@ -465,6 +465,136 @@
       },
       "typeName": "WP0070Body"
     },
+    "1e5e4741037f4c05a3af3012ed47a957": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              300.0,
+              0.0,
+              173.2050018310547
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinG11219"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        }
+      ],
+      "name": "WorldMap_5",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          300.0,
+          0.0,
+          173.2050018310547
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
+    },
+    "1f79f1ea269440a984eb10b15a385859": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              150.0,
+              0.0,
+              -86.60250091552734
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinG11121"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        }
+      ],
+      "name": "WorldMap_4",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          150.0,
+          0.0,
+          -86.60250091552734
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
+    },
     "32438e1ec3a54b99adfa0afa36f591a2": {
       "children": [],
       "components": [
@@ -501,11 +631,11 @@
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         }
       ],
       "name": "WorldMap_2",
@@ -566,11 +696,11 @@
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         }
       ],
       "name": "WorldMap_1_1",
@@ -632,11 +762,11 @@
         },
         {
           "properties": {},
-          "typeName": "VIBuffer_Rect"
+          "typeName": "Shader"
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "VIBuffer_Rect"
         }
       ],
       "name": "Phase6_HpBar",
@@ -762,11 +892,11 @@
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         }
       ],
       "name": "WorldMap",
@@ -777,6 +907,71 @@
           0.0,
           0.0,
           0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
+    },
+    "50390167a77c42cf838420058f6a3e26": {
+      "children": [],
+      "components": [
+        {
+          "properties": {
+            "Position": [
+              450.0,
+              0.0,
+              -86.60250091552734
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
+        {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinG11320"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        }
+      ],
+      "name": "WorldMap_6",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          450.0,
+          0.0,
+          -86.60250091552734
         ],
         "rotation": [
           -0.0,
@@ -812,7 +1007,7 @@
             ],
             "Rotation": [
               -0.0,
-              55.54119873046875,
+              55.541194915771484,
               0.0
             ],
             "Scale": [
@@ -846,7 +1041,7 @@
         ],
         "rotation": [
           -0.0,
-          55.54119873046875,
+          55.541194915771484,
           0.0
         ],
         "scale": [
@@ -893,11 +1088,11 @@
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         }
       ],
       "name": "WorldMap_3",
@@ -1015,11 +1210,11 @@
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         }
       ],
       "name": "WorldMap_1",
@@ -5896,9 +6091,9 @@
         {
           "properties": {
             "Position": [
-              0.0,
-              10.0,
-              -10.0
+              398.34527587890625,
+              104.83760070800781,
+              -18.966073989868164
             ],
             "Rotation": [
               -0.0,
@@ -5939,9 +6134,9 @@
       "stableChildKey": "",
       "transform": {
         "position": [
-          0.0,
-          10.0,
-          -10.0
+          398.34527587890625,
+          104.83760070800781,
+          -18.966073989868164
         ],
         "rotation": [
           -0.0,
@@ -6312,9 +6507,9 @@
               -45.573219299316406
             ],
             "Rotation": [
-              -2.4928090572357178,
-              55.54120635986328,
-              1.0682278883678009e-07
+              -2.4928081035614014,
+              55.5411376953125,
+              0.0
             ],
             "Scale": [
               1.0,
@@ -6337,9 +6532,9 @@
           -45.573219299316406
         ],
         "rotation": [
-          -2.4928090572357178,
-          55.54120635986328,
-          1.0682278883678009e-07
+          -2.4928081035614014,
+          55.5411376953125,
+          0.0
         ],
         "scale": [
           1.0,
@@ -7503,9 +7698,12 @@
     }
   },
   "roots": [
+    "1e5e4741037f4c05a3af3012ed47a957",
+    "1f79f1ea269440a984eb10b15a385859",
     "32438e1ec3a54b99adfa0afa36f591a2",
     "3d127efb65fa4041af0df7c822a78370",
     "4c2b302f04ba42f989b568c5475ed4f5",
+    "50390167a77c42cf838420058f6a3e26",
     "594c14c4acc543379a88f5f1c103c6e7",
     "617ee45639994f93b96ef9d6719695f3",
     "718b32868dbe4d88a7b06b68e7b5b1ac",

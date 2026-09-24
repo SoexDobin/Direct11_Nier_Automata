@@ -109,7 +109,7 @@ void WP3000Body::Late_Update(Float timeDelta)
 	
 	Vector3 targetOffset = m_TargetOffset;
 	targetOffset.y += hoverOffset;
-	m_Transform->Set_Position(targetOffset);
+	m_Transform->Set_LocalPosition(targetOffset);
 	
 	m_Transform->Update_WorldMatrix();
 	

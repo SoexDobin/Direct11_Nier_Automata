@@ -46,8 +46,6 @@ HRESULT SheathWP0220Body::Initialize(void* arg)
 		Matrix::CreateRotationZ(XMConvertToRadians(-25.f)) *
 		Matrix::CreateTranslation(Vector3{ 0.f, 1.5f, -0.65f });
 
-	m_Transform->Set_WorldMatrix(m_HeavySheathMatrix);
-
 	return S_OK;
 }
 
@@ -66,7 +64,8 @@ void SheathWP0220Body::Update(Float timeDelta)
 
 void SheathWP0220Body::Late_Update(Float timeDelta)
 {
-	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
+	m_Transform->Update_WorldMatrix();
+	Update_CombineWorldMatrix(m_HeavySheathMatrix * *m_Transform->Get_WorldMatrixPtr());
 	m_Model->Update_ModelAnimation(timeDelta);
 }
 

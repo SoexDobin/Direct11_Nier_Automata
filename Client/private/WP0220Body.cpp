@@ -81,6 +81,7 @@ void WP0220Body::Update(Float timeDelta)
 
 void WP0220Body::Late_Update(Float timeDelta)
 {
+	m_Transform->Update_WorldMatrix();
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 	
 	Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);

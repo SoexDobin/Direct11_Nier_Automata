@@ -129,6 +129,7 @@ void WP0070Body::Late_Update(Float timeDelta)
 		return;
 	}
 
+	m_Transform->Update_WorldMatrix();
 	Update_CombineWorldMatrix(*m_Transform->Get_WorldMatrixPtr());
 	Matrix boneMatrix = m_Model->Get_BoneMatrix(m_WeaponBoneIndex);
 	m_AttackCollider->Update(boneMatrix * m_CombinedWorldMatrix);

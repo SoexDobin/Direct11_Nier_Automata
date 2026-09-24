@@ -462,6 +462,66 @@
       },
       {
          "level": "3",
+         "path": "Models/World/CityOfRuinG11419/CityOfRuinG11419.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinG11419"
+      },
+      {
+         "level": "3",
+         "path": "Models/World/CityOfRuinG11419/CityOfRuinG11419_LOD.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinG11419_LOD"
+      },
+      {
+         "level": "3",
+         "path": "Models/World/CityOfRuinG11419/CityOfRuinG11419_COL.model",
+         "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "rotation": {
+            "x": 90.0,
+            "y": 0.0,
+            "z": 0.0
+         },
+         "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+         },
+         "tag": "CityOfRuinG11419_COL"
+      },
+      {
+         "level": "3",
          "path": "Models/World/CityOfRuinG11221/CityOfRuinG11221.model",
          "position": {
             "x": 0.0,

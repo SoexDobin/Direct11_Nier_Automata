@@ -6,10 +6,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               600.0,
@@ -30,6 +26,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinG11417"
@@ -38,11 +38,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinG11417",
@@ -489,10 +489,6 @@
           "typeName": "Model"
         },
         {
-          "properties": {},
-          "typeName": "Shader"
-        },
-        {
           "properties": {
             "Extents": [
               0.07500000298023224,
@@ -506,6 +502,10 @@
             ]
           },
           "typeName": "OBBCollider"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
         }
       ],
       "name": "WP0070Body",
@@ -534,10 +534,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               300.0,
@@ -558,6 +554,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinG11219"
@@ -566,11 +566,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinG11219",
@@ -599,10 +599,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               150.0,
@@ -623,6 +619,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinG11121"
@@ -631,11 +631,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinG11121",
@@ -664,10 +664,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               300.0,
@@ -688,6 +684,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinMainField"
@@ -696,11 +696,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinMainField",
@@ -725,13 +725,74 @@
       },
       "typeName": "WorldMap"
     },
-    "3d127efb65fa4041af0df7c822a78370": {
+    "3cd8649e81284f27a90c94108df4e4b0": {
       "children": [],
       "components": [
+        {
+          "properties": {
+            "Position": [
+              600.0,
+              0.0,
+              0.0
+            ],
+            "Rotation": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "Scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "typeName": "Transform"
+        },
         {
           "properties": {},
           "typeName": "WorldCollider"
         },
+        {
+          "properties": {
+            "AnimationPreset": null,
+            "ModelTag": "CityOfRuinG11419"
+          },
+          "typeName": "Model"
+        },
+        {
+          "properties": {},
+          "typeName": "Navigation"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
+        }
+      ],
+      "name": "CityOfRuinG11419",
+      "properties": {},
+      "stableChildKey": "",
+      "transform": {
+        "position": [
+          600.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          -0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "typeName": "WorldMap"
+    },
+    "3d127efb65fa4041af0df7c822a78370": {
+      "children": [],
+      "components": [
         {
           "properties": {
             "Position": [
@@ -753,6 +814,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinG11319"
@@ -761,11 +826,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinG11319",
@@ -925,10 +990,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               0.0,
@@ -949,6 +1010,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinEntry"
@@ -957,11 +1022,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinEntry",
@@ -990,10 +1055,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               450.0,
@@ -1014,6 +1075,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinG11320"
@@ -1022,11 +1087,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinG11320",
@@ -1121,10 +1186,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               600.0,
@@ -1145,6 +1206,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinManHole"
@@ -1153,11 +1218,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinManHole",
@@ -1243,10 +1308,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               150.0,
@@ -1267,6 +1328,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinBridge"
@@ -1275,11 +1340,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinBridge",
@@ -6220,10 +6285,6 @@
       "children": [],
       "components": [
         {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
-        {
           "properties": {
             "Position": [
               450.0,
@@ -6244,6 +6305,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinG11318"
@@ -6252,11 +6317,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinG11318",
@@ -6637,9 +6702,9 @@
               32.100372314453125
             ],
             "Rotation": [
-              -26.29543113708496,
-              -171.36813354492188,
-              -2.380794370537842e-07
+              -26.295425415039063,
+              -171.3681182861328,
+              2.380794370537842e-07
             ],
             "Scale": [
               1.0,
@@ -6662,9 +6727,9 @@
           32.100372314453125
         ],
         "rotation": [
-          -26.29543113708496,
-          -171.36813354492188,
-          -2.380794370537842e-07
+          -26.295425415039063,
+          -171.3681182861328,
+          2.380794370537842e-07
         ],
         "scale": [
           1.0,
@@ -6677,10 +6742,6 @@
     "c8b204f54d1e48be8eebeaa6c4b27ad5": {
       "children": [],
       "components": [
-        {
-          "properties": {},
-          "typeName": "WorldCollider"
-        },
         {
           "properties": {
             "Position": [
@@ -6702,6 +6763,10 @@
           "typeName": "Transform"
         },
         {
+          "properties": {},
+          "typeName": "WorldCollider"
+        },
+        {
           "properties": {
             "AnimationPreset": null,
             "ModelTag": "CityOfRuinG11221"
@@ -6710,11 +6775,11 @@
         },
         {
           "properties": {},
-          "typeName": "Shader"
+          "typeName": "Navigation"
         },
         {
           "properties": {},
-          "typeName": "Navigation"
+          "typeName": "Shader"
         }
       ],
       "name": "CityOfRuinG11221",
@@ -7850,10 +7915,6 @@
           "typeName": "Model"
         },
         {
-          "properties": {},
-          "typeName": "Shader"
-        },
-        {
           "properties": {
             "Extents": [
               0.25,
@@ -7867,6 +7928,10 @@
             ]
           },
           "typeName": "OBBCollider"
+        },
+        {
+          "properties": {},
+          "typeName": "Shader"
         }
       ],
       "name": "WP0220Body",
@@ -7897,6 +7962,7 @@
     "1e5e4741037f4c05a3af3012ed47a957",
     "1f79f1ea269440a984eb10b15a385859",
     "32438e1ec3a54b99adfa0afa36f591a2",
+    "3cd8649e81284f27a90c94108df4e4b0",
     "3d127efb65fa4041af0df7c822a78370",
     "4c2b302f04ba42f989b568c5475ed4f5",
     "50390167a77c42cf838420058f6a3e26",

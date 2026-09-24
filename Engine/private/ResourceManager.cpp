@@ -273,7 +273,11 @@ int32 ResourceManager::Get_ContainLevelByModelTag(const wstring& tag)
         {
             return m_StaticModelContainLev[tag];
         }
-        LOG_ERROR(L"Model {} is not in such level", tag);
+        /* -1은 이 질의의 정상적인 반환값이다. WorldCollider와 WorldMap은 <태그>_COL / <태그>_LOD가
+           있는지 알아보려고 여기를 부르고, 없는 것이 정상인 자산도 있다. 실패로 취급하는 호출자는
+           (Model.cpp:351, :1395, PhysicsManager.cpp:123) 각자 LOG_ERROR를 남기므로 심각도는
+           호출자가 정한다. 여기서는 사실만 적는다. */
+        LOG_INFO(L"Model {} is not in such level", tag);
         return -1;
     }
 

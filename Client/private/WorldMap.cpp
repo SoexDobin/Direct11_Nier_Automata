@@ -270,8 +270,11 @@ const Shared<Model>& WorldMap::Select_Model()
 	}
 
 	const auto camera = GAME_INSTANCE->Get_MainCamera();
+	/* 원본 모델 상자는 타일 밖 물체까지 품는다. G11319의 g11420_dummybuild는 214 떨어진
+	   이웃 타일 위에, G11121의 enkei 판은 수천 밖에 있어 카메라가 이웃 타일로 가도 상자 안에
+	   남아 LOD0에 머문다. 바꿔 그릴 대상인 LOD 모델의 상자로 잰다. */
 	BoundingBox tileLocal{};
-	if (camera && camera->Get_Transform() && m_Model->Compute_LocalBounds(tileLocal))
+	if (camera && camera->Get_Transform() && m_LodModel->Compute_LocalBounds(tileLocal))
 	{
 		BoundingBox tileWorld{};
 		tileLocal.Transform(tileWorld, m_Transform->Get_WorldMatrix());
